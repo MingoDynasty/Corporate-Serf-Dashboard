@@ -41,8 +41,8 @@ def test_build_scenario_figure_sensitivity_mode_builds_traces(monkeypatch):
 
     assert supports_overlays is True
     assert len(figure.data) == 2
-    assert figure.data[0].name == "Run Data Point"
-    assert figure.data[1].name == "Average Score"
+    assert figure.data[0].name == "Run data point"
+    assert figure.data[1].name == "Average score"
 
 
 def test_build_scenario_figure_fetches_and_applies_playlist_ranks(monkeypatch):
@@ -126,8 +126,8 @@ def test_build_scenario_figure_time_mode_builds_traces(monkeypatch):
 
     assert supports_overlays is True
     assert len(figure.data) == 2
-    assert figure.data[0].name == "Run Data Point"
-    assert figure.data[1].name == "Average Score"
+    assert figure.data[0].name == "Run data point"
+    assert figure.data[1].name == "Average score"
 
 
 def test_build_scenario_figure_sensitivity_mode_empty_range_suppresses_overlays(
@@ -144,6 +144,9 @@ def test_build_scenario_figure_sensitivity_mode_empty_range_suppresses_overlays(
     assert supports_overlays is False
     assert len(figure.data) == 0
     assert home._NO_DATE_RANGE_DATA_PLOT_TITLE in figure.layout.annotations[0].text
+    assert figure.layout.annotations[1].text == (
+        "Choose an older date or play more runs."
+    )
 
 
 def test_build_scenario_figure_time_mode_empty_range_suppresses_overlays(monkeypatch):

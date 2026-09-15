@@ -121,17 +121,18 @@ commands becomes burdensome.
 
 ## UI/UX
 
-### Manual-refresh failure color, and the title it depends on
+### Manual-refresh failure color
 
-`source/pages/home.py` — a hard refresh failure is red and a served-stale
-refresh is yellow, and both are titled "Position refresh failed". Softening the
-red to yellow was raised during the notification redesign and deliberately left
-open: the color is currently the *only* thing separating the two outcomes, so
-softening it without first giving the served-stale toast a title of its own
-makes them nearly indistinguishable, which is worse than leaving red alone.
-Decide the title first; the color follows. Note Mantine suppresses a
-notification's full-height color bar whenever an icon is present, and both of
-these carry one, so the color is a 28 px circle rather than a stripe.
+`source/pages/home.py` — a hard refresh failure is red, titled "Position
+refresh failed", and a served-stale refresh is yellow, titled "Refresh failed ·
+position from cache". Softening the red to yellow was raised during the
+notification redesign and deliberately left open. It used to wait on the
+served-stale toast getting a title of its own, since the color was the only
+thing separating the two outcomes; the app messaging sweep (PR #291) gave it
+one, so the color question can now be decided on its own. Note Mantine
+suppresses a notification's full-height color bar whenever an icon is present,
+and both of these carry one, so the color is a 28 px circle rather than a
+stripe.
 
 ### Watch for `is_scenario_in_database` early-return pattern
 

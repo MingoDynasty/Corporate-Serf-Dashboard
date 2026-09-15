@@ -1,0 +1,447 @@
+{
+  "name": "Aimbeast Ground Advanced",
+  "code": "KovaaKsCrankingJumboEco",
+  "scenarios": [
+    {
+      "name": "SouljahStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 3000.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 3150.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 3300.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 3600.0
+        }
+      ],
+      "leaderboard_id": 203657
+    },
+    {
+      "name": "StelosStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 2650.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 2800.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 2950.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 3250.0
+        }
+      ],
+      "leaderboard_id": 203658
+    },
+    {
+      "name": "VexinStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 2750.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 2900.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 3050.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 3350.0
+        }
+      ],
+      "leaderboard_id": 203651
+    },
+    {
+      "name": "MbmStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 1225.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 1525.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 1675.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 1825.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 1975.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 2125.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 2275.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 2575.0
+        }
+      ],
+      "leaderboard_id": 203654
+    },
+    {
+      "name": "SleepStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 1900.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 2050.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 2200.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 2500.0
+        }
+      ],
+      "leaderboard_id": 203656
+    },
+    {
+      "name": "RobidashkaStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 975.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 1275.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 1350.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 1425.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 1500.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 1575.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 1650.0
+        }
+      ],
+      "leaderboard_id": 203655
+    },
+    {
+      "name": "FlickerStrafes",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#FF4BFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Amethyst_2",
+          "color": "#FF4BFF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Amethyst_3",
+          "color": "#FF4BFF",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Master",
+          "color": "#3EFF59",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Master_2",
+          "color": "#3EFF59",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Master_3",
+          "color": "#3EFF59",
+          "threshold": 3000.0
+        },
+        {
+          "name": "GM",
+          "color": "#FFFF4B",
+          "threshold": 3150.0
+        },
+        {
+          "name": "GM_2",
+          "color": "#FFFF4B",
+          "threshold": 3300.0
+        },
+        {
+          "name": "GM_3",
+          "color": "#FFFF4B",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FCFDAA",
+          "threshold": 3600.0
+        }
+      ],
+      "leaderboard_id": 203652
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrankingJumboEco",
+    "kovaaks_benchmark_id": 2874,
+    "rank_colors": [
+      [
+        "Amethyst",
+        "#FF4BFF"
+      ],
+      [
+        "Amethyst_2",
+        "#FF4BFF"
+      ],
+      [
+        "Amethyst_3",
+        "#FF4BFF"
+      ],
+      [
+        "Master",
+        "#3EFF59"
+      ],
+      [
+        "Master_2",
+        "#3EFF59"
+      ],
+      [
+        "Master_3",
+        "#3EFF59"
+      ],
+      [
+        "GM",
+        "#FFFF4B"
+      ],
+      [
+        "GM_2",
+        "#FFFF4B"
+      ],
+      [
+        "GM_3",
+        "#FFFF4B"
+      ],
+      [
+        "Supreme",
+        "#FCFDAA"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:42.403182+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

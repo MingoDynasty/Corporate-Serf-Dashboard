@@ -44,45 +44,45 @@
       "leaderboard_id": 163285
     },
     {
-      "name": "GliderTrack Newcomer",
+      "name": "Vertical Smoothing 60 Altered Newcomer",
       "ranks": [
         {
           "name": "Penguin",
           "color": "#6B94DF",
-          "threshold": 3070.0
+          "threshold": 3400.0
         },
         {
           "name": "Fox",
           "color": "#5558AA",
-          "threshold": 3140.0
+          "threshold": 3550.0
         },
         {
           "name": "Mammoth",
           "color": "#6E3F98",
-          "threshold": 3210.0
+          "threshold": 3700.0
         },
         {
           "name": "Orca",
           "color": "#C080E4",
-          "threshold": 3280.0
+          "threshold": 3850.0
         },
         {
           "name": "Seal",
           "color": "#F5BDE8",
-          "threshold": 3350.0
+          "threshold": 4000.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 3420.0
+          "threshold": 4150.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 3500.0
+          "threshold": 4300.0
         }
       ],
-      "leaderboard_id": 163302
+      "leaderboard_id": 163300
     },
     {
       "name": "Bipolar Centering 360 Newcomer",
@@ -167,45 +167,45 @@
       "leaderboard_id": 163301
     },
     {
-      "name": "Multi Angle Smoothness Newcomer",
+      "name": "VAI 314 TE Big",
       "ranks": [
         {
           "name": "Penguin",
           "color": "#6B94DF",
-          "threshold": 2400.0
+          "threshold": 1300.0
         },
         {
           "name": "Fox",
           "color": "#5558AA",
-          "threshold": 2600.0
+          "threshold": 1350.0
         },
         {
           "name": "Mammoth",
           "color": "#6E3F98",
-          "threshold": 2800.0
+          "threshold": 1400.0
         },
         {
           "name": "Orca",
           "color": "#C080E4",
-          "threshold": 3000.0
+          "threshold": 1450.0
         },
         {
           "name": "Seal",
           "color": "#F5BDE8",
-          "threshold": 3200.0
+          "threshold": 1500.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 3400.0
+          "threshold": 1550.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 3600.0
+          "threshold": 1600.0
         }
       ],
-      "leaderboard_id": 163291
+      "leaderboard_id": 203158
     },
     {
       "name": "PTXS Newcomer",
@@ -247,6 +247,47 @@
         }
       ],
       "leaderboard_id": 163292
+    },
+    {
+      "name": "GliderTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 3070.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 3140.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3210.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3280.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Cerulean",
+          "color": "#02A4D3",
+          "threshold": 3420.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#C2C2FF",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 163302
     },
     {
       "name": "Smoothsphere Viscose Easier",
@@ -295,22 +336,22 @@
         {
           "name": "Penguin",
           "color": "#6B94DF",
-          "threshold": 4285.0
+          "threshold": 4250.0
         },
         {
           "name": "Fox",
           "color": "#5558AA",
-          "threshold": 4470.0
+          "threshold": 4450.0
         },
         {
           "name": "Mammoth",
           "color": "#6E3F98",
-          "threshold": 4655.0
+          "threshold": 4650.0
         },
         {
           "name": "Orca",
           "color": "#C080E4",
-          "threshold": 4840.0
+          "threshold": 4825.0
         },
         {
           "name": "Seal",
@@ -320,7 +361,7 @@
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 5210.0
+          "threshold": 5200.0
         },
         {
           "name": "Lavender",
@@ -1061,7 +1102,7 @@
         "#C2C2FF"
       ]
     ],
-    "generated_at": "2026-08-09T02:57:04.710885+00:00",
+    "generated_at": "2026-09-14T22:01:29.755008+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

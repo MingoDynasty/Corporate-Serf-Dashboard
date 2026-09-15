@@ -1,0 +1,1150 @@
+{
+  "name": "snakbox Benchmarks Medium",
+  "code": "KovaaKsHipfiringMagentaLurker",
+  "scenarios": [
+    {
+      "name": "1wall5targets_pasu Reload",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 112.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 125.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 137.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 150.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 165.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 190.0
+        }
+      ],
+      "leaderboard_id": 43
+    },
+    {
+      "name": "VT Bounceshot Viscose Medium",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 770.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 850.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 920.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 980.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 1250.0
+        }
+      ],
+      "leaderboard_id": 185237
+    },
+    {
+      "name": "Popcorn MV Intermediate",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 230.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 300.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 350.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 400.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 440.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 480.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 76960
+    },
+    {
+      "name": "VT Floating Heads Novice S5 Hard",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 550.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 620.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 700.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 790.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 880.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 104667
+    },
+    {
+      "name": "psalmTS angelic click 30% Larger",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 55.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 65.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 73.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 81.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 88.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 95.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 120.0
+        }
+      ],
+      "leaderboard_id": 89546
+    },
+    {
+      "name": "Star Clicking 30% Larger",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 40.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 50.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 58.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 65.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 72.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 80.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 105.0
+        }
+      ],
+      "leaderboard_id": 89545
+    },
+    {
+      "name": "1w6ts reload v2 20% bigger",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 112.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 125.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 135.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 145.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 155.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 175.0
+        }
+      ],
+      "leaderboard_id": 21620
+    },
+    {
+      "name": "1w2ts Perfected Easier",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 90.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 102.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 115.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 128.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 136.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 145.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 162.0
+        }
+      ],
+      "leaderboard_id": 160751
+    },
+    {
+      "name": "ww4t Voltaic",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 120.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 130.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 140.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 150.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 160.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 180.0
+        }
+      ],
+      "leaderboard_id": 23921
+    },
+    {
+      "name": "PGTI Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 510
+    },
+    {
+      "name": "Smoothbot Voltaic 90% Speed",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 98877
+    },
+    {
+      "name": "VT PGT Intermediate S5 snakbox",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 4650.0
+        }
+      ],
+      "leaderboard_id": 203500
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 10900.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 12250.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 14200.0
+        }
+      ],
+      "leaderboard_id": 392
+    },
+    {
+      "name": "Whisphere Small & Slow Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 21000.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 22500.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 25000.0
+        }
+      ],
+      "leaderboard_id": 77069
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 4900.0
+        }
+      ],
+      "leaderboard_id": 42
+    },
+    {
+      "name": "Air Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 845.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 860.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 872.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 882.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 890.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 897.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 905.0
+        }
+      ],
+      "leaderboard_id": 568
+    },
+    {
+      "name": "Air Angelic Easier",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 905.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 914.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 921.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 927.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 932.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 936.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 941.0
+        }
+      ],
+      "leaderboard_id": 189778
+    },
+    {
+      "name": "Aimerz+ VGS Easy S1",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 3925.0
+        }
+      ],
+      "leaderboard_id": 68358
+    },
+    {
+      "name": "VT DotTS Intermediate S5 snakbox",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 1650.0
+        }
+      ],
+      "leaderboard_id": 203244
+    },
+    {
+      "name": "VT skyTS Intermediate",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 1520.0
+        }
+      ],
+      "leaderboard_id": 24964
+    },
+    {
+      "name": "VT psalmTS Intermediate",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 780.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 850.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 920.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 990.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 1250.0
+        }
+      ],
+      "leaderboard_id": 24960
+    },
+    {
+      "name": "kinTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 50.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 57.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 64.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 71.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 78.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 85.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 95.0
+        }
+      ],
+      "leaderboard_id": 542
+    },
+    {
+      "name": "B180T Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 63.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 70.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 75.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 80.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 85.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 90.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 100.0
+        }
+      ],
+      "leaderboard_id": 543
+    },
+    {
+      "name": "snakSwitch Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 500.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 600.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 680.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 750.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 830.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 920.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 1080.0
+        }
+      ],
+      "leaderboard_id": 192745
+    },
+    {
+      "name": "cAt snortSwitch Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 350.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 400.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 450.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 500.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 540.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 580.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 650.0
+        }
+      ],
+      "leaderboard_id": 83332
+    },
+    {
+      "name": "domiSwitch Easy",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 5250.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 8500.0
+        }
+      ],
+      "leaderboard_id": 83043
+    },
+    {
+      "name": "VT ControlTS Novice S5 30% Smaller",
+      "ranks": [
+        {
+          "name": "Calorie",
+          "color": "#FFFFFF",
+          "threshold": 300.0
+        },
+        {
+          "name": "Mineral",
+          "color": "#808080",
+          "threshold": 350.0
+        },
+        {
+          "name": "Enzyme",
+          "color": "#00ffb3",
+          "threshold": 410.0
+        },
+        {
+          "name": "Fiber",
+          "color": "#9d7d58",
+          "threshold": 440.0
+        },
+        {
+          "name": "Protein",
+          "color": "#ff5252",
+          "threshold": 475.0
+        },
+        {
+          "name": "Nutrient",
+          "color": "#00ff1e",
+          "threshold": 500.0
+        },
+        {
+          "name": "Essence",
+          "color": "#b685ff",
+          "threshold": 575.0
+        }
+      ],
+      "leaderboard_id": 193261
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHipfiringMagentaLurker",
+    "kovaaks_benchmark_id": 2846,
+    "rank_colors": [
+      [
+        "Calorie",
+        "#FFFFFF"
+      ],
+      [
+        "Mineral",
+        "#808080"
+      ],
+      [
+        "Enzyme",
+        "#00ffb3"
+      ],
+      [
+        "Fiber",
+        "#9d7d58"
+      ],
+      [
+        "Protein",
+        "#ff5252"
+      ],
+      [
+        "Nutrient",
+        "#00ff1e"
+      ],
+      [
+        "Essence",
+        "#b685ff"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:35.168570+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

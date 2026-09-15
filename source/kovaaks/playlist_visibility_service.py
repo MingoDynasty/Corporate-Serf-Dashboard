@@ -48,6 +48,9 @@ DEFAULT_VISIBLE_CODES = frozenset(
         "KovaaKsBobbingSepiaBuff",  # Voltaic Advanced Benchmarks S5
         "KovaaKsBottingShinyDoor",  # Voltaic Intermediate Benchmarks S5
         "KovaaKsBouncingSilverBinding",  # Voltaic Novice Benchmarks S5
+        "KovaaKsChallengingNastyArmorshard",  # Voltaic Advanced Benchmarks S5.5
+        "KovaaKsCarryingNarrowCt",  # Voltaic Intermediate Benchmarks S5.5
+        "KovaaKsCapturingMountedHighground",  # Voltaic Novice Benchmarks S5.5
         "KovaaKsQuestingMaximumblueNightfall",  # Viscose benchmarks hard
         "KovaaKsPushingMauveWeaponlevel",  # Viscose benchmarks medium
         "KovaaKsRaidingMediumFaction",  # Viscose benchmarks easier
@@ -86,6 +89,7 @@ def _visibility_document() -> StoreDocument:
             document = read_store_document(
                 VISIBILITY_FILE_PATH,
                 encoding="utf-8",
+                kind="playlist visibility file",
                 validate=validate_visibility_v1,
             )
             _shown_cache["value"] = document
@@ -121,6 +125,7 @@ def _guard_visibility_destination() -> None:
     document = read_store_document(
         VISIBILITY_FILE_PATH,
         encoding="utf-8",
+        kind="playlist visibility file",
         validate=validate_visibility_v1,
     )
     if document.state is StoreState.FUTURE:

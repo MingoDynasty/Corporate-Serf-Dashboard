@@ -206,7 +206,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 ## The Settings page
 
 - `/settings` renders from the stored view, never the pins, so it shows what
-  is on disk. Three fields: "Stats directory" (an Autocomplete over the
+  is on disk. Three fields: "Stats folder" (an Autocomplete over the
   suggestions with filtering off), "KovaaK's username", and "Steam ID", all
   free text. Opening the page never calls KovaaK's
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page),
@@ -215,8 +215,8 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   to pick from the folders found on this machine." only when there are
   suggestions.
 - Save is all-or-nothing and offline: `stats_dir` must be empty or an existing
-  directory ("No such directory."), `steam_id` must be empty or 17 ASCII
-  digits at or above `76561197960265728` ("Enter a 17-digit SteamID64 — it
+  directory ("No such folder."), `steam_id` must be empty or 17 ASCII
+  digits at or above `76561197960265728` ("Enter a 17-digit SteamID64. It
   starts with 7656119."), the username has no rule. Any field error writes
   nothing; values are stripped; a successful save writes every key, says
   "Settings saved.", and, when a username is present and
@@ -224,7 +224,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   running
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
 - Save outcomes are in-place statuses, never toasts: an I/O failure says
-  "Could not save settings — nothing was written. See data/logs/debug.log."
+  "Couldn't save settings, so nothing was written. See data/logs/debug.log."
   and a refused write over a newer file says "Nothing was saved. The settings
   file was written by a newer version of this app. Update the app to change
   settings."
@@ -237,22 +237,29 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
 - "Detect my accounts" fills inputs only. Exactly one candidate with nothing
   unchecked and discovery complete fills both fields ("Found `<username>`.
-  Save to apply it."); any other result with at least one candidate goes to
-  the "Detected KovaaK's accounts" picker, led by "Found `<n>` KovaaK's
-  accounts. Choose the one to use, then Save." ("account" for one), whose
+  **Save** to apply it."); any other result with at least one candidate goes
+  to the "Detected KovaaK's accounts" picker (described "Choosing one fills
+  the fields above. **Save** applies it."), led by "Found `<n>` KovaaK's
+  accounts. Choose the one to use, then **Save**." ("account" for one), whose
   pick fills both fields from the rendered result without a second
   detection; an empty result leaves the picker hidden. The conclusive "No
   Steam account on this machine has a KovaaK's profile. Type your username
-  in yourself — KovaaK's cannot look one up from a Steam ID." appears only
+  in yourself. KovaaK's can't look one up from a Steam ID." appears only
   when nothing was unresolved; otherwise "No KovaaK's profile matched the
-  Steam accounts that could be checked.", followed by the discovery and
-  unchecked caveats
+  Steam accounts that could be checked.", followed by the discovery caveat
+  "Steam's account list couldn't be read, so accounts on this machine may
+  have been missed. See data/logs/debug.log." and the unchecked caveat
+  "`<n>` Steam accounts couldn't be checked. Press the **Detect my accounts**
+  button again to retry."
   ([2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  The status line is built from parts so that every control name in it is
+  bold, including a line that names both Save and Detect my accounts
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   Before any detection the button sits beside the hint "Checks the Steam
   accounts on this machine against KovaaK's.", which a detection's report
   replaces.
 - A yellow alert with a warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices))
-  titled "Your saved settings are not being used" carries the
+  titled "Your saved settings aren't being used" carries the
   store's message in the error and future states and is re-derived after a
   save that repairs the file
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
@@ -279,8 +286,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 - A "Celebrations" section sits between the Save form and the version section,
   outside the form: the select "Personal best celebration", described as
   "Plays a short animation and shows a toast when a run beats your personal
-  best in any scenario. Works on every page, and does not depend on Run
-  Notifications. Takes effect right away.", with a "Preview" button beside it.
+  best in any scenario. Works on every page, and doesn't depend on **Run
+  notifications**. Takes effect right away.", with a "Preview" button beside
+  it; the control name renders bold ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   Nothing here goes through Save, and nothing here touches the restart notice
   or the store alert, which speak for the form's three keys
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
@@ -348,17 +356,18 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   Two things stop the write and neither takes the card away, because nothing
   was recorded: a future-state store refuses it
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)),
-  and an unwritable `data/` fails it. Both report on the red toast "Skip was
-  not saved", the refusal with "The settings file was written by a newer
+  and an unwritable `data/` fails it. Both report on the red toast "Skip
+  wasn't saved", the refusal with "The settings file was written by a newer
   version of this app. Update the app to change settings." and the failure
-  with "Nothing was written. Try again, or see data/logs/debug.log for
-  details."; the failure is logged. They share one channel, so a second Skip
+  with "Nothing was written. Try again. See data/logs/debug.log."
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)); the failure is logged. They share one channel, so a
+  second Skip
   click re-pops the current answer instead of clicking into silence, and a
   retry that fails differently replaces the first explanation rather than
   sitting beside it
   ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
-- The landing page's in-place hint "No stats directory configured — set it in
-  Settings" speaks only for a `stats_dir` key that exists and is unusable;
+- The landing page's in-place hint "No stats folder configured. Set it in
+  Settings." speaks only for a `stats_dir` key that exists and is unusable;
   while a set directory awaits a restart it reads "Restart the app to apply
   your saved settings." instead
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)
@@ -404,6 +413,12 @@ exempt
   alert and statuses, the Playlists page for visibility, the startup warning
   queue for playlist files
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  Every store message names the file by kind ("settings file", "playlist
+  visibility file", "playlist file"), states the problem as whole sentences,
+  and closes with the full path as a `File: {path}` readout, such as "The
+  settings file isn't valid JSON. File: {path}"; a malformed stamp is quoted
+  as the file holds it, in JSON
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - Settings v1 is a subset of the three keys with string values, unknown keys
   invalid; visibility v1 is exactly `shown_playlists` as a list of strings;
   playlist v1 is `PlaylistData`, extras ignored. The same validators serve the

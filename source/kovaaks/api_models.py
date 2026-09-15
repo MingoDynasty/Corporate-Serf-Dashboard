@@ -113,7 +113,9 @@ class Rank(BaseModel):
 class BenchmarksAPIResponse(BaseModel):
     """Represent a player's benchmark progress response."""
 
-    benchmark_progress: int
+    # KovaaK's sends a fractional value here on some benchmarks (e.g. 74452.55);
+    # ``int`` would reject the whole response, and nothing reads this field.
+    benchmark_progress: float
     overall_rank: int
     categories: dict[str, Category]
     ranks: list[Rank]

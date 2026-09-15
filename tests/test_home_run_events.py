@@ -283,7 +283,7 @@ def test_top_n_placement_alone_leads_with_the_scenario():
     notification = _notification(_payload(is_new_sensitivity=True))
 
     assert notification["title"] == "New 2nd-best score"
-    assert notification["message"] == "Scenario A — 812.40 at 34.64 cm/360."
+    assert notification["message"] == "Scenario A: 812.40 at 34.64 cm/360."
     assert notification["color"] == "green"
 
 
@@ -293,7 +293,7 @@ def test_a_first_place_run_is_titled_new_best_score():
     notification = _notification(_payload(nth_score=1, is_new_sensitivity=True))
 
     assert notification["title"] == "New best score"
-    assert notification["message"] == "Scenario A — 812.40 at 34.64 cm/360."
+    assert notification["message"] == "Scenario A: 812.40 at 34.64 cm/360."
 
 
 def test_threshold_pass_headlines_over_the_placement_it_also_earned():
@@ -305,7 +305,7 @@ def test_threshold_pass_headlines_over_the_placement_it_also_earned():
     assert notification["title"] == "Threshold passed"
     assert notification["color"] == "green"
     assert notification["message"] == (
-        "Scenario A — 830.00, 103.8% of PB. Also your 2nd-best at 34.64 cm/360."
+        "Scenario A: 830.00, 103.8% of PB. Also your 2nd-best at 34.64 cm/360."
     )
 
 
@@ -317,7 +317,7 @@ def test_threshold_pass_without_a_placement_points_at_the_next_scenario():
 
     assert notification["title"] == "Threshold passed"
     assert notification["message"] == (
-        "Scenario A — 830.00, 103.8% of PB. Ready to move on."
+        "Scenario A: 830.00, 103.8% of PB. Ready to move on."
     )
 
 
@@ -328,7 +328,7 @@ def test_threshold_passes_at_exactly_the_goal():
     )
 
     assert notification["title"] == "Threshold passed"
-    assert notification["message"].startswith("Scenario A — 820.00, 102.5% of PB.")
+    assert notification["message"].startswith("Scenario A: 820.00, 102.5% of PB.")
 
 
 def test_threshold_fail_names_the_target_it_missed():
@@ -340,8 +340,8 @@ def test_threshold_fail_names_the_target_it_missed():
     assert notification["title"] == "Below threshold"
     assert notification["color"] == "yellow"
     assert notification["message"] == (
-        "Scenario A — 780.00, 97.5% of PB — need 98.8%. "
-        "Still your 2nd-best at 34.64 cm/360. Keep grinding..."
+        "Scenario A: 780.00, 97.5% of PB (need 98.8%). "
+        "Still your 2nd-best at 34.64 cm/360."
     )
 
 
@@ -356,8 +356,8 @@ def test_a_new_pb_short_of_a_stretch_goal_still_reads_as_below_threshold():
 
     assert notification["title"] == "Below threshold"
     assert notification["message"] == (
-        "Scenario A — 820.00, 102.5% of PB — need 105.0%. "
-        "Still your best at 34.64 cm/360. Keep grinding..."
+        "Scenario A: 820.00, 102.5% of PB (need 105.0%). "
+        "Still your best at 34.64 cm/360."
     )
 
 
@@ -367,9 +367,7 @@ def test_threshold_fail_without_a_placement_drops_the_placement_clause():
         score_threshold_percentage=98.75,
     )
 
-    assert notification["message"] == (
-        "Scenario A — 780.00, 97.5% of PB — need 98.8%. Keep grinding..."
-    )
+    assert notification["message"] == ("Scenario A: 780.00, 97.5% of PB (need 98.8%).")
 
 
 def test_an_empty_threshold_percentage_leaves_the_run_unjudged():
@@ -572,6 +570,33 @@ def test_generate_graph_returns_empty_state_before_scenario_selection():
     assert plot["layout"]["yaxis"]["visible"] is False
 
 
+def test_generate_graph_names_the_missing_control_in_bold():
+    # The date field is paraphrased as "the oldest date", a value rather than a
+    # control name, so only Top N scores is bold.
+    plot_json, *_outputs = home.generate_graph(
+        None,
+        "Scenario A",
+        None,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        False,
+        False,
+        95,
+        True,
+        True,
+        None,
+        {},
+    )
+
+    plot = json.loads(plot_json)
+
+    assert plot["layout"]["annotations"][1]["text"] == (
+        "Set <b>Top N scores</b> and the oldest date to plot this scenario."
+    )
+
+
 def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
 
@@ -604,7 +629,7 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
     assert toast_channels is no_update
     assert "Unsupported graph option" in plot["layout"]["annotations"][0]["text"]
     assert plot["layout"]["annotations"][1]["text"] == (
-        "Choose Score vs Sensitivity or Score vs Time."
+        "Choose <b>Score vs Sensitivity</b> or <b>Score vs Time</b>."
     )
     assert plot["layout"]["dragmode"] is False
     assert plot["layout"]["xaxis"]["visible"] is False
@@ -951,6 +976,6 @@ def test_a_native_run_at_a_converted_groups_value_is_not_a_new_sensitivity(
 
     assert notification["title"] == "Below threshold"
     assert notification["message"] == (
-        f"{NORMALIZED_SCENARIO} — 85.00, 94.4% of PB — need 95.0%. "
-        f"Still your 2nd-best at {NORMALIZED_KEY}. Keep grinding..."
+        f"{NORMALIZED_SCENARIO}: 85.00, 94.4% of PB (need 95.0%). "
+        f"Still your 2nd-best at {NORMALIZED_KEY}."
     )

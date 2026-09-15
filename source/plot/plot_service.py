@@ -26,7 +26,7 @@ _K = TypeVar("_K")
 # preferences select on: index 0 is an implementation detail of how the
 # combined figure is assembled, while the name is what the legend, the hover
 # template, and the appearance callback all already agree on.
-RUN_DATA_POINT_TRACE_NAME = "Run Data Point"
+RUN_DATA_POINT_TRACE_NAME = "Run data point"
 # The Mantine figure template each color scheme draws with. The run trace
 # carries no color of its own (see the ``px.scatter`` note in the generator),
 # so the template's colorway is what colors the points, and it is also where
@@ -98,7 +98,7 @@ def add_high_score_overlay(figure: go.Figure, high_score: float) -> go.Figure:
     """Add a labeled high-score line to a figure."""
     figure.add_hline(
         name="PB Score",
-        annotation_text=f"PB Score ({format_decimal(high_score):.2f})",
+        annotation_text=f"PB score ({format_decimal(high_score):.2f})",
         y=high_score,
         line_dash="dash",
     )
@@ -109,7 +109,7 @@ def add_score_threshold_overlay(figure: go.Figure, score_threshold: float) -> go
     """Add a labeled score-threshold line to a figure."""
     figure.add_hline(
         name="Score Threshold",
-        annotation_text=f"Score Threshold ({format_decimal(score_threshold):.2f})",
+        annotation_text=f"Score threshold ({format_decimal(score_threshold):.2f})",
         y=score_threshold,
         line_dash="dash",
     )
@@ -280,7 +280,7 @@ def _generate_xy_plot(  # noqa: PLR0913
         y="Score",
     )
     figure_line.update_traces(
-        hovertemplate="<b>Average Score</b>: %{y}<br>"
+        hovertemplate="<b>Average score</b>: %{y}<br>"
         + hover_x_label
         + "<extra></extra>",
         hoverlabel={"font_size": 16},
@@ -312,7 +312,7 @@ def _generate_xy_plot(  # noqa: PLR0913
     )
     figure_combined["data"][0]["name"] = RUN_DATA_POINT_TRACE_NAME
     figure_combined["data"][0]["showlegend"] = True
-    figure_combined["data"][1]["name"] = "Average Score"
+    figure_combined["data"][1]["name"] = "Average score"
     figure_combined["data"][1]["showlegend"] = True
 
     _add_rank_overlays(

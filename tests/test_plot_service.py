@@ -7,6 +7,8 @@ from source.plot.plot_service import (
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
     _add_rank_overlays,
+    add_high_score_overlay,
+    add_score_threshold_overlay,
     apply_point_appearance,
     generate_empty_plot,
     generate_placeholder_plot,
@@ -110,9 +112,19 @@ def test_generate_sensitivity_plot_has_expected_traces() -> None:
     fig = generate_sensitivity_plot(data, "1w4ts", True, ranks)
 
     assert len(fig.data) == 2
-    assert fig.data[0].name == "Run Data Point"
-    assert fig.data[1].name == "Average Score"
+    assert fig.data[0].name == "Run data point"
+    assert fig.data[1].name == "Average score"
+    assert fig.data[1].hovertemplate.startswith("<b>Average score</b>: %{y}<br>")
     assert any(shape["type"] == "line" for shape in fig.layout.shapes)
+
+
+def test_score_overlays_label_their_lines_in_sentence_case() -> None:
+    fig = add_score_threshold_overlay(add_high_score_overlay(go.Figure(), 123.0), 118.0)
+
+    assert [annotation.text for annotation in fig.layout.annotations] == [
+        "PB score (123.00)",
+        "Score threshold (118.00)",
+    ]
 
 
 def test_generate_time_plot_has_expected_traces() -> None:
@@ -129,8 +141,8 @@ def test_generate_time_plot_has_expected_traces() -> None:
     fig = generate_time_plot(data, "1w4ts", False, [])
 
     assert len(fig.data) == 2
-    assert fig.data[0].name == "Run Data Point"
-    assert fig.data[1].name == "Average Score"
+    assert fig.data[0].name == "Run data point"
+    assert fig.data[1].name == "Average score"
 
 
 def test_score_plots_lay_the_legend_above_the_plot() -> None:
@@ -253,7 +265,7 @@ def _point_figure() -> go.Figure:
     """A two-trace stand-in for a scored figure, run trace second."""
     return go.Figure(
         data=[
-            go.Scatter(name="Average Score", y=[1, 2]),
+            go.Scatter(name="Average score", y=[1, 2]),
             go.Scatter(name=RUN_DATA_POINT_TRACE_NAME, y=[1, 2]),
         ]
     )
@@ -305,7 +317,7 @@ def test_apply_point_appearance_tolerates_figures_without_a_run_trace() -> None:
     for figure in (
         generate_placeholder_plot(),
         generate_empty_plot("No runs to plot", "Nothing here yet."),
-        go.Figure(data=[go.Scatter(name="Average Score", y=[1, 2])]),
+        go.Figure(data=[go.Scatter(name="Average score", y=[1, 2])]),
     ):
         before = figure.to_json()
         assert apply_point_appearance(figure, "Large", "#f03e3e").to_json() == before

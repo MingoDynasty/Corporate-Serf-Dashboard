@@ -262,6 +262,13 @@ one-to-one):
   importer never reads these display fields (served rank colors come from
   Evxl), so `api_models.Rank.color` is now optional and a missing value no
   longer fails response validation.
+- The top-level `benchmark_progress` can be fractional (observed: `74452.55`
+  on benchmark 2813, and similar on 2761, 2843, 2844, 2845, 2934, 2026-09-14),
+  while every per-category `benchmark_progress` in those same responses is
+  still an integer. An `int` field rejected the whole response and blocked
+  importing those six benchmarks. Nothing reads the value, so
+  `BenchmarksAPIResponse.benchmark_progress` is now a `float`; the
+  per-category field stays `int` until a fractional one is observed.
 - A benchmark's rank count can disagree with the Evxl rank ladder it is paired
   with, which aborts the 1:1 merge. Observed 2026-07-11 on benchmark 2412
   ("Black Dawn / Celestial Forge"), which then exposed 3 tiers

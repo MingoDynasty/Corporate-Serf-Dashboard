@@ -10,6 +10,7 @@ from dash import dcc, no_update
 from source.config import settings_service
 from source.kovaaks import api_service, data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
+from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -345,6 +346,39 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
     assert score_threshold_percentage.min == 1
 
 
+def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypatch):
+    components = _layout_components(monkeypatch)
+    expected = {
+        "show-all-ranks-switch": (
+            "Draws every rank in the playlist's ladder instead of only the ones "
+            "around your plotted scores. Needs **Rank thresholds** turned on."
+        ),
+        "score-threshold-percentage": (
+            "Sets the score goal as a percentage of your personal best. The "
+            "overlay line tracks your current personal best. Notifications judge "
+            "a run against the personal best you had before the run."
+        ),
+        "score-threshold-notification-switch": (
+            "Adds a pass or fail verdict to run notifications when the run can be "
+            "judged against the score threshold. Needs **Run notifications** "
+            "turned on."
+        ),
+        "top_n_scores": (
+            "How many of your best scores to plot per sensitivity within the "
+            "selected date range, or per day in **Score vs Time**. A new run that "
+            "lands in the top N also triggers a notification."
+        ),
+    }
+
+    for component_id, text in expected.items():
+        (tooltip,) = [
+            component
+            for component in _walk_components(components[component_id].label)
+            if isinstance(component, dmc.Tooltip)
+        ]
+        assert rendered_text(tooltip.label) == text
+
+
 def test_home_no_longer_builds_the_settings_modal(monkeypatch):
     components = _layout_components(monkeypatch)
 
@@ -378,13 +412,13 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
     }
 
     assert labels == {
-        "rank-overlay-switch": "Rank Thresholds",
+        "rank-overlay-switch": "Rank thresholds",
         "show-all-ranks-switch": "Show all ranks",
-        "high-score-overlay-switch": "PB Score",
-        "score-threshold-overlay-switch": "Score Threshold Overlay",
-        "score-threshold-percentage": "Score Threshold Percentage",
-        "score-threshold-notification-switch": "Score Threshold Verdict",
-        "run-notification-switch": "Run Notifications",
+        "high-score-overlay-switch": "PB score",
+        "score-threshold-overlay-switch": "Score threshold overlay",
+        "score-threshold-percentage": "Score threshold percentage",
+        "score-threshold-notification-switch": "Score threshold verdict",
+        "run-notification-switch": "Run notifications",
     }
 
 
@@ -544,7 +578,7 @@ def test_format_scenario_rank_with_total_players():
         percentile=38.58,
     )
 
-    assert format_scenario_rank(rank_info) == "11,266 of 18,342 (38.58% Percentile)"
+    assert format_scenario_rank(rank_info) == "11,266 of 18,342 (38.58% percentile)"
 
 
 def test_format_scenario_rank_with_total_players_but_no_percentile():
@@ -650,14 +684,14 @@ def test_rank_render_records_only_interactive_activity(monkeypatch, tmp_path):
 
     assert (
         _rendered_rank(scenario_name, allow_network=False)
-        == "10 of 100 (90.50% Percentile)"
+        == "10 of 100 (90.50% percentile)"
     )
     interval_activity, _network_success = api_service.get_api_activity_timestamps()
     assert interval_activity == 10.0
 
     assert (
         _rendered_rank(scenario_name, allow_network=True)
-        == "10 of 100 (90.50% Percentile)"
+        == "10 of 100 (90.50% percentile)"
     )
     interactive_activity, _network_success = api_service.get_api_activity_timestamps()
     assert interactive_activity > interval_activity
@@ -667,7 +701,7 @@ def test_rank_render_records_only_interactive_activity(monkeypatch, tmp_path):
     ("total_state", "expected"),
     [
         ("missing", "10"),
-        ("expired", "10 of 100 (90.50% Percentile)"),
+        ("expired", "10 of 100 (90.50% percentile)"),
     ],
 )
 def test_interval_rank_render_is_ttl_independent_and_never_fetches(
@@ -725,7 +759,7 @@ def test_interval_rank_render_does_not_fetch_or_cache_unresolved_scenario(
     monkeypatch.setattr(api_service, "_session_get", fail_network)
 
     rendered = _rendered_rank(scenario_name, allow_network=False)
-    assert _rank_text(rendered) == "N/A — lookup failed, Refresh to retry"
+    assert _rank_text(rendered) == "N/A · lookup failed"
     assert api_service.get_cached_leaderboard_id(scenario_name) is None
 
 
@@ -797,7 +831,7 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
         allow_network=True,
     )
 
-    assert display == "10 of 100 (90.50% Percentile)"
+    assert display == "10 of 100 (90.50% percentile)"
     assert len(notifications) == 1
     assert notifications[0]["title"] == "Steam ID mismatch"
     assert notifications[0]["color"] == "yellow"
@@ -849,7 +883,7 @@ def test_a_rank_render_nobody_triggered_keeps_the_sessions_mismatch_toast(
 
     display, notifications = home.get_scenario_rank(None, scenario_name, 0)
 
-    assert display == "10 of 100 (90.50% Percentile)"
+    assert display == "10 of 100 (90.50% percentile)"
     assert notifications is no_update
 
     monkeypatch.setattr(
@@ -885,7 +919,7 @@ def test_passive_rank_render_points_an_unset_username_at_settings():
         allow_network=True,
     )
 
-    assert _rank_text(rendered) == "N/A — set your KovaaK's username in Settings"
+    assert _rank_text(rendered) == "N/A · set your KovaaK's username in Settings"
     anchors = [
         component
         for child in rendered
@@ -912,7 +946,7 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
         allow_network=True,
     )
 
-    assert _rank_text(rendered) == "N/A — lookup failed, Refresh to retry"
+    assert _rank_text(rendered) == "N/A · lookup failed"
     assert notifications == []
 
 
@@ -935,7 +969,7 @@ def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
         allow_network=True,
     )
 
-    assert _rank_text(rendered) == "1,240 — from cache, Refresh to update"
+    assert _rank_text(rendered) == "1,240 · from cache"
     assert notifications == []
 
 
@@ -955,11 +989,11 @@ def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
 
     assert (
         _rank_text(_rendered_rank("Scenario", allow_network=True))
-        == "1,240 — from cache, Refresh to update"
+        == "1,240 · from cache"
     )
     assert (
         _rank_text(_rendered_rank("Scenario", allow_network=False))
-        == "1,240 — from cache, Refresh to update"
+        == "1,240 · from cache"
     )
 
 
@@ -1114,7 +1148,10 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
     assert calls == [{"force_refresh": True}]
     assert [notification["color"] for notification in notifications] == ["red"]
     assert notifications[0]["title"] == "Position refresh failed"
-    assert notifications[0]["message"] == "Couldn't refresh — position unchanged."
+    assert (
+        notifications[0]["message"]
+        == "Couldn't refresh. The position shown is unchanged."
+    )
 
 
 def test_manual_rank_refresh_crash_toasts_red_and_leaves_the_value_alone(monkeypatch):
@@ -1154,11 +1191,12 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
-    assert _rank_text(rank_display) == "50 — from cache, Refresh to update"
+    assert _rank_text(rank_display) == "50 · from cache"
     assert [notification["color"] for notification in notifications] == ["yellow"]
-    assert notifications[0]["title"] == "Position refresh failed"
+    assert notifications[0]["title"] == "Refresh failed · position from cache"
     assert (
-        notifications[0]["message"] == "Couldn't refresh — showing the cached position."
+        notifications[0]["message"]
+        == "Couldn't refresh. The position shown is from cache."
     )
 
 

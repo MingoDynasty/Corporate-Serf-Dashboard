@@ -636,4 +636,4 @@ def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
     assert celebration[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
     assert celebration[0]["message"].startswith("Scenario B: 900.00.")
     assert verdict["id"] == home._RUN_VERDICT_CHANNEL
-    assert verdict["message"].startswith("Scenario A — 780.00")
+    assert verdict["message"].startswith("Scenario A: 780.00")

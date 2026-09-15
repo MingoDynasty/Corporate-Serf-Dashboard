@@ -16,6 +16,7 @@ from dash import (
     no_update,
 )
 
+from source.components.control_name import control_name
 from source.components.local_icon import local_icon
 from source.config.settings_service import get_kovaaks_username
 from source.kovaaks.data_service import (
@@ -59,28 +60,47 @@ WARMUP_REFRESH_INTERVAL_MS = 1_000
 # Reused from the former Settings-modal import control, with the trailing
 # clause reworded for the overview: importing here lands the playlist as a new
 # visible row on this management surface.
-IMPORT_HELP_TEXT = (
-    "Paste a KovaaK's playlist share code and press Import to add that "
-    "playlist to this list."
-)
+IMPORT_HELP_TEXT = [
+    "Paste a KovaaK's playlist share code and press ",
+    control_name("Import"),
+    " to add that playlist to this list.",
+]
 
-# Appended to a duplicate-code refusal when the conflicting playlist exists but
-# is hidden (R14): the code "already exists" but the user cannot see it, so
-# point them at the toggle that surfaces it.
-HIDDEN_DUPLICATE_HINT = (
-    ' It is currently hidden — toggle "Show hidden" on this page to unhide it.'
-)
 
-# Appended to the import toast when the playlist file landed but the visibility
-# write failed. The import itself succeeded, so the message must say so and then
-# name the one thing that did not happen, plus its recovery: the new code is
-# absent from the shown set, so its row renders as hidden and "Show hidden" is
-# what surfaces it before the eye toggle can be clicked.
-IMPORT_VISIBILITY_FAILED_HINT = (
-    " It could not be marked visible, so it may be missing from playlist"
-    ' selectors — toggle "Show hidden" on this page, then click its row\'s eye'
-    " icon to show it."
-)
+def _hidden_duplicate_hint() -> list:
+    """Build the hint for a duplicate-code refusal whose playlist is hidden.
+
+    The code "already exists" but the user cannot see it (R14). Show hidden
+    only reveals the row; the eye icon is what changes the saved visibility,
+    so the hint names both steps.
+
+    Built fresh per call: the hint joins a toast message, which is a callback
+    output, and a mutable component list must not be reused across requests.
+    """
+    return [
+        " It is currently hidden. Turn on the ",
+        control_name("Show hidden"),
+        " switch on this page, then click the eye icon on its row to show it.",
+    ]
+
+
+def _import_visibility_failed_hint() -> list:
+    """Build the hint for an import whose visibility write failed.
+
+    The import itself succeeded, so the message must say so and then name the
+    one thing that did not happen, plus its recovery: the new code is absent
+    from the shown set, so its row renders as hidden and Show hidden is what
+    surfaces it before the eye icon can be clicked.
+
+    Built fresh per call for the same reason as ``_hidden_duplicate_hint``.
+    """
+    return [
+        " It couldn't be marked visible, so it may be missing from playlist "
+        "selectors. Turn on the ",
+        control_name("Show hidden"),
+        " switch on this page, then click the eye icon on its row to show it.",
+    ]
+
 
 # Shown when a show/hide is refused because the visibility file belongs to a
 # newer build. Nothing was written and nothing changed, so the toast is the
@@ -117,7 +137,7 @@ def delete_successful_channel(playlist_code: str) -> str:
     return f"deleted-playlist-successful-{playlist_code}"
 
 
-VISIBILITY_ALERT_TITLE = "Playlist visibility is not being used"
+VISIBILITY_ALERT_TITLE = "Playlist visibility isn't being used"
 # The alert ships hidden and the render callback drops this modifier, the same
 # way the leftover-files notice below it works.
 VISIBILITY_ALERT_HIDDEN_CLASS = "playlists-visibility-alert-hidden"
@@ -166,7 +186,7 @@ LAST_PLAYED_TOOLTIP = (
 
 PERCENTILE_PLACEHOLDER_TOOLTIP = (
     "('Shown once all ' + params.data.played_count"
-    " + ' played scenarios have data — open the playlist to fetch now')"
+    " + ' played scenarios have data. Open the playlist to fetch it now.')"
 )
 
 PERCENTILE_TOOLTIP = (
@@ -224,8 +244,8 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Type",
         "field": "type_display",
         "headerTooltip": (
-            "Benchmarks carry rank thresholds (Bronze, Silver, ...) for their "
-            "scenarios; playlists are plain scenario lists."
+            "Benchmarks carry rank thresholds such as Bronze and Silver for "
+            "their scenarios. Playlists are plain scenario lists."
         ),
         "cellRenderer": "TypeBadge",
         "sortable": True,
@@ -288,7 +308,7 @@ TABLE_COLUMN_DEFS = [
         "headerTooltip": (
             "The weakest leaderboard percentile among ranked scenarios you "
             "have played. Shown once every played scenario has enough cached "
-            "leaderboard data; hover a value to see which scenario."
+            "leaderboard data. Hover a value to see which scenario."
         ),
         "valueFormatter": {"function": "params.data.lowest_percentile_display"},
         "tooltipValueGetter": {"function": LOWEST_PERCENTILE_TOOLTIP},
@@ -425,7 +445,11 @@ def load_playlist_overview_rows(
         ):
             return (
                 [],
-                'All playlists are hidden. Toggle "Show hidden" to manage them.',
+                [
+                    "All playlists are hidden. Turn on the ",
+                    control_name("Show hidden"),
+                    " switch to manage them.",
+                ],
                 *warmup_outputs,
             )
         return [], "No playlists are loaded.", *warmup_outputs
@@ -471,7 +495,7 @@ def _format_warmup_status(snapshot: PercentileWarmupSnapshot) -> str:
 
     status = f"Updating percentile data: {snapshot.remaining_count} remaining"
     if snapshot.paused_until is not None:
-        return f"{status} · paused; retrying at {_format_retry_time(snapshot)}"
+        return f"{status} · paused until {_format_retry_time(snapshot)}"
     if snapshot.recent_pace_seconds is not None:
         eta = snapshot.remaining_count * snapshot.recent_pace_seconds
         status += f" (~{format_approximate_duration(eta)})"
@@ -589,14 +613,15 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
     error_message, canonical_code = load_playlist_from_code(playlist_to_import)
 
     if error_message:
+        refusal: str | list = error_message
         # The refusal branch can carry the conflicting existing code; if that
         # playlist is hidden, tell the user where to find it.
         if canonical_code is not None and not is_playlist_shown(canonical_code):
-            error_message += HIDDEN_DUPLICATE_HINT
+            refusal = [error_message, *_hidden_duplicate_hint()]
         notification = toast(
             IMPORT_FAILED_CHANNEL,
             "Playlist import failed",
-            error_message,
+            refusal,
             color="red",
             icon=local_icon("material-symbols:upload"),
         )
@@ -640,8 +665,8 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
     if visibility_write_failed:
         notification = toast(
             import_visibility_failed_channel(imported_code),
-            "Playlist imported — not shown",
-            imported_message + IMPORT_VISIBILITY_FAILED_HINT,
+            "Playlist imported but hidden",
+            [imported_message, *_import_visibility_failed_hint()],
             color="orange",
             icon=local_icon("material-symbols:upload"),
         )
@@ -978,7 +1003,7 @@ def layout(**kwargs):  # noqa: ARG001
                         children=[
                             dmc.TextInput(
                                 id="playlists-overview-quick-filter",
-                                placeholder="Filter playlists...",
+                                placeholder="Filter playlists",
                                 size="sm",
                                 w=240,
                             ),
@@ -1020,7 +1045,7 @@ def layout(**kwargs):  # noqa: ARG001
                 justify="space-between",
             ),
             dmc.Modal(
-                title="Import Playlist",
+                title="Import playlist",
                 id="playlists-import-modal",
                 children=dmc.Group(
                     gap="md",
@@ -1029,7 +1054,7 @@ def layout(**kwargs):  # noqa: ARG001
                     children=[
                         dmc.TextInput(
                             id="playlists-import-textinput",
-                            placeholder="KovaaK's playlist code...",
+                            placeholder="KovaaK's playlist code",
                             label="Playlist code",
                             description=IMPORT_HELP_TEXT,
                             size="md",
@@ -1046,7 +1071,7 @@ def layout(**kwargs):  # noqa: ARG001
             # Delete confirmation for a user playlist. Opened by a click on a
             # row's delete cell; the target code lives in the store above.
             dmc.Modal(
-                title="Delete Playlist",
+                title="Delete playlist",
                 id="playlists-delete-modal",
                 children=dmc.Stack(
                     gap="md",
@@ -1121,7 +1146,7 @@ def layout(**kwargs):  # noqa: ARG001
                 ),
             ),
             dmc.Modal(
-                title="Delete Leftover Files",
+                title="Delete leftover files",
                 id="playlists-superseded-modal",
                 children=dmc.Stack(
                     gap="md",

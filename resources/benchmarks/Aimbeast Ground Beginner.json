@@ -1,0 +1,408 @@
+{
+  "name": "Aimbeast Ground Beginner",
+  "code": "KovaaKsBackflippingPickedXur",
+  "scenarios": [
+    {
+      "name": "SouljahStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 2250.0
+        }
+      ],
+      "leaderboard_id": 203674
+    },
+    {
+      "name": "StelosStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 900.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 2100.0
+        }
+      ],
+      "leaderboard_id": 203675
+    },
+    {
+      "name": "VexinStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 950.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 2000.0
+        }
+      ],
+      "leaderboard_id": 203672
+    },
+    {
+      "name": "MbmStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 425.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 525.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 625.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 725.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 825.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 925.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 1025.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 1225.0
+        }
+      ],
+      "leaderboard_id": 203669
+    },
+    {
+      "name": "SleepStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 350.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 450.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 550.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 650.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 750.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 850.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 950.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 1150.0
+        }
+      ],
+      "leaderboard_id": 203671
+    },
+    {
+      "name": "RobidashkaStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 375.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 450.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 525.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 600.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 675.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 750.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 825.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 900.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 975.0
+        }
+      ],
+      "leaderboard_id": 203670
+    },
+    {
+      "name": "FlickerStrafes Beginner",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#E6BF69",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Bronze_2",
+          "color": "#E6BF69",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Bronze_3",
+          "color": "#E6BF69",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Silver",
+          "color": "#E6E6E6",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Silver_2",
+          "color": "#E6E6E6",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Silver_3",
+          "color": "#E6E6E6",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#F4D030",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Gold_2",
+          "color": "#F4D030",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Gold_3",
+          "color": "#F4D030",
+          "threshold": 2250.0
+        }
+      ],
+      "leaderboard_id": 203673
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBackflippingPickedXur",
+    "kovaaks_benchmark_id": 2876,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#E6BF69"
+      ],
+      [
+        "Bronze_2",
+        "#E6BF69"
+      ],
+      [
+        "Bronze_3",
+        "#E6BF69"
+      ],
+      [
+        "Silver",
+        "#E6E6E6"
+      ],
+      [
+        "Silver_2",
+        "#E6E6E6"
+      ],
+      [
+        "Silver_3",
+        "#E6E6E6"
+      ],
+      [
+        "Gold",
+        "#F4D030"
+      ],
+      [
+        "Gold_2",
+        "#F4D030"
+      ],
+      [
+        "Gold_3",
+        "#F4D030"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:40.605988+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
