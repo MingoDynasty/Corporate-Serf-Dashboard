@@ -1,4 +1,4 @@
-// Plotly only redraws a responsive graph on window `resize` events. The home
+// Plotly only redraws a responsive graph on window ``resize`` events. The home
 // graph's box is sized by the page layout, which changes without a window
 // resize: the controls row can grow taller (e.g. the Scenario Stats block
 // wrapping to an extra line), and the chart options inspector opens and
