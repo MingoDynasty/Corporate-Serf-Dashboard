@@ -1,0 +1,1150 @@
+{
+  "name": "CONTINIUM TacFPS Benchmarks E1",
+  "code": "KovaaKsBoomstickingGreenProjectile",
+  "scenarios": [
+    {
+      "name": "1w2ts Horizontalish",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 103.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 105.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 107.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 110.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 114.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 117.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 119.0
+        }
+      ],
+      "leaderboard_id": 16425
+    },
+    {
+      "name": "1w3ts reload",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 103.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 115.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 120.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 123.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 126.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 129.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 135.0
+        }
+      ],
+      "leaderboard_id": 215
+    },
+    {
+      "name": "devTS Static Click Angelic",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 109.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 120.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 127.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 132.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 136.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 140.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 145.0
+        }
+      ],
+      "leaderboard_id": 38539
+    },
+    {
+      "name": "RawMouseControlClicking3 30% smaller",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 1980.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 2170.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 2240.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 2320.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 2390.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 2470.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 2520.0
+        }
+      ],
+      "leaderboard_id": 24395
+    },
+    {
+      "name": "eth 1w2tes Micro 20% Larger",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 175.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 182.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 190.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 198.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 206.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 213.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 224.0
+        }
+      ],
+      "leaderboard_id": 199253
+    },
+    {
+      "name": "uv VBR Micro 2ts",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 178.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 195.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 210.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 217.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 229.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 241.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 255.0
+        }
+      ],
+      "leaderboard_id": 60162
+    },
+    {
+      "name": "1w2ts Pasu Horizontal",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 820.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 840.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 880.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 920.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 940.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 960.0
+        }
+      ],
+      "leaderboard_id": 38094
+    },
+    {
+      "name": "Wavy Micros Intermediate",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 960.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 990.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 1140.0
+        }
+      ],
+      "leaderboard_id": 55115
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 1540.0
+        }
+      ],
+      "leaderboard_id": 65396
+    },
+    {
+      "name": "FHTS Click 30% Smaller",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 78.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 82.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 84.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 88.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 96.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 100.0
+        }
+      ],
+      "leaderboard_id": 3197
+    },
+    {
+      "name": "HeadClick Altered",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 960.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 1280.0
+        }
+      ],
+      "leaderboard_id": 81278
+    },
+    {
+      "name": "voxTargetClick 20% Small",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 80.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 84.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 88.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 92.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 96.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 104.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 110.0
+        }
+      ],
+      "leaderboard_id": 857
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 4860.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 6750.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 8550.0
+        }
+      ],
+      "leaderboard_id": 68993
+    },
+    {
+      "name": "Controlsphere Far Larger",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 12700.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 13100.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 13500.0
+        }
+      ],
+      "leaderboard_id": 124981
+    },
+    {
+      "name": "e1se MicroTrack",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 3770.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 3845.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 3900.0
+        }
+      ],
+      "leaderboard_id": 62726
+    },
+    {
+      "name": "VT Controlstrafes Valorant Harder",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 2560.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 2870.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 3000.0
+        }
+      ],
+      "leaderboard_id": 73755
+    },
+    {
+      "name": "Extra Controlsphere Horizontal",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 7700.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 7850.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 8150.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 10050.0
+        }
+      ],
+      "leaderboard_id": 50996
+    },
+    {
+      "name": "Valorant Peektrack Hard",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 3240.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 3320.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 3550.0
+        }
+      ],
+      "leaderboard_id": 133383
+    },
+    {
+      "name": "vietTS Micro",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 96.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 105.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 110.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 114.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 117.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 126.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 133.0
+        }
+      ],
+      "leaderboard_id": 129100
+    },
+    {
+      "name": "Amare GarfMicroTS",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 18.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 19.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 21.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 23.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 25.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 28.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 31.0
+        }
+      ],
+      "leaderboard_id": 80969
+    },
+    {
+      "name": "AvomiTS Micro",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 38.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 42.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 44.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 46.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 48.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 50.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 53.0
+        }
+      ],
+      "leaderboard_id": 139166
+    },
+    {
+      "name": "StaticSwitchingVox xSmall",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 118.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 122.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 126.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 134.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 138.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 142.0
+        }
+      ],
+      "leaderboard_id": 15766
+    },
+    {
+      "name": "devTS Goated NR Static 5Bot",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 760.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 780.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 800.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 825.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 845.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 870.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 890.0
+        }
+      ],
+      "leaderboard_id": 125002
+    },
+    {
+      "name": "devts static regen",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 6300.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 8000.0
+        }
+      ],
+      "leaderboard_id": 59364
+    },
+    {
+      "name": "Controlsphere TS",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 5600.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 5880.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 6165.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 6445.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 6725.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 7010.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 7290.0
+        }
+      ],
+      "leaderboard_id": 862
+    },
+    {
+      "name": "TamTS Warzone",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 40.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 43.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 45.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 48.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 51.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 54.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 56.0
+        }
+      ],
+      "leaderboard_id": 3483
+    },
+    {
+      "name": "devTS Goated rAim Small",
+      "ranks": [
+        {
+          "name": "Solivagant",
+          "color": "#66FFA6",
+          "threshold": 420.0
+        },
+        {
+          "name": "Berserker",
+          "color": "#FF667F",
+          "threshold": 440.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FFB366",
+          "threshold": 460.0
+        },
+        {
+          "name": "Blessed",
+          "color": "#669FFF",
+          "threshold": 480.0
+        },
+        {
+          "name": "Exalted",
+          "color": "#5FE8DF",
+          "threshold": 500.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#9966FF",
+          "threshold": 520.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFE566",
+          "threshold": 535.0
+        }
+      ],
+      "leaderboard_id": 13887
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBoomstickingGreenProjectile",
+    "kovaaks_benchmark_id": 2761,
+    "rank_colors": [
+      [
+        "Solivagant",
+        "#66FFA6"
+      ],
+      [
+        "Berserker",
+        "#FF667F"
+      ],
+      [
+        "Archon",
+        "#FFB366"
+      ],
+      [
+        "Blessed",
+        "#669FFF"
+      ],
+      [
+        "Exalted",
+        "#5FE8DF"
+      ],
+      [
+        "Ascendant",
+        "#9966FF"
+      ],
+      [
+        "Sovereign",
+        "#FFE566"
+      ]
+    ],
+    "generated_at": "2026-09-15T21:53:41.771528+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
