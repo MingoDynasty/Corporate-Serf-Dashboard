@@ -16,14 +16,14 @@ as they are, because they qualify a value rather than announce a condition.
 
 ## Decisions needed
 
-Four product rulings. Each carries the author's recommendation, adopted by
-the maintainer as a non-binding lean on 2026-09-12 pending the co-design
-review. Everything else in this proposal is author-owned and reversible.
+Four product rulings, each ratified by the maintainer on 2026-09-15 when the
+proposal was ratified as a whole, after both full reviewers had endorsed
+every row. Each keeps its recommendation and the alternative it rejected,
+for the record. Everything else in this proposal is author-owned.
 
 ### D1 — The Position hints stay value qualifiers
 
-Status: Open. Maintainer lean (2026-09-12): keep them as they are,
-non-binding until ruled.
+Status: Ratified (user), 2026-09-15: accept the recommendation below.
 
 The Position field on Scenario Performance appends a dimmed fragment to its
 value in three states (username unset, lookup failed, served from cache). The
@@ -56,7 +56,7 @@ forbids, and leaves a cached position indistinguishable from a fresh one.
 
 ### D2 — The restart-pending branch is yellow
 
-Status: Open. Maintainer lean (2026-09-12): yellow, non-binding until ruled.
+Status: Ratified (user), 2026-09-15: accept the recommendation below.
 
 While a saved stats-folder change awaits a restart, the Home hint reads
 "Restart the app to apply your saved settings." and the setup card stands
@@ -78,15 +78,14 @@ that preceded it. It also costs a second class and icon pair on one id.
 
 ### D3 — The promoted hint has no title
 
-Status: Open. Maintainer lean (2026-09-12): no title, non-binding until
-ruled.
+Status: Ratified (user), 2026-09-15: accept the recommendation below.
 
 The setup card and the leftover-files notice carry a bold title above their
 body. The Aim Training Journey banner does not: icon and one sentence.
 
-**Recommendation: no title.** Each hint is one sentence that already names
-the action ("Restart the app…", "…set it in Settings"). A title over it
-repeats the sentence in fewer words. The title-less shape is shipped (the
+**Recommendation: no title.** Each hint's own text already names the action
+("Restart the app…", "Set it in Settings."). A title over it repeats that
+in fewer words. The title-less shape is shipped (the
 journey banner, a `dmc.Alert`); as a Paper it needs one Group prop, specified
 in Design. No title means no new string: the proposal changes no copy at all.
 
@@ -97,8 +96,7 @@ proposal would then own.
 
 ### D4 — The Settings restart notice joins the same anatomy
 
-Status: Open. Maintainer lean (2026-09-12): promote it to the same yellow
-panel, non-binding until ruled.
+Status: Ratified (user), 2026-09-15: accept the recommendation below.
 
 The Settings page shows "Restart the app to apply. This app is still running
 on the settings it started with." under the Save button whenever
@@ -282,14 +280,8 @@ as a second selector on the same declaration (`margin-bottom` at the `md`
 step, `max-width: 32rem`), so the two panels are the same width when they
 stack. The `.alert-panel` and `.alert-panel-caution` rules are untouched.
 
-Under D2 both branches are yellow with the warning icon. If D2 goes blue for
-the restart branch, that branch drops `alert-panel-caution` and takes
-`material-symbols:info-outline`; the id stays, and the class assertion in the
-test splits per branch.
-
-Under D3 there is no title row. If D3 goes titled, the title takes
-`.alert-panel-title` in a leading `dmc.Group` with the icon, exactly as the
-setup card lays it out, and the titles join the Copy block below.
+Both branches are yellow with the warning icon (D2), and there is no title
+row (D3).
 
 ### Co-render and ordering
 
@@ -303,7 +295,7 @@ moment" stays true.
 
 ### The Settings restart notice (D4)
 
-Under the lean, the `dmc.Text` with `id="app-settings-restart-notice"`
+The `dmc.Text` with `id="app-settings-restart-notice"`
 becomes a `dmc.Paper` with the same id, `withBorder=True`, and the same
 `Group` anatomy as the Home hint (`wrap="nowrap"`, warning icon beside the
 sentence). `_restart_notice()` keeps its `(children, class)` shape: `""` with
@@ -322,12 +314,6 @@ The notice's trigger logic does not change: it shows for every restart-scoped
 change, identity or folder, on a working install or a first-run one, and D4
 gives every one of those states the same yellow.
 
-If D4 is ruled out of scope, the settings page is untouched, and the shipping
-PR's decision-log entry records the orange notice as an accepted exception to
-the toast-only rule, naming the trade actually accepted: an off-scale color
-at 2.57:1 in light mode, kept on purpose, so the next sweep does not re-find
-it.
-
 ### Copy
 
 No string is added or changed. Every string this proposal touches is carried
@@ -340,9 +326,6 @@ verbatim:
 - Home, restart pending: `Restart the app to apply your saved settings.`
 - Settings, restart pending: `Restart the app to apply. This app is still
   running on the settings it started with.`
-
-If D3 is ruled titled, the titles are new strings and join this block before
-implementation.
 
 ### Alternatives rejected
 
@@ -435,8 +418,8 @@ below. No callback signature, id, or settings-service behavior changes.
 ## Delivery plan
 
 1. **This PR: the proposal.** Default lane: the connector, one full Codex
-   review in co-design mode, the maintainer's deep read. Nothing ships until
-   D1 to D4 are ruled.
+   review in co-design mode, the maintainer's deep read. D1 to D4 were
+   ratified with the proposal on 2026-09-15.
 2. **One implementation PR** (Opus 5 at high, from a kickoff prompt that
    names the rulings), in three commits: the Home hint with its tests; the
    Settings notice with its tests (D4); the docs. It follows main, where the
@@ -444,8 +427,8 @@ below. No callback signature, id, or settings-service behavior changes.
    `HINT_TEXT` in `tests/test_home_stats_dir_hint.py` are the shipped ones.
 3. **Docs definition of done**, in the implementation PR: a decision-log
    entry that amends the 2026-08-30 entry's five-surface enumeration (a
-   superseded-in-part note there, the enumeration erased nowhere) and, if D4
-   is adopted, the 2026-08-02 entry for the Settings notice's look;
+   superseded-in-part note there, the enumeration erased nowhere) and the
+   2026-08-02 entry for the Settings notice's look;
    [`specs/scenario_performance.md`](../specs/scenario_performance.md#hosted-setup-surfaces)
    (Hosted setup surfaces),
    [`specs/settings.md`](../specs/settings.md#the-setup-card) (The setup
