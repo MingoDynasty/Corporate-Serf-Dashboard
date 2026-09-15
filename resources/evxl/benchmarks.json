@@ -15058,8 +15058,10 @@
         "rankColors": {
           "Solivagant": "#66FFA6",
           "Berserker": "#FF667F",
+          "Archon": "#FFB366",
+          "Blessed": "#669FFF",
           "Exalted": "#5FE8DF",
-          "Invictus": "#9966FF",
+          "Ascendant": "#9966FF",
           "Sovereign": "#FFE566"
         },
         "categories": [
