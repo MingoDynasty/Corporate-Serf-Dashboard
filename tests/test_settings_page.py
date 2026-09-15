@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import dash
+import dash_mantine_components as dmc
 import pytest
 from dash import no_update
 from dash._callback import GLOBAL_CALLBACK_LIST
@@ -124,6 +125,22 @@ def _component_by_id(root, component_id):
 
 def _save(stats_dir="", username="", steam_id="", n_clicks=1):
     return settings_page.save_user_settings(n_clicks, stats_dir, username, steam_id)
+
+
+def _restart_notice_sentence(children):
+    """Return the pending notice's sentence after checking the panel contents.
+
+    The warning icon sits beside the sentence, with no title above it.
+    """
+    assert isinstance(children, dmc.Group)
+    # Invisible to every other assertion: without it a sentence wider than the
+    # space beside the icon drops whole onto the row under the icon.
+    assert children.wrap == "nowrap"
+    icon, text = children.children
+    assert icon.className == "alert-panel-icon"
+    assert "material-symbols-warning-outline.svg" in icon.style["mask"]
+    assert isinstance(text, dmc.Text)
+    return text.children
 
 
 MAIN_ACCOUNT_ID = "76561197986713986"
@@ -421,7 +438,7 @@ def test_changing_a_consumed_identity_shows_the_restart_notice(clicked, tmp_path
 
     *_, notice, notice_class = _save(stats_dir=str(tmp_path), username="Second")
 
-    assert notice == settings_page.RESTART_NOTICE
+    assert _restart_notice_sentence(notice) == settings_page.RESTART_NOTICE
     assert notice_class == settings_page.RESTART_NOTICE_CLASS
 
 
@@ -435,7 +452,7 @@ def test_moving_the_stats_directory_shows_the_restart_notice(clicked, tmp_path):
 
     *_, notice, notice_class = _save(stats_dir=str(moved))
 
-    assert notice == settings_page.RESTART_NOTICE
+    assert _restart_notice_sentence(notice) == settings_page.RESTART_NOTICE
     assert notice_class == settings_page.RESTART_NOTICE_CLASS
 
 
@@ -451,8 +468,16 @@ def test_the_notice_survives_a_page_revisit(clicked, tmp_path):
 
     notice = _component_by_id(settings_page.layout(), "app-settings-restart-notice")
 
-    assert notice.children == settings_page.RESTART_NOTICE
+    assert isinstance(notice, dmc.Paper)
+    assert _restart_notice_sentence(notice.children) == settings_page.RESTART_NOTICE
     assert notice.className == settings_page.RESTART_NOTICE_CLASS
+    # Spelled out once: the caution modifier is what makes the panel yellow, and
+    # the equality above would pass for a constant that lost it.
+    assert notice.className.split() == [
+        "alert-panel",
+        "alert-panel-caution",
+        "app-settings-restart-notice",
+    ]
 
 
 def test_the_page_names_the_running_build(monkeypatch):

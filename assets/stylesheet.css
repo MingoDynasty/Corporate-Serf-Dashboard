@@ -332,7 +332,8 @@
    of a taller line box, visibly above the first line's middle. Half the
    leading drops it onto that middle; the icon inherits the sentence's line
    height, so 1lh is the sentence's line box. */
-.stats-dir-hint .alert-panel-icon {
+.stats-dir-hint .alert-panel-icon,
+.app-settings-restart-notice .alert-panel-icon {
     margin-top: calc((1lh - 1em) / 2);
 }
 
@@ -436,10 +437,11 @@ a.playlist-scenario-link-cell:hover {
 
 /* The settings page's restart notice: derived at render and after each save,
    so it stays put until the restart actually happens. Ships hidden; the save
-   callback and the layout drop the modifier when a change is pending. */
+   callback and the layout drop the modifier when a change is pending. A Stack
+   child otherwise runs the full page, so it is capped at the form fields' width
+   and ends where they do. */
 .app-settings-restart-notice {
-    color: var(--mantine-color-orange-filled);
-    font-size: var(--mantine-font-size-sm);
+    max-width: 40rem;
 }
 
 .app-settings-restart-notice-hidden {

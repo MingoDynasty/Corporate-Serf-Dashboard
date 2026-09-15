@@ -137,7 +137,10 @@ STORE_ALERT_CLASS = "app-settings-store-alert"
 # modifier when the store is in a state the user has to know about.
 STORE_ALERT_HIDDEN_CLASS = f"{STORE_ALERT_CLASS} app-settings-store-alert-hidden"
 
-RESTART_NOTICE_CLASS = "app-settings-restart-notice"
+# The caution panel in every state the notice has, identity or folder, working
+# install or first run: a saved change that is not in effect until the user
+# restarts needs the user without anything having failed.
+RESTART_NOTICE_CLASS = "alert-panel alert-panel-caution app-settings-restart-notice"
 # The notice ships hidden and is revealed by dropping this modifier, the same
 # way the playlists page reveals its cleanup alert.
 RESTART_NOTICE_HIDDEN_CLASS = (
@@ -247,11 +250,30 @@ def _validate(stats_dir: str, steam_id: str) -> tuple[str | None, str | None]:
     return stats_dir_error, steam_id_error
 
 
-def _restart_notice() -> tuple[str, str]:
-    """Build the notice's children and class for the current process state."""
+def _restart_notice() -> tuple[str | dmc.Group, str]:
+    """Build the notice's children and class for the current process state.
+
+    The pending children are the panel's contents, the warning icon beside the
+    sentence with no title, so a save swaps them in without rebuilding the
+    panel the layout placed.
+    """
     if not is_restart_pending():
         return "", RESTART_NOTICE_HIDDEN_CLASS
-    return RESTART_NOTICE, RESTART_NOTICE_CLASS
+    group = dmc.Group(
+        [
+            local_icon(
+                "material-symbols:warning-outline", className="alert-panel-icon"
+            ),
+            dmc.Text(RESTART_NOTICE),
+        ],
+        # Group defaults to wrap="wrap", which sizes the text at its one-line
+        # width and drops a sentence too wide for the space beside the icon
+        # whole onto the row under it instead of wrapping it there.
+        wrap="nowrap",
+        gap="xs",
+        align="flex-start",
+    )
+    return group, RESTART_NOTICE_CLASS
 
 
 def _store_alert() -> tuple[str, str]:
@@ -979,10 +1001,11 @@ def layout(**kwargs):  # noqa: ARG001
                 gap="md",
                 align="center",
             ),
-            dmc.Text(
+            dmc.Paper(
                 notice,
                 id="app-settings-restart-notice",
                 className=notice_class,
+                withBorder=True,
             ),
             dmc.Divider(),
             _celebrations_section(),
