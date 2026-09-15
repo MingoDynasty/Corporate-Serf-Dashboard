@@ -29,6 +29,16 @@ uv run mypy source
 uv run python -m compileall source tests
 ```
 
+Coverage is a local measurement, never a CI gate; pytest-cov is a dev
+dependency and `pyproject.toml` carries its settings. The app-startup tests run
+`source/app.py` in child processes that change into temp state roots, so the
+data file must be an absolute path or their results are lost:
+
+```powershell
+$env:COVERAGE_FILE = "$PWD\ignore\.coverage"
+uv run pytest tests --basetemp=ignore/pt --cov=source --cov=scripts --cov-report=term-missing
+```
+
 ## Layout
 
 - `source/` — application code. See `docs/architecture.md` for the module map

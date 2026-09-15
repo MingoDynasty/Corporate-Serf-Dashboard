@@ -1,0 +1,561 @@
+{
+  "name": "Control Track DOJO",
+  "code": "KovaaKsJumpingCobaltBsp",
+  "scenarios": [
+    {
+      "name": "ControlTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4025.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 203099
+    },
+    {
+      "name": "LeapTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4600.0
+        }
+      ],
+      "leaderboard_id": 203104
+    },
+    {
+      "name": "TwisterTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3925.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4675.0
+        }
+      ],
+      "leaderboard_id": 203157
+    },
+    {
+      "name": "MacroTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4325.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 203110
+    },
+    {
+      "name": "SwerveTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 5100.0
+        }
+      ],
+      "leaderboard_id": 203106
+    },
+    {
+      "name": "TornadoTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4075.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4425.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 203100
+    },
+    {
+      "name": "CozyTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 196979
+    },
+    {
+      "name": "MicroTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4300.0
+        }
+      ],
+      "leaderboard_id": 46113
+    },
+    {
+      "name": "DistanceTrack",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4550.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4850.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 5150.0
+        }
+      ],
+      "leaderboard_id": 203102
+    },
+    {
+      "name": "Control Paradise",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 200781
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsJumpingCobaltBsp",
+    "kovaaks_benchmark_id": 2819,
+    "rank_colors": [
+      [
+        "White Belt|\u767d\u5e2f",
+        "#FFFFFF"
+      ],
+      [
+        "Yellow Belt|\u9ec4\u5e2f",
+        "#E4E428"
+      ],
+      [
+        "Orange Belt|\u6a59\u5e2f",
+        "#D89925"
+      ],
+      [
+        "Green Belt|\u7dd1\u5e2f",
+        "#13A513"
+      ],
+      [
+        "Blue Belt|\u9752\u5e2f",
+        "#4176CB"
+      ],
+      [
+        "Purple Belt|\u7d2b\u5e2f",
+        "#5E259B"
+      ],
+      [
+        "Brown Belt|\u8336\u5e2f",
+        "#964B00"
+      ],
+      [
+        "Red Belt|\u8d64\u5e2f",
+        "#9B1B0A"
+      ],
+      [
+        "Black Belt|\u9ed2\u5e2f",
+        "#434343"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:24.297465+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

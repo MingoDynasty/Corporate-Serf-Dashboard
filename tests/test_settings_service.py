@@ -391,6 +391,22 @@ def test_changing_a_frozen_identity_is_pending(settings_path, saved):
     assert settings.is_restart_pending() is True
 
 
+def test_an_empty_steam_id_matches_a_frozen_unset_one(settings_path):
+    """A cleared field is stored as "", which is still unset, so nothing moved."""
+    settings.save_settings({"kovaaks_username": "First"})
+    settings.get_identity()
+
+    settings.save_settings({"kovaaks_username": "First", "steam_id": ""})
+
+    assert settings.is_restart_pending() is False
+
+    settings.save_settings(
+        {"kovaaks_username": "First", "steam_id": "76561197960287930"}
+    )
+
+    assert settings.is_restart_pending() is True
+
+
 def test_only_a_stats_directory_change_is_a_stats_directory_change(
     settings_path,
     tmp_path,

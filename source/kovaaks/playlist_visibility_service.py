@@ -48,6 +48,9 @@ DEFAULT_VISIBLE_CODES = frozenset(
         "KovaaKsBobbingSepiaBuff",  # Voltaic Advanced Benchmarks S5
         "KovaaKsBottingShinyDoor",  # Voltaic Intermediate Benchmarks S5
         "KovaaKsBouncingSilverBinding",  # Voltaic Novice Benchmarks S5
+        "KovaaKsChallengingNastyArmorshard",  # Voltaic Advanced Benchmarks S5.5
+        "KovaaKsCarryingNarrowCt",  # Voltaic Intermediate Benchmarks S5.5
+        "KovaaKsCapturingMountedHighground",  # Voltaic Novice Benchmarks S5.5
         "KovaaKsQuestingMaximumblueNightfall",  # Viscose benchmarks hard
         "KovaaKsPushingMauveWeaponlevel",  # Viscose benchmarks medium
         "KovaaKsRaidingMediumFaction",  # Viscose benchmarks easier

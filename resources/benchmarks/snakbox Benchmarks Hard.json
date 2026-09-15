@@ -1,0 +1,1011 @@
+{
+  "name": "snakbox Benchmarks Hard",
+  "code": "KovaaKsUltingSkyblueLostsector",
+  "scenarios": [
+    {
+      "name": "Pasu Reload Goated",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 135.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 150.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 165.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 180.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 195.0
+        }
+      ],
+      "leaderboard_id": 583
+    },
+    {
+      "name": "VT Bounceshot Viscose Hard",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 900.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 1400.0
+        }
+      ],
+      "leaderboard_id": 185230
+    },
+    {
+      "name": "Popcorn MV Advanced",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 300.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 380.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 450.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 500.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 550.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 76966
+    },
+    {
+      "name": "VT Floating Heads Intermediate S5 Hard",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 800.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 910.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 1225.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 1350.0
+        }
+      ],
+      "leaderboard_id": 106273
+    },
+    {
+      "name": "psalmTS angelic click",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 75.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 85.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 95.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 105.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 115.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 125.0
+        }
+      ],
+      "leaderboard_id": 578
+    },
+    {
+      "name": "Star Clicking - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 60.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 70.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 78.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 95.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 105.0
+        }
+      ],
+      "leaderboard_id": 29687
+    },
+    {
+      "name": "1w6ts reload v2",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 148.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 160.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 170.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 180.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 190.0
+        }
+      ],
+      "leaderboard_id": 666
+    },
+    {
+      "name": "1w2ts Perfected",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 135.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 145.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 154.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 162.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 170.0
+        }
+      ],
+      "leaderboard_id": 565
+    },
+    {
+      "name": "ww3t Voltaic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 140.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 155.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 165.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 175.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 185.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 195.0
+        }
+      ],
+      "leaderboard_id": 68
+    },
+    {
+      "name": "PGTI Voltaic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 99
+    },
+    {
+      "name": "Smoothbot Voltaic XSmall",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 4150.0
+        }
+      ],
+      "leaderboard_id": 657
+    },
+    {
+      "name": "VT PGT Advanced S5 snakbox",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 4400.0
+        }
+      ],
+      "leaderboard_id": 203486
+    },
+    {
+      "name": "Extra Controlsphere",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 12000.0
+        }
+      ],
+      "leaderboard_id": 562
+    },
+    {
+      "name": "Whisphere Small & Slow",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 20000.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 21500.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 23000.0
+        }
+      ],
+      "leaderboard_id": 34966
+    },
+    {
+      "name": "Air Angelic 4 Voltaic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 4650.0
+        }
+      ],
+      "leaderboard_id": 30
+    },
+    {
+      "name": "Air Voltaic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 875.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 881.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 887.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 892.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 897.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 901.0
+        }
+      ],
+      "leaderboard_id": 29
+    },
+    {
+      "name": "Air Angelic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 916.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 922.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 926.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 930.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 934.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 938.0
+        }
+      ],
+      "leaderboard_id": 419
+    },
+    {
+      "name": "Aimerz+ VGS Med S1",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 3925.0
+        }
+      ],
+      "leaderboard_id": 69298
+    },
+    {
+      "name": "VT DotTS Advanced S5 snakbox",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 1670.0
+        }
+      ],
+      "leaderboard_id": 203245
+    },
+    {
+      "name": "VT skyTS Advanced",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 1670.0
+        }
+      ],
+      "leaderboard_id": 25150
+    },
+    {
+      "name": "VT psalmTS Advanced",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 1380.0
+        }
+      ],
+      "leaderboard_id": 25177
+    },
+    {
+      "name": "kinTS Voltaic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 75.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 82.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 88.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 92.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 97.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 101.0
+        }
+      ],
+      "leaderboard_id": 604
+    },
+    {
+      "name": "B180T Voltaic",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 77.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 83.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 89.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 95.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 101.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 107.0
+        }
+      ],
+      "leaderboard_id": 947
+    },
+    {
+      "name": "snakSwitch",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 670.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 750.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 840.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 930.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 1100.0
+        }
+      ],
+      "leaderboard_id": 192578
+    },
+    {
+      "name": "cAt snortSwitch Hard",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 380.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 430.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 480.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 530.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 570.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 620.0
+        }
+      ],
+      "leaderboard_id": 83401
+    },
+    {
+      "name": "domiSwitch",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 8500.0
+        }
+      ],
+      "leaderboard_id": 83035
+    },
+    {
+      "name": "VT ControlTS Intermediate S5 30% Smaller",
+      "ranks": [
+        {
+          "name": "Stardust",
+          "color": "#5cabff",
+          "threshold": 400.0
+        },
+        {
+          "name": "Comet",
+          "color": "#567795",
+          "threshold": 440.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#a700b3",
+          "threshold": 480.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0088ff",
+          "threshold": 520.0
+        },
+        {
+          "name": "Supernova",
+          "color": "#2b00ff",
+          "threshold": 560.0
+        },
+        {
+          "name": "Singularity",
+          "color": "#000000",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 115804
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsUltingSkyblueLostsector",
+    "kovaaks_benchmark_id": 2510,
+    "rank_colors": [
+      [
+        "Stardust",
+        "#5cabff"
+      ],
+      [
+        "Comet",
+        "#567795"
+      ],
+      [
+        "Nebula",
+        "#a700b3"
+      ],
+      [
+        "Pulsar",
+        "#0088ff"
+      ],
+      [
+        "Supernova",
+        "#2b00ff"
+      ],
+      [
+        "Singularity",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:36.055768+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

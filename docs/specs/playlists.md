@@ -107,9 +107,9 @@ section and [product.md](../product.md). Leaderboard placement is worded
   ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
 - Visibility is a per-code show-list in `data/playlist_visibility.json`,
   uniform for bundled and user playlists. A missing or unusable file yields
-  the first-run seed (eleven Voltaic S5 and Viscose codes plus every
-  user-root code) without writing; a usable file is authoritative, even
-  empty. Hidden playlists still load, route, and draw rank overlays
+  the first-run seed (fourteen Voltaic S5, Voltaic S5.5, and Viscose codes
+  plus every user-root code) without writing; a usable file is
+  authoritative, even empty. Hidden playlists still load, route, and draw rank overlays
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
   The browser-persisted "Show hidden" switch reveals them muted, and the eye
   cell toggles one code with no confirm step. The file is
@@ -270,8 +270,12 @@ section and [product.md](../product.md). Leaderboard placement is worded
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface));
-  230 files as of 2026-08-22. User playlists live under `data/playlists/`,
-  created on first import. Files load in `(filename.casefold(), filename)`
+  253 files as of 2026-09-14. It holds Evxl's listed, non-hidden benchmarks:
+  a benchmark Evxl delists is removed even if KovaaK's still serves it, and
+  a hidden one waits until Evxl unhides it
+  ([2026-09-15](../decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)).
+  User playlists live under `data/playlists/`, created on first import.
+  Files load in `(filename.casefold(), filename)`
   order per root, bundled root first; the first file for a code wins, and a
   shadowed one is skipped with a startup warning buffered for the UI
   ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)).

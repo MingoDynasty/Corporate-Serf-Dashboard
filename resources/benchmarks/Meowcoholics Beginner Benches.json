@@ -1,0 +1,1027 @@
+{
+  "name": "Meowcoholics Beginner Benches",
+  "code": "KovaaKsHeadshottingSmoothStart",
+  "scenarios": [
+    {
+      "name": "VT 1w4ts Novice S5 Pokeball Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 500.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 600.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 700.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 800.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 900.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 1600.0
+        }
+      ],
+      "leaderboard_id": 159140
+    },
+    {
+      "name": "Aimerz+ ww2t Easy S1Pokeball",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 72.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 81.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 90.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 100.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 110.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 122.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 155.0
+        }
+      ],
+      "leaderboard_id": 189823
+    },
+    {
+      "name": "1w4ts reload 50% bigger",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 55.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 66.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 77.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 88.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 99.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 165.0
+        }
+      ],
+      "leaderboard_id": 21679
+    },
+    {
+      "name": "Wide Wall 3 Targets TE",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 68.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 79.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 90.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 101.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 112.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 195.0
+        }
+      ],
+      "leaderboard_id": 591
+    },
+    {
+      "name": "1w2ts Vertical Flicks easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 80.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 84.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 88.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 92.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 96.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 100.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 160.0
+        }
+      ],
+      "leaderboard_id": 164921
+    },
+    {
+      "name": "Pasu Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 15.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 24.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 33.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 42.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 51.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 60.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 110.0
+        }
+      ],
+      "leaderboard_id": 605
+    },
+    {
+      "name": "B180 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 30.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 40.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 50.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 60.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 70.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 80.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 125.0
+        }
+      ],
+      "leaderboard_id": 405
+    },
+    {
+      "name": "Ground Plaza Sparky v3 Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 750.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 770.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 790.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 810.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 830.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 850.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 912.0
+        }
+      ],
+      "leaderboard_id": 134502
+    },
+    {
+      "name": "MLSI Demotori Easy + Slower",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 5250.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 6700.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 8200.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 14000.0
+        }
+      ],
+      "leaderboard_id": 174568
+    },
+    {
+      "name": "Air Divine Avasive Easier",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 5550.0
+        }
+      ],
+      "leaderboard_id": 203408
+    },
+    {
+      "name": "Air Angelic Easier 90%",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 830.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 844.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 858.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 872.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 886.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 900.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 945.0
+        }
+      ],
+      "leaderboard_id": 194104
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 14000.0
+        }
+      ],
+      "leaderboard_id": 392
+    },
+    {
+      "name": "Smoothsphere Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 6200.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 7300.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 15500.0
+        }
+      ],
+      "leaderboard_id": 2102
+    },
+    {
+      "name": "Avasive bukeTrack Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 5300.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 6200.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 13500.0
+        }
+      ],
+      "leaderboard_id": 130665
+    },
+    {
+      "name": "VT PGT Novice S5",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 98060
+    },
+    {
+      "name": "PGTI Voltaic Easy 70%",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 800.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 3350.0
+        }
+      ],
+      "leaderboard_id": 1914
+    },
+    {
+      "name": "cloverRawControl Easy Big",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 14500.0
+        }
+      ],
+      "leaderboard_id": 156759
+    },
+    {
+      "name": "StaticSwitchingVox Jumbo",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 90.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 98.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 106.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 114.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 122.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 188.0
+        }
+      ],
+      "leaderboard_id": 15654
+    },
+    {
+      "name": "Aimerz+ Week #5 - Static Switching 30% Larger",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 11300.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 18000.0
+        }
+      ],
+      "leaderboard_id": 111216
+    },
+    {
+      "name": "DotTS Entry",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 3200.0
+        }
+      ],
+      "leaderboard_id": 111232
+    },
+    {
+      "name": "B180T Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 20.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 28.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 36.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 44.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 52.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 60.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 95.0
+        }
+      ],
+      "leaderboard_id": 543
+    },
+    {
+      "name": "psalmTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 30.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 39.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 48.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 57.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 66.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 76.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 110.0
+        }
+      ],
+      "leaderboard_id": 960
+    },
+    {
+      "name": "VT Penta Bounce Novice S5",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 200.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 240.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 280.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 320.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 360.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 400.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 735.0
+        }
+      ],
+      "leaderboard_id": 103262
+    },
+    {
+      "name": "voxTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Mocktail",
+          "color": "#ff1d1d",
+          "threshold": 60.0
+        },
+        {
+          "name": "Mimosa",
+          "color": "#ff9900",
+          "threshold": 68.0
+        },
+        {
+          "name": "Bloody Mary",
+          "color": "#f1c232",
+          "threshold": 76.0
+        },
+        {
+          "name": "Moscow Mule",
+          "color": "#46c6a8",
+          "threshold": 84.0
+        },
+        {
+          "name": "Old Fashioned",
+          "color": "#3d85c6",
+          "threshold": 92.0
+        },
+        {
+          "name": "Margarita",
+          "color": "#b479ff",
+          "threshold": 100.0
+        },
+        {
+          "name": "Blackout",
+          "color": "#000000",
+          "threshold": 136.0
+        }
+      ],
+      "leaderboard_id": 577
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHeadshottingSmoothStart",
+    "kovaaks_benchmark_id": 2934,
+    "rank_colors": [
+      [
+        "Mocktail",
+        "#ff1d1d"
+      ],
+      [
+        "Mimosa",
+        "#ff9900"
+      ],
+      [
+        "Bloody Mary",
+        "#f1c232"
+      ],
+      [
+        "Moscow Mule",
+        "#46c6a8"
+      ],
+      [
+        "Old Fashioned",
+        "#3d85c6"
+      ],
+      [
+        "Margarita",
+        "#b479ff"
+      ],
+      [
+        "Blackout",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:05:38.252609+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

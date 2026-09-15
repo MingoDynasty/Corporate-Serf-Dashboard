@@ -4,6 +4,8 @@ version = "1.0.0"
 description = "Dash web app that monitors your KovaaK's stats directory and turns your runs into training insight."
 readme = "README.md"
 requires-python = ">=3.14"
+authors = [{ name = "MingoDynasty" }]
+license = "AGPL-3.0-or-later"
 # Lower bounds track the versions actually locked and tested (uv.lock is the
 # source of truth for what gets installed). They are not a compatibility
 # promise for older releases: resolving at the previous floors produced an app
@@ -93,6 +95,13 @@ files = ["source"]
 addopts = "-q -p no:cacheprovider"
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+# The app-startup tests run source/app.py in child processes, which pytest-cov 7
+# no longer measures on its own; without this patch app.py reads as 0% covered.
+patch = ["subprocess"]
 
 [dependency-groups]
 dev = [

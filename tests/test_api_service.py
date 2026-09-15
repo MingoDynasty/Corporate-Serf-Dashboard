@@ -735,6 +735,20 @@ def test_benchmarks_response_allows_rank_without_color():
     assert response.ranks[0].name == "Copper"
 
 
+def test_benchmarks_response_allows_fractional_benchmark_progress():
+    """KovaaK's sends a fractional top-level progress on some benchmarks."""
+    payload = {
+        "benchmark_progress": 74452.55,
+        "overall_rank": 2,
+        "categories": {},
+        "ranks": [],
+    }
+
+    response = BenchmarksAPIResponse.model_validate(payload)
+
+    assert response.benchmark_progress == 74452.55
+
+
 def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
     calls = []
 

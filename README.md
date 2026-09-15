@@ -381,6 +381,8 @@ reasoning behind the durable choices is public in the
 
 ## License
 
+Copyright (C) 2025-2026 MingoDynasty
+
 Corporate Serf Dashboard is free software under the
-[GNU Affero General Public License v3.0](LICENSE). Derivatives stay free and
-open source on the same terms.
+[GNU Affero General Public License](LICENSE), version 3 or (at your option)
+any later version. Derivatives stay free and open source on the same terms.

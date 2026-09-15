@@ -13,6 +13,44 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-15: The Bundled Corpus Is Evxl's Listed, Non-Hidden Benchmarks
+
+Status: Accepted
+
+The app ships a benchmark only while Evxl lists it and does not mark it
+hidden. When Evxl delists a benchmark, its file leaves the app at the next
+refresh, even if KovaaK's still serves it. A benchmark Evxl marks hidden
+stays out until Evxl unhides it. Refreshes apply both rules without asking
+the maintainer again.
+
+**The rule.** `resources/benchmarks/` holds the importable sharecodes that
+the committed Evxl snapshot (`resources/evxl/benchmarks.json`) lists under a
+benchmark without `hidden: true`. The maintainer made both calls for the
+2026-09-14 refresh and ruled them standing rules on 2026-09-15
+([PR #289 thread](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/289#discussion_r4013683306)):
+
+- **Delisting removes.** A bundled file whose sharecode the refreshed
+  snapshot no longer lists is deleted in the refresh PR, even when KovaaK's
+  still serves that benchmark ID unchanged. First applied to
+  `Trial of Lords S2.json` (Black Dawn / Trials V2, benchmark 2285), which
+  still matched KovaaK's exactly when Evxl dropped Black Dawn.
+- **Hidden waits.** A sharecode under a hidden benchmark is not imported
+  until Evxl unhides it. First applied to AIMCORE Benchmarks S1 and The Good
+  Benchmark. Voltaic S5.5 Advanced had been kept out on the same grounds
+  since the 2026-07-11 curation, and was imported once Evxl unhid it. A
+  bundled benchmark that Evxl later hides is not covered by this ruling.
+
+**The importer enforces neither rule.** `load_evxl_data` does not filter
+`hidden`, and a sweep leaves the file for a removed sharecode in place,
+logging that the manifest contains a removed sharecode. The refresh author
+applies both: generate with `--only` over the listed, non-hidden codes, and
+delete delisted files in the same PR.
+
+**Consequences.** Corpus membership can be checked against the committed
+snapshot alone, so a reviewer can verify a refresh PR mechanically. A user
+who had a delisted benchmark shown stops seeing it after the update, with no
+migration.
+
 ## 2026-09-14: App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out
 
 Status: Accepted
@@ -2448,7 +2486,8 @@ in the shipping PR and git history holds its full text.
 Status: Accepted
 
 Corporate Serf Dashboard is licensed under the GNU Affero General Public
-License v3.0, and contributors are not asked to sign a contributor agreement.
+License, version 3 or any later version, its copyright is held by
+MingoDynasty, and contributors are not asked to sign a contributor agreement.
 Anyone may use, change, and redistribute it, but a version they pass on has to
 stay free and open source under the same terms. The choice was confirmed
 deliberately on 2026-08-10, before the public launch, because it is the one
@@ -2460,6 +2499,23 @@ from other projects keep their own terms, so this is not a whole-tree claim.
 request is accepted on its merits, and its author keeps their copyright. The
 ruling is from 2026-08-10; the README's `## License` section has stated the
 license publicly since PR #278, and this entry is the record of why.
+
+**Amended 2026-09-13: the holder is named and the version form is chosen.**
+The maintainer ruled both on 2026-09-13. The copyright holder is
+MingoDynasty, the maintainer's commit and GitHub handle, and it is the sole
+holder: `git shortlog -sne fd812fd`, run on the amending PR's base, lists only
+the maintainer's own identity and the maintainer's Codex and Claude agent
+sessions. The license form is AGPL-3.0-or-later. Until this amendment the
+README said "v3.0" with no "or any later version" wording, and section 14 of
+the license applies only the named version in that case, so the project was
+3.0-only by omission rather than by ruling. Or-later was chosen so that a
+future AGPL revision, such as one fixing a flaw, can be adopted without
+relicensing, which stops being possible at the first outside contribution.
+Section 14 bounds the risk the other way: later versions are promised to be
+similar in spirit, and following one imposes no additional obligation on any
+author or copyright holder. Per-file copyright headers were considered and
+rejected: the project has a single author, `LICENSE` is enforced into every
+release zip, and the app header links the source.
 
 **Bundled third-party assets keep their own licenses**, and this is not a
 whole-tree AGPL claim. `assets/vendor/canvas-confetti.js` is ISC
@@ -2501,7 +2557,11 @@ after.
 **Where the terms travel.** `LICENSE` is named in `REQUIRED_ARCHIVE_ENTRIES`
 in `scripts/release_job.py`, so a release whose zip lost it fails the draft
 rather than shipping: every published copy carries the terms. The README's
-`## License` section states them for readers who never open the file.
+`## License` section states them for readers who never open the file. Since
+the 2026-09-13 amendment that section also carries the copyright line, and
+`pyproject.toml` carries `authors` and the SPDX `license` expression
+`AGPL-3.0-or-later`. Both files are release-archive entries too, so every
+published zip carries the notice and the metadata.
 
 ## 2026-08-10: Bug Reports Land On GitHub Issues, With The Log Attached Unredacted And Disclosed
 
