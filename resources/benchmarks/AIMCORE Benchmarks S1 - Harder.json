@@ -1,0 +1,781 @@
+{
+  "name": "AIMCORE Benchmarks S1 - Harder",
+  "code": "KovaaKsCounterstrafingBurntorangeTile",
+  "scenarios": [
+    {
+      "name": "AC KittyClick Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 104.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 112.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 119.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 125.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 131.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 136.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 141.0
+        }
+      ],
+      "leaderboard_id": 203904
+    },
+    {
+      "name": "AC BunnyClick Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 89.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 98.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 106.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 113.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 119.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 124.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 129.0
+        }
+      ],
+      "leaderboard_id": 203905
+    },
+    {
+      "name": "AC PuppyClick Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 85.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 90.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 95.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 100.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 105.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 110.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 115.0
+        }
+      ],
+      "leaderboard_id": 203906
+    },
+    {
+      "name": "AC MicroShot Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 147.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 154.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 161.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 168.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 175.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 182.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 189.0
+        }
+      ],
+      "leaderboard_id": 203907
+    },
+    {
+      "name": "AC WideShot Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 67.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 71.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 75.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 80.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 85.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 90.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 95.0
+        }
+      ],
+      "leaderboard_id": 203908
+    },
+    {
+      "name": "AC ClusterShot Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 182.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 189.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 196.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 203.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 210.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 217.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 224.0
+        }
+      ],
+      "leaderboard_id": 203909
+    },
+    {
+      "name": "AC Driftsphere Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 12200.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 13400.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 14600.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 15200.0
+        }
+      ],
+      "leaderboard_id": 203272
+    },
+    {
+      "name": "AC Arcstrafes Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 204001
+    },
+    {
+      "name": "AC FlowerXYZ Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 4750.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 4900.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 5050.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 5250.0
+        }
+      ],
+      "leaderboard_id": 203911
+    },
+    {
+      "name": "AC AirDodge Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 4350.0
+        }
+      ],
+      "leaderboard_id": 203912
+    },
+    {
+      "name": "AC PlazaDodge Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 4400.0
+        }
+      ],
+      "leaderboard_id": 203913
+    },
+    {
+      "name": "AC RoboStrafes Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 15300.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 15800.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 16300.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 16800.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 17300.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 17700.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 18200.0
+        }
+      ],
+      "leaderboard_id": 203914
+    },
+    {
+      "name": "AC MicroTS Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 122.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 128.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 133.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 137.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 141.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 144.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 147.0
+        }
+      ],
+      "leaderboard_id": 203915
+    },
+    {
+      "name": "AC PillTS Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 124.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 130.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 136.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 141.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 147.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 153.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 159.0
+        }
+      ],
+      "leaderboard_id": 203916
+    },
+    {
+      "name": "AC SpeedTS 360 Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 107.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 112.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 117.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 122.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 127.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 132.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 137.0
+        }
+      ],
+      "leaderboard_id": 203917
+    },
+    {
+      "name": "AC Wispswitch Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 63.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 66.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 69.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 72.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 74.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 76.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 78.0
+        }
+      ],
+      "leaderboard_id": 203975
+    },
+    {
+      "name": "AC AirSwitch Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 56.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 59.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 61.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 64.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 68.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 71.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 74.0
+        }
+      ],
+      "leaderboard_id": 203919
+    },
+    {
+      "name": "AC EvaSwitch 360 Harder",
+      "ranks": [
+        {
+          "name": "Nomad",
+          "color": "#e5df00",
+          "threshold": 65.0
+        },
+        {
+          "name": "Chrome",
+          "color": "#e5c400",
+          "threshold": 69.0
+        },
+        {
+          "name": "Zero",
+          "color": "#e3a325",
+          "threshold": 72.0
+        },
+        {
+          "name": "Delta",
+          "color": "#df8139",
+          "threshold": 75.0
+        },
+        {
+          "name": "Daemon",
+          "color": "#dd5c41",
+          "threshold": 78.0
+        },
+        {
+          "name": "Atomic",
+          "color": "#da474c",
+          "threshold": 81.0
+        },
+        {
+          "name": "Scarlet",
+          "color": "#e01f2f",
+          "threshold": 84.0
+        }
+      ],
+      "leaderboard_id": 203920
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCounterstrafingBurntorangeTile",
+    "kovaaks_benchmark_id": 2892,
+    "rank_colors": [
+      [
+        "Nomad",
+        "#e5df00"
+      ],
+      [
+        "Chrome",
+        "#e5c400"
+      ],
+      [
+        "Zero",
+        "#e3a325"
+      ],
+      [
+        "Delta",
+        "#df8139"
+      ],
+      [
+        "Daemon",
+        "#dd5c41"
+      ],
+      [
+        "Atomic",
+        "#da474c"
+      ],
+      [
+        "Scarlet",
+        "#e01f2f"
+      ]
+    ],
+    "generated_at": "2026-09-15T18:08:46.927546+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
