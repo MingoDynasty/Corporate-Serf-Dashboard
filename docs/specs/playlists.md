@@ -270,7 +270,7 @@ section and [product.md](../product.md). Leaderboard placement is worded
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface));
-  256 files as of 2026-09-15. It holds Evxl's listed, non-hidden benchmarks:
+  257 files as of 2026-09-15. It holds Evxl's listed, non-hidden benchmarks:
   a benchmark Evxl delists is removed even if KovaaK's still serves it, and
   a hidden one waits until Evxl unhides it
   ([2026-09-15](../decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)).
