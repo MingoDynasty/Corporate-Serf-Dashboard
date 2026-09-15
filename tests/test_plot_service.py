@@ -236,6 +236,19 @@ def test_rank_overlays_include_boundary_ties() -> None:
     assert _drawn_ranks(ladder, [70.0, 80.0]) == ["B", "C", "D"]
 
 
+def test_rank_overlays_include_thresholds_at_the_plotted_range_edges() -> None:
+    # Thresholds equal to the lowest and highest plotted score are in range, not
+    # context. Context selection is strict, so an exclusive range check would
+    # drop B and C from the overlay entirely.
+    ladder = [
+        Rank(name="A", color="#111111", threshold=30.0),
+        Rank(name="B", color="#222222", threshold=70.0),
+        Rank(name="C", color="#333333", threshold=80.0),
+        Rank(name="D", color="#444444", threshold=90.0),
+    ]
+    assert _drawn_ranks(ladder, [70.0, 80.0]) == ["A", "B", "C", "D"]
+
+
 def _point_figure() -> go.Figure:
     """A two-trace stand-in for a scored figure, run trace second."""
     return go.Figure(

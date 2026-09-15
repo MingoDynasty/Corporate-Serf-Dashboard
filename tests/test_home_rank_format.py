@@ -547,6 +547,16 @@ def test_format_scenario_rank_with_total_players():
     assert format_scenario_rank(rank_info) == "11,266 of 18,342 (38.58% Percentile)"
 
 
+def test_format_scenario_rank_with_total_players_but_no_percentile():
+    rank_info = ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        rank=11266,
+        total_players=18342,
+    )
+
+    assert format_scenario_rank(rank_info) == "11,266 of 18,342"
+
+
 def test_format_scenario_rank_without_total_players():
     rank_info = ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
