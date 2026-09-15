@@ -94,6 +94,13 @@ addopts = "-q -p no:cacheprovider"
 pythonpath = ["."]
 testpaths = ["tests"]
 
+[tool.coverage.run]
+branch = true
+parallel = true
+# The app-startup tests run source/app.py in child processes, which pytest-cov 7
+# no longer measures on its own; without this patch app.py reads as 0% covered.
+patch = ["subprocess"]
+
 [dependency-groups]
 dev = [
     "datamodel-code-generator>=0.79.0",
