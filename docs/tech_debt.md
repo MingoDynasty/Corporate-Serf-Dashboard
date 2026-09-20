@@ -16,7 +16,7 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The four entries below were established by the two 2026-08-12 audits, which
+The first four entries below were established by the two 2026-08-12 audits, which
 hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
@@ -56,6 +56,20 @@ reconciles.
 `source/my_watchdog/file_watchdog.py` — the handler has no event dedup, so
 duplicate create events and delete/recreate patterns for one logical run file
 import it twice (observed in the 2026-08-12 soak).
+
+### A rank above the cached total prints a negative percentile
+
+`source/kovaaks/api_service.py` — `_with_percentile` guards `total_players <=
+0` but never `rank > total_players`, and the midpoint formula goes negative
+past that point. Any path that pairs a fresh rank with an older, smaller
+cached total can reach it: a board that grew from 500 to 1,200 inside the
+one-week total TTL shows a 900th placement as `900 of 500 (-79.90%
+percentile)`. A clicked Refresh no longer reaches it — the
+[2026-09-19 entry](decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)
+re-reads the total with the rank — but the warmup worker, the playlist
+scenarios fill, and a TTL-expired foreground lookup all still can. Found while
+shipping that entry and deliberately left out of it: the guard belongs with
+the formula, not with one caller's refresh policy.
 
 ## Code Smells
 
