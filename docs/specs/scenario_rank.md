@@ -112,10 +112,13 @@ benchmark tier) — see the
 - `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
   both default to `168`
   ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
-- Both TTLs govern automatic paths only. `force_refresh` marks a lookup
-  board-authoritative for the whole readout and bypasses the rank cache and
-  the leaderboard-total TTL alike, so a live position meets a week-old count
-  only when the total re-read fails, which the result marks
+- Both TTLs govern automatic paths that fetch. A cache-only read
+  (`allow_network=False`, used by the playlists overview, the Home interval
+  tick and the playlist scenarios first paint) serves the rank and total
+  caches regardless of age, so neither TTL applies to it. `force_refresh`
+  marks a lookup board-authoritative for the whole readout and bypasses the
+  rank cache and the leaderboard-total TTL alike, so a live position meets a
+  week-old count only when the total re-read fails, which the result marks
   ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - Every automatic rank-cache write routes through one process-locked
   monotonic writer, so a lower score or transient `UNRANKED` result never
