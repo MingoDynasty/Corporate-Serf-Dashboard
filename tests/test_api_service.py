@@ -939,7 +939,8 @@ def test_with_percentile_omits_incomplete_or_unranked_results(rank_info):
     assert api_service._with_percentile(rank_info).percentile is None
 
 
-def test_with_percentile_suppresses_a_rank_above_the_cached_total(caplog):
+def test_with_percentile_suppresses_a_rank_above_the_cached_total(monkeypatch, caplog):
+    monkeypatch.setattr(api_service, "_warned_rank_over_total", {})
     rank_info = ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
         leaderboard_id=98330,
@@ -957,6 +958,35 @@ def test_with_percentile_suppresses_a_rank_above_the_cached_total(caplog):
     assert [record.getMessage() for record in caplog.records] == [
         "Rank 900 for Some Scenario (leaderboard 98330) exceeds the cached "
         "total 500; suppressing the percentile."
+    ]
+
+
+def test_with_percentile_warns_once_per_leaderboard_rank_and_total(monkeypatch, caplog):
+    """The cache-only read path re-derives every tick; the log must not follow."""
+    monkeypatch.setattr(api_service, "_warned_rank_over_total", {})
+    rank_info = ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        leaderboard_id=98330,
+        scenario_name="Some Scenario",
+        rank=900,
+        total_players=500,
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        for _ in range(3):
+            api_service._with_percentile(rank_info)
+        api_service._with_percentile(rank_info.model_copy(update={"rank": 901}))
+        api_service._with_percentile(
+            rank_info.model_copy(update={"leaderboard_id": 11111})
+        )
+
+    assert [record.getMessage() for record in caplog.records] == [
+        "Rank 900 for Some Scenario (leaderboard 98330) exceeds the cached "
+        "total 500; suppressing the percentile.",
+        "Rank 901 for Some Scenario (leaderboard 98330) exceeds the cached "
+        "total 500; suppressing the percentile.",
+        "Rank 900 for Some Scenario (leaderboard 11111) exceeds the cached "
+        "total 500; suppressing the percentile.",
     ]
 
 

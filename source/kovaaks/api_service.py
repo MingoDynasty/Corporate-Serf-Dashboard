@@ -1258,6 +1258,16 @@ def get_leaderboard_total(
     return total_players
 
 
+# The rank/total pair last warned about, per leaderboard. The cache-only read
+# path re-derives the percentile on every polling tick (1 s by default) and the
+# playlists overview re-derives it once per played scenario, so warning every
+# time would fill both rotating logs for as long as the total stays stale.
+# Keying on the pair rather than the leaderboard alone lets a moved rank or a
+# refreshed total report itself once more. Racing threads may duplicate a line;
+# a lock would buy nothing a log line needs.
+_warned_rank_over_total: dict[int | None, tuple[int, int]] = {}
+
+
 def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
     """Attach display-only percentile when rank and leaderboard total are known."""
     if (
@@ -1273,14 +1283,17 @@ def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
     # has no floor past that point: it yields a negative percentile, which the
     # playlists overview would then take into its median and lowest.
     if rank_info.rank > rank_info.total_players:
-        logger.warning(
-            "Rank %s for %s (leaderboard %s) exceeds the cached total %s; "
-            "suppressing the percentile.",
-            rank_info.rank,
-            rank_info.scenario_name or "?",
-            rank_info.leaderboard_id,
-            rank_info.total_players,
-        )
+        pair = (rank_info.rank, rank_info.total_players)
+        if _warned_rank_over_total.get(rank_info.leaderboard_id) != pair:
+            _warned_rank_over_total[rank_info.leaderboard_id] = pair
+            logger.warning(
+                "Rank %s for %s (leaderboard %s) exceeds the cached total %s; "
+                "suppressing the percentile.",
+                rank_info.rank,
+                rank_info.scenario_name or "?",
+                rank_info.leaderboard_id,
+                rank_info.total_players,
+            )
         return rank_info
 
     return rank_info.model_copy(

@@ -30,6 +30,10 @@ Decision: `_with_percentile` derives nothing when `rank > total_players`. It
 returns the result unchanged — `rank` and `total_players` both survive,
 `percentile` stays `None` — and logs the scenario, leaderboard id, rank and
 total at WARNING so the staleness is diagnosable from `data/logs/debug.log`.
+That warning is emitted once per leaderboard per rank/total pair, because the
+cache-only read path re-derives the percentile on every polling tick and the
+playlists overview re-derives it per played scenario: one line in the log
+means one condition, not one occurrence.
 The guard is strictly `>`: `rank == total_players` is a real last place on the
 board and keeps its
 [midpoint value](#2026-04-27-use-the-midpoint-percentile-formula).
