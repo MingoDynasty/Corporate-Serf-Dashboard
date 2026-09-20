@@ -45,10 +45,16 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - With `show_version_in_title` enabled, the tab title is prefixed with the
   build's release label; the key is specified in
   [settings.md](settings.md#the-configuration-file).
-- `?scenario=` and `?playlist_code=` query parameters preselect the
-  dropdowns, and a control set by query parameter neither restores nor
-  stores a persisted value that visit; an unknown playlist code selects
-  nothing while still counting as set for that visit's persistence.
+- `?scenario=` and `?playlist_code=` query parameters select the dropdowns,
+  and the selection they make is remembered exactly like one made by hand:
+  arriving from a Playlists grid scenario link and then returning to the page
+  shows that playlist and scenario, not an earlier one
+  ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
+  A parameter the URL omits leaves its control on the remembered value, so
+  `?scenario=` alone keeps the playlist filter. An unknown playlist code
+  clears the filter. The parameters are applied on every load of that URL, so
+  reloading a deep link re-applies it over a later choice; the navbar link
+  and the header title are the way back to the remembered selection.
 
 ## The controls row
 
@@ -59,8 +65,8 @@ of scope here, apart from its chart toolbar, noted under The graph.
   picker (defaults to January 1 of the current year; no future dates), and
   the Scenario Stats block. A second column carries the "Score vs
   Sensitivity" / "Score vs Time" radio (default Score vs Sensitivity) and
-  the "Chart options" button. Every control except the two dropdowns
-  persists in the browser unconditionally. The follow switch and the Top N
+  the "Chart options" button. Every control in the row persists in the
+  browser, the two dropdowns included. The follow switch and the Top N
   input carry help tooltips; the other row controls have plain labels.
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation

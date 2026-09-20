@@ -13,6 +13,85 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-19: A Query Parameter Selects A Control, It Does Not Suspend Its Memory
+
+Status: Accepted
+
+Clicking a scenario in a playlist now counts as choosing it. Before, arriving
+at Scenario Performance from a playlist link put the page into a mode where
+nothing the user picked was remembered, so going back to the page snapped both
+dropdowns to a selection that could be weeks old. The page now remembers a
+selection however it was made, and the navbar link returns to the latest one.
+
+**The bug.** `layout()` derived `persistence=playlist_code is None` and
+`persistence=scenario is None` for the two dropdowns, so a
+`/?playlist_code=…&scenario=…` arrival rendered both with `persistence=False`.
+Dash's `recordUiEdit` returns early on a falsy `persistence`, so every
+selection made during that visit went unrecorded; `persistenceMods` skips the
+component for the same reason, so the value stored *before* the visit was not
+cleared either. Returning to `/` re-enabled persistence against a layout
+`value` of `None`, which matched the stored original, and the pre-visit value
+was restored. Confirmed against the shipped `dash_renderer` and reproduced in
+a browser: with no deep-linked visit the selection survives a Home click; with
+one, both dropdowns revert, through the navbar link and the header title
+alike.
+
+**The invariant this establishes.** *A browser-persisted control's layout
+default never varies per visit; a per-visit initial value arrives by
+callback.* Dash pins a persisted edit to the layout value it was made against
+and discards the edit when a later visit renders a different one, so a default
+that varies per visit retires persistence for that control instead of
+overriding it. This is the per-visit twin of the keyed-by-id rule in
+[2026-08-09](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph),
+and it binds any future `?param=` preselect on any page.
+
+**The mechanism.** Both dropdowns carry `persistence=True` and an explicit
+`value=None` on every visit. `layout()` resolves the query parameters into a
+layout-bound `dcc.Store` (`home-deep-link`), and one callback,
+`apply_deep_link`, writes them to the two dropdowns. Callback-written values
+*are* persisted — the response path reaches `recordUiEdit` — so the deep link
+becomes an ordinary remembered selection. Details that are load-bearing:
+
+- **`value=None` is explicit, not omitted.** An omitted prop is `undefined`
+  rather than `null`, which would not match the original already stored in
+  every existing browser and would discard those values on upgrade.
+- **A layout-bound store, not the URL.** Dash Pages rebuilds the page on a
+  route change and the store then triggers exactly one write, keeping the deep
+  link out of the router's callback graph — the same reason
+  [2026-04-29](#2026-04-29-drive-playlist-table-loads-from-mounted-route-state)
+  drives the playlist scenario table from mounted route state.
+- **`allow_duplicate` plus `prevent_initial_call="initial_duplicate"`.**
+  `check_for_new_data` already writes the scenario value, and applying the
+  deep link is the mount's whole job. Folding it into `check_for_new_data` was
+  rejected: that callback's `prevent_initial_call=True` stops a remount
+  replaying the retained run-event batch.
+- **Presence, not just value.** The store records a key only for a parameter
+  the URL carried, and the callback returns `no_update` for the rest, so
+  `?scenario=` alone leaves the playlist filter on the restored value. An
+  unknown playlist code is recorded with no value and clears the filter, which
+  is what applying the URL's selection as given means.
+
+**The URL is not rewritten after the deep link is consumed**, so a reload
+re-applies it over a later choice. `_pages_location.search` is a router
+`Input`; rewriting it would remount the page. The behavior matches a URL with
+parameters read as a bookmark, and the navbar link is the way back.
+
+**Accepted cost.** Persistence restores the previous selection before the
+callback's value lands, so a deep-linked visit shows the old playlist name for
+one round trip. Dash holds every dependent callback until the write completes,
+so the chart is built once, from the deep-linked values, and never paints a
+wrong plot. A clientside callback would shrink the transient to a frame at the
+cost of moving the resolution out of Python; it stays available if the
+transient ever proves visible.
+
+**Rejected.** Keeping `persistence=False` for the visit and clearing the
+stored keys from the browser: it depends on dash-renderer's private key format
+and still discards the visit's selections. Keeping the query value as the
+layout `value` with persistence on: the pinned original then becomes the query
+value, so the next Home visit discards the entry and both dropdowns come up
+empty — the same loss, reached differently. No prior entry governed the
+original behavior, so nothing is superseded.
+
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
 
 Status: Accepted
