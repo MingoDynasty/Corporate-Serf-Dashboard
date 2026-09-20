@@ -296,6 +296,8 @@ _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
 _RANK_REFRESH_STALE_TITLE = "Refresh failed · position from cache"
 _RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh. The position shown is unchanged."
 _RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh. The position shown is from cache."
+_RANK_REFRESH_TOTAL_STALE_TITLE = "Position refreshed but total from cache"
+_RANK_REFRESH_TOTAL_MISSING_TITLE = "Position refreshed but no total"
 # Notices that fire once per app session rather than once per trigger, by id.
 # A set, so the check-and-set needs no ``global`` rebinding; sound under
 # Waitress's single-process thread pool, and a lost race is benign because the
@@ -802,6 +804,38 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
     )
 
 
+def _rank_refresh_total_failed_notification(
+    selected_scenario: str,
+    has_total: bool,
+) -> dict[str, object]:
+    """Report a refresh whose position landed but whose total did not.
+
+    Orange is the partial-success rung: the position the click asked for is
+    live, the count beside it is not. Green would assert a freshness the
+    readout does not have, and the served-stale yellow would claim the position
+    came from cache when it is the one part that did refresh. It shares the
+    success channel because a re-click is the recovery, so the green it earns
+    must replace this rather than stack under a contradicting verdict.
+    """
+    if has_total:
+        return toast(
+            _rank_refresh_success_channel(selected_scenario),
+            _RANK_REFRESH_TOTAL_STALE_TITLE,
+            f"Refreshed position for {selected_scenario}. Couldn't refresh the "
+            f"total, so the percentile is from cache.",
+            color="orange",
+            icon=local_icon("material-symbols:refresh-rounded"),
+        )
+    return toast(
+        _rank_refresh_success_channel(selected_scenario),
+        _RANK_REFRESH_TOTAL_MISSING_TITLE,
+        f"Refreshed position for {selected_scenario}. Couldn't fetch the "
+        f"total, so no percentile is shown.",
+        color="orange",
+        icon=local_icon("material-symbols:refresh-rounded"),
+    )
+
+
 def _rank_refresh_username_unset_notification() -> dict[str, object]:
     """Answer a Refresh click that has no identity to look anything up with.
 
@@ -842,9 +876,10 @@ def refresh_rank(  # noqa: PLR0911
 
     The user asked, so every outcome answers on this callback's own
     notification output: red when the refresh failed outright, yellow when it
-    failed but a cached position was served in its place, green only on a
-    genuinely fresh result, and blue when there is no username to look
-    anything up with.
+    failed but a cached position was served in its place, orange when the
+    position refreshed but the leaderboard total behind the percentile did not,
+    green only on a genuinely fresh result, and blue when there is no username
+    to look anything up with.
 
     The unset-username case is caught before the lookup, on the direct settings
     read rather than the service's error copy. The passive field already
@@ -914,6 +949,24 @@ def refresh_rank(  # noqa: PLR0911
         )
         return display, *channel_toast(
             _rank_refresh_problem_notification(served_stale=True), toast_channels
+        )
+    # Same clears as the green below: the position did refresh, which falsifies
+    # both the unchanged-position claim and the no-username one.
+    if rank_info.total_refresh_failed:
+        logger.warning(
+            "Manual rank refresh for %s could not re-read the leaderboard total.",
+            selected_scenario,
+        )
+        return display, *channel_toast(
+            _rank_refresh_total_failed_notification(
+                selected_scenario,
+                has_total=rank_info.total_players is not None,
+            ),
+            toast_channels,
+            clears=(
+                _RANK_REFRESH_PROBLEM_CHANNEL,
+                _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
+            ),
         )
     return display, *channel_toast(
         _rank_refresh_success_notification(selected_scenario),

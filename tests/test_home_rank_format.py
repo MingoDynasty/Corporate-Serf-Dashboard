@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
+import requests
 from dash import dcc, no_update
 
 from source.config import settings_service
@@ -1107,7 +1108,7 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     monkeypatch.setattr(
         api_service,
         "_with_leaderboard_total",
-        lambda rank_info, _ttl: rank_info,
+        lambda rank_info, _ttl=168, force_refresh=False: rank_info,
     )
 
     rank_text, notifications, _hidden = _RefreshClient().click(scenario_name)
@@ -1123,6 +1124,186 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     assert stored is not None
     assert stored.status == candidate.status
     assert stored.score == candidate.score
+
+
+def _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id):
+    """Cache one resolved, ranked scenario for a Refresh click to act on."""
+    username = "MingoDynasty"
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
+    settings_service.save_settings({"kovaaks_username": username})
+    api_service.make_cache()
+    api_service.save_leaderboard_id(scenario, leaderboard_id, "test")
+    api_service.save_scenario_rank(
+        leaderboard_id,
+        username,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=40,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario,
+            score=110.0,
+        ),
+    )
+    monkeypatch.setattr(
+        api_service,
+        "get_user_scenario_total_play",
+        lambda *_args: None,
+    )
+
+
+def _refreshed_rank(leaderboard_id, rank=25):
+    """Return the board-authoritative result a click's rank fetch would give."""
+    return ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        rank=rank,
+        leaderboard_id=leaderboard_id,
+    )
+
+
+def test_manual_rank_refresh_re_reads_the_total_behind_the_percentile(
+    monkeypatch,
+    tmp_path,
+):
+    """A fresh totals cache does not spare the click its total lookup.
+
+    The denominator is refreshed with the numerator: a live position over a
+    week-old count is two moments presented as one fact, and on a growing
+    board it understates the percentile.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    totals = []
+
+    def fetch_total(_leaderboard_id):
+        totals.append(True)
+        return 1000
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: _refreshed_rank(leaderboard_id),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert totals == [True]
+    # 95.10% is what the cached 500 would have printed.
+    assert _rank_text(display) == "25 of 1,000 (97.55% percentile)"
+    assert notifications[0]["color"] == "green"
+
+
+def test_a_passive_render_still_honors_the_leaderboard_total_ttl(
+    monkeypatch,
+    tmp_path,
+):
+    """Only the click is board-authoritative; bulk and interval paths keep the TTL."""
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_leaderboard_total",
+        lambda *_args: pytest.fail("a passive render must not refetch the total"),
+    )
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: pytest.fail("a passive render must not refetch the rank"),
+    )
+
+    assert _rank_text(_rendered_rank(scenario, True)) == "40 of 500 (92.10% percentile)"
+
+
+def test_a_failed_total_refresh_toasts_orange_and_keeps_the_cached_percentile(
+    monkeypatch,
+    tmp_path,
+):
+    """Orange is partial success: the position committed, the total did not.
+
+    Green would assert a freshness the readout does not have, and the
+    served-stale yellow would claim the position came from cache when it is
+    the one part that did refresh.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    def fetch_total(_leaderboard_id):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: _refreshed_rank(leaderboard_id),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "25 of 500 (95.10% percentile)"
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Position refreshed but total from cache"
+    assert scenario in notifications[0]["message"]
+    assert notifications[0]["id"].startswith(f"rank-refresh-success-{scenario}-")
+
+
+def test_a_failed_total_refresh_with_nothing_cached_toasts_orange_without_a_total(
+    monkeypatch,
+    tmp_path,
+):
+    """No count was ever cached, so the position stands alone and says so."""
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+
+    def fetch_total(_leaderboard_id):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: _refreshed_rank(leaderboard_id),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "25"
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Position refreshed but no total"
+
+
+def test_a_failed_rank_refresh_asks_for_no_total(monkeypatch, tmp_path):
+    """A host that just failed the rank is not asked for the count as well."""
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_leaderboard_total",
+        lambda *_args: pytest.fail("a failed rank fetch must not ask for the total"),
+    )
+
+    def fetch_rank(*_args):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", fetch_rank)
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    # The cached position carries the served-stale hint; its count comes from
+    # the TTL-free read in the fallback, not from a second request.
+    assert _rank_text(display) == "40 of 500 (92.10% percentile) · from cache"
+    assert notifications[0]["color"] == "yellow"
 
 
 def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
