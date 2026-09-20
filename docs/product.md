@@ -172,6 +172,14 @@ list in the roadmap.)
   copy read as machine-written ran through all of it. With a launch post
   about to put the app in front of new users, the copy is now something a
   cold reader can trust, and a test keeps the em dash from creeping back.
+- **The lines that ask something of you look like it** (PR #298; design in
+  #281). The stats-folder line at the top of Scenario Performance, the line
+  that asks for a restart after a save, and the Settings page's restart
+  notice are now yellow panels with a warning icon, like every other notice
+  in the app. Nothing they say changed. *Problem solved:* the three messages
+  that tell you the app needs something from you were the faintest text on
+  the screen, and one of them was printed in a color the app otherwise uses
+  for a save that only half worked.
 
 ### Standing: where do I rank
 
