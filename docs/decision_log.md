@@ -116,8 +116,13 @@ stored keys from the browser: it depends on dash-renderer's private key format
 and still discards the visit's selections. Keeping the query value as the
 layout `value` with persistence on: the pinned original then becomes the query
 value, so the next Home visit discards the entry and both dropdowns come up
-empty — the same loss, reached differently. No prior entry governed the
-original behavior, so nothing is superseded.
+empty — the same loss, reached differently. Making `apply_deep_link` the plain
+writer of the scenario value and moving `allow_duplicate` onto
+`check_for_new_data`, which would make the hold symmetric and the double run
+go away: it puts the mount-fire hazard on the one callback whose contract is
+that a mount must not replay the retained run-event batch, which is worth more
+than one discarded plot build per deep-linked visit. No prior entry governed
+the original behavior, so nothing is superseded.
 
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
 
