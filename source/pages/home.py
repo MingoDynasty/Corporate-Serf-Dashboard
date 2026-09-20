@@ -806,7 +806,7 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
 
 def _rank_refresh_total_failed_notification(
     selected_scenario: str,
-    rank_info: ScenarioRankInfo,
+    has_total: bool,
 ) -> dict[str, object]:
     """Report a refresh whose position landed but whose total did not.
 
@@ -817,34 +817,25 @@ def _rank_refresh_total_failed_notification(
     success channel because a re-click is the recovery, so the green it earns
     must replace this rather than stack under a contradicting verdict.
 
-    The consequence clause names what this value actually carries rather than
-    what a ranked one usually does: an unranked readout is
-    ``Unranked (N players)`` and has no percentile for the failure to stale,
-    and a ranked one keeps its position but loses the percentile when no total
-    is cached either.
+    The consequence names the total, which is what failed, rather than the
+    percentile, which is recomputed from it and usually moves under the user's
+    eyes as the position refreshes. Naming the failed thing also stays true for
+    an unranked readout, which shows a count and never a percentile.
     """
-    if rank_info.percentile is not None:
-        title = _RANK_REFRESH_TOTAL_STALE_TITLE
-        message = (
-            f"Refreshed position for {selected_scenario}. Couldn't refresh "
-            f"the total, so the percentile is from cache."
-        )
-    elif rank_info.total_players is not None:
-        title = _RANK_REFRESH_TOTAL_STALE_TITLE
-        message = (
-            f"Refreshed position for {selected_scenario}. Couldn't refresh "
-            f"the total, so the player count is from cache."
-        )
-    else:
-        title = _RANK_REFRESH_TOTAL_MISSING_TITLE
-        message = (
-            f"Refreshed position for {selected_scenario}. Couldn't fetch the "
-            f"total, so no player count is shown."
+    if has_total:
+        return toast(
+            _rank_refresh_success_channel(selected_scenario),
+            _RANK_REFRESH_TOTAL_STALE_TITLE,
+            f"Refreshed position for {selected_scenario}. Couldn't refresh the "
+            f"total, so the total shown is from cache.",
+            color="orange",
+            icon=local_icon("material-symbols:refresh-rounded"),
         )
     return toast(
         _rank_refresh_success_channel(selected_scenario),
-        title,
-        message,
+        _RANK_REFRESH_TOTAL_MISSING_TITLE,
+        f"Refreshed position for {selected_scenario}. Couldn't fetch the "
+        f"total, so no total is shown.",
         color="orange",
         icon=local_icon("material-symbols:refresh-rounded"),
     )
@@ -879,8 +870,8 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
     running=[(Output("rank-refresh-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-# One return per outcome the click can have -- three guards and four verdicts.
-# Collapsing any pair would only hide which answer a reader is looking at.
+# One return per outcome the click can have. Collapsing any pair would only
+# hide which answer a reader is looking at.
 def refresh_rank(  # noqa: PLR0911
     n_clicks,
     selected_scenario: str | None,
@@ -972,7 +963,10 @@ def refresh_rank(  # noqa: PLR0911
             selected_scenario,
         )
         return display, *channel_toast(
-            _rank_refresh_total_failed_notification(selected_scenario, rank_info),
+            _rank_refresh_total_failed_notification(
+                selected_scenario,
+                has_total=rank_info.total_players is not None,
+            ),
             toast_channels,
             clears=(
                 _RANK_REFRESH_PROBLEM_CHANNEL,

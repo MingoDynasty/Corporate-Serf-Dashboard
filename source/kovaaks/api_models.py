@@ -263,8 +263,9 @@ class ScenarioRankInfo(BaseModel):
     served_stale: bool | None = None
     # Transient marker: the leaderboard total could not be re-read, so the
     # total and percentile beside the position are the last cached ones, or
-    # absent when nothing was cached. ``exclude`` rather than the neighbor's
-    # exclude_none reliance, because totals are stripped before a rank write
-    # while this marker would survive it, and ``_cached_rank`` does not clear
-    # it -- a stuck True would outlive the failure it describes.
+    # absent when nothing was cached. ``exclude`` rather than the
+    # ``exclude_none`` reliance ``served_stale`` uses, because totals are
+    # stripped before a rank write while this marker would survive it, and
+    # ``_cached_rank`` does not clear it -- a stuck True would outlive the
+    # failure it describes.
     total_refresh_failed: bool | None = Field(default=None, exclude=True)

@@ -1251,6 +1251,9 @@ def test_a_failed_total_refresh_toasts_orange_and_keeps_the_cached_percentile(
     assert notifications[0]["color"] == "orange"
     assert notifications[0]["title"] == "Position refreshed but total from cache"
     assert scenario in notifications[0]["message"]
+    # The percentile moved under the user's eyes this click (92.10 to 95.10),
+    # so the copy names the total, which is the part that came from cache.
+    assert "the total shown is from cache" in notifications[0]["message"]
     assert notifications[0]["id"].startswith(f"rank-refresh-success-{scenario}-")
 
 
@@ -1278,17 +1281,18 @@ def test_a_failed_total_refresh_with_nothing_cached_toasts_orange_without_a_tota
     assert _rank_text(display) == "25"
     assert notifications[0]["color"] == "orange"
     assert notifications[0]["title"] == "Position refreshed but no total"
-    assert "no player count is shown" in notifications[0]["message"]
+    assert "no total is shown" in notifications[0]["message"]
 
 
-def test_a_failed_total_refresh_on_an_unranked_result_names_the_player_count(
+def test_a_failed_total_refresh_on_an_unranked_result_stays_true(
     monkeypatch,
     tmp_path,
 ):
-    """An unranked readout has no percentile to be stale, so the copy says count.
+    """An unranked readout has no percentile, so the copy must not claim one.
 
-    ``format_scenario_rank`` renders UNRANKED as ``Unranked (N players)``: the
-    count is the only thing the failed total touched.
+    ``format_scenario_rank`` renders UNRANKED as ``Unranked (N players)``. The
+    total is the only thing the failed re-read touched, and naming it is what
+    keeps one string true for both statuses.
     """
     scenario = "Reset Scenario"
     leaderboard_id = 98330
@@ -1313,7 +1317,7 @@ def test_a_failed_total_refresh_on_an_unranked_result_names_the_player_count(
     assert _rank_text(display) == "Unranked (500 players)"
     assert notifications[0]["color"] == "orange"
     assert notifications[0]["title"] == "Position refreshed but total from cache"
-    assert "player count is from cache" in notifications[0]["message"]
+    assert "the total shown is from cache" in notifications[0]["message"]
     assert "percentile" not in notifications[0]["message"]
 
 

@@ -1310,10 +1310,11 @@ def _with_leaderboard_total(
 
     Total-count freshness has its own TTL, which ``force_refresh`` bypasses:
     a board-authoritative caller re-reads the denominator its percentile is
-    derived from, so a fresh rank is never divided by a week-old total. A
-    failure degrades to the last cached total, and only a leaderboard with no
-    total cached at all degrades to the rank/unranked state by itself, because
-    that result is still valid.
+    derived from, so a fresh rank meets a week-old total only when that
+    re-read fails. A failure degrades to the last cached total and says so
+    through ``total_refresh_failed``; only a leaderboard with no total cached
+    at all degrades to the rank/unranked state by itself, because that result
+    is still valid.
     """
     if (
         rank_info.status not in (ScenarioRankStatus.RANKED, ScenarioRankStatus.UNRANKED)
@@ -1712,12 +1713,13 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     the last cached rank (TTL ignored, read-only) tagged with a
     ``warning_message``; UNKNOWN only when nothing is cached.
     ``force_refresh=True`` is the board-authoritative path: it bypasses the
-    rank cache and the leaderboard-total TTL alike, so a fresh position is
-    never divided by a stale total, and it may write a rank lower than the
-    stored one. ``allow_network=False`` serves rank and total caches
-    independent of TTL and returns UNKNOWN on a miss without fetching. ``allow_hydration=False`` skips
-    total-play hydration during leaderboard resolution, for callers that already
-    hydrated once before fanning out per scenario.
+    rank cache and the leaderboard-total TTL alike, so a fresh position meets
+    a stale total only when the total re-read fails, which the result marks,
+    and it may write a rank lower than the stored one.
+    ``allow_network=False`` serves rank and total caches independent of TTL
+    and returns UNKNOWN on a miss without fetching. ``allow_hydration=False``
+    skips total-play hydration during leaderboard resolution, for callers that
+    already hydrated once before fanning out per scenario.
 
     Result states:
     - RANKED: leaderboard exists and the exact user has a score.
