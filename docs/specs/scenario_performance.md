@@ -55,8 +55,9 @@ of scope here, apart from its chart toolbar, noted under The graph.
   A parameter the URL omits leaves its control on the remembered value, so
   `?scenario=` alone keeps the playlist filter. An unknown playlist code
   clears the filter. The parameters are applied on every load of that URL, so
-  reloading a deep link re-applies it over a later choice; the navbar link
-  and the header title are the way back to the remembered selection.
+  reloading a deep link re-applies it over a later choice, and the re-applied
+  selection becomes the remembered one. The navbar link and the header title
+  lead to the page without parameters, where a reload changes nothing.
 
 ## The controls row
 

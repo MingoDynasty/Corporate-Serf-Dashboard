@@ -45,6 +45,20 @@ overriding it. This is the per-visit twin of the keyed-by-id rule in
 [2026-08-09](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph),
 and it binds any future `?param=` preselect on any page.
 
+**Its corollary, learned the hard way in review.** *A callback that writes a
+control only on some visits starves that control's single-Input dependents on
+the others.* The renderer drops a ready callback when none of its Inputs was
+written and every one of them is a declared output of a group member that
+already ran. `select_playlist`'s only Input was the playlist value, which
+`apply_deep_link` now declares and returns `no_update` for on every visit
+without `?playlist_code=` — so it stopped making its initial call, and the
+scenario dropdown kept the layout's full local list while the filter named a
+playlist. The fix is a second Input that nothing writes, which makes the
+prune's "every Input covered" test fail; `select_playlist` carries the
+`home-deep-link` store for that reason and no other. A structural test in
+`tests/test_home_rank_format.py` fails if any callback's Input set is ever
+again a subset of what `apply_deep_link` conditionally writes.
+
 **The mechanism.** Both dropdowns carry `persistence=True` and an explicit
 `value=None` on every visit. `layout()` resolves the query parameters into a
 layout-bound `dcc.Store` (`home-deep-link`), and one callback,
@@ -78,11 +92,24 @@ parameters read as a bookmark, and the navbar link is the way back.
 
 **Accepted cost.** Persistence restores the previous selection before the
 callback's value lands, so a deep-linked visit shows the old playlist name for
-one round trip. Dash holds every dependent callback until the write completes,
-so the chart is built once, from the deep-linked values, and never paints a
-wrong plot. A clientside callback would shrink the transient to a frame at the
-cost of moving the resolution out of Python; it stays available if the
-transient ever proves visible.
+one round trip. What the renderer holds during that round trip is asymmetric,
+and only the playlist half is held: `getReadyCallbacks` waits on a pending
+output only when an Input's `id.prop` equals the output's key, and an
+`allow_duplicate` output's key carries an `@<hash>` suffix that this
+comparison does not strip (though `cleanOutputProp` strips it when results are
+applied). So the playlist value's dependents wait, and the scenario value's do
+not: on a deep-linked visit `generate_graph` and `get_scenario_num_runs` each
+run twice, once for the restored scenario and again for the deep-linked one.
+The user does not see the first: the renderer discards the in-flight request
+when the second is issued, and a 15 ms poll of the figure during review saw
+the placeholder and then the deep-linked title, never the stale one. The cost
+is server-side and small: one discarded plot build and one stats read per
+deep-linked visit. It stops there. `get_scenario_rank` also runs twice, but
+its initial call has an empty `ctx.triggered`, which `_rank_allows_network`
+reads as network refused, so the stale scenario costs a cache read rather
+than a KovaaK's lookup. A clientside callback would shrink the transient to a
+frame at the cost of moving the resolution out of Python; it stays available
+if the transient ever proves visible.
 
 **Rejected.** Keeping `persistence=False` for the visit and clearing the
 stored keys from the browser: it depends on dash-renderer's private key format
