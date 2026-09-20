@@ -1441,8 +1441,18 @@ def _local_scenario_options() -> list:
 @callback(
     Output("scenario-dropdown-selection", "data"),
     Input("playlist-dropdown-selection", "value"),
+    # Scheduling, not data: this Input looks removable and is not. The value
+    # above is an output of ``apply_deep_link``, and the renderer prunes a
+    # ready callback whose every Input is a declared output of a group member
+    # that already ran and whose none was actually written. On a visit with no
+    # ``?playlist_code=`` that callback returns ``no_update``, so without a
+    # second Input nothing writes this list and the scenario dropdown keeps
+    # the layout's full local set while the filter names a playlist. Nothing
+    # writes this store, so the prune's "every Input covered" test fails and
+    # the initial call survives. See the 2026-09-19 decision-log entry.
+    Input(HOME_DEEP_LINK_STORE_ID, "data"),
 )
-def select_playlist(selected_playlist):
+def select_playlist(selected_playlist, _deep_link):
     """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
         return _local_scenario_options()
@@ -1733,10 +1743,10 @@ def _home_deep_link(
     """Resolve Home's query params into the selections this visit applies.
 
     A key is present only for a parameter the URL actually carried, because
-    the two dropdowns are set independently: `?scenario=` alone must leave the
-    playlist filter on whatever the browser restored. An unknown playlist code
-    is present with no value, which clears the filter rather than leaving a
-    code the app cannot resolve standing.
+    the two dropdowns are set independently: ``?scenario=`` alone must leave
+    the playlist filter on whatever the browser restored. An unknown playlist
+    code is present with no value, which clears the filter rather than leaving
+    a code the app cannot resolve standing.
     """
     selection: dict[str, str | None] = {}
     if playlist_code is not None:
@@ -1787,8 +1797,10 @@ def apply_deep_link(selection):
     nothing triggering it. Re-emitting the same values is harmless -- Dash
     skips a persistence write when the value is unchanged -- so this needs no
     guard beyond the empty payload every non-deep-linked visit carries.
-    :param selection: this visit's resolved query parameters, by control
-    :return: the value for each control the URL named
+
+    Returning ``no_update`` for a control the URL did not name leaves that
+    control's dependents unwritten, which is why ``select_playlist`` carries a
+    second Input.
     """
     if not selection:
         return no_update, no_update

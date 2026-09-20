@@ -258,11 +258,7 @@ def test_apply_deep_link_is_a_second_writer_of_the_scenario_value():
     mount's whole job, and Dash refuses an ``allow_duplicate`` output without
     one of the ``prevent_initial_call`` forms.
     """
-    (registration,) = [
-        entry
-        for entry in GLOBAL_CALLBACK_LIST
-        if any(dep["id"] == home.HOME_DEEP_LINK_STORE_ID for dep in entry["inputs"])
-    ]
+    registration = _deep_link_registration()
     playlist_output, scenario_output = registration["output"].strip(".").split("...")
 
     assert playlist_output == "playlist-dropdown-selection.value"
@@ -271,6 +267,54 @@ def test_apply_deep_link_is_a_second_writer_of_the_scenario_value():
     assert scenario_output.startswith("scenario-dropdown-selection.value@")
     # What Dash stores for "initial_duplicate": the mount still runs it.
     assert registration["prevent_initial_call"] is False
+
+
+def _deep_link_registration() -> dict:
+    """Find apply_deep_link's registration. The store has more than one reader."""
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if any(dep["id"] == home.HOME_DEEP_LINK_STORE_ID for dep in entry["inputs"])
+        and "playlist-dropdown-selection.value" in entry["output"]
+    ]
+    return registration
+
+
+def _output_keys(registration: dict) -> set[str]:
+    """Read a registration's outputs as ``id.prop``, without duplicate hashes."""
+    return {
+        output.split("@")[0]
+        for output in registration["output"].strip(".").split("...")
+    }
+
+
+def test_no_callback_depends_only_on_what_apply_deep_link_conditionally_writes():
+    """Guard the regression that shipped once: a starved single-Input dependent.
+
+    ``apply_deep_link`` returns ``no_update`` for a control the URL did not
+    name, which is every control on an ordinary visit. dash-renderer drops a
+    ready callback when none of its Inputs was written and every one of them
+    is a declared output of a group member that already ran, so a callback
+    whose Inputs are all written by ``apply_deep_link`` never makes its
+    initial call on those visits. ``select_playlist`` was exactly that, and
+    the scenario dropdown kept the full local list while the filter named a
+    playlist. Its second Input is what this test protects.
+    """
+    deep_link = _deep_link_registration()
+    written = _output_keys(deep_link)
+
+    starved = [
+        entry["output"]
+        for entry in GLOBAL_CALLBACK_LIST
+        if entry is not deep_link
+        and entry["inputs"]
+        and {f"{dep['id']}.{dep['property']}" for dep in entry["inputs"]} <= written
+    ]
+
+    assert starved == [], (
+        "these callbacks would not make their initial call on a visit with no "
+        f"query parameters: {starved}"
+    )
 
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
@@ -363,8 +407,10 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     )
     monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
 
-    assert home.select_playlist("Old Playlist Name") == ["All"]
-    assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
+    # The second argument is the deep-link store: a scheduling Input the
+    # callback never reads. See select_playlist.
+    assert home.select_playlist("Old Playlist Name", None) == ["All"]
+    assert home.select_playlist("ValidCode", None) == ["ValidCode Scenario"]
 
 
 def test_page_is_named_scenario_performance_and_keeps_the_root_route():
