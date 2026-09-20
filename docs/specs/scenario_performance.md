@@ -53,8 +53,9 @@ of scope here, apart from its chart toolbar, noted under The graph.
   shows that playlist and scenario, not an earlier one
   ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
   A parameter the URL omits leaves its control on the remembered value, so
-  `?scenario=` alone keeps the playlist filter. An unknown playlist code
-  clears the filter. The parameters are applied on every load of that URL, so
+  `?scenario=` alone keeps the playlist filter — and a scenario that filter
+  does not list is then dropped, leaving no scenario selected and nothing
+  remembered. An unknown playlist code clears the filter. The parameters are applied on every load of that URL, so
   reloading a deep link re-applies it over a later choice, and the re-applied
   selection becomes the remembered one. The navbar link and the header title
   lead to the page without parameters, where a reload changes nothing.

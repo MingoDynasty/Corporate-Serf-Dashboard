@@ -103,11 +103,17 @@ run twice, once for the restored scenario and again for the deep-linked one.
 The user does not see the first: the renderer discards the in-flight request
 when the second is issued, and a 15 ms poll of the figure during review saw
 the placeholder and then the deep-linked title, never the stale one. The cost
-is server-side and small: one discarded plot build and one stats read per
-deep-linked visit. It stops there. `get_scenario_rank` also runs twice, but
-its initial call has an empty `ctx.triggered`, which `_rank_allows_network`
-reads as network refused, so the stale scenario costs a cache read rather
-than a KovaaK's lookup. A clientside callback would shrink the transient to a
+is server-side: one discarded plot build and one stats read per deep-linked
+visit. `get_scenario_rank` also runs twice, and its stale run is network-
+allowed, so it is an ordinary TTL-governed lookup — a cache read while that
+scenario's rank cache is fresh, which is the usual case because the scenario
+was the selection a moment ago and the TTL is a week, and a KovaaK's lookup
+when the cache is cold or expired. Nothing suppresses it: `ctx.triggered` is
+never `[]` inside a callback, because Dash substitutes a one-item falsy list
+whose `prop_id` is `"."`, and `_rank_allows_network` refuses only when the
+interval is the sole trigger. The falsy list is what keeps the toasts quiet
+on that run, and it is easy to mistake for a network refusal it does not
+give. A clientside callback would shrink the transient to a
 frame at the cost of moving the resolution out of Python; it stays available
 if the transient ever proves visible.
 
