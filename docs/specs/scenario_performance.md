@@ -2,16 +2,18 @@
 
 The landing page plots the kept runs of one scenario as points over
 sensitivity or time, with the personal best, a configurable score goal, and
-playlist rank thresholds available as overlay lines. A collapsible Chart
-options panel tunes how the chart looks and which run notifications fire, and
-every preference in it is remembered by the browser. A newly played run
-reaches the chart automatically once its file is imported, and the page can
-follow the scenario just played. Older runs recorded on a game's own
-sensitivity scale sit on the same cm/360 axis as everything else. The chart's
-toolbar can save it as a PNG, or share it to Plotly Cloud once you confirm
-and are signed in there. The page
-also hosts the setup surfaces that point you at Settings, whether something
-has never been set or saved settings cannot be read.
+playlist rank thresholds available as overlay lines; older runs recorded on a
+game's own sensitivity scale sit on the same cm/360 axis as everything else.
+A collapsible Chart options panel tunes how the chart looks and which run
+notifications fire, and the browser remembers every control on the page — the
+chosen playlist and scenario included, so returning to the page shows the
+selection you last made, whether you picked it in the dropdowns or arrived
+from a playlist link. A newly played run reaches the chart automatically once
+its file is imported, and the page can follow the scenario just played. The
+chart's toolbar can save it as a PNG, or share it to Plotly Cloud once you
+confirm and are signed in there. The page also hosts the setup surfaces that
+point you at Settings, whether something has never been set or saved settings
+cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
