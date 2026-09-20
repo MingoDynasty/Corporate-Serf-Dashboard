@@ -513,7 +513,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |
 | `steam-id-mismatch` | fixed id, sticky, once per process | "Steam ID mismatch" | yellow, until dismissed | — | `get_scenario_rank`; rank spec |
 | `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · position from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
-| `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" | green | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
+| `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" (fresh) / "Position refreshed but total from cache" / "Position refreshed but no total" | green (fresh) / orange (total not refreshed) | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
 | `setup-card-skip-problem` | channel | "Skip wasn't saved" | red | — | `skip_identity_setup`; settings spec |
 | `imported-playlist-successful-{code}` | channel per playlist code | "Playlist imported" | green | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |

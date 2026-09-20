@@ -112,6 +112,10 @@ benchmark tier) — see the
 - `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
   both default to `168`
   ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
+- Both TTLs govern automatic paths only. `force_refresh` marks a lookup
+  board-authoritative for the whole readout and bypasses the rank cache and
+  the leaderboard-total TTL alike, so a live position is never divided by a
+  week-old count ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - Every automatic rank-cache write routes through one process-locked
   monotonic writer, so a lower score or transient `UNRANKED` result never
   replaces a known better value; only a user-clicked Refresh is
@@ -140,6 +144,8 @@ benchmark tier) — see the
   leaderboard as caught up only when its score reaches the two-decimal floor
   of the local score; an exhausted chain leaves the previous cache untouched
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+  A chain that does catch up writes a board-authoritative rank, so it re-reads
+  the leaderboard total too, TTL bypassed ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - The Scenario Performance rank widget passively re-reads the rank and total
   caches on its existing interval — TTL ignored, no network calls
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
@@ -220,6 +226,21 @@ benchmark tier) — see the
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).
+  The failure substitutes the last cached total whatever its age, so the
+  percentile survives it, and only a leaderboard with no total ever cached
+  degrades to a bare position. Either way the result carries
+  `total_refresh_failed`, a transient marker excluded from serialization so it
+  can never reach a rank cache file ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+- A Refresh whose position landed but whose total did not is orange, titled
+  "Position refreshed but total from cache" with "Refreshed position for
+  {scenario}. Couldn't refresh the total, so the percentile is from cache.",
+  or "Position refreshed but no total" with "Refreshed position for
+  {scenario}. Couldn't fetch the total, so no percentile is shown." when
+  nothing was cached. Both ride the per-scenario success channel and clear the
+  same two channels the green does, so a re-click's green replaces the partial
+  verdict instead of stacking under it. The value carries no extra inline
+  hint; the Refresh button beside it is the affordance. A rank fetch that
+  failed asks for no total at all ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - Unexpected application bugs may still raise and are handled by
   UI/background safety nets — the expected/unexpected boundary is set by
   the same entry that reserves `UNKNOWN` for expected failures

@@ -13,6 +13,63 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-19: A Clicked Refresh Re-Reads The Leaderboard Total
+
+Status: Accepted
+
+The Refresh button beside the Position field used to fetch a live position and
+divide it by a player count that could be a week old, so the percentile it
+showed was two numbers from different moments. Clicking Refresh now re-reads
+the count as well and recomputes the percentile from both. When the position
+refreshes but the count cannot be reached, the app keeps the last count it has
+and says so in an orange notification instead of confirming a clean refresh.
+Automatic lookups are unchanged and still reuse a cached count for a week.
+
+**What `force_refresh` means now.** It marks the whole readout
+board-authoritative, not just the rank: `get_scenario_rank_info` passes it
+through to `_with_leaderboard_total`, which bypasses
+`leaderboard_total_cache_ttl_hours` for that call. The flag already bypassed
+the rank cache and already permitted a regressing write
+([2026-07-01](#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes));
+the denominator was the part it did not cover. The PB-triggered freshness chain
+had been forcing the total since 59b2d1d by passing a zero TTL, never recorded
+as a decision — an unlogged precedent that this entry adopts and states, and
+that call now names the flag instead of the zero.
+
+**Why the one-week TTL still stands elsewhere.**
+[2026-04-29](#2026-04-29-cache-leaderboard-totals-for-one-week) priced the
+trade against bursty cold-cache total fetches across every playlist scenario,
+and named "a targeted refresh flow" as the remedy if stale totals ever
+misled. The Refresh button is that flow: one leaderboard, one extra
+unfiltered GET, at a moment the user asked for truth. Every automatic path —
+the warmup worker, the playlist scenarios fill, the overview, a TTL-expired
+foreground lookup — keeps the TTL, so the knob still governs what it was
+bought for. A percentile needs an unfiltered count the rank call cannot
+supply: with `usernameSearch` the response's `total` is the number of search
+matches, not the board population.
+
+**Orange when the position lands and the count does not.** A failed total
+fetch now substitutes the last cached count whatever its age and marks the
+result `total_refresh_failed`, so a clicked refresh answers orange — the
+partial-success rung, where the action committed but a follow-up did not
+([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)).
+Green would assert a freshness the readout does not have, and the served-stale
+yellow would claim the position came from cache when the position is the one
+part that did refresh. It shares the per-scenario success channel, so the
+green a re-click earns replaces it rather than stacking under a contradicting
+verdict. Rejected: dropping the count entirely, which shows less than the app
+knows and contradicts
+[2026-07-12](#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank);
+a silent green over the cached count, which is the smallest diff but leaves
+the button's promise unverifiable; a new inline hint, since the affordance is
+already beside the value and the same host is failing seconds apart. No total
+request is made at all when the rank fetch itself failed.
+
+**Not fixed here.** `_with_percentile` guards `total_players <= 0` but not
+`rank > total`, so an automatic path can still print a negative percentile
+from a fresh rank over an old smaller count. Tracked in
+[tech_debt.md](tech_debt.md).
+
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
 
 Status: Accepted
@@ -5185,7 +5242,9 @@ Consequences: `_with_leaderboard_total()` catches expected total-enrichment fail
 
 ## 2026-04-29: Cache Leaderboard Totals For One Week
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): the
+TTL governs automatic paths only, and a user-clicked Refresh bypasses it)
 
 Decision: `leaderboard_total_cache_ttl_hours` defaults to `168`, matching `scenario_rank_cache_ttl_hours`.
 
