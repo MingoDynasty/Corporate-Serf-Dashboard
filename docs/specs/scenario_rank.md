@@ -98,6 +98,11 @@ benchmark tier) — see the
   rank plus leaderboard total when rank info is returned; it is not stored in
   the rank cache
   ([2026-04-27](../decision_log.md#2026-04-27-use-the-midpoint-percentile-formula)).
+  A rank above the known total suppresses the percentile instead of deriving a
+  negative one: the rank and the total are still shown, the condition is
+  logged at WARNING, and the playlists overview counts that scenario
+  unresolved until the total refreshes. `rank == total_players` still derives
+  ([2026-09-20](../decision_log.md#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile)).
 
 ## Caching
 

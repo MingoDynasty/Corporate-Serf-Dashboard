@@ -13,6 +13,57 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-20: A Rank Above The Known Total Suppresses The Percentile
+
+Status: Accepted
+
+A scenario's position and its leaderboard's player count are fetched and
+cached separately, so a current position can be paired with an older, smaller
+count and the percentile derived from the pair goes negative. The app now
+withholds the percentile whenever the position sits past the count it knows,
+showing the two numbers on their own until the count refreshes. A user sees
+that scenario's Position lose its percentile, and the playlists holding it
+fall back to the cached-coverage placeholder in Median Percentile and Lowest
+Percentile.
+
+Decision: `_with_percentile` derives nothing when `rank > total_players`. It
+returns the result unchanged — `rank` and `total_players` both survive,
+`percentile` stays `None` — and logs the scenario, leaderboard id, rank and
+total at WARNING so the staleness is diagnosable from `data/logs/debug.log`.
+The guard is strictly `>`: `rank == total_players` is a real last place on the
+board and keeps its
+[midpoint value](#2026-04-27-use-the-midpoint-percentile-formula).
+
+Why: rank comes from `/leaderboard/scores/global` with `usernameSearch`, whose
+`total` counts search matches rather than the board, so the population is a
+second unfiltered request cached under `leaderboard_total_cache_ttl_hours`
+([one week by default](#2026-04-29-cache-leaderboard-totals-for-one-week)).
+Boards only grow, so a cached total is a lower bound on the live one, and
+`((total - rank + 0.5) / total) * 100` crosses zero as soon as the rank passes
+it: a board cached at 500 that grew to 1,200 renders a 900th placement as
+`900 of 500 (-79.90% percentile)`. Every path whose rank and total ages are
+independent can reach it — the percentile warmup worker, the playlist
+scenarios fill, the overview's cache-only reads, a TTL-expired foreground
+lookup, and the stale-rank fallback.
+
+Consequences: a suppressed percentile leaves that scenario unresolved for the
+playlists overview, so the whole playlist reports `{resolved}/{played} cached`
+in both percentile columns instead of a median it cannot support. That is the
+honest readout — the aggregate genuinely is not known — but it is visible, and
+it clears on the next total refresh.
+
+Rejected: clamping to `0.0`, or to the value at `rank == total`. Either
+invents a number from data already known to be inconsistent, and the invented
+floor still feeds the median as though it had been measured. Also rejected:
+dropping the total along with the percentile, which discards a count the app
+legitimately has and contradicts the principle that a degraded read
+[shows no less than the app already knows](#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank).
+
+Not done: refreshing the total when the guard trips. A rank above the total is
+good evidence the total is stale, but `_with_percentile` is a pure derivation
+and must not grow a network call; a self-healing refresh would need its own
+proposal.
+
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
 
 Status: Accepted
