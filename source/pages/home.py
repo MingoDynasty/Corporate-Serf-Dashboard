@@ -806,7 +806,7 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
 
 def _rank_refresh_total_failed_notification(
     selected_scenario: str,
-    has_total: bool,
+    rank_info: ScenarioRankInfo,
 ) -> dict[str, object]:
     """Report a refresh whose position landed but whose total did not.
 
@@ -816,21 +816,35 @@ def _rank_refresh_total_failed_notification(
     came from cache when it is the one part that did refresh. It shares the
     success channel because a re-click is the recovery, so the green it earns
     must replace this rather than stack under a contradicting verdict.
+
+    The consequence clause names what this value actually carries rather than
+    what a ranked one usually does: an unranked readout is
+    ``Unranked (N players)`` and has no percentile for the failure to stale,
+    and a ranked one keeps its position but loses the percentile when no total
+    is cached either.
     """
-    if has_total:
-        return toast(
-            _rank_refresh_success_channel(selected_scenario),
-            _RANK_REFRESH_TOTAL_STALE_TITLE,
-            f"Refreshed position for {selected_scenario}. Couldn't refresh the "
-            f"total, so the percentile is from cache.",
-            color="orange",
-            icon=local_icon("material-symbols:refresh-rounded"),
+    if rank_info.percentile is not None:
+        title = _RANK_REFRESH_TOTAL_STALE_TITLE
+        message = (
+            f"Refreshed position for {selected_scenario}. Couldn't refresh "
+            f"the total, so the percentile is from cache."
+        )
+    elif rank_info.total_players is not None:
+        title = _RANK_REFRESH_TOTAL_STALE_TITLE
+        message = (
+            f"Refreshed position for {selected_scenario}. Couldn't refresh "
+            f"the total, so the player count is from cache."
+        )
+    else:
+        title = _RANK_REFRESH_TOTAL_MISSING_TITLE
+        message = (
+            f"Refreshed position for {selected_scenario}. Couldn't fetch the "
+            f"total, so no player count is shown."
         )
     return toast(
         _rank_refresh_success_channel(selected_scenario),
-        _RANK_REFRESH_TOTAL_MISSING_TITLE,
-        f"Refreshed position for {selected_scenario}. Couldn't fetch the "
-        f"total, so no percentile is shown.",
+        title,
+        message,
         color="orange",
         icon=local_icon("material-symbols:refresh-rounded"),
     )
@@ -958,10 +972,7 @@ def refresh_rank(  # noqa: PLR0911
             selected_scenario,
         )
         return display, *channel_toast(
-            _rank_refresh_total_failed_notification(
-                selected_scenario,
-                has_total=rank_info.total_players is not None,
-            ),
+            _rank_refresh_total_failed_notification(selected_scenario, rank_info),
             toast_channels,
             clears=(
                 _RANK_REFRESH_PROBLEM_CHANNEL,

@@ -231,12 +231,15 @@ benchmark tier) — see the
   degrades to a bare position. Either way the result carries
   `total_refresh_failed`, a transient marker excluded from serialization so it
   can never reach a rank cache file ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
-- A Refresh whose position landed but whose total did not is orange, titled
-  "Position refreshed but total from cache" with "Refreshed position for
-  {scenario}. Couldn't refresh the total, so the percentile is from cache.",
-  or "Position refreshed but no total" with "Refreshed position for
-  {scenario}. Couldn't fetch the total, so no percentile is shown." when
-  nothing was cached. Both ride the per-scenario success channel and clear the
+- A Refresh whose position landed but whose total did not is orange. Its
+  consequence clause names what the value actually carries, not what a ranked
+  one usually does: "Position refreshed but total from cache" with "Refreshed
+  position for {scenario}. Couldn't refresh the total, so the percentile is
+  from cache." when a percentile survived, the same title with "so the player
+  count is from cache." when the readout has a count but no percentile (an
+  unranked result reads `Unranked (N players)`), and "Position refreshed but
+  no total" with "Refreshed position for {scenario}. Couldn't fetch the total,
+  so no player count is shown." when nothing was cached. Both ride the per-scenario success channel and clear the
   same two channels the green does, so a re-click's green replaces the partial
   verdict instead of stacking under it. The value carries no extra inline
   hint; the Refresh button beside it is the affordance. A rank fetch that

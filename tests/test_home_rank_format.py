@@ -1278,6 +1278,43 @@ def test_a_failed_total_refresh_with_nothing_cached_toasts_orange_without_a_tota
     assert _rank_text(display) == "25"
     assert notifications[0]["color"] == "orange"
     assert notifications[0]["title"] == "Position refreshed but no total"
+    assert "no player count is shown" in notifications[0]["message"]
+
+
+def test_a_failed_total_refresh_on_an_unranked_result_names_the_player_count(
+    monkeypatch,
+    tmp_path,
+):
+    """An unranked readout has no percentile to be stale, so the copy says count.
+
+    ``format_scenario_rank`` renders UNRANKED as ``Unranked (N players)``: the
+    count is the only thing the failed total touched.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    def fetch_total(_leaderboard_id):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNRANKED,
+            leaderboard_id=leaderboard_id,
+        ),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "Unranked (500 players)"
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Position refreshed but total from cache"
+    assert "player count is from cache" in notifications[0]["message"]
+    assert "percentile" not in notifications[0]["message"]
 
 
 def test_a_failed_rank_refresh_asks_for_no_total(monkeypatch, tmp_path):
