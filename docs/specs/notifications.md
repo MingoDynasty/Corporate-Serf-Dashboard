@@ -492,8 +492,8 @@ toasts under, and it applies to every toast the app adds from here on
   reports it even when a later step fails
   ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
   The instances are on the playlists overview: an import whose visibility
-  write fails reports the split outcome in orange, "Playlist imported — not
-  shown", with every other output matching the success path; a delete whose
+  write fails reports the split outcome in orange, "Playlist imported but
+  hidden", with every other output matching the success path; a delete whose
   visibility write fails still confirms in green, "Playlist deleted"; a
   visibility toggle propagates the failure, since nothing was committed and
   no claim was printed. The playlists spec carries those toasts in full.
