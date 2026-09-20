@@ -5,7 +5,7 @@ Date: 2026-09-19
 
 ## TL;DR
 
-The README has grown to about 3,200 words, and most of it is reference
+The README has grown to about 3,300 words, and most of it is reference
 material that a player arriving from a link does not read. This proposal
 makes the README a front door: what the app does, how to install it, and
 where to get help, in about 1,100 words. Everything that leaves moves, word
@@ -39,7 +39,7 @@ Configuration.
 What is this, how do I install it, what does it do on first run, and where
 do I get help. Features are one line each. Configuration is a pointer.
 Reference material is one link away. The draft assembled from this proposal
-measures 1,119 words against 3,246 today.
+measures 1,136 words against 3,289 today.
 
 Choosing differently: the research's raw target is about 450 to 700 words,
 which is where ShareX, OBS, Syncthing, and Playnite sit. Every one of them
@@ -115,11 +115,11 @@ words inline.
 Status: Open.
 
 Maintainer lean: none on record. The maintainer did not name this section;
-the author adds the row because Install is the largest section, at 797
+the author adds the row because Install is the largest section, at 811
 words.
 
-**Recommendation: move 353 words and leave the rest untouched.** Manual
-install (131 words) and the collapsed Rollback block (222 words) move to
+**Recommendation: move 357 words and leave the rest untouched.** Manual
+install (133 words) and the collapsed Rollback block (224 words) move to
 the guide. The three-step quick start, the paragraph on what the installer
 touches, the release-integrity paragraph, Updates, and Uninstall stay
 exactly as #278 verified them against the scripts. A short "Other ways to
@@ -135,7 +135,7 @@ the price is rewording sentences that were checked line by line against
 Status: Open. Reopens #278 D3 (location only).
 
 Maintainer lean: none on record. Also an author-added row: the section is
-506 words.
+512 words.
 
 **Recommendation: all eight entries move to the guide, in order,
 unchanged.** One list in one place, so the schema-recovery ordering that
@@ -163,16 +163,16 @@ contributor, so it sits beside Manual install. The README's Development
 section keeps the tech-stack sentence and the link to the architecture doc,
 and "Other ways to install" links the moved section.
 
-This is the lowest-stakes row. Run From Source is 84 words at the bottom of
+This is the lowest-stakes row. Run From Source is 85 words at the bottom of
 the file, below the point where players stop reading, so keeping it costs
 them nothing. Of the two objections #278's reviewer raised, the
 release-contract cost disappears because this proposal pays it anyway, and
 contributor discovery friction remains.
 
 Choosing differently: keeping it in the README, #278's unanimous outcome,
-adds 84 words and keeps zero-click discovery for contributors. A standalone
+adds 85 words and keeps zero-click discovery for contributors. A standalone
 `docs/development.md` adds a second new file and a second archive row for
-84 words.
+85 words.
 
 ## Problem
 
@@ -187,23 +187,26 @@ Nothing in the repository says what does not belong there.
 
 ### What was measured
 
-Words per section at `413a8c0`, counted with `wc -w` over each section's
-line range, heading line excluded:
+Words per section at `413a8c0`, heading line excluded. A word here is a
+whitespace-separated token, which is what `awk '{w += NF}'` counts on any
+platform and what `wc -w` counts under a UTF-8 locale. `wc -w` with no
+locale set, the default in Git Bash on Windows, skips a standalone em dash
+and reads 43 lower on today's file (3,246), so it is not the method.
 
 | Section | Words |
 | --- | --- |
-| Install | 797 |
-| of which Manual install and Rollback | 353 |
-| Configuration | 734 |
-| Troubleshooting | 506 |
+| Install | 811 |
+| of which Manual install and Rollback | 357 |
+| Configuration | 746 |
+| Troubleshooting | 512 |
 | What it talks to | 429 |
-| Features | 297 |
-| Playlists and Benchmarks | 129 |
-| Found a bug? | 86 |
-| Run From Source | 84 |
+| Features | 302 |
+| Playlists and Benchmarks | 133 |
+| Found a bug? | 87 |
+| Run From Source | 85 |
 | Intro, Development, License | 151 |
 | Heading lines | 33 |
-| **Total** | **3,246** |
+| **Total** | **3,289** |
 
 Two findings beyond the sizes. `example.toml` already documents every
 `config.toml` key, including the no-login warning beside `host`, so the
@@ -240,7 +243,9 @@ evidence: reviewers should check the sources themselves.
   a Configuration section is reference and a Playlists explainer is
   explanation, and both conventionally live in their own documents.
 
-Exemplars, by `wc -w` on the raw file (badge markup inflates the counts):
+Exemplars, by a raw word count of each file. These are approximate: badge
+markup inflates them, and they were taken with a locale-less `wc -w`, which
+can read a few words low.
 
 | Project | Words | Features | Configuration | Privacy or network |
 | --- | --- | --- | --- | --- |
@@ -292,18 +297,18 @@ Measured on a draft assembled from today's file and the new prose below.
 | Section | Today | After | How |
 | --- | --- | --- | --- |
 | Intro | 78 | 104 | unchanged, plus one "why" sentence; the name line moves below it |
-| Features | 297 | 177 | new prose: six one-line bullets |
-| Install | 797 | 481 | unchanged, minus Manual install and Rollback, plus "Other ways to install" |
+| Features | 302 | 183 | new prose: six one-line bullets |
+| Install | 811 | 491 | unchanged, minus Manual install and Rollback, plus "Other ways to install" |
 | What it talks to | 429 | 77 | new prose: the summary (D3) |
-| Troubleshooting | 506 | 39 | new prose: the pointer (D5) |
-| Found a bug? | 86 | 86 | unchanged |
-| Configuration | 734 | 42 | new prose: the pointer |
-| Playlists and Benchmarks | 129 | 0 | folded into the Benchmarks bullet |
-| Run From Source | 84 | 0 | moved (D6) |
+| Troubleshooting | 512 | 39 | new prose: the pointer (D5) |
+| Found a bug? | 87 | 87 | unchanged |
+| Configuration | 746 | 42 | new prose: the pointer |
+| Playlists and Benchmarks | 133 | 0 | folded into the Benchmarks bullet |
+| Run From Source | 85 | 0 | moved (D6) |
 | Development | 37 | 52 | unchanged, plus the tech-stack sentence |
 | License | 36 | 36 | unchanged |
 | Heading lines | 33 | 25 | |
-| **Total** | **3,246** | **1,119** | |
+| **Total** | **3,289** | **1,136** | |
 
 Section order is unchanged. The "why" sentence restates the three
 questions that open the product overview, so it introduces no new claim.
@@ -503,7 +508,8 @@ the README and no longer scroll to the section.
 - The move is proven as a move: commit 1 of the implementation PR is
   reviewed with `git diff --color-moved`, and the PR description lists each
   permitted cross-reference fix.
-- The size is proven by `wc -w README.md`, against the budget D1 rules.
+- The size is proven by `awk '{w += NF} END {print w}' README.md`, the
+  platform-independent count used throughout, against the budget D1 rules.
 - Manual: open the branch's README and guide on GitHub and follow every
   link once, including the collapsed Rollback block.
 
