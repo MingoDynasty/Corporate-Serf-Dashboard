@@ -939,6 +939,38 @@ def test_with_percentile_omits_incomplete_or_unranked_results(rank_info):
     assert api_service._with_percentile(rank_info).percentile is None
 
 
+def test_with_percentile_suppresses_a_rank_above_the_cached_total(caplog):
+    rank_info = ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        leaderboard_id=98330,
+        scenario_name="Some Scenario",
+        rank=900,
+        total_players=500,
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        result = api_service._with_percentile(rank_info)
+
+    assert result.percentile is None
+    assert result.rank == 900
+    assert result.total_players == 500
+    assert [record.getMessage() for record in caplog.records] == [
+        "Rank 900 for Some Scenario (leaderboard 98330) exceeds the cached "
+        "total 500; suppressing the percentile."
+    ]
+
+
+def test_with_percentile_derives_when_rank_equals_the_total():
+    rank_info = ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        leaderboard_id=98330,
+        rank=500,
+        total_players=500,
+    )
+
+    assert round(api_service._with_percentile(rank_info).percentile, 2) == 0.10
+
+
 def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)

@@ -1268,6 +1268,21 @@ def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
     ):
         return rank_info
 
+    # Rank and leaderboard total are cached separately and age independently,
+    # so a fresh rank can outrun an older, smaller total. The midpoint formula
+    # has no floor past that point: it yields a negative percentile, which the
+    # playlists overview would then take into its median and lowest.
+    if rank_info.rank > rank_info.total_players:
+        logger.warning(
+            "Rank %s for %s (leaderboard %s) exceeds the cached total %s; "
+            "suppressing the percentile.",
+            rank_info.rank,
+            rank_info.scenario_name or "?",
+            rank_info.leaderboard_id,
+            rank_info.total_players,
+        )
+        return rank_info
+
     return rank_info.model_copy(
         update={
             "percentile": calculate_percentile(
