@@ -145,6 +145,12 @@ RANK_REFRESH_TOOLTIP = (
 # constant would leave the ``@container`` queries with nothing to match and
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
+# This visit's ``?scenario=`` and ``?playlist_code=``, carried as layout-bound
+# state rather than read from the URL by a callback. Dash Pages rebuilds the
+# page on a route change and then this store triggers exactly one write, which
+# keeps the deep link out of the router's own callback graph.
+HOME_DEEP_LINK_STORE_ID = "home-deep-link"
+
 # The chart options inspector. Its collapsed class is the open state: hiding
 # with ``display: none`` takes the controls out of the tab order and the
 # accessibility tree while leaving them mounted, so their persisted values keep
@@ -1720,22 +1726,76 @@ def skip_identity_setup(n_clicks, toast_channels):
     return [], no_update, no_update, no_update
 
 
-def _home_initial_selection(
+def _home_deep_link(
     scenario: str | None,
     playlist_code: str | None,
-) -> tuple[str | None, list[str], str | None]:
-    """Resolve optional Home query params into dropdown initial state."""
+) -> dict[str, str | None]:
+    """Resolve Home's query params into the selections this visit applies.
+
+    A key is present only for a parameter the URL actually carried, because
+    the two dropdowns are set independently: `?scenario=` alone must leave the
+    playlist filter on whatever the browser restored. An unknown playlist code
+    is present with no value, which clears the filter rather than leaving a
+    code the app cannot resolve standing.
+    """
+    selection: dict[str, str | None] = {}
+    if playlist_code is not None:
+        selection["playlist"] = (
+            playlist_code if get_playlist_by_code(playlist_code) is not None else None
+        )
+    if scenario is not None:
+        selection["scenario"] = scenario or None
+    return selection
+
+
+def _home_scenario_options(playlist_code: str | None) -> list[str]:
+    """List the scenarios the first paint shows, before any callback runs.
+
+    ``select_playlist`` owns this list from then on. Resolving the query
+    parameter here too means a deep-linked visit paints its playlist's
+    scenarios immediately instead of the whole local list.
+    """
     selected_playlist = (
         playlist_code
         if playlist_code and get_playlist_by_code(playlist_code) is not None
         else None
     )
-    scenario_options = (
-        get_scenarios_from_playlist_code(selected_playlist)
-        if selected_playlist
-        else _local_scenario_options()
+    if selected_playlist:
+        return get_scenarios_from_playlist_code(selected_playlist)
+    return _local_scenario_options()
+
+
+@callback(
+    Output("playlist-dropdown-selection", "value"),
+    Output("scenario-dropdown-selection", "value", allow_duplicate=True),
+    Input(HOME_DEEP_LINK_STORE_ID, "data"),
+    # Not ``True``: applying the deep link *is* the mount's job, but Dash
+    # refuses an ``allow_duplicate`` output without one of the
+    # ``prevent_initial_call`` forms.
+    prevent_initial_call="initial_duplicate",
+)
+def apply_deep_link(selection):
+    """Set the two dropdowns from this visit's query parameters.
+
+    The values arrive by callback rather than as the layout's ``value`` so
+    that Dash persistence records them: a persisted control's layout default
+    has to be the same on every visit, or the stored edit is discarded instead
+    of restored. Writing them here makes a Playlists grid click an ordinary
+    selection, which the browser then remembers like any other.
+
+    Under DashProxy an ``allow_duplicate`` callback can fire once on load with
+    nothing triggering it. Re-emitting the same values is harmless -- Dash
+    skips a persistence write when the value is unchanged -- so this needs no
+    guard beyond the empty payload every non-deep-linked visit carries.
+    :param selection: this visit's resolved query parameters, by control
+    :return: the value for each control the URL named
+    """
+    if not selection:
+        return no_update, no_update
+    return (
+        selection.get("playlist", no_update),
+        selection.get("scenario", no_update),
     )
-    return selected_playlist, scenario_options, scenario or None
 
 
 def _chart_options_group(title: str, controls: list) -> dmc.Stack:
@@ -1951,17 +2011,16 @@ def layout(
 ):
     """Build the interactive home dashboard."""
     config = get_config()
-    selected_playlist, scenario_options, selected_scenario = _home_initial_selection(
-        scenario,
-        playlist_code,
-    )
-    playlist_persistence = playlist_code is None
-    scenario_persistence = scenario is None
+    scenario_options = _home_scenario_options(playlist_code)
 
     return dmc.Box(
         className="home-page",
         children=[
             dcc.Store(id="run-events"),
+            dcc.Store(
+                id=HOME_DEEP_LINK_STORE_ID,
+                data=_home_deep_link(scenario, playlist_code),
+            ),
             dcc.Store(
                 id="cached-plot",
                 data=_placeholder_plot_json(),
@@ -2008,8 +2067,19 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    persistence=playlist_persistence,
-                                    value=selected_playlist,
+                                    persistence=True,
+                                    # Never the query parameter, and never
+                                    # omitted. Dash pins a persisted edit to
+                                    # the layout value it was made against and
+                                    # discards the edit when a later visit
+                                    # renders a different one, so a default
+                                    # that varies per visit silently retires
+                                    # persistence. ``apply_deep_link`` carries
+                                    # the query parameter instead. Explicit
+                                    # ``None`` because an omitted prop is
+                                    # ``undefined``, which no longer matches
+                                    # what a browser already stored.
+                                    value=None,
                                 ),
                                 dmc.Stack(
                                     [
@@ -2022,11 +2092,16 @@ def layout(
                                             id="scenario-dropdown-selection",
                                             label="Selected scenario",
                                             maxDropdownHeight="75vh",
-                                            persistence=scenario_persistence,
+                                            persistence=True,
                                             placeholder="Select a scenario",
                                             scrollAreaProps={"type": "auto"},
                                             searchable=True,
-                                            value=selected_scenario,
+                                            # Constant on every visit, for the
+                                            # reason the playlist filter's own
+                                            # default carries;
+                                            # ``apply_deep_link`` is what
+                                            # applies ``?scenario=``.
+                                            value=None,
                                         ),
                                         # Selection behavior, not chart
                                         # presentation: it decides what the
