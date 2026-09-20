@@ -1,0 +1,537 @@
+# The README Is A Front Door, And Its Reference Moves To A User Guide
+
+Status: Proposed
+Date: 2026-09-19
+
+## TL;DR
+
+The README has grown to about 3,200 words, and most of it is reference
+material that a player arriving from a link does not read. This proposal
+makes the README a front door: what the app does, how to install it, and
+where to get help, in about 1,100 words. Everything that leaves moves, word
+for word, into one user guide that the README links. The network disclosure
+keeps a short summary in the README, because a reader deciding whether to
+run an installer needs it before they install.
+
+## Decisions needed
+
+Nothing is ratified. The maintainer stated leans in chat on 2026-09-19, and
+each row records the one that applies. A lean is non-binding, and two rows
+(D2, D3) carry an author recommendation that differs from it. Each row keeps
+its recommendation beside the strongest alternative and what choosing it
+would change. Everything else in this proposal is author-owned and sits in
+Design; a reviewer may still challenge it.
+
+Three rows reopen decisions from PR #278, the README rework merged on
+2026-09-12. They reopen where the content lives, never what it says: every
+section that moves keeps the wording #278's review settled.
+
+### D1 — The README is a front door, about 1,000 to 1,200 words
+
+Status: Open.
+
+Maintainer lean: the average user reads what the app does and how to
+install and use it, and little else. Features should be succinct, not a
+paragraph per feature "like it's a spec", and the same goes for
+Configuration.
+
+**Recommendation: the README answers four questions and links the rest.**
+What is this, how do I install it, what does it do on first run, and where
+do I get help. Features are one line each. Configuration is a pointer.
+Reference material is one link away. The draft assembled from this proposal
+measures 1,119 words against 3,246 today.
+
+Choosing differently: the research's raw target is about 450 to 700 words,
+which is where ShareX, OBS, Syncthing, and Playnite sit. Every one of them
+hands off to a website or a wiki, and this project has neither. Reaching
+that size means moving the installer-trust paragraph, Updates, and Uninstall
+out as well, and those are what make pasting a one-line installer
+acceptable. Heroic Games Launcher, the one exemplar without a marketing
+site, runs 1,406 words.
+
+### D2 — Everything that leaves goes to one user guide, `docs/user_guide.md`
+
+Status: Open.
+
+Maintainer lean: "What it talks to" and "Playlists and Benchmarks" belong
+"in some sort of architecture document".
+
+**Recommendation: one new file, `docs/user_guide.md`, written for users.**
+Sections move into it with their headings intact, so every anchor that
+other documents link today survives under the new file name. It ships in
+the release zip beside the README, and `tests/test_docs.py` checks its
+links like any other doc.
+
+Choosing differently:
+
+- **`docs/architecture.md`, the lean.** That file is the contributor and
+  agent map of the codebase: 693 lines on modules, threads, and data flow. A
+  player asking why the app contacts Plotly, or how to import a playlist,
+  will not open a file called architecture, and an agent reading it for
+  module structure would wade through user how-to. The content is
+  user-facing, so its home should be too.
+- **A `docs/guide/` folder of five files.** This was the author's first
+  lean in chat. File names such as `network.md` announce themselves in the
+  repository tree. The costs: five archive-contract rows instead of one, a
+  133-word file for Playlists and Benchmarks, and the `#configuration`
+  references inside Troubleshooting and Run From Source become cross-file
+  links.
+- **The GitHub wiki.** Conventional for end-user apps. It is not versioned
+  with the code, sits outside the same-PR documentation rule and the link
+  gate, and does not ship in the zip.
+
+### D3 — The README keeps a short network summary that links the full disclosure
+
+Status: Open. Reopens #278 D2 (location only).
+
+Maintainer lean: the section does not need to be in the README.
+
+**Recommendation: four sentences stay, and the table moves.** The first two
+sentences are today's, unchanged: no usage or crash analytics, and data
+stays on the PC. A third names the three reasons the app reaches the
+network, by category. The fourth links the full section in the guide. The
+reader this serves is the one being asked to paste `irm | iex` from a
+Reddit link, and they need it before they install, not after they go
+looking.
+
+The summary names categories, not services, so a new service under an
+existing category cannot make it false. There is evidence for that choice:
+the service-naming short form kept in the maintainer's private launch note
+went stale the day chart sharing landed, and still omits Plotly.
+
+The cost is a second surface. The `AGENTS.md` rule that binds the
+disclosure to same-PR updates is rewritten to cover the summary too (see
+Design).
+
+Choosing differently: fully out of the README, the lean, leaves nothing to
+drift, and the README says nothing about network use at the moment the
+reader decides to install. Unchanged keeps 429 words between Install and
+Troubleshooting. PowerToys uses the recommended pattern: two sentences in
+the README that link a separate privacy document. Playnite keeps about 85
+words inline.
+
+### D4 — Install keeps its quick start and trust story; Manual install and Rollback move
+
+Status: Open.
+
+Maintainer lean: none on record. The maintainer did not name this section;
+the author adds the row because Install is the largest section, at 797
+words.
+
+**Recommendation: move 353 words and leave the rest untouched.** Manual
+install (131 words) and the collapsed Rollback block (222 words) move to
+the guide. The three-step quick start, the paragraph on what the installer
+touches, the release-integrity paragraph, Updates, and Uninstall stay
+exactly as #278 verified them against the scripts. A short "Other ways to
+install" subsection links what moved.
+
+Choosing differently: leaving Install alone puts the README near 1,450
+words. Tightening the quick start as well saves about 60 more words, and
+the price is rewording sentences that were checked line by line against
+`launcher.ps1` and `install.ps1`.
+
+### D5 — Troubleshooting moves whole; the README keeps a pointer and the log location
+
+Status: Open. Reopens #278 D3 (location only).
+
+Maintainer lean: none on record. Also an author-added row: the section is
+506 words.
+
+**Recommendation: all eight entries move to the guide, in order,
+unchanged.** One list in one place, so the schema-recovery ordering that
+#278's review restored travels intact. The README keeps a short paragraph
+that names the kinds of symptom covered, links the list, and says where the
+logs are. The two failures a new user can hit in the first minute already
+explain themselves: the console names a port conflict, and a card on the
+Scenario Performance page names a stats folder it could not find.
+
+Choosing differently: keeping three entries inline (port, stats folder,
+logs) is the alternative #278 D3 rejected. It adds about 200 words and
+splits one list across two files. Leaving the section alone adds about 470.
+
+### D6 — Run From Source moves into the guide; no `docs/development.md`
+
+Status: Open. Reopens #278 D4.
+
+Maintainer lean: none on record. The maintainer parked a kickoff prompt for
+this move on 2026-09-12 as an idea worth keeping, not approved work, and
+that prompt asks for the move to become a row of any wider README rework.
+
+**Recommendation: the section moves to the guide as an install path.** It
+serves a user who would rather manage the toolchain themselves as well as a
+contributor, so it sits beside Manual install. The README's Development
+section keeps the tech-stack sentence and the link to the architecture doc,
+and "Other ways to install" links the moved section.
+
+This is the lowest-stakes row. Run From Source is 84 words at the bottom of
+the file, below the point where players stop reading, so keeping it costs
+them nothing. Of the two objections #278's reviewer raised, the
+release-contract cost disappears because this proposal pays it anyway, and
+contributor discovery friction remains.
+
+Choosing differently: keeping it in the README, #278's unanimous outcome,
+adds 84 words and keeps zero-click discovery for contributors. A standalone
+`docs/development.md` adds a second new file and a second archive row for
+84 words.
+
+## Problem
+
+### Why now
+
+The README is the landing page for the public re-launch: a player arrives
+from a Reddit or Discord link, and the first screen decides whether they
+install. #278 made the content accurate and complete. Since then the file
+has kept growing by one correct paragraph at a time, because the standing
+habit is to document each shipped behavior in the README in the same PR.
+Nothing in the repository says what does not belong there.
+
+### What was measured
+
+Words per section at `413a8c0`, counted with `wc -w` over each section's
+line range, heading line excluded:
+
+| Section | Words |
+| --- | --- |
+| Install | 797 |
+| of which Manual install and Rollback | 353 |
+| Configuration | 734 |
+| Troubleshooting | 506 |
+| What it talks to | 429 |
+| Features | 297 |
+| Playlists and Benchmarks | 129 |
+| Found a bug? | 86 |
+| Run From Source | 84 |
+| Intro, Development, License | 151 |
+| Heading lines | 33 |
+| **Total** | **3,246** |
+
+Two findings beyond the sizes. `example.toml` already documents every
+`config.toml` key, including the no-login warning beside `host`, so the
+README's Configuration bullets restate it. And the installed `config.toml`
+contains only `port`, so a reader is never looking at `host` without having
+opened `example.toml` or the Configuration section first.
+
+### What the sources say
+
+An Opus subagent fetched and read each source below on 2026-09-19. The full
+notes, including what could not be fetched, are in the main checkout at
+`ignore/design-notes/readme-trim-research.md`. They are a convenience, not
+evidence: reviewers should check the sources themselves.
+
+- [GitHub's README documentation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
+  lists what a README answers: what the project does, why it is useful, how
+  to get started, where to get help, and who maintains it. It sends longer
+  documentation elsewhere.
+- [Google's documentation guide](https://google.github.io/styleguide/docguide/READMEs.html)
+  calls a README a short summary that links the user-facing documentation.
+- Art of README (the original repository is gone; read through
+  [a fork](https://raw.githubusercontent.com/bradparks/art-of-readme/master/README.md))
+  says "The ideal README is as short as it can be without being any
+  shorter." It orders content from broadest to most specific, so a reader
+  can stop as soon as they have what they came for.
+- [makeareadme.com](https://www.makeareadme.com/) is the dissent: it prefers
+  too long over too short, while still recommending separate documents for
+  the excess.
+- [Prana et al.](https://ar5iv.labs.arxiv.org/html/1802.06997) hand-labelled
+  4,226 README sections from 393 repositories. 97% of READMEs say what the
+  project is and 88.5% say how to use it. Only 25.7% say why it is useful.
+  The "why" is the scarce content.
+- [Diátaxis](https://diataxis.fr/) says nothing about READMEs. By its types,
+  a Configuration section is reference and a Playlists explainer is
+  explanation, and both conventionally live in their own documents.
+
+Exemplars, by `wc -w` on the raw file (badge markup inflates the counts):
+
+| Project | Words | Features | Configuration | Privacy or network |
+| --- | --- | --- | --- | --- |
+| ShareX | 176 | website only | none | links a website policy |
+| OBS Studio | 300 | one paragraph | none | none |
+| Syncthing | 470 | seven goals | none | on its docs site |
+| Playnite | 607 | homepage | none | about 85 words inline |
+| PowerToys | 882 | a grid of links | none | two sentences linking a separate document |
+| Heroic Games Launcher | 1,406 | 16 one-line bullets | none | none |
+| Jellyfin | 1,600 | none | developer variables only | none |
+
+No exemplar carries a configuration reference. Feature lists are one line
+per feature or live elsewhere. `PRIVACY.md` is not a file GitHub
+recognizes, and `SECURITY.md` is for vulnerability reports, so neither is a
+conventional home for the network disclosure.
+
+### What constrains a move
+
+- **Inbound anchors.** Three specs and `AGENTS.md` link README headings:
+  `#configuration`, `#manual-install`, `#playlists-and-benchmarks`,
+  `#what-it-talks-to`, plus `#install` and `#uninstall`, which stay.
+  `tests/test_docs.py` fails on a heading anchor that no longer exists.
+- **The README ships in the release zip.** Every relative `docs/` link in
+  it must be named in `REQUIRED_ARCHIVE_ENTRIES` in
+  `scripts/release_job.py`. The test
+  `test_readme_doc_targets_are_all_required` enforces that, because the
+  archive contract is checked before an irreversible publication.
+- **The gate keys off the link, not the file.** A section deleted from the
+  README with no link to its new home passes every test and ships a README
+  that is silently missing the content.
+- **The network rule.** `AGENTS.md` names the README section as the public
+  disclosure of outbound network use and requires same-PR updates to it.
+
+## Design
+
+### The rule
+
+The README is for the reader who arrived from a link and has not installed
+yet, or installed a minute ago. It says what the app does and why, shows
+it, lists features one line each, installs it, and points at help.
+Reference, how-to, and explanation for a reader who already runs the app
+live in the user guide. A new feature adds at most one line to Features;
+its settings, edge cases, and failure modes go to the guide or the spec.
+
+### The README after the trim
+
+Measured on a draft assembled from today's file and the new prose below.
+
+| Section | Today | After | How |
+| --- | --- | --- | --- |
+| Intro | 78 | 104 | unchanged, plus one "why" sentence; the name line moves below it |
+| Features | 297 | 177 | new prose: six one-line bullets |
+| Install | 797 | 481 | unchanged, minus Manual install and Rollback, plus "Other ways to install" |
+| What it talks to | 429 | 77 | new prose: the summary (D3) |
+| Troubleshooting | 506 | 39 | new prose: the pointer (D5) |
+| Found a bug? | 86 | 86 | unchanged |
+| Configuration | 734 | 42 | new prose: the pointer |
+| Playlists and Benchmarks | 129 | 0 | folded into the Benchmarks bullet |
+| Run From Source | 84 | 0 | moved (D6) |
+| Development | 37 | 52 | unchanged, plus the tech-stack sentence |
+| License | 36 | 36 | unchanged |
+| Heading lines | 33 | 25 | |
+| **Total** | **3,246** | **1,119** | |
+
+Section order is unchanged. The "why" sentence restates the three
+questions that open the product overview, so it introduces no new claim.
+
+### What moves, and the verbatim rule
+
+Six blocks move to `docs/user_guide.md`: Configuration, Playlists and
+Benchmarks, Troubleshooting, What it talks to, Manual install with its
+Rollback block, and Run From Source.
+
+**A moved block is copied, not rewritten.** Headings, wording, order, and
+the collapsed `<details>` blocks are preserved. The only permitted edits
+are the cross-reference fixes a change of file forces, and the
+implementation PR lists each one in its description:
+
+- `docs/architecture.md` becomes `architecture.md` inside Run From Source.
+- References to "the install one-liner" and "the easy install" gain a link
+  to the README's Install section.
+- `#configuration` references inside Troubleshooting and Run From Source
+  need no change, because both sections land in the same file.
+
+This is what keeps #278's two review redlines intact without re-arguing
+them: the network table names services and never hostnames, and schema
+recovery leads with backing up the `data` folder and the converter script.
+
+Nothing in a moved block is dropped. The one deliberate loss is in
+Features, which is rewritten, not moved: the per-feature detail that the
+capability specs already state. That covers how a notification replaces the
+previous one, the celebration's covered-window and reduced-motion behavior
+and its Settings control, the chart-point preferences, and the bounded
+leaderboard refresh.
+
+### The user guide
+
+`docs/user_guide.md`, H1 "User Guide", opening with two sentences: the
+README covers what the app is and how to install it, and this guide covers
+everything after that. Sections in this order, by how often a running user
+needs them: Configuration, Playlists and Benchmarks, Troubleshooting, What
+it talks to, Manual install, Run From Source. Heading text is unchanged, so
+the anchors are `#configuration`, `#playlists-and-benchmarks`,
+`#troubleshooting`, `#what-it-talks-to`, `#manual-install`, and
+`#run-from-source`.
+
+### New README prose
+
+No app copy changes: the copy rules govern strings the app's code shows,
+and the README is a document. The new prose is gathered here anyway, and
+reviewers are asked to redline it as they would a Copy block. Everything in
+the README that is not in this block is today's text.
+
+```markdown
+It turns the runs you already play into answers to three questions: am I improving, where am
+I weak, and what should I work on next?
+
+## Features
+
+- **Scenario plots** — Score vs Sensitivity and Score vs Time for each scenario, with optional
+  PB-score, score-threshold, and benchmark-rank overlays.
+- **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
+  pass or fail against your personal best, or the top-N placement it earned.
+- **Personal best celebration** — confetti, fireworks, cannons, or stars when a run beats your
+  scenario best, on whatever page you have open.
+- **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
+  `Position: 11,290 of 63,892 (82.33% percentile)`, refreshed after a new personal best.
+- **Playlist scenarios table** — every scenario in a playlist with position, percentile, last
+  played, runs, and personal-best stats; sort by percentile to build a training priority list.
+- **Benchmarks** — a bundled benchmark library, built with the help of
+  [Evxl.app](https://evxl.app)'s author. Voltaic and Viscose are visible by default, the
+  **Show hidden** switch on the Playlists page reveals the rest, and **Import** adds any
+  playlist by share code. More in
+  [Playlists and Benchmarks](docs/user_guide.md#playlists-and-benchmarks).
+
+### Other ways to install
+
+[Manual install](docs/user_guide.md#manual-install) installs from a release you have inspected
+yourself, and covers rolling back to, and pinning, an older release.
+[Run From Source](docs/user_guide.md#run-from-source) is for development, or for managing the
+toolchain yourself.
+
+## What it talks to
+
+The dashboard does not collect or send usage or crash analytics. Your runs, settings, and
+caches stay on your PC unless you share a chart yourself. It reaches the network for three
+things: installing and updating itself, leaderboard lookups once a KovaaK's username is set,
+and the actions you click (detecting your accounts, importing a playlist, sharing a chart).
+[What it talks to](docs/user_guide.md#what-it-talks-to) in the user guide lists every service
+and what makes the app reach it.
+
+## Troubleshooting
+
+[Troubleshooting](docs/user_guide.md#troubleshooting) in the user guide lists problems by what
+you see, such as a port already in use, a stats folder that was not found, a missing
+leaderboard position, or a slow first start. The logs are in
+`%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`.
+
+## Configuration
+
+Most settings live on the dashboard's own **Settings** page: where your KovaaK's stats live,
+and who you are on the leaderboards. Boot settings such as `port` live in `config.toml`
+(installed: `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`), which updates never touch.
+[Configuration](docs/user_guide.md#configuration) in the user guide covers both.
+```
+
+Four choices inside that block, each open to challenge:
+
+- **The network summary is checked against the table row by row.** Rows one
+  to three are installing and updating. Row four is leaderboard lookups
+  behind a username, which includes the background percentile fill. Row
+  five is two of the clicked actions and row six is the third. It stays
+  consistent with the sentence that moves to the guide: with no username
+  set, the running app makes no requests on its own.
+- **The Configuration pointer names `port` and never `host`.** `host` is
+  the one setting with a security consequence, and its no-login warning
+  lives beside it in `example.toml` and in the guide. The README should not
+  name the key without the warning.
+- **The plots bullet uses the chart modes' on-screen names**, Score vs
+  Sensitivity and Score vs Time. Today's bullet paraphrases them.
+- **The name line moves below the description**, so the first sentence
+  under the title says what the app does. The wording is unchanged.
+
+### Links and contracts
+
+- `docs/specs/settings.md` repoints `README.md#configuration`,
+  `docs/specs/release_and_install.md` repoints `README.md#manual-install`,
+  and `docs/specs/playlists.md` repoints
+  `README.md#playlists-and-benchmarks`, each to the same anchor in the
+  guide. The `#install` and `#uninstall` links stay.
+- The README's release-integrity paragraph repoints its Manual install
+  link to the guide.
+- `REQUIRED_ARCHIVE_ENTRIES` gains one row, `docs/user_guide.md`. The
+  `docs/architecture.md` row stays true, because the README's Development
+  section still links that file.
+- The archive test reads relative `docs/` links from the README only. The
+  guide is a second shipped document with links of its own, today only the
+  one to `architecture.md`. The author recommends extending
+  `test_readme_doc_targets_are_all_required` to the guide's links, resolved
+  from `docs/`. It is the same failure the test exists for. It goes beyond
+  the trim itself, so it is flagged here and is cheap to drop.
+
+### The `AGENTS.md` rules
+
+The network rule in Documentation Habits is rewritten in place. The guide's
+section becomes the public disclosure, the same-PR duty is unchanged, and
+one duty is added: the PR also checks that the README's summary is still
+true. The services-not-hostnames sentence and its link to the #278 thread
+are kept.
+
+One new bullet records the rule from this proposal, so the README does not
+grow back: the README is the front door; user-facing reference, how-to, and
+troubleshooting go to `docs/user_guide.md`; a new feature adds at most one
+line to Features. Enforcement is review-only, like the prose rules beside
+it.
+
+### Alternatives rejected
+
+- **A word-count gate in `tests/test_docs.py`.** It would fail unrelated
+  PRs on an editorial threshold, and the docs test deliberately gates
+  structure, never prose.
+- **Collapsing sections into `<details>` blocks in place.** The words stay
+  in the file and in every diff, and a collapsed block is invisible to a
+  reader searching the page.
+- **Rewriting the moved sections while moving them.** It would reopen
+  wording that #278 verified against code, and it would make the move
+  unreviewable as a move.
+- **A table of contents.** At 157 lines GitHub's outline button covers it.
+
+### Blast radius
+
+One new file, one README rewrite that is mostly deletion, three one-line
+spec repoints, two `AGENTS.md` bullets, one archive row, and one test
+extension. No application code changes. Because `scripts/release_job.py`
+changes, the merge is release-worthy and cuts a release; that release is
+how the new README and the guide reach installed copies. External links to
+the old README anchors, in a forum post for instance, land at the top of
+the README and no longer scroll to the section.
+
+## Out of scope
+
+- The wording of every moved section, including the network table and all
+  eight troubleshooting entries.
+- `docs/example.png`, the screenshot, and any new visual such as a GIF.
+- A website, a wiki, or GitHub Pages.
+- A `CONTRIBUTING.md`. The Development section's statement on AI-assisted
+  development stays where #278 D1 put it.
+- The license section, and mentioning the license nearer the top.
+- In-app links. The app links the repository and the bug form, never a
+  README section, so no app code depends on these anchors.
+
+## Testing
+
+- This PR is one Markdown file: `git diff --check` and
+  `uv run pytest tests/test_docs.py`.
+- The implementation PR runs the five gates. `tests/test_docs.py` proves
+  every relative link and heading anchor resolves after the move, and
+  `tests/test_release_job.py` proves the archive contract names every
+  `docs/` target the README links.
+- The move is proven as a move: commit 1 of the implementation PR is
+  reviewed with `git diff --color-moved`, and the PR description lists each
+  permitted cross-reference fix.
+- The size is proven by `wc -w README.md`, against the budget D1 rules.
+- Manual: open the branch's README and guide on GitHub and follow every
+  link once, including the collapsed Rollback block.
+
+## Delivery plan
+
+1. **This PR: the proposal.** The review lane follows the maintainer's
+   direction in chat on 2026-09-19 and is recorded in the PR description.
+   The author is a Fable session, so there is no Fable review seat.
+2. **One implementation PR** (Opus 5 at high, from a kickoff prompt written
+   into `ignore/prompts/` after ratification), in four commits:
+   1. the move: the six blocks leave the README for `docs/user_guide.md`
+      with only the listed cross-reference fixes, the specs and the
+      `AGENTS.md` link repoint, and the archive row lands. This must be one
+      commit, because the link and archive gates fail on any subset;
+   2. the new README prose from the block in Design, exactly as ratified,
+      with any divergence flagged in the PR description;
+   3. the two `AGENTS.md` rule changes and the archive-test extension;
+   4. the docs definition of done.
+3. **Docs definition of done**, in the implementation PR: a decision-log
+   entry, opening with its plain-language summary, that records the front
+   door rule, the guide as the home of user-facing reference, and the
+   network disclosure's two surfaces; this proposal file deleted; the
+   kickoff prompt moved to `ignore/prompts/done/`. No capability spec
+   covers the README, and no app behavior changes, so there is no spec
+   statement, `docs/roadmap.md`, or `docs/product.md` change beyond the
+   three repointed links.
+
+Rows ruled differently shrink the plan without reshaping it: a block ruled
+to stay is left out of commit 1, and its pointer is left out of commit 2.
+If D2 is ruled for a different destination, commit 1 targets that file and
+the rest holds.
