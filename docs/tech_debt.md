@@ -221,8 +221,3 @@ recorded rather than fixed. The pattern to copy is `_load_leaderboard_mapping`'s
 mtime-revalidated mirror.
 
 ## Documentation
-
-### Refresh stale example screenshot
-
-`docs/example.png` — README screenshot from before the rank UI, deliberately
-kept until replaced. Recapture next time the app is running with real data.
