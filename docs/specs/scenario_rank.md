@@ -114,8 +114,9 @@ benchmark tier) — see the
   ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
 - Both TTLs govern automatic paths only. `force_refresh` marks a lookup
   board-authoritative for the whole readout and bypasses the rank cache and
-  the leaderboard-total TTL alike, so a live position is never divided by a
-  week-old count ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  the leaderboard-total TTL alike, so a live position meets a week-old count
+  only when the total re-read fails, which the result marks
+  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - Every automatic rank-cache write routes through one process-locked
   monotonic writer, so a lower score or transient `UNRANKED` result never
   replaces a known better value; only a user-clicked Refresh is
@@ -232,15 +233,15 @@ benchmark tier) — see the
   `total_refresh_failed`, a transient marker excluded from serialization so it
   can never reach a rank cache file ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - A Refresh whose position landed but whose total did not is orange. Its
-  consequence clause names what the value actually carries, not what a ranked
-  one usually does: "Position refreshed but total from cache" with "Refreshed
-  position for {scenario}. Couldn't refresh the total, so the percentile is
-  from cache." when a percentile survived, the same title with "so the player
-  count is from cache." when the readout has a count but no percentile (an
-  unranked result reads `Unranked (N players)`), and "Position refreshed but
-  no total" with "Refreshed position for {scenario}. Couldn't fetch the total,
-  so no player count is shown." when nothing was cached. Both ride the per-scenario success channel and clear the
-  same two channels the green does, so a re-click's green replaces the partial
+  consequence names the total, which is what failed, rather than the
+  percentile, which is recomputed from it: "Position refreshed but total from
+  cache" with "Refreshed position for {scenario}. Couldn't refresh the total,
+  so the total shown is from cache." when a count was cached, and "Position
+  refreshed but no total" with "Refreshed position for {scenario}. Couldn't
+  fetch the total, so no total is shown." when none was. Naming the failed
+  thing keeps both true for an unranked readout, which shows a count and never
+  a percentile. Both ride the per-scenario success channel and clear the same
+  two channels the green does, so a re-click's green replaces the partial
   verdict instead of stacking under it. The value carries no extra inline
   hint; the Refresh button beside it is the affordance. A rank fetch that
   failed asks for no total at all ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).

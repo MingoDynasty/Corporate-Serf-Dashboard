@@ -23,7 +23,9 @@ showed was two numbers from different moments. Clicking Refresh now re-reads
 the count as well and recomputes the percentile from both. When the position
 refreshes but the count cannot be reached, the app keeps the last count it has
 and says so in an orange notification instead of confirming a clean refresh.
-Automatic lookups are unchanged and still reuse a cached count for a week.
+Automatic lookups still reuse a cached count for a week. When their own count
+fetch fails they now fall back to the last count they have, where they used to
+show none.
 
 **What `force_refresh` means now.** It marks the whole readout
 board-authoritative, not just the rank: `get_scenario_rank_info` passes it
@@ -41,18 +43,31 @@ that call now names the flag instead of the zero.
 trade against bursty cold-cache total fetches across every playlist scenario,
 and named "a targeted refresh flow" as the remedy if stale totals ever
 misled. The Refresh button is that flow: one leaderboard, one extra
-unfiltered GET, at a moment the user asked for truth. Every automatic path —
-the warmup worker, the playlist scenarios fill, the overview, a TTL-expired
-foreground lookup — keeps the TTL, so the knob still governs what it was
-bought for. A percentile needs an unfiltered count the rank call cannot
+unfiltered GET, at a moment the user asked for truth. Every other automatic
+path — the warmup worker, the playlist scenarios fill, the overview, a
+TTL-expired foreground lookup — keeps the TTL, so the knob still governs what
+it was bought for. A percentile needs an unfiltered count the rank call cannot
 supply: with `usernameSearch` the response's `total` is the number of search
 matches, not the board population.
 
-**Orange when the position lands and the count does not.** A failed total
-fetch now substitutes the last cached count whatever its age and marks the
-result `total_refresh_failed`, so a clicked refresh answers orange — the
-partial-success rung, where the action committed but a follow-up did not
-([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)).
+**The failed-total fallback is not gated on the flag.** A total fetch that
+fails now substitutes the last cached count whatever its age and marks the
+result `total_refresh_failed`, for every caller rather than only a clicked
+one. One rule, because the cache-only interval path and `_stale_rank_fallback`
+already read the total TTL-free, so gating it would have left three callers
+disagreeing about the same cache. The consequence for automatic renders: one
+whose own total fetch fails now shows the last cached count at any age where
+it used to show none — the same count the next interval tick would have
+supplied a second later anyway. It also supersedes the Consequences line of
+[2026-04-27](#2026-04-27-make-leaderboard-total-enrichment-best-effort), which
+described returning the original `ScenarioRankInfo` untouched.
+
+**Orange when the position lands and the count does not.** A clicked refresh
+whose total fetch failed answers orange — the partial-success rung
+([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)),
+**extended here** from "a follow-up write did not" to any follow-up step, since
+what failed is a read. `docs/specs/notifications.md` carries the widened
+sentence.
 Green would assert a freshness the readout does not have, and the served-stale
 yellow would claim the position came from cache when the position is the one
 part that did refresh. It shares the per-scenario success channel, so the
@@ -66,8 +81,9 @@ already beside the value and the same host is failing seconds apart. No total
 request is made at all when the rank fetch itself failed.
 
 **Not fixed here.** `_with_percentile` guards `total_players <= 0` but not
-`rank > total`, so an automatic path can still print a negative percentile
-from a fresh rank over an old smaller count. Tracked in
+`rank > total`, so an automatic path, or a click whose total re-read failed
+and fell back to the cached count, can still print a negative percentile from
+a fresh rank over an older smaller count. Tracked in
 [tech_debt.md](tech_debt.md).
 
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
@@ -1560,7 +1576,9 @@ as the flood backstop.
 
 ## 2026-08-30: One Severity Color Language For Inline Notices
 
-Status: Accepted
+Status: Accepted (the orange rung widened by
+[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total) from
+a failed follow-up write to any failed follow-up step)
 
 The app's inline notices each picked their own look, so the surfaces that most
 needed attention were the faintest things on the page. They now speak the same
@@ -5232,7 +5250,10 @@ Consequences: The warning is transient and derived from current config each time
 
 ## 2026-04-27: Make Leaderboard Total Enrichment Best-Effort
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): a
+failed total lookup now falls back to the last cached count for every caller
+rather than returning the result untouched)
 
 Decision: Leaderboard total lookup should never invalidate a valid rank or unranked result.
 
@@ -5244,7 +5265,8 @@ Consequences: `_with_leaderboard_total()` catches expected total-enrichment fail
 
 Status: Accepted (amended by
 [2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): the
-TTL governs automatic paths only, and a user-clicked Refresh bypasses it)
+TTL governs automatic paths only, and both board-authoritative callers — a
+user-clicked Refresh and the PB-triggered freshness chain — bypass it)
 
 Decision: `leaderboard_total_cache_ttl_hours` defaults to `168`, matching `scenario_rank_cache_ttl_hours`.
 

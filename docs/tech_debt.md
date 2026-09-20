@@ -16,8 +16,8 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The first four entries below were established by the two 2026-08-12 audits, which
-hold the reproductions, soak measurements, and sequenced fix plans:
+The first four entries below were established by the two 2026-08-12 audits,
+which hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
 (gitignored, main checkout only — deliberately not linked so a fresh clone's
@@ -64,12 +64,14 @@ import it twice (observed in the 2026-08-12 soak).
 past that point. Any path that pairs a fresh rank with an older, smaller
 cached total can reach it: a board that grew from 500 to 1,200 inside the
 one-week total TTL shows a 900th placement as `900 of 500 (-79.90%
-percentile)`. A clicked Refresh no longer reaches it — the
+percentile)`. Reaching paths: the warmup worker, the playlist scenarios fill,
+a TTL-expired foreground lookup, and a clicked Refresh whose total re-read
+failed and fell back to the cached count. The
 [2026-09-19 entry](decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)
-re-reads the total with the rank — but the warmup worker, the playlist
-scenarios fill, and a TTL-expired foreground lookup all still can. Found while
-shipping that entry and deliberately left out of it: the guard belongs with
-the formula, not with one caller's refresh policy.
+narrowed the click to that last case — it re-reads the total with the rank, so
+only the failure branch still pairs a fresh rank with an older count — and did
+not close it. Found while shipping that entry and deliberately left out of it:
+the guard belongs with the formula, not with one caller's refresh policy.
 
 ## Code Smells
 
