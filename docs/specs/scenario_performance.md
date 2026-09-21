@@ -10,10 +10,8 @@ chosen playlist and scenario included, so returning to the page shows the
 selection you last made, whether you picked it in the dropdowns or arrived
 from a playlist link. A newly played run reaches the chart automatically once
 its file is imported, and the page can follow the scenario just played. The
-chart's toolbar can save it as a PNG, or share it to Plotly Cloud once you
-confirm and are signed in there. The page also hosts the setup surfaces that
-point you at Settings, whether something has never been set or saved settings
-cannot be read.
+page also hosts the setup surfaces that point you at Settings, whether
+something has never been set or saved settings cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
