@@ -218,8 +218,9 @@ def host_address_family(host: str) -> int:
     every IPv6 interface included, with none of the warnings that gate an
     explicit ``0.0.0.0``.
 
-    Rejecting names costs nothing the documentation promised: ``README.md``,
-    ``example.toml``, and the decision log all specify literals.
+    Rejecting names costs nothing the documentation promised:
+    ``docs/user_guide.md``, ``example.toml``, and the decision log all specify
+    literals.
     """
     try:
         address = ipaddress.ip_address(host)
