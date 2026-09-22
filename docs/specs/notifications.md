@@ -514,7 +514,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `run-import-failure` | burst, fixed id | "Run not recorded" | red | — | `flush_run_import_failures`; this spec |
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |
 | `steam-id-mismatch` | fixed id, sticky, once per process | "Steam ID mismatch" | yellow, until dismissed | — | `get_scenario_rank`; rank spec |
-| `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · position from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
+| `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · data from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
 | `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" (fresh) / "Position refreshed but total from cache" / "Position refreshed but no total" | green (fresh) / orange (total re-read failed) | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
 | `setup-card-skip-problem` | channel | "Skip wasn't saved" | red | — | `skip_identity_setup`; settings spec |

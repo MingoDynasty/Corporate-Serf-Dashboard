@@ -13,6 +13,46 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-21: Failed-Refresh Copy Names The Total Too
+
+Status: Accepted
+
+When a click on Refresh can't get the position from KovaaK's, none of the
+readout refreshes, yet the notification mentioned only the position. Once the
+app began reporting the total on its own after a partial refresh, that
+wording read as though the total had refreshed, which can't happen on this
+path. Both failure notifications now name the position and the total, and the
+yellow one's title says the data is from cache.
+
+**The strings.** Served stale (yellow): the title "Refresh failed · position
+from cache" becomes "Refresh failed · data from cache", and the message
+"Couldn't refresh. The position shown is from cache." becomes "Couldn't
+refresh. The position and total shown are from cache." Hard failure (red): the
+message "Couldn't refresh. The position shown is unchanged." becomes "Couldn't
+refresh. The position and total shown are unchanged." The red title "Position
+refresh failed" stays: it names the operation that failed rather than what is
+on screen, and it is still true.
+
+**Why both numbers, on both paths.** A clicked refresh fetches the position
+first and asks for the total only once the position has come back
+([2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+When the position request fails, no total request is made, so on the yellow
+path every number shown is the cached readout and on the red path the value is
+left exactly as it was. Before 2026-09-19 no verdict reported the total on its
+own, and "position" served as shorthand for the whole readout. That entry's
+orange verdict names the total separately — "Couldn't refresh the total, so
+the total shown is from cache." — and read beside it, "The position shown is
+from cache." looked like its mirror image: position stale, total fresh. The
+fetch order makes that state impossible, and the copy now says so.
+
+**Why the title says "data".** A title is for scanning, and the message names
+both numbers straight after it. Rejected: "Refresh failed · position and total
+from cache", which is longer and repeats the message.
+
+**Unchanged.** Channels, colors, and the " · from cache" hint on a
+served-stale value. The open question of softening the red to yellow stays in
+[tech_debt.md](tech_debt.md).
+
 ## 2026-09-19: A Clicked Refresh Re-Reads The Leaderboard Total
 
 Status: Accepted
@@ -3451,6 +3491,9 @@ them — and is left open in [tech_debt.md](./tech_debt.md). *(Superseded in
 part, for copy, 2026-09-14: the served-stale toast now has that title of its
 own, "Refresh failed · position from cache", while the red hard failure keeps
 "Position refresh failed"; the color question stays open. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).)*
+*(Superseded again, for copy, 2026-09-21: the served-stale title is now
+"Refresh failed · data from cache", and both failure messages name the
+position and the total. See [Failed-Refresh Copy Names The Total Too](#2026-09-21-failed-refresh-copy-names-the-total-too).)*
 
 **Deliberately left open: do background rank events deserve a real toast?**
 "Your rank updated after that PB" and "Position update timed out" are

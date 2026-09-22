@@ -293,9 +293,13 @@ _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 # dismissed.
 _RUN_VERDICT_CHANNEL = "run-verdict"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
-_RANK_REFRESH_STALE_TITLE = "Refresh failed · position from cache"
-_RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh. The position shown is unchanged."
-_RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh. The position shown is from cache."
+_RANK_REFRESH_STALE_TITLE = "Refresh failed · data from cache"
+_RANK_REFRESH_FAILED_MESSAGE = (
+    "Couldn't refresh. The position and total shown are unchanged."
+)
+_RANK_REFRESH_STALE_MESSAGE = (
+    "Couldn't refresh. The position and total shown are from cache."
+)
 _RANK_REFRESH_TOTAL_STALE_TITLE = "Position refreshed but total from cache"
 _RANK_REFRESH_TOTAL_MISSING_TITLE = "Position refreshed but no total"
 # Notices that fire once per app session rather than once per trigger, by id.
@@ -894,7 +898,9 @@ def refresh_rank(  # noqa: PLR0911
 
     A failed refresh returns ``no_update`` for the value rather than ``N/A``,
     so whatever was on screen stays put -- usually the cached position -- and
-    the red toast's "The position shown is unchanged." is true either way.
+    the red toast's "The position and total shown are unchanged." is true
+    either way. Both failure verdicts name the total because a failed position
+    request asks for none, so every number on screen predates the click.
 
     Every verdict is a channel emission, so a repeat click always re-pops its
     answer instead of being swallowed by ``show``'s dedupe. A fresh position

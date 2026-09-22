@@ -1372,7 +1372,7 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
     assert notifications[0]["title"] == "Position refresh failed"
     assert (
         notifications[0]["message"]
-        == "Couldn't refresh. The position shown is unchanged."
+        == "Couldn't refresh. The position and total shown are unchanged."
     )
 
 
@@ -1415,10 +1415,10 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
 
     assert _rank_text(rank_display) == "50 · from cache"
     assert [notification["color"] for notification in notifications] == ["yellow"]
-    assert notifications[0]["title"] == "Refresh failed · position from cache"
+    assert notifications[0]["title"] == "Refresh failed · data from cache"
     assert (
         notifications[0]["message"]
-        == "Couldn't refresh. The position shown is from cache."
+        == "Couldn't refresh. The position and total shown are from cache."
     )
 
 
