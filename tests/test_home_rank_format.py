@@ -723,6 +723,21 @@ def test_format_scenario_rank_with_total_players_but_no_percentile():
     assert format_scenario_rank(rank_info) == "11,266 of 18,342"
 
 
+def test_format_scenario_rank_drops_the_parenthetical_over_a_stale_total():
+    """A rank past the cached total still shows both numbers, without a percentile."""
+    rank_info = api_service._with_percentile(
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            leaderboard_id=98330,
+            scenario_name="Some Scenario",
+            rank=900,
+            total_players=500,
+        )
+    )
+
+    assert format_scenario_rank(rank_info) == "900 of 500"
+
+
 def test_format_scenario_rank_without_total_players():
     rank_info = ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
