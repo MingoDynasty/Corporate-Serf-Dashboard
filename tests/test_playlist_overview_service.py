@@ -2,7 +2,7 @@ from datetime import datetime
 from types import SimpleNamespace
 
 from source.config import settings_service
-from source.kovaaks import data_service, playlist_overview_service
+from source.kovaaks import api_service, data_service, playlist_overview_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario, ScenarioStats
 from source.kovaaks.playlist_overview_service import (
@@ -314,6 +314,44 @@ def test_format_playlist_overview_row_gates_unresolved_scenarios(monkeypatch):
     assert row["median_percentile_display"] == "2/4 cached"
     assert row["median_percentile_sort"] is None
     assert row["lowest_percentile_display"] == "2/4 cached"
+    assert row["lowest_percentile_sort"] is None
+    assert row["lowest_scenario"] is None
+
+
+def test_format_playlist_overview_row_gates_a_rank_above_the_cached_total(
+    monkeypatch,
+):
+    """A suppressed percentile leaves the row unresolved, never a negative median."""
+    _configure(monkeypatch)
+    playlist = PlaylistData(
+        name="Stale Total",
+        code="KovaaKsStaleTotal",
+        scenarios=[Scenario(name="Outgrown", ranks=RANKS)],
+    )
+    stats_by_scenario = _played_stats("Outgrown")
+    _install_cached_ranks(
+        monkeypatch,
+        {
+            # The board grew past the weekly-cached total, so the rank the
+            # overview reads has no percentile to aggregate.
+            "Outgrown": api_service._with_percentile(
+                ScenarioRankInfo(
+                    status=ScenarioRankStatus.RANKED,
+                    leaderboard_id=98330,
+                    scenario_name="Outgrown",
+                    rank=900,
+                    total_players=500,
+                )
+            ),
+        },
+    )
+
+    row = format_playlist_overview_row("Stale Total", playlist, stats_by_scenario)
+
+    assert row["percentile_aggregates_resolved"] is False
+    assert row["median_percentile_display"] == "0/1 cached"
+    assert row["median_percentile_sort"] is None
+    assert row["lowest_percentile_display"] == "0/1 cached"
     assert row["lowest_percentile_sort"] is None
     assert row["lowest_scenario"] is None
 

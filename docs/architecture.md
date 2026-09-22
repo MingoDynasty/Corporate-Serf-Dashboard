@@ -321,6 +321,11 @@ flowchart LR
   the resulting `run-events` summary). The follow switch and the scenario
   dropdown are `State` there, not `Input`: a Store replays its last value, so a
   control flip would otherwise re-forward a batch already processed.
+  `?scenario=` and `?playlist_code=` reach the two dropdowns through the
+  layout-bound `home-deep-link` store and the `apply_deep_link` callback, never
+  as their layout `value`: both are browser-persisted, and Dash discards a
+  stored edit when a later visit renders a different default, so the per-visit
+  value has to arrive by callback to be remembered.
   As the landing page it also carries the first-run setup card
   (`_setup_card_children`), which is suppressed while a stats-directory change
   awaits a restart. It asks the store's read state before anything else: an
@@ -493,8 +498,12 @@ flowchart LR
   request's parameters and query string out of every log line), JSON cache
   helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
-  bounded `schedule_rank_freshness_refresh` Timer poll. The stale fallback tags
-  its returned `ScenarioRankInfo` structurally without persisting the marker;
+  bounded `schedule_rank_freshness_refresh` Timer poll. `force_refresh` marks a
+  read board-authoritative and bypasses the leaderboard-total TTL as well as
+  the rank cache, so a fresh position divides a cached count only when the
+  re-read fails. The stale fallback and the failed-total substitution tag
+  their returned
+  `ScenarioRankInfo` structurally without persisting the marker;
   split interactive-activity/network-success timestamps coordinate the
   percentile warmup worker. UI consumes `ScenarioRankInfo` and never calls endpoints directly. See
   `docs/kovaaks_api_notes.md`.

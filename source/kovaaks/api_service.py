@@ -1258,6 +1258,16 @@ def get_leaderboard_total(
     return total_players
 
 
+# The rank/total pair last warned about, per leaderboard. The cache-only read
+# path re-derives the percentile on every polling tick (1 s by default) and the
+# playlists overview re-derives it once per played scenario, so warning every
+# time would fill both rotating logs for as long as the total stays stale.
+# Keying on the pair rather than the leaderboard alone lets a moved rank or a
+# refreshed total report itself once more. Racing threads may duplicate a line;
+# a lock would buy nothing a log line needs.
+_warned_rank_over_total: dict[int | None, tuple[int, int]] = {}
+
+
 def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
     """Attach display-only percentile when rank and leaderboard total are known."""
     if (
@@ -1266,6 +1276,24 @@ def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
         or rank_info.total_players is None
         or rank_info.total_players <= 0
     ):
+        return rank_info
+
+    # Rank and leaderboard total are cached separately and age independently,
+    # so a fresh rank can outrun an older, smaller total. The midpoint formula
+    # has no floor past that point: it yields a negative percentile, which the
+    # playlists overview would then take into its median and lowest.
+    if rank_info.rank > rank_info.total_players:
+        pair = (rank_info.rank, rank_info.total_players)
+        if _warned_rank_over_total.get(rank_info.leaderboard_id) != pair:
+            _warned_rank_over_total[rank_info.leaderboard_id] = pair
+            logger.warning(
+                "Rank %s for %s (leaderboard %s) exceeds the cached total %s; "
+                "suppressing the percentile.",
+                rank_info.rank,
+                rank_info.scenario_name or "?",
+                rank_info.leaderboard_id,
+                rank_info.total_players,
+            )
         return rank_info
 
     return rank_info.model_copy(
@@ -1278,15 +1306,43 @@ def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
     )
 
 
+def _after_failed_total(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
+    """Substitute the last cached leaderboard total after a failed fetch.
+
+    Age is ignored: the total the fetch could not confirm is still the best
+    count the app has, and a percentile derived from it beats dropping to a
+    bare position. The marker it sets is what lets a caller that asked for a
+    fresh total tell this apart from a confirmed one; it is set even when no
+    total was ever cached, because the fetch failed either way.
+    """
+    if rank_info.leaderboard_id is None:
+        return rank_info
+
+    total_players = _cached_leaderboard_total(rank_info.leaderboard_id)
+    if total_players is None:
+        return rank_info.model_copy(update={"total_refresh_failed": True})
+
+    rank_info = rank_info.model_copy(
+        update={"total_players": total_players, "total_refresh_failed": True}
+    )
+    return _with_percentile(rank_info)
+
+
 def _with_leaderboard_total(
     rank_info: ScenarioRankInfo,
     leaderboard_total_cache_ttl_hours: int = 168,
+    force_refresh: bool = False,
 ) -> ScenarioRankInfo:
     """
     Best-effort attach total ranked-player count to a resolved leaderboard.
 
-    Total-count freshness has its own short TTL. A failure here should degrade to
-    showing the rank/unranked state by itself, because that result is still valid.
+    Total-count freshness has its own TTL, which ``force_refresh`` bypasses:
+    a board-authoritative caller re-reads the denominator its percentile is
+    derived from, so a fresh rank meets a week-old total only when that
+    re-read fails. A failure degrades to the last cached total and says so
+    through ``total_refresh_failed``; only a leaderboard with no total cached
+    at all degrades to the rank/unranked state by itself, because that result
+    is still valid.
     """
     if (
         rank_info.status not in (ScenarioRankStatus.RANKED, ScenarioRankStatus.UNRANKED)
@@ -1297,7 +1353,7 @@ def _with_leaderboard_total(
     try:
         total_players = get_leaderboard_total(
             rank_info.leaderboard_id,
-            leaderboard_total_cache_ttl_hours,
+            0 if force_refresh else leaderboard_total_cache_ttl_hours,
         )
     except requests.RequestException as exc:
         logger.warning(
@@ -1306,14 +1362,14 @@ def _with_leaderboard_total(
             rank_info.leaderboard_id,
             request_exception_summary(exc),
         )
-        return rank_info
+        return _after_failed_total(rank_info)
     except ValidationError, OSError, ValueError:
         logger.warning(
             "Failed to process leaderboard total for %s",
             rank_info.leaderboard_id,
             exc_info=True,
         )
-        return rank_info
+        return _after_failed_total(rank_info)
     rank_info = rank_info.model_copy(update={"total_players": total_players})
     return _with_percentile(rank_info)
 
@@ -1515,7 +1571,7 @@ def _run_attempt(  # noqa: PLR0913
                 try:
                     _with_leaderboard_total(
                         rank_info,
-                        leaderboard_total_cache_ttl_hours=0,
+                        force_refresh=True,
                     )
                 except Exception:  # noqa: BLE001
                     logger.warning(
@@ -1684,10 +1740,14 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     rank fetch that fails after the leaderboard resolved, which falls back to
     the last cached rank (TTL ignored, read-only) tagged with a
     ``warning_message``; UNKNOWN only when nothing is cached.
-    ``allow_network=False`` serves rank and total caches independent of TTL and
-    returns UNKNOWN on a miss without fetching. ``allow_hydration=False`` skips
-    total-play hydration during leaderboard resolution, for callers that already
-    hydrated once before fanning out per scenario.
+    ``force_refresh=True`` is the board-authoritative path: it bypasses the
+    rank cache and the leaderboard-total TTL alike, so a fresh position meets
+    a stale total only when the total re-read fails, which the result marks,
+    and it may write a rank lower than the stored one.
+    ``allow_network=False`` serves rank and total caches independent of TTL
+    and returns UNKNOWN on a miss without fetching. ``allow_hydration=False``
+    skips total-play hydration during leaderboard resolution, for callers that
+    already hydrated once before fanning out per scenario.
 
     Result states:
     - RANKED: leaderboard exists and the exact user has a score.
@@ -1889,5 +1949,6 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     rank_info = _with_leaderboard_total(
         rank_info,
         leaderboard_total_cache_ttl_hours,
+        force_refresh=force_refresh,
     )
     return _with_derived_rank_warning(rank_info, username, steam_id)

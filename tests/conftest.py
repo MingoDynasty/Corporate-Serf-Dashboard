@@ -7,6 +7,7 @@ import pytest
 
 from source.config import config_service, settings_service
 from source.config.config_service import ConfigData, get_config
+from source.kovaaks import api_service
 
 
 @pytest.fixture(autouse=True)
@@ -52,3 +53,14 @@ def test_settings(
     settings_service.clear_settings_cache()
     settings_service.clear_stats_dir_pin()
     settings_service.clear_identity_pin()
+
+
+@pytest.fixture(autouse=True)
+def forget_rank_over_total_warnings(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep the warn-once memo from leaking between tests.
+
+    Any test that reaches the real ``_with_percentile`` with a rank above the
+    total writes to it, so without a reset a ``caplog`` assertion on that
+    warning would depend on which test ran first.
+    """
+    monkeypatch.setattr(api_service, "_warned_rank_over_total", {})
