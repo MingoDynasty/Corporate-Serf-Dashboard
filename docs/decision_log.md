@@ -20,7 +20,8 @@ Status: Accepted
 The README had grown to 3,289 words, most of it reference material that a
 player arriving from a link never reads. It is now a front door: what the app
 does, one line per feature, how to install it, and where to get help.
-Everything else moved word for word into a user guide that the README links.
+The reference sections moved word for word into a user guide that the
+README links.
 The README keeps a short summary of the app's network use, because a reader
 deciding whether to run the installer needs it before they install.
 
@@ -903,8 +904,8 @@ its destination, and completes in a Plotly Cloud tab the user can see, which
 makes it an export in the same class as saving the PNG. That is what
 separates it from crash telemetry, which the
 [2026-08-10 bug-reports entry](#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)
-rejects as privacy-hostile for a local tool. The README's outside-services
-table carries a Plotly row as the disclosure.
+rejects as privacy-hostile for a local tool. The user guide's
+outside-services table carries a Plotly row as the disclosure.
 
 **Rejected alternative.** `config={"showSendToCloud": False}` on both graphs,
 holding the plotly.js 3 default. PR #283 shipped that hold first and backed it
@@ -915,7 +916,8 @@ updating the README.
 **Reversing it.** Pass `config={"showSendToCloud": False}` to every
 `dcc.Graph`, including any added later (a layout test that walks all graphs,
 rather than naming ids, is the guard that holds), and remove the Plotly row
-from the README. **Revisit trigger:** plotly.js changing the flow so data
+from the user guide's What it talks to table and "sharing a chart" from the
+README's summary. **Revisit trigger:** plotly.js changing the flow so data
 leaves before the dialog or without the Plotly Cloud tab, or changing the
 default `plotlyServerURL`; or a user report of the button being mistaken for
 a local save.
