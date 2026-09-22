@@ -193,7 +193,7 @@ benchmark tier) — see the
   the hint is retired rather than left contradicting a position that has
   since arrived.
 - With a scenario selected, Manual Refresh answers with a toast whatever
-  happens — the user asked for it — and all four outcomes come off the
+  happens — the user asked for it — and every outcome comes off the
   callback's own notification output; with none selected the click sets the
   field to `N/A` and toasts nothing. A hard failure (an `error_message`
   result or a raised exception) is

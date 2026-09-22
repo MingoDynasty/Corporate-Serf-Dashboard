@@ -229,7 +229,7 @@ toasts under, and it applies to every toast the app adds from here on
   [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
   and
   [2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry));
-  the four outcomes are specified in
+  each outcome is specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - The title carries the verdict and never reads "Notification"; a run
   verdict's message leads with the scenario, with sensitivity as a trailing
