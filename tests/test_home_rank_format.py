@@ -7,6 +7,7 @@ import dash_mantine_components as dmc
 import pytest
 import requests
 from dash import dcc, no_update
+from dash._callback import GLOBAL_CALLBACK_LIST
 
 from source.config import settings_service
 from source.kovaaks import api_service, data_service
@@ -181,12 +182,140 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
         for component in components
         if getattr(component, "id", None) == "scenario-dropdown-selection"
     )
+    deep_link_store = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == home.HOME_DEEP_LINK_STORE_ID
+    )
 
-    assert playlist_filter.value == "KovaaKsTestCode"
-    assert playlist_filter.persistence is False
+    # The query parameters reach the dropdowns through the store, never as
+    # the layout value: a persisted control's default has to be the same on
+    # every visit or Dash discards the stored edit instead of restoring it.
+    assert deep_link_store.data == {
+        "playlist": "KovaaKsTestCode",
+        "scenario": "KovaaKsTestCode Scenario",
+    }
+    assert playlist_filter.value is None
+    assert playlist_filter.persistence is True
+    assert scenario_dropdown.value is None
+    assert scenario_dropdown.persistence is True
+    # Still resolved in the layout, so the first paint already lists the
+    # deep-linked playlist's scenarios.
     assert scenario_dropdown.data == ["KovaaKsTestCode Scenario"]
-    assert scenario_dropdown.value == "KovaaKsTestCode Scenario"
-    assert scenario_dropdown.persistence is False
+
+
+def _known_playlist(monkeypatch):
+    monkeypatch.setattr(
+        home,
+        "get_playlist_by_code",
+        lambda code: object() if code == "KovaaKsTestCode" else None,
+    )
+
+
+def test_home_deep_link_records_only_the_parameters_the_url_carried(monkeypatch):
+    """An absent parameter leaves its control on the restored value."""
+    _known_playlist(monkeypatch)
+
+    assert home._home_deep_link(None, None) == {}
+    assert home._home_deep_link("Scenario A", None) == {"scenario": "Scenario A"}
+    assert home._home_deep_link(None, "KovaaKsTestCode") == {
+        "playlist": "KovaaKsTestCode"
+    }
+
+
+def test_home_deep_link_clears_the_filter_for_an_unknown_playlist_code(monkeypatch):
+    """The URL's selection is applied as given: no playlist means no filter."""
+    _known_playlist(monkeypatch)
+
+    assert home._home_deep_link(None, "KovaaKsGoneCode") == {"playlist": None}
+
+
+def test_home_deep_link_treats_an_empty_scenario_as_no_scenario(monkeypatch):
+    _known_playlist(monkeypatch)
+
+    assert home._home_deep_link("", "KovaaKsTestCode") == {
+        "playlist": "KovaaKsTestCode",
+        "scenario": None,
+    }
+
+
+def test_apply_deep_link_writes_only_the_controls_the_url_named():
+    assert home.apply_deep_link({}) == (no_update, no_update)
+    assert home.apply_deep_link(None) == (no_update, no_update)
+    assert home.apply_deep_link({"scenario": "Scenario A"}) == (
+        no_update,
+        "Scenario A",
+    )
+    assert home.apply_deep_link({"playlist": None}) == (None, no_update)
+    assert home.apply_deep_link(
+        {"playlist": "KovaaKsTestCode", "scenario": "Scenario A"}
+    ) == ("KovaaKsTestCode", "Scenario A")
+
+
+def test_apply_deep_link_is_a_second_writer_of_the_scenario_value():
+    """It shares the scenario value with the run-event consumer.
+
+    ``initial_duplicate`` rather than ``True``: applying the deep link is the
+    mount's whole job, and Dash refuses an ``allow_duplicate`` output without
+    one of the ``prevent_initial_call`` forms.
+    """
+    registration = _deep_link_registration()
+    playlist_output, scenario_output = registration["output"].strip(".").split("...")
+
+    assert playlist_output == "playlist-dropdown-selection.value"
+    # The suffix Dash appends to an allow_duplicate output. The scenario value
+    # already has a writer in check_for_new_data; the playlist filter does not.
+    assert scenario_output.startswith("scenario-dropdown-selection.value@")
+    # What Dash stores for "initial_duplicate": the mount still runs it.
+    assert registration["prevent_initial_call"] is False
+
+
+def _deep_link_registration() -> dict:
+    """Find apply_deep_link's registration. The store has more than one reader."""
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if any(dep["id"] == home.HOME_DEEP_LINK_STORE_ID for dep in entry["inputs"])
+        and "playlist-dropdown-selection.value" in entry["output"]
+    ]
+    return registration
+
+
+def _output_keys(registration: dict) -> set[str]:
+    """Read a registration's outputs as ``id.prop``, without duplicate hashes."""
+    return {
+        output.split("@")[0]
+        for output in registration["output"].strip(".").split("...")
+    }
+
+
+def test_no_callback_depends_only_on_what_apply_deep_link_conditionally_writes():
+    """Guard the regression that shipped once: a starved single-Input dependent.
+
+    ``apply_deep_link`` returns ``no_update`` for a control the URL did not
+    name, which is every control on an ordinary visit. dash-renderer drops a
+    ready callback when none of its Inputs was written and every one of them
+    is a declared output of a group member that already ran, so a callback
+    whose Inputs are all written by ``apply_deep_link`` never makes its
+    initial call on those visits. ``select_playlist`` was exactly that, and
+    the scenario dropdown kept the full local list while the filter named a
+    playlist. Its second Input is what this test protects.
+    """
+    deep_link = _deep_link_registration()
+    written = _output_keys(deep_link)
+
+    starved = [
+        entry["output"]
+        for entry in GLOBAL_CALLBACK_LIST
+        if entry is not deep_link
+        and entry["inputs"]
+        and {f"{dep['id']}.{dep['property']}" for dep in entry["inputs"]} <= written
+    ]
+
+    assert starved == [], (
+        "these callbacks would not make their initial call on a visit with no "
+        f"query parameters: {starved}"
+    )
 
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
@@ -279,8 +408,10 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     )
     monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
 
-    assert home.select_playlist("Old Playlist Name") == ["All"]
-    assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
+    # The second argument is the deep-link store: a scheduling Input the
+    # callback never reads. See select_playlist.
+    assert home.select_playlist("Old Playlist Name", None) == ["All"]
+    assert home.select_playlist("ValidCode", None) == ["ValidCode Scenario"]
 
 
 def test_page_is_named_scenario_performance_and_keeps_the_root_route():
@@ -590,6 +721,21 @@ def test_format_scenario_rank_with_total_players_but_no_percentile():
     )
 
     assert format_scenario_rank(rank_info) == "11,266 of 18,342"
+
+
+def test_format_scenario_rank_drops_the_parenthetical_over_a_stale_total():
+    """A rank past the cached total still shows both numbers, without a percentile."""
+    rank_info = api_service._with_percentile(
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            leaderboard_id=98330,
+            scenario_name="Some Scenario",
+            rank=900,
+            total_players=500,
+        )
+    )
+
+    assert format_scenario_rank(rank_info) == "900 of 500"
 
 
 def test_format_scenario_rank_without_total_players():
