@@ -1,37 +1,35 @@
 # Corporate Serf Dashboard
 
-The name of this app is in honor of [Corporate Serf](https://www.youtube.com/watch?v=a-MShVYe3kY).
-
 Corporate Serf Dashboard watches your KovaaK's stats folder while you train. Each run you
 finish lands on the Scenario Performance page as it happens: the plots and stats update, a
 notification says how the run went, and your leaderboard position refreshes when you set a
 new personal best. It runs on your own PC and opens in your browser.
 
+It turns the runs you already play into answers to three questions: am I improving, where am
+I weak, and what should I work on next?
+
+The name of this app is in honor of [Corporate Serf](https://www.youtube.com/watch?v=a-MShVYe3kY).
+
 ![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
 
 ## Features
 
-- **Scenario plots** — Sensitivity vs Score and score-over-time plots per scenario, with optional
-  PB-score, score-threshold, and benchmark-rank overlays. Chart options also set the run points'
-  size and color, so a dense or a faint chart can be made readable; both preferences stay in your
-  browser.
-- **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
-  pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
-  it rather than stacking a second one beside it, and a run that earns neither says nothing. One
-  Chart options switch, Run notifications, turns these off, leaving the chart to update silently.
-- **Personal best celebration** — a run that beats your scenario best gets a short burst of
-  confetti and its own toast, on whatever page you have open, and the toast stays until you
-  dismiss it so the news survives a fullscreen session. If the window was covered when the run
-  landed, the animation waits until you come back to it. A Settings control picks the animation,
-  Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with a Preview button
-  beside it, and it is its own family, so Run notifications does not silence it.
-  A reduced-motion preference keeps the toast and drops the animation.
+- **Scenario plots** — Score vs Sensitivity and Score vs Time for each scenario, with optional
+  PB-score, score-threshold, and benchmark-rank overlays.
+- **Run notifications** — one toast when a run earns a verdict, titled with it: score-threshold
+  pass or fail against your personal best, or the top-N placement it earned. A run that earns
+  neither says nothing.
+- **Personal best celebration** — confetti, fireworks, cannons, or stars when a run beats your
+  scenario best, on whatever page you have open.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
-  `Position: 11,290 of 63,892 (82.33% percentile)`, with a bounded background refresh after a new
-  personal best and a manual Refresh button for when the leaderboard lags.
+  `Position: 11,290 of 63,892 (82.33% percentile)`, refreshed after a new personal best.
 - **Playlist scenarios table** — every scenario in a playlist with position, percentile, last
-  played, runs, and personal-best stats (PB Score, PB Date, PB cm/360, PB Accuracy); sort by
-  percentile to build a training priority list.
+  played, runs, and personal-best stats; sort by percentile to build a training priority list.
+- **Benchmarks** — a bundled benchmark library, built with the help of
+  [Evxl.app](https://evxl.app)'s author. Voltaic and Viscose are visible by default, the
+  **Show hidden** switch on the Playlists page lists the rest, a playlist's eye icon turns one
+  on, and **Import** adds any playlist by share code. More in
+  [Playlists and Benchmarks](docs/user_guide.md#playlists-and-benchmarks).
 
 The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
 [docs/roadmap.md](docs/roadmap.md).
@@ -79,6 +77,13 @@ version you already have. A new version only becomes the recorded install after 
 started successfully; one that fails to start is discarded and the previous version runs instead.
 Updates never touch your `config.toml` or your `data` folder.
 
+### Other ways to install
+
+[Manual install](docs/user_guide.md#manual-install) installs from a release you have inspected
+yourself, and covers rolling back to, and pinning, an older release.
+[Run From Source](#run-from-source) is for development, or for managing the toolchain
+yourself.
+
 ### Uninstall
 
 Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
@@ -98,6 +103,23 @@ Remove-Item "$env:TEMP\csd-install-*.ps1"
 
 </details>
 
+## What it talks to
+
+The dashboard does not collect or send usage or crash analytics. Your runs, settings, and
+caches stay on your PC unless you share a chart yourself. Three things reach the network:
+installing and updating it, leaderboard lookups once a KovaaK's username is set, and the
+actions you click (detecting your accounts, importing a playlist, sharing a chart).
+[What it talks to](docs/user_guide.md#what-it-talks-to) in the user guide lists every service
+and what makes the app reach it.
+
+## Troubleshooting
+
+[Troubleshooting](docs/user_guide.md#troubleshooting) in the user guide lists problems by what
+you see, such as a port already in use, a stats folder that was not found, a missing
+leaderboard position, or a slow first start. An installed copy keeps its logs in
+`%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`; a source checkout keeps them in its own
+`data\logs`.
+
 ## Found a bug?
 
 Open an issue from the
@@ -111,12 +133,17 @@ Easiest route: the **Settings** page has a "Report a bug" link that opens the
 form with your version already filled in, and shows the folder your logs are
 in.
 
+## Configuration
+
+Most settings live on the dashboard's own **Settings** page: where your KovaaK's stats live,
+and who you are on the leaderboards. Boot settings such as `port` live in `config.toml`
+(installed: `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`), which updates never touch.
+[Configuration](docs/user_guide.md#configuration) in the user guide covers both.
+
 ## Run From Source
 
-For development, or if you would rather manage the toolchain yourself. The app
-is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
-[docs/architecture.md](docs/architecture.md) has the module map. Requires git
-and [uv](https://docs.astral.sh/uv/):
+Run from a git checkout if you develop the app, or if you would rather manage the toolchain
+yourself. You need git and [uv](https://docs.astral.sh/uv/):
 
 ```shell
 git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
@@ -124,17 +151,19 @@ cd Corporate-Serf-Dashboard
 uv sync
 ```
 
-Copy `example.toml` to `config.toml`, then start the app — the stats folder is
-detected on the first start, and the Settings page covers whatever it missed
-(see [Configuration](docs/user_guide.md#configuration)):
+Copy `example.toml` to `config.toml`, then start the app:
 
 ```shell
 uv run python source/app.py
 ```
 
-A source checkout does not auto-update; `git pull` is the update path.
+The stats folder is detected on the first start, and the Settings page covers whatever it
+missed. A checkout does not update itself: `git pull` is the update path.
 
 ## Development
+
+The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
+[docs/architecture.md](docs/architecture.md) has the module map.
 
 Development uses AI coding agents. Every change is reviewed and must pass the
 project's test suite and CI gates (ruff, mypy, pytest) before it merges; the
