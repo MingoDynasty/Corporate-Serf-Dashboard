@@ -61,11 +61,11 @@ or crash analytics, data stays on the PC, three things reach the network
 actions the user clicks), and a link to the guide. The summary names
 categories rather than services, so a new service under an existing category
 cannot make it false; a service-naming short form in the maintainer's launch
-notes went stale the day chart sharing landed. It stays in the README because the reader being
-asked to paste `irm | iex` needs it before installing, not after going
-looking. The cost is a second surface, so a PR that adds an outbound service
-or a new trigger updates the guide's section and checks that the README's
-summary is still true, in the same PR.
+notes went stale the day chart sharing landed. It stays in the README because
+the reader being asked to paste `irm | iex` needs it before installing, not
+after going looking. The cost is a second surface, so a PR that adds an
+outbound service or a new trigger updates the guide's section and checks that
+the README's summary is still true, in the same PR.
 
 **The move is verbatim.** Configuration, Playlists and Benchmarks,
 Troubleshooting, What it talks to, and Manual install with its Rollback block
