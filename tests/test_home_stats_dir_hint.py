@@ -247,4 +247,4 @@ def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
-    assert home.select_playlist(None) == []
+    assert home.select_playlist(None, None) == []
