@@ -8,7 +8,7 @@ Date: 2026-09-19
 The README has grown to about 3,300 words, and most of it is reference
 material that a player arriving from a link does not read. This proposal
 makes the README a front door: what the app does, how to install it, and
-where to get help, in about 1,100 words. Everything that leaves moves, word
+where to get help, in under 1,200 words. Everything that leaves moves, word
 for word, into one user guide that the README links. The network disclosure
 keeps a short summary in the README, because a reader deciding whether to
 run an installer needs it before they install.
@@ -39,7 +39,7 @@ Configuration.
 What is this, how do I install it, what does it do on first run, and where
 do I get help. Features are one line each. Configuration is a pointer.
 Reference material is one link away. The draft assembled from this proposal
-measures 1,136 words against 3,289 today.
+measures 1,161 words against 3,289 today.
 
 Choosing differently: the research's raw target is about 450 to 700 words,
 which is where ShareX, OBS, Syncthing, and Playnite sit. Every one of them
@@ -125,7 +125,7 @@ touches, the release-integrity paragraph, Updates, and Uninstall stay
 exactly as #278 verified them against the scripts. A short "Other ways to
 install" subsection links what moved.
 
-Choosing differently: leaving Install alone puts the README near 1,450
+Choosing differently: leaving Install alone puts the README near 1,500
 words. Tightening the quick start as well saves about 60 more words, and
 the price is rewording sentences that were checked line by line against
 `launcher.ps1` and `install.ps1`.
@@ -147,7 +147,7 @@ Scenario Performance page names a stats folder it could not find.
 
 Choosing differently: keeping three entries inline (port, stats folder,
 logs) is the alternative #278 D3 rejected. It adds about 200 words and
-splits one list across two files. Leaving the section alone adds about 470.
+splits one list across two files. Leaving the section alone adds about 460.
 
 ### D6 — Run From Source moves into the guide; no `docs/development.md`
 
@@ -160,8 +160,9 @@ that prompt asks for the move to become a row of any wider README rework.
 **Recommendation: the section moves to the guide as an install path.** It
 serves a user who would rather manage the toolchain themselves as well as a
 contributor, so it sits beside Manual install. The README's Development
-section keeps the tech-stack sentence and the link to the architecture doc,
-and "Other ways to install" links the moved section.
+section gains a copy of the tech-stack sentence and its link to the
+architecture doc (Run From Source keeps its own, because a moved block is
+copied whole), and "Other ways to install" links the moved section.
 
 This is the lowest-stakes row. Run From Source is 85 words at the bottom of
 the file, below the point where players stop reading, so keeping it costs
@@ -297,18 +298,18 @@ Measured on a draft assembled from today's file and the new prose below.
 | Section | Today | After | How |
 | --- | --- | --- | --- |
 | Intro | 78 | 104 | unchanged, plus one "why" sentence; the name line moves below it |
-| Features | 302 | 183 | new prose: six one-line bullets |
+| Features | 302 | 198 | new prose: six one-line bullets, plus today's closing pointer sentence |
 | Install | 811 | 491 | unchanged, minus Manual install and Rollback, plus "Other ways to install" |
-| What it talks to | 429 | 77 | new prose: the summary (D3) |
-| Troubleshooting | 512 | 39 | new prose: the pointer (D5) |
+| What it talks to | 429 | 75 | new prose: the summary (D3) |
+| Troubleshooting | 512 | 51 | new prose: the pointer (D5) |
 | Found a bug? | 87 | 87 | unchanged |
 | Configuration | 746 | 42 | new prose: the pointer |
 | Playlists and Benchmarks | 133 | 0 | folded into the Benchmarks bullet |
 | Run From Source | 85 | 0 | moved (D6) |
-| Development | 37 | 52 | unchanged, plus the tech-stack sentence |
+| Development | 37 | 52 | unchanged, plus a copy of the tech-stack sentence |
 | License | 36 | 36 | unchanged |
 | Heading lines | 33 | 25 | |
-| **Total** | **3,289** | **1,136** | |
+| **Total** | **3,289** | **1,161** | |
 
 Section order is unchanged. The "why" sentence restates the three
 questions that open the product overview, so it introduces no new claim.
@@ -325,8 +326,10 @@ are the cross-reference fixes a change of file forces, and the
 implementation PR lists each one in its description:
 
 - `docs/architecture.md` becomes `architecture.md` inside Run From Source.
-- References to "the install one-liner" and "the easy install" gain a link
-  to the README's Install section.
+- References inside a moved block to the install one-liner ("the one-liner"
+  in Manual install, "the install one-liner" in Rollback) gain a link to
+  the README's Install section. "The easy install", in the Uninstall
+  footnote, stays in the README and needs none.
 - `#configuration` references inside Troubleshooting and Run From Source
   need no change, because both sections land in the same file.
 
@@ -334,12 +337,16 @@ This is what keeps #278's two review redlines intact without re-arguing
 them: the network table names services and never hostnames, and schema
 recovery leads with backing up the `data` folder and the converter script.
 
-Nothing in a moved block is dropped. The one deliberate loss is in
-Features, which is rewritten, not moved: the per-feature detail that the
-capability specs already state. That covers how a notification replaces the
-previous one, the celebration's covered-window and reduced-motion behavior
-and its Settings control, the chart-point preferences, and the bounded
-leaderboard refresh.
+Nothing in a moved block is dropped. One sentence is duplicated rather than
+moved: the tech-stack sentence that opens Run From Source travels with that
+block, and the README's Development section gains a copy, so the README
+keeps a link to the architecture doc on its own account. The one deliberate
+loss is in Features, which is rewritten, not moved: the per-feature detail
+that the capability specs already state. That covers how a notification
+replaces the previous one, the celebration's covered-window and
+reduced-motion behavior and its Settings control, the chart-point
+preferences, and the manual **Refresh** button for when the leaderboard
+lags.
 
 ### The user guide
 
@@ -357,7 +364,10 @@ the anchors are `#configuration`, `#playlists-and-benchmarks`,
 No app copy changes: the copy rules govern strings the app's code shows,
 and the README is a document. The new prose is gathered here anyway, and
 reviewers are asked to redline it as they would a Copy block. Everything in
-the README that is not in this block is today's text.
+the README that is not in this block is today's text. Two sentences inside
+it are today's text in a new place: the pointer sentence that closes
+Features today closes it still, and the tech-stack sentence that opens Run
+From Source today is copied into Development.
 
 ```markdown
 It turns the runs you already play into answers to three questions: am I improving, where am
@@ -367,8 +377,9 @@ I weak, and what should I work on next?
 
 - **Scenario plots** — Score vs Sensitivity and Score vs Time for each scenario, with optional
   PB-score, score-threshold, and benchmark-rank overlays.
-- **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
-  pass or fail against your personal best, or the top-N placement it earned.
+- **Run notifications** — one toast when a run earns a verdict, titled with it: score-threshold
+  pass or fail against your personal best, or the top-N placement it earned. A run that earns
+  neither says nothing.
 - **Personal best celebration** — confetti, fireworks, cannons, or stars when a run beats your
   scenario best, on whatever page you have open.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
@@ -377,9 +388,12 @@ I weak, and what should I work on next?
   played, runs, and personal-best stats; sort by percentile to build a training priority list.
 - **Benchmarks** — a bundled benchmark library, built with the help of
   [Evxl.app](https://evxl.app)'s author. Voltaic and Viscose are visible by default, the
-  **Show hidden** switch on the Playlists page reveals the rest, and **Import** adds any
-  playlist by share code. More in
+  **Show hidden** switch on the Playlists page lists the rest, a playlist's eye icon turns one
+  on, and **Import** adds any playlist by share code. More in
   [Playlists and Benchmarks](docs/user_guide.md#playlists-and-benchmarks).
+
+The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
+[docs/roadmap.md](docs/roadmap.md).
 
 ### Other ways to install
 
@@ -391,9 +405,9 @@ toolchain yourself.
 ## What it talks to
 
 The dashboard does not collect or send usage or crash analytics. Your runs, settings, and
-caches stay on your PC unless you share a chart yourself. It reaches the network for three
-things: installing and updating itself, leaderboard lookups once a KovaaK's username is set,
-and the actions you click (detecting your accounts, importing a playlist, sharing a chart).
+caches stay on your PC unless you share a chart yourself. Three things reach the network:
+installing and updating it, leaderboard lookups once a KovaaK's username is set, and the
+actions you click (detecting your accounts, importing a playlist, sharing a chart).
 [What it talks to](docs/user_guide.md#what-it-talks-to) in the user guide lists every service
 and what makes the app reach it.
 
@@ -401,8 +415,9 @@ and what makes the app reach it.
 
 [Troubleshooting](docs/user_guide.md#troubleshooting) in the user guide lists problems by what
 you see, such as a port already in use, a stats folder that was not found, a missing
-leaderboard position, or a slow first start. The logs are in
-`%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`.
+leaderboard position, or a slow first start. An installed copy keeps its logs in
+`%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`; a source checkout keeps them in its own
+`data\logs`.
 
 ## Configuration
 
@@ -410,16 +425,33 @@ Most settings live on the dashboard's own **Settings** page: where your KovaaK's
 and who you are on the leaderboards. Boot settings such as `port` live in `config.toml`
 (installed: `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`), which updates never touch.
 [Configuration](docs/user_guide.md#configuration) in the user guide covers both.
+
+## Development
+
+The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
+[docs/architecture.md](docs/architecture.md) has the module map.
 ```
 
-Four choices inside that block, each open to challenge:
+The choices inside that block, each open to challenge:
 
 - **The network summary is checked against the table row by row.** Rows one
   to three are installing and updating. Row four is leaderboard lookups
   behind a username, which includes the background percentile fill. Row
   five is two of the clicked actions and row six is the third. It stays
   consistent with the sentence that moves to the guide: with no username
-  set, the running app makes no requests on its own.
+  set, the running app makes no requests on its own. It names triggers
+  rather than making the app the actor, because the install and the
+  launch-time update check run in the scripts before the app exists.
+- **The Run notifications bullet keeps today's qualifier** that a run
+  earning neither verdict says nothing. A live run with no score-threshold
+  verdict that lands outside the top N produces no toast, so a bullet
+  promising one toast per run would be false under ordinary settings.
+- **The Benchmarks bullet keeps both steps of enabling a hidden benchmark.**
+  The **Show hidden** switch only lists hidden playlists in the overview;
+  a row's eye icon is what adds one to every picker, and so to the
+  benchmark-rank overlays.
+- **The Troubleshooting pointer names both log locations**, because the
+  README still advertises Run From Source, whose logs live in the checkout.
 - **The Configuration pointer names `port` and never `host`.** `host` is
   the one setting with a security consequence, and its no-login warning
   lives beside it in `example.toml` and in the guide. The README should not
@@ -431,16 +463,25 @@ Four choices inside that block, each open to challenge:
 
 ### Links and contracts
 
-- `docs/specs/settings.md` repoints `README.md#configuration`,
-  `docs/specs/release_and_install.md` repoints `README.md#manual-install`,
-  and `docs/specs/playlists.md` repoints
-  `README.md#playlists-and-benchmarks`, each to the same anchor in the
-  guide. The `#install` and `#uninstall` links stay.
+- Three specs name the README in prose as well as in a link, so each gets
+  a sentence edit, not an href swap. `docs/specs/settings.md` says the
+  user's view of both files is the README's Configuration section, and
+  will say it is the guide's. `docs/specs/playlists.md` says the same of
+  Playlists and Benchmarks. `docs/specs/release_and_install.md` names
+  Install, Manual install, and Uninstall in one sentence, and is rewritten
+  so that Install and Uninstall stay with the README and Manual install
+  goes to the guide. The `#install` and `#uninstall` links stay.
 - The README's release-integrity paragraph repoints its Manual install
   link to the guide.
-- `REQUIRED_ARCHIVE_ENTRIES` gains one row, `docs/user_guide.md`. The
-  `docs/architecture.md` row stays true, because the README's Development
-  section still links that file.
+- `REQUIRED_ARCHIVE_ENTRIES` gains one row, `docs/user_guide.md`, with a
+  comment in the existing style. The `docs/architecture.md`,
+  `docs/product.md`, and `docs/roadmap.md` rows each say the shipped README
+  links them, and that stays true only because the prose block carries the
+  Features pointer sentence and the tech-stack sentence. The archive test
+  checks one direction, that every README link is a row, and not that
+  every row is still linked, so a row whose justification lapses goes
+  false without a failing gate. A row whose link moves to the guide gets
+  its comment updated in the same commit.
 - The archive test reads relative `docs/` links from the README only. The
   guide is a second shipped document with links of its own, today only the
   one to `architecture.md`. The author recommends extending
@@ -462,6 +503,14 @@ troubleshooting go to `docs/user_guide.md`; a new feature adds at most one
 line to Features. Enforcement is review-only, like the prose rules beside
 it.
 
+A third edit scopes the shipping checklist. Its opening line reads as
+unconditional, and a reviewer read it that way on this proposal, so one
+sentence under "Shipping a proposal" says that steps 4 and 5, the roadmap
+milestone and the product inventory, apply when the proposal ships an app
+feature, and that a docs-only proposal records itself in the decision log
+alone. #278 and #301 relied on that reading without writing it down; this
+proposal writes it down.
+
 ### Alternatives rejected
 
 - **A word-count gate in `tests/test_docs.py`.** It would fail unrelated
@@ -477,13 +526,14 @@ it.
 
 ### Blast radius
 
-One new file, one README rewrite that is mostly deletion, three one-line
-spec repoints, two `AGENTS.md` bullets, one archive row, and one test
-extension. No application code changes. Because `scripts/release_job.py`
-changes, the merge is release-worthy and cuts a release; that release is
-how the new README and the guide reach installed copies. External links to
-the old README anchors, in a forum post for instance, land at the top of
-the README and no longer scroll to the section.
+One new file, one README rewrite that is mostly deletion, three spec
+sentences rewritten to name the guide, three `AGENTS.md` edits, one
+archive row, and one test extension. No application code changes. Because
+`scripts/release_job.py` changes, the merge is release-worthy and cuts a
+release; that release is how the new README and the guide reach installed
+copies. External links to the old README anchors, in a forum post for
+instance, land at the top of the README and no longer scroll to the
+section.
 
 ## Out of scope
 
@@ -496,6 +546,10 @@ the README and no longer scroll to the section.
 - The license section, and mentioning the license nearer the top.
 - In-app links. The app links the repository and the bug form, never a
   README section, so no app code depends on these anchors.
+- De-duplicating the moved Configuration section against `example.toml`,
+  which already documents every key. The verbatim rule forbids rewriting
+  while moving, so it is a separate change; the implementation PR files it
+  as a Backlog line so the finding survives this proposal's deletion.
 
 ## Testing
 
@@ -508,6 +562,9 @@ the README and no longer scroll to the section.
 - The move is proven as a move: commit 1 of the implementation PR is
   reviewed with `git diff --color-moved`, and the PR description lists each
   permitted cross-reference fix.
+- A link that resolves is not evidence that the sentence around it is
+  still true. The PR description quotes each edited spec sentence, and the
+  reviewer reads it against the section it now names.
 - The size is proven by `awk '{w += NF} END {print w}' README.md`, the
   platform-independent count used throughout, against the budget D1 rules.
 - Manual: open the branch's README and guide on GitHub and follow every
@@ -526,7 +583,7 @@ the README and no longer scroll to the section.
       commit, because the link and archive gates fail on any subset;
    2. the new README prose from the block in Design, exactly as ratified,
       with any divergence flagged in the PR description;
-   3. the two `AGENTS.md` rule changes and the archive-test extension;
+   3. the three `AGENTS.md` edits and the archive-test extension;
    4. the docs definition of done.
 3. **Docs definition of done**, in the implementation PR: a decision-log
    entry, opening with its plain-language summary, that records the front
@@ -535,7 +592,7 @@ the README and no longer scroll to the section.
    kickoff prompt moved to `ignore/prompts/done/`. No capability spec
    covers the README, and no app behavior changes, so there is no spec
    statement, `docs/roadmap.md`, or `docs/product.md` change beyond the
-   three repointed links.
+   three edited spec sentences.
 
 Rows ruled differently shrink the plan without reshaping it: a block ruled
 to stay is left out of commit 1, and its pointer is left out of commit 2.
