@@ -70,7 +70,9 @@ proposal.
 
 ## 2026-09-19: A Clicked Refresh Re-Reads The Leaderboard Total
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile):
+the `rank > total` guard it deferred has landed)
 
 The Refresh button beside the Position field used to fetch a live position and
 divide it by a player count that could be a week old, so the percentile it
@@ -140,11 +142,14 @@ the button's promise unverifiable; a new inline hint, since the affordance is
 already beside the value and the same host is failing seconds apart. No total
 request is made at all when the rank fetch itself failed.
 
-**Not fixed here.** `_with_percentile` guards `total_players <= 0` but not
+**Not fixed here.** `_with_percentile` guarded `total_players <= 0` but not
 `rank > total`, so an automatic path, or a click whose total re-read failed
-and fell back to the cached count, can still print a negative percentile from
-a fresh rank over an older smaller count. Tracked in
-[tech_debt.md](tech_debt.md).
+and fell back to the cached count, could still print a negative percentile
+from a fresh rank over an older smaller count. The guard shipped separately in
+[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile),
+and that pairing now withholds the percentile instead. The click's orange
+verdict is unchanged by it: the verdict keys on the failed re-read, not on the
+percentile.
 
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
 

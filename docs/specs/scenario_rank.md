@@ -236,10 +236,12 @@ benchmark tier) — see the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).
   The failure substitutes the last cached total whatever its age, so the
-  percentile survives it, and only a leaderboard with no total ever cached
-  degrades to a bare position. Either way the result carries
-  `total_refresh_failed`, a transient marker excluded from serialization so it
-  can never reach a rank cache file ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  percentile survives it unless the fresh position sits above that older count
+  ([2026-09-20](../decision_log.md#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile)),
+  and only a leaderboard with no total ever cached degrades to a bare position.
+  Either way the result carries `total_refresh_failed`, a transient marker
+  excluded from serialization so it can never reach a rank cache file
+  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
 - A Refresh whose position landed but whose total did not is orange. Its
   consequence names the total, which is what failed, rather than the
   percentile, which is recomputed from it: "Position refreshed but total from
