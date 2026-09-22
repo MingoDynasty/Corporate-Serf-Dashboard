@@ -15,13 +15,14 @@ run an installer needs it before they install.
 
 ## Decisions needed
 
-One row is ruled and five are open; nothing else is ratified. The maintainer
-stated leans in chat on 2026-09-19, and each open row records the one that
-applies. A lean is non-binding, and two rows (D2, D3) carry an author
-recommendation that differs from it. Each open row keeps its recommendation
-beside the strongest alternative and what choosing it would change.
-Everything else in this proposal is author-owned and sits in Design; a
-reviewer may still challenge it.
+All six rows are settled. D6 was ruled on 2026-09-21 after the first review
+wave, and D1 to D5 were ratified as written on 2026-09-22, after all three
+reviewers had LGTM'd the same head. The maintainer's leans of 2026-09-19 are
+kept in each row as the record of where the discussion started; on two rows
+(D2, D3) the ratified recommendation differs from the lean. Each row keeps
+its recommendation beside the strongest alternative and what choosing it
+would have changed. Everything else in this proposal is author-owned and
+sits in Design.
 
 Two rows reopen decisions from PR #278, the README rework merged on
 2026-09-12. They reopen where the content lives, never what it says: every
@@ -30,7 +31,8 @@ leave #278's outcome standing.
 
 ### D1 — The README is a front door, about 1,000 to 1,200 words
 
-Status: Open.
+Status: Ratified (user), 2026-09-22, after three reviewer LGTMs at one head.
+Settled unless material new evidence emerges.
 
 Maintainer lean: the average user reads what the app does and how to
 install and use it, and little else. Features should be succinct, not a
@@ -57,7 +59,8 @@ site, runs 1,406 words.
 
 ### D2 — Everything that leaves goes to one user guide, `docs/user_guide.md`
 
-Status: Open.
+Status: Ratified (user), 2026-09-22, after three reviewer LGTMs at one head.
+Settled unless material new evidence emerges.
 
 Maintainer lean: "What it talks to" and "Playlists and Benchmarks" belong
 "in some sort of architecture document".
@@ -87,7 +90,9 @@ Choosing differently:
 
 ### D3 — The README keeps a short network summary that links the full disclosure
 
-Status: Open. Reopens #278 D2 (location only).
+Status: Ratified (user), 2026-09-22, after three reviewer LGTMs at one head;
+reopens #278 D2 on location only. Settled unless material new
+evidence emerges.
 
 Maintainer lean: the section does not need to be in the README.
 
@@ -117,7 +122,8 @@ words inline.
 
 ### D4 — Install keeps its quick start and trust story; Manual install and Rollback move
 
-Status: Open.
+Status: Ratified (user), 2026-09-22, after three reviewer LGTMs at one head.
+Settled unless material new evidence emerges.
 
 Maintainer lean: none on record. The maintainer did not name this section;
 the author adds the row because Install is the largest section, at 811
@@ -137,7 +143,9 @@ the price is rewording sentences that were checked line by line against
 
 ### D5 — Troubleshooting moves whole; the README keeps a pointer and the log location
 
-Status: Open. Reopens #278 D3 (location only).
+Status: Ratified (user), 2026-09-22, after three reviewer LGTMs at one head;
+reopens #278 D3 on location only. Settled unless material new
+evidence emerges.
 
 Maintainer lean: none on record. Also an author-added row: the section is
 512 words.
