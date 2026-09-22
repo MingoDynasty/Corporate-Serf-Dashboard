@@ -299,9 +299,12 @@ _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 # dismissed.
 _RUN_VERDICT_CHANNEL = "run-verdict"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
-_RANK_REFRESH_STALE_TITLE = "Refresh failed · position from cache"
+_RANK_REFRESH_STALE_TITLE = "Refresh failed · data from cache"
 _RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh. The position shown is unchanged."
 _RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh. The position shown is from cache."
+_RANK_REFRESH_STALE_WITH_TOTAL_MESSAGE = (
+    "Couldn't refresh. The position and total shown are from cache."
+)
 _RANK_REFRESH_TOTAL_STALE_TITLE = "Position refreshed but total from cache"
 _RANK_REFRESH_TOTAL_MISSING_TITLE = "Position refreshed but no total"
 # Notices that fire once per app session rather than once per trigger, by id.
@@ -758,19 +761,32 @@ def get_scenario_rank(_, selected_scenario, _n_intervals):
     return display, notifications or no_update
 
 
-def _rank_refresh_problem_notification(*, served_stale: bool) -> dict[str, object]:
+def _rank_refresh_problem_notification(
+    *,
+    served_stale: bool,
+    has_total: bool = False,
+) -> dict[str, object]:
     """Report what went wrong with the latest manual refresh.
 
     One channel, two flavors: the hard failure came back with nothing usable,
     the served-stale one re-served the cached position. They are the mutually
     exclusive verdicts on one attempt, so they replace each other rather than
     stacking two contradictory claims about the same click.
+
+    ``has_total`` applies to the served-stale flavor only. A failed position
+    request asks for no total, so a total beside the cached position is cached
+    too, and naming only the position would read as though the total had
+    refreshed. With no total on screen, naming it would claim one that isn't
+    there. The hard failure keeps one message because it never sees what the
+    field is showing.
     """
     if served_stale:
         return toast(
             _RANK_REFRESH_PROBLEM_CHANNEL,
             _RANK_REFRESH_STALE_TITLE,
-            _RANK_REFRESH_STALE_MESSAGE,
+            _RANK_REFRESH_STALE_WITH_TOTAL_MESSAGE
+            if has_total
+            else _RANK_REFRESH_STALE_MESSAGE,
             color="yellow",
             icon=local_icon("material-symbols:refresh-rounded"),
         )
@@ -959,7 +975,11 @@ def refresh_rank(  # noqa: PLR0911
             rank_info.warning_message,
         )
         return display, *channel_toast(
-            _rank_refresh_problem_notification(served_stale=True), toast_channels
+            _rank_refresh_problem_notification(
+                served_stale=True,
+                has_total=rank_info.total_players is not None,
+            ),
+            toast_channels,
         )
     # Same clears as the green below: the position did refresh, which falsifies
     # both the unchanged-position claim and the no-username one.

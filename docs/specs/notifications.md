@@ -218,18 +218,20 @@ toasts under, and it applies to every toast the app adds from here on
   the instances are specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - With a scenario selected, Manual Refresh answers every click with a
-  toast — red, yellow, green, or blue; with none selected the click sets the
-  field to `N/A` and toasts nothing. Every answer is a channel emission, so a
-  repeat click always re-pops its answer: the red and yellow outcomes share one
-  problem channel, the green confirmation is keyed by scenario, and the blue
-  notice is its own standing-condition channel. The passive rank renders that
-  used to toast red or yellow no longer do
+  toast — red, yellow, green, orange, or blue; with none selected the click
+  sets the field to `N/A` and toasts nothing. Every answer is a channel
+  emission, so a repeat click always re-pops its answer: the red and yellow
+  outcomes share one problem channel, the green confirmation and the orange
+  partial success share a channel keyed by scenario
+  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)),
+  and the blue notice is its own standing-condition channel. The passive rank
+  renders that used to toast red or yellow no longer do
   ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)
   as amended by
   [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
   and
   [2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry));
-  the four outcomes are specified in
+  each outcome is specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - The title carries the verdict and never reads "Notification"; a run
   verdict's message leads with the scenario, with sensitivity as a trailing
@@ -514,7 +516,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `run-import-failure` | burst, fixed id | "Run not recorded" | red | — | `flush_run_import_failures`; this spec |
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |
 | `steam-id-mismatch` | fixed id, sticky, once per process | "Steam ID mismatch" | yellow, until dismissed | — | `get_scenario_rank`; rank spec |
-| `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · position from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
+| `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · data from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
 | `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" (fresh) / "Position refreshed but total from cache" / "Position refreshed but no total" | green (fresh) / orange (total re-read failed) | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
 | `setup-card-skip-problem` | channel | "Skip wasn't saved" | red | — | `skip_identity_setup`; settings spec |

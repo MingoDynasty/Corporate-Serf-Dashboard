@@ -3656,6 +3656,16 @@ them — and is left open in [tech_debt.md](./tech_debt.md). *(Superseded in
 part, for copy, 2026-09-14: the served-stale toast now has that title of its
 own, "Refresh failed · position from cache", while the red hard failure keeps
 "Position refresh failed"; the color question stays open. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).)*
+*(Superseded again, for copy, 2026-09-22: the served-stale title is now
+"Refresh failed · data from cache", chosen by the maintainer over "Refresh
+failed · from cache", and when the cached readout includes a total its
+message reads "Couldn't refresh. The position and total shown are from
+cache." A failed position request asks for no total, so that total predates
+the click too, and once a partial refresh began reporting the total on its
+own, naming only the position read as though the total had refreshed. With no
+total on screen the message still names only the position, and the red hard
+failure keeps its message because it never sees what the field shows. See
+[scenario_rank.md](specs/scenario_rank.md#failure-handling).)*
 
 **Deliberately left open: do background rank events deserve a real toast?**
 "Your rank updated after that PB" and "Position update timed out" are

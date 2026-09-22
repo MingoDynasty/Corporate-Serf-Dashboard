@@ -198,7 +198,7 @@ benchmark tier) — see the
   the hint is retired rather than left contradicting a position that has
   since arrived.
 - With a scenario selected, Manual Refresh answers with a toast whatever
-  happens — the user asked for it — and all four outcomes come off the
+  happens — the user asked for it — and every outcome comes off the
   callback's own notification output; with none selected the click sets the
   field to `N/A` and toasts nothing. A hard failure (an `error_message`
   result or a raised exception) is
@@ -206,9 +206,11 @@ benchmark tier) — see the
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh. The
   position shown is unchanged." is true whether a cached position was on
   screen or not. A served-stale result is yellow, titled "Refresh failed ·
-  position from cache" with "Couldn't refresh. The position shown is from
-  cache.", and its value carries the same " · from cache" hint a passive
-  render would give it ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The two share one
+  data from cache", with "Couldn't refresh. The position and total shown are
+  from cache." when the cached readout includes a total and "Couldn't
+  refresh. The position shown is from cache." when it does not, and its value
+  carries the same " · from cache" hint a passive render would give it
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The two share one
   `rank-refresh-problem` channel: they are
   mutually exclusive verdicts on one attempt, so a stale retry after a hard
   failure replaces it instead of leaving both on screen contradicting each

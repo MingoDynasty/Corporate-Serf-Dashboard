@@ -125,7 +125,7 @@ commands becomes burdensome.
 
 `source/pages/home.py` — a hard refresh failure is red, titled "Position
 refresh failed", and a served-stale refresh is yellow, titled "Refresh failed ·
-position from cache". Softening the red to yellow was raised during the
+data from cache". Softening the red to yellow was raised during the
 notification redesign and deliberately left open. It used to wait on the
 served-stale toast getting a title of its own, since the color was the only
 thing separating the two outcomes; the app messaging sweep (PR #291) gave it
