@@ -2403,6 +2403,36 @@ def test_get_scenario_rank_info_serves_stale_rank_when_fetch_fails(
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_a_failed_total_marker_never_reaches_a_rank_cache_file(monkeypatch):
+    """``total_refresh_failed`` is transient and must not be written.
+
+    Insurance rather than a live gap: every rank write today happens before
+    the total is attached, so the marker cannot be set yet. This pins the
+    ``exclude=True`` that keeps it that way if the ordering ever changes,
+    because a stuck ``True`` read back from cache would outlive the failure
+    it describes.
+    """
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_scenario_rank(
+        98330,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=98330,
+            total_players=200,
+            total_refresh_failed=True,
+        ),
+    )
+
+    cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
+    assert b"total_refresh_failed" not in cache_file.read_bytes()
+    assert api_service._cached_rank(98330, "MingoDynasty").total_refresh_failed is None
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_scenario_rank_info_serves_stale_rank_without_total_cache(monkeypatch):
     rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
         monkeypatch,
