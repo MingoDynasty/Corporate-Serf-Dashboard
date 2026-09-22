@@ -498,8 +498,12 @@ flowchart LR
   request's parameters and query string out of every log line), JSON cache
   helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
-  bounded `schedule_rank_freshness_refresh` Timer poll. The stale fallback tags
-  its returned `ScenarioRankInfo` structurally without persisting the marker;
+  bounded `schedule_rank_freshness_refresh` Timer poll. `force_refresh` marks a
+  read board-authoritative and bypasses the leaderboard-total TTL as well as
+  the rank cache, so a fresh position divides a cached count only when the
+  re-read fails. The stale fallback and the failed-total substitution tag
+  their returned
+  `ScenarioRankInfo` structurally without persisting the marker;
   split interactive-activity/network-success timestamps coordinate the
   percentile warmup worker. UI consumes `ScenarioRankInfo` and never calls endpoints directly. See
   `docs/kovaaks_api_notes.md`.
