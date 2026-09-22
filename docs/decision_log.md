@@ -100,20 +100,28 @@ comparison does not strip (though `cleanOutputProp` strips it when results are
 applied). So the playlist value's dependents wait, and the scenario value's do
 not: on a deep-linked visit `generate_graph` and `get_scenario_num_runs` each
 run twice, once for the restored scenario and again for the deep-linked one.
-The user does not see the first: the renderer discards the in-flight request
-when the second is issued, and a 15 ms poll of the figure during review saw
-the placeholder and then the deep-linked title, never the stale one. The cost
-is server-side: one discarded plot build and one stats read per deep-linked
-visit. `get_scenario_rank` also runs twice, and its stale run is network-
-allowed, so it is an ordinary TTL-governed lookup — a cache read while that
-scenario's rank cache is fresh, which is the usual case because the scenario
-was the selection a moment ago and the TTL is a week, and a KovaaK's lookup
-when the cache is cold or expired. Nothing suppresses it: `ctx.triggered` is
-never `[]` inside a callback, because Dash substitutes a one-item falsy list
-whose `prop_id` is `"."`, and `_rank_allows_network` refuses only when the
-interval is the sole trigger. The falsy list is what keeps the toasts quiet
-on that run, and it is easy to mistake for a network refusal it does not
-give. A clientside callback would shrink the transient to a
+A stale run's outputs are not discarded — they land. The stale
+`generate_graph` response finishes before the second request is issued and
+is applied, so the `cached-plot` store holds the stale plot for tens of
+milliseconds. The user still does not see it, because the hold this paragraph
+describes works one hop downstream: `cached-plot.data` is a plain output, so
+`apply_graph_appearance` waits behind the pending second `generate_graph` and
+draws once, from the deep-linked plot. That rests on `apply_deep_link`'s
+response landing alongside the stale plot's, which it did in every measured
+load and which nothing guarantees; "never drew the stale plot when measured"
+is the honest claim, not "cannot". The cost is server-side: one plot build
+that is never drawn and one stats read per deep-linked visit.
+`get_scenario_rank` also runs twice, and its stale run is an ordinary mount
+run: it arrives with real triggers (three `changedPropIds`), so it is
+network-allowed and toast-allowed, and its lookup is TTL-governed — a cache
+read while that scenario's rank cache is fresh, which is the usual case
+because the scenario was the selection a moment ago and the TTL is a week,
+and a KovaaK's lookup when the cache is cold or expired. The falsy list Dash
+substitutes for an *untriggered* call — one item whose `prop_id` is `"."`,
+so `ctx.triggered` is never `[]` inside a callback — is what keeps such a
+call quiet without refusing it the network, since `_rank_allows_network`
+refuses only when the interval is the sole trigger. It does not apply to this
+run, which is triggered. A clientside callback would shrink the transient to a
 frame at the cost of moving the resolution out of Python; it stays available
 if the transient ever proves visible.
 
@@ -127,7 +135,7 @@ writer of the scenario value and moving `allow_duplicate` onto
 `check_for_new_data`, which would make the hold symmetric and the double run
 go away: it puts the mount-fire hazard on the one callback whose contract is
 that a mount must not replay the retained run-event batch, which is worth more
-than one discarded plot build per deep-linked visit. No prior entry governed
+than one never-drawn plot build per deep-linked visit. No prior entry governed
 the original behavior, so nothing is superseded.
 
 ## 2026-09-19: A Clicked Refresh Re-Reads The Leaderboard Total
