@@ -1467,6 +1467,34 @@ def test_a_failed_total_refresh_on_an_unranked_result_stays_true(
     assert "percentile" not in notifications[0]["message"]
 
 
+def test_a_served_stale_refresh_names_the_total_it_shows(monkeypatch, tmp_path):
+    """A cached total beside the cached position is named as cached too.
+
+    A failed position request asks for no total, so the total on screen
+    predates the click. Naming only the position would read as though the
+    total had refreshed.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    def fetch_rank(*_args):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", fetch_rank)
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "40 of 500 (92.10% percentile) · from cache"
+    assert notifications[0]["color"] == "yellow"
+    assert notifications[0]["title"] == "Refresh failed · data from cache"
+    assert (
+        notifications[0]["message"]
+        == "Couldn't refresh. The position and total shown are from cache."
+    )
+
+
 def test_a_failed_rank_refresh_asks_for_no_total(monkeypatch, tmp_path):
     """A host that just failed the rank is not asked for the count as well."""
     scenario = "Reset Scenario"
@@ -1518,7 +1546,7 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
     assert notifications[0]["title"] == "Position refresh failed"
     assert (
         notifications[0]["message"]
-        == "Couldn't refresh. The position and total shown are unchanged."
+        == "Couldn't refresh. The position shown is unchanged."
     )
 
 
@@ -1562,9 +1590,10 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
     assert _rank_text(rank_display) == "50 · from cache"
     assert [notification["color"] for notification in notifications] == ["yellow"]
     assert notifications[0]["title"] == "Refresh failed · data from cache"
+    # No total on screen, so the message must not claim one.
     assert (
         notifications[0]["message"]
-        == "Couldn't refresh. The position and total shown are from cache."
+        == "Couldn't refresh. The position shown is from cache."
     )
 
 

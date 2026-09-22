@@ -204,13 +204,13 @@ benchmark tier) — see the
   result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh. The
-  position and total shown are unchanged." is true whether a cached position
-  was on screen or not. A served-stale result is yellow, titled "Refresh
-  failed · data from cache" with "Couldn't refresh. The position and total
-  shown are from cache.", and its value carries the same " · from cache" hint
-  a passive render would give it ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out), copy as amended by
-  [2026-09-21](../decision_log.md#2026-09-21-failed-refresh-copy-names-the-total-too)). Both name the total because a failed position request
-  asks for none. The two share one
+  position shown is unchanged." is true whether a cached position was on
+  screen or not. A served-stale result is yellow, titled "Refresh failed ·
+  data from cache", with "Couldn't refresh. The position and total shown are
+  from cache." when the cached readout includes a total and "Couldn't
+  refresh. The position shown is from cache." when it does not, and its value
+  carries the same " · from cache" hint a passive render would give it
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The two share one
   `rank-refresh-problem` channel: they are
   mutually exclusive verdicts on one attempt, so a stale retry after a hard
   failure replaces it instead of leaving both on screen contradicting each
