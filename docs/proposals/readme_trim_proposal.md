@@ -8,23 +8,25 @@ Date: 2026-09-19
 The README has grown to about 3,300 words, and most of it is reference
 material that a player arriving from a link does not read. This proposal
 makes the README a front door: what the app does, how to install it, and
-where to get help, in under 1,200 words. Everything that leaves moves, word
+where to get help, in about 1,200 words. Everything that leaves moves, word
 for word, into one user guide that the README links. The network disclosure
 keeps a short summary in the README, because a reader deciding whether to
 run an installer needs it before they install.
 
 ## Decisions needed
 
-Nothing is ratified. The maintainer stated leans in chat on 2026-09-19, and
-each row records the one that applies. A lean is non-binding, and two rows
-(D2, D3) carry an author recommendation that differs from it. Each row keeps
-its recommendation beside the strongest alternative and what choosing it
-would change. Everything else in this proposal is author-owned and sits in
-Design; a reviewer may still challenge it.
+One row is ruled and five are open; nothing else is ratified. The maintainer
+stated leans in chat on 2026-09-19, and each open row records the one that
+applies. A lean is non-binding, and two rows (D2, D3) carry an author
+recommendation that differs from it. Each open row keeps its recommendation
+beside the strongest alternative and what choosing it would change.
+Everything else in this proposal is author-owned and sits in Design; a
+reviewer may still challenge it.
 
-Three rows reopen decisions from PR #278, the README rework merged on
+Two rows reopen decisions from PR #278, the README rework merged on
 2026-09-12. They reopen where the content lives, never what it says: every
-section that moves keeps the wording #278's review settled.
+section that moves keeps the wording #278's review settled. D6 was ruled to
+leave #278's outcome standing.
 
 ### D1 — The README is a front door, about 1,000 to 1,200 words
 
@@ -39,7 +41,9 @@ Configuration.
 What is this, how do I install it, what does it do on first run, and where
 do I get help. Features are one line each. Configuration is a pointer.
 Reference material is one link away. The draft assembled from this proposal
-measures 1,161 words against 3,289 today.
+measures 1,241 words against 3,289 today: at the top of the band once the
+D6 ruling keeps Run From Source in the file, and the band is an editorial
+budget, not a reason to drop a true qualifier.
 
 Choosing differently: the research's raw target is about 450 to 700 words,
 which is where ShareX, OBS, Syncthing, and Playnite sit. Every one of them
@@ -125,7 +129,7 @@ touches, the release-integrity paragraph, Updates, and Uninstall stay
 exactly as #278 verified them against the scripts. A short "Other ways to
 install" subsection links what moved.
 
-Choosing differently: leaving Install alone puts the README near 1,500
+Choosing differently: leaving Install alone puts the README near 1,550
 words. Tightening the quick start as well saves about 60 more words, and
 the price is rewording sentences that were checked line by line against
 `launcher.ps1` and `install.ps1`.
@@ -149,35 +153,36 @@ Choosing differently: keeping three entries inline (port, stats folder,
 logs) is the alternative #278 D3 rejected. It adds about 200 words and
 splits one list across two files. Leaving the section alone adds about 460.
 
-### D6 — Run From Source moves into the guide; no `docs/development.md`
+### D6 — Where Run From Source lives
 
-Status: Open. Reopens #278 D4.
+Status: Ruled (user), 2026-09-21, after the first review wave. Settled
+unless material new evidence emerges.
 
-Maintainer lean: none on record. The maintainer parked a kickoff prompt for
-this move on 2026-09-12 as an idea worth keeping, not approved work, and
-that prompt asks for the move to become a row of any wider README rework.
+**Ruling: Run From Source stays in the README, reworded so it reads
+cleaner.** The section is short, sits below the point where players stop
+reading, and is where a contributor and a user managing their own toolchain
+both expect to find the commands. Keeping it leaves #278 D4 standing, avoids
+duplicating the tech-stack sentence, and keeps the `docs/architecture.md`
+archive row true on the README's own account. The rewording is a change in
+place, not a move, so the section joins the new README prose block for
+review instead of the verbatim rule. Its tech-stack sentence moves within
+the README to Development, where it describes the codebase beside the
+architecture link; its configuration aside goes, because the sentence about
+the Settings page already says where the rest is set.
 
-**Recommendation: the section moves to the guide as an install path.** It
-serves a user who would rather manage the toolchain themselves as well as a
-contributor, so it sits beside Manual install. The README's Development
-section gains a copy of the tech-stack sentence and its link to the
-architecture doc (Run From Source keeps its own, because a moved block is
-copied whole), and "Other ways to install" links the moved section.
+Material consequences: five blocks move instead of six; "Other ways to
+install" links Manual install in the guide and Run From Source in this file;
+the guide holds no link into `docs/` today, so the archive-test extension
+guards the next such link rather than an existing one; the draft measures
+1,241 words.
 
-This is the lowest-stakes row. Run From Source is 85 words at the bottom of
-the file, below the point where players stop reading, so keeping it costs
-them nothing. Of the two objections #278's reviewer raised, the
-release-contract cost disappears because this proposal pays it anyway, and
-contributor discovery friction remains.
-
-Choosing differently: keeping it in the README, #278's unanimous outcome,
-adds about 60 words net, keeps zero-click discovery for contributors,
-leaves #278 D4 standing, and avoids the duplicated tech-stack sentence,
-because the README's own unchanged sentence keeps the `docs/architecture.md`
-archive row true. "Other ways to install" then links Manual install
-alone, the guide holds five blocks, and the section's `#configuration`
-link repoints to the guide. A standalone `docs/development.md` adds a
-second new file and a second archive row for 85 words.
+Rejected: moving the section into the guide as a third install path beside
+Manual install. That would have given secondary install paths one
+destination and saved about 60 README words, at the cost of a copied
+sentence, a reversed unanimous #278 outcome, and one more click for a
+contributor. A standalone `docs/development.md` was rejected earlier for
+adding a second file and a second archive row for 85 words. The kickoff
+prompt parked on 2026-09-12 for that move is retired by this ruling.
 
 ## Problem
 
@@ -309,44 +314,42 @@ Measured on a draft assembled from today's file and the new prose below.
 | Found a bug? | 87 | 87 | unchanged |
 | Configuration | 746 | 42 | new prose: the pointer |
 | Playlists and Benchmarks | 133 | 0 | folded into the Benchmarks bullet |
-| Run From Source | 85 | 0 | moved (D6) |
-| Development | 37 | 52 | unchanged, plus a copy of the tech-stack sentence |
+| Run From Source | 85 | 76 | reworded in place (D6); its tech-stack sentence moves to Development |
+| Development | 37 | 52 | unchanged, plus the tech-stack sentence from Run From Source |
 | License | 36 | 36 | unchanged |
-| Heading lines | 33 | 25 | |
-| **Total** | **3,289** | **1,161** | |
+| Heading lines | 33 | 29 | |
+| **Total** | **3,289** | **1,241** | |
 
 Section order is unchanged. The "why" sentence restates the three
 questions that open the product overview, so it introduces no new claim.
 
 ### What moves, and the verbatim rule
 
-Six blocks move to `docs/user_guide.md`: Configuration, Playlists and
-Benchmarks, Troubleshooting, What it talks to, Manual install with its
-Rollback block, and Run From Source.
+Five blocks move to `docs/user_guide.md`: Configuration, Playlists and
+Benchmarks, Troubleshooting, What it talks to, and Manual install with its
+Rollback block.
 
 **A moved block is copied, not rewritten.** Headings, wording, order, and
 the collapsed `<details>` blocks are preserved. The only permitted edits
 are the cross-reference fixes a change of file forces, and the
 implementation PR lists each one in its description:
 
-- `docs/architecture.md` becomes `architecture.md` inside Run From Source.
 - References inside a moved block to the install one-liner ("the one-liner"
   in Manual install, "the install one-liner" in Rollback) gain a link to
   the README's Install section. "The easy install", in the Uninstall
   footnote, stays in the README and needs none.
-- `#configuration` references inside Troubleshooting and Run From Source
-  need no change, because both sections land in the same file.
+- The `#configuration` reference inside Troubleshooting needs no change,
+  because both sections land in the same file.
 
 This is what keeps #278's two review redlines intact without re-arguing
 them: the network table names services and never hostnames, and schema
 recovery leads with backing up the `data` folder and the converter script.
 
-Nothing in a moved block is dropped. One sentence is duplicated rather than
-moved: the tech-stack sentence that opens Run From Source travels with that
-block, and the README's Development section gains a copy, so the README
-keeps a link to the architecture doc on its own account. The one deliberate
-loss is in Features, which is rewritten, not moved: the per-feature detail
-that the capability specs already state. That covers how a notification
+Nothing in a moved block is dropped. Two sections are rewritten in place
+rather than moved, and their new text sits in the prose block: Features,
+and Run From Source under the D6 ruling, whose tech-stack sentence moves
+within the README to Development. The one deliberate loss is in Features:
+the per-feature detail that the capability specs already state. That covers how a notification
 replaces the previous one, the celebration's covered-window and
 reduced-motion behavior and its Settings control, the chart-point
 preferences, and the manual **Refresh** button for when the leaderboard
@@ -358,10 +361,9 @@ lags.
 README covers what the app is and how to install it, and this guide covers
 everything after that. Sections in this order, by how often a running user
 needs them: Configuration, Playlists and Benchmarks, Troubleshooting, What
-it talks to, Manual install, Run From Source. Heading text is unchanged, so
-the anchors are `#configuration`, `#playlists-and-benchmarks`,
-`#troubleshooting`, `#what-it-talks-to`, `#manual-install`, and
-`#run-from-source`.
+it talks to, Manual install. Heading text is unchanged, so the anchors are
+`#configuration`, `#playlists-and-benchmarks`, `#troubleshooting`,
+`#what-it-talks-to`, and `#manual-install`.
 
 ### New README prose
 
@@ -371,7 +373,8 @@ reviewers are asked to redline it as they would a Copy block. Everything in
 the README that is not in this block is today's text. Two sentences inside
 it are today's text in a new place: the pointer sentence that closes
 Features today closes it still, and the tech-stack sentence that opens Run
-From Source today is copied into Development.
+From Source today moves to Development. Run From Source itself is reworded
+in place under the D6 ruling, so its new text is here too.
 
 ```markdown
 It turns the runs you already play into answers to three questions: am I improving, where am
@@ -403,8 +406,8 @@ The rationale behind each feature lives in [docs/product.md](docs/product.md); w
 
 [Manual install](docs/user_guide.md#manual-install) installs from a release you have inspected
 yourself, and covers rolling back to, and pinning, an older release.
-[Run From Source](docs/user_guide.md#run-from-source) is for development, or for managing the
-toolchain yourself.
+[Run From Source](#run-from-source) is for development, or for managing the toolchain
+yourself.
 
 ## What it talks to
 
@@ -429,6 +432,26 @@ Most settings live on the dashboard's own **Settings** page: where your KovaaK's
 and who you are on the leaderboards. Boot settings such as `port` live in `config.toml`
 (installed: `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`), which updates never touch.
 [Configuration](docs/user_guide.md#configuration) in the user guide covers both.
+
+## Run From Source
+
+Run from a git checkout if you develop the app, or if you would rather manage the toolchain
+yourself. You need git and [uv](https://docs.astral.sh/uv/):
+
+```shell
+git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
+cd Corporate-Serf-Dashboard
+uv sync
+```
+
+Copy `example.toml` to `config.toml`, then start the app:
+
+```shell
+uv run python source/app.py
+```
+
+The stats folder is detected on the first start, and the Settings page covers whatever it
+missed. A checkout does not update itself: `git pull` is the update path.
 
 ## Development
 
@@ -456,6 +479,12 @@ The choices inside that block, each open to challenge:
   benchmark-rank overlays.
 - **The Troubleshooting pointer names both log locations**, because the
   README still advertises Run From Source, whose logs live in the checkout.
+- **Run From Source is reworded, not moved.** The opening fragment becomes a
+  sentence, the tech-stack sentence leaves for Development, and the
+  configuration aside goes, because the sentence about the Settings page
+  already says where the rest is set. Every fact stays: git and uv, the
+  three commands, copying `example.toml` to `config.toml`, first-start
+  detection, and no self-update.
 - **The Configuration pointer names `port` and never `host`.** `host` is
   the one setting with a security consequence, and its no-login warning
   lives beside it in `example.toml` and in the guide. The README should not
@@ -487,8 +516,10 @@ The choices inside that block, each open to challenge:
   false without a failing gate. A row whose link moves to the guide gets
   its comment updated in the same commit.
 - The archive test reads relative `docs/` links from the README only. The
-  guide is a second shipped document with links of its own, today only the
-  one to `architecture.md`. The author recommends extending
+  guide is a second shipped document with links of its own; today it holds
+  none into `docs/` and one back to `README.md#install`, so the extension
+  guards the next such link rather than an existing one. The author
+  recommends extending
   `test_readme_doc_targets_are_all_required` to the guide's links, resolved
   from `docs/`. It is the same failure the test exists for. It goes beyond
   the trim itself, so it is flagged here and is cheap to drop.
@@ -581,7 +612,7 @@ section.
    The author is a Fable session, so there is no Fable review seat.
 2. **One implementation PR** (Opus 5 at high, from a kickoff prompt written
    into `ignore/prompts/` after ratification), in four commits:
-   1. the move: the six blocks leave the README for `docs/user_guide.md`
+   1. the move: the five blocks leave the README for `docs/user_guide.md`
       with only the listed cross-reference fixes, the specs and the
       `AGENTS.md` link repoint, and the archive row lands. This must be one
       commit, because the link and archive gates fail on any subset;
