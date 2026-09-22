@@ -1,5 +1,9 @@
 # Corporate Serf Dashboard
 
+Your KovaaK's runs, plotted as you play, on your own PC.
+
+[Install](#install) · [Features](#features) · [User guide](docs/user_guide.md) · [Troubleshooting](#troubleshooting)
+
 Corporate Serf Dashboard watches your KovaaK's stats folder while you train. Each run you
 finish lands on the Scenario Performance page as it happens: the plots and stats update, a
 notification says how the run went, and your leaderboard position refreshes when you set a
@@ -14,22 +18,17 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
 
 ## Features
 
-- **Scenario plots** — Score vs Sensitivity and Score vs Time for each scenario, with optional
-  PB-score, score-threshold, and benchmark-rank overlays.
-- **Run notifications** — one toast when a run earns a verdict, titled with it: score-threshold
-  pass or fail against your personal best, or the top-N placement it earned. A run that earns
-  neither says nothing.
+- **Scenario plots** — Score vs Sensitivity and Score vs Time per scenario, with PB, score-threshold,
+  and benchmark-rank overlays.
+- **Run notifications** — a toast when a run earns a verdict against your personal best or the top N.
 - **Personal best celebration** — confetti, fireworks, cannons, or stars when a run beats your
-  scenario best, on whatever page you have open.
-- **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
-  `Position: 11,290 of 63,892 (82.33% percentile)`, refreshed after a new personal best.
-- **Playlist scenarios table** — every scenario in a playlist with position, percentile, last
-  played, runs, and personal-best stats; sort by percentile to build a training priority list.
-- **Benchmarks** — a bundled benchmark library, built with the help of
-  [Evxl.app](https://evxl.app)'s author. Voltaic and Viscose are visible by default, the
-  **Show hidden** switch on the Playlists page lists the rest, a playlist's eye icon turns one
-  on, and **Import** adds any playlist by share code. More in
-  [Playlists and Benchmarks](docs/user_guide.md#playlists-and-benchmarks).
+  scenario best.
+- **Leaderboard standing** — your global position and percentile per scenario, refreshed after a new
+  personal best.
+- **Playlist scenarios table** — every scenario in a playlist with position, percentile, and
+  personal-best stats; sort by percentile to pick what to train.
+- **Benchmarks** — a bundled benchmark library, Voltaic and Viscose on by default, plus import of any
+  playlist by share code; see [Playlists and Benchmarks](docs/user_guide.md#playlists-and-benchmarks).
 
 The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
 [docs/roadmap.md](docs/roadmap.md).
