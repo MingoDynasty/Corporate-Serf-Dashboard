@@ -376,7 +376,7 @@ Features today closes it still, and the tech-stack sentence that opens Run
 From Source today moves to Development. Run From Source itself is reworded
 in place under the D6 ruling, so its new text is here too.
 
-```markdown
+````markdown
 It turns the runs you already play into answers to three questions: am I improving, where am
 I weak, and what should I work on next?
 
@@ -457,7 +457,7 @@ missed. A checkout does not update itself: `git pull` is the update path.
 
 The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
 [docs/architecture.md](docs/architecture.md) has the module map.
-```
+````
 
 The choices inside that block, each open to challenge:
 
