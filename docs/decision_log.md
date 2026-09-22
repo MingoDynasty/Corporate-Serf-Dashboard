@@ -46,8 +46,11 @@ from cache." looked like its mirror image: position stale, total fresh. The
 fetch order makes that state impossible, and the copy now says so.
 
 **Why the title says "data".** A title is for scanning, and the message names
-both numbers straight after it. Rejected: "Refresh failed · position and total
-from cache", which is longer and repeats the message.
+both numbers straight after it. The maintainer chose it on 2026-09-21: the
+title says what kind of thing is from cache, and the message says which.
+Rejected: "Refresh failed · position and total from cache", which is longer
+and repeats the message; and "Refresh failed · from cache", which mirrors the
+value's own " · from cache" hint but says nothing about what is stale.
 
 **Unchanged.** Channels, colors, and the " · from cache" hint on a
 served-stale value. The open question of softening the red to yellow stays in
