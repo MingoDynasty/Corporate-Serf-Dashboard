@@ -171,9 +171,13 @@ release-contract cost disappears because this proposal pays it anyway, and
 contributor discovery friction remains.
 
 Choosing differently: keeping it in the README, #278's unanimous outcome,
-adds 85 words and keeps zero-click discovery for contributors. A standalone
-`docs/development.md` adds a second new file and a second archive row for
-85 words.
+adds about 60 words net, keeps zero-click discovery for contributors,
+leaves #278 D4 standing, and avoids the duplicated tech-stack sentence,
+because the README's own unchanged sentence keeps the `docs/architecture.md`
+archive row true. "Other ways to install" then links Manual install
+alone, the guide holds five blocks, and the section's `#configuration`
+link repoints to the guide. A standalone `docs/development.md` adds a
+second new file and a second archive row for 85 words.
 
 ## Problem
 
