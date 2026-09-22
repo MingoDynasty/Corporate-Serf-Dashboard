@@ -110,6 +110,13 @@ Codex <codex@local>
   must have a spec: a new capability gets its spec in the PR that ships it,
   and a PR that changes specified behavior updates the spec in the same PR
   (this is step 2 of "Shipping a proposal" below).
+- Keep the README a front door, for a reader who has not installed yet: what
+  the app does, one line per feature, how to install it, and where to get
+  help. User-facing reference, how-to, and troubleshooting go to
+  [docs/user_guide.md](docs/user_guide.md). A new feature adds at most one
+  line to the README's Features; its settings, edge cases, and failure modes
+  go to the guide or its capability spec. Review holds this rule, as it does
+  the doc prose rules; no test measures the README.
 - Use the user guide's [What it talks to](docs/user_guide.md#what-it-talks-to)
   section for the public disclosure of outbound network use. A PR that adds an
   outbound service, or a new trigger for an existing one, updates that section
@@ -276,6 +283,10 @@ in the same PR — do not leave it for later:
    the PR description instead. The `/merge-sweep` skill
    (`.claude/skills/merge-sweep/`) is the on-demand backstop that archives
    anything missed after merge.
+
+Steps 4 and 5, the roadmap milestone and the product inventory, apply when
+the proposal ships an app feature; a docs-only proposal records itself in the
+decision log alone.
 
 ## Testing Philosophy
 

@@ -1,5 +1,6 @@
 import io
 import json
+import posixpath
 import re
 import zipfile
 from collections.abc import Sequence
@@ -461,6 +462,24 @@ def test_readme_doc_targets_are_all_required() -> None:
     root = Path(__file__).resolve().parent.parent
     targets = _readme_doc_targets((root / "README.md").read_text(encoding="utf-8"))
     assert targets, "expected the README to link into docs/"
+    assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
+
+
+#: Relative link destinations, anchor dropped. A destination with a scheme is
+#: external, and a bare ``#anchor`` needs at least one path character first.
+_RELATIVE_LINK = re.compile(r"\]\((?![a-z][a-z0-9+.-]*:)([^)\s#]+)")
+
+
+def test_user_guide_link_targets_are_all_required() -> None:
+    # The guide ships beside the README, so its links fail the same way. They
+    # resolve from docs/, where ``../README.md`` names the archive's README.md.
+    root = Path(__file__).resolve().parent.parent
+    guide = (root / "docs" / "user_guide.md").read_text(encoding="utf-8")
+    targets = {
+        posixpath.normpath(f"docs/{match.group(1)}")
+        for match in _RELATIVE_LINK.finditer(guide)
+    }
+    assert "README.md" in targets, "expected the guide to link back to the README"
     assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
 
 
