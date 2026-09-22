@@ -218,12 +218,14 @@ toasts under, and it applies to every toast the app adds from here on
   the instances are specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - With a scenario selected, Manual Refresh answers every click with a
-  toast — red, yellow, green, or blue; with none selected the click sets the
-  field to `N/A` and toasts nothing. Every answer is a channel emission, so a
-  repeat click always re-pops its answer: the red and yellow outcomes share one
-  problem channel, the green confirmation is keyed by scenario, and the blue
-  notice is its own standing-condition channel. The passive rank renders that
-  used to toast red or yellow no longer do
+  toast — red, yellow, green, orange, or blue; with none selected the click
+  sets the field to `N/A` and toasts nothing. Every answer is a channel
+  emission, so a repeat click always re-pops its answer: the red and yellow
+  outcomes share one problem channel, the green confirmation and the orange
+  partial success share a channel keyed by scenario
+  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)),
+  and the blue notice is its own standing-condition channel. The passive rank
+  renders that used to toast red or yellow no longer do
   ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)
   as amended by
   [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
