@@ -41,9 +41,11 @@ Configuration.
 What is this, how do I install it, what does it do on first run, and where
 do I get help. Features are one line each. Configuration is a pointer.
 Reference material is one link away. The draft assembled from this proposal
-measures 1,241 words against 3,289 today: at the top of the band once the
-D6 ruling keeps Run From Source in the file, and the band is an editorial
-budget, not a reason to drop a true qualifier.
+measures 1,241 words against 3,289 today: about 40 over the band's nominal
+ceiling once the D6 ruling keeps Run From Source in the file. The band is
+an editorial budget, and the qualifiers that carried the draft past it are
+true, so the ratified draft's count, not the band, is what implementation
+is measured against.
 
 Choosing differently: the research's raw target is about 450 to 700 words,
 which is where ShareX, OBS, Syncthing, and Playnite sit. Every one of them
@@ -78,8 +80,7 @@ Choosing differently:
   lean in chat. File names such as `network.md` announce themselves in the
   repository tree. The costs: five archive-contract rows instead of one, a
   133-word file for Playlists and Benchmarks, and the `#configuration`
-  references inside Troubleshooting and Run From Source become cross-file
-  links.
+  reference inside Troubleshooting becomes a cross-file link.
 - **The GitHub wiki.** Conventional for end-user apps. It is not versioned
   with the code, sits outside the same-PR documentation rule and the link
   gate, and does not ship in the zip.
@@ -374,7 +375,9 @@ the README that is not in this block is today's text. Two sentences inside
 it are today's text in a new place: the pointer sentence that closes
 Features today closes it still, and the tech-stack sentence that opens Run
 From Source today moves to Development. Run From Source itself is reworded
-in place under the D6 ruling, so its new text is here too.
+in place under the D6 ruling, so its new text is here too. A heading in
+the block introduces that section's whole new text, so Development shows
+the sentence it gains and then today's paragraph, unchanged.
 
 ````markdown
 It turns the runs you already play into answers to three questions: am I improving, where am
@@ -457,6 +460,11 @@ missed. A checkout does not update itself: `git pull` is the update path.
 
 The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
 [docs/architecture.md](docs/architecture.md) has the module map.
+
+Development uses AI coding agents. Every change is reviewed and must pass the
+project's test suite and CI gates (ruff, mypy, pytest) before it merges; the
+reasoning behind the durable choices is public in the
+[decision log](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/main/docs/decision_log.md).
 ````
 
 The choices inside that block, each open to challenge:
@@ -517,7 +525,7 @@ The choices inside that block, each open to challenge:
   its comment updated in the same commit.
 - The archive test reads relative `docs/` links from the README only. The
   guide is a second shipped document with links of its own; today it holds
-  none into `docs/` and one back to `README.md#install`, so the extension
+  none into `docs/`, only links back to `README.md#install`, so the extension
   guards the next such link rather than an existing one. The author
   recommends extending
   `test_readme_doc_targets_are_all_required` to the guide's links, resolved
@@ -557,7 +565,8 @@ proposal writes it down.
 - **Rewriting the moved sections while moving them.** It would reopen
   wording that #278 verified against code, and it would make the move
   unreviewable as a move.
-- **A table of contents.** At 157 lines GitHub's outline button covers it.
+- **A table of contents.** At about 180 lines GitHub's outline button
+  covers it.
 
 ### Blast radius
 
@@ -601,7 +610,8 @@ section.
   still true. The PR description quotes each edited spec sentence, and the
   reviewer reads it against the section it now names.
 - The size is proven by `awk '{w += NF} END {print w}' README.md`, the
-  platform-independent count used throughout, against the budget D1 rules.
+  platform-independent count used throughout, against the ratified
+  draft's count rather than D1's band.
 - Manual: open the branch's README and guide on GitHub and follow every
   link once, including the collapsed Rollback block.
 
