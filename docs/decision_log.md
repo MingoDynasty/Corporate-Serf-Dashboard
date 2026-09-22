@@ -865,8 +865,8 @@ because the new plotly.js turns that button on by default. The button stays
 rather than being hidden. Sharing happens only when a user presses it,
 confirms a dialog that names Plotly Cloud, and is signed in there, so it is
 an export the user chooses and not data the app sends on its own. Users see it
-beside the existing PNG download, and the README lists Plotly Cloud among the
-services the app can reach.
+beside the existing PNG download, and the user guide lists Plotly Cloud among
+the services the app can reach.
 
 **What changed.** plotly 7.0.0 bundles plotly.js 4.0.0, and Dash serves
 plotly.js from the plotly package (`package_data/plotly.min.js`), so the
