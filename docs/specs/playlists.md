@@ -16,8 +16,9 @@ sentence after the link, or with no link, is an implementation fact that no
 decision-log entry governs. Structure is mapped in
 [architecture.md](../architecture.md), endpoint quirks in
 [kovaaks_api_notes.md](../kovaaks_api_notes.md), the user-facing picture in
-the README's [Playlists and Benchmarks](../../README.md#playlists-and-benchmarks)
-section and [product.md](../product.md). Leaderboard placement is worded
+the user guide's
+[Playlists and Benchmarks](../user_guide.md#playlists-and-benchmarks) section
+and [product.md](../product.md). Leaderboard placement is worded
 "Position"
 ([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 

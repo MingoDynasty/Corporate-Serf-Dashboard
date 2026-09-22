@@ -1,11 +1,14 @@
 import io
 import json
+import posixpath
 import re
 import zipfile
 from collections.abc import Sequence
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
+from markdown_it import MarkdownIt
 
 from scripts.release_job import (
     EXCLUDED_ARCHIVE_TREES,
@@ -461,6 +464,53 @@ def test_readme_doc_targets_are_all_required() -> None:
     root = Path(__file__).resolve().parent.parent
     targets = _readme_doc_targets((root / "README.md").read_text(encoding="utf-8"))
     assert targets, "expected the README to link into docs/"
+    assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
+
+
+def _relative_link_paths(markdown: str) -> set[str]:
+    """Collect the relative link, image, and reference-definition paths a page renders.
+
+    Parses with the CommonMark tokenizer ``tests/test_docs.py`` uses, so a
+    reference-style link counts and a link inside fenced code does not. The
+    anchor is dropped, a bare ``#anchor`` yields no path, and a destination
+    with a scheme is external.
+    """
+    env: dict = {}
+    tokens = MarkdownIt("commonmark").parse(markdown, env)
+    targets = [
+        str(child.attrGet("href" if child.type == "link_open" else "src") or "")
+        for token in tokens
+        if token.type == "inline"
+        for child in token.children or []
+        if child.type in ("link_open", "image")
+    ]
+    targets.extend(ref["href"] for ref in env.get("references", {}).values())
+    return {
+        path
+        for target in targets
+        if not urlparse(target).scheme and (path := target.partition("#")[0])
+    }
+
+
+def test_relative_link_paths_follow_the_rendered_page() -> None:
+    markdown = (
+        "[in](../README.md#install) [ref][r] [here](#configuration) "
+        "[web](https://evxl.app)\n\n```\n[fenced](specs/fenced.md)\n```\n\n"
+        "[r]: specs/settings.md\n"
+    )
+    assert _relative_link_paths(markdown) == {"../README.md", "specs/settings.md"}
+
+
+def test_user_guide_link_targets_are_all_required() -> None:
+    # The guide ships beside the README, so its links fail the same way. They
+    # resolve from ``docs/``, where ``../README.md`` names the archive's
+    # ``README.md``.
+    root = Path(__file__).resolve().parent.parent
+    guide = (root / "docs" / "user_guide.md").read_text(encoding="utf-8")
+    targets = {
+        posixpath.normpath(f"docs/{path}") for path in _relative_link_paths(guide)
+    }
+    assert "README.md" in targets, "expected the guide to link back to the README"
     assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
 
 

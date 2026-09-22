@@ -57,7 +57,8 @@ REQUIRED_ARCHIVE_ENTRIES = (
     "docs/architecture.md",  # the shipped README links it
     "docs/product.md",  # the shipped README links it
     "docs/roadmap.md",  # the shipped README links it
-    "install.ps1",  # the manual-install entry point README documents
+    "docs/user_guide.md",  # the shipped README links it
+    "install.ps1",  # the manual-install entry point the user guide documents
     "pyproject.toml",  # dependency and uv pins the installer syncs against
     "uv.lock",  # the locked resolution `uv sync --locked` requires
     ".python-version",  # the interpreter the installer provisions
