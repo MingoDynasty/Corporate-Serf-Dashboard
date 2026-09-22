@@ -184,7 +184,7 @@ def test_read_path_returns_cached_winner_without_clobber(
     monkeypatch.setattr(
         api_service,
         "_with_leaderboard_total",
-        lambda rank_info, leaderboard_total_cache_ttl_hours: rank_info,
+        lambda rank_info, _ttl=168, force_refresh=False: rank_info,
     )
 
     result = api_service.get_scenario_rank_info(
@@ -220,8 +220,8 @@ def test_run_attempt_retries_stale_results_then_saves_fresh_rank(
     monkeypatch.setattr(
         api_service,
         "_with_leaderboard_total",
-        lambda rank_info, leaderboard_total_cache_ttl_hours: total_refreshes.append(
-            (rank_info, leaderboard_total_cache_ttl_hours)
+        lambda rank_info, _ttl=168, force_refresh=False: total_refreshes.append(
+            (rank_info, force_refresh)
         ),
     )
 
@@ -243,7 +243,9 @@ def test_run_attempt_retries_stale_results_then_saves_fresh_rank(
     assert results == []
     assert api_service._cached_rank(LEADERBOARD_ID, USERNAME).score == 100.0
     assert len(total_refreshes) == 1
-    assert total_refreshes[0][1] == 0
+    # The chain writes a board-authoritative rank, so it re-reads the total
+    # rather than leaving a fresh rank beside a week-old denominator.
+    assert total_refreshes[0][1] is True
     assert [
         record.getMessage()
         for record in caplog.records
@@ -375,7 +377,7 @@ def test_transient_resolver_error_retries_without_traceback(
     monkeypatch.setattr(
         api_service,
         "_with_leaderboard_total",
-        lambda rank_info, leaderboard_total_cache_ttl_hours: rank_info,
+        lambda rank_info, _ttl=168, force_refresh=False: rank_info,
     )
     monkeypatch.setattr(
         api_service,

@@ -27,8 +27,10 @@ their full behavior.
   caution, an attention-worthy negative outcome or a state that needs the user
   without anything having failed; red is an error, an operation that failed;
   green is a positive outcome; orange is partial success, where the action
-  committed but a follow-up write did not
-  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  committed but a follow-up step did not
+  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices),
+  widened from a follow-up write to any follow-up step by
+  [2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
   Green and orange are toast-only: no inline surface uses either.
 - Every inline notice carries a leading icon,
   `material-symbols:warning-outline` on yellow and
@@ -513,7 +515,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |
 | `steam-id-mismatch` | fixed id, sticky, once per process | "Steam ID mismatch" | yellow, until dismissed | — | `get_scenario_rank`; rank spec |
 | `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · position from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
-| `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" | green | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
+| `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" (fresh) / "Position refreshed but total from cache" / "Position refreshed but no total" | green (fresh) / orange (total re-read failed) | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
 | `setup-card-skip-problem` | channel | "Skip wasn't saved" | red | — | `skip_identity_setup`; settings spec |
 | `imported-playlist-successful-{code}` | channel per playlist code | "Playlist imported" | green | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
