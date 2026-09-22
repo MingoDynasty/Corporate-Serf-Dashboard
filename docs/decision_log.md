@@ -51,10 +51,16 @@ scenarios fill, the overview's cache-only reads, a TTL-expired foreground
 lookup, and the stale-rank fallback.
 
 Consequences: a suppressed percentile leaves that scenario unresolved for the
-playlists overview, so the whole playlist reports `{resolved}/{played} cached`
-in both percentile columns instead of a median it cannot support. That is the
-honest readout — the aggregate genuinely is not known — but it is visible, and
-it clears on the next total refresh.
+playlists overview, so the whole playlist shows the `{resolved}/{played}
+cached` placeholder in both percentile columns instead of a median it cannot
+support. That is the honest readout — the aggregate genuinely is not known —
+but it is visible, and it clears on the next total refresh. It also breaks two
+properties
+[2026-07-16](#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)
+stated for that placeholder, whose display rule it called weaker than the
+warmup worker's freshness test and monotonic: a scenario the worker counts as
+fresh can still hold a row on the placeholder, and a row that was showing
+aggregates can return to it.
 
 Rejected: clamping to `0.0`, or to the value at `rank == total`. Either
 invents a number from data already known to be inconsistent, and the invented
@@ -4859,7 +4865,12 @@ whichever source resolved it, never the pasted input.
 Status: Superseded in part by the
 [2026-08-03 quiet-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy):
 the fatal-state toast for an unknown username was removed in PR #196; the
-overview's status line and a WARNING log carry it. Everything else stands.
+overview's status line and a WARNING log carry it. Amended by
+[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile):
+the display rule is no longer weaker and monotonic, because a RANKED scenario
+whose rank sits above its cached total is worker-fresh yet display-unresolved,
+and a resolved row returns to the placeholder when a rewritten rank lands above
+the cached total. Everything else stands.
 
 Decision: After startup finishes ingesting local runs, one app-lifetime daemon
 worker warms the rank and leaderboard-total caches used by the Playlists
