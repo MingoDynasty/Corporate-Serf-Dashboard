@@ -61,13 +61,17 @@ fact already has a home:
 **Development links `docs/`, not `architecture.md`.** The front-door entry put
 the tech-stack sentence beside the architecture link, "which keeps the
 `docs/architecture.md` archive row true on the README's own account". The
-sentence now points at the `docs/` folder, so no shipped file links
-`docs/architecture.md` or `docs/product.md`, and both rows left
-`REQUIRED_ARCHIVE_ENTRIES`, where each entry is there because something reads
-it. `docs/` still ships whole, so both files remain in the zip. Relinking
-either from the README fails `test_readme_doc_targets_are_all_required` until
-its row returns. The AI-assisted-development sentence (#278 D1) stays,
-shorter.
+sentence now points at the `docs/` folder, and with the `product.md` pointer
+also gone, neither file is a target of the README or the user guide. Those two
+shipped entry points are what the contract's documentation rows cover, per the
+[archive-contract entry](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)
+and the two tests that hold their targets in `REQUIRED_ARCHIVE_ENTRIES`, so
+both rows left it. `docs/roadmap.md`, itself a row, still links both, as it
+links `decision_log.md`, a spec, and a proposal that never had rows: targets
+one hop further in are covered by `.gitattributes` keeping `docs/` whole, not
+by rows. Relinking either file from the README or the guide fails that
+entry point's test until the row returns. The AI-assisted-development sentence
+(#278 D1) stays, shorter.
 
 **Screenshots live in `docs/screenshots/`**, named for the view they show:
 `scenario_performance.png` (formerly `docs/example.png`), `playlists.png`,
@@ -87,10 +91,15 @@ serves reviewing past runs. The Run notifications bullet now reads "a toast to
 compare your new run against your personal best": it no longer names the
 top-N verdict or says that a run earning neither gets no toast, the qualifier
 the front-door entry's size paragraph defended. The maintainer chose this
-wording on 2026-09-22 ahead of an intended, unscheduled change to notify on
-every run; until that ships, the notifications spec is the precise statement.
+wording on 2026-09-22, intending every run to notify. Under default settings
+that already holds on the Scenario Performance page: a live run gets a
+threshold pass or fail against the previous best, a top-N placement when it is
+the first at its sensitivity, or the personal-best celebration. A run goes
+silent only when the threshold verdict is switched off or its percentage is
+blank and the run falls outside the top N; the notifications spec states those
+edges.
 
-**Size.** 776 words in 144 lines by the front-door entry's measure, down from
+**Size.** 773 words in 149 lines by the front-door entry's measure, down from
 1,196 at #308's merge.
 
 Provenance: the maintainer's own README edits, reviewed and completed in PR
