@@ -1,6 +1,7 @@
 # Corporate Serf Dashboard
 
-Charts your KovaaK's history and each new run as you play, so you can see whether you're improving, where you're weak, and what to train next.
+Charts your KovaaK's history and each new run as you play, so you can see whether you're
+improving, where you're weak, and what to train next.
 
 [Install](#install) · [Features](#features) · [User guide](docs/user_guide.md) · [Troubleshooting](#troubleshooting)
 
@@ -41,8 +42,8 @@ Windows only.
 
 2. Double-click the **Corporate Serf Dashboard** shortcut the installer put on your desktop. A
    console window opens, the dashboard starts, and your browser opens it at
-   <http://localhost:8050/>. **Closing that console window stops the dashboard**. Double-clicking the shortcut while it is already running opens another
-   browser tab.
+   <http://localhost:8050/>. **Closing that console window stops the dashboard**.
+   Double-clicking the shortcut while it is already running opens another browser tab.
 
 3. On its first start the dashboard finds your KovaaK's stats folder through Steam. If it
    can't, a card on the Scenario Performance page says so and sends you to Settings to set it.
@@ -52,14 +53,16 @@ Windows only.
 
 ### Updates
 
-Each launch checks for a new release and updates itself before starting. If that check fails (e.g. you're offline), then it simply runs the
-version you already have.
+Each launch checks for a new release and updates itself before starting. If that check fails,
+say because you're offline, it runs the version you already have.
 
 ### Other ways to install
 
-If you'd rather not pipe a script from the internet, instead use [Manual install](docs/user_guide.md#manual-install). It also covers rolling back to an older version.
+If you'd rather not pipe a script from the internet, use
+[Manual install](docs/user_guide.md#manual-install) instead. It also covers rolling back to an
+older version.
 
-Alternatively, you can [Run From Source](#run-from-source).
+Or [run from source](#run-from-source).
 
 ### Uninstall
 
@@ -101,8 +104,9 @@ The **Settings** page has a "Report a bug" link that opens the
 form with your version already filled in, and shows the folder your logs are
 in.
 
-Alternatively, open an issue from the
-[issue chooser](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new/choose). Please include your app version and your log files.
+Or open an issue from the
+[issue chooser](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new/choose).
+Please include your app version and your log files.
 
 ## Configuration
 
@@ -113,8 +117,8 @@ and who you are on the leaderboards. Boot settings such as `port` live in `confi
 
 ## Run From Source
 
-Run from a git checkout if you want to help develop the app, or if you would rather manage the toolchain
-yourself. You need git and [uv](https://docs.astral.sh/uv/):
+Run from a git checkout if you want to help develop the app, or if you would rather manage the
+toolchain yourself. You need git and [uv](https://docs.astral.sh/uv/):
 
 ```shell
 git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
@@ -130,10 +134,11 @@ uv run python source/app.py
 
 ## Development
 
-The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components). See the documentation in
-[docs/](docs/).
+The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components). See the
+documentation in [docs/](docs/).
 
-This app is built with AI coding agents. Every change is reviewed and must pass the tests and CI before it merges.
+This app is built with AI coding agents. Every change is reviewed and must pass the tests
+and CI before it merges.
 
 ## License
 
