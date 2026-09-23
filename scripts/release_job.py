@@ -53,9 +53,9 @@ REQUIRED_ARCHIVE_ENTRIES = (
     "resources/",  # the bundled benchmark library, scanned in full at startup
     "scripts/launch_bootstrap.ps1",  # install.ps1 copies it to launch.ps1
     "scripts/launcher.ps1",  # what that bootstrap then runs
-    "docs/example.png",  # the shipped README embeds it
-    "docs/architecture.md",  # the shipped README links it
-    "docs/product.md",  # the shipped README links it
+    "docs/screenshots/scenario_performance.png",  # the shipped README embeds it
+    "docs/screenshots/playlists.png",  # the shipped README embeds it
+    "docs/screenshots/playlist_scenarios.png",  # the shipped README embeds it
     "docs/roadmap.md",  # the shipped README links it
     "docs/user_guide.md",  # the shipped README links it
     "install.ps1",  # the manual-install entry point the user guide documents

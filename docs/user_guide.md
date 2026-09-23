@@ -190,7 +190,8 @@ inspected yourself:
 
 1. Download the app zip (`Corporate-Serf-Dashboard-<tag>.zip`) from the
    [Releases page](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/releases/latest).
-   Its SHA-256 digest is listed beside it; GitHub's own "Source code" downloads carry no digest.
+   Its SHA-256 digest is listed beside it, and `Get-FileHash <file>` in PowerShell prints the
+   same digest for your copy. GitHub's own "Source code" downloads carry no digest.
 2. Extract it and read `install.ps1` — it is the same installer the [one-liner](../README.md#install) runs.
 3. Open PowerShell in the extracted folder and run:
 
