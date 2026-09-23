@@ -106,7 +106,6 @@ in.
 
 Or open an issue from the
 [issue chooser](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new/choose).
-The bug form says which logs to attach and what they contain.
 
 ## Configuration
 

@@ -57,8 +57,8 @@ fact already has a home:
   modified" would be false while the script remains.
 - Also cut: Run From Source's first-start and `git pull` paragraph, the
   `product.md` rationale pointer, and the bug section's account of why
-  `debug.log` matters. The bug section now defers to the bug form for what to
-  attach, because the form names the file for each failure and warns that
+  `debug.log` matters. The bug section asks for no logs at all and leaves that
+  to the bug form, which names the file for each failure and warns that
   attachments are public; a blanket request for "log files" invites
   over-sharing, and the issue chooser also leads to the feature-request form,
   which asks for none. Run From Source stays, per the front-door entry's
@@ -107,7 +107,7 @@ run also goes silent when the threshold verdict is switched off or its
 percentage is blank and the run falls outside the top N; the notifications
 spec states those edges.
 
-**Size.** 784 words in 149 lines by the front-door entry's measure, down from
+**Size.** 772 words in 148 lines by the front-door entry's measure, down from
 1,196 at #308's merge.
 
 Provenance: the maintainer's own README edits, reviewed and completed in PR
