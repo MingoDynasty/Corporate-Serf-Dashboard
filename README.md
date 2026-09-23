@@ -67,7 +67,7 @@ Or [run from source](#run-from-source).
 ### Uninstall
 
 Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
-shortcut. Nothing else on the machine was modified.
+shortcut. Apart from the installer script below, the install changed nothing else on your PC.
 
 <details>
 <summary>One loose end: the installer script left in <code>%TEMP%</code></summary>
@@ -106,7 +106,7 @@ in.
 
 Or open an issue from the
 [issue chooser](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new/choose).
-Please include your app version and your log files.
+The bug form says which logs to attach and what they contain.
 
 ## Configuration
 

@@ -50,13 +50,19 @@ fact already has a home:
   sentences live in the release spec and the user guide's Configuration
   section.
 - Uninstall lost its registry and `PATH` list and the `%TEMP%` script's
-  "inert" clause. The `%TEMP%` `<details>` block stays: the installer entry
-  says the README documents deleting that file, and the block keeps
-  Uninstall's "nothing else on the machine was modified" true.
+  "inert" clause. The `%TEMP%` `<details>` block stays, because the installer
+  entry says the README documents deleting that file, and Uninstall's
+  closing sentence names that script as the one change outside the folder
+  and the shortcut; an unqualified "nothing else on the machine was
+  modified" would be false while the script remains.
 - Also cut: Run From Source's first-start and `git pull` paragraph, the
   `product.md` rationale pointer, and the bug section's account of why
-  `debug.log` matters, which the bug form itself states. Run From Source
-  stays, per the front-door entry's 2026-09-21 ruling.
+  `debug.log` matters. The bug section now defers to the bug form for what to
+  attach, because the form names the file for each failure and warns that
+  attachments are public; a blanket request for "log files" invites
+  over-sharing, and the issue chooser also leads to the feature-request form,
+  which asks for none. Run From Source stays, per the front-door entry's
+  2026-09-21 ruling.
 
 **Development links `docs/`, not `architecture.md`.** The front-door entry put
 the tech-stack sentence beside the architecture link, "which keeps the
@@ -91,15 +97,17 @@ serves reviewing past runs. The Run notifications bullet now reads "a toast to
 compare your new run against your personal best": it no longer names the
 top-N verdict or says that a run earning neither gets no toast, the qualifier
 the front-door entry's size paragraph defended. The maintainer chose this
-wording on 2026-09-22, intending every run to notify. Under default settings
-that already holds on the Scenario Performance page: a live run gets a
-threshold pass or fail against the previous best, a top-N placement when it is
-the first at its sensitivity, or the personal-best celebration. A run goes
-silent only when the threshold verdict is switched off or its percentage is
-blank and the run falls outside the top N; the notifications spec states those
-edges.
+wording on 2026-09-22, intending every run to notify, which has not fully
+shipped. Under default settings it holds for the latest live run of each poll
+on the Scenario Performance page: that run gets a threshold pass or fail
+against the previous best, a top-N placement when it is the first at its
+sensitivity, or the personal-best celebration. Earlier runs coalesced into the
+same poll stay plot-only, a personal best among them included, and the latest
+run also goes silent when the threshold verdict is switched off or its
+percentage is blank and the run falls outside the top N; the notifications
+spec states those edges.
 
-**Size.** 774 words in 149 lines by the front-door entry's measure, down from
+**Size.** 784 words in 149 lines by the front-door entry's measure, down from
 1,196 at #308's merge.
 
 Provenance: the maintainer's own README edits, reviewed and completed in PR
