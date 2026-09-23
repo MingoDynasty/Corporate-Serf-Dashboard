@@ -99,7 +99,7 @@ silent only when the threshold verdict is switched off or its percentage is
 blank and the run falls outside the top N; the notifications spec states those
 edges.
 
-**Size.** 773 words in 149 lines by the front-door entry's measure, down from
+**Size.** 774 words in 149 lines by the front-door entry's measure, down from
 1,196 at #308's merge.
 
 Provenance: the maintainer's own README edits, reviewed and completed in PR

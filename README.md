@@ -54,7 +54,7 @@ Windows only.
 ### Updates
 
 Each launch checks for a new release and updates itself before starting. If that check fails,
-say because you're offline, it runs the version you already have.
+for example because you're offline, it runs the version you already have.
 
 ### Other ways to install
 
