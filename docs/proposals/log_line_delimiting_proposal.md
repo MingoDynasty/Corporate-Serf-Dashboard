@@ -45,20 +45,20 @@ never escapes, so the name reads in the log exactly as it does in the UI and
 in KovaaK's, and a search of the log for a reported scenario name always
 hits.
 
-A code or key the user typed is the one kind of value that can hold
-whatever a clipboard holds: a double quote, which would collide with the
-delimiter, or an invisible character. The import field is stripped before
-it is logged, and a zero-width space survives `strip()`. A playlist code
-pasted with one is a realistic cause of a "code not found" report; `"%s"`
-shows it as nothing and `%r` shows `'KovaaKsXyz\u200b'`. So this kind takes
-`%r`, which is the job the design already gives `%r` (see Kinds, and the
-test for each). Once validation accepts the code it is a token and stays
-bare. The KovaaK's username is typed too, and validated against KovaaK's,
-but it is a name, not a code: it takes `"%s"` before and after validation,
-as copy quotes it. Its one pre-validation log line fires when the lookup
-could not run at all, where its characters are not the diagnosis, and its
-rejection reaches the log only inside the user message that names it,
-which no delimiting rule edits.
+A code or key the user typed can hold whatever a clipboard holds: a double
+quote, which would collide with the delimiter, or an invisible character. The
+import field is stripped before it is logged, and a zero-width space survives
+`strip()`. A playlist code pasted with one is a realistic cause of a "code not
+found" report; `"%s"` shows it as nothing and `%r` shows `'KovaaKsXyz\u200b'`.
+So this kind takes `%r`, which is the job the design already gives `%r` (see
+Kinds, and the test for each). Once validation accepts the code it is a token
+and stays bare. The KovaaK's username is typed too, and validated against
+KovaaK's, but it is a name, not a code: it takes `"%s"` before and after
+validation, as copy quotes it. Its exact characters already reach the log:
+every attempt of the total-play request that validates it logs its params at
+DEBUG, and a dict renders its values with `repr`, so a pasted zero-width space
+shows as `'Pasu\u200b'` on the request whose answer the app reports as not
+found.
 
 Choosing differently: `%r` for all free text is the Python idiom and shows
 more. It escapes invisible characters and tells `None` from `"None"`. No
@@ -68,17 +68,14 @@ clipboard. Its costs:
 the quote character flips to `"` for the 62 names with an apostrophe, so one
 kind of value carries two delimiters, an escaped name no longer matches a
 search for it, and it cannot serve paths (D2), so paths would need a second
-rule. `%r` for the username as well, until KovaaK's confirms it, treats
-every typed value alike and would show a pasted invisible character on the
-username's own lines. It moves five placeholders, adds a third divergence
-from copy rule 6 (which quotes the username), and renders one value two
-ways inside a single event, because the rejection message that names the
-username is copy and keeps its double quotes; and the line it would help,
-the one that logs the username when validation could not run, fires on a
-network failure, where the characters are not the diagnosis. `"%s"` for
-typed codes too is one rule fewer, and leaves the one value that can hold a
-double quote or an invisible character as the one the delimiter cannot
-bound. Bare `%s` with no rule is the status quo: an empty
+rule. `%r` for the username as well, until KovaaK's confirms it, treats every
+typed value alike. It moves two placeholders, the lines that log the username
+when the total-play lookup failed with no cached answer, both network
+failures, and adds a divergence from copy rule 6 on those lines; the
+characters it would expose are already on the request line. `"%s"` for typed
+codes too is one rule fewer, and leaves the values that can hold a double
+quote or an invisible character as the ones the delimiter cannot bound. Bare
+`%s` with no rule is the status quo: an empty
 value renders as nothing, and `for %s (leaderboard %s)` renders a name such
 as `Tracking Benchmarks (Easy)` as two parenthesized groups.
 
@@ -404,11 +401,11 @@ The test is what can reach the handler, and applying it means reading the
 keeps the identity probe's `except ValueError` honestly conforming rather
 than conforming by a reading the text does not support. The floor (the words
 before the colon name the failure) holds on every line regardless, so a
-line that ends at its colon still says which operation failed. The routes
-are ordered by what reached the handler, never by how the `except` is
-spelled: a `requests` failure that arrives through a blind `except
-Exception` still takes the summary, and only what remains takes the
-traceback.
+line that ends at its colon still says which operation failed. The routes are
+ordered by what reached the handler, never by how the `except` is spelled: a
+`requests` failure that arrives through a blind `except Exception` still takes
+the summary, an expected failure this app raises with a message keeps `%s`,
+and only the unexpected remainder takes the traceback.
 
 The three broad lines D3 names, and what conforming looks like:
 
@@ -424,10 +421,13 @@ The three broad lines D3 names, and what conforming looks like:
   only where the test holds, which the implementer settles by reading the
   four `try` bodies, and take the class name where it does not.
 - `kovaaks/playlist_scenarios_service.py`, the best-effort hydration, is a
-  blind `except Exception`, and a `requests` failure can reach it: the
-  total-play hydration it calls does not consume request exceptions. A
-  `requests.RequestException` clause takes the summary first, and the blind
-  catch that remains takes the traceback.
+  blind `except Exception`, and two expected failures reach it: the
+  total-play hydration it calls does not consume request exceptions, and
+  an unknown configured username is rejected there on every open while a
+  scenario stays unmapped. A `requests.RequestException` clause takes the
+  summary first, an `UnknownKovaaksUserError` clause keeps its message
+  with `%s` (an unknown username is an expected failure that repeats), and
+  the blind catch that remains takes the traceback.
 
 None of the three requests is `sensitive`, so none is a privacy defect
 today.
@@ -534,10 +534,10 @@ is involved.
   is neither corruption nor a distrusted value. It is Python's text and a fix
   would be per line, so it stays; the decision-log entry carries this caveat,
   because a reader meets it in a real bug report after this file is gone.
-- An invisible character in a pasted KovaaK's username. The username is a
-  name and takes `"%s"`, and its rejection reaches the log only inside the
-  user message that quotes it, so a stray character in it stays invisible
-  in the log as it does on screen.
+- The raw characters inside the rejection message for an unknown KovaaK's
+  username. The message is copy and carries the name as typed; the request
+  that produced the rejection already logs the name escaped, one DEBUG
+  line earlier.
 - Numeric formats (`%d`, `%f`, `%g`).
 
 ## Testing
