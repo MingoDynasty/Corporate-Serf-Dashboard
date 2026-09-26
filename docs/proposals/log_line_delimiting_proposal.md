@@ -27,8 +27,8 @@ and sits in Design; a reviewer may still challenge it.
 Status: Open.
 
 Free text is a string whose content someone outside the code chose: a
-scenario, playlist, or user name, or a value read from a run file. 59
-placeholders carry one today: 54 are bare, 4 sit in parentheses, and 1 is a
+scenario, playlist, or user name, or a value read from a run file. 61
+placeholders carry one today: 56 are bare, 4 sit in parentheses, and 1 is a
 `%r`. Eight more carry text the user typed that nothing has validated yet: 7
 are bare and 1 is single-quoted.
 
@@ -147,12 +147,12 @@ Status: Open.
 
 **Recommendation: a full sweep, in the implementation PR, so the rule and a
 tree that follows it land together.** Measured by applying the sweep to a
-checkout of `8aa47fd` and running the suite (baseline 1358 passed): 102
-placeholders in 99 calls across 17 files change, and 22 tests in 10 files
-fail, every one a plain assertion on rendered log text. The comment and
+checkout of `88060d9` and running the suite (baseline 1380 passed): 104
+placeholders in 101 calls across 17 files change, and 24 tests in
+10 files fail, every one a plain assertion on rendered log text. The comment and
 docstring conventions took the opposite posture, no backfill, and that was
 right there because the rule transcribed a style the tree already followed
-better than nine times in ten. One of the 101 placeholders this rule governs
+better than nine times in ten. One of the 103 placeholders this rule governs
 already follows it. Agents in this repository learn house style from the
 neighboring code at least as much as from the agent instructions, so an
 unswept tree teaches bare `%s` on every edit while the instructions say
@@ -164,15 +164,15 @@ vouched for". Three formats single-quote an ordinary value by hand today,
 and under no backfill they survive until someone edits them, so the signal
 never becomes reliable. The change is mechanical, has no behavior in it, and
 is cheapest before the public launch, after which bug-report logs in two
-formats would coexist for as long as old installs do. The measurement quoted
-every one of the 102 placeholders with `"%s"`; under D1 eight of them take
-`%r` instead, on the same lines, and no test asserts on those lines.
+formats would coexist for as long as old installs do. The measurement
+applies D1 as amended: `"%s"` for names and paths, `%r` for the eight
+user-typed values, on the same lines.
 
 Choosing differently: no backfill (new and edited lines only) costs nothing
-now and leaves a mixed log for as long as the 98 calls go unedited, which
+now and leaves a mixed log for as long as the 100 calls go unedited, which
 for log lines is a long time. A targeted sweep of only the values with prose
-after them or parentheses around them is 58 placeholders in 56 calls and 9
-failing tests; it leaves 44 bare values at line ends, so the tree would then
+after them or parentheses around them is 60 placeholders in 58
+calls and 11 failing tests; it leaves 44 bare values at line ends, so the tree would then
 match a two-branch rule (quote unless last) rather than the one-branch rule
 D1 and D2 recommend.
 
@@ -192,44 +192,48 @@ aid.
 
 ### What was measured
 
-Commit-scoped: an AST walk over a `git archive` export of `origin/main`
-`8aa47fd` on 2026-09-19, run twice with identical output. Value kinds were
-assigned by reading every one of the 198 string placeholders and recording
-each of their 85 distinct argument expressions in an explicit table; an
-expression the table does not know is reported, never guessed.
+Commit-scoped: an AST walk over a `git archive` export of `origin/main`,
+run twice with identical output, first at `8aa47fd` on 2026-09-19 and again
+at `88060d9` on 2026-09-25 after `main` moved. Between the two, `main`
+added two warnings (five `%s` placeholders) and 22 tests; the corpus, the
+exception routes, and every other count are unchanged, and the numbers
+below are the later ones. Value kinds were assigned by reading every one of
+the 203 string placeholders and recording each of their 87 distinct
+argument expressions in an explicit table; an expression the table does
+not know is reported, never guessed.
 
-- **Calls.** 161 logging calls in 19 files under `source/`, all on a
-  module-level `logger`: warning 84, info 31, debug 29, exception 12, error
-  3, critical 2. 140 pass a literal format with arguments, 16 a literal
+- **Calls.** 163 logging calls in 19 files under `source/`, all on a
+  module-level `logger`: warning 86, info 31, debug 29, exception 12, error
+  3, critical 2. 142 pass a literal format with arguments, 16 a literal
   with none, and 5 a pre-built message variable; none is an f-string (ruff's
   `G` rules are on). 36 carry a traceback.
-- **Conversions.** 268 placeholders: `%s` 195, `%d` 47, `%f` 19, `%g` 4,
+- **Conversions.** 273 placeholders: `%s` 200, `%d` 47, `%f` 19, `%g` 4,
   `%r` 3.
-- **Value kinds, for the 198 `%s` and `%r` placeholders.**
+- **Value kinds, for the 203 `%s` and `%r` placeholders.**
 
   | Kind | Count | How it is delimited today |
   | --- | --- | --- |
-  | Names and other outside text | 59 | 54 bare, 4 in parentheses, 1 `%r` |
+  | Names and other outside text | 61 | 56 bare, 4 in parentheses, 1 `%r` |
   | User-typed text | 8 | 7 bare, 1 single-quoted |
   | Paths and file names | 34 | 33 bare, 1 double-quoted inside its argument |
-  | Tokens rendered as strings | 68 | 53 bare, 11 in parentheses, 2 single-quoted, 2 `%r` |
+  | Tokens rendered as strings | 71 | 56 bare, 11 in parentheses, 2 single-quoted, 2 `%r` |
   | Request summaries | 11 | all last, after a colon |
   | Exceptions interpolated | 8 | 7 last after a colon, 1 in parentheses |
   | Pre-built messages | 5 | all last, after a colon |
   | Collections | 5 | Python's container repr |
 
-- **Position, for the 101 free-text and path placeholders (98 calls).** 51
+- **Position, for the 103 free-text and path placeholders (100 calls).** 53
   have prose after the value, so its end is not visible; 5 are wrapped in
   parentheses; 44 end the message; 1 is quoted. Four of the 44 are paths
-  with the sentence's period glued on (`Failed to read %s.`). In 43 calls a
+  with the sentence's period glued on (`Failed to read %s.`). In 44 calls a
   free-text or path value is followed by another value.
 - **The same value, four ways.** A playlist code is single-quoted in
   `pages/playlists.py`, and parenthesized, after a colon, or bare in
-  `kovaaks/data_service.py`. A scenario name is bare in 37 places, in
+  `kovaaks/data_service.py`. A scenario name is bare in 39 places, in
   parentheses in 4, and a `%r` in 1.
 - **`scripts/`.** 47 calls, 3 f-string messages, 2 `%r`. Excluded from
   lint; output goes to a terminal, never to `debug.log`.
-- **Tests.** 254 `caplog` references in 17 files. The count that matters is
+- **Tests.** 261 `caplog` references in 18 files. The count that matters is
   how many assert on text a sweep would change; D4 carries it.
 
 ### What the values look like
@@ -431,7 +435,7 @@ around the probe catches a `sensitive` request's failure without naming it.
 Review only, the same posture as the comment conventions. A guard in the
 style of `tests/test_em_dash_guard.py` would have to know a placeholder's
 value kind, and the AST does not carry it: the table behind this proposal's
-numbers needed 85 hand-read expressions, and any name heuristic misfiles the
+numbers needed 87 hand-read expressions, and any name heuristic misfiles the
 pair that matters most (`playlist_code` is a token and stays bare,
 `input_playlist_code` is user-typed and takes `%r`). The one check with no
 false positives, "no `'%s'` in a logger
@@ -448,11 +452,15 @@ edits a string the copy rules own.
 
 - **Single quotes.** 62 bundled names contain an apostrophe, and the copy
   side already chose the double quote.
+- **Brackets or curly quotes.** 3 scenario and 4 playlist names contain a
+  bracket, and a path may. No bundled name holds a curly quote, but it is
+  not typeable in a log search and a Windows path permits it. The straight
+  double quote is the only candidate with no collision in the census.
 - **Parentheses as the delimiter**, the tree's second most common form.
   10.1% of playlist names contain one, and the dominant playlist pattern is
   already `%s (%s)`, name then code.
 - **Placement only**: every free-text value last after a colon, bare. A line
-  has one last position, and 43 calls carry a free-text or path value with
+  has one last position, and 44 calls carry a free-text or path value with
   another value after it.
 - **Escaping every quoted value**, so a double quote or a control character
   inside one can never break its boundary. `%r` is that encoding, and the
@@ -473,8 +481,8 @@ edits a string the copy rules own.
 
 ### Blast radius
 
-Under D4's recommendation: 99 of 161 calls change only how a value is
-delimited, four exception lines change shape, and 22 tests update an
+Under D4's recommendation: 101 of 163 calls change only how a value is
+delimited, four exception lines change shape, and 24 tests update an
 expected string. No log level, logger name, or message wording changes, so a search
 for a line's words still finds it. Anyone who searches a log for a bare
 `for <name> (` pattern would need the quote. No cache, store, or wire format
@@ -503,10 +511,10 @@ is involved.
 
 - This PR is one Markdown file: `git diff --check` and
   `uv run pytest tests/test_docs.py`.
-- The implementation PR updates the 22 assertions the sweep breaks,
+- The implementation PR updates the 24 assertions the sweep breaks,
   tightened and never loosened: each asserts the quoted rendering rather
-  than dropping to a substring that avoids the value. By file at `8aa47fd`:
-  `test_api_service.py` 3, `test_app_startup_stats_dir.py` 3,
+  than dropping to a substring that avoids the value. By file at `88060d9`:
+  `test_api_service.py` 5, `test_app_startup_stats_dir.py` 3,
   `test_percentile_warmup_service.py` 3, `test_scenario_rank_freshness.py`
   3, `test_aim_training_journey.py` 2, `test_crash_logging.py` 2,
   `test_data_service_queries.py` 2, `test_playlist_rekey.py` 2,
@@ -529,7 +537,7 @@ is involved.
    pass: one signed review body with a stance per row, no inline threads,
    and no LGTM seat. The author is a Fable session, so there is no Fable
    review seat.
-2. **One implementation PR** (Opus 5 at high, from a kickoff prompt written
+2. **One implementation PR** (Opus 5.5 at high, from a kickoff prompt written
    into `ignore/prompts/` after ratification), in five commits:
    1. the `AGENTS.md` section and an `Accepted` decision-log entry, which
       carries this proposal's measurements, the two deliberate divergences
@@ -549,7 +557,8 @@ is involved.
 3. **Docs definition of done**, in the implementation PR: the decision-log
    entry; the `AGENTS.md` section; the proposal file deleted; the kickoff
    prompt moved to `ignore/prompts/done/`. No capability spec covers
-   logging, and nothing user-visible changes, so there is no spec,
+   logging, and a docs-only proposal records itself in the decision log
+   alone (the Shipping a proposal checklist says so), so there is no spec,
    `docs/roadmap.md`, or `docs/product.md` change; the implementer searches
    `docs/` for any quoted log line the sweep alters.
 
