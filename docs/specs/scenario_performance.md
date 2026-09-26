@@ -2,16 +2,16 @@
 
 The landing page plots the kept runs of one scenario as points over
 sensitivity or time, with the personal best, a configurable score goal, and
-playlist rank thresholds available as overlay lines. A collapsible Chart
-options panel tunes how the chart looks and which run notifications fire, and
-every preference in it is remembered by the browser. A newly played run
-reaches the chart automatically once its file is imported, and the page can
-follow the scenario just played. Older runs recorded on a game's own
-sensitivity scale sit on the same cm/360 axis as everything else. The chart's
-toolbar can save it as a PNG, or share it to Plotly Cloud once you confirm
-and are signed in there. The page
-also hosts the setup surfaces that point you at Settings, whether something
-has never been set or saved settings cannot be read.
+playlist rank thresholds available as overlay lines; older runs recorded on a
+game's own sensitivity scale sit on the same cm/360 axis as everything else.
+A collapsible Chart options panel tunes how the chart looks and which run
+notifications fire, and the browser remembers every control on the page — the
+chosen playlist and scenario included, so returning to the page shows the
+selection you last made, whether you picked it in the dropdowns or arrived
+from a playlist link. A newly played run reaches the chart automatically once
+its file is imported, and the page can follow the scenario just played. The
+page also hosts the setup surfaces that point you at Settings, whether
+something has never been set or saved settings cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
@@ -45,10 +45,18 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - With `show_version_in_title` enabled, the tab title is prefixed with the
   build's release label; the key is specified in
   [settings.md](settings.md#the-configuration-file).
-- `?scenario=` and `?playlist_code=` query parameters preselect the
-  dropdowns, and a control set by query parameter neither restores nor
-  stores a persisted value that visit; an unknown playlist code selects
-  nothing while still counting as set for that visit's persistence.
+- `?scenario=` and `?playlist_code=` query parameters select the dropdowns,
+  and the selection they make is remembered exactly like one made by hand:
+  arriving from a Playlists grid scenario link and then returning to the page
+  shows that playlist and scenario, not an earlier one
+  ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
+  A parameter the URL omits leaves its control on the remembered value, so
+  `?scenario=` alone keeps the playlist filter — and a scenario that filter
+  does not list is then dropped, leaving no scenario selected and nothing
+  remembered. An unknown playlist code clears the filter. The parameters are applied on every load of that URL, so
+  reloading a deep link re-applies it over a later choice, and the re-applied
+  selection becomes the remembered one. The navbar link and the header title
+  lead to the page without parameters, where a reload changes nothing.
 
 ## The controls row
 
@@ -59,8 +67,8 @@ of scope here, apart from its chart toolbar, noted under The graph.
   picker (defaults to January 1 of the current year; no future dates), and
   the Scenario Stats block. A second column carries the "Score vs
   Sensitivity" / "Score vs Time" radio (default Score vs Sensitivity) and
-  the "Chart options" button. Every control except the two dropdowns
-  persists in the browser unconditionally. The follow switch and the Top N
+  the "Chart options" button. Every control in the row persists in the
+  browser, the two dropdowns included. The follow switch and the Top N
   input carry help tooltips; the other row controls have plain labels.
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation

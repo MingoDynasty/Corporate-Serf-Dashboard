@@ -17,10 +17,10 @@ rationale lives in those entries, not here. A statement with no link is an
 implementation fact that no decision-log entry governs. Runtime structure is
 mapped in [architecture.md](../architecture.md); the user-facing rationale is
 in [product.md](../product.md); the operator's view is the README's
-[Install](../../README.md#install),
-[Manual install](../../README.md#manual-install), and
-[Uninstall](../../README.md#uninstall) sections. The launcher's console
-lines quoted here are plain console output, not app notifications.
+[Install](../../README.md#install) and [Uninstall](../../README.md#uninstall)
+sections and the user guide's
+[Manual install](../user_guide.md#manual-install) section. The launcher's
+console lines quoted here are plain console output, not app notifications.
 
 ## Cutting a release
 

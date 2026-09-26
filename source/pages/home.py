@@ -145,6 +145,12 @@ RANK_REFRESH_TOOLTIP = (
 # constant would leave the ``@container`` queries with nothing to match and
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
+# This visit's ``?scenario=`` and ``?playlist_code=``, carried as layout-bound
+# state rather than read from the URL by a callback. Dash Pages rebuilds the
+# page on a route change and then this store triggers exactly one write, which
+# keeps the deep link out of the router's own callback graph.
+HOME_DEEP_LINK_STORE_ID = "home-deep-link"
+
 # The chart options inspector. Its collapsed class is the open state: hiding
 # with ``display: none`` takes the controls out of the tab order and the
 # accessibility tree while leaving them mounted, so their persisted values keep
@@ -293,9 +299,14 @@ _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 # dismissed.
 _RUN_VERDICT_CHANNEL = "run-verdict"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
-_RANK_REFRESH_STALE_TITLE = "Refresh failed · position from cache"
+_RANK_REFRESH_STALE_TITLE = "Refresh failed · data from cache"
 _RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh. The position shown is unchanged."
 _RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh. The position shown is from cache."
+_RANK_REFRESH_STALE_WITH_TOTAL_MESSAGE = (
+    "Couldn't refresh. The position and total shown are from cache."
+)
+_RANK_REFRESH_TOTAL_STALE_TITLE = "Position refreshed but total from cache"
+_RANK_REFRESH_TOTAL_MISSING_TITLE = "Position refreshed but no total"
 # Notices that fire once per app session rather than once per trigger, by id.
 # A set, so the check-and-set needs no ``global`` rebinding; sound under
 # Waitress's single-process thread pool, and a lost race is benign because the
@@ -750,19 +761,32 @@ def get_scenario_rank(_, selected_scenario, _n_intervals):
     return display, notifications or no_update
 
 
-def _rank_refresh_problem_notification(*, served_stale: bool) -> dict[str, object]:
+def _rank_refresh_problem_notification(
+    *,
+    served_stale: bool,
+    has_total: bool = False,
+) -> dict[str, object]:
     """Report what went wrong with the latest manual refresh.
 
     One channel, two flavors: the hard failure came back with nothing usable,
     the served-stale one re-served the cached position. They are the mutually
     exclusive verdicts on one attempt, so they replace each other rather than
     stacking two contradictory claims about the same click.
+
+    ``has_total`` applies to the served-stale flavor only. A failed position
+    request asks for no total, so a total beside the cached position is cached
+    too, and naming only the position would read as though the total had
+    refreshed. With no total on screen, naming it would claim one that isn't
+    there. The hard failure keeps one message because it never sees what the
+    field is showing.
     """
     if served_stale:
         return toast(
             _RANK_REFRESH_PROBLEM_CHANNEL,
             _RANK_REFRESH_STALE_TITLE,
-            _RANK_REFRESH_STALE_MESSAGE,
+            _RANK_REFRESH_STALE_WITH_TOTAL_MESSAGE
+            if has_total
+            else _RANK_REFRESH_STALE_MESSAGE,
             color="yellow",
             icon=local_icon("material-symbols:refresh-rounded"),
         )
@@ -802,6 +826,43 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
     )
 
 
+def _rank_refresh_total_failed_notification(
+    selected_scenario: str,
+    has_total: bool,
+) -> dict[str, object]:
+    """Report a refresh whose position landed but whose total did not.
+
+    Orange is the partial-success rung: the position the click asked for is
+    live, the count beside it is not. Green would assert a freshness the
+    readout does not have, and the served-stale yellow would claim the position
+    came from cache when it is the one part that did refresh. It shares the
+    success channel because a re-click is the recovery, so the green it earns
+    must replace this rather than stack under a contradicting verdict.
+
+    The consequence names the total, which is what failed, rather than the
+    percentile, which is recomputed from it and usually moves under the user's
+    eyes as the position refreshes. Naming the failed thing also stays true for
+    an unranked readout, which shows a count and never a percentile.
+    """
+    if has_total:
+        return toast(
+            _rank_refresh_success_channel(selected_scenario),
+            _RANK_REFRESH_TOTAL_STALE_TITLE,
+            f"Refreshed position for {selected_scenario}. Couldn't refresh the "
+            f"total, so the total shown is from cache.",
+            color="orange",
+            icon=local_icon("material-symbols:refresh-rounded"),
+        )
+    return toast(
+        _rank_refresh_success_channel(selected_scenario),
+        _RANK_REFRESH_TOTAL_MISSING_TITLE,
+        f"Refreshed position for {selected_scenario}. Couldn't fetch the "
+        f"total, so no total is shown.",
+        color="orange",
+        icon=local_icon("material-symbols:refresh-rounded"),
+    )
+
+
 def _rank_refresh_username_unset_notification() -> dict[str, object]:
     """Answer a Refresh click that has no identity to look anything up with.
 
@@ -831,8 +892,8 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
     running=[(Output("rank-refresh-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-# One return per outcome the click can have -- three guards and four verdicts.
-# Collapsing any pair would only hide which answer a reader is looking at.
+# One return per outcome the click can have. Collapsing any pair would only
+# hide which answer a reader is looking at.
 def refresh_rank(  # noqa: PLR0911
     n_clicks,
     selected_scenario: str | None,
@@ -842,9 +903,10 @@ def refresh_rank(  # noqa: PLR0911
 
     The user asked, so every outcome answers on this callback's own
     notification output: red when the refresh failed outright, yellow when it
-    failed but a cached position was served in its place, green only on a
-    genuinely fresh result, and blue when there is no username to look
-    anything up with.
+    failed but a cached position was served in its place, orange when the
+    position refreshed but the leaderboard total behind the percentile did not,
+    green only on a genuinely fresh result, and blue when there is no username
+    to look anything up with.
 
     The unset-username case is caught before the lookup, on the direct settings
     read rather than the service's error copy. The passive field already
@@ -913,7 +975,29 @@ def refresh_rank(  # noqa: PLR0911
             rank_info.warning_message,
         )
         return display, *channel_toast(
-            _rank_refresh_problem_notification(served_stale=True), toast_channels
+            _rank_refresh_problem_notification(
+                served_stale=True,
+                has_total=rank_info.total_players is not None,
+            ),
+            toast_channels,
+        )
+    # Same clears as the green below: the position did refresh, which falsifies
+    # both the unchanged-position claim and the no-username one.
+    if rank_info.total_refresh_failed:
+        logger.warning(
+            "Manual rank refresh for %s could not re-read the leaderboard total.",
+            selected_scenario,
+        )
+        return display, *channel_toast(
+            _rank_refresh_total_failed_notification(
+                selected_scenario,
+                has_total=rank_info.total_players is not None,
+            ),
+            toast_channels,
+            clears=(
+                _RANK_REFRESH_PROBLEM_CHANNEL,
+                _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
+            ),
         )
     return display, *channel_toast(
         _rank_refresh_success_notification(selected_scenario),
@@ -1435,8 +1519,18 @@ def _local_scenario_options() -> list:
 @callback(
     Output("scenario-dropdown-selection", "data"),
     Input("playlist-dropdown-selection", "value"),
+    # Scheduling, not data: this Input looks removable and is not. The value
+    # above is an output of ``apply_deep_link``, and the renderer prunes a
+    # ready callback whose every Input is a declared output of a group member
+    # that already ran and whose none was actually written. On a visit with no
+    # ``?playlist_code=`` that callback returns ``no_update``, so without a
+    # second Input nothing writes this list and the scenario dropdown keeps
+    # the layout's full local set while the filter names a playlist. Nothing
+    # writes this store, so the prune's "every Input covered" test fails and
+    # the initial call survives. See the 2026-09-19 decision-log entry.
+    Input(HOME_DEEP_LINK_STORE_ID, "data"),
 )
-def select_playlist(selected_playlist):
+def select_playlist(selected_playlist, _deep_link):
     """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
         return _local_scenario_options()
@@ -1720,22 +1814,78 @@ def skip_identity_setup(n_clicks, toast_channels):
     return [], no_update, no_update, no_update
 
 
-def _home_initial_selection(
+def _home_deep_link(
     scenario: str | None,
     playlist_code: str | None,
-) -> tuple[str | None, list[str], str | None]:
-    """Resolve optional Home query params into dropdown initial state."""
+) -> dict[str, str | None]:
+    """Resolve Home's query params into the selections this visit applies.
+
+    A key is present only for a parameter the URL actually carried, because
+    the two dropdowns are set independently: ``?scenario=`` alone must leave
+    the playlist filter on whatever the browser restored. An unknown playlist
+    code is present with no value, which clears the filter rather than leaving
+    a code the app cannot resolve standing.
+    """
+    selection: dict[str, str | None] = {}
+    if playlist_code is not None:
+        selection["playlist"] = (
+            playlist_code if get_playlist_by_code(playlist_code) is not None else None
+        )
+    if scenario is not None:
+        selection["scenario"] = scenario or None
+    return selection
+
+
+def _home_scenario_options(playlist_code: str | None) -> list[str]:
+    """List the scenarios the first paint shows, before any callback runs.
+
+    ``select_playlist`` owns this list from then on. Resolving the query
+    parameter here too means a deep-linked visit paints its playlist's
+    scenarios immediately instead of the whole local list.
+    """
     selected_playlist = (
         playlist_code
         if playlist_code and get_playlist_by_code(playlist_code) is not None
         else None
     )
-    scenario_options = (
-        get_scenarios_from_playlist_code(selected_playlist)
-        if selected_playlist
-        else _local_scenario_options()
+    if selected_playlist:
+        return get_scenarios_from_playlist_code(selected_playlist)
+    return _local_scenario_options()
+
+
+@callback(
+    Output("playlist-dropdown-selection", "value"),
+    Output("scenario-dropdown-selection", "value", allow_duplicate=True),
+    Input(HOME_DEEP_LINK_STORE_ID, "data"),
+    # Not ``True``: applying the deep link *is* the mount's job, but Dash
+    # refuses an ``allow_duplicate`` output without one of the
+    # ``prevent_initial_call`` forms.
+    prevent_initial_call="initial_duplicate",
+)
+def apply_deep_link(selection):
+    """Set the two dropdowns from this visit's query parameters.
+
+    The values arrive by callback rather than as the layout's ``value`` so
+    that Dash persistence records them: a persisted control's layout default
+    has to be the same on every visit, or the stored edit is discarded instead
+    of restored. Writing them here makes a Playlists grid click an ordinary
+    selection, which the browser then remembers like any other.
+
+    Under DashProxy an ``allow_duplicate`` callback can fire once on load with
+    nothing triggering it. Re-emitting the same values is harmless -- Dash
+    skips a persistence write when the value is unchanged -- so this needs no
+    guard beyond the empty payload every non-deep-linked visit carries.
+
+    Returning ``no_update`` for a control the URL did not name leaves that
+    control's dependents unwritten, which is why ``select_playlist`` carries a
+    second Input.
+    """
+    if not selection:
+        return no_update, no_update
+    return (
+        selection.get("playlist", no_update),
+        selection.get("scenario", no_update),
     )
-    return selected_playlist, scenario_options, scenario or None
 
 
 def _chart_options_group(title: str, controls: list) -> dmc.Stack:
@@ -1951,17 +2101,16 @@ def layout(
 ):
     """Build the interactive home dashboard."""
     config = get_config()
-    selected_playlist, scenario_options, selected_scenario = _home_initial_selection(
-        scenario,
-        playlist_code,
-    )
-    playlist_persistence = playlist_code is None
-    scenario_persistence = scenario is None
+    scenario_options = _home_scenario_options(playlist_code)
 
     return dmc.Box(
         className="home-page",
         children=[
             dcc.Store(id="run-events"),
+            dcc.Store(
+                id=HOME_DEEP_LINK_STORE_ID,
+                data=_home_deep_link(scenario, playlist_code),
+            ),
             dcc.Store(
                 id="cached-plot",
                 data=_placeholder_plot_json(),
@@ -2008,8 +2157,19 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    persistence=playlist_persistence,
-                                    value=selected_playlist,
+                                    persistence=True,
+                                    # Never the query parameter, and never
+                                    # omitted. Dash pins a persisted edit to
+                                    # the layout value it was made against and
+                                    # discards the edit when a later visit
+                                    # renders a different one, so a default
+                                    # that varies per visit silently retires
+                                    # persistence. ``apply_deep_link`` carries
+                                    # the query parameter instead. Explicit
+                                    # ``None`` because an omitted prop is
+                                    # ``undefined``, which no longer matches
+                                    # what a browser already stored.
+                                    value=None,
                                 ),
                                 dmc.Stack(
                                     [
@@ -2022,11 +2182,16 @@ def layout(
                                             id="scenario-dropdown-selection",
                                             label="Selected scenario",
                                             maxDropdownHeight="75vh",
-                                            persistence=scenario_persistence,
+                                            persistence=True,
                                             placeholder="Select a scenario",
                                             scrollAreaProps={"type": "auto"},
                                             searchable=True,
-                                            value=selected_scenario,
+                                            # Constant on every visit, for the
+                                            # reason the playlist filter's own
+                                            # default carries;
+                                            # ``apply_deep_link`` is what
+                                            # applies ``?scenario=``.
+                                            value=None,
                                         ),
                                         # Selection behavior, not chart
                                         # presentation: it decides what the

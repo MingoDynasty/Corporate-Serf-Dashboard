@@ -5,7 +5,9 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
+import requests
 from dash import dcc, no_update
+from dash._callback import GLOBAL_CALLBACK_LIST
 
 from source.config import settings_service
 from source.kovaaks import api_service, data_service
@@ -180,12 +182,140 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
         for component in components
         if getattr(component, "id", None) == "scenario-dropdown-selection"
     )
+    deep_link_store = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == home.HOME_DEEP_LINK_STORE_ID
+    )
 
-    assert playlist_filter.value == "KovaaKsTestCode"
-    assert playlist_filter.persistence is False
+    # The query parameters reach the dropdowns through the store, never as
+    # the layout value: a persisted control's default has to be the same on
+    # every visit or Dash discards the stored edit instead of restoring it.
+    assert deep_link_store.data == {
+        "playlist": "KovaaKsTestCode",
+        "scenario": "KovaaKsTestCode Scenario",
+    }
+    assert playlist_filter.value is None
+    assert playlist_filter.persistence is True
+    assert scenario_dropdown.value is None
+    assert scenario_dropdown.persistence is True
+    # Still resolved in the layout, so the first paint already lists the
+    # deep-linked playlist's scenarios.
     assert scenario_dropdown.data == ["KovaaKsTestCode Scenario"]
-    assert scenario_dropdown.value == "KovaaKsTestCode Scenario"
-    assert scenario_dropdown.persistence is False
+
+
+def _known_playlist(monkeypatch):
+    monkeypatch.setattr(
+        home,
+        "get_playlist_by_code",
+        lambda code: object() if code == "KovaaKsTestCode" else None,
+    )
+
+
+def test_home_deep_link_records_only_the_parameters_the_url_carried(monkeypatch):
+    """An absent parameter leaves its control on the restored value."""
+    _known_playlist(monkeypatch)
+
+    assert home._home_deep_link(None, None) == {}
+    assert home._home_deep_link("Scenario A", None) == {"scenario": "Scenario A"}
+    assert home._home_deep_link(None, "KovaaKsTestCode") == {
+        "playlist": "KovaaKsTestCode"
+    }
+
+
+def test_home_deep_link_clears_the_filter_for_an_unknown_playlist_code(monkeypatch):
+    """The URL's selection is applied as given: no playlist means no filter."""
+    _known_playlist(monkeypatch)
+
+    assert home._home_deep_link(None, "KovaaKsGoneCode") == {"playlist": None}
+
+
+def test_home_deep_link_treats_an_empty_scenario_as_no_scenario(monkeypatch):
+    _known_playlist(monkeypatch)
+
+    assert home._home_deep_link("", "KovaaKsTestCode") == {
+        "playlist": "KovaaKsTestCode",
+        "scenario": None,
+    }
+
+
+def test_apply_deep_link_writes_only_the_controls_the_url_named():
+    assert home.apply_deep_link({}) == (no_update, no_update)
+    assert home.apply_deep_link(None) == (no_update, no_update)
+    assert home.apply_deep_link({"scenario": "Scenario A"}) == (
+        no_update,
+        "Scenario A",
+    )
+    assert home.apply_deep_link({"playlist": None}) == (None, no_update)
+    assert home.apply_deep_link(
+        {"playlist": "KovaaKsTestCode", "scenario": "Scenario A"}
+    ) == ("KovaaKsTestCode", "Scenario A")
+
+
+def test_apply_deep_link_is_a_second_writer_of_the_scenario_value():
+    """It shares the scenario value with the run-event consumer.
+
+    ``initial_duplicate`` rather than ``True``: applying the deep link is the
+    mount's whole job, and Dash refuses an ``allow_duplicate`` output without
+    one of the ``prevent_initial_call`` forms.
+    """
+    registration = _deep_link_registration()
+    playlist_output, scenario_output = registration["output"].strip(".").split("...")
+
+    assert playlist_output == "playlist-dropdown-selection.value"
+    # The suffix Dash appends to an allow_duplicate output. The scenario value
+    # already has a writer in check_for_new_data; the playlist filter does not.
+    assert scenario_output.startswith("scenario-dropdown-selection.value@")
+    # What Dash stores for "initial_duplicate": the mount still runs it.
+    assert registration["prevent_initial_call"] is False
+
+
+def _deep_link_registration() -> dict:
+    """Find apply_deep_link's registration. The store has more than one reader."""
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if any(dep["id"] == home.HOME_DEEP_LINK_STORE_ID for dep in entry["inputs"])
+        and "playlist-dropdown-selection.value" in entry["output"]
+    ]
+    return registration
+
+
+def _output_keys(registration: dict) -> set[str]:
+    """Read a registration's outputs as ``id.prop``, without duplicate hashes."""
+    return {
+        output.split("@")[0]
+        for output in registration["output"].strip(".").split("...")
+    }
+
+
+def test_no_callback_depends_only_on_what_apply_deep_link_conditionally_writes():
+    """Guard the regression that shipped once: a starved single-Input dependent.
+
+    ``apply_deep_link`` returns ``no_update`` for a control the URL did not
+    name, which is every control on an ordinary visit. dash-renderer drops a
+    ready callback when none of its Inputs was written and every one of them
+    is a declared output of a group member that already ran, so a callback
+    whose Inputs are all written by ``apply_deep_link`` never makes its
+    initial call on those visits. ``select_playlist`` was exactly that, and
+    the scenario dropdown kept the full local list while the filter named a
+    playlist. Its second Input is what this test protects.
+    """
+    deep_link = _deep_link_registration()
+    written = _output_keys(deep_link)
+
+    starved = [
+        entry["output"]
+        for entry in GLOBAL_CALLBACK_LIST
+        if entry is not deep_link
+        and entry["inputs"]
+        and {f"{dep['id']}.{dep['property']}" for dep in entry["inputs"]} <= written
+    ]
+
+    assert starved == [], (
+        "these callbacks would not make their initial call on a visit with no "
+        f"query parameters: {starved}"
+    )
 
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
@@ -278,8 +408,10 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     )
     monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
 
-    assert home.select_playlist("Old Playlist Name") == ["All"]
-    assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
+    # The second argument is the deep-link store: a scheduling Input the
+    # callback never reads. See select_playlist.
+    assert home.select_playlist("Old Playlist Name", None) == ["All"]
+    assert home.select_playlist("ValidCode", None) == ["ValidCode Scenario"]
 
 
 def test_page_is_named_scenario_performance_and_keeps_the_root_route():
@@ -589,6 +721,21 @@ def test_format_scenario_rank_with_total_players_but_no_percentile():
     )
 
     assert format_scenario_rank(rank_info) == "11,266 of 18,342"
+
+
+def test_format_scenario_rank_drops_the_parenthetical_over_a_stale_total():
+    """A rank past the cached total still shows both numbers, without a percentile."""
+    rank_info = api_service._with_percentile(
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            leaderboard_id=98330,
+            scenario_name="Some Scenario",
+            rank=900,
+            total_players=500,
+        )
+    )
+
+    assert format_scenario_rank(rank_info) == "900 of 500"
 
 
 def test_format_scenario_rank_without_total_players():
@@ -1107,7 +1254,7 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     monkeypatch.setattr(
         api_service,
         "_with_leaderboard_total",
-        lambda rank_info, _ttl: rank_info,
+        lambda rank_info, _ttl=168, force_refresh=False: rank_info,
     )
 
     rank_text, notifications, _hidden = _RefreshClient().click(scenario_name)
@@ -1123,6 +1270,255 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     assert stored is not None
     assert stored.status == candidate.status
     assert stored.score == candidate.score
+
+
+def _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id):
+    """Cache one resolved, ranked scenario for a Refresh click to act on."""
+    username = "MingoDynasty"
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
+    settings_service.save_settings({"kovaaks_username": username})
+    api_service.make_cache()
+    api_service.save_leaderboard_id(scenario, leaderboard_id, "test")
+    api_service.save_scenario_rank(
+        leaderboard_id,
+        username,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=40,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario,
+            score=110.0,
+        ),
+    )
+    monkeypatch.setattr(
+        api_service,
+        "get_user_scenario_total_play",
+        lambda *_args: None,
+    )
+
+
+def _refreshed_rank(leaderboard_id, rank=25):
+    """Return the board-authoritative result a click's rank fetch would give."""
+    return ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        rank=rank,
+        leaderboard_id=leaderboard_id,
+    )
+
+
+def test_manual_rank_refresh_re_reads_the_total_behind_the_percentile(
+    monkeypatch,
+    tmp_path,
+):
+    """A fresh totals cache does not spare the click its total lookup.
+
+    The denominator is refreshed with the numerator: a live position over a
+    week-old count is two moments presented as one fact, and on a growing
+    board it understates the percentile.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    totals = []
+
+    def fetch_total(_leaderboard_id):
+        totals.append(True)
+        return 1000
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: _refreshed_rank(leaderboard_id),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert totals == [True]
+    # 95.10% is what the cached 500 would have printed.
+    assert _rank_text(display) == "25 of 1,000 (97.55% percentile)"
+    assert notifications[0]["color"] == "green"
+
+
+def test_a_passive_render_still_honors_the_leaderboard_total_ttl(
+    monkeypatch,
+    tmp_path,
+):
+    """Only the click is board-authoritative; bulk and interval paths keep the TTL."""
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_leaderboard_total",
+        lambda *_args: pytest.fail("a passive render must not refetch the total"),
+    )
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: pytest.fail("a passive render must not refetch the rank"),
+    )
+
+    assert _rank_text(_rendered_rank(scenario, True)) == "40 of 500 (92.10% percentile)"
+
+
+def test_a_failed_total_refresh_toasts_orange_and_keeps_the_cached_percentile(
+    monkeypatch,
+    tmp_path,
+):
+    """Orange is partial success: the position committed, the total did not.
+
+    Green would assert a freshness the readout does not have, and the
+    served-stale yellow would claim the position came from cache when it is
+    the one part that did refresh.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    def fetch_total(_leaderboard_id):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: _refreshed_rank(leaderboard_id),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "25 of 500 (95.10% percentile)"
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Position refreshed but total from cache"
+    assert scenario in notifications[0]["message"]
+    # The percentile moved under the user's eyes this click (92.10 to 95.10),
+    # so the copy names the total, which is the part that came from cache.
+    assert "the total shown is from cache" in notifications[0]["message"]
+    assert notifications[0]["id"].startswith(f"rank-refresh-success-{scenario}-")
+
+
+def test_a_failed_total_refresh_with_nothing_cached_toasts_orange_without_a_total(
+    monkeypatch,
+    tmp_path,
+):
+    """No count was ever cached, so the position stands alone and says so."""
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+
+    def fetch_total(_leaderboard_id):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: _refreshed_rank(leaderboard_id),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "25"
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Position refreshed but no total"
+    assert "no total is shown" in notifications[0]["message"]
+
+
+def test_a_failed_total_refresh_on_an_unranked_result_stays_true(
+    monkeypatch,
+    tmp_path,
+):
+    """An unranked readout has no percentile, so the copy must not claim one.
+
+    ``format_scenario_rank`` renders UNRANKED as ``Unranked (N players)``. The
+    total is the only thing the failed re-read touched, and naming it is what
+    keeps one string true for both statuses.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    def fetch_total(_leaderboard_id):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", fetch_total)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNRANKED,
+            leaderboard_id=leaderboard_id,
+        ),
+    )
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "Unranked (500 players)"
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Position refreshed but total from cache"
+    assert "the total shown is from cache" in notifications[0]["message"]
+    assert "percentile" not in notifications[0]["message"]
+
+
+def test_a_served_stale_refresh_names_the_total_it_shows(monkeypatch, tmp_path):
+    """A cached total beside the cached position is named as cached too.
+
+    A failed position request asks for no total, so the total on screen
+    predates the click. Naming only the position would read as though the
+    total had refreshed.
+    """
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    def fetch_rank(*_args):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", fetch_rank)
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    assert _rank_text(display) == "40 of 500 (92.10% percentile) · from cache"
+    assert notifications[0]["color"] == "yellow"
+    assert notifications[0]["title"] == "Refresh failed · data from cache"
+    assert (
+        notifications[0]["message"]
+        == "Couldn't refresh. The position and total shown are from cache."
+    )
+
+
+def test_a_failed_rank_refresh_asks_for_no_total(monkeypatch, tmp_path):
+    """A host that just failed the rank is not asked for the count as well."""
+    scenario = "Reset Scenario"
+    leaderboard_id = 98330
+    _prepare_refresh_scenario(monkeypatch, tmp_path, scenario, leaderboard_id)
+    api_service.save_leaderboard_total(leaderboard_id, 500)
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_leaderboard_total",
+        lambda *_args: pytest.fail("a failed rank fetch must not ask for the total"),
+    )
+
+    def fetch_rank(*_args):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", fetch_rank)
+
+    display, notifications, _hidden = _RefreshClient().click(scenario)
+
+    # The cached position carries the served-stale hint; its count comes from
+    # the TTL-free read in the fallback, not from a second request.
+    assert _rank_text(display) == "40 of 500 (92.10% percentile) · from cache"
+    assert notifications[0]["color"] == "yellow"
 
 
 def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
@@ -1193,7 +1589,8 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
 
     assert _rank_text(rank_display) == "50 · from cache"
     assert [notification["color"] for notification in notifications] == ["yellow"]
-    assert notifications[0]["title"] == "Refresh failed · position from cache"
+    assert notifications[0]["title"] == "Refresh failed · data from cache"
+    # No total on screen, so the message must not claim one.
     assert (
         notifications[0]["message"]
         == "Couldn't refresh. The position shown is from cache."

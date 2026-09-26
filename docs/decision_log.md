@@ -13,6 +13,502 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-22: The README Stops Explaining How The Installer Works
+
+Status: Accepted
+
+A second pass on the README cut the installer details a player does not need
+before installing, such as how releases are verified and how an update
+protects itself. Install now covers only what the player does and sees.
+A reader who wants to check a release before running it follows the manual
+install link, which now carries the digest check in full.
+The README also shows the playlist pages, and its screenshots live in their
+own folder.
+
+**What this reverses.** The
+[front-door entry](#2026-09-22-the-readme-is-a-front-door-and-user-reference-lives-in-a-user-guide)
+kept Install's paragraph on what the installer touches, the
+release-integrity paragraph, Updates, and Uninstall unchanged, "because those
+are what make pasting a one-line installer acceptable". The maintainer
+overrode that the same day: the average reader does not care how releases are
+made. A separate release document was considered and not made, because each
+fact already has a home:
+
+- The installer-touches paragraph (one root under `%LOCALAPPDATA%`, its own uv
+  and Python, no registry, `PATH`, or machine-wide toolchain) lives in
+  `docs/specs/release_and_install.md` and the
+  [installer entry](#2026-07-19-the-installer-brings-its-own-toolchain-app-locally).
+  Its "nothing else is touched" also overstated: the desktop shortcut and
+  `get.ps1`'s `%TEMP%` copy sit outside the root.
+- The release-integrity paragraph: the digest check, `Get-FileHash` included,
+  moved into the user guide's Manual install step, which already listed the
+  digest; immutability and the archive contract live in the release spec and
+  the [immutability](#2026-07-19-releases-and-their-assets-are-immutable) and
+  [archive-contract](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)
+  entries.
+- Updates' promotion-after-a-healthy-start and untouched-`config.toml`-and-`data`
+  sentences live in the release spec and the user guide's Configuration
+  section.
+- Uninstall lost its registry and `PATH` list and the `%TEMP%` script's
+  "inert" clause. The `%TEMP%` `<details>` block stays, because the installer
+  entry says the README documents deleting that file, and Uninstall's
+  closing sentence names that script as the one change outside the folder
+  and the shortcut; an unqualified "nothing else on the machine was
+  modified" would be false while the script remains.
+- Also cut: Run From Source's first-start and `git pull` paragraph, the
+  `product.md` rationale pointer, and the bug section's account of why
+  `debug.log` matters. The bug section asks for no logs at all and leaves that
+  to the bug form, which names the file for each failure and warns that
+  attachments are public; a blanket request for "log files" invites
+  over-sharing, and the issue chooser also leads to the feature-request form,
+  which asks for none. Run From Source stays, per the front-door entry's
+  2026-09-21 ruling.
+
+**Development links `docs/`, not `architecture.md`.** The front-door entry put
+the tech-stack sentence beside the architecture link, "which keeps the
+`docs/architecture.md` archive row true on the README's own account". The
+sentence now points at the `docs/` folder, and with the `product.md` pointer
+also gone, neither file is a target of the README or the user guide. Those two
+shipped entry points are what the contract's documentation rows cover, per the
+[archive-contract entry](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)
+and the two tests that hold their targets in `REQUIRED_ARCHIVE_ENTRIES`, so
+both rows left it. `docs/roadmap.md`, itself a row, still links both, as it
+links `decision_log.md`, a spec, and a proposal that never had rows: targets
+one hop further in are covered by `.gitattributes` keeping `docs/` whole, not
+by rows. Relinking either file from the README or the guide fails that
+entry point's test until the row returns. The AI-assisted-development sentence
+(#278 D1) stays, shorter.
+
+**Screenshots live in `docs/screenshots/`**, named for the view they show:
+`scenario_performance.png` (formerly `docs/example.png`), `playlists.png`,
+and `playlist_scenarios.png`. `.github/` was rejected because `.gitattributes`
+prunes it from the release zip, which would break the shipped README's
+images; `assets/` because Dash serves it at runtime. Each embedded image is
+its own `REQUIRED_ARCHIVE_ENTRIES` row: a `docs/screenshots/` directory row
+would still pass after the embedded file was renamed away. The two playlist
+shots are cropped to the page title, its controls, the column headers, and
+six rows, and stack at full width below Features. Side by side at half width
+was rejected: at GitHub's README width their table text renders about 3 px
+tall.
+
+**Tagline and Run notifications.** The tagline names history as well as live
+runs, because "plotted as you play" read as the app's only use when it also
+serves reviewing past runs. The Run notifications bullet now reads "a toast to
+compare your new run against your personal best": it no longer names the
+top-N verdict or says that a run earning neither gets no toast, the qualifier
+the front-door entry's size paragraph defended. The maintainer chose this
+wording on 2026-09-22, intending every run to notify, which has not fully
+shipped. Under default settings it holds for the latest live run of each poll
+on the Scenario Performance page: that run gets a threshold pass or fail
+against the previous best, a top-N placement when it is the first at its
+sensitivity, or the personal-best celebration. Earlier runs coalesced into the
+same poll stay plot-only, a personal best among them included, and the latest
+run also goes silent when the threshold verdict is switched off or its
+percentage is blank and the run falls outside the top N; the notifications
+spec states those edges.
+
+**Size.** 772 words in 148 lines by the front-door entry's measure, down from
+1,196 at #308's merge.
+
+Provenance: the maintainer's own README edits, reviewed and completed in PR
+#309; no proposal.
+
+## 2026-09-22: The README Is A Front Door, And User Reference Lives In A User Guide
+
+Status: Accepted (amended by
+[2026-09-22](#2026-09-22-the-readme-stops-explaining-how-the-installer-works):
+Install no longer carries the installer-touches or release-integrity
+paragraphs, and Development links `docs/` rather than `architecture.md`)
+
+The README had grown to 3,289 words, most of it reference material that a
+player arriving from a link never reads. It is now a front door: what the app
+does, one line per feature, how to install it, and where to get help.
+The reference sections moved word for word into a user guide that the
+README links.
+The README keeps a short summary of the app's network use, because a reader
+deciding whether to run the installer needs it before they install.
+
+**The rule.** The README is for the reader who arrived from a link and has not
+installed yet, or installed a minute ago. It says what the app does and why,
+shows it, lists features one line each, installs it, and points at help.
+Reference, how-to, and troubleshooting for a reader who already runs the app
+live in `docs/user_guide.md`. A new feature adds at most one line to Features;
+its settings, edge cases, and failure modes go to the guide or the capability
+spec. `AGENTS.md` carries the rule under Documentation Habits, and review
+holds it. A word-count gate in `tests/test_docs.py` was rejected: it would
+fail unrelated PRs on an editorial threshold, and that test gates structure,
+never prose. Collapsing sections into `<details>` in place was rejected too:
+the words stay in every diff, and a collapsed block is invisible to a reader
+searching the page.
+
+**One guide.** Everything that left went to one file written for users.
+Each section kept its heading text, so the anchors other documents link
+(`#configuration`, `#playlists-and-benchmarks`, `#troubleshooting`,
+`#what-it-talks-to`, `#manual-install`) survive under the new file name.
+Sections run by how often a running user needs them: Configuration, Playlists
+and Benchmarks, Troubleshooting, What it talks to, Manual install.
+`docs/architecture.md` was rejected as the home because it is the contributor
+and agent map of the codebase, and a player will not open a file called
+architecture. A `docs/guide/` folder of five files would have cost five
+archive rows and made the `#configuration` reference inside Troubleshooting a
+cross-file link. The GitHub wiki is not versioned with the code, sits outside
+the same-PR documentation rule and the link gate, and does not ship. The guide
+does ship: `REQUIRED_ARCHIVE_ENTRIES` names it, and `tests/test_release_job.py`
+requires every target it links, resolved from `docs/`, as it already did for
+the README's `docs/` links.
+
+**The network disclosure has two surfaces.** The guide's What it talks to
+section is the public disclosure: the table of services, never hostnames, and
+its caveats. The README keeps four sentences under the same heading: no usage
+or crash analytics, data stays on the PC, three things reach the network
+(installing and updating, leaderboard lookups once a username is set, and the
+actions the user clicks), and a link to the guide. The summary names
+categories rather than services, so a new service under an existing category
+cannot make it false; a service-naming short form in the maintainer's launch
+notes went stale the day chart sharing landed. It stays in the README because
+the reader being asked to paste `irm | iex` needs it before installing, not
+after going looking. The cost is a second surface, so a PR that adds an
+outbound service or a new trigger updates the guide's section and checks that
+the README's summary is still true, in the same PR.
+
+**The move is verbatim.** Configuration, Playlists and Benchmarks,
+Troubleshooting, What it talks to, and Manual install with its Rollback block
+were copied, not rewritten. Wording, order, the collapsed `<details>` blocks,
+the network table's services-not-hostnames shape, and the schema-recovery
+entry's order (back up `data` first, the converter script, the hand edit
+last) all carried over. The only edits: the three references to the install
+one-liner, in Manual install, Rollback, and the network table's first row,
+link to the README's Install section, and Manual install's heading is H2
+because the guide has no Install section for it to sit under. Rewording while
+moving was rejected because it would reopen text #278 verified against the
+scripts and make the move unreviewable as a move. Install keeps its
+three-step quick start, the paragraph on what the installer touches, the
+release-integrity paragraph, Updates, and Uninstall, unchanged, because those
+are what make pasting a one-line installer acceptable. Troubleshooting moved
+whole, all eight entries in order, rather than splitting a few inline entries
+from the rest; the README's pointer names both log locations, because it still
+advertises Run From Source, whose logs live in the checkout. Features was
+rewritten in place from ratified prose; its lost per-feature detail is what
+the capability specs already state.
+
+**Run From Source stays in the README, reworded (ruled 2026-09-21).** The
+section is short, sits below where players stop reading, and is where a
+contributor and a user managing their own toolchain both look for the
+commands. Its opening fragment became a sentence, its configuration aside
+went, and its tech-stack sentence moved to Development beside the
+architecture link, which keeps the `docs/architecture.md` archive row true on
+the README's own account. Moving it into the guide as a third install path
+was rejected: it would have saved about 60 README words at the cost of a
+copied sentence, a reversal of #278's unanimous outcome, and one more click
+for a contributor. A standalone `docs/development.md` was rejected as a second
+file and a second archive row for 85 words.
+
+**The size is 1,241 words in 179 lines.** Words are whitespace tokens,
+`awk '{w += NF} END {print w}' README.md`; a locale-less `wc -w` in Git Bash
+skips standalone em dashes and reads low. The proposal set 1,000 to 1,200 as
+an editorial budget, and the result sits about 40 over it once Run From Source
+stayed. The qualifiers that carry it past the band are true and stayed: the
+Run notifications bullet keeps that a run earning neither verdict says
+nothing, because one toast per run is false under ordinary settings, and the
+Benchmarks bullet keeps both steps of enabling a hidden benchmark. Going
+further, to the 450 to 700 words of the shortest exemplars, would have meant
+moving the installer-trust paragraph, Updates, and Uninstall as well.
+
+**Shipping-checklist scope.** Steps 4 and 5 of "Shipping a proposal" in
+`AGENTS.md`, the roadmap milestone and the product inventory, apply when a
+proposal ships an app feature; a docs-only proposal records itself in the
+decision log alone. Earlier docs-only changes relied on that reading without
+writing it down; this change writes it down, and it is why this change adds no
+roadmap or product entry.
+
+Provenance: distilled from `docs/proposals/readme_trim_proposal.md` (proposed
+in PR #303; D6 ruled 2026-09-21, D1 to D5 ratified 2026-09-22), shipped in PR
+#307; the proposal file is deleted in the shipping PR and git history holds
+its full text.
+
+## 2026-09-20: A Rank Above The Known Total Suppresses The Percentile
+
+Status: Accepted
+
+A scenario's position and its leaderboard's player count are fetched and cached
+separately, so a current position can be paired with an older, smaller count
+and the percentile derived from the pair goes negative. The app now withholds
+the percentile whenever the position sits past the count it knows, showing the
+two numbers on their own until the count refreshes, which clicking Refresh on
+that scenario forces. A user sees that scenario's Position lose its percentile,
+and the playlists holding it fall back to the cached-coverage placeholder in
+Median Percentile and Lowest Percentile.
+
+Decision: `_with_percentile` derives nothing when `rank > total_players`. It
+returns the result unchanged — `rank` and `total_players` both survive,
+`percentile` stays `None` — and logs the scenario, leaderboard id, rank and
+total at WARNING so the staleness is diagnosable from `data/logs/debug.log`.
+That warning is emitted once per leaderboard per rank/total pair, because the
+cache-only read path re-derives the percentile on every polling tick and the
+playlists overview re-derives it per played scenario: one line in the log
+means one condition, not one occurrence.
+The guard is strictly `>`: `rank == total_players` is a real last place on the
+board and keeps its
+[midpoint value](#2026-04-27-use-the-midpoint-percentile-formula).
+
+Why: rank comes from `/leaderboard/scores/global` with `usernameSearch`, whose
+`total` counts search matches rather than the board, so the population is a
+second unfiltered request cached under `leaderboard_total_cache_ttl_hours`
+([one week by default](#2026-04-29-cache-leaderboard-totals-for-one-week)).
+Boards are expected to grow, so a cached total is normally a lower bound on the
+live one, and `((total - rank + 0.5) / total) * 100` crosses zero as soon as
+the rank passes it: a board cached at 500 that grew to 1,200 renders a 900th
+placement as `900 of 500 (-79.90% percentile)`. Every path whose rank and total
+ages are independent can reach it — the percentile warmup worker, the playlist
+scenarios fill, the overview's cache-only reads, a TTL-expired foreground
+lookup, the stale-rank fallback, and a clicked Refresh whose total re-read
+failed and fell back to the cached count
+([2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+
+Consequences: a suppressed percentile leaves that scenario unresolved for the
+playlists overview, so the whole playlist shows the
+`{resolved}/{played} cached` placeholder in both percentile columns instead of
+a median it cannot support. That is the honest readout — the aggregate
+genuinely is not known — but it is visible, and it lasts until the total
+refreshes. The placeholder's tooltip suggests opening the playlist, which
+doesn't clear it while the total is TTL-fresh, because the playlist's fill
+honors that TTL. A clicked Refresh on that scenario does, since it re-reads the
+total
+([2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total));
+otherwise the row waits out `leaderboard_total_cache_ttl_hours`, a week by
+default. The suppression also breaks two properties
+[2026-07-16](#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)
+stated for that placeholder, whose display rule it called weaker than the
+warmup worker's freshness test and monotonic: a scenario the worker counts as
+fresh can still hold a row on the placeholder, and a row that was showing
+aggregates can return to it.
+
+Rejected: clamping to `0.0`, or to the value at `rank == total`. Either
+invents a number from data already known to be inconsistent, and the invented
+floor still feeds the median as though it had been measured. Also rejected:
+dropping the total along with the percentile, which discards a count the app
+legitimately has and contradicts the principle that a degraded read
+[shows no less than the app already knows](#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank).
+
+Not done: refreshing the total when the guard trips. A rank above the total is
+good evidence the total is stale. The self-heal would not live in
+`_with_percentile`, which stays a pure derivation, but in the network-allowed
+enrichment path: `_with_leaderboard_total` bypassing the TTL once when the
+cached total sits below the rank, plus `_freshly_satisfied` learning the same
+condition so the warmup worker stops skipping the scenario as satisfied. It
+covers only a board that grew. If a board ever loses rows, the stale side is
+the rank, and a total re-read heals nothing. Suppression is the right floor
+either way, which is why the self-heal is a separable follow-up rather than
+part of this guard.
+
+## 2026-09-19: A Query Parameter Selects A Control, It Does Not Suspend Its Memory
+
+Status: Accepted
+
+Clicking a scenario in a playlist now counts as choosing it. Before, arriving
+at Scenario Performance from a playlist link put the page into a mode where
+nothing the user picked was remembered, so going back to the page snapped both
+dropdowns to a selection that could be weeks old. The page now remembers a
+selection however it was made, and the navbar link returns to the latest one.
+
+**The bug.** `layout()` derived `persistence=playlist_code is None` and
+`persistence=scenario is None` for the two dropdowns, so a
+`/?playlist_code=…&scenario=…` arrival rendered both with `persistence=False`.
+Dash's `recordUiEdit` returns early on a falsy `persistence`, so every
+selection made during that visit went unrecorded; `persistenceMods` skips the
+component for the same reason, so the value stored *before* the visit was not
+cleared either. Returning to `/` re-enabled persistence against a layout
+`value` of `None`, which matched the stored original, and the pre-visit value
+was restored. Confirmed against the shipped `dash_renderer` and reproduced in
+a browser: with no deep-linked visit the selection survives a Home click; with
+one, both dropdowns revert, through the navbar link and the header title
+alike.
+
+**The invariant this establishes.** *A browser-persisted control's layout
+default never varies per visit; a per-visit initial value arrives by
+callback.* Dash pins a persisted edit to the layout value it was made against
+and discards the edit when a later visit renders a different one, so a default
+that varies per visit retires persistence for that control instead of
+overriding it. This is the per-visit twin of the keyed-by-id rule in
+[2026-08-09](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph),
+and it binds any future `?param=` preselect on any page.
+
+**Its corollary, learned the hard way in review.** *A callback that writes a
+control only on some visits starves that control's single-Input dependents on
+the others.* The renderer drops a ready callback when none of its Inputs was
+written and every one of them is a declared output of a group member that
+already ran. `select_playlist`'s only Input was the playlist value, which
+`apply_deep_link` now declares and returns `no_update` for on every visit
+without `?playlist_code=` — so it stopped making its initial call, and the
+scenario dropdown kept the layout's full local list while the filter named a
+playlist. The fix is a second Input that nothing writes, which makes the
+prune's "every Input covered" test fail; `select_playlist` carries the
+`home-deep-link` store for that reason and no other. A structural test in
+`tests/test_home_rank_format.py` fails if any callback's Input set is ever
+again a subset of what `apply_deep_link` conditionally writes.
+
+**The mechanism.** Both dropdowns carry `persistence=True` and an explicit
+`value=None` on every visit. `layout()` resolves the query parameters into a
+layout-bound `dcc.Store` (`home-deep-link`), and one callback,
+`apply_deep_link`, writes them to the two dropdowns. Callback-written values
+*are* persisted — the response path reaches `recordUiEdit` — so the deep link
+becomes an ordinary remembered selection. Details that are load-bearing:
+
+- **`value=None` is explicit, not omitted.** An omitted prop is `undefined`
+  rather than `null`, which would not match the original already stored in
+  every existing browser and would discard those values on upgrade.
+- **A layout-bound store, not the URL.** Dash Pages rebuilds the page on a
+  route change and the store then triggers exactly one write, keeping the deep
+  link out of the router's callback graph — the same reason
+  [2026-04-29](#2026-04-29-drive-playlist-table-loads-from-mounted-route-state)
+  drives the playlist scenario table from mounted route state.
+- **`allow_duplicate` plus `prevent_initial_call="initial_duplicate"`.**
+  `check_for_new_data` already writes the scenario value, and applying the
+  deep link is the mount's whole job. Folding it into `check_for_new_data` was
+  rejected: that callback's `prevent_initial_call=True` stops a remount
+  replaying the retained run-event batch.
+- **Presence, not just value.** The store records a key only for a parameter
+  the URL carried, and the callback returns `no_update` for the rest, so
+  `?scenario=` alone leaves the playlist filter on the restored value. An
+  unknown playlist code is recorded with no value and clears the filter, which
+  is what applying the URL's selection as given means.
+
+**The URL is not rewritten after the deep link is consumed**, so a reload
+re-applies it over a later choice. `_pages_location.search` is a router
+`Input`; rewriting it would remount the page. The behavior matches a URL with
+parameters read as a bookmark, and the navbar link is the way back.
+
+**Accepted cost.** Persistence restores the previous selection before the
+callback's value lands, so a deep-linked visit shows the old playlist name for
+one round trip. What the renderer holds during that round trip is asymmetric,
+and only the playlist half is held: `getReadyCallbacks` waits on a pending
+output only when an Input's `id.prop` equals the output's key, and an
+`allow_duplicate` output's key carries an `@<hash>` suffix that this
+comparison does not strip (though `cleanOutputProp` strips it when results are
+applied). So the playlist value's dependents wait, and the scenario value's do
+not: on a deep-linked visit `generate_graph` and `get_scenario_num_runs` each
+run twice, once for the restored scenario and again for the deep-linked one.
+A stale run's outputs are not discarded — they land. The stale
+`generate_graph` response finishes before the second request is issued and
+is applied, so the `cached-plot` store holds the stale plot for tens of
+milliseconds. The user still does not see it, because the hold this paragraph
+describes works one hop downstream: `cached-plot.data` is a plain output, so
+`apply_graph_appearance` waits behind the pending second `generate_graph` and
+draws once, from the deep-linked plot. That rests on `apply_deep_link`'s
+response landing alongside the stale plot's, which it did in every measured
+load and which nothing guarantees; "never drew the stale plot when measured"
+is the honest claim, not "cannot". The cost is server-side: one plot build
+that is never drawn and one stats read per deep-linked visit.
+`get_scenario_rank` also runs twice, and its stale run is an ordinary mount
+run: it arrives with real triggers (three `changedPropIds`), so it is
+network-allowed and toast-allowed, and its lookup is TTL-governed — a cache
+read while that scenario's rank cache is fresh, which is the usual case
+because the scenario was the selection a moment ago and the TTL is a week,
+and a KovaaK's lookup when the cache is cold or expired. The falsy list Dash
+substitutes for an *untriggered* call — one item whose `prop_id` is `"."`,
+so `ctx.triggered` is never `[]` inside a callback — is what keeps such a
+call quiet without refusing it the network, since `_rank_allows_network`
+refuses only when the interval is the sole trigger. It does not apply to this
+run, which is triggered. A clientside callback would shrink the transient to a
+frame at the cost of moving the resolution out of Python; it stays available
+if the transient ever proves visible.
+
+**Rejected.** Keeping `persistence=False` for the visit and clearing the
+stored keys from the browser: it depends on dash-renderer's private key format
+and still discards the visit's selections. Keeping the query value as the
+layout `value` with persistence on: the pinned original then becomes the query
+value, so the next Home visit discards the entry and both dropdowns come up
+empty — the same loss, reached differently. Making `apply_deep_link` the plain
+writer of the scenario value and moving `allow_duplicate` onto
+`check_for_new_data`, which would make the hold symmetric and the double run
+go away: it puts the mount-fire hazard on the one callback whose contract is
+that a mount must not replay the retained run-event batch, which is worth more
+than one never-drawn plot build per deep-linked visit. No prior entry governed
+the original behavior, so nothing is superseded.
+
+## 2026-09-19: A Clicked Refresh Re-Reads The Leaderboard Total
+
+Status: Accepted (amended by
+[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile):
+the `rank > total` guard it deferred has landed)
+
+The Refresh button beside the Position field used to fetch a live position and
+divide it by a player count that could be a week old, so the percentile it
+showed was two numbers from different moments. Clicking Refresh now re-reads
+the count as well and recomputes the percentile from both. When the position
+refreshes but the count cannot be reached, the app keeps the last count it has
+and says so in an orange notification instead of confirming a clean refresh.
+Automatic lookups that still go to the network reuse a cached count for a
+week, and when their own fetch fails they now fall back to the last count they
+have instead of showing none.
+
+**What `force_refresh` means now.** It marks the whole readout
+board-authoritative, not just the rank: `get_scenario_rank_info` passes it
+through to `_with_leaderboard_total`, which bypasses
+`leaderboard_total_cache_ttl_hours` for that call. The flag already bypassed
+the rank cache and already permitted a regressing write
+([2026-07-01](#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes));
+the denominator was the part it did not cover. The PB-triggered freshness chain
+had been forcing the total since 59b2d1d by passing a zero TTL, never recorded
+as a decision — an unlogged precedent that this entry adopts and states, and
+that call now names the flag instead of the zero.
+
+**Why the one-week TTL still stands elsewhere.**
+[2026-04-29](#2026-04-29-cache-leaderboard-totals-for-one-week) priced the
+trade against bursty cold-cache total fetches across every playlist scenario,
+and named "a targeted refresh flow" as the remedy if stale totals ever
+misled. The Refresh button is that flow: one leaderboard, one extra
+unfiltered GET, at a moment the user asked for truth. Every other automatic
+path that fetches — the warmup worker, the network phase of the playlist
+scenarios fill, a foreground lookup whose rank cache expired — keeps the TTL,
+so the knob still governs what it was bought for. A cache-only reader never
+had a TTL to keep: the playlists overview, the Home interval tick and the
+fill's first paint all pass `allow_network=False`, which serves the rank and
+total caches regardless of age so those surfaces can render without touching
+the network. A percentile needs an unfiltered count the rank call cannot
+supply: with `usernameSearch` the response's `total` is the number of search
+matches, not the board population.
+
+**The failed-total fallback is not gated on the flag.** A total fetch that
+fails now substitutes the last cached count whatever its age and marks the
+result `total_refresh_failed`, for every caller rather than only a clicked
+one. One rule, because the cache-only interval path and `_stale_rank_fallback`
+already read the total TTL-free, so gating it would have left three callers
+disagreeing about the same cache. The consequence for automatic renders: one
+whose own total fetch fails now shows the last cached count at any age where
+it used to show none. On Home that is the count the next interval tick would
+have supplied a second later anyway; in the playlist scenarios fill it is the
+one the first paint had already shown. It also supersedes the Consequences line of
+[2026-04-27](#2026-04-27-make-leaderboard-total-enrichment-best-effort), which
+described returning the original `ScenarioRankInfo` untouched.
+
+**Orange when the position lands and the count does not.** A clicked refresh
+whose total fetch failed answers orange — the partial-success rung
+([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)),
+**extended here** from "a follow-up write did not" to any follow-up step, since
+what failed is a read. `docs/specs/notifications.md` carries the widened
+sentence.
+Green would assert a freshness the readout does not have, and the served-stale
+yellow would claim the position came from cache when the position is the one
+part that did refresh. It shares the per-scenario success channel, so the
+green a re-click earns replaces it rather than stacking under a contradicting
+verdict. Rejected: dropping the count entirely, which shows less than the app
+knows and contradicts
+[2026-07-12](#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank);
+a silent green over the cached count, which is the smallest diff but leaves
+the button's promise unverifiable; a new inline hint, since the affordance is
+already beside the value and the same host is failing seconds apart. No total
+request is made at all when the rank fetch itself failed.
+
+**Not fixed here.** `_with_percentile` guarded `total_players <= 0` but not
+`rank > total`, so an automatic path, or a click whose total re-read failed
+and fell back to the cached count, could still print a negative percentile
+from a fresh rank over an older smaller count. The guard shipped separately in
+[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile),
+and that pairing now withholds the percentile instead. The click's orange
+verdict is unchanged by it: the verdict keys on the failed re-read, not on the
+percentile.
+
 ## 2026-09-15: Setup Hints Wear The Notice Anatomy
 
 Status: Accepted
@@ -472,8 +968,8 @@ because the new plotly.js turns that button on by default. The button stays
 rather than being hidden. Sharing happens only when a user presses it,
 confirms a dialog that names Plotly Cloud, and is signed in there, so it is
 an export the user chooses and not data the app sends on its own. Users see it
-beside the existing PNG download, and the README lists Plotly Cloud among the
-services the app can reach.
+beside the existing PNG download, and the user guide lists Plotly Cloud among
+the services the app can reach.
 
 **What changed.** plotly 7.0.0 bundles plotly.js 4.0.0, and Dash serves
 plotly.js from the plotly package (`package_data/plotly.min.js`), so the
@@ -511,8 +1007,8 @@ its destination, and completes in a Plotly Cloud tab the user can see, which
 makes it an export in the same class as saving the PNG. That is what
 separates it from crash telemetry, which the
 [2026-08-10 bug-reports entry](#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)
-rejects as privacy-hostile for a local tool. The README's outside-services
-table carries a Plotly row as the disclosure.
+rejects as privacy-hostile for a local tool. The user guide's
+outside-services table carries a Plotly row as the disclosure.
 
 **Rejected alternative.** `config={"showSendToCloud": False}` on both graphs,
 holding the plotly.js 3 default. PR #283 shipped that hold first and backed it
@@ -523,7 +1019,8 @@ updating the README.
 **Reversing it.** Pass `config={"showSendToCloud": False}` to every
 `dcc.Graph`, including any added later (a layout test that walks all graphs,
 rather than naming ids, is the guard that holds), and remove the Plotly row
-from the README. **Revisit trigger:** plotly.js changing the flow so data
+from the user guide's What it talks to table and "sharing a chart" from the
+README's summary. **Revisit trigger:** plotly.js changing the flow so data
 leaves before the dialog or without the Plotly Cloud tab, or changing the
 default `plotlyServerURL`; or a user report of the button being mistaken for
 a local save.
@@ -1503,7 +2000,9 @@ as the flood backstop.
 
 ## 2026-08-30: One Severity Color Language For Inline Notices
 
-Status: Accepted
+Status: Accepted (the orange rung widened by
+[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total) from
+a failed follow-up write to any failed follow-up step)
 
 The app's inline notices each picked their own look, so the surfaces that most
 needed attention were the faintest things on the page. They now speak the same
@@ -3371,6 +3870,16 @@ them — and is left open in [tech_debt.md](./tech_debt.md). *(Superseded in
 part, for copy, 2026-09-14: the served-stale toast now has that title of its
 own, "Refresh failed · position from cache", while the red hard failure keeps
 "Position refresh failed"; the color question stays open. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).)*
+*(Superseded again, for copy, 2026-09-22: the served-stale title is now
+"Refresh failed · data from cache", chosen by the maintainer over "Refresh
+failed · from cache", and when the cached readout includes a total its
+message reads "Couldn't refresh. The position and total shown are from
+cache." A failed position request asks for no total, so that total predates
+the click too, and once a partial refresh began reporting the total on its
+own, naming only the position read as though the total had refreshed. With no
+total on screen the message still names only the position, and the red hard
+failure keeps its message because it never sees what the field shows. See
+[scenario_rank.md](specs/scenario_rank.md#failure-handling).)*
 
 **Deliberately left open: do background rank events deserve a real toast?**
 "Your rank updated after that PB" and "Position update timed out" are
@@ -4719,7 +5228,12 @@ whichever source resolved it, never the pasted input.
 Status: Superseded in part by the
 [2026-08-03 quiet-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy):
 the fatal-state toast for an unknown username was removed in PR #196; the
-overview's status line and a WARNING log carry it. Everything else stands.
+overview's status line and a WARNING log carry it. Amended by
+[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile):
+the display rule is no longer weaker and monotonic, because a RANKED scenario
+whose rank sits above its cached total is worker-fresh yet display-unresolved,
+and a resolved row returns to the placeholder when a rewritten rank lands above
+the cached total. Everything else stands.
 
 Decision: After startup finishes ingesting local runs, one app-lifetime daemon
 worker warms the rank and leaderboard-total caches used by the Playlists
@@ -5175,7 +5689,10 @@ Consequences: The warning is transient and derived from current config each time
 
 ## 2026-04-27: Make Leaderboard Total Enrichment Best-Effort
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): a
+failed total lookup now falls back to the last cached count for every caller
+rather than returning the result untouched)
 
 Decision: Leaderboard total lookup should never invalidate a valid rank or unranked result.
 
@@ -5185,7 +5702,10 @@ Consequences: `_with_leaderboard_total()` catches expected total-enrichment fail
 
 ## 2026-04-29: Cache Leaderboard Totals For One Week
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): the
+TTL governs automatic paths only, and both board-authoritative callers — a
+user-clicked Refresh and the PB-triggered freshness chain — bypass it)
 
 Decision: `leaderboard_total_cache_ttl_hours` defaults to `168`, matching `scenario_rank_cache_ttl_hours`.
 

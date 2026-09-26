@@ -19,7 +19,7 @@ fact that no decision-log entry governs. Runtime structure, including the two
 filesystem roots and the in-memory stores, is mapped in
 [architecture.md](../architecture.md#state); the user-facing rationale is in
 [product.md](../product.md#getting-data-in); the user's view of both files is
-the README's [Configuration](../../README.md#configuration) section; the
+the user guide's [Configuration](../user_guide.md#configuration) section; the
 endpoint that identity detection calls is documented in
 [kovaaks_api_notes.md](../kovaaks_api_notes.md#userprofileby-username). How
 the installer and launcher set the state root and write the first-run

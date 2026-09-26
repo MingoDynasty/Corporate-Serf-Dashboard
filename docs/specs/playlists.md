@@ -16,8 +16,9 @@ sentence after the link, or with no link, is an implementation fact that no
 decision-log entry governs. Structure is mapped in
 [architecture.md](../architecture.md), endpoint quirks in
 [kovaaks_api_notes.md](../kovaaks_api_notes.md), the user-facing picture in
-the README's [Playlists and Benchmarks](../../README.md#playlists-and-benchmarks)
-section and [product.md](../product.md). Leaderboard placement is worded
+the user guide's
+[Playlists and Benchmarks](../user_guide.md#playlists-and-benchmarks) section
+and [product.md](../product.md). Leaderboard placement is worded
 "Position"
 ([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 
@@ -89,6 +90,17 @@ section and [product.md](../product.md). Leaderboard placement is worded
   The placeholder is dimmed with the tooltip "Shown once all N played
   scenarios have data. Open the playlist to fetch it now."; a Lowest value
   shows "Lowest: {scenario}" on hover.
+- A RANKED scenario whose rank sits above its cached leaderboard total has no
+  percentile, so it counts unresolved even with both caches fresh. The
+  placeholder can therefore hold with the warmup worker idle, and can return
+  to a row that was showing aggregates when a rewritten rank lands above the
+  cached total. Opening the playlist doesn't clear it, because the fill
+  honors the total's TTL. A clicked Refresh on that scenario re-reads the
+  total and does; otherwise it lasts until
+  `leaderboard_total_cache_ttl_hours` lapses, a week by default
+  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)
+  as amended by
+  [2026-09-20](../decision_log.md#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile)).
 - The warmup status line has three renderings: "Updating percentile data: N
   remaining", the same with " (~{duration})" once a pace sample exists
   (smallest form "<1 min"), and "Updating percentile data: N remaining ·
