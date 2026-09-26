@@ -102,9 +102,10 @@ of scope here, apart from its chart toolbar, noted under The graph.
   placement, and for first-sensitivity detection
   ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
 - Point hover shows the run's timestamp with seconds kept — the one surface
-  that keeps them, cross-referencing KovaaK's second-stamped CSV filenames —
-  plus score, the x value, and accuracy
+  that keeps them, cross-referencing KovaaK's second-stamped CSV filenames
   ([2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
+  Then come the score, the x value, the run's sensitivity-and-scale string
+  in Score vs Time (where the x value is the day), and the accuracy.
 - Three overlay families, all dashed labelled lines. "PB score ({value})"
   and "Score threshold ({value})" draw at the current post-run personal best
   and at the
