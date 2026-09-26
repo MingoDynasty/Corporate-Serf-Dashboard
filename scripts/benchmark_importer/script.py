@@ -47,6 +47,7 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 EVXL_BENCHMARKS_JSON_FILE = REPO_ROOT / "resources" / "evxl" / "benchmarks.json"
+BUNDLED_DIR = REPO_ROOT / "resources" / "benchmarks"
 GENERATED_DIR = SCRIPT_DIR / "generated"
 MANIFEST_FILE = GENERATED_DIR / "manifest.json"
 FAILURES_FILE = GENERATED_DIR / "failures.json"
@@ -101,6 +102,23 @@ class RunSummary:
         # Known-bad skips are informational: the failure was already reported by
         # the run that recorded it.
         return int(bool(self.failed or self.conflicts))
+
+
+@dataclass
+class CheckSummary:
+    identical: list[str] = field(default_factory=list)
+    drifted: dict[str, list[str]] = field(default_factory=dict)
+    failed: dict[str, str] = field(default_factory=dict)
+    not_checked: list[str] = field(default_factory=list)
+    # Bundled filename per key. A file with no usable sharecode is keyed by
+    # its filename, and an unbundled --only code has no entry.
+    filenames: dict[str, str] = field(default_factory=dict)
+
+    @property
+    def exit_code(self) -> int:
+        # Zero only when every visited file was rebuilt and matched, so a run
+        # the breaker cut short never reads as clean.
+        return int(bool(self.drifted or self.failed or self.not_checked))
 
 
 def _ordered_rank_colors(item: EvxlDatabaseItem) -> list[tuple[str, str]]:
@@ -872,6 +890,215 @@ def log_summary(summary: RunSummary) -> None:
             )
 
 
+def _quoted(names: Sequence[str]) -> str:
+    # Scenario names can contain commas, so a bare comma join is ambiguous.
+    return ", ".join(repr(name) for name in names)
+
+
+def describe_drift(shipped: PlaylistData, rebuilt: PlaylistData) -> list[str]:
+    """Explain how a rebuilt playlist differs from the shipped one.
+
+    Explanation only, never the drift test: scenarios are matched by name, so
+    a repeated name, or a field this does not compare, can leave two different
+    models with nothing to say. Lines come in a fixed order and only for the
+    differences present.
+    """
+    lines: list[str] = []
+    if rebuilt.name != shipped.name:
+        lines.append(f"name changed: {shipped.name!r} -> {rebuilt.name!r}")
+    if rebuilt.code != shipped.code:
+        lines.append(f"code changed: {shipped.code!r} -> {rebuilt.code!r}")
+
+    shipped_scenarios = {scenario.name: scenario for scenario in shipped.scenarios}
+    rebuilt_scenarios = {scenario.name: scenario for scenario in rebuilt.scenarios}
+    added = [name for name in rebuilt_scenarios if name not in shipped_scenarios]
+    removed = [name for name in shipped_scenarios if name not in rebuilt_scenarios]
+    if added:
+        lines.append(f"scenarios added: {_quoted(added)}")
+    if removed:
+        lines.append(f"scenarios removed: {_quoted(removed)}")
+    kept = [name for name in shipped_scenarios if name in rebuilt_scenarios]
+    if kept != [name for name in rebuilt_scenarios if name in shipped_scenarios]:
+        lines.append("scenario order changed")
+
+    changed: dict[str, list[str]] = {
+        "thresholds": [],
+        "leaderboard IDs": [],
+        "rank ladder": [],
+    }
+    for name in kept:
+        before = shipped_scenarios[name]
+        after = rebuilt_scenarios[name]
+        before_ranks = before.ranks or []
+        after_ranks = after.ranks or []
+        if [rank.threshold for rank in before_ranks] != [
+            rank.threshold for rank in after_ranks
+        ]:
+            changed["thresholds"].append(name)
+        if before.leaderboard_id != after.leaderboard_id:
+            changed["leaderboard IDs"].append(name)
+        if [(rank.name, rank.color) for rank in before_ranks] != [
+            (rank.name, rank.color) for rank in after_ranks
+        ]:
+            changed["rank ladder"].append(name)
+    for label, names in changed.items():
+        if names:
+            lines.append(
+                f"{label} changed in {len(names)} of {len(kept)} scenarios: "
+                f"{_quoted(names)}"
+            )
+    return lines
+
+
+def _bundled_sharecode(payload: Any) -> str | None:
+    generated_from = (
+        payload.get("generated_from") if isinstance(payload, dict) else None
+    )
+    if not isinstance(generated_from, dict):
+        return None
+    sharecode = generated_from.get("sharecode")
+    return sharecode if isinstance(sharecode, str) and sharecode else None
+
+
+def run_check(
+    database: dict[str, EvxlDatabaseItem],
+    conflicts: dict[str, list[DuplicateClaimant]],
+    *,
+    only: Sequence[str] | None = None,
+    max_consecutive_failures: int = 3,
+    bundled_dir: Path = BUNDLED_DIR,
+) -> CheckSummary:
+    """Rebuild each bundled benchmark live and compare it with the shipped file.
+
+    Files are keyed by their ``generated_from.sharecode``, never by ``code`` or
+    filename, which can differ from it in casing. Nothing under ``generated/``
+    is read or written; the only write is the KovaaK's benchmark cache that
+    every live fetch refreshes. A file that cannot be rebuilt lands in
+    ``failed`` whatever the cause, because a bundled file that no longer builds
+    is stale either way.
+    """
+    summary = CheckSummary()
+    requested = set(only or ())
+    visits: list[tuple[str, Any, str | None]] = []
+    for path in sorted(bundled_dir.glob("*.json"), key=lambda path: path.name):
+        payload: Any = None
+        problem: str | None = None
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            problem = f"not readable as JSON: {exc}"
+        sharecode = _bundled_sharecode(payload)
+        if requested and sharecode not in requested:
+            continue
+        if problem is None and sharecode is None:
+            problem = "no generated_from.sharecode"
+        key = sharecode or path.name
+        if key in summary.filenames:
+            # Keying by sharecode would otherwise drop one of the two results.
+            problem = f"sharecode {key} is also stamped on {summary.filenames[key]}"
+            key = path.name
+        summary.filenames[key] = path.name
+        visits.append((key, payload, problem))
+
+    for sharecode in sorted(requested - summary.filenames.keys()):
+        logger.error("Requested sharecode is not bundled: %s", sharecode)
+        summary.failed[sharecode] = "no bundled file carries this sharecode"
+
+    consecutive_failures = 0
+    made_network_request = False
+    for index, (key, payload, problem) in enumerate(visits, start=1):
+        if problem is None and key in conflicts:
+            problem = "sharecode is a conflicting duplicate in the Evxl snapshot"
+        elif problem is None and key not in database:
+            problem = "sharecode is not in the Evxl snapshot"
+        if problem is None:
+            try:
+                shipped = PlaylistData.model_validate(payload)
+            except ValidationError as exc:
+                problem = f"not a valid playlist: {exc}"
+        if problem is not None:
+            logger.error("Cannot check %s: %s", key, problem)
+            summary.failed[key] = problem
+            continue
+
+        if made_network_request:
+            time.sleep(POLITENESS_DELAY_SECONDS)
+        logger.info("Checking (%d/%d) for sharecode: %s", index, len(visits), key)
+        made_network_request = True
+        try:
+            # Bypass the benchmark cache: it can hold the very payload the
+            # bundled file was built from, and a rebuild from that matches the
+            # file by construction.
+            rebuilt = build_playlist(key, database[key], use_cache=False)
+        except (
+            requests.RequestException,
+            ValidationError,
+            BenchmarkDataMismatchError,
+        ) as exc:
+            deterministic = _is_deterministic_failure(exc)
+            kind = "deterministic" if deterministic else "transient"
+            logger.error("Failed to rebuild %s (%s): %s", key, kind, exc)
+            summary.failed[key] = f"{kind} failure: {exc}"
+            if deterministic:
+                continue
+            consecutive_failures += 1
+            if consecutive_failures >= max_consecutive_failures:
+                logger.error(
+                    "Aborting after %d consecutive transient failures",
+                    consecutive_failures,
+                )
+                summary.not_checked = [remaining for remaining, *_ in visits[index:]]
+                break
+            continue
+
+        consecutive_failures = 0
+        # Whole-model equality, not a field-by-field diff: a diff silently
+        # passes any field added to the models later, and scenarios matched by
+        # name collapse when a name repeats.
+        if rebuilt == shipped:
+            logger.info("Identical: %s", key)
+            summary.identical.append(key)
+        else:
+            logger.warning("Drifted: %s", key)
+            summary.drifted[key] = describe_drift(shipped, rebuilt) or [
+                "differs in a field this description does not cover"
+            ]
+
+    return summary
+
+
+def _check_label(summary: CheckSummary, key: str) -> str:
+    filename = summary.filenames.get(key, key)
+    return key if filename == key else f"{key} ({filename})"
+
+
+def log_check_summary(summary: CheckSummary) -> None:
+    """Log the check's result buckets and, when files drifted, a paste line."""
+    logger.info(
+        "Check summary: identical=%d, drifted=%d, failed=%d, not_checked=%d",
+        len(summary.identical),
+        len(summary.drifted),
+        len(summary.failed),
+        len(summary.not_checked),
+    )
+    for sharecode, lines in summary.drifted.items():
+        logger.warning("Drifted: %s", _check_label(summary, sharecode))
+        for line in lines:
+            logger.warning("  %s", line)
+    for key, reason in summary.failed.items():
+        logger.error("Failed: %s: %s", _check_label(summary, key), reason)
+    logger.info("Not checked: %s", summary.not_checked or "none")
+    if summary.drifted:
+        # Failures and unchecked files stay off this line: regenerating
+        # cannot fix a file that does not build or was never compared.
+        only_flags = " ".join(f"--only {sharecode}" for sharecode in summary.drifted)
+        logger.info("Regenerate the drifted files with:")
+        logger.info(
+            "uv run python scripts/benchmark_importer/script.py --offline --force %s",
+            only_flags,
+        )
+
+
 def _positive_int(value: str) -> int:
     parsed = int(value)
     if parsed <= 0:
@@ -916,12 +1143,36 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="accept a live Evxl snapshot that removes sharecodes",
     )
-    return parser.parse_args(argv)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help=(
+            "rebuild every bundled benchmark from live KovaaK's data and report "
+            "drift, writing nothing but the benchmark cache; compares against "
+            "the committed Evxl snapshot, so it implies --offline"
+        ),
+    )
+    args = parser.parse_args(argv)
+    if args.check and args.force:
+        parser.error("--check cannot be combined with --force: the check never writes")
+    if args.check and args.limit is not None:
+        parser.error(
+            "--check cannot be combined with --limit: a partial check would read "
+            "as clean"
+        )
+    if args.check and args.accept_removals:
+        parser.error(
+            "--check cannot be combined with --accept-removals: the check never "
+            "refreshes the Evxl snapshot"
+        )
+    return args
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
-    if args.offline:
+    if args.check:
+        logger.info("Check mode: using the committed Evxl snapshot")
+    elif args.offline:
         logger.info("Offline mode: using the local Evxl snapshot")
     else:
         refresh_evxl_snapshot(accept_removals=args.accept_removals)
@@ -931,6 +1182,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         len(database),
         len(conflicts),
     )
+    if args.check:
+        check_summary = run_check(
+            database,
+            conflicts,
+            only=args.only,
+            max_consecutive_failures=args.max_consecutive_failures,
+        )
+        log_check_summary(check_summary)
+        return check_summary.exit_code
     summary = run_importer(
         database,
         conflicts,
