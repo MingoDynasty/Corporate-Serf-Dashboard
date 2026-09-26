@@ -178,6 +178,10 @@ class _AxisDescriptor(Generic[_K]):
     :param scatter_x: per-run x value from the ``(dict key, run)`` pair.
     :param line_x: per-group x value from the dict key.
     :param hover_x_label: hovertemplate fragment for the x value.
+    :param hover_point_extra: hovertemplate lines, each ending in ``<br>``,
+        added to the run points only, after the x value. It may read
+        ``customdata``; ``hover_x_label`` must not, because the Average score
+        line shares it and carries no ``customdata``.
     """
 
     axis_title: str
@@ -185,6 +189,7 @@ class _AxisDescriptor(Generic[_K]):
     scatter_x: Callable[[_K, RunData], float | str | date]
     line_x: Callable[[_K], float | str | date]
     hover_x_label: str
+    hover_point_extra: str
 
 
 def _generate_xy_plot(  # noqa: PLR0913
@@ -221,6 +226,8 @@ def _generate_xy_plot(  # noqa: PLR0913
         axis_title: [],
         "Datetime": [],
         "Accuracy": [],
+        # Not "Sensitivity": that is the x column's key in Score vs Sensitivity.
+        "Run sensitivity": [],
     }
     line_plot_data: dict[str, list[float | str | date]] = {
         "Score": [],
@@ -238,6 +245,9 @@ def _generate_xy_plot(  # noqa: PLR0913
                 ),
             )
             scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
+            scatter_plot_data["Run sensitivity"].append(
+                f"{run_data.horizontal_sens} {run_data.sens_scale}"
+            )
         line_plot_data[axis_title].append(axis.line_x(key))
         line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
     # If we want to generate a trendline (e.g. lowess)
@@ -256,7 +266,7 @@ def _generate_xy_plot(  # noqa: PLR0913
         y="Score",
         hover_name="Datetime",
         hover_data=["Datetime"],
-        custom_data=["Datetime", "Accuracy"],
+        custom_data=["Datetime", "Accuracy", "Run sensitivity"],
     )
     figure_scatter.update_traces(
         # px bakes the first colorway entry of Plotly's default template into
@@ -268,6 +278,7 @@ def _generate_xy_plot(  # noqa: PLR0913
         hovertemplate="<b>%{customdata[0]}</b><br><br>"
         + "<b>Score</b>: %{y}<br>"
         + f"{hover_x_label}<br>"
+        + axis.hover_point_extra
         + "<b>Accuracy</b>: %{customdata[1]}%"
         + "<extra></extra>",
         hoverlabel={"font_size": 16},
@@ -354,6 +365,7 @@ def generate_sensitivity_plot(
             scatter_x=lambda _key, run: f"{run.horizontal_sens} {run.sens_scale}",
             line_x=lambda key: key,
             hover_x_label="<b>Sensitivity</b>: %{x}",
+            hover_point_extra="",
         ),
     )
 
@@ -387,6 +399,8 @@ def generate_time_plot(
             scatter_x=lambda key, _run: key,
             line_x=lambda key: key,
             hover_x_label="<b>Date</b>: %{x}",
+            # A day's runs can span sensitivities, so each point names its own.
+            hover_point_extra="<b>Sensitivity</b>: %{customdata[2]}<br>",
         ),
     )
 
