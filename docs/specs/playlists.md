@@ -346,7 +346,13 @@ and [product.md](../product.md). Leaderboard placement is worded
   signature they failed against and are skipped until that changes,
   `--force` runs, or `--only` names the code; transient failures feed a
   consecutive-failure breaker (default 3). The manifest skips intact current
-  output and unlinks a renamed playlist's previous file. Operator steps are
+  output and unlinks a renamed playlist's previous file. A read-only
+  `--check` rebuilds every bundled file from live KovaaK's data over the
+  committed snapshot and reports drift by whole-benchmark inequality;
+  regeneration still keys on Evxl metadata, so a refresh regenerates the
+  files the check names
+  ([2026-09-26](../decision_log.md#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
+  Operator steps, including the refresh runbook, are
   in the [importer readme](../../scripts/benchmark_importer/readme.md); the
   script is exempt from the lint and type gates
   ([tech_debt.md](../tech_debt.md)).
