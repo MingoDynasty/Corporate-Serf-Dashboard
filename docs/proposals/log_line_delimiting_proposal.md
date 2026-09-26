@@ -369,13 +369,13 @@ file's fields is free text, because the scale name comes from the file.
 `%r` keeps one job: a value nothing has vouched for. Two of its three uses
 today are that job: a cached leaderboard ID that failed the numeric check,
 and a build stamp with an unknown schema version. In both, whether the value
-is `"12"`, `12`, or `None` is the diagnosis. A code or key the user typed
-is the same job before validation (D1): the six lines that log the pasted
+is `"12"`, `12`, or `None` is the diagnosis. A code or key the user typed is
+the same job before validation (D1): the six lines that log the pasted
 playlist code, the import line that single-quotes it by hand today, and the
-unknown config keys, which become the list itself. The third use today, a scenario name in
-the corpus-disagreement warning, is a trusted name and becomes `"%s"`. One
-more line fits the job and is `%s` today: the unsupported radio option in
-`pages/home.py`.
+unknown config keys, which become the list itself. The third use today, a
+scenario name in the corpus-disagreement warning, is a trusted name and
+becomes `"%s"`. One more line fits the job and is `%s` today: the unsupported
+radio option in `pages/home.py`.
 
 This diverges from copy rule 6 twice, deliberately. Rule 6 keeps playlist
 codes and paths bare as tokens, and shipped copy follows it, down to a
