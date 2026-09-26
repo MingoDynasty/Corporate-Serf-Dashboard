@@ -29,11 +29,12 @@ Status: Open.
 Free text is a string whose content someone outside the code chose: a
 scenario, playlist, or user name, or a value read from a run file. 61
 placeholders carry one today: 56 are bare, 4 sit in parentheses, and 1 is a
-`%r`. Eight more carry text the user typed that nothing has validated yet: 7
-are bare and 1 is single-quoted.
+`%r`. Eight more carry a code or key the user typed that nothing has
+validated yet: 7 are bare and 1 is single-quoted.
 
 **Recommendation: `"%s"` for free text, wherever the value sits in the line,
-and `%r` for text the user typed, until validation accepts it.** Of the 3177
+and `%r` for a code or key the user typed, until validation accepts it.**
+Of the 3177
 scenario names and 257 playlist names in the bundled corpus, none contains a
 double quote, 62 contain an apostrophe, and 35 contain a parenthesis, so the
 double quote is the only one of the three candidate delimiters that never
@@ -44,27 +45,40 @@ never escapes, so the name reads in the log exactly as it does in the UI and
 in KovaaK's, and a search of the log for a reported scenario name always
 hits.
 
-Text the user typed is the one kind that can hold whatever a clipboard
-holds: a double quote, which would collide with the delimiter, or an
-invisible character. The import field is stripped before it is logged, and a
-zero-width space survives `strip()`. A playlist code pasted with one is a
-realistic cause of a "code not found" report; `"%s"` shows it as nothing and
-`%r` shows `'KovaaKsXyz​'`. So this kind takes `%r`, which is the job
-the design already gives `%r` (see Kinds, and the test for each), and a
-single-quoted value in the log then always means the same thing: shown as
-received, not yet vouched for. Once validation accepts the code it is a
-token and stays bare.
+A code or key the user typed is the one kind of value that can hold
+whatever a clipboard holds: a double quote, which would collide with the
+delimiter, or an invisible character. The import field is stripped before
+it is logged, and a zero-width space survives `strip()`. A playlist code
+pasted with one is a realistic cause of a "code not found" report; `"%s"`
+shows it as nothing and `%r` shows `'KovaaKsXyz\u200b'`. So this kind takes
+`%r`, which is the job the design already gives `%r` (see Kinds, and the
+test for each). Once validation accepts the code it is a token and stays
+bare. The KovaaK's username is typed too, and validated against KovaaK's,
+but it is a name, not a code: it takes `"%s"` before and after validation,
+as copy quotes it. Its one pre-validation log line fires when the lookup
+could not run at all, where its characters are not the diagnosis, and its
+rejection reaches the log only inside the user message that names it,
+which no delimiting rule edits.
 
 Choosing differently: `%r` for all free text is the Python idiom and shows
 more. It escapes invisible characters and tells `None` from `"None"`. No
-bundled name has an invisible character, and a name is read from a run
-file's own field or an upstream response, not from a clipboard. Its costs:
+bundled name has an invisible character, and a scenario or playlist name is
+read from a run file's own field or an upstream response, not from a
+clipboard. Its costs:
 the quote character flips to `"` for the 62 names with an apostrophe, so one
 kind of value carries two delimiters, an escaped name no longer matches a
 search for it, and it cannot serve paths (D2), so paths would need a second
-rule. `"%s"` for user-typed text too is one rule fewer, and leaves the one
-value that can hold a double quote or an invisible character as the one the
-delimiter cannot bound. Bare `%s` with no rule is the status quo: an empty
+rule. `%r` for the username as well, until KovaaK's confirms it, treats
+every typed value alike and would show a pasted invisible character on the
+username's own lines. It moves five placeholders, adds a third divergence
+from copy rule 6 (which quotes the username), and renders one value two
+ways inside a single event, because the rejection message that names the
+username is copy and keeps its double quotes; and the line it would help,
+the one that logs the username when validation could not run, fires on a
+network failure, where the characters are not the diagnosis. `"%s"` for
+typed codes too is one rule fewer, and leaves the one value that can hold a
+double quote or an invisible character as the one the delimiter cannot
+bound. Bare `%s` with no rule is the status quo: an empty
 value renders as nothing, and `for %s (leaderboard %s)` renders a name such
 as `Tracking Benchmarks (Easy)` as two parenthesized groups.
 
@@ -117,8 +131,9 @@ carry no message at all.
 **Recommendation: write down the three routes the code already mostly
 follows, keyed on what can reach the handler.** A `requests` failure always
 goes through the summary helper. Any other exception is interpolated with
-`%s` only when everything the `try` body can raise is an exception this app
-constructs with a message, or an `OSError` raised by the operating system;
+`%s` only when everything that can reach the handler is an exception this
+app constructs with a message, or an `OSError` raised by the operating
+system;
 otherwise the line names the failure in words and, when the failure is
 unexpected, carries the traceback. Bare `%s` on a broad catch is the hazard
 this closes: `TimeoutError()` renders as nothing and `KeyError("steamId")`
@@ -159,14 +174,16 @@ unswept tree teaches bare `%s` on every edit while the instructions say
 otherwise, and each conforming new line makes the log less consistent than
 it is today rather than more. The sweep is also what makes `%r` legible.
 `%r` renders a string in single quotes, and the design gives it one job, so
-a single-quoted value standing in a line should mean "shown as received, not
-vouched for". Three formats single-quote an ordinary value by hand today,
-and under no backfill they survive until someone edits them, so the signal
+a single-quoted placeholder value should mean "shown as received, not
+vouched for". Python's own quoting inside a collection's repr or an
+exception's text is not that signal, and a reader has to know it; but three
+formats single-quote an ordinary placeholder by hand today, and under no
+backfill they survive until someone edits them, so even the narrow signal
 never becomes reliable. The change is mechanical, has no behavior in it, and
 is cheapest before the public launch, after which bug-report logs in two
 formats would coexist for as long as old installs do. The measurement
 applies D1 as amended: `"%s"` for names and paths, `%r` for the eight
-user-typed values, on the same lines.
+typed codes and keys, on the same lines.
 
 Choosing differently: no backfill (new and edited lines only) costs nothing
 now and leaves a mixed log for as long as the 100 calls go unedited, which
@@ -214,7 +231,7 @@ not know is reported, never guessed.
   | Kind | Count | How it is delimited today |
   | --- | --- | --- |
   | Names and other outside text | 61 | 56 bare, 4 in parentheses, 1 `%r` |
-  | User-typed text | 8 | 7 bare, 1 single-quoted |
+  | Codes and keys the user typed | 8 | 7 bare, 1 single-quoted |
   | Paths and file names | 34 | 33 bare, 1 double-quoted inside its argument |
   | Tokens rendered as strings | 71 | 56 bare, 11 in parentheses, 2 single-quoted, 2 `%r` |
   | Request summaries | 11 | all last, after a colon |
@@ -309,19 +326,21 @@ follows D4:
 >   whether the value happens to hold a space: counts, scores, IDs, playlist
 >   codes after validation, SHAs, URLs, HTTP statuses, timestamps, words the
 >   code chose.
-> - `%r` is for a value nothing has vouched for: text the user typed, until
->   validation accepts it, and a value read back in the wrong type or shape
->   (a cached ID that is not a number, an unknown schema stamp). There the
->   exact characters or the type are the diagnosis.
+> - `%r` is for a value nothing has vouched for: a code or key the user
+>   typed, until validation accepts it, and a value read back in the wrong
+>   type or shape (a cached ID that is not a number, an unknown schema
+>   stamp). There the exact characters or the type are the diagnosis.
 > - A `requests` failure always goes through `request_exception_summary`,
 >   with `redact_query=True` when the request is `sensitive`. Its `str`, its
 >   `repr`, and its traceback all carry the query string, so no handler that
 >   a `sensitive` request's failure can reach takes `exc_info`, however
->   broad its `except`.
+>   broad its `except` (a `requests` exception is an `OSError`, so
+>   `except OSError` around a request counts).
 > - Any other caught exception is interpolated with `%s` only when
->   everything the `try` body can raise is an exception this app constructs
->   with a message, or an `OSError` raised by the operating system. The test
->   is what can reach the handler, not what the `except` names. Otherwise
+>   everything that can reach the handler is an exception this app
+>   constructs with a message, or an `OSError` raised by the operating
+>   system. The test is what can reach the handler, not what the `except`
+>   names. Otherwise
 >   the line names the failure in words and, when the failure is unexpected,
 >   carries the traceback (`logger.exception`, or `exc_info=True` below
 >   ERROR). Either way the words before the colon name the failure, so the
@@ -342,16 +361,18 @@ new and edited log lines; existing lines are not swept to match."
 The line between free text and a token is who chose the content, not whether
 this particular value happens to hold a space. A timestamp renders with a
 space and stays bare, because its shape is fixed by the code that formatted
-it. A KovaaK's username is free text. A sensitivity label assembled from a
-run file's fields is free text, because the scale name comes from the file.
+it. A KovaaK's username is typed by the user and validated against
+KovaaK's, but it is a name, not a code, so it takes `"%s"` before and after
+validation, as copy quotes it. A sensitivity label assembled from a run
+file's fields is free text, because the scale name comes from the file.
 
 `%r` keeps one job: a value nothing has vouched for. Two of its three uses
 today are that job: a cached leaderboard ID that failed the numeric check,
 and a build stamp with an unknown schema version. In both, whether the value
-is `"12"`, `12`, or `None` is the diagnosis. Text the user typed is the same
-job before validation (D1): the six lines that log the pasted playlist code,
-the import line that single-quotes it by hand today, and the unknown config
-keys, which become the list itself. The third use today, a scenario name in
+is `"12"`, `12`, or `None` is the diagnosis. A code or key the user typed
+is the same job before validation (D1): the six lines that log the pasted
+playlist code, the import line that single-quotes it by hand today, and the
+unknown config keys, which become the list itself. The third use today, a scenario name in
 the corpus-disagreement warning, is a trusted name and becomes `"%s"`. One
 more line fits the job and is `%s` today: the unsupported radio option in
 `pages/home.py`.
@@ -383,7 +404,11 @@ The test is what can reach the handler, and applying it means reading the
 keeps the identity probe's `except ValueError` honestly conforming rather
 than conforming by a reading the text does not support. The floor (the words
 before the colon name the failure) holds on every line regardless, so a
-line that ends at its colon still says which operation failed.
+line that ends at its colon still says which operation failed. The routes
+are ordered by what reached the handler, never by how the `except` is
+spelled: a `requests` failure that arrives through a blind `except
+Exception` still takes the summary, and only what remains takes the
+traceback.
 
 The three broad lines D3 names, and what conforming looks like:
 
@@ -399,7 +424,10 @@ The three broad lines D3 names, and what conforming looks like:
   only where the test holds, which the implementer settles by reading the
   four `try` bodies, and take the class name where it does not.
 - `kovaaks/playlist_scenarios_service.py`, the best-effort hydration, is a
-  blind `except Exception` and takes the traceback.
+  blind `except Exception`, and a `requests` failure can reach it: the
+  total-play hydration it calls does not consume request exceptions. A
+  `requests.RequestException` clause takes the summary first, and the blind
+  catch that remains takes the traceback.
 
 None of the three requests is `sensitive`, so none is a privacy defect
 today.
@@ -464,7 +492,8 @@ edits a string the copy rules own.
   another value after it.
 - **Escaping every quoted value**, so a double quote or a control character
   inside one can never break its boundary. `%r` is that encoding, and the
-  design uses it where a value can hold either: text the user typed. Applied
+  design uses it where a value can hold either: a code or key the user
+  typed. Applied
   to names it would break the property that a search of the log for a
   reported name always hits, to guard a collision no bundled name has and
   that degrades, when it happens, to today's ambiguity and no further.
@@ -483,8 +512,8 @@ edits a string the copy rules own.
 
 Under D4's recommendation: 101 of 163 calls change only how a value is
 delimited, four exception lines change shape, and 24 tests update an
-expected string. No log level, logger name, or message wording changes, so a search
-for a line's words still finds it. Anyone who searches a log for a bare
+expected string. No log level, logger name, or message wording changes, so a
+search for a line's words still finds it. Anyone who searches a log for a bare
 `for <name> (` pattern would need the quote. No cache, store, or wire format
 is involved.
 
@@ -505,6 +534,10 @@ is involved.
   is neither corruption nor a distrusted value. It is Python's text and a fix
   would be per line, so it stays; the decision-log entry carries this caveat,
   because a reader meets it in a real bug report after this file is gone.
+- An invisible character in a pasted KovaaK's username. The username is a
+  name and takes `"%s"`, and its rejection reaches the log only inside the
+  user message that quotes it, so a stray character in it stays invisible
+  in the log as it does on screen.
 - Numeric formats (`%d`, `%f`, `%g`).
 
 ## Testing
@@ -544,7 +577,7 @@ is involved.
       from copy rule 6, and the `OSError` text caveat from Out of scope,
       because the entry is what remains once this file is deleted;
    2. the delimiting sweep with its test updates (D1, D2, D4): `"%s"` for
-      free text and paths, `%r` for text the user typed, and the parentheses
+      free text and paths, `%r` for typed codes and keys, and the parentheses
       and single quotes that stood in as delimiters dropped;
    3. the four exception lines (D3, and the placement outlier in `app.py`);
    4. the double-warning fix: a skipped user-root playlist file is logged
@@ -557,9 +590,10 @@ is involved.
 3. **Docs definition of done**, in the implementation PR: the decision-log
    entry; the `AGENTS.md` section; the proposal file deleted; the kickoff
    prompt moved to `ignore/prompts/done/`. No capability spec covers
-   logging, and a docs-only proposal records itself in the decision log
-   alone (the Shipping a proposal checklist says so), so there is no spec,
-   `docs/roadmap.md`, or `docs/product.md` change; the implementer searches
+   logging, and the roadmap and product-inventory steps of the Shipping a
+   proposal checklist apply when a proposal ships an app feature, which a
+   logging convention is not, so there is no spec, `docs/roadmap.md`, or
+   `docs/product.md` change; the implementer searches
    `docs/` for any quoted log line the sweep alters.
 
 If D4 is ruled no backfill, the implementation PR is commits 1 and 5, and
