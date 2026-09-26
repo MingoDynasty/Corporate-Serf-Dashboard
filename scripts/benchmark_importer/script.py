@@ -574,6 +574,35 @@ def build_scenarios(
     return scenario_list
 
 
+def build_playlist(
+    sharecode: str,
+    evxl_database_item: EvxlDatabaseItem,
+    *,
+    use_cache: bool,
+) -> PlaylistData:
+    """Fetch and merge one benchmark playlist without writing it.
+
+    Evxl is always queried live; ``use_cache`` governs only the KovaaK's
+    benchmark cache, which every live fetch rewrites.
+    """
+    playlist = get_evxl_playlist(sharecode)
+    logger.debug("Resolved %s as playlist: %s", sharecode, playlist.playlist_name)
+
+    response_json = get_benchmark_json(
+        evxl_database_item.kovaaksBenchmarkId,
+        None,
+        use_cache,
+        attempts=RETRY_ATTEMPTS,
+        backoff_seconds=RETRY_BACKOFF_SECONDS,
+    )
+    benchmark_response = BenchmarksAPIResponse.model_validate(response_json)
+    return PlaylistData(
+        name=playlist.playlist_name.strip(),
+        code=playlist.playlist_code.strip(),
+        scenarios=build_scenarios(benchmark_response, evxl_database_item),
+    )
+
+
 def generate_playlist(
     sharecode: str,
     evxl_database_item: EvxlDatabaseItem,
@@ -586,22 +615,7 @@ def generate_playlist(
     manifest_path: Path | None = None,
 ) -> Path:
     """Fetch, merge, and write one benchmark playlist."""
-    playlist = get_evxl_playlist(sharecode)
-    logger.debug("Resolved %s as playlist: %s", sharecode, playlist.playlist_name)
-
-    response_json = get_benchmark_json(
-        evxl_database_item.kovaaksBenchmarkId,
-        None,
-        use_cache,
-        attempts=RETRY_ATTEMPTS,
-        backoff_seconds=RETRY_BACKOFF_SECONDS,
-    )
-    benchmark_response = BenchmarksAPIResponse.model_validate(response_json)
-    playlist_data = PlaylistData(
-        name=playlist.playlist_name.strip(),
-        code=playlist.playlist_code.strip(),
-        scenarios=build_scenarios(benchmark_response, evxl_database_item),
-    )
+    playlist_data = build_playlist(sharecode, evxl_database_item, use_cache=use_cache)
 
     generated_dir.mkdir(parents=True, exist_ok=True)
     generated_path = choose_generated_path(
