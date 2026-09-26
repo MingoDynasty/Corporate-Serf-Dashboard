@@ -148,8 +148,8 @@ Status: Open.
 **Recommendation: a full sweep, in the implementation PR, so the rule and a
 tree that follows it land together.** Measured by applying the sweep to a
 checkout of `88060d9` and running the suite (baseline 1380 passed): 104
-placeholders in 101 calls across 17 files change, and 24 tests in
-10 files fail, every one a plain assertion on rendered log text. The comment and
+placeholders in 101 calls across 17 files change, and 24 tests in 10 files
+fail, every one a plain assertion on rendered log text. The comment and
 docstring conventions took the opposite posture, no backfill, and that was
 right there because the rule transcribed a style the tree already followed
 better than nine times in ten. One of the 103 placeholders this rule governs
@@ -171,8 +171,8 @@ user-typed values, on the same lines.
 Choosing differently: no backfill (new and edited lines only) costs nothing
 now and leaves a mixed log for as long as the 100 calls go unedited, which
 for log lines is a long time. A targeted sweep of only the values with prose
-after them or parentheses around them is 60 placeholders in 58
-calls and 11 failing tests; it leaves 44 bare values at line ends, so the tree would then
+after them or parentheses around them is 60 placeholders in 58 calls and 11
+failing tests; it leaves 44 bare values at line ends, so the tree would then
 match a two-branch rule (quote unless last) rather than the one-branch rule
 D1 and D2 recommend.
 
