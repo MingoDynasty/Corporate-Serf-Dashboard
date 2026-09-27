@@ -8,37 +8,37 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 104.0
+          "threshold": 107.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 112.0
+          "threshold": 115.0
         },
         {
           "name": "Zero",
           "color": "#e3a325",
-          "threshold": 119.0
+          "threshold": 122.0
         },
         {
           "name": "Delta",
           "color": "#df8139",
-          "threshold": 125.0
+          "threshold": 128.0
         },
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 131.0
+          "threshold": 134.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 136.0
+          "threshold": 139.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 141.0
+          "threshold": 144.0
         }
       ],
       "leaderboard_id": 203904
@@ -336,37 +336,37 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 4300.0
+          "threshold": 4200.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 4450.0
+          "threshold": 4350.0
         },
         {
           "name": "Zero",
           "color": "#e3a325",
-          "threshold": 4600.0
+          "threshold": 4500.0
         },
         {
           "name": "Delta",
           "color": "#df8139",
-          "threshold": 4750.0
+          "threshold": 4650.0
         },
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 4900.0
+          "threshold": 4800.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 5050.0
+          "threshold": 4950.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 5250.0
+          "threshold": 5150.0
         }
       ],
       "leaderboard_id": 203911
@@ -438,17 +438,17 @@
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 4100.0
+          "threshold": 4050.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 4250.0
+          "threshold": 4175.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 4400.0
+          "threshold": 4325.0
         }
       ],
       "leaderboard_id": 203913
@@ -774,7 +774,7 @@
         "#e01f2f"
       ]
     ],
-    "generated_at": "2026-09-15T18:08:46.927546+00:00",
+    "generated_at": "2026-09-27T02:33:42.178065+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

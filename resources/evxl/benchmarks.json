@@ -16099,7 +16099,7 @@
       {
         "difficultyName": "Easy",
         "kovaaksBenchmarkId": 2942,
-        "sharecode": "KovaaKsCrossfiring360Blueberry",
+        "sharecode": "KovaaKsGlidingSmallSeason",
         "rankColors": {
           "Inept": "#40302F",
           "Adept": "#5A3432",
@@ -16145,8 +16145,304 @@
             ]
           }
         ]
+      },
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 2972,
+        "sharecode": "KovaaKsGhostpeekingSmallBm",
+        "rankColors": {
+          "Mystic": "#7D2939",
+          "Demonic": "#62586E",
+          "Godly": "#F0EDE4",
+          "Legendary": "#36B8E6",
+          "Unreal": "#21172B"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#8338C9",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 2,
+                "color": "#6677C8"
+              },
+              {
+                "subcategoryName": "Micro adjust",
+                "scenarioCount": 3,
+                "color": "#58A98B"
+              },
+              {
+                "subcategoryName": "Correct",
+                "scenarioCount": 3,
+                "color": "#A7B84F"
+              },
+              {
+                "subcategoryName": "Reading",
+                "scenarioCount": 2,
+                "color": "#C99545"
+              },
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 2,
+                "color": "#C85F4A"
+              },
+              {
+                "subcategoryName": "General",
+                "scenarioCount": 2,
+                "color": "#8338C9"
+              }
+            ]
+          }
+        ]
       }
     ],
-    "lastUpdated": "2026-09-11"
+    "lastUpdated": "2026-09-16"
+  },
+  {
+    "benchmarkName": "Coach Ben Strafeaim VALORANT S1",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "Ben",
+    "color": "#fe48dd",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-09-17",
+    "difficulties": [
+      {
+        "difficultyName": "Immersive",
+        "kovaaksBenchmarkId": 2975,
+        "sharecode": "KovaaKsWipingBraveGasmask",
+        "rankColors": {
+          "Novice 3": "#FFFFFF",
+          "Novice 2": "#FFFFFF",
+          "Novice 1": "#FFFFFF",
+          "Platinum": "#737373",
+          "Diamond": "#00ecf0",
+          "Sapphire": "#0040ff",
+          "Jade": "#00bd1f"
+        },
+        "categories": [
+          {
+            "categoryName": "Agility",
+            "color": "#ff0000",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#f95353"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#f95353"
+              }
+            ]
+          },
+          {
+            "categoryName": "Precision",
+            "color": "#0040ff",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#8381fe"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#8381fe"
+              }
+            ]
+          },
+          {
+            "categoryName": "Micros",
+            "color": "#ffdd00",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#f66504"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#f66504"
+              }
+            ]
+          },
+          {
+            "categoryName": "Immersion",
+            "color": "#268000",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#52f047"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#52f047"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "lastUpdated": "2026-09-17"
+  },
+  {
+    "benchmarkName": "Intro to KovaaK's Benchmark",
+    "rankCalculation": "basic",
+    "abbreviation": "ITB",
+    "color": "#b83bf1",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-09-24",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 3004,
+        "sharecode": "KovaaKsJumpingMidnightblue90s",
+        "rankColors": {
+          "Silver": "#7f6b57",
+          "Copper": "#a85100",
+          "Gold": "#ffa200",
+          "Aluminum": "#ffffff",
+          "Beryllium": "#808080",
+          "Calcium": "#f45757",
+          "Magnesium": "#bfbfbf",
+          "Rhodium": "#fb4b97",
+          "Lithium": "#b83bf1"
+        },
+        "categories": [
+          {
+            "categoryName": "Tracking",
+            "color": "#ff33d3",
+            "subcategories": [
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 6,
+                "color": "#ff0000"
+              },
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 7,
+                "color": "#990000"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 6,
+                "color": "#620075"
+              }
+            ]
+          },
+          {
+            "categoryName": "Clicking",
+            "color": "#245af9",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 5,
+                "color": "#1100ff"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 4,
+                "color": "#000661"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#2eff77",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 5,
+                "color": "#11ff00"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 4,
+                "color": "#0e7500"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "lastUpdated": "2026-09-24"
+  },
+  {
+    "benchmarkName": "\u771f\u30fb\u8475Aim",
+    "rankCalculation": "\u771f\u30fb\u8475Aim",
+    "abbreviation": "Aoi",
+    "color": "#B479C3",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-09-25",
+    "difficulties": [
+      {
+        "difficultyName": "\u8475",
+        "kovaaksBenchmarkId": 3008,
+        "sharecode": "KovaaKsBaitingSneakyBsp",
+        "rankColors": {
+          "\u8475": "#B479C3"
+        },
+        "categories": [
+          {
+            "categoryName": "Tracking",
+            "color": "#B479C3",
+            "subcategories": [
+              {
+                "subcategoryName": "Ground",
+                "scenarioCount": 3,
+                "color": "#C18DCC"
+              },
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 3,
+                "color": "#CEA2D6"
+              },
+              {
+                "subcategoryName": "Air",
+                "scenarioCount": 3,
+                "color": "#DBB7E0"
+              },
+              {
+                "subcategoryName": "Bounce",
+                "scenarioCount": 3,
+                "color": "#E8CDEA"
+              },
+              {
+                "subcategoryName": "Smoothbot",
+                "scenarioCount": 3,
+                "color": "#F2E3F4"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "\u8f1d",
+        "kovaaksBenchmarkId": 3009,
+        "sharecode": "",
+        "rankColors": {
+          "\u8f1d": "#B479C3"
+        },
+        "categories": [
+          {
+            "categoryName": "Tracking",
+            "color": "#B479C3",
+            "subcategories": [
+              {
+                "subcategoryName": "All",
+                "scenarioCount": 5,
+                "color": "#C18DCC"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "lastUpdated": "2026-09-25"
   }
 ]

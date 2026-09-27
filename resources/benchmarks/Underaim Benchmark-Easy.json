@@ -1,6 +1,6 @@
 {
-  "name": "Underaim-Benchmark",
-  "code": "KovaaKsCrossfiring360Blueberry",
+  "name": "Underaim Benchmark-Easy",
+  "code": "KovaaKsGlidingSmallSeason",
   "scenarios": [
     {
       "name": "VT Raw Control Entry S5 Precision Focus+",
@@ -39,22 +39,22 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 3950.0
+          "threshold": 3900.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 4350.0
+          "threshold": 4300.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4800.0
+          "threshold": 4750.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 5250.0
+          "threshold": 5200.0
         },
         {
           "name": "Celestial",
@@ -70,22 +70,22 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 3450.0
+          "threshold": 3550.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3950.0
+          "threshold": 4050.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4450.0
+          "threshold": 4550.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 5000.0
+          "threshold": 5050.0
         },
         {
           "name": "Celestial",
@@ -101,12 +101,43 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 3350.0
+          "threshold": 3300.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3800.0
+          "threshold": 3750.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#81343B",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Mythical",
+          "color": "#C41E3A",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56D6FF",
+          "threshold": 5100.0
+        }
+      ],
+      "leaderboard_id": 50447
+    },
+    {
+      "name": "Air Angelic invincible 8 Smoothness",
+      "ranks": [
+        {
+          "name": "Inept",
+          "color": "#40302F",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Adept",
+          "color": "#5A3432",
+          "threshold": 3850.0
         },
         {
           "name": "Masterful",
@@ -124,37 +155,6 @@
           "threshold": 5100.0
         }
       ],
-      "leaderboard_id": 50447
-    },
-    {
-      "name": "Air Angelic invincible 8 Smoothness",
-      "ranks": [
-        {
-          "name": "Inept",
-          "color": "#40302F",
-          "threshold": 3500.0
-        },
-        {
-          "name": "Adept",
-          "color": "#5A3432",
-          "threshold": 3900.0
-        },
-        {
-          "name": "Masterful",
-          "color": "#81343B",
-          "threshold": 4300.0
-        },
-        {
-          "name": "Mythical",
-          "color": "#C41E3A",
-          "threshold": 4750.0
-        },
-        {
-          "name": "Celestial",
-          "color": "#56D6FF",
-          "threshold": 5100.0
-        }
-      ],
       "leaderboard_id": 204401
     },
     {
@@ -163,22 +163,22 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 8200.0
+          "threshold": 8150.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 9500.0
+          "threshold": 9400.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 11000.0
+          "threshold": 10850.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 12500.0
+          "threshold": 12300.0
         },
         {
           "name": "Celestial",
@@ -194,22 +194,22 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 3150.0
+          "threshold": 3000.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3500.0
+          "threshold": 3400.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 3900.0
+          "threshold": 3800.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 4300.0
+          "threshold": 4200.0
         },
         {
           "name": "Celestial",
@@ -225,22 +225,22 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 3250.0
+          "threshold": 3150.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3650.0
+          "threshold": 3550.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4050.0
+          "threshold": 3950.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 4500.0
+          "threshold": 4400.0
         },
         {
           "name": "Celestial",
@@ -256,27 +256,27 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 2500.0
+          "threshold": 2400.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 2900.0
+          "threshold": 2800.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 3300.0
+          "threshold": 3200.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 3700.0
+          "threshold": 3600.0
         },
         {
           "name": "Celestial",
           "color": "#56D6FF",
-          "threshold": 4020.0
+          "threshold": 4000.0
         }
       ],
       "leaderboard_id": 128694
@@ -307,7 +307,7 @@
         {
           "name": "Celestial",
           "color": "#56D6FF",
-          "threshold": 4485.0
+          "threshold": 4500.0
         }
       ],
       "leaderboard_id": 128781
@@ -328,12 +328,12 @@
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4750.0
+          "threshold": 4700.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 5300.0
+          "threshold": 5200.0
         },
         {
           "name": "Celestial",
@@ -349,22 +349,22 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 2900.0
+          "threshold": 3300.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3650.0
+          "threshold": 3900.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4400.0
+          "threshold": 4500.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 5200.0
+          "threshold": 5100.0
         },
         {
           "name": "Celestial",
@@ -380,27 +380,27 @@
         {
           "name": "Inept",
           "color": "#40302F",
-          "threshold": 3400.0
+          "threshold": 3450.0
         },
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3800.0
+          "threshold": 3750.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4200.0
+          "threshold": 4100.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 4650.0
+          "threshold": 4450.0
         },
         {
           "name": "Celestial",
           "color": "#56D6FF",
-          "threshold": 4950.0
+          "threshold": 5000.0
         }
       ],
       "leaderboard_id": 204403
@@ -416,17 +416,17 @@
         {
           "name": "Adept",
           "color": "#5A3432",
-          "threshold": 3850.0
+          "threshold": 3800.0
         },
         {
           "name": "Masterful",
           "color": "#81343B",
-          "threshold": 4200.0
+          "threshold": 4150.0
         },
         {
           "name": "Mythical",
           "color": "#C41E3A",
-          "threshold": 4550.0
+          "threshold": 4500.0
         },
         {
           "name": "Celestial",
@@ -438,7 +438,7 @@
     }
   ],
   "generated_from": {
-    "sharecode": "KovaaKsCrossfiring360Blueberry",
+    "sharecode": "KovaaKsGlidingSmallSeason",
     "kovaaks_benchmark_id": 2942,
     "rank_colors": [
       [
@@ -462,7 +462,7 @@
         "#56D6FF"
       ]
     ],
-    "generated_at": "2026-09-14T22:01:44.202966+00:00",
+    "generated_at": "2026-09-27T02:33:50.419887+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

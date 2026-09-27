@@ -172,37 +172,37 @@
         {
           "name": "Fishbed",
           "color": "#37baf3",
-          "threshold": 47.0
+          "threshold": 50.0
         },
         {
           "name": "Flogger",
           "color": "#4bceba",
-          "threshold": 53.0
+          "threshold": 55.0
         },
         {
           "name": "Fulcrum",
           "color": "#60d796",
-          "threshold": 58.0
+          "threshold": 60.0
         },
         {
           "name": "Flanker",
           "color": "#7adf77",
-          "threshold": 63.0
+          "threshold": 65.0
         },
         {
           "name": "Eagle",
           "color": "#99e75b",
-          "threshold": 68.0
+          "threshold": 70.0
         },
         {
           "name": "Typhoon",
           "color": "#bcee43",
-          "threshold": 73.0
+          "threshold": 75.0
         },
         {
           "name": "Raptor",
           "color": "#e5f52c",
-          "threshold": 78.0
+          "threshold": 80.0
         }
       ],
       "leaderboard_id": 203886
@@ -774,7 +774,7 @@
         "#e5f52c"
       ]
     ],
-    "generated_at": "2026-09-15T18:08:46.014995+00:00",
+    "generated_at": "2026-09-27T02:33:41.055494+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

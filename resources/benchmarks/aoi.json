@@ -1,0 +1,184 @@
+{
+  "name": "aoi",
+  "code": "KovaaKsBaitingSneakyBsp",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 903.0
+        }
+      ],
+      "leaderboard_id": 871
+    },
+    {
+      "name": "Close Fast Strafes Invincible - Thin",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 12800.0
+        }
+      ],
+      "leaderboard_id": 814
+    },
+    {
+      "name": "Midrange Fast Strafes Invincible V2 Thin",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 11200.0
+        }
+      ],
+      "leaderboard_id": 581
+    },
+    {
+      "name": "Controlsphere Easy",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 17900.0
+        }
+      ],
+      "leaderboard_id": 4014
+    },
+    {
+      "name": "Whisphere",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 22000.0
+        }
+      ],
+      "leaderboard_id": 34963
+    },
+    {
+      "name": "DomiSphere no Blinks",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 5400.0
+        }
+      ],
+      "leaderboard_id": 129536
+    },
+    {
+      "name": "Air",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 99858.0
+        }
+      ],
+      "leaderboard_id": 388
+    },
+    {
+      "name": "Air CELESTIAL",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 894.0
+        }
+      ],
+      "leaderboard_id": 1241
+    },
+    {
+      "name": "Air AIO Angelic",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 725
+    },
+    {
+      "name": "PGTI Voltaic",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 3000.0
+        }
+      ],
+      "leaderboard_id": 99
+    },
+    {
+      "name": "Leapcorn Pure Tracking Hard",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 192369
+    },
+    {
+      "name": "B360TI Sparky Extra Small Popcorn",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 2500.0
+        }
+      ],
+      "leaderboard_id": 77978
+    },
+    {
+      "name": "Smoothbot 180",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 4150.0
+        }
+      ],
+      "leaderboard_id": 24650
+    },
+    {
+      "name": "SmoothBot Perfected",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 6300.0
+        }
+      ],
+      "leaderboard_id": 184298
+    },
+    {
+      "name": "Close Smoothbot",
+      "ranks": [
+        {
+          "name": "\u8475",
+          "color": "#B479C3",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 58419
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBaitingSneakyBsp",
+    "kovaaks_benchmark_id": 3008,
+    "rank_colors": [
+      [
+        "\u8475",
+        "#B479C3"
+      ]
+    ],
+    "generated_at": "2026-09-27T02:33:53.973903+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

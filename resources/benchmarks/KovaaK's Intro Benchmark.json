@@ -1,0 +1,1938 @@
+{
+  "name": "KovaaK's Intro Benchmark",
+  "code": "KovaaKsJumpingMidnightblue90s",
+  "scenarios": [
+    {
+      "name": "Controlsphere Easy",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 13300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 13700.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 14100.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 14650.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 15250.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 16700.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 17400.0
+        }
+      ],
+      "leaderboard_id": 4014
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy 70%",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 4550.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 4900.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 5300.0
+        }
+      ],
+      "leaderboard_id": 14155
+    },
+    {
+      "name": "RawControlSphere Entry",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 8300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 11375.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 11900.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 14200.0
+        }
+      ],
+      "leaderboard_id": 190185
+    },
+    {
+      "name": "VT Raw Control Entry S5 30% Larger",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 5200.0
+        }
+      ],
+      "leaderboard_id": 145608
+    },
+    {
+      "name": "cloverRawControl Viscose Entry",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 11250.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 11700.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 12100.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 14000.0
+        }
+      ],
+      "leaderboard_id": 190024
+    },
+    {
+      "name": "Controlsphere Far, Far Larger 90%",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 6300.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 9175.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 9550.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 10050.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 11700.0
+        }
+      ],
+      "leaderboard_id": 128692
+    },
+    {
+      "name": "Leaptrack Goated 60% Larger",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 900.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 1825.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 2700.0
+        }
+      ],
+      "leaderboard_id": 128691
+    },
+    {
+      "name": "VT Smoothboth Novice 75%",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 3300.0
+        }
+      ],
+      "leaderboard_id": 94559
+    },
+    {
+      "name": "VT PGT Entry S5 Bot 2",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 4500.0
+        }
+      ],
+      "leaderboard_id": 108025
+    },
+    {
+      "name": "VT PGT Entry S5 Bot 1",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 4500.0
+        }
+      ],
+      "leaderboard_id": 108024
+    },
+    {
+      "name": "B180TI Miru",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 350000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 500000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 610000.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 670000.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 726000.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 755000.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 795000.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 830000.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 880000.0
+        }
+      ],
+      "leaderboard_id": 23807
+    },
+    {
+      "name": "TSK - Hewchy's VAI 20 MASSIVE",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 500.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 2600.0
+        }
+      ],
+      "leaderboard_id": 132430
+    },
+    {
+      "name": "TSK - Hewchy's VAI 160 MASSIVE",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 500.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 2600.0
+        }
+      ],
+      "leaderboard_id": 132424
+    },
+    {
+      "name": "Air Pure Easier No UFO 80% 10% smaller",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 715.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 725.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 730.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 733.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 737.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 740.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 742.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 744.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 748.0
+        }
+      ],
+      "leaderboard_id": 188900
+    },
+    {
+      "name": "Air Voltaic Invincible 4 Easier 80%",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 3650.0
+        }
+      ],
+      "leaderboard_id": 190618
+    },
+    {
+      "name": "VT Aether Entry S5 Bot 1",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 3775.0
+        }
+      ],
+      "leaderboard_id": 108881
+    },
+    {
+      "name": "VT Aether Entry S5 Bot 2",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 4300.0
+        }
+      ],
+      "leaderboard_id": 108048
+    },
+    {
+      "name": "Ground Plaza Voltaic Easy Invincible 2",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 3350.0
+        }
+      ],
+      "leaderboard_id": 11822
+    },
+    {
+      "name": "VT Ground Novice S5 Bot 2",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 3775.0
+        }
+      ],
+      "leaderboard_id": 108184
+    },
+    {
+      "name": "1w2ts Perfected Easier",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 68.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 80.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 91.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 94.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 97.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 100.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 110.0
+        }
+      ],
+      "leaderboard_id": 160751
+    },
+    {
+      "name": "Wide Wall 4 Targets",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 68.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 82.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 88.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 93.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 96.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 99.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 102.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 114.0
+        }
+      ],
+      "leaderboard_id": 831
+    },
+    {
+      "name": "VT 1w6ts Rasp Novice",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 600.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 665.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 730.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 780.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 825.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 860.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 900.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 950.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 1010.0
+        }
+      ],
+      "leaderboard_id": 29483
+    },
+    {
+      "name": "1w6ts_trustechain Raspberry",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 65.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 73.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 79.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 91.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 95.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 100.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 105.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 117.0
+        }
+      ],
+      "leaderboard_id": 10625
+    },
+    {
+      "name": "6 Sphere Hipfire Voltaic",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 64.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 76.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 86.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 94.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 100.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 105.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 110.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 115.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 130.0
+        }
+      ],
+      "leaderboard_id": 108
+    },
+    {
+      "name": "skyClick Goated Easier",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 58.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 70.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 80.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 98.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 103.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 108.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 114.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 123.0
+        }
+      ],
+      "leaderboard_id": 185490
+    },
+    {
+      "name": "Pasu Voltaic Bronze",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 30.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 40.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 48.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 55.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 63.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 66.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 69.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 72.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 82.0
+        }
+      ],
+      "leaderboard_id": 4093
+    },
+    {
+      "name": "VT Floating Heads Viscose Easier",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 430.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 580.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 670.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 750.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 822.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 855.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 890.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 940.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 1040.0
+        }
+      ],
+      "leaderboard_id": 185409
+    },
+    {
+      "name": "Floating Heads Timing 400% Larger",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 900.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 3050.0
+        }
+      ],
+      "leaderboard_id": 1607
+    },
+    {
+      "name": "voxTargetSwitch 2 Large",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 67.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 77.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 86.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 94.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 101.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 106.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 111.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 116.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 125.0
+        }
+      ],
+      "leaderboard_id": 84880
+    },
+    {
+      "name": "XYZ FloatSwitch Easy",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 600.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 750.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 875.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 975.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 1290.0
+        }
+      ],
+      "leaderboard_id": 142175
+    },
+    {
+      "name": "beanTS Larger",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 74.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 88.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 100.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 108.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 115.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 120.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 125.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 132.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 145.0
+        }
+      ],
+      "leaderboard_id": 129353
+    },
+    {
+      "name": "devTS Goated NR Static 5Bot",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 350.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 430.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 500.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 550.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 585.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 610.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 635.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 670.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 745.0
+        }
+      ],
+      "leaderboard_id": 125002
+    },
+    {
+      "name": "Pole Switching 360 Easy More Bots",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 54.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 68.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 80.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 98.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 102.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 107.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 112.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 125.0
+        }
+      ],
+      "leaderboard_id": 77123
+    },
+    {
+      "name": "Smoothbot TS Voltaic Easy 60%",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 36.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 43.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 49.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 53.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 56.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 58.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 62.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 65.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 74.0
+        }
+      ],
+      "leaderboard_id": 6102
+    },
+    {
+      "name": "VT ControlTS Entry S5",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 325.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 360.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 390.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 415.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 437.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 455.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 475.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 500.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 550.0
+        }
+      ],
+      "leaderboard_id": 106696
+    },
+    {
+      "name": "VT FlyTS Entry S5",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 320.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 390.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 460.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 515.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 551.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 580.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 600.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 630.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 700.0
+        }
+      ],
+      "leaderboard_id": 106709
+    },
+    {
+      "name": "VT evaTS Novice Jumbo",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#7f6b57",
+          "threshold": 430.0
+        },
+        {
+          "name": "Copper",
+          "color": "#a85100",
+          "threshold": 490.0
+        },
+        {
+          "name": "Gold",
+          "color": "#ffa200",
+          "threshold": 540.0
+        },
+        {
+          "name": "Aluminum",
+          "color": "#ffffff",
+          "threshold": 585.0
+        },
+        {
+          "name": "Beryllium",
+          "color": "#808080",
+          "threshold": 612.0
+        },
+        {
+          "name": "Calcium",
+          "color": "#f45757",
+          "threshold": 635.0
+        },
+        {
+          "name": "Magnesium",
+          "color": "#bfbfbf",
+          "threshold": 665.0
+        },
+        {
+          "name": "Rhodium",
+          "color": "#fb4b97",
+          "threshold": 710.0
+        },
+        {
+          "name": "Lithium",
+          "color": "#b83bf1",
+          "threshold": 780.0
+        }
+      ],
+      "leaderboard_id": 62466
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsJumpingMidnightblue90s",
+    "kovaaks_benchmark_id": 3004,
+    "rank_colors": [
+      [
+        "Silver",
+        "#7f6b57"
+      ],
+      [
+        "Copper",
+        "#a85100"
+      ],
+      [
+        "Gold",
+        "#ffa200"
+      ],
+      [
+        "Aluminum",
+        "#ffffff"
+      ],
+      [
+        "Beryllium",
+        "#808080"
+      ],
+      [
+        "Calcium",
+        "#f45757"
+      ],
+      [
+        "Magnesium",
+        "#bfbfbf"
+      ],
+      [
+        "Rhodium",
+        "#fb4b97"
+      ],
+      [
+        "Lithium",
+        "#b83bf1"
+      ]
+    ],
+    "generated_at": "2026-09-27T02:33:53.148319+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

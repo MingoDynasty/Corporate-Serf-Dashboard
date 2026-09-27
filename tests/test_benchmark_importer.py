@@ -206,6 +206,32 @@ def test_load_evxl_data_dedupes_identical_payload_once(tmp_path, caplog):
     ]
 
 
+def test_load_evxl_data_skips_empty_sharecodes(tmp_path, caplog):
+    data_path = tmp_path / "benchmarks.json"
+    ladder = {"Bronze": "#111", "Silver": "#222"}
+    _write_evxl_data(
+        data_path,
+        [
+            {
+                "benchmarkName": "Aim",
+                "difficulties": [
+                    _difficulty("KovaaKsListed", 10, ladder, "Easy"),
+                    _difficulty("", 11, ladder, "Hard"),
+                ],
+            },
+        ],
+    )
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+
+    database, conflicts = script.load_evxl_data(data_path)
+
+    assert list(database) == ["KovaaKsListed"]
+    assert conflicts == {}
+    assert caplog.messages == [
+        "Skipping Evxl entry with an empty sharecode: Aim / Hard (benchmark 11)"
+    ]
+
+
 def test_load_evxl_data_classifies_ordered_rank_conflicts(tmp_path):
     data_path = tmp_path / "benchmarks.json"
     _write_evxl_data(
