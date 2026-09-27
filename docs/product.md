@@ -19,6 +19,29 @@ The overriding principle: **answer the question, don't just show the data.**
 Charts and numbers are means; the user wants conclusions. (Full principles
 list in the roadmap.)
 
+### When they ask them
+
+The user comes to the app at one of two moments. The moment decides which
+question they are asking and how much attention they have for the answer, so
+a feature is designed for a moment as well as for a question.
+
+- **In session.** The user is playing with KovaaK's fullscreen and looks at
+  the app between runs: an alt-tab, a second monitor, or a phone. They have
+  a glance to spare, not a page. They are asking a question the three above
+  do not cover: *how is this session going?* Concretely: what rank are my
+  scores reaching, should I push for speed or for accuracy, how long have I
+  been playing, how many runs have I done, and which scenarios have I played.
+- **Between sessions.** The game is closed and the user has their full
+  attention. They look back (*am I improving?*, starting with how the last
+  session went) and look ahead (*where am I weak, and what should I work on
+  next?*). Looking back often leads straight into looking ahead in one
+  sitting.
+
+The session, one continuous stretch of play, is what the two moments share.
+In session, the user watches the live session. Between sessions, the session
+that just ended is the first thing they look back on, so one view serves
+both.
+
 ## What the app does today
 
 ### The core loop: watch, plot, notify
