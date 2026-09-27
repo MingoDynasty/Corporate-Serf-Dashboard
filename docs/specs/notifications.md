@@ -379,7 +379,8 @@ toasts under, and it applies to every toast the app adds from here on
 - A run is judged only when Score threshold verdict is on, the threshold
   percentage is a usable non-zero number, the run is not the first at its
   sensitivity, and `scenario_previous_best` is positive. It passes when
-  `score >= scenario_previous_best × goal / 100`; the message shows
+  `score >= scenario_previous_best × goal / 100`, compared as decimals so a
+  run exactly at the goal passes; the message shows
   `score / scenario_previous_best × 100` and the goal, each to one decimal
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
   A failing percentage is capped one tenth below the goal as printed, so a

@@ -331,6 +331,18 @@ def test_threshold_passes_at_exactly_the_goal():
     assert notification["message"].startswith("Scenario A: 820.00, 102.5% of PB.")
 
 
+def test_threshold_passes_exactly_at_a_goal_float_math_overshoots():
+    # 19.57 is exactly 95% of 20.60, but in floats 20.6 * 95 / 100 is
+    # 19.570000000000004, which would fail the run and cap it to 94.9%.
+    notification = _notification(
+        _payload(score=19.57, scenario_previous_best=20.60),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A: 19.57, 95.0% of PB.")
+
+
 def test_threshold_fail_names_the_target_it_missed():
     notification = _notification(
         _payload(score=780.0, scenario_previous_best=800.0),
