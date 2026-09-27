@@ -1155,6 +1155,23 @@ def test_a_newer_stamped_user_playlist_is_skipped_and_says_so(monkeypatch, tmp_p
     ]
 
 
+@pytest.mark.parametrize("stamp", [None, 2], ids=["unstamped", "newer"])
+def test_a_skipped_user_playlist_is_logged_once(monkeypatch, tmp_path, caplog, stamp):
+    """The store layer logs the message; the loader only queues it for the UI."""
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    playlist = _playlist("Skipped", "SkippedCode")
+    if stamp is None:
+        _write_playlist(user_root / "skipped.json", playlist)
+    else:
+        _write_raw_playlist(user_root / "skipped.json", _stamped(playlist, stamp))
+
+    with caplog.at_level(logging.WARNING):
+        data_service.load_playlists()
+
+    [warning] = data_service.drain_startup_playlist_warnings()
+    assert [record.getMessage() for record in caplog.records].count(warning) == 1
+
+
 def test_a_stamped_user_playlist_with_an_invalid_payload_names_the_code_fix(
     monkeypatch,
     tmp_path,

@@ -830,7 +830,10 @@ def _load_user_playlist_file(playlist_file: Path) -> PlaylistData | None:
     if document.state is not StoreState.MISSING:
         # MISSING means the file vanished between listing and reading, which
         # needs no warning; everything else is a file the user should know about.
-        _record_startup_playlist_warning(document.message)
+        # Queued without _record_startup_playlist_warning: the store layer
+        # already logged this exact message, and logging it here as well put
+        # every skipped file in debug.log twice.
+        playlist_startup_warning_queue.append(document.message)
     return None
 
 

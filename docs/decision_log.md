@@ -1110,9 +1110,12 @@ numbering is the proposal's.
   missing field, or a Steam account list the app does not recognize, logs a
   plain warning. The startup playlist
   warnings and the store messages are logged by helpers that log what they
-  show, so those log lines follow the new copy, and a user-root playlist file
-  the loader skips is now logged twice with identical text (store layer and
-  loader). How log lines delimit their values is a separate audit.
+  show, so those log lines follow the new copy. A user-root playlist file the
+  loader skipped was logged twice with identical text (store layer and
+  loader) until the
+  [2026-09-26 logging conventions](#2026-09-26-log-lines-delimit-their-values-by-kind)
+  shipped; the loader now only queues the message for the UI. That entry is
+  also the audit of how log lines delimit their values.
 - `tests/test_em_dash_guard.py` walks every module under `source/`, visits
   every string constant including f-string parts, skips docstrings, and fails
   on an em dash outside an allowlist holding only the Last played glyph, keyed
