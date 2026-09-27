@@ -117,7 +117,8 @@ expanded into its own roadmap entry when it becomes the next thing up.
 - **Next-rank threshold for benchmark playlists** — "+47 to Gold" motivational
   target on benchmark scenarios. External tools (e.g. evxl.app) already
   provide a substitute, so this is consolidation rather than net-new
-  capability.
+  capability. Proposed in
+  [`next_rank_proposal.md`](./proposals/next_rank_proposal.md).
 - **Aim Training Journey page polish** — the page already exists at
   `/aim-training-journey` (currently marked work-in-progress). It visualizes
   training-hour checkpoints across playlists, which is a different question
