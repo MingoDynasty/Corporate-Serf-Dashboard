@@ -382,6 +382,8 @@ toasts under, and it applies to every toast the app adds from here on
   `score >= scenario_previous_best × goal / 100`; the message shows
   `score / scenario_previous_best × 100` and the goal, each to one decimal
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
+  A failing percentage is capped one tenth below the goal as printed, so a
+  94.98% miss of a 95% goal reads `94.9%`, never `95.0%`.
   A run is placed when `nth_score` is at most the Top N value; first place is
   phrased "best" and the rest "Nth-best".
 - The page narrates only the batch's latest matching run, and only when the

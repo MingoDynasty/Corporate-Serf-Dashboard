@@ -1112,7 +1112,11 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {verdict.percentage:.1f}% of PB "
+    # Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
+    # 95.0%)", so a miss shows at most one tenth below the goal as printed.
+    # Flooring would not do: float error prints 407 / 500 as 81.3%.
+    shown_percentage = min(verdict.percentage, round(verdict.goal_percentage, 1) - 0.1)
+    shortfall = f"{score}, {shown_percentage:.1f}% of PB "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."
