@@ -78,7 +78,7 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
     for playlist_code, data in journey_data.items():
         if not data:
             logger.warning(
-                "Insufficient data for playlist: %s",
+                'Insufficient data for playlist: "%s"',
                 get_playlist_display_label(playlist_code),
             )
 

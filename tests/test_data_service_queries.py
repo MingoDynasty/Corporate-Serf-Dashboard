@@ -299,5 +299,5 @@ def test_rank_data_lookup_miss_is_empty_and_warns(
     assert result == []
     assert caplog.messages == [
         f"Failed to get rank data for playlist code ({playlist_code}), "
-        f"scenario ({scenario_name})"
+        f'scenario "{scenario_name}"'
     ]

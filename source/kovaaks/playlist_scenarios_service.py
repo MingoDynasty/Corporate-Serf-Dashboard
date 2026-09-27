@@ -241,7 +241,7 @@ def _lookup_rank_info(
 
 def _unknown_rank_info(scenario_name: str, exc: Exception) -> ScenarioRankInfo:
     logger.warning(
-        "Failed to fetch playlist scenario rank for %s",
+        'Failed to fetch playlist scenario rank for "%s"',
         scenario_name,
         exc_info=True,
     )
@@ -288,14 +288,14 @@ def _build_row(  # noqa: PLR0913
         scenario_stats = _get_local_stats(scenario_name)
     except Exception:  # noqa: BLE001
         logger.warning(
-            "Failed to read local stats for %s", scenario_name, exc_info=True
+            'Failed to read local stats for "%s"', scenario_name, exc_info=True
         )
         scenario_stats = None
     try:
         personal_best_run = _get_personal_best_run(scenario_name)
     except Exception:  # noqa: BLE001
         logger.warning(
-            "Failed to read the personal best for %s",
+            'Failed to read the personal best for "%s"',
             scenario_name,
             exc_info=True,
         )

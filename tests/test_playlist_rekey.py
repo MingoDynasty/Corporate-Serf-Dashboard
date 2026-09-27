@@ -327,7 +327,7 @@ def test_import_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
         for record in caplog.records
         if record.levelno == logging.INFO
     ]
-    assert info_messages == ["Imported playlist Fresh (FreshCode): 2 scenarios."]
+    assert info_messages == ['Imported playlist "Fresh" (FreshCode): 2 scenarios.']
 
 
 def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
@@ -403,7 +403,7 @@ def test_import_reports_write_failures_without_updating_database(
         record
         for record in caplog.records
         if record.getMessage()
-        == "Failed to save playlist data: Locked Playlist (LockedCode)"
+        == 'Failed to save playlist data: "Locked Playlist" (LockedCode)'
     ]
     assert record.exc_info is not None
     assert record.exc_info[1] is write_error

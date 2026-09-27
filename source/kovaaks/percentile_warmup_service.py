@@ -239,7 +239,7 @@ def _expected_failure_result(
     exc: BaseException,
 ) -> WarmupStepResult:
     logger.warning(
-        "Percentile warmup failed for %s: %s",
+        'Percentile warmup failed for "%s": %s',
         scenario_name,
         exc,
     )
@@ -261,7 +261,7 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
             "KovaaK's username isn't configured.",
         )
 
-    logger.debug("Percentile warmup processing %s", scenario_name)
+    logger.debug('Percentile warmup processing "%s"', scenario_name)
     try:
         leaderboard_id = resolve_leaderboard_id(
             scenario_name,
@@ -282,7 +282,7 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
         outcome = _outcome(context, scenario_name)
         outcome.terminal = True
         outcome.reason = "leaderboard could not be resolved"
-        logger.warning("Percentile warmup could not resolve %s", scenario_name)
+        logger.warning('Percentile warmup could not resolve "%s"', scenario_name)
         return WarmupStepResult(StepDisposition.TERMINAL, outcome.reason)
 
     rank_info = get_cached_scenario_rank(
@@ -468,7 +468,7 @@ def _startup_queue() -> list[str]:
         duplicates = len(scenarios) - len(new_names)
         if duplicates:
             logger.info(
-                "Percentile warmup queued playlist %s (%s): %d played scenarios "
+                'Percentile warmup queued playlist "%s" (%s): %d played scenarios '
                 "(%d already queued)",
                 playlist_name,
                 playlist_code,
@@ -477,7 +477,7 @@ def _startup_queue() -> list[str]:
             )
         else:
             logger.info(
-                "Percentile warmup queued playlist %s (%s): %d played scenarios",
+                'Percentile warmup queued playlist "%s" (%s): %d played scenarios',
                 playlist_name,
                 playlist_code,
                 len(new_names),
@@ -566,7 +566,7 @@ class PercentileWarmupWorker:
                 self._begin_batch_locked()
             self._condition.notify()
         logger.info(
-            "Percentile warmup prepended playlist %s (%s): %d played scenarios",
+            'Percentile warmup prepended playlist "%s" (%s): %d played scenarios',
             playlist.name,
             playlist.code,
             len(scenarios),
@@ -848,7 +848,7 @@ class PercentileWarmupWorker:
                 result = process_warmup_item(scenario_name, self.context)
             except Exception as exc:  # noqa: BLE001 - daemon safety net
                 logger.exception(
-                    "Unexpected percentile warmup failure for %s",
+                    'Unexpected percentile warmup failure for "%s"',
                     scenario_name,
                 )
                 self._set_fatal(str(exc))

@@ -474,7 +474,7 @@ def get_rank_data_from_playlist_code(
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
         logger.warning(
-            "Failed to get rank data for playlist code (%s), scenario (%s)",
+            'Failed to get rank data for playlist code (%s), scenario "%s"',
             playlist_code,
             scenario_name,
         )
@@ -485,7 +485,7 @@ def get_rank_data_from_playlist_code(
             continue
         return scenario.ranks or []
     logger.warning(
-        "Failed to get rank data for playlist code (%s), scenario (%s)",
+        'Failed to get rank data for playlist code (%s), scenario "%s"',
         playlist_code,
         scenario_name,
     )
@@ -527,7 +527,7 @@ def load_csv_file_into_database(csv_file: str) -> bool:
     """
     run_data = extract_data_from_file(csv_file)
     if not run_data:
-        logger.warning("Failed to get run data for CSV file: %s", csv_file)
+        logger.warning('Failed to get run data for CSV file: "%s"', csv_file)
         return False
 
     run_database.add(run_data)
@@ -728,7 +728,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         # watchdog path already holds the same line (file_watchdog.on_created).
         # UnicodeDecodeError is a ValueError subclass, already covered.
         logger.warning(
-            "Failed to read or parse file: %s", full_file_path, exc_info=True
+            'Failed to read or parse file: "%s"', full_file_path, exc_info=True
         )
         return None
 
@@ -740,7 +740,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         or score is None
         or sens_scale is None
     ):
-        logger.warning("Missing data from file: %s", full_file_path)
+        logger.warning('Missing data from file: "%s"', full_file_path)
         return None
 
     # Converting needs the whole key-value tail, not just the sensitivity
@@ -932,7 +932,7 @@ def get_bundled_leaderboard_seed() -> tuple[dict[str, int], bool]:
     for scenario_name, leaderboard_ids in ids_by_name.items():
         if len(leaderboard_ids) > 1:
             logger.warning(
-                "Bundled corpus disagrees on leaderboard id for scenario %r: %s; "
+                'Bundled corpus disagrees on leaderboard id for scenario "%s": %s; '
                 "excluding it from the seed.",
                 scenario_name,
                 sorted(leaderboard_ids),
@@ -985,7 +985,7 @@ def load_playlist_from_code(  # noqa: PLR0911
             else exc.__class__.__name__
         )
         logger.warning(
-            "Failed to look up playlist code %s: %s",
+            "Failed to look up playlist code %r: %s",
             input_playlist_code,
             detail,
         )
@@ -1013,7 +1013,7 @@ def load_playlist_from_code(  # noqa: PLR0911
             # response can still fail here and must degrade to the refusal
             # rather than escape into the Dash callback.
             logger.warning(
-                "Invalid playlist data returned by API for playlist code: %s",
+                "Invalid playlist data returned by API for playlist code: %r",
                 input_playlist_code,
             )
             return f"The playlist data for {input_playlist_code} is unusable.", None
@@ -1024,13 +1024,13 @@ def load_playlist_from_code(  # noqa: PLR0911
         # Fall back to Evxl's exact by-code lookup before refusing.
         if not response or not response.data:
             logger.info(
-                "KovaaK's search returned no usable record for %s; "
+                "KovaaK's search returned no usable record for %r; "
                 "trying Evxl playlist-by-code.",
                 input_playlist_code,
             )
         else:
             logger.info(
-                "KovaaK's search returned %d records for %s; "
+                "KovaaK's search returned %d records for %r; "
                 "trying Evxl playlist-by-code.",
                 len(response.data),
                 input_playlist_code,
@@ -1055,7 +1055,7 @@ def load_playlist_from_code(  # noqa: PLR0911
             # a connection error, so the refusal must not claim that no playlist
             # matches. The search's log line keeps the zero-versus-many detail.
             logger.warning(
-                "Evxl playlist-by-code fallback failed for %s: %s",
+                "Evxl playlist-by-code fallback failed for %r: %s",
                 input_playlist_code,
                 exc,
             )
@@ -1066,7 +1066,7 @@ def load_playlist_from_code(  # noqa: PLR0911
             return message, None
 
         logger.info(
-            "Resolved %s through Evxl playlist-by-code (canonical code %s).",
+            "Resolved %r through Evxl playlist-by-code (canonical code %s).",
             input_playlist_code,
             playlist_data.code,
         )
@@ -1074,7 +1074,7 @@ def load_playlist_from_code(  # noqa: PLR0911
     if playlist_data.code in playlist_database:
         existing_playlist = playlist_database[playlist_data.code]
         logger.warning(
-            "Playlist code already exists: %s is already imported as %s (%s).",
+            'Playlist code already exists: %s is already imported as "%s" (%s).',
             playlist_data.code,
             existing_playlist.name,
             existing_playlist.code,
@@ -1091,7 +1091,7 @@ def load_playlist_from_code(  # noqa: PLR0911
         write_playlist_data_to_file(playlist_data)
     except ValueError:
         logger.warning(
-            "Invalid playlist data returned by API: %s (%s)",
+            'Invalid playlist data returned by API: "%s" (%s)',
             playlist_data.name,
             playlist_data.code,
         )
@@ -1101,7 +1101,7 @@ def load_playlist_from_code(  # noqa: PLR0911
         # records the OSError itself (a full disk, a denied directory, a failed
         # fsync), so the traceback has to ride on this line.
         logger.warning(
-            "Failed to save playlist data: %s (%s)",
+            'Failed to save playlist data: "%s" (%s)',
             playlist_data.name,
             playlist_data.code,
             exc_info=True,
@@ -1115,7 +1115,7 @@ def load_playlist_from_code(  # noqa: PLR0911
         # The destination point-check found a file from a newer build. Nothing
         # was written, and the incumbent is untouched.
         logger.warning(
-            "Cannot save this playlist: %s (%s) would replace a playlist file "
+            'Cannot save this playlist: "%s" (%s) would replace a playlist file '
             "written by a newer version of this app.",
             playlist_data.name,
             playlist_data.code,
@@ -1141,7 +1141,7 @@ def load_playlist_from_code(  # noqa: PLR0911
     # this is the one place both import paths (search and Evxl) converge after
     # persistence actually succeeded.
     logger.info(
-        "Imported playlist %s (%s): %d scenarios.",
+        'Imported playlist "%s" (%s): %d scenarios.',
         playlist_data.name,
         playlist_data.code,
         len(playlist_data.scenarios),
@@ -1189,10 +1189,12 @@ def delete_user_playlist(playlist_code: str) -> str | None:
             except FileNotFoundError:
                 # Already gone on disk (manual delete or a prior partial run).
                 deleted.add(file_path)
-                logger.warning("Playlist file already missing on delete: %s", file_path)
+                logger.warning(
+                    'Playlist file already missing on delete: "%s"', file_path
+                )
             except OSError:
                 logger.warning(
-                    "Failed to delete playlist file: %s", file_path, exc_info=True
+                    'Failed to delete playlist file: "%s"', file_path, exc_info=True
                 )
                 error_message = (
                     "Couldn't delete the playlist file. See data/logs/debug.log. "
@@ -1238,12 +1240,12 @@ def delete_superseded_user_playlist_files() -> str | None:
                 file_path.unlink()
             except FileNotFoundError:
                 logger.warning(
-                    "Superseded playlist file already missing on delete: %s",
+                    'Superseded playlist file already missing on delete: "%s"',
                     file_path,
                 )
             except OSError:
                 logger.warning(
-                    "Failed to delete playlist file: %s", file_path, exc_info=True
+                    'Failed to delete playlist file: "%s"', file_path, exc_info=True
                 )
                 error_message = (
                     "Couldn't delete the playlist file. See data/logs/debug.log. "
@@ -1275,7 +1277,7 @@ def _guard_playlist_destination(file_path: Path) -> None:
     if document.state is StoreState.SUPPORTED:
         incumbent = document.value
         logger.warning(
-            "Cannot save this playlist: %s already holds %s (%s). Delete that "
+            'Cannot save this playlist: "%s" already holds "%s" (%s). Delete that '
             "playlist first, then import again.",
             file_path.name,
             incumbent.name,

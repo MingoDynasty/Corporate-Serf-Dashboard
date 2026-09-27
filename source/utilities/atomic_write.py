@@ -42,7 +42,7 @@ def replace_with_retry(
         except PermissionError:
             if retry_delay is None:
                 raise
-            logger.warning("Retrying replace after PermissionError: %s", destination)
+            logger.warning('Retrying replace after PermissionError: "%s"', destination)
             time.sleep(retry_delay)
 
 

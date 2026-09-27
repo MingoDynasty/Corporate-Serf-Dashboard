@@ -241,7 +241,7 @@ def test_load_csv_file_into_database_reports_extract_failure(
     monkeypatch.setattr(data_service, "extract_data_from_file", lambda _path: None)
 
     assert data_service.load_csv_file_into_database("broken.csv") is False
-    assert "Failed to get run data for CSV file: broken.csv" in caplog.messages
+    assert 'Failed to get run data for CSV file: "broken.csv"' in caplog.messages
 
 
 def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(

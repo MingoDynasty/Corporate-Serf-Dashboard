@@ -66,7 +66,7 @@ def _get_created_csv_path(event) -> str | None:
         return None
 
     file = event.src_path
-    logger.debug("Detected new file: %s", Path(file).name)
+    logger.debug('Detected new file: "%s"', Path(file).name)
     if not file.endswith(".csv"):
         return None
     return file
@@ -102,7 +102,7 @@ def _refresh_rank_after_high_score(
             get_config().scenario_metadata_cache_ttl_hours,
         )
     except Exception:
-        logger.exception("Failed to schedule rank refresh for %s", scenario_name)
+        logger.exception('Failed to schedule rank refresh for "%s"', scenario_name)
 
 
 class NewFileHandler(FileSystemEventHandler):
@@ -120,7 +120,7 @@ class NewFileHandler(FileSystemEventHandler):
             # from a CSV still locked by KovaaK's); the next run must still
             # find a live handler. Log it and tell the UI instead.
             logger.exception(
-                "Failed to process new stats file: %s",
+                'Failed to process new stats file: "%s"',
                 getattr(event, "src_path", "(unknown)"),
             )
             run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
@@ -139,7 +139,7 @@ class NewFileHandler(FileSystemEventHandler):
             # None, so on_created's guard above never sees them. This handler
             # only sees the creation event and never retries, so the run stays
             # missing until a restart: notify here or the user is never told.
-            logger.warning("Failed to get run data for CSV file: %s", file)
+            logger.warning('Failed to get run data for CSV file: "%s"', file)
             run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
             return
 
@@ -147,7 +147,7 @@ class NewFileHandler(FileSystemEventHandler):
 
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
-            logger.debug("Found new scenario: %s", run_data.scenario)
+            logger.debug('Found new scenario: "%s"', run_data.scenario)
             new_score_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT * run_data.score
             logger.debug(
                 "Current score (%.2f) sets the score threshold at (%.2f)",
@@ -213,7 +213,7 @@ class NewFileHandler(FileSystemEventHandler):
         # Case 2: new sensitivity.
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
         if sensitivity_key not in sensitivities_vs_runs:
-            logger.debug("Found new sensitivity: %s", sensitivity_key)
+            logger.debug('Found new sensitivity: "%s"', sensitivity_key)
             message = NewFileMessage(
                 datetime_created=datetime.datetime.now(),
                 is_new_sensitivity=True,
@@ -242,7 +242,7 @@ class NewFileHandler(FileSystemEventHandler):
         )
         nth_score = higher_count + 1
         logger.debug(
-            "%s has a new %s place score: %s",
+            '"%s" has a new %s place score: %s',
             sensitivity_key,
             ordinal(nth_score),
             run_data.score,

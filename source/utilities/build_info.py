@@ -110,11 +110,11 @@ def _load_json_object(path: Path) -> dict[str, object] | None:
     except FileNotFoundError:
         return None  # No such file: a checkout, not an install.
     except OSError, UnicodeDecodeError, json.JSONDecodeError:
-        logger.warning("Ignoring unreadable %s", path, exc_info=True)
+        logger.warning('Ignoring unreadable "%s"', path, exc_info=True)
         return None
 
     if not isinstance(loaded, dict):
-        logger.warning("Ignoring %s: expected a JSON object", path)
+        logger.warning('Ignoring "%s": expected a JSON object', path)
         return None
     return loaded
 
@@ -136,7 +136,7 @@ def _from_identity_file(
     found_version = document.get("schema_version")
     if found_version != schema_version:
         logger.warning(
-            "Ignoring %s: unsupported schema_version %r",
+            'Ignoring "%s": unsupported schema_version %r',
             path,
             found_version,
         )
@@ -144,12 +144,12 @@ def _from_identity_file(
 
     sha = _optional_string(document.get("sha"))
     if not sha:
-        logger.warning("Ignoring %s: no sha", path)
+        logger.warning('Ignoring "%s": no sha', path)
         return None
 
     if stamped is None or stamped.sha != sha:
         logger.info(
-            "Ignoring %s: it describes %s, which is not the running code",
+            'Ignoring "%s": it describes %s, which is not the running code',
             path,
             sha,
         )
@@ -208,7 +208,7 @@ def _from_version_stamp() -> BuildInfo | None:
     except FileNotFoundError:
         return None
     except OSError, UnicodeDecodeError:
-        logger.warning("Ignoring unreadable %s", stamp_path, exc_info=True)
+        logger.warning('Ignoring unreadable "%s"', stamp_path, exc_info=True)
         return None
 
     values = _parse_version_stamp(text)

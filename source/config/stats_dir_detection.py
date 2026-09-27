@@ -86,7 +86,7 @@ def _libraries_in_vdf(root: str) -> list[str]:
         # A root with no vdf is normal -- the root itself is still a library.
         return []
     except OSError, UnicodeDecodeError:
-        logger.warning("Could not read %s; skipping it.", vdf_path, exc_info=True)
+        logger.warning('Could not read "%s"; skipping it.', vdf_path, exc_info=True)
         return []
     # The vdf escapes backslashes; the installer's regex unescaped them the
     # same way, and an unescaped path would not resolve.
@@ -169,7 +169,7 @@ def bootstrap_stats_dir() -> None:
             "settings page. Detection runs again on the next start."
         )
         return
-    logger.info("Detected the KovaaK's stats directory: %s", detected)
+    logger.info('Detected the KovaaK\'s stats directory: "%s"', detected)
     try:
         # Merged, never replaced: an identity may already be stored.
         save_settings({**settings, STATS_DIR_KEY: detected})

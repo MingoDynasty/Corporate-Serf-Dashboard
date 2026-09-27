@@ -720,7 +720,7 @@ def _render_scenario_rank(
             record_activity=allow_network,
         )
     except Exception:  # noqa: BLE001
-        logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
+        logger.exception('Failed to fetch scenario rank for "%s"', selected_scenario)
         return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), []
 
     value = format_scenario_rank(rank_info)
@@ -946,7 +946,7 @@ def refresh_rank(  # noqa: PLR0911
             force_refresh=True,
         )
     except Exception:  # noqa: BLE001
-        logger.exception("Manual rank refresh failed for %s", selected_scenario)
+        logger.exception('Manual rank refresh failed for "%s"', selected_scenario)
         return no_update, *channel_toast(
             _rank_refresh_problem_notification(served_stale=False), toast_channels
         )
@@ -954,7 +954,7 @@ def refresh_rank(  # noqa: PLR0911
     if rank_info.error_message:
         # The console/file record the log bridge used to keep, kept here now.
         logger.error(
-            "Manual rank refresh for %s failed: %s",
+            'Manual rank refresh for "%s" failed: %s',
             selected_scenario,
             rank_info.error_message,
         )
@@ -970,7 +970,7 @@ def refresh_rank(  # noqa: PLR0911
     display = _rank_display(rank_text, hint)
     if rank_info.served_stale:
         logger.warning(
-            "Manual rank refresh for %s served a cached position: %s",
+            'Manual rank refresh for "%s" served a cached position: %s',
             selected_scenario,
             rank_info.warning_message,
         )
@@ -985,7 +985,7 @@ def refresh_rank(  # noqa: PLR0911
     # both the unchanged-position claim and the no-username one.
     if rank_info.total_refresh_failed:
         logger.warning(
-            "Manual rank refresh for %s could not re-read the leaderboard total.",
+            'Manual rank refresh for "%s" could not re-read the leaderboard total.',
             selected_scenario,
         )
         return display, *channel_toast(
@@ -1199,7 +1199,7 @@ def _build_scenario_figure(  # noqa: PLR0913
         )
         if not sensitivities_vs_runs:
             logger.warning(
-                "No scenario data found for (%s) for date range: %s",
+                'No scenario data found for "%s" for date range: %s',
                 selected_scenario,
                 oldest_datetime,
             )
@@ -1236,7 +1236,7 @@ def _build_scenario_figure(  # noqa: PLR0913
         )
         if not time_vs_runs:
             logger.warning(
-                "No scenario data found for (%s) for date range: %s",
+                'No scenario data found for "%s" for date range: %s',
                 selected_scenario,
                 oldest_datetime,
             )
@@ -1265,7 +1265,7 @@ def _build_scenario_figure(  # noqa: PLR0913
             True,
         )
 
-    logger.error("Unsupported radio option: %s", x_axis_radiogroup)
+    logger.error("Unsupported radio option: %r", x_axis_radiogroup)
     return (
         generate_empty_plot(
             _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
@@ -1345,7 +1345,7 @@ def generate_graph(  # noqa: PLR0913
         )
 
     if not is_scenario_in_database(selected_scenario):
-        logger.warning("No scenario data found for: %s", selected_scenario)
+        logger.warning('No scenario data found for: "%s"', selected_scenario)
         return _empty_state_graph_response(
             _NO_SCENARIO_DATA_PLOT_TITLE,
             _NO_SCENARIO_DATA_PLOT_MESSAGE,

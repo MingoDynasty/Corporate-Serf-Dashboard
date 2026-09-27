@@ -85,9 +85,9 @@ def _warn_unknown_keys(config_dict: Mapping[str, Any]) -> None:
     unknown = sorted(set(config_dict) - known)
     if unknown:
         logger.warning(
-            "Ignoring unknown key(s) in %s: %s. Remove them when convenient.",
+            'Ignoring unknown key(s) in "%s": %r. Remove them when convenient.',
             config_file_path(),
-            ", ".join(unknown),
+            unknown,
         )
 
 

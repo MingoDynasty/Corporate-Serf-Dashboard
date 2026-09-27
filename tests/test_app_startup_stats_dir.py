@@ -91,7 +91,7 @@ def test_startup_scans_and_watches_a_usable_stats_dir(state_root: Path) -> None:
     assert result.returncode == 0, result.stderr
     log_text = _debug_log(state_root)
     assert "CSV startup load complete" in log_text
-    assert f"Monitoring directory: {stats_dir}" in log_text
+    assert f'Monitoring directory: "{stats_dir}"' in log_text
     # Startup, not module import, builds the API cache tree. On this path
     # (no identity, no network) make_cache is the only creator of this
     # directory; the permanent mapping file is a weaker witness because the
@@ -110,8 +110,8 @@ def test_startup_detects_a_never_configured_stats_dir_and_uses_it(
 
     assert result.returncode == 0, result.stderr
     log_text = _debug_log(state_root)
-    assert f"Detected the KovaaK's stats directory: {stats_dir}" in log_text
-    assert f"Monitoring directory: {stats_dir}" in log_text
+    assert f'Detected the KovaaK\'s stats directory: "{stats_dir}"' in log_text
+    assert f'Monitoring directory: "{stats_dir}"' in log_text
     assert json.loads(
         (state_root / "data" / "settings.json").read_text(encoding="utf-8")
     ) == {"schema_version": 1, "stats_dir": str(stats_dir)}
@@ -128,7 +128,7 @@ def test_startup_leaves_a_configured_stats_dir_alone(state_root: Path) -> None:
     result = _run_startup(state_root, detected=str(detected))
 
     assert result.returncode == 0, result.stderr
-    assert f"Monitoring directory: {stats_dir}" in _debug_log(state_root)
+    assert f'Monitoring directory: "{stats_dir}"' in _debug_log(state_root)
 
 
 @pytest.mark.parametrize("configured", [None, "", "no-such-stats-dir"])

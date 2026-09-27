@@ -222,7 +222,7 @@ def test_on_created_preserves_detection_log_for_non_csv(caplog):
             SimpleNamespace(is_directory=False, src_path="notes.txt")
         )
 
-    assert "Detected new file: notes.txt" in caplog.messages
+    assert 'Detected new file: "notes.txt"' in caplog.messages
 
 
 def test_scheduling_failure_does_not_block_ingestion(monkeypatch, caplog):

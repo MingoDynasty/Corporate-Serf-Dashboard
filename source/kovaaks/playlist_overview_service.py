@@ -66,7 +66,7 @@ def _cached_rank_resolution(
         )
     except Exception:  # noqa: BLE001 - one bad cache entry must not empty the page
         logger.warning(
-            "Failed to read cached rank info for %s",
+            'Failed to read cached rank info for "%s"',
             scenario_name,
             exc_info=True,
         )

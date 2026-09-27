@@ -94,7 +94,7 @@ def test_startup_queue_enqueues_shared_scenarios_once(monkeypatch, caplog):
 
     messages = [record.getMessage() for record in caplog.records]
     assert (
-        "Percentile warmup queued playlist Older playlist (Older): "
+        'Percentile warmup queued playlist "Older playlist" (Older): '
         "1 played scenarios (1 already queued)"
     ) in messages
 
@@ -605,7 +605,7 @@ def test_unresolvable_leaderboard_is_terminal(monkeypatch, caplog):
     assert result.disposition == warmup.StepDisposition.TERMINAL
     assert result.reason == "leaderboard could not be resolved"
     assert context.outcomes["Scenario"].terminal is True
-    assert caplog.messages == ["Percentile warmup could not resolve Scenario"]
+    assert caplog.messages == ['Percentile warmup could not resolve "Scenario"']
 
 
 def test_rank_endpoint_without_a_usable_state_is_terminal(monkeypatch):
@@ -985,7 +985,7 @@ def test_run_stops_when_item_processing_raises(monkeypatch, caplog):
     [record] = [
         record
         for record in caplog.records
-        if record.getMessage() == "Unexpected percentile warmup failure for A"
+        if record.getMessage() == 'Unexpected percentile warmup failure for "A"'
     ]
     assert record.levelno == logging.ERROR
     assert record.exc_info is not None
