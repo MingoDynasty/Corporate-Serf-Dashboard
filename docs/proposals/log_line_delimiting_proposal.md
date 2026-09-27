@@ -17,14 +17,15 @@ so the code teaches the rule the agent instructions state.
 
 ## Decisions needed
 
-Nothing is ratified, and the maintainer has no lean on record for any row.
-Each row keeps its recommendation beside the strongest alternative and what
-choosing it would change. Everything else in this proposal is author-owned
-and sits in Design; a reviewer may still challenge it.
+Four rulings, each ratified by the maintainer on 2026-09-26 when the
+proposal was ratified as a whole, after every review seat had endorsed
+every row at its current text. Each keeps its recommendation and the
+alternative it rejected, for the record. The maintainer had no lean on
+record before ratifying. Everything else in this proposal is author-owned.
 
 ### D1 — Free text takes double quotes
 
-Status: Open.
+Status: Ratified (user), 2026-09-26: accept the recommendation below.
 
 Free text is a string whose content someone outside the code chose: a
 scenario, playlist, or user name, or a value read from a run file. 61
@@ -81,7 +82,7 @@ as `Tracking Benchmarks (Easy)` as two parenthesized groups.
 
 ### D2 — Paths take the same double quotes
 
-Status: Open.
+Status: Ratified (user), 2026-09-26: accept the recommendation below.
 
 34 placeholders carry a path or a file name. 16 already sit last after a
 colon, where the end of the line delimits them. 11 have prose running on
@@ -111,7 +112,7 @@ empty or whitespace-tailed path invisible.
 
 ### D3 — A caught exception reaches the log one of three ways
 
-Status: Open.
+Status: Ratified (user), 2026-09-26: accept the recommendation below.
 
 55 calls log an exception: 36 carry a traceback and name the failure in
 words, 11 route a `requests` failure through `request_exception_summary`,
@@ -155,7 +156,7 @@ changes all 8 lines instead of 3.
 
 ### D4 — The existing lines are swept once, in the PR that lands the rule
 
-Status: Open.
+Status: Ratified (user), 2026-09-26: accept the recommendation below.
 
 **Recommendation: a full sweep, in the implementation PR, so the rule and a
 tree that follows it land together.** Measured by applying the sweep to a
@@ -350,8 +351,8 @@ follows D4:
 >   follows the copy rules in Styling Conventions, and these rules do not
 >   edit it.
 
-If D4 is ruled no backfill, the scope sentence reads instead: "They govern
-new and edited log lines; existing lines are not swept to match."
+D4 is ratified as a full sweep, so the scope sentence above is the one that
+ships.
 
 ### Kinds, and the test for each
 
@@ -596,5 +597,5 @@ is involved.
    `docs/product.md` change; the implementer searches
    `docs/` for any quoted log line the sweep alters.
 
-If D4 is ruled no backfill, the implementation PR is commits 1 and 5, and
-the double-warning fix ships as its own small PR.
+D4 is ratified as a full sweep, so all five commits ship in the one
+implementation PR.
