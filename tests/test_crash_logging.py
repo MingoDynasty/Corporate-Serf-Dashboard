@@ -91,7 +91,7 @@ def test_on_created_survives_unexpected_error(monkeypatch, caplog):
             SimpleNamespace(is_directory=False, src_path="run.csv")
         )
 
-    assert "Failed to process new stats file: run.csv" in caplog.text
+    assert 'Failed to process new stats file: "run.csv"' in caplog.text
     # exc_info rides along, so the traceback reaches debug.log.
     assert "file still locked" in caplog.text
     # The watchdog thread has no callback context, so it publishes the failure
@@ -113,7 +113,7 @@ def test_on_created_reports_contained_parse_failure(monkeypatch, caplog):
             SimpleNamespace(is_directory=False, src_path="run.csv")
         )
 
-    assert "Failed to get run data for CSV file: run.csv" in caplog.text
+    assert 'Failed to get run data for CSV file: "run.csv"' in caplog.text
     # The failure never reaches on_created's handler, so this path has to
     # publish the toast itself -- once.
     assert file_watchdog.drain_run_import_failures() == [

@@ -86,8 +86,8 @@ def test_playlists_without_runs_render_an_in_page_empty_state(
 
     assert journey._NO_JOURNEY_DATA_PLOT_TITLE in _empty_state_title(figure)
     # The developer record stays in the log; the user reads the canvas.
-    assert "Insufficient data for playlist: A Playlist" in caplog.text
-    assert "Insufficient data for playlist: B Playlist" in caplog.text
+    assert 'Insufficient data for playlist: "A Playlist"' in caplog.text
+    assert 'Insufficient data for playlist: "B Playlist"' in caplog.text
 
 
 def test_one_playlist_with_runs_still_plots(monkeypatch, known_playlists, caplog):
@@ -109,4 +109,4 @@ def test_one_playlist_with_runs_still_plots(monkeypatch, known_playlists, caplog
     assert _empty_state_title(figure) is None
     plotted = {len(trace.y) for trace in figure.data}
     assert plotted == {0, 2}
-    assert "Insufficient data for playlist: B Playlist" in caplog.text
+    assert 'Insufficient data for playlist: "B Playlist"' in caplog.text

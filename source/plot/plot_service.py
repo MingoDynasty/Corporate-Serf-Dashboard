@@ -285,7 +285,7 @@ def _generate_xy_plot(  # noqa: PLR0913
 
     current_datetime = format_absolute_timestamp(datetime.today())
     title = f"{scenario_name} (updated: {current_datetime!s})"
-    logger.debug("Generating plot for: %s", scenario_name)
+    logger.debug('Generating plot for: "%s"', scenario_name)
 
     figure_scatter = px.scatter(
         data_frame=pd.DataFrame(scatter_plot_data),

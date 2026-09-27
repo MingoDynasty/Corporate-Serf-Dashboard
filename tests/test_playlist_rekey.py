@@ -327,7 +327,7 @@ def test_import_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
         for record in caplog.records
         if record.levelno == logging.INFO
     ]
-    assert info_messages == ["Imported playlist Fresh (FreshCode): 2 scenarios."]
+    assert info_messages == ['Imported playlist "Fresh" (FreshCode): 2 scenarios.']
 
 
 def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
@@ -403,7 +403,7 @@ def test_import_reports_write_failures_without_updating_database(
         record
         for record in caplog.records
         if record.getMessage()
-        == "Failed to save playlist data: Locked Playlist (LockedCode)"
+        == 'Failed to save playlist data: "Locked Playlist" (LockedCode)'
     ]
     assert record.exc_info is not None
     assert record.exc_info[1] is write_error
@@ -559,6 +559,7 @@ def test_import_refuses_when_search_empty_and_evxl_returns_http_400(
 def test_import_refuses_when_search_empty_and_evxl_connection_error(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
     monkeypatch.setattr(
@@ -570,17 +571,22 @@ def test_import_refuses_when_search_empty_and_evxl_connection_error(
 
     monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_down)
 
-    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+    with caplog.at_level(logging.WARNING, logger=data_service.logger.name):
+        message, imported_code = data_service.load_playlist_from_code("SomeCode")
 
     assert message == (
         "Couldn't load a playlist for the code SomeCode. Check the code and try again."
     )
     assert imported_code is None
+    assert caplog.messages == [
+        "Evxl playlist-by-code fallback failed for 'SomeCode': evxl unreachable"
+    ]
 
 
 def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     monkeypatch.setattr(
@@ -592,7 +598,8 @@ def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
     evxl = _evxl_playlist("Nameless", "   ", ["Scenario"])
     monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
 
-    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+    with caplog.at_level(logging.WARNING, logger=data_service.logger.name):
+        message, imported_code = data_service.load_playlist_from_code("SomeCode")
 
     assert message == (
         "Couldn't load a playlist for the code SomeCode. Check the code and try again."
@@ -600,6 +607,10 @@ def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
+    # The class name, not the validation error's field dump.
+    assert caplog.messages == [
+        "Evxl playlist-by-code fallback failed for 'SomeCode': ValidationError"
+    ]
 
 
 def test_import_falls_back_to_evxl_when_search_is_ambiguous(monkeypatch, tmp_path):
@@ -1142,6 +1153,23 @@ def test_a_newer_stamped_user_playlist_is_skipped_and_says_so(monkeypatch, tmp_p
         "(schema_version 2). It is intact. Update the app to use it. "
         f"File: {user_root.resolve() / 'future.json'}"
     ]
+
+
+@pytest.mark.parametrize("stamp", [None, 2], ids=["unstamped", "newer"])
+def test_a_skipped_user_playlist_is_logged_once(monkeypatch, tmp_path, caplog, stamp):
+    """Check that only the store layer logs a skipped file; the loader queues it."""
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    playlist = _playlist("Skipped", "SkippedCode")
+    if stamp is None:
+        _write_playlist(user_root / "skipped.json", playlist)
+    else:
+        _write_raw_playlist(user_root / "skipped.json", _stamped(playlist, stamp))
+
+    with caplog.at_level(logging.WARNING):
+        data_service.load_playlists()
+
+    [warning] = data_service.drain_startup_playlist_warnings()
+    assert [record.getMessage() for record in caplog.records].count(warning) == 1
 
 
 def test_a_stamped_user_playlist_with_an_invalid_payload_names_the_code_fix(

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 import requests
+from pydantic import ValidationError
 
 from source.config import settings_service
 from source.config.config_service import ConfigData
@@ -94,7 +95,7 @@ def test_startup_queue_enqueues_shared_scenarios_once(monkeypatch, caplog):
 
     messages = [record.getMessage() for record in caplog.records]
     assert (
-        "Percentile warmup queued playlist Older playlist (Older): "
+        'Percentile warmup queued playlist "Older playlist" (Older): '
         "1 played scenarios (1 already queued)"
     ) in messages
 
@@ -605,7 +606,48 @@ def test_unresolvable_leaderboard_is_terminal(monkeypatch, caplog):
     assert result.disposition == warmup.StepDisposition.TERMINAL
     assert result.reason == "leaderboard could not be resolved"
     assert context.outcomes["Scenario"].terminal is True
-    assert caplog.messages == ["Percentile warmup could not resolve Scenario"]
+    assert caplog.messages == ['Percentile warmup could not resolve "Scenario"']
+
+
+def _validation_error() -> ValidationError:
+    try:
+        ScenarioRankInfo.model_validate({"status": "not a status"})
+    except ValidationError as exc:
+        return exc
+    raise AssertionError("expected a ValidationError")
+
+
+@pytest.mark.parametrize(
+    ("make_error", "detail"),
+    [
+        # Empty text: the summary helper falls back to the class name.
+        (requests.ConnectionError, "ConnectionError"),
+        (
+            lambda: api_service.UnknownKovaaksUserError(
+                "KovaaK's username \"Ghost\" wasn't found."
+            ),
+            "KovaaK's username \"Ghost\" wasn't found.",
+        ),
+        (
+            lambda: FileNotFoundError(2, "No such file or directory"),
+            "[Errno 2] No such file or directory",
+        ),
+        (_validation_error, "ValidationError"),
+        # Renders as nothing under %s, so it logs its class name.
+        (ValueError, "ValueError"),
+    ],
+)
+def test_expected_failure_logs_each_route(monkeypatch, caplog, make_error, detail):
+    def fail(*_args, **_kwargs):
+        raise make_error()
+
+    monkeypatch.setattr(warmup, "resolve_leaderboard_id", fail)
+    context = warmup.WarmupContext(_config())
+
+    with caplog.at_level(logging.WARNING, logger=warmup.__name__):
+        warmup.process_warmup_item("Scenario", context)
+
+    assert caplog.messages == [f'Percentile warmup failed for "Scenario": {detail}']
 
 
 def test_rank_endpoint_without_a_usable_state_is_terminal(monkeypatch):
@@ -985,7 +1027,7 @@ def test_run_stops_when_item_processing_raises(monkeypatch, caplog):
     [record] = [
         record
         for record in caplog.records
-        if record.getMessage() == "Unexpected percentile warmup failure for A"
+        if record.getMessage() == 'Unexpected percentile warmup failure for "A"'
     ]
     assert record.levelno == logging.ERROR
     assert record.exc_info is not None

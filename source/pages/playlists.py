@@ -609,7 +609,7 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
             no_update,
             "Enter a playlist code.",
         )
-    logger.debug("Importing playlist '%s'", playlist_to_import)
+    logger.debug("Importing playlist %r", playlist_to_import)
     error_message, canonical_code = load_playlist_from_code(playlist_to_import)
 
     if error_message:
@@ -649,7 +649,7 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
             # replace, and a newer-stamped file is never written at all), so
             # the code is simply absent from the shown set.
             logger.exception(
-                "Failed to mark imported playlist '%s' as shown", canonical_code
+                "Failed to mark imported playlist %s as shown", canonical_code
             )
             visibility_write_failed = True
         # Outside the try: the playlist file exists either way, so warm it.
@@ -783,7 +783,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels)
         # nothing, and the natural retry deletes an absent file and renders a
         # red "delete failed" toast for a delete that succeeded.
         logger.exception(
-            "Failed to drop deleted playlist '%s' from the shown set", target_code
+            "Failed to drop deleted playlist %s from the shown set", target_code
         )
     notification = toast(
         delete_successful_channel(target_code),

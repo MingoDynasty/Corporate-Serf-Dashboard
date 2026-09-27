@@ -251,13 +251,13 @@ def test_run_attempt_retries_stale_results_then_saves_fresh_rank(
         for record in caplog.records
         if record.levelno == logging.DEBUG
     ] == [
-        f"Rank freshness attempt 1/5 for {SCENARIO_NAME} not ready "
+        f'Rank freshness attempt 1/5 for "{SCENARIO_NAME}" not ready '
         "(status=UNRANKED, board score=N/A, expected score >= 100.00); "
         "retrying in 4s.",
-        f"Rank freshness attempt 2/5 for {SCENARIO_NAME} not ready "
+        f'Rank freshness attempt 2/5 for "{SCENARIO_NAME}" not ready '
         "(status=RANKED, board score=99.99, expected score >= 100.00); "
         "retrying in 8s.",
-        f"Rank freshness complete for {SCENARIO_NAME} on attempt 3/5 "
+        f'Rank freshness complete for "{SCENARIO_NAME}" on attempt 3/5 '
         "(leaderboard 98330, cached rank 100, cached score 100.00, "
         "cache=updated).",
     ]
@@ -349,7 +349,7 @@ def test_unknown_user_stops_with_warning_log(monkeypatch, caplog):
     with caplog.at_level(logging.WARNING, logger=api_service.__name__):
         api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)
 
-    assert f"Rank refresh stopped for {SCENARIO_NAME}: unknown user" in caplog.text
+    assert f'Rank refresh stopped for "{SCENARIO_NAME}": unknown user' in caplog.text
 
 
 def test_transient_resolver_error_retries_without_traceback(
@@ -537,15 +537,15 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
     assert fetch_count == len(api_service.ATTEMPT_DELAYS_SECONDS)
     assert rank_file.read_bytes() == original_rank
     assert total_file.read_bytes() == original_total
-    assert f"Rank freshness refresh exhausted for {SCENARIO_NAME}" in caplog.text
+    assert f'Rank freshness refresh exhausted for "{SCENARIO_NAME}"' in caplog.text
     assert "Possible score-precision drift" in caplog.text
     assert (
-        f"Scheduled rank freshness refresh for {SCENARIO_NAME} "
+        f'Scheduled rank freshness refresh for "{SCENARIO_NAME}" '
         "(expected score >= 100.00; first attempt in 2s, 5 attempts total)."
         in caplog.messages
     )
     assert (
-        f"Rank freshness attempt 5/5 for {SCENARIO_NAME} not ready "
+        f'Rank freshness attempt 5/5 for "{SCENARIO_NAME}" not ready '
         "(status=RANKED, board score=99.99, expected score >= 100.00); "
         "attempts exhausted." in caplog.messages
     )

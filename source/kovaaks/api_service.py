@@ -444,7 +444,7 @@ def _read_json(cache_file: Path) -> dict | list | None:
             with open(cache_file, encoding="utf-8") as file:
                 return json.load(file)
         except OSError, json.JSONDecodeError, UnicodeDecodeError:
-            logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
+            logger.warning('Failed to read cache file: "%s"', cache_file, exc_info=True)
             return None
 
 
@@ -633,7 +633,7 @@ def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     coerced = _coerce_leaderboard_id(leaderboard_id)
     if coerced is None:
         logger.warning(
-            "Ignoring non-numeric cached leaderboard id for scenario %s: %r",
+            'Ignoring non-numeric cached leaderboard id for scenario "%s": %r',
             scenario_name,
             leaderboard_id,
         )
@@ -692,7 +692,7 @@ def save_leaderboard_id(
         existing_id = _coerce_leaderboard_id(existing_raw)
         if existing_id is not None and existing_id != leaderboard_id:
             logger.warning(
-                "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
+                'Conflicting leaderboard id for scenario "%s": existing=%s new=%s source=%s',
                 scenario_name,
                 existing_raw,
                 leaderboard_id,
@@ -790,7 +790,7 @@ def _validated_total_play_cache(
         return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
     except ValidationError:
         logger.warning(
-            "Ignoring schema-invalid %s total-play cache for %s",
+            'Ignoring schema-invalid %s total-play cache for "%s"',
             freshness,
             username,
             exc_info=True,
@@ -823,7 +823,7 @@ def _fresh_total_play_cache(
         max_results,
         _has_terminal_user_scenario_total_play_page(username, max_results),
     ):
-        logger.warning("Ignoring incomplete total-play cache for %s", username)
+        logger.warning('Ignoring incomplete total-play cache for "%s"', username)
         return None
     return _validated_total_play_cache(cache_data, username, "fresh")
 
@@ -920,7 +920,7 @@ def get_user_scenario_total_play(
                     f"KovaaK's username \"{username}\" wasn't found."
                 )
             logger.warning(
-                "Using stale total-play cache for %s after failed request: %s",
+                'Using stale total-play cache for "%s" after failed request: %s',
                 username,
                 request_exception_summary(exc),
             )
@@ -990,7 +990,7 @@ def search_scenario_exact(scenario_name: str) -> int | None:
         return leaderboard_id
     if len(matches) > 1:
         logger.warning(
-            "Found multiple exact scenario search matches for %s: %s",
+            'Found multiple exact scenario search matches for "%s": %s',
             scenario_name,
             [match.leaderboardId for match in matches],
         )
@@ -1034,7 +1034,7 @@ def resolve_leaderboard_id(
             hydrate_leaderboard_id_cache(username, metadata_cache_ttl_hours)
         except requests.RequestException as exc:
             logger.warning(
-                "Failed to hydrate leaderboard metadata from total-play for %s: %s",
+                'Failed to hydrate leaderboard metadata from total-play for "%s": %s',
                 username,
                 request_exception_summary(exc),
             )
@@ -1078,7 +1078,7 @@ def get_cached_scenario_rank(
         )
     except ValidationError:
         logger.warning(
-            "Failed to validate rank cache file: %s",
+            'Failed to validate rank cache file: "%s"',
             cache_file,
             exc_info=True,
         )
@@ -1117,7 +1117,7 @@ def _cached_rank(
         )
     except ValidationError:
         logger.warning(
-            "Failed to validate rank cache file: %s",
+            'Failed to validate rank cache file: "%s"',
             cache_file,
             exc_info=True,
         )
@@ -1287,7 +1287,7 @@ def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
         if _warned_rank_over_total.get(rank_info.leaderboard_id) != pair:
             _warned_rank_over_total[rank_info.leaderboard_id] = pair
             logger.warning(
-                "Rank %s for %s (leaderboard %s) exceeds the cached total %s; "
+                'Rank %s for "%s" (leaderboard %s) exceeds the cached total %s; '
                 "suppressing the percentile.",
                 rank_info.rank,
                 rank_info.scenario_name or "?",
@@ -1357,7 +1357,7 @@ def _with_leaderboard_total(
         )
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch leaderboard total for %s (leaderboard %s): %s",
+            'Failed to fetch leaderboard total for "%s" (leaderboard %s): %s',
             rank_info.scenario_name or "?",
             rank_info.leaderboard_id,
             request_exception_summary(exc),
@@ -1494,7 +1494,7 @@ def _notify_exhaustion(
     last_rank_info: ScenarioRankInfo | None,
 ) -> None:
     """Log after all scheduled freshness attempts are exhausted."""
-    logger.warning("Rank freshness refresh exhausted for %s", scenario_name)
+    logger.warning('Rank freshness refresh exhausted for "%s"', scenario_name)
     if (
         last_rank_info is not None
         and last_rank_info.status == ScenarioRankStatus.RANKED
@@ -1502,7 +1502,7 @@ def _notify_exhaustion(
         and last_rank_info.score < _floor_2dp(expected_score) - SCORE_EPSILON
     ):
         logger.warning(
-            "Possible score-precision drift for %s: board %.4f < floor2(%.6f). "
+            'Possible score-precision drift for "%s": board %.4f < floor2(%.6f). '
             "If this recurs on every PB, the board==floor2(local) assumption is stale.",
             scenario_name,
             last_rank_info.score,
@@ -1529,20 +1529,20 @@ def _run_attempt(  # noqa: PLR0913
                 metadata_cache_ttl_hours,
             )
         except UnknownKovaaksUserError as exc:
-            logger.warning("Rank refresh stopped for %s: %s", scenario_name, exc)
+            logger.warning('Rank refresh stopped for "%s": %s', scenario_name, exc)
             return
         except requests.RequestException as exc:
             # INFO for the same reason as _get_with_retry's retry records: a
             # scheduled attempt that may still recover is self-healed churn.
             # Exhausting the schedule warns in _notify_exhaustion.
             logger.info(
-                "Transient failure resolving leaderboard for %s; will retry: %s",
+                'Transient failure resolving leaderboard for "%s"; will retry: %s',
                 scenario_name,
                 request_exception_summary(exc),
             )
         else:
             if leaderboard_id is None:
-                logger.warning("Could not resolve leaderboard for %s", scenario_name)
+                logger.warning('Could not resolve leaderboard for "%s"', scenario_name)
                 return
             try:
                 rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
@@ -1557,7 +1557,7 @@ def _run_attempt(  # noqa: PLR0913
             rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
             winner, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
             logger.debug(
-                "Rank freshness complete for %s on attempt %d/%d "
+                'Rank freshness complete for "%s" on attempt %d/%d '
                 "(leaderboard %s, cached rank %s, cached score %s, cache=%s).",
                 scenario_name,
                 attempt_index + 1,
@@ -1594,7 +1594,7 @@ def _run_attempt(  # noqa: PLR0913
             else f"retrying in {ATTEMPT_DELAYS_SECONDS[next_index]}s"
         )
         logger.debug(
-            "Rank freshness attempt %d/%d for %s not ready "
+            'Rank freshness attempt %d/%d for "%s" not ready '
             "(status=%s, board score=%s, expected score >= %.2f); %s.",
             attempt_index + 1,
             len(ATTEMPT_DELAYS_SECONDS),
@@ -1617,7 +1617,7 @@ def _run_attempt(  # noqa: PLR0913
             next_index,
         )
     except Exception:
-        logger.exception("Unexpected error during rank refresh for %s", scenario_name)
+        logger.exception('Unexpected error during rank refresh for "%s"', scenario_name)
 
 
 def _schedule_attempt(  # noqa: PLR0913
@@ -1656,7 +1656,7 @@ def schedule_rank_freshness_refresh(
 ) -> None:
     """Start a bounded score-aware refresh after a new local high score."""
     logger.debug(
-        "Scheduled rank freshness refresh for %s "
+        'Scheduled rank freshness refresh for "%s" '
         "(expected score >= %.2f; first attempt in %ds, %d attempts total).",
         scenario_name,
         _floor_2dp(expected_score),
@@ -1692,7 +1692,7 @@ def _stale_rank_fallback(
         return None
     age_hours = _cache_age_hours(_rank_cache_file(leaderboard_id, username))
     logger.warning(
-        "Serving stale cached position for %s (leaderboard %s, age %s) "
+        'Serving stale cached position for "%s" (leaderboard %s, age %s) '
         "after failed refresh.",
         scenario_name,
         leaderboard_id,
@@ -1783,7 +1783,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
         )
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to resolve leaderboard for %s: %s",
+            'Failed to resolve leaderboard for "%s": %s',
             scenario_name,
             request_exception_summary(exc),
         )
@@ -1811,13 +1811,13 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
             # serves Home's per-second interval ticks and would spam debug.log.
             if cached_rank:
                 logger.debug(
-                    "Rank cache hit for %s (leaderboard %s).",
+                    'Rank cache hit for "%s" (leaderboard %s).',
                     scenario_name,
                     leaderboard_id,
                 )
             else:
                 logger.debug(
-                    "Rank cache %s for %s (leaderboard %s).",
+                    'Rank cache %s for "%s" (leaderboard %s).',
                     _describe_cache_state(
                         _rank_cache_file(leaderboard_id, username),
                         rank_cache_ttl_hours,
@@ -1871,7 +1871,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     # hide a rank we already know. Fall back to the last cached rank; UNKNOWN
     # only when nothing is cached.
     logger.debug(
-        "Fetching current position for %s (leaderboard %s).",
+        'Fetching current position for "%s" (leaderboard %s).',
         scenario_name,
         leaderboard_id,
     )
@@ -1879,7 +1879,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch scenario rank for %s (leaderboard %s): %s",
+            'Failed to fetch scenario rank for "%s" (leaderboard %s): %s',
             scenario_name,
             leaderboard_id,
             request_exception_summary(exc),
@@ -1897,7 +1897,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
         )
     except ValidationError:
         logger.warning(
-            "Invalid leaderboard response for %s",
+            'Invalid leaderboard response for "%s"',
             scenario_name,
             exc_info=True,
         )
@@ -1927,7 +1927,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
             )
         except requests.RequestException as exc:
             logger.warning(
-                "Failed to validate KovaaK's username through total-play for %s: %s",
+                'Failed to validate KovaaK\'s username through total-play for "%s": %s',
                 username,
                 request_exception_summary(exc),
             )
@@ -1942,7 +1942,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
         update={"scenario_name": rank_info.scenario_name or scenario_name}
     )
     logger.debug(
-        "Fetching total positions for %s (leaderboard %s).",
+        'Fetching total positions for "%s" (leaderboard %s).',
         scenario_name,
         leaderboard_id,
     )

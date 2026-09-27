@@ -223,7 +223,7 @@ def read_store_document(
     except FileNotFoundError:
         return StoreDocument(StoreState.MISSING)
     except OSError, UnicodeDecodeError:
-        logger.warning("Failed to read %s.", path, exc_info=True)
+        logger.warning('Failed to read "%s".', path, exc_info=True)
         return _error(
             f"Couldn't read the {kind}. See data/logs/debug.log. File: {path}"
         )
@@ -277,7 +277,7 @@ def back_up_unusable_store(path: Path) -> Path:
                 os.link(temp, backup)
             except FileExistsError:
                 continue
-            logger.warning("Copied the unusable file %s aside to %s.", path, backup)
+            logger.warning('Copied the unusable file "%s" aside to "%s".', path, backup)
             return backup
     finally:
         try:
@@ -287,7 +287,7 @@ def back_up_unusable_store(path: Path) -> Path:
             # ``replace_with_retry`` exists for) must not fail a backup whose
             # bytes are already durable under their own name. The unlink above
             # clears the leftover on the next call.
-            logger.warning("Could not remove %s.", temp, exc_info=True)
+            logger.warning('Could not remove "%s".', temp, exc_info=True)
     msg = f"No free backup name beside {path} after {_MAX_BACKUP_ATTEMPTS} tries."
     raise OSError(msg)
 

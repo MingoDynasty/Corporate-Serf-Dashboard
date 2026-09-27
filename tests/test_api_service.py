@@ -955,7 +955,7 @@ def test_with_percentile_suppresses_a_rank_above_the_cached_total(caplog):
     assert result.rank == 900
     assert result.total_players == 500
     assert [record.getMessage() for record in caplog.records] == [
-        "Rank 900 for Some Scenario (leaderboard 98330) exceeds the cached "
+        'Rank 900 for "Some Scenario" (leaderboard 98330) exceeds the cached '
         "total 500; suppressing the percentile."
     ]
 
@@ -979,11 +979,11 @@ def test_with_percentile_warns_once_per_leaderboard_rank_and_total(caplog):
         )
 
     assert [record.getMessage() for record in caplog.records] == [
-        "Rank 900 for Some Scenario (leaderboard 98330) exceeds the cached "
+        'Rank 900 for "Some Scenario" (leaderboard 98330) exceeds the cached '
         "total 500; suppressing the percentile.",
-        "Rank 901 for Some Scenario (leaderboard 98330) exceeds the cached "
+        'Rank 901 for "Some Scenario" (leaderboard 98330) exceeds the cached '
         "total 500; suppressing the percentile.",
-        "Rank 900 for Some Scenario (leaderboard 11111) exceeds the cached "
+        'Rank 900 for "Some Scenario" (leaderboard 11111) exceeds the cached '
         "total 500; suppressing the percentile.",
     ]
 
@@ -1556,7 +1556,7 @@ def test_get_user_scenario_total_play_serves_stale_valid_cache_after_failure(
 
     assert response.total == 1
     assert [scenario.scenarioName for scenario in response.data] == ["Cached Scenario"]
-    assert "Using stale total-play cache for MingoDynasty" in caplog.text
+    assert 'Using stale total-play cache for "MingoDynasty"' in caplog.text
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -1603,7 +1603,8 @@ def test_get_user_scenario_total_play_refetches_schema_invalid_fresh_cache(
 
     assert [scenario.scenarioName for scenario in response.data] == ["Fetched Scenario"]
     assert (
-        "Ignoring schema-invalid fresh total-play cache for MingoDynasty" in caplog.text
+        'Ignoring schema-invalid fresh total-play cache for "MingoDynasty"'
+        in caplog.text
     )
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
@@ -1632,7 +1633,8 @@ def test_get_user_scenario_total_play_keeps_request_error_for_invalid_stale_cach
 
     assert str(exc_info.value) == "total-play unavailable"
     assert (
-        "Ignoring schema-invalid stale total-play cache for MingoDynasty" in caplog.text
+        'Ignoring schema-invalid stale total-play cache for "MingoDynasty"'
+        in caplog.text
     )
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 

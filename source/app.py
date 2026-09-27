@@ -300,7 +300,7 @@ def bind_server_socket(port: int, host: str = DEFAULT_HOST) -> list[socket.socke
         if error.errno not in (errno.EAFNOSUPPORT, errno.EADDRNOTAVAIL):
             _exit_port_taken(port, sockets)
         logger.info(
-            "No IPv6 loopback available (%s); serving on 127.0.0.1 only.",
+            "No IPv6 loopback available; serving on 127.0.0.1 only: %s",
             error,
         )
     return sockets
@@ -388,7 +388,7 @@ def main() -> None:
             recursive=False,
         )  # Set recursive=True to monitor subdirectories
         observer.start()
-        logger.info("Monitoring directory: %s", stats_dir)
+        logger.info('Monitoring directory: "%s"', stats_dir)
 
     try:
         # Run the Dash app. `app.run()` uses Flask's development server even when
@@ -406,7 +406,7 @@ def main() -> None:
                 logger.warning(
                     "debug is on and host is %s, so the interactive debugger "
                     "is reachable from that network, not just this machine. "
-                    "Turn debug off in %s unless you meant this.",
+                    'Turn debug off in "%s" unless you meant this.',
                     config.host,
                     config_file_path(),
                 )

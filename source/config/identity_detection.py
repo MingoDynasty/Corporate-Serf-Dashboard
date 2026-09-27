@@ -186,12 +186,12 @@ def _read_login_users(path: Path) -> tuple[list[SteamAccount], bool]:
         # A root whose Steam never signed anyone in, or no Steam at all.
         return [], True
     except OSError, UnicodeDecodeError:
-        logger.warning("Could not read %s; skipping it.", path, exc_info=True)
+        logger.warning('Could not read "%s"; skipping it.', path, exc_info=True)
         return [], False
 
     if _USERS_SECTION_PATTERN.search(text) is None:
         logger.warning(
-            "%s does not look like a Steam account list; skipping it.",
+            '"%s" does not look like a Steam account list; skipping it.',
             path,
         )
         return [], False
@@ -199,7 +199,7 @@ def _read_login_users(path: Path) -> tuple[list[SteamAccount], bool]:
     accounts, unusable = _parse_accounts(text)
     if unusable:
         logger.warning(
-            "Skipped %d unreadable account entr%s in %s.",
+            'Skipped %d unreadable account entr%s in "%s".',
             unusable,
             "y" if unusable == 1 else "ies",
             path,

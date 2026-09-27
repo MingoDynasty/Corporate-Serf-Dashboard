@@ -8,10 +8,13 @@ from dataclasses import dataclass, field
 from typing import Literal, TypeAlias
 from urllib.parse import urlencode
 
+import requests
+
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity, get_kovaaks_username
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import (
+    UnknownKovaaksUserError,
     get_cached_leaderboard_id,
     get_scenario_rank_info,
     hydrate_leaderboard_id_cache,
@@ -23,6 +26,7 @@ from source.kovaaks.data_service import (
     get_scenario_stats,
     is_scenario_in_database,
 )
+from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_RANK_MAX_WORKERS = 4
@@ -241,7 +245,7 @@ def _lookup_rank_info(
 
 def _unknown_rank_info(scenario_name: str, exc: Exception) -> ScenarioRankInfo:
     logger.warning(
-        "Failed to fetch playlist scenario rank for %s",
+        'Failed to fetch playlist scenario rank for "%s"',
         scenario_name,
         exc_info=True,
     )
@@ -265,12 +269,28 @@ def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
             username,
             config.scenario_metadata_cache_ttl_hours,
         )
-    except Exception as exc:  # noqa: BLE001
-        # Best-effort: the per-scenario path can still resolve ranks without
-        # this optimization, and it converts expected API failures itself.
+    except requests.RequestException as exc:
+        # Expected whenever KovaaK's is slow or unreachable, and it recurs on
+        # every open, so it logs a one-line summary rather than a traceback.
+        logger.warning(
+            "Failed to hydrate leaderboard metadata for playlist open: %s",
+            request_exception_summary(exc),
+        )
+    except UnknownKovaaksUserError as exc:
+        # An unknown configured username is rejected here on every open while
+        # a scenario stays unmapped. The message names the user, and a
+        # traceback per open would bury the log.
         logger.warning(
             "Failed to hydrate leaderboard metadata for playlist open: %s",
             exc,
+        )
+    except Exception:  # noqa: BLE001
+        # Best-effort: the per-scenario path can still resolve ranks without
+        # this optimization, and it converts expected API failures itself.
+        # What reaches here is unexpected, so it keeps the traceback.
+        logger.warning(
+            "Failed to hydrate leaderboard metadata for playlist open",
+            exc_info=True,
         )
 
 
@@ -288,14 +308,14 @@ def _build_row(  # noqa: PLR0913
         scenario_stats = _get_local_stats(scenario_name)
     except Exception:  # noqa: BLE001
         logger.warning(
-            "Failed to read local stats for %s", scenario_name, exc_info=True
+            'Failed to read local stats for "%s"', scenario_name, exc_info=True
         )
         scenario_stats = None
     try:
         personal_best_run = _get_personal_best_run(scenario_name)
     except Exception:  # noqa: BLE001
         logger.warning(
-            "Failed to read the personal best for %s",
+            'Failed to read the personal best for "%s"',
             scenario_name,
             exc_info=True,
         )
