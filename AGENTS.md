@@ -328,6 +328,50 @@ not swept to match; bring one into line when a change touches it anyway.
   protects.
 - A TODO names a concrete unresolved problem, not a wish.
 
+## Logging Conventions
+
+These rules govern log lines under `source/`: how a logged value is
+delimited, never whether it may be logged. What stays out of the log (the
+identity probe's persona names, a `sensitive` request's parameters) is
+decided where the value is handled. The existing lines were swept to match
+when the rules landed. The rationale and the measurements live in the
+decision-log entry
+[Log Lines Delimit Their Values By Kind](docs/decision_log.md#2026-09-26-log-lines-delimit-their-values-by-kind).
+
+- Free text and paths take double quotes: `"%s"`. Free text is a string
+  whose content someone outside the code chose: a scenario, playlist, or
+  user name, a file name, a value read from a run file. Parentheses and
+  single quotes do not delimit a value, because names contain both.
+- Tokens and numbers stay bare. The test is who chose the content, not
+  whether the value happens to hold a space: counts, scores, IDs, playlist
+  codes after validation, SHAs, URLs, HTTP statuses, timestamps, words the
+  code chose.
+- `%r` is for a value nothing has vouched for: a code or key the user
+  typed, until validation accepts it, and a value read back in the wrong
+  type or shape (a cached ID that is not a number, an unknown schema
+  stamp). There the exact characters or the type are the diagnosis.
+- A `requests` failure always goes through `request_exception_summary`,
+  with `redact_query=True` when the request is `sensitive`. Its `str`, its
+  `repr`, and its traceback all carry the query string, so no handler that
+  a `sensitive` request's failure can reach takes `exc_info`, however
+  broad its `except` (a `requests` exception is an `OSError`, so
+  `except OSError` around a request counts).
+- Any other caught exception is interpolated with `%s` only when
+  everything that can reach the handler is an exception this app
+  constructs with a message, or an `OSError` raised by the operating
+  system. The test is what can reach the handler, not what the `except`
+  names. Otherwise the line names the failure in words and, when the
+  failure is unexpected, carries the traceback (`logger.exception`, or
+  `exc_info=True` below ERROR). Either way the words before the colon name
+  the failure, so the line still says what happened when the exception
+  renders as nothing (`TimeoutError()`, a bare `ValueError()`).
+- Unbounded text goes last, after a colon: an exception's text, a request
+  summary, a pre-built message. It cannot be quoted usefully, so the end
+  of the line is its delimiter.
+- A line that logs a user-facing message verbatim is copy: the message
+  follows the copy rules in Styling Conventions, and these rules do not
+  edit it.
+
 ## Styling Conventions
 
 - User-facing copy follows nine rules. The rationale and the guide citations
