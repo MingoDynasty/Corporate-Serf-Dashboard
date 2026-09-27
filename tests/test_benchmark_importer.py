@@ -13,6 +13,7 @@ from scripts.benchmark_importer.models import (
     EvxlPlaylistScenario,
     ManifestEntry,
 )
+from source.kovaaks.data_models import PlaylistData, Rank, Scenario
 from source.utilities import atomic_write
 
 
@@ -1608,3 +1609,546 @@ def test_only_on_a_healthy_code_still_honours_the_manifest_skip(tmp_path, monkey
 
     assert summary.skipped == ["Healthy"]
     assert summary.generated == []
+
+
+def test_build_playlist_passes_use_cache_through_and_returns_the_merge(monkeypatch):
+    benchmark_calls = []
+    playlist = EvxlPlaylist(
+        playlist_name=" Built Playlist ",
+        playlist_code="KovaaKsBuilt",
+        scenario_list=[EvxlPlaylistScenario(scenario_name="Test Scenario")],
+    )
+    monkeypatch.setattr(script, "get_evxl_playlist", lambda _code: playlist)
+
+    def fake_benchmark(*args, **kwargs):
+        benchmark_calls.append((args, kwargs))
+        return _benchmark_response([100])
+
+    monkeypatch.setattr(script, "get_benchmark_json", fake_benchmark)
+
+    built = script.build_playlist(
+        "KovaaKsBuilt",
+        EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"}),
+        use_cache=False,
+    )
+
+    assert benchmark_calls == [
+        ((42, None, False), {"attempts": 4, "backoff_seconds": (2, 4, 8)})
+    ]
+    assert built == PlaylistData(
+        name="Built Playlist",
+        code="KovaaKsBuilt",
+        scenarios=[
+            Scenario(
+                name="Test Scenario",
+                ranks=[Rank(name="Bronze", color="#111", threshold=100)],
+                leaderboard_id=1,
+            )
+        ],
+    )
+
+
+# --- --check: drift between bundled files and a live rebuild ---
+
+
+_LADDER = (("Bronze", "#111"), ("Silver", "#222"))
+
+
+def _scenario(
+    name: str,
+    thresholds: tuple[float, ...] = (100, 200),
+    *,
+    leaderboard_id: int | None = 1,
+    ladder: tuple[tuple[str, str], ...] = _LADDER,
+) -> Scenario:
+    return Scenario(
+        name=name,
+        ranks=[
+            Rank(name=rank_name, color=color, threshold=threshold)
+            for (rank_name, color), threshold in zip(ladder, thresholds, strict=True)
+        ],
+        leaderboard_id=leaderboard_id,
+    )
+
+
+def _check_playlist(
+    *scenarios: Scenario | str,
+    name: str = "Bundled Playlist",
+    code: str = "KovaaKsBundled",
+) -> PlaylistData:
+    return PlaylistData(
+        name=name,
+        code=code,
+        scenarios=[
+            _scenario(scenario) if isinstance(scenario, str) else scenario
+            for scenario in scenarios
+        ],
+    )
+
+
+def _write_bundled(
+    directory: Path,
+    filename: str,
+    playlist: PlaylistData,
+    sharecode: str | None,
+    **provenance_extra,
+) -> None:
+    payload = playlist.model_dump(mode="json")
+    if sharecode is not None:
+        payload["generated_from"] = {
+            "sharecode": sharecode,
+            "kovaaks_benchmark_id": 1,
+            "rank_colors": [list(pair) for pair in _LADDER],
+            "generated_at": "2026-09-15T12:00:00+00:00",
+            "generator": "benchmark_importer",
+            "schema_version": script.GENERATOR_SCHEMA_VERSION,
+            **provenance_extra,
+        }
+    (directory / filename).write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _bundle(tmp_path: Path, *sharecodes: str):
+    """Bundle one file per sharecode, named after it, that rebuilds identically."""
+    bundled_dir = tmp_path / "benchmarks"
+    bundled_dir.mkdir()
+    for sharecode in sharecodes:
+        _write_bundled(
+            bundled_dir,
+            f"{sharecode}.json",
+            _check_playlist("A", code=sharecode),
+            sharecode,
+        )
+    database = {
+        sharecode: EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors=dict(_LADDER))
+        for sharecode in sharecodes
+    }
+    return bundled_dir, database
+
+
+def _fake_build(calls: list, outcomes: dict | None = None):
+    """Rebuild each sharecode as ``_bundle`` wrote it unless ``outcomes`` says not.
+
+    An exception outcome is raised; a playlist outcome is returned.
+    """
+
+    def fake(sharecode, _item, *, use_cache):
+        calls.append((sharecode, use_cache))
+        outcome = (outcomes or {}).get(sharecode)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return outcome or _check_playlist("A", code=sharecode)
+
+    return fake
+
+
+def test_describe_drift_is_empty_for_identical_models():
+    assert script.describe_drift(_check_playlist("A"), _check_playlist("A")) == []
+
+
+@pytest.mark.parametrize(
+    ("rebuilt", "expected"),
+    [
+        pytest.param(
+            _check_playlist("A", "B", "C", name="Renamed"),
+            ["name changed: 'Bundled Playlist' -> 'Renamed'"],
+            id="name",
+        ),
+        pytest.param(
+            _check_playlist("A", "B", "C", code="KovaaKsOther"),
+            ["code changed: 'KovaaKsBundled' -> 'KovaaKsOther'"],
+            id="code",
+        ),
+        pytest.param(
+            _check_playlist("A", "B", "C", "D"),
+            ["scenarios added: 'D'"],
+            id="added",
+        ),
+        pytest.param(
+            _check_playlist("A", "B"),
+            ["scenarios removed: 'C'"],
+            id="removed",
+        ),
+        pytest.param(
+            _check_playlist("A", "C", "B"),
+            ["scenario order changed"],
+            id="order",
+        ),
+        pytest.param(
+            _check_playlist("A", _scenario("B", (150, 250)), "C"),
+            ["thresholds changed in 1 of 3 scenarios: 'B'"],
+            id="thresholds",
+        ),
+        pytest.param(
+            _check_playlist("A", _scenario("B", leaderboard_id=2), "C"),
+            ["leaderboard IDs changed in 1 of 3 scenarios: 'B'"],
+            id="leaderboard-id",
+        ),
+        pytest.param(
+            _check_playlist("A", _scenario("B", leaderboard_id=None), "C"),
+            ["leaderboard IDs changed in 1 of 3 scenarios: 'B'"],
+            id="leaderboard-id-none",
+        ),
+        pytest.param(
+            _check_playlist(
+                "A", _scenario("B", ladder=(("Bronze", "#111"), ("Gold", "#222"))), "C"
+            ),
+            ["rank ladder changed in 1 of 3 scenarios: 'B'"],
+            id="ladder",
+        ),
+    ],
+)
+def test_describe_drift_reports_each_bucket(rebuilt, expected):
+    assert script.describe_drift(_check_playlist("A", "B", "C"), rebuilt) == expected
+
+
+def test_describe_drift_reports_a_swap_and_a_rebalance_in_order():
+    # The IRON PIPE #2 shape from 2026-09-15: one scenario swapped for another,
+    # and a kept scenario's thresholds moved.
+    shipped = _check_playlist("Kept", "Old, Retired", "Moved")
+    rebuilt = _check_playlist("Kept", "New", _scenario("Moved", (0, 100)))
+
+    assert script.describe_drift(shipped, rebuilt) == [
+        "scenarios added: 'New'",
+        "scenarios removed: 'Old, Retired'",
+        "thresholds changed in 1 of 2 scenarios: 'Moved'",
+    ]
+
+
+def test_check_ignores_unknown_provenance_keys(tmp_path, monkeypatch):
+    bundled_dir = tmp_path / "benchmarks"
+    bundled_dir.mkdir()
+    _write_bundled(
+        bundled_dir,
+        "Future.json",
+        _check_playlist("A", code="KovaaKsFuture"),
+        "KovaaKsFuture",
+        future_provenance_key="ignored",
+    )
+    monkeypatch.setattr(script, "build_playlist", _fake_build([]))
+
+    summary = script.run_check(
+        {"KovaaKsFuture": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})},
+        {},
+        bundled_dir=bundled_dir,
+    )
+
+    assert summary.identical == ["KovaaKsFuture"]
+    assert summary.exit_code == 0
+
+
+def test_check_counts_a_rank_color_change_alone_as_drift(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsRecolored")
+    recolored = _check_playlist(
+        _scenario("A", ladder=(("Bronze", "#111"), ("Silver", "#999"))),
+        code="KovaaKsRecolored",
+    )
+    monkeypatch.setattr(
+        script, "build_playlist", _fake_build([], {"KovaaKsRecolored": recolored})
+    )
+
+    summary = script.run_check(database, {}, bundled_dir=bundled_dir)
+
+    assert summary.drifted == {
+        "KovaaKsRecolored": ["rank ladder changed in 1 of 1 scenarios: 'A'"]
+    }
+
+
+def test_check_sorts_results_into_buckets_and_fetches_live(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA", "KovaaKsB", "KovaaKsC")
+    # Keyed by provenance, not by ``code`` or filename: the real corpus has a
+    # file whose code differs from its sharecode in casing.
+    _write_bundled(
+        bundled_dir,
+        "Zeta.json",
+        _check_playlist("A", code="KovaaKscased"),
+        "KovaaKsCased",
+    )
+    database["KovaaKsCased"] = EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})
+    calls = []
+    sleeps = []
+    monkeypatch.setattr(
+        script,
+        "build_playlist",
+        _fake_build(
+            calls,
+            {
+                "KovaaKsB": _check_playlist(_scenario("A", (50, 200)), code="KovaaKsB"),
+                "KovaaKsC": script.BenchmarkDataMismatchError("bad ladder"),
+                "KovaaKsCased": _check_playlist("A", code="KovaaKscased"),
+            },
+        ),
+    )
+    monkeypatch.setattr(script.time, "sleep", sleeps.append)
+
+    summary = script.run_check(database, {}, bundled_dir=bundled_dir)
+
+    assert calls == [
+        ("KovaaKsA", False),
+        ("KovaaKsB", False),
+        ("KovaaKsC", False),
+        ("KovaaKsCased", False),
+    ]
+    assert sleeps == [0.5, 0.5, 0.5]
+    assert summary.identical == ["KovaaKsA", "KovaaKsCased"]
+    assert summary.drifted == {
+        "KovaaKsB": ["thresholds changed in 1 of 1 scenarios: 'A'"]
+    }
+    assert summary.failed == {"KovaaKsC": "deterministic failure: bad ladder"}
+    assert summary.not_checked == []
+    assert summary.filenames["KovaaKsCased"] == "Zeta.json"
+    assert summary.exit_code == 1
+
+
+def test_check_exits_zero_only_when_every_file_matches(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA", "KovaaKsB")
+    monkeypatch.setattr(script, "build_playlist", _fake_build([]))
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_check(database, {}, bundled_dir=bundled_dir)
+
+    assert summary.identical == ["KovaaKsA", "KovaaKsB"]
+    assert summary.exit_code == 0
+
+
+def test_check_only_transient_failures_advance_the_breaker(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(
+        tmp_path, "KovaaKsA", "KovaaKsB", "KovaaKsC", "KovaaKsD"
+    )
+    calls = []
+    monkeypatch.setattr(
+        script,
+        "build_playlist",
+        _fake_build(
+            calls,
+            {
+                "KovaaKsA": script.BenchmarkDataMismatchError("bad ladder"),
+                "KovaaKsB": _http_error(404),
+                "KovaaKsC": requests.ReadTimeout("too slow"),
+            },
+        ),
+    )
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_check(
+        database, {}, max_consecutive_failures=2, bundled_dir=bundled_dir
+    )
+
+    # Two deterministic failures and then a transient one stay under a
+    # threshold of two, so the sweep reaches the last file.
+    assert [sharecode for sharecode, _ in calls] == list(database)
+    assert summary.failed == {
+        "KovaaKsA": "deterministic failure: bad ladder",
+        "KovaaKsB": "deterministic failure: 404 error",
+        "KovaaKsC": "transient failure: too slow",
+    }
+    assert summary.identical == ["KovaaKsD"]
+    assert summary.not_checked == []
+
+
+def test_check_breaker_leaves_the_rest_not_checked(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(
+        tmp_path, "KovaaKsA", "KovaaKsB", "KovaaKsC", "KovaaKsD"
+    )
+    calls = []
+    offline = requests.ConnectionError("offline")
+    monkeypatch.setattr(
+        script,
+        "build_playlist",
+        _fake_build(calls, {"KovaaKsA": offline, "KovaaKsB": offline}),
+    )
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_check(
+        database, {}, max_consecutive_failures=2, bundled_dir=bundled_dir
+    )
+
+    assert [sharecode for sharecode, _ in calls] == ["KovaaKsA", "KovaaKsB"]
+    assert list(summary.failed) == ["KovaaKsA", "KovaaKsB"]
+    assert summary.not_checked == ["KovaaKsC", "KovaaKsD"]
+    assert summary.identical == []
+    assert summary.exit_code == 1
+
+
+def test_check_only_narrows_and_an_unbundled_code_fails(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA", "KovaaKsB", "KovaaKsC")
+    calls = []
+    monkeypatch.setattr(script, "build_playlist", _fake_build(calls))
+
+    summary = script.run_check(
+        database,
+        {},
+        only=["KovaaKsB", "KovaaKsUnbundled"],
+        bundled_dir=bundled_dir,
+    )
+
+    assert calls == [("KovaaKsB", False)]
+    assert summary.identical == ["KovaaKsB"]
+    assert summary.failed == {
+        "KovaaKsUnbundled": "no bundled file carries this sharecode"
+    }
+    assert summary.exit_code == 1
+
+
+def test_check_fails_unkeyable_files_without_a_network_call(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA")
+    _write_bundled(bundled_dir, "Delisted.json", _check_playlist("A"), "KovaaKsGone")
+    _write_bundled(
+        bundled_dir, "Disputed.json", _check_playlist("A"), "KovaaKsConflict"
+    )
+    _write_bundled(bundled_dir, "Unstamped.json", _check_playlist("A"), None)
+    (bundled_dir / "Broken.json").write_text("{not json", encoding="utf-8")
+    calls = []
+    monkeypatch.setattr(script, "build_playlist", _fake_build(calls))
+
+    summary = script.run_check(
+        database, {"KovaaKsConflict": []}, bundled_dir=bundled_dir
+    )
+
+    assert calls == [("KovaaKsA", False)]
+    assert summary.failed["KovaaKsGone"] == "sharecode is not in the Evxl snapshot"
+    assert summary.failed["KovaaKsConflict"] == (
+        "sharecode is a conflicting duplicate in the Evxl snapshot"
+    )
+    assert summary.failed["Unstamped.json"] == "no generated_from.sharecode"
+    assert summary.failed["Broken.json"].startswith("not readable as JSON:")
+    assert summary.identical == ["KovaaKsA"]
+
+
+def test_check_fails_a_second_file_with_the_same_sharecode(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA")
+    _write_bundled(
+        bundled_dir, "Twin.json", _check_playlist("A", code="KovaaKsA"), "KovaaKsA"
+    )
+    monkeypatch.setattr(script, "build_playlist", _fake_build([]))
+
+    summary = script.run_check(database, {}, bundled_dir=bundled_dir)
+
+    assert summary.identical == ["KovaaKsA"]
+    assert summary.failed == {
+        "Twin.json": "sharecode KovaaKsA is also stamped on KovaaKsA.json"
+    }
+
+
+def test_check_writes_nothing_outside_the_benchmark_cache(tmp_path, monkeypatch):
+    generated_dir = tmp_path / "generated"
+    monkeypatch.setattr(script, "GENERATED_DIR", generated_dir)
+    monkeypatch.setattr(script, "MANIFEST_FILE", generated_dir / "manifest.json")
+    monkeypatch.setattr(script, "FAILURES_FILE", generated_dir / "failures.json")
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA", "KovaaKsB", "KovaaKsC")
+    before = {path.name: path.read_bytes() for path in bundled_dir.iterdir()}
+    monkeypatch.setattr(
+        script,
+        "build_playlist",
+        _fake_build(
+            [],
+            {
+                # A normal run records a deterministic failure in the ledger
+                # under generated/; the check must not.
+                "KovaaKsA": script.BenchmarkDataMismatchError("bad ladder"),
+                "KovaaKsB": _check_playlist("A", "Extra", code="KovaaKsB"),
+            },
+        ),
+    )
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    script.run_check(database, {}, bundled_dir=bundled_dir)
+
+    assert not generated_dir.exists()
+    assert {path.name: path.read_bytes() for path in bundled_dir.iterdir()} == before
+
+
+def test_check_summary_paste_line_names_only_drifted_sharecodes(caplog):
+    summary = script.CheckSummary(
+        identical=["KovaaKsSame"],
+        drifted={
+            "KovaaKsA": ["thresholds changed in 1 of 1 scenarios: 'A'"],
+            "KovaaKsB": ["scenarios added: 'New'"],
+        },
+        failed={"KovaaKsBroken": "deterministic failure: bad ladder"},
+        not_checked=["KovaaKsLater"],
+        filenames={
+            "KovaaKsSame": "Same.json",
+            "KovaaKsA": "A.json",
+            "KovaaKsB": "B.json",
+            "KovaaKsBroken": "Broken.json",
+            "KovaaKsLater": "Later.json",
+        },
+    )
+    caplog.set_level(logging.INFO, logger=script.__name__)
+
+    script.log_check_summary(summary)
+
+    assert [message for message in caplog.messages if message.startswith("uv run")] == [
+        "uv run python scripts/benchmark_importer/script.py --offline --force "
+        "--only KovaaKsA --only KovaaKsB"
+    ]
+    assert "Drifted: KovaaKsA (A.json)" in caplog.messages
+    assert (
+        "Failed: KovaaKsBroken (Broken.json): deterministic failure: bad ladder"
+        in caplog.messages
+    )
+    assert "Not checked: ['KovaaKsLater']" in caplog.messages
+
+
+def test_check_summary_has_no_paste_line_without_drift(caplog):
+    summary = script.CheckSummary(
+        identical=["KovaaKsSame"],
+        failed={"KovaaKsBroken": "transient failure: too slow"},
+        not_checked=["KovaaKsLater"],
+    )
+    caplog.set_level(logging.INFO, logger=script.__name__)
+
+    script.log_check_summary(summary)
+
+    assert not any(message.startswith("uv run") for message in caplog.messages)
+    assert "Failed: KovaaKsBroken: transient failure: too slow" in caplog.messages
+
+
+def test_parse_args_accepts_check_alone_and_with_only():
+    assert script.parse_args(["--check"]).check
+    args = script.parse_args(["--check", "--only", "KovaaKsA", "--offline"])
+    assert args.check
+    assert args.only == ["KovaaKsA"]
+
+
+@pytest.mark.parametrize(
+    "conflicting",
+    [["--force"], ["--limit", "1"], ["--accept-removals"]],
+)
+def test_parse_args_rejects_flags_meaningless_under_check(conflicting, capsys):
+    with pytest.raises(SystemExit):
+        script.parse_args(["--check", *conflicting])
+
+    assert f"--check cannot be combined with {conflicting[0]}" in (
+        capsys.readouterr().err
+    )
+
+
+def test_main_check_skips_the_snapshot_refresh_and_the_importer(monkeypatch):
+    database = {"KovaaKsA": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+    check_calls = []
+    monkeypatch.setattr(
+        script,
+        "refresh_evxl_snapshot",
+        lambda **_kwargs: pytest.fail("--check must not refresh the snapshot"),
+    )
+    monkeypatch.setattr(script, "load_evxl_data", lambda: (database, {}))
+    monkeypatch.setattr(
+        script,
+        "run_importer",
+        lambda *_args, **_kwargs: pytest.fail("--check must not generate"),
+    )
+
+    def fake_run_check(*args, **kwargs):
+        check_calls.append((args, kwargs))
+        return script.CheckSummary(drifted={"KovaaKsA": ["scenario order changed"]})
+
+    monkeypatch.setattr(script, "run_check", fake_run_check)
+    monkeypatch.setattr(script, "log_check_summary", lambda _summary: None)
+
+    exit_code = script.main(["--check", "--only", "KovaaKsA"])
+
+    assert exit_code == 1
+    assert check_calls == [
+        ((database, {}), {"only": ["KovaaKsA"], "max_consecutive_failures": 3})
+    ]
