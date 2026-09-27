@@ -1157,7 +1157,7 @@ def test_a_newer_stamped_user_playlist_is_skipped_and_says_so(monkeypatch, tmp_p
 
 @pytest.mark.parametrize("stamp", [None, 2], ids=["unstamped", "newer"])
 def test_a_skipped_user_playlist_is_logged_once(monkeypatch, tmp_path, caplog, stamp):
-    """The store layer logs the message; the loader only queues it for the UI."""
+    """Check that only the store layer logs a skipped file; the loader queues it."""
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     playlist = _playlist("Skipped", "SkippedCode")
     if stamp is None:

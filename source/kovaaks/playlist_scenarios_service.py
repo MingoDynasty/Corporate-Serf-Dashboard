@@ -271,7 +271,7 @@ def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
         )
     except requests.RequestException as exc:
         # Expected whenever KovaaK's is slow or unreachable, and it recurs on
-        # every open; the catch-all below would log a traceback for it.
+        # every open, so it logs a one-line summary rather than a traceback.
         logger.warning(
             "Failed to hydrate leaderboard metadata for playlist open: %s",
             request_exception_summary(exc),
