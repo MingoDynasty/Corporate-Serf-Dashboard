@@ -192,7 +192,9 @@ another value, and a line has one last position).
 Provenance: proposal
 [#301](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/301)
 (opened 2026-09-19; all four rows ratified 2026-09-26 in the
-[ratification record](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/301#issuecomment-5851883535)).
+[ratification record](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/301#issuecomment-5851883535)),
+shipped in
+[#315](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/315).
 Distilled from `docs/proposals/log_line_delimiting_proposal.md`, deleted in
 the shipping PR.
 

@@ -81,11 +81,13 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   bind, with its own message
   ([2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load)).
   The same line is written to the log files.
-- Unknown keys are named once in a warning, "Ignoring unknown key(s) in
-  `<path>`: `<keys>`. Remove them when convenient.", and ignored; a file
-  carrying keys a release has retired or does not have yet loads on both
-  sides of an update
+- Unknown keys are named once in a warning,
+  `Ignoring unknown key(s) in "<path>": ['<key>', ...]. Remove them when convenient.`,
+  and ignored; a file carrying keys a release has retired or does not have
+  yet loads on both sides of an update
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  The path is quoted and the keys are shown as typed, in Python's list form
+  ([2026-09-26](../decision_log.md#2026-09-26-log-lines-delimit-their-values-by-kind)).
 - `host` must be an IP literal. A name, `localhost` and the empty string
   included, exits before any bind with a message naming the setting; the
   address family comes from the literal, so `::` binds as IPv6. On the
