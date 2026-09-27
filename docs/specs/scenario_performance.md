@@ -101,11 +101,21 @@ of scope here, apart from its chart toolbar, noted under The graph.
   normalized sensitivity-and-scale group is the unit for grouping, for run
   placement, and for first-sensitivity detection
   ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  A converted run also keeps the value, scale, and DPI its file recorded,
+  unrounded, for the point hover only
+  ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
 - Point hover shows the run's timestamp with seconds kept — the one surface
   that keeps them, cross-referencing KovaaK's second-stamped CSV filenames
   ([2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
-  Then come the score, the x value, the run's sensitivity-and-scale string
-  in Score vs Time (where the x value is the day), and the accuracy.
+  Then come the score, the day in Score vs Time, the run's
+  sensitivity-and-scale string in both modes (in Score vs Sensitivity it is
+  the x value, so it is not repeated), and the accuracy. A converted run's
+  sensitivity line adds the setting it was recorded at, as in
+  `Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)`; any other run's
+  line ends at its sensitivity. The Average score hover names only the
+  group's x value, since one group can hold runs recorded at different
+  settings
+  ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
 - Three overlay families, all dashed labelled lines. "PB score ({value})"
   and "Score threshold ({value})" draw at the current post-run personal best
   and at the
@@ -175,8 +185,9 @@ of scope here, apart from its chart toolbar, noted under The graph.
   hands that tab the figure only once Plotly Cloud reports the user signed in
   there; a blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
-  accuracy, and x value, the Average score line, and the label and value of
-  each overlay line drawn. Neither the button nor the flow is app code: the
+  accuracy, sensitivity, and x value, the setting a converted run was
+  recorded at, the Average score line, and the label and value of each
+  overlay line drawn. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow; its figure is the playlist lines, their dates and

@@ -9,8 +9,24 @@ from pydantic import BaseModel, field_validator
 
 
 @dataclass(frozen=True)
+class RecordedSensitivity:
+    """The sensitivity setting a converted run's stats file recorded."""
+
+    value: float
+    scale: str
+    dpi: float
+
+
+@dataclass(frozen=True)
 class RunData:
-    """Dataclass models data extracted from a Kovaak's run file."""
+    """Dataclass models data extracted from a Kovaak's run file.
+
+    ``horizontal_sens`` and ``sens_scale`` are normalized: a run recorded on a
+    game's own scale is converted to cm/360 when its file is parsed, and
+    everything that groups, sorts, or compares sensitivities reads those two.
+    ``recorded_sensitivity`` keeps what a converted run's file recorded, for
+    display only, and is ``None`` for every run that was not converted.
+    """
 
     datetime_object: datetime.datetime
     score: float
@@ -19,6 +35,7 @@ class RunData:
     scenario: str
     accuracy: float
     damage_accuracy: float | None = None
+    recorded_sensitivity: RecordedSensitivity | None = None
 
 
 @dataclass()
