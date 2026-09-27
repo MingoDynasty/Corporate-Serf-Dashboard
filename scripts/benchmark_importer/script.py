@@ -397,6 +397,19 @@ def load_evxl_data(
 
     for benchmark in evxl_data.root:
         for difficulty in benchmark.difficulties:
+            # Evxl can list a difficulty before it has a sharecode. Its
+            # playlist-by-code endpoint answers an empty code with a 400
+            # (measured 2026-09-27), so the entry would fail a plain sweep and
+            # land in the failure ledger under an empty key.
+            if not difficulty.sharecode:
+                logger.warning(
+                    "Skipping Evxl entry with an empty sharecode: %s / %s "
+                    "(benchmark %d)",
+                    benchmark.benchmarkName,
+                    difficulty.difficultyName,
+                    difficulty.kovaaksBenchmarkId,
+                )
+                continue
             database_item = EvxlDatabaseItem(
                 kovaaksBenchmarkId=difficulty.kovaaksBenchmarkId,
                 rankColors=difficulty.rankColors,

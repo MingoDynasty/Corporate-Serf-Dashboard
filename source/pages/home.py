@@ -3,6 +3,7 @@
 import json
 import logging
 from datetime import datetime
+from decimal import Decimal
 from typing import Any, NamedTuple, TypedDict
 
 import dash
@@ -1060,8 +1061,14 @@ def _threshold_verdict(
         or scenario_previous_best <= 0
     ):
         return None
+    # Compared as decimals: in floats, 20.6 * 95 / 100 is 19.570000000000004,
+    # which fails a 19.57 run sitting exactly at 95% of a 20.60 PB. A float's
+    # str() is the decimal the stats CSV wrote.
+    passed = Decimal(str(latest["score"])) * 100 >= Decimal(
+        str(scenario_previous_best)
+    ) * Decimal(str(goal_percentage))
     return _ThresholdVerdict(
-        passed=latest["score"] >= scenario_previous_best * goal_percentage / 100,
+        passed=passed,
         percentage=latest["score"] / scenario_previous_best * 100,
         goal_percentage=goal_percentage,
     )
@@ -1112,7 +1119,11 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {verdict.percentage:.1f}% of PB "
+    # Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
+    # 95.0%)", so a miss shows at most one tenth below the goal as printed.
+    # Flooring would not do: float error prints 407 / 500 as 81.3%.
+    shown_percentage = min(verdict.percentage, round(verdict.goal_percentage, 1) - 0.1)
+    shortfall = f"{score}, {shown_percentage:.1f}% of PB "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."

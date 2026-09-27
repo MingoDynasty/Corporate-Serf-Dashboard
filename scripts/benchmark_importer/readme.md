@@ -179,11 +179,14 @@ one PR. Run every command from the repository root with
 
    It logs `Evxl data unchanged`; or writes the snapshot and logs the added,
    changed, and removed counts; or, when the live data removes sharecodes,
-   logs a warning naming them and writes nothing. Read
-   `git diff resources/evxl/benchmarks.json`. Rerun with
-   `script.refresh_evxl_snapshot(accept_removals=True)` only after deciding
-   the removals are real. A refresh that should carry no snapshot change skips
-   this step.
+   logs a warning naming them and writes nothing. A rejected candidate leaves
+   no diff to judge its removals by, so rerun with
+   `script.refresh_evxl_snapshot(accept_removals=True)` to write it; the
+   snapshot is tracked, so `git restore resources/evxl/benchmarks.json` backs
+   out a candidate whose removals aren't real. Either way, read
+   `git diff resources/evxl/benchmarks.json`. A re-code shows as a changed
+   `sharecode` under an unchanged `kovaaksBenchmarkId`, and is a real removal.
+   A refresh that should carry no snapshot change skips this step.
 2. **Apply the membership rule**
    ([decision log](../../docs/decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)):
    import the listed, non-hidden sharecodes that aren't bundled yet, delete
@@ -192,10 +195,12 @@ one PR. Run every command from the repository root with
    sharecode's bundled file. The importer doesn't filter `hidden` itself, so
    curation is by `--only`.
 3. **Find drift.** Run `--check`, then regenerate the drifted sharecodes with
-   the line it prints, and carry its per-file account into the PR body. Rerun
-   a transient failure with `--check --only`. A deterministic failure means
-   the upstream data no longer builds, which needs a look before anything
-   replaces the bundled file.
+   the line it prints, and carry its per-file account into the PR body. The
+   printed line leaves out failed and not-checked files, so rerun transient
+   failures, and any files a circuit-breaker abort left not checked, with
+   `--check --only`; after an early abort, a full rerun is simpler. A
+   deterministic failure means the upstream data no longer builds, which
+   needs a look before anything replaces the bundled file.
 4. **Generate the new sharecodes** with `--only`, one flag per code. Add
    `--offline` so the run uses the snapshot as reviewed in step 1 (or as
    committed, when the snapshot must stay out of the PR) instead of refreshing

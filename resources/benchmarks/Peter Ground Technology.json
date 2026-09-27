@@ -159,30 +159,30 @@
       "leaderboard_id": 141929
     },
     {
-      "name": "MLSI demotori hard",
+      "name": "MLSI demotori hard v2",
       "ranks": [
         {
           "name": "Hydroboy",
           "color": "#3a7e79",
-          "threshold": 5500.0
+          "threshold": 5900.0
         },
         {
           "name": "Gsync",
           "color": "#334ccc",
-          "threshold": 6500.0
+          "threshold": 6800.0
         },
         {
           "name": "Marlon",
           "color": "#0e4953",
-          "threshold": 7200.0
+          "threshold": 7700.0
         },
         {
           "name": "Sajid",
           "color": "#ffffff",
-          "threshold": 8200.0
+          "threshold": 8600.0
         }
       ],
-      "leaderboard_id": 100709
+      "leaderboard_id": 204314
     },
     {
       "name": "Peepo CFSI",
@@ -232,7 +232,7 @@
         "#ffffff"
       ]
     ],
-    "generated_at": "2026-09-14T22:01:39.712859+00:00",
+    "generated_at": "2026-09-27T02:33:43.374499+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

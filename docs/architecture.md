@@ -409,7 +409,11 @@ flowchart LR
   skipped entirely — phase-1 rows with the pending flags cleared, a `None`
   generation token, the interval left disabled, and the condition stated in
   the status line (see decision log), so no lookup runs over a pass that would
-  fetch nothing.
+  fetch nothing. The table's sort lives in the page URL as `?sort=`: `layout`
+  seeds `initialSort` on a fresh copy of the column defs from a fully valid
+  value, and a clientside callback on the grid's `columnState` rewrites the
+  key with a raw `history.replaceState`, never through `dcc.Location` (see
+  decision log).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing

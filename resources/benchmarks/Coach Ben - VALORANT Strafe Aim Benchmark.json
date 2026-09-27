@@ -1,0 +1,371 @@
+{
+  "name": "Coach Ben - VALORANT Strafe Aim Benchmark",
+  "code": "KovaaKsWipingBraveGasmask",
+  "scenarios": [
+    {
+      "name": "ben Strafe 1w2ts Wide VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 48.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 51.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 54.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 59.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 62.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 65.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 68.0
+        }
+      ],
+      "leaderboard_id": 204576
+    },
+    {
+      "name": "ben Strafe 1w3t Vandal VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 50.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 54.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 58.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 66.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 70.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 74.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 78.0
+        }
+      ],
+      "leaderboard_id": 204779
+    },
+    {
+      "name": "ben Strafe Phantom Double Tap VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 41.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 44.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 47.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 53.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 57.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 61.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 65.0
+        }
+      ],
+      "leaderboard_id": 204743
+    },
+    {
+      "name": "ben Strafe Gallery VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 44.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 47.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 50.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 56.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 59.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 62.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 65.0
+        }
+      ],
+      "leaderboard_id": 204673
+    },
+    {
+      "name": "ben Strafe Re-Peek Micros Valorant",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 64.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 70.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 76.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 85.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 91.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 97.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 103.0
+        }
+      ],
+      "leaderboard_id": 204680
+    },
+    {
+      "name": "ben Strafe Micros Stairs VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 55.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 60.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 65.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 75.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 80.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 90.0
+        }
+      ],
+      "leaderboard_id": 204577
+    },
+    {
+      "name": "ben Strafe 1w1t Reflex Duel VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 30.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 32.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 34.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 37.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 39.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 42.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 45.0
+        }
+      ],
+      "leaderboard_id": 204717
+    },
+    {
+      "name": "ben Strafe Bind Clutch VALORANT",
+      "ranks": [
+        {
+          "name": "Novice 3",
+          "color": "#FFFFFF",
+          "threshold": 45.0
+        },
+        {
+          "name": "Novice 2",
+          "color": "#FFFFFF",
+          "threshold": 50.0
+        },
+        {
+          "name": "Novice 1",
+          "color": "#FFFFFF",
+          "threshold": 55.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#737373",
+          "threshold": 64.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00ecf0",
+          "threshold": 68.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0040ff",
+          "threshold": 72.0
+        },
+        {
+          "name": "Jade",
+          "color": "#00bd1f",
+          "threshold": 76.0
+        }
+      ],
+      "leaderboard_id": 204785
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsWipingBraveGasmask",
+    "kovaaks_benchmark_id": 2975,
+    "rank_colors": [
+      [
+        "Novice 3",
+        "#FFFFFF"
+      ],
+      [
+        "Novice 2",
+        "#FFFFFF"
+      ],
+      [
+        "Novice 1",
+        "#FFFFFF"
+      ],
+      [
+        "Platinum",
+        "#737373"
+      ],
+      [
+        "Diamond",
+        "#00ecf0"
+      ],
+      [
+        "Sapphire",
+        "#0040ff"
+      ],
+      [
+        "Jade",
+        "#00bd1f"
+      ]
+    ],
+    "generated_at": "2026-09-27T02:33:52.071020+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

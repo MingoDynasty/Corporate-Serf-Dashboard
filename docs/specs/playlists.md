@@ -269,6 +269,16 @@ and [product.md](../product.md). Leaderboard placement is worded
   copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   A playlist deleted between phase 1 and registration settles as "Update
   interrupted" with no pending cell.
+- The table's sort lives in the page URL as
+  `?sort=<name>.<dir>[,<name>.<dir>…]`, in priority order, with `dir` `asc`
+  or `desc` and the names `scenario`, `last-played`, `runs`, `position`,
+  `total-players`, `percentile`, `pb-score`, `pb-date`, `pb-cm360`, and
+  `pb-accuracy`. Back and Forward restore each history entry's own sort, and
+  a reload or a copied link keeps it. A fresh visit through the Playlists page
+  starts unsorted, in playlist order. Sorting rewrites the current entry and
+  adds none. A value that is not entirely valid opens the table unsorted and
+  is removed from the address, as is a sort cleared through the header
+  ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
 - The scenarios grid owns vertical scrolling inside the AppShell viewport
   with a 300px minimum height
   ([2026-07-06](../decision_log.md#2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling));
@@ -282,7 +292,7 @@ and [product.md](../product.md). Leaderboard placement is worded
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface));
-  257 files as of 2026-09-15. It holds Evxl's listed, non-hidden benchmarks:
+  261 files as of 2026-09-26. It holds Evxl's listed, non-hidden benchmarks:
   a benchmark Evxl delists is removed even if KovaaK's still serves it, and
   a hidden one waits until Evxl unhides it
   ([2026-09-15](../decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)).

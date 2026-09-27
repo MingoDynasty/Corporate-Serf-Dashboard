@@ -317,7 +317,7 @@ Observed behavior:
   `playlist_name`, `playlist_code`, `scenario_list[].scenario_name`, plus
   extras (`is_private`, `author_name`, `description`, `playlist_id`,
   `author_steam_id`) the app does not need.
-- Unknown or **mis-cased** codes return HTTP 400. `_get_with_retry`
+- Unknown, **mis-cased**, or empty codes return HTTP 400. `_get_with_retry`
   `raise_for_status()`es this immediately (no retry), so the import fallback
   sees one `requests.HTTPError` and refuses.
 - There is no first-party KovaaK's by-code endpoint (path and query variants

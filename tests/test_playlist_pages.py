@@ -1,3 +1,4 @@
+import copy
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
@@ -6,7 +7,11 @@ import dash
 import dash_mantine_components as dmc
 import pytest
 from dash import dcc, no_update
-from dash._callback import GLOBAL_CALLBACK_MAP
+from dash._callback import (
+    GLOBAL_CALLBACK_LIST,
+    GLOBAL_CALLBACK_MAP,
+    GLOBAL_INLINE_SCRIPTS,
+)
 from dash.exceptions import PreventUpdate
 
 from source.config import settings_service
@@ -2227,6 +2232,173 @@ def test_playlist_scenarios_scenario_column_fills_remaining_width():
     assert column["cellRenderer"] == "ScenarioLink"
     assert "cellClass" not in column
     assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+
+
+# --- the scenario table's sort lives in the page URL as ?sort= ---
+
+
+def _scenario_grid(page):
+    return next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlist-scenarios-grid"
+    )
+
+
+def _sort_seeds(page) -> dict[str, tuple[str | None, int | None]]:
+    """Map each column the page seeds with an opening sort to its seed."""
+    return {
+        column["field"]: (column.get("initialSort"), column.get("initialSortIndex"))
+        for column in _scenario_grid(page).columnDefs
+        if "initialSort" in column or "initialSortIndex" in column
+    }
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        pytest.param({}, id="absent"),
+        pytest.param({"sort": None}, id="none"),
+        pytest.param({"sort": ""}, id="empty"),
+        pytest.param({"sort": ["percentile.desc", "runs.asc"]}, id="repeated"),
+        pytest.param({"sort": "garbage"}, id="garbage"),
+        pytest.param({"sort": "nope.desc"}, id="unknown-name"),
+        pytest.param({"sort": "percentile_sort.desc"}, id="column-id-not-name"),
+        pytest.param({"sort": "percentile"}, id="no-direction"),
+        pytest.param({"sort": "percentile."}, id="empty-direction"),
+        pytest.param({"sort": "percentile.up"}, id="bad-direction"),
+        pytest.param({"sort": "Percentile.desc"}, id="name-case"),
+        pytest.param({"sort": "percentile.DESC"}, id="direction-case"),
+        pytest.param({"sort": " percentile.desc"}, id="whitespace"),
+        pytest.param({"sort": "percentile.desc.asc"}, id="extra-dot"),
+        pytest.param({"sort": "percentile.desc,percentile.asc"}, id="duplicate"),
+        pytest.param(
+            {
+                "sort": ",".join(
+                    [f"{name}.asc" for name in playlist_scenarios.SORT_URL_NAMES]
+                    + ["runs.desc"]
+                )
+            },
+            id="more-entries-than-columns",
+        ),
+        pytest.param({"sort": "percentile.desc,nope.asc"}, id="valid-then-invalid"),
+        pytest.param({"sort": "nope.asc,percentile.desc"}, id="invalid-then-valid"),
+        pytest.param({"sort": "percentile.desc,"}, id="trailing-comma"),
+    ],
+)
+def test_playlist_scenarios_invalid_sort_opens_the_table_unsorted(query):
+    page = playlist_scenarios.layout("KovaaKsTestCode", **query)
+
+    assert _sort_seeds(page) == {}
+
+
+def test_playlist_scenarios_sort_seeds_the_named_columns_in_priority_order():
+    page = playlist_scenarios.layout(
+        "KovaaKsTestCode", sort="percentile.desc,pb-score.asc"
+    )
+
+    assert _sort_seeds(page) == {
+        "percentile_sort": ("desc", 0),
+        "high_score_sort": ("asc", 1),
+    }
+    # ``sort`` would come back whenever the defs were sent again; only the
+    # ``initial*`` pair leaves later header clicks alone.
+    for column_defs in (
+        _scenario_grid(page).columnDefs,
+        playlist_scenarios.TABLE_COLUMN_DEFS,
+    ):
+        assert not any(
+            "sort" in column or "sortIndex" in column for column in column_defs
+        )
+
+
+def test_playlist_scenarios_sorted_layout_leaves_the_shared_column_defs_alone():
+    snapshot = copy.deepcopy(playlist_scenarios.TABLE_COLUMN_DEFS)
+
+    first = _scenario_grid(
+        playlist_scenarios.layout("KovaaKsTestCode", sort="percentile.desc")
+    ).columnDefs
+    second = _scenario_grid(
+        playlist_scenarios.layout("KovaaKsTestCode", sort="runs.asc")
+    ).columnDefs
+
+    assert playlist_scenarios.TABLE_COLUMN_DEFS == snapshot
+    first_ids = {id(column) for column in first}
+    assert not first_ids & {id(column) for column in second}
+    assert not first_ids & {
+        id(column) for column in playlist_scenarios.TABLE_COLUMN_DEFS
+    }
+
+
+def test_playlist_scenarios_sort_names_cover_every_column_once():
+    # The names are address-bar copy the maintainer ruled verbatim, and saved
+    # links depend on them, so pin them exactly.
+    assert playlist_scenarios.SORT_URL_NAMES == {
+        "scenario": "scenario",
+        "last-played": "last_played_sort",
+        "runs": "runs_sort",
+        "position": "rank_sort",
+        "total-players": "total_sort",
+        "percentile": "percentile_sort",
+        "pb-score": "high_score_sort",
+        "pb-date": "pb_timestamp_sort",
+        "pb-cm360": "pb_cm360_sort",
+        "pb-accuracy": "pb_accuracy_sort",
+    }
+    column_ids = [column["field"] for column in playlist_scenarios.TABLE_COLUMN_DEFS]
+    assert sorted(playlist_scenarios.SORT_URL_NAMES.values()) == sorted(column_ids)
+    for name, column_id in playlist_scenarios.SORT_URL_NAMES.items():
+        page = playlist_scenarios.layout("KovaaKsTestCode", sort=f"{name}.desc")
+        assert _sort_seeds(page) == {column_id: ("desc", 0)}
+
+
+def _sort_url_writer_spec():
+    (spec,) = [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if {"id": "playlist-scenarios-grid", "property": "columnState"}
+        in spec["inputs"]
+    ]
+    return spec
+
+
+def test_playlist_scenarios_sort_url_writer_replaces_the_history_entry():
+    spec = _sort_url_writer_spec()
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    store_outputs = {
+        f"{component.id}.data"
+        for component in _walk_components(page)
+        if isinstance(component, dcc.Store)
+    }
+
+    assert spec["clientside_function"] is not None
+    assert spec["state"] == [{"id": "playlist-scenarios-code", "property": "data"}]
+    assert spec["output"] in store_outputs
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+    assert "history.replaceState(" in source
+    assert "pushState" not in source
+    # The JavaScript reads the Python name table, never a hand-copied one.
+    for name, column_id in playlist_scenarios.SORT_URL_NAMES.items():
+        assert f'"{column_id}": "{name}"' in source
+
+
+def test_playlist_scenarios_location_receives_only_href():
+    # A pathname write would push the pathname plus the Location's stale
+    # search, which predates every ``?sort=`` rewrite.
+    properties = {
+        output.component_property.split("@")[0]
+        for spec in GLOBAL_CALLBACK_MAP.values()
+        for output in (
+            spec["output"] if isinstance(spec["output"], list) else [spec["output"]]
+        )
+        if output.component_id == "playlist-scenarios-location"
+    }
+
+    assert properties == {"href"}
 
 
 # --- schema_version: the visibility store's page-level surfaces ---
