@@ -102,6 +102,11 @@ KovaaK's API and saves it under `data/playlists`. Playlists imported this way
 carry no rank data — the benchmark-rank overlays come only from the bundled
 library.
 
+A playlist's scenario table keeps its sort when you come back to it with the
+browser's Back button, but opening the playlist fresh from the Playlists page
+starts it in playlist order; to clear a sort, click a sorted column's header
+until the table returns to that order.
+
 ## Troubleshooting
 
 Each entry starts with what you see. The logs are the last one.
