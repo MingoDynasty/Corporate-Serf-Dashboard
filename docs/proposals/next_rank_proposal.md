@@ -189,10 +189,23 @@ behave like this:
 
 The cell rounds the gap **up** to one decimal, so a PB just under a threshold
 reads "+0.1%", never "+0.0%", which would look like the rank was reached
-(PB 999.96 against 1,000 is a 0.004% gap). The rounding strips float noise
-first: PB 2.8 against 3.08 computes as `10.000000000000009`, and a bare
-ceiling would show "+10.1%". Rounding to six decimals before the ceiling
-fixes it. The sort key stays unrounded.
+(PB 999.96 against 1,000 is a 0.004% gap). The tooltip's points round up the
+same way, to the two decimals PB Score shows, so a remainder under 0.005
+reads "0.01 to go", never "0 to go". That case is real: run files record
+scores to as many as six decimals (1,388 of the 8,665 runs in the
+maintainer's stats folder on 2026-09-27), so a PB of 999.999 against 1,000
+can happen. The sort key stays unrounded, and both columns compare the
+unrounded PB with the threshold. PB Score beside them still displays that PB
+as `1,000`, as it does today. The tooltip is what shows a gap remains.
+
+Both ceilings strip float noise first. Scale the value to the displayed
+unit, round that to six decimals, then take the ceiling:
+`ceil(round(x * 10**d, 6)) / 10**d`. A bare ceiling shows "+10.1%" for PB
+2.8 against 3.08, because the gap computes as `10.000000000000009`. It also
+shows "0.29 to go", because the difference computes as
+`0.28000000000000025`. Rounding before scaling doesn't fix the second case,
+because `0.28 * 100` is `28.000000000000004`. The recipe matched an exact
+decimal ceiling on 200,000 random score pairs.
 
 ### Where it lives
 
@@ -236,7 +249,7 @@ design adds:
 | Next Rank header | `Next Rank` | Title Case. Names the target rather than the metric, so the header survives a D1 change of metric. |
 | Next Rank header tooltip | `How much your PB score has to grow to reach the next rank. Lower is closer.` | "Lower is closer." mirrors the Percentile tooltip's "Higher is better." and tells the reader which sort direction finds the closest ranks. |
 | Next Rank cell | `+{gap}% to {rank name}`, such as `+10.0% to Gold` | Reads as the maintainer's own sentence, "push my PB by 10% to reach Gold." A readout, so no period. The sign marks it as growth still needed. |
-| Next Rank cell tooltip | `{rank name} at {threshold} · {points} to go`, such as `Gold at 110 · 10 to go` | Carries the exact points D1 leaves out of the cell. A readout, so the middle dot and no period. Numbers format like PB Score: up to two decimals, trailing zeros dropped ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)). |
+| Next Rank cell tooltip | `{rank name} at {threshold} · {points} to go`, such as `Gold at 110 · 10 to go` | Carries the exact points D1 leaves out of the cell. A readout, so the middle dot and no period. Numbers format like PB Score: up to two decimals, trailing zeros dropped ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)). The points round up, so a remaining gap never reads `0 to go`. |
 | Next Rank cell, last rank reached | `Top rank` | States the fact without implying a failure. Sorts last, beside `N/A`. |
 
 ## Out of scope
@@ -290,8 +303,9 @@ buy polish, not correctness.
     property;
   - zero thresholds, including the all-zero ladder;
   - a single-rank ladder, no PB, and a PB of zero or less;
-  - rounding up (999.96 against 1,000 reads "+0.1%") and float noise (2.8
-    against 3.08 reads "+10.0%").
+  - rounding up (999.96 against 1,000 reads "+0.1%", and 999.999 against
+    1,000 reads "0.01 to go") and float noise (2.8 against 3.08 reads
+    "+10.0%" and "0.28 to go").
 - **The row builder:** a benchmark row carries the five fields. A playlist
   row carries none. A second-phase row built for the same scenario carries
   the same values as its first-phase row.
