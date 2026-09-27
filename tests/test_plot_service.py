@@ -182,6 +182,48 @@ def test_scatter_x_locks_sensitivity_vs_time_asymmetry() -> None:
     assert tuple(time_fig.data[0].x) == (day,)
 
 
+def test_time_plot_point_hover_names_each_runs_own_sensitivity() -> None:
+    # One day holds runs at two sensitivities, which its Date x value can't
+    # tell apart, so each point carries its own run's sensitivity.
+    time_data = {
+        datetime(2025, 1, 1).date(): [
+            _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0)),
+            _build_run(110.0, 3.0, datetime(2025, 1, 1, 11, 0, 0)),
+        ],
+        datetime(2025, 1, 2).date(): [
+            _build_run(120.0, 2.5, datetime(2025, 1, 2, 10, 0, 0)),
+        ],
+    }
+    time_fig = generate_time_plot(time_data, "1w4ts", False, [])
+    points = time_fig.data[0]
+
+    assert [
+        (score, row[2]) for score, row in zip(points.y, points.customdata, strict=True)
+    ] == [
+        (100.0, "2.0 Overwatch"),
+        (110.0, "3.0 Overwatch"),
+        (120.0, "2.5 Overwatch"),
+    ]
+    sensitivity_line = "<b>Sensitivity</b>: %{customdata[2]}"
+    hover = points.hovertemplate
+    assert (
+        hover.index("<b>Date</b>")
+        < hover.index(sensitivity_line)
+        < hover.index("<b>Accuracy</b>")
+    )
+
+    # Score vs Sensitivity already names the sensitivity as its x value.
+    sens_data = {
+        "2.0 Overwatch": [_build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))],
+    }
+    sens_fig = generate_sensitivity_plot(sens_data, "1w4ts", False, [])
+    assert sens_fig.data[0].hovertemplate.count("<b>Sensitivity</b>") == 1
+
+    # A day's average can span sensitivities, and the line has no customdata.
+    for fig in (time_fig, sens_fig):
+        assert "customdata" not in fig.data[1].hovertemplate
+
+
 def test_rank_overlays_omitted_when_switch_off() -> None:
     fig = go.Figure()
     _add_rank_overlays(fig, False, VISCOSE_LADDER, [55.0, 57.0])
