@@ -1,5 +1,7 @@
 """Per-playlist scenario table page."""
 
+import copy
+import json
 from uuid import uuid4
 
 import dash
@@ -196,6 +198,64 @@ TABLE_COLUMN_DEFS = [
     },
 ]
 
+# The names ``?sort=`` uses in the address bar, mapped to column IDs. Other code
+# keys on the column IDs, so the names exist only where the URL is read and
+# written: a saved link survives a field rename, and "rank" never names the
+# Position column (Rank is the benchmark tier).
+SORT_URL_NAMES = {
+    "scenario": "scenario",
+    "last-played": "last_played_sort",
+    "runs": "runs_sort",
+    "position": "rank_sort",
+    "total-players": "total_sort",
+    "percentile": "percentile_sort",
+    "pb-score": "high_score_sort",
+    "pb-date": "pb_timestamp_sort",
+    "pb-cm360": "pb_cm360_sort",
+    "pb-accuracy": "pb_accuracy_sort",
+}
+SORT_DIRECTIONS = ("asc", "desc")
+
+
+def _parse_sort(sort: object) -> list[tuple[str, str]]:
+    """Read a ``?sort=`` value as ``(column ID, direction)`` pairs, by priority.
+
+    Anything not entirely valid reads as unsorted, an empty list: a missing,
+    empty, or repeated parameter, an unknown name, a bad direction, or a
+    duplicate name, which also caps the list at one entry per column. Matching
+    is exact, and no valid part of a mixed value is kept.
+    """
+    if not isinstance(sort, str) or not sort:
+        return []
+    directions_by_id: dict[str, str] = {}
+    for entry in sort.split(","):
+        name, _, direction = entry.partition(".")
+        column_id = SORT_URL_NAMES.get(name)
+        if (
+            column_id is None
+            or direction not in SORT_DIRECTIONS
+            or column_id in directions_by_id
+        ):
+            return []
+        directions_by_id[column_id] = direction
+    return list(directions_by_id.items())
+
+
+def _column_defs(sort: object) -> list[dict]:
+    """Copy the column defs, seeding the grid's opening sort from ``?sort=``.
+
+    A fresh copy per call, because ``TABLE_COLUMN_DEFS`` is shared across
+    requests. The seed is ``initialSort``, never ``sort``: AG Grid reapplies
+    ``sort`` whenever column defs arrive again, overriding the user's header
+    clicks.
+    """
+    column_defs = copy.deepcopy(TABLE_COLUMN_DEFS)
+    columns_by_id = {column["field"]: column for column in column_defs}
+    for sort_index, (column_id, direction) in enumerate(_parse_sort(sort)):
+        columns_by_id[column_id]["initialSort"] = direction
+        columns_by_id[column_id]["initialSortIndex"] = sort_index
+    return column_defs
+
 
 @callback(
     Output("playlist-scenarios-location", "href"),
@@ -362,6 +422,75 @@ clientside_callback(
 )
 
 
+# Keep ``?sort=`` in step with the table, so Back, a reload, or a copied link
+# reopens the page with the sort the user left it in.
+clientside_callback(
+    """
+    (columnState, playlistCode) => {
+        const noUpdate = window.dash_clientside.no_update;
+        const namesByColumnId = SORT_NAMES_BY_COLUMN_ID;
+        // Until the grid initializes there is no column state. Reading that
+        // as "unsorted" would strip ?sort= from the address on arrival.
+        if (
+            !Array.isArray(columnState)
+            || columnState.length === 0
+            || !columnState.every((column) => column && typeof column.colId === "string")
+            || typeof playlistCode !== "string"
+            || !playlistCode
+        ) {
+            return noUpdate;
+        }
+        // A row click moves the address to another page before this grid
+        // unmounts, so a late publish must not write there. Dash Pages hands
+        // the page its path segment undecoded, so compare the raw pathname.
+        if (window.location.pathname !== "/playlists/" + playlistCode) {
+            return noUpdate;
+        }
+        const sorted = columnState
+            .map((column, position) => ({column, position}))
+            .filter(({column}) => column.sort === "asc" || column.sort === "desc")
+            .sort((a, b) =>
+                (a.column.sortIndex ?? a.position) - (b.column.sortIndex ?? b.position)
+            );
+        if (sorted.some(({column}) => !Object.hasOwn(namesByColumnId, column.colId))) {
+            return noUpdate;
+        }
+        const value = sorted
+            .map(({column}) => namesByColumnId[column.colId] + "." + column.sort)
+            .join(",");
+        const current = new URLSearchParams(window.location.search).getAll("sort");
+        if (value ? current.length === 1 && current[0] === value : current.length === 0) {
+            return noUpdate;
+        }
+        // Built by hand because URLSearchParams would write the commas as %2C.
+        const kept = window.location.search
+            .slice(1)
+            .split("&")
+            .filter((pair) => pair && new URLSearchParams(pair).keys().next().value !== "sort");
+        if (value) {
+            kept.push("sort=" + value);
+        }
+        const search = kept.length ? "?" + kept.join("&") : "";
+        // Never through a dcc.Location prop: that pushes a history entry and
+        // makes Dash Pages re-render the page on every sort click. A raw
+        // replaceState fires no event Dash listens for.
+        window.history.replaceState(
+            window.history.state,
+            "",
+            window.location.pathname + search + window.location.hash
+        );
+        return noUpdate;
+    }
+    """.replace(
+        "SORT_NAMES_BY_COLUMN_ID",
+        json.dumps({column_id: name for name, column_id in SORT_URL_NAMES.items()}),
+    ),
+    Output("playlist-scenarios-sort-sink", "data"),
+    Input("playlist-scenarios-grid", "columnState"),
+    State("playlist-scenarios-code", "data"),
+)
+
+
 def _page_header(playlist_code: str) -> dmc.Group:
     """Title the page with the playlist's display label and its share code."""
     return dmc.Group(
@@ -374,8 +503,16 @@ def _page_header(playlist_code: str) -> dmc.Group:
     )
 
 
-def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
-    """Build the per-playlist scenario table page."""
+def layout(
+    playlist_code: str | None = None,
+    sort: str | list[str] | None = None,
+    **kwargs,  # noqa: ARG001
+):
+    """Build the per-playlist scenario table page.
+
+    ``sort`` is the raw ``?sort=`` query value, which Dash Pages passes as a
+    string, or as a list when the parameter repeats.
+    """
     return dmc.Stack(
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
@@ -386,8 +523,10 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
             dcc.Store(id="playlist-scenarios-generation"),
             dcc.Store(id="playlist-scenarios-relative-time-refresh"),
-            # Dummy sink for the client-side quick-filter callback's output.
+            # Dummy sinks for the client-side quick-filter and sort-URL
+            # callbacks' outputs.
             dcc.Store(id="playlist-scenarios-quick-filter-sink"),
+            dcc.Store(id="playlist-scenarios-sort-sink"),
             dcc.Interval(
                 id="playlist-scenarios-relative-time-interval",
                 interval=30_000,
@@ -419,7 +558,7 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
             dag.AgGrid(
                 id="playlist-scenarios-grid",
                 className="ag-theme-quartz playlist-scenarios-grid",
-                columnDefs=TABLE_COLUMN_DEFS,
+                columnDefs=_column_defs(sort),
                 defaultColDef={
                     "resizable": True,
                     "sortable": True,
