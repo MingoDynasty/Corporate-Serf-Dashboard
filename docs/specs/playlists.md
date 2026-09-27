@@ -238,6 +238,10 @@ and [product.md](../product.md). Leaderboard placement is worded
   ([scenario_performance.md](scenario_performance.md#the-graph)); a legacy run
   without DPI and increment keeps `N/A`
   ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  PB Score and PB cm/360 show up to two decimals with trailing zeros
+  dropped, so a column can read `710` beside `863.94`, and the table's `50`
+  is the chart's `50.0 cm/360`
+  ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)).
   PB Accuracy prefers damage accuracy, falling back to hit accuracy.
 - Opening the route has two phases. Phase 1 paints every row from local
   stats and TTL-ignored caches with explicit pending flags per unresolved

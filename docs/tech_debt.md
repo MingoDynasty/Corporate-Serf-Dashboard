@@ -121,19 +121,6 @@ commands becomes burdensome.
 
 ## UI/UX
 
-### Manual-refresh failure color
-
-`source/pages/home.py` — a hard refresh failure is red, titled "Position
-refresh failed", and a served-stale refresh is yellow, titled "Refresh failed ·
-data from cache". Softening the red to yellow was raised during the
-notification redesign and deliberately left open. It used to wait on the
-served-stale toast getting a title of its own, since the color was the only
-thing separating the two outcomes; the app messaging sweep (PR #291) gave it
-one, so the color question can now be decided on its own. Note Mantine
-suppresses a notification's full-height color bar whenever an icon is present,
-and both of these carry one, so the color is a 28 px circle rather than a
-stripe.
-
 ### Watch for `is_scenario_in_database` early-return pattern
 
 `source/pages/home.py` previously had a bug where the rank callback short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.

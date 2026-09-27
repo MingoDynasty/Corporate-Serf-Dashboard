@@ -210,7 +210,11 @@ benchmark tier) — see the
   from cache." when the cached readout includes a total and "Couldn't
   refresh. The position shown is from cache." when it does not, and its value
   carries the same " · from cache" hint a passive render would give it
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The two share one
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  The hard failure's red, not yellow, follows the severity scale: nothing
+  usable came back
+  ([2026-09-27](../decision_log.md#2026-09-27-the-manual-refresh-hard-failure-stays-red)).
+  The two share one
   `rank-refresh-problem` channel: they are
   mutually exclusive verdicts on one attempt, so a stale retry after a hard
   failure replaces it instead of leaving both on screen contradicting each
