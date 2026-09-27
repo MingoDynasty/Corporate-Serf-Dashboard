@@ -239,10 +239,17 @@ Releases published before the installer existed cannot be rolled back to;
 
 Rolling back has a config floor too. Because `config.toml` is written once at
 first install and never rewritten, an install first set up by a release that
-omits `polling_interval` and `sens_round_decimal_places` (they now default in
-code) cannot roll back to an older release that still requires them — the
-install stops with a "cannot load config.toml" error. Add those two keys from
-`example.toml`, or delete `config.toml` so the older installer regenerates its
-own, then re-run.
+omits `polling_interval` and `sens_round_decimal_places` cannot roll back to
+an older release that still requires them — the install stops with a "cannot
+load config.toml" error. Add these two lines to `config.toml`, or delete it so
+the older installer regenerates its own, then re-run:
+
+```toml
+polling_interval = 1000
+sens_round_decimal_places = 1
+```
+
+Current releases no longer read the second line and log a warning about it,
+so remove it once you update again.
 
 </details>

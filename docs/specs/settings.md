@@ -34,8 +34,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
   `ConfigData` holds `port` (required, no default, `1` to `65535`), `host`
   (`"127.0.0.1"`), `open_browser_on_launch` (`True`), `polling_interval`
-  (`1000` ms, `1` to `2147483647`),
-  `sens_round_decimal_places` (`1`), `debug` (`False`),
+  (`1000` ms, `1` to `2147483647`), `debug` (`False`),
   `scenario_metadata_cache_ttl_hours` (`24`),
   `scenario_rank_cache_ttl_hours` (`168`),
   `leaderboard_total_cache_ttl_hours` (`168`), `percentile_warmup_enabled`
