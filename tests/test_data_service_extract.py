@@ -7,7 +7,7 @@ import pytest
 from sortedcontainers import SortedList
 
 from source.kovaaks import data_service
-from source.kovaaks.data_models import RunData, ScenarioStats
+from source.kovaaks.data_models import RecordedSensitivity, RunData, ScenarioStats
 from source.my_watchdog import file_watchdog
 
 extract_data_from_file = data_service.extract_data_from_file
@@ -397,6 +397,7 @@ def test_a_cm360_file_keeps_the_value_it_recorded(one_decimal_place):
     assert run is not None
     assert run.horizontal_sens == 40.0
     assert run.sens_scale == "cm/360"
+    assert run.recorded_sensitivity is None
 
 
 @pytest.mark.parametrize(
@@ -432,6 +433,27 @@ def test_a_game_scale_run_converts_to_cm360(  # noqa: PLR0913
     assert run is not None
     assert run.horizontal_sens == expected_cm360
     assert run.sens_scale == "cm/360"
+
+
+def test_a_converted_run_keeps_the_setting_its_file_recorded(one_decimal_place):
+    # Kept for the hover, and kept unrounded: the one decimal place an
+    # unconverted run is rounded to would show this run as 0.2 Valorant, a
+    # setting it was never played at.
+    run = _extract_written_file(
+        "recorded-0.16",
+        sens_scale="Valorant",
+        horizontal_sens="0.16",
+        sens_increment="0.159909",
+        dpi="1600",
+    )
+
+    assert run is not None
+    assert run.horizontal_sens == 51.1
+    assert run.recorded_sensitivity == RecordedSensitivity(
+        value=0.16,
+        scale="Valorant",
+        dpi=1600.0,
+    )
 
 
 def test_converted_runs_leave_the_group_raw_rounding_collapsed_them_into(
@@ -578,6 +600,8 @@ def test_an_unusable_conversion_field_costs_the_conversion_not_the_run(
     assert run.horizontal_sens == 0.2
     assert run.sens_scale == "Valorant"
     assert run.score == 123.45
+    # The "neither" row is a legacy file; every row stays unconverted.
+    assert run.recorded_sensitivity is None
 
 
 def test_a_mid_write_dpi_line_costs_the_conversion_not_the_run(one_decimal_place):

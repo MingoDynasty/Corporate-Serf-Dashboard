@@ -41,6 +41,11 @@ POINT_SIZE_DEFAULT = "Default"
 POINT_SIZE_OPTIONS = ("Small", POINT_SIZE_DEFAULT, "Large")
 POINT_SIZE_PRESET_PX = {"Small": 4, "Large": 10}
 
+# The run points' sensitivity hover line, shared by both chart modes so they
+# can't drift apart. ``customdata[3]`` is empty for a run that wasn't converted,
+# so the line then ends at the sensitivity itself.
+_RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
+
 # ColorInput is set to hex, so this is the whole shape a stored value can
 # legitimately have. Anything else -- a cleared field's "", a hand-typed
 # fragment, a value from an older format -- means Default.
@@ -177,11 +182,12 @@ class _AxisDescriptor(Generic[_K]):
     :param empty_message: empty-state message shown when there is no data.
     :param scatter_x: per-run x value from the ``(dict key, run)`` pair.
     :param line_x: per-group x value from the dict key.
-    :param hover_x_label: hovertemplate fragment for the x value.
-    :param hover_point_extra: hovertemplate lines, each ending in ``<br>``,
-        added to the run points only, after the x value. It may read
-        ``customdata``; ``hover_x_label`` must not, because the Average score
-        line shares it and carries no ``customdata``.
+    :param hover_x_label: hovertemplate fragment for the x value, shown by the
+        Average score line only. It must not read ``customdata``: the line
+        carries none, and a group can span recorded sensitivities.
+    :param hover_point_lines: hovertemplate lines, each ending in ``<br>``, that
+        the run points show between Score and Accuracy. They may read
+        ``customdata``.
     """
 
     axis_title: str
@@ -189,7 +195,24 @@ class _AxisDescriptor(Generic[_K]):
     scatter_x: Callable[[_K, RunData], float | str | date]
     line_x: Callable[[_K], float | str | date]
     hover_x_label: str
-    hover_point_extra: str
+    hover_point_lines: str
+
+
+def _recorded_sensitivity_suffix(run_data: RunData) -> str:
+    """Name the setting a converted run was recorded at, or return ``""``.
+
+    The suffix keeps its leading space, so a run that wasn't converted leaves
+    nothing where it would go. ``format_decimal`` never rounds, so ``0.16``
+    stays ``0.16``, and it drops a whole number's ``.0``, so the DPI reads
+    ``1600`` rather than ``1600.0``.
+    """
+    recorded = run_data.recorded_sensitivity
+    if recorded is None:
+        return ""
+    return (
+        f" ({format_decimal(recorded.value)} {recorded.scale}"
+        f" at {format_decimal(recorded.dpi)} DPI)"
+    )
 
 
 def _generate_xy_plot(  # noqa: PLR0913
@@ -228,6 +251,7 @@ def _generate_xy_plot(  # noqa: PLR0913
         "Accuracy": [],
         # Not "Sensitivity": that is the x column's key in Score vs Sensitivity.
         "Run sensitivity": [],
+        "Recorded sensitivity": [],
     }
     line_plot_data: dict[str, list[float | str | date]] = {
         "Score": [],
@@ -248,6 +272,9 @@ def _generate_xy_plot(  # noqa: PLR0913
             scatter_plot_data["Run sensitivity"].append(
                 f"{run_data.horizontal_sens} {run_data.sens_scale}"
             )
+            scatter_plot_data["Recorded sensitivity"].append(
+                _recorded_sensitivity_suffix(run_data)
+            )
         line_plot_data[axis_title].append(axis.line_x(key))
         line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
     # If we want to generate a trendline (e.g. lowess)
@@ -266,7 +293,12 @@ def _generate_xy_plot(  # noqa: PLR0913
         y="Score",
         hover_name="Datetime",
         hover_data=["Datetime"],
-        custom_data=["Datetime", "Accuracy", "Run sensitivity"],
+        custom_data=[
+            "Datetime",
+            "Accuracy",
+            "Run sensitivity",
+            "Recorded sensitivity",
+        ],
     )
     figure_scatter.update_traces(
         # px bakes the first colorway entry of Plotly's default template into
@@ -277,8 +309,7 @@ def _generate_xy_plot(  # noqa: PLR0913
         marker_color=None,
         hovertemplate="<b>%{customdata[0]}</b><br><br>"
         + "<b>Score</b>: %{y}<br>"
-        + f"{hover_x_label}<br>"
-        + axis.hover_point_extra
+        + axis.hover_point_lines
         + "<b>Accuracy</b>: %{customdata[1]}%"
         + "<extra></extra>",
         hoverlabel={"font_size": 16},
@@ -365,7 +396,10 @@ def generate_sensitivity_plot(
             scatter_x=lambda _key, run: f"{run.horizontal_sens} {run.sens_scale}",
             line_x=lambda key: key,
             hover_x_label="<b>Sensitivity</b>: %{x}",
-            hover_point_extra="",
+            # The sensitivity line shows the same value as %{x}, plus the setting
+            # a converted run was recorded at, so it stands in for the x line
+            # rather than repeating it.
+            hover_point_lines=_RUN_SENSITIVITY_HOVER_LINE,
         ),
     )
 
@@ -400,7 +434,7 @@ def generate_time_plot(
             line_x=lambda key: key,
             hover_x_label="<b>Date</b>: %{x}",
             # A day's runs can span sensitivities, so each point names its own.
-            hover_point_extra="<b>Sensitivity</b>: %{customdata[2]}<br>",
+            hover_point_lines="<b>Date</b>: %{x}<br>" + _RUN_SENSITIVITY_HOVER_LINE,
         ),
     )
 

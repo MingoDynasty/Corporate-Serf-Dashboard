@@ -33,7 +33,8 @@ list in the roadmap.)
   actually better?" and "am I trending up on this scenario?" are answered
   visually instead of by gut feel.
 - **Older runs land on the same sensitivity axis.** Runs recorded on a game's
-  own sensitivity scale are shown in cm/360 like everything else, and the
+  own sensitivity scale are shown in cm/360 like everything else, with a
+  chart hover that names the setting and DPI each was recorded at, and the
   playlist tables' PB cm/360 column fills in for them. *Problem solved:* a run
   from the Valorant-scale era used to sort as `0.2` among centimeters and sit
   at the wrong end of the axis, so the history could not be compared across

@@ -488,6 +488,9 @@ flowchart LR
   file carries `Sens Increment` and `DPI`, so every downstream consumer of
   `RunData.horizontal_sens` / `RunData.sens_scale` reads one scale
   ([decision_log.md](decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  A converted run also carries `RunData.recorded_sensitivity`, the unrounded
+  value, scale, and DPI its file recorded, which only the chart hover reads
+  ([decision_log.md](decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
   `load_playlists` records each winning user-root code's actual file path
   (so deletion targets the real file, not a reconstructed name) and the user files it skips because
   a bundled code already won; `delete_user_playlist` and
@@ -532,8 +535,8 @@ flowchart LR
   Playlists page renders it. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Scenario
   Performance filter, Journey picker, overview).
-- `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
-  `Rank`, `Scenario`).
+- `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
+  `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
   `ScenarioRankInfo` / `ScenarioRankStatus`.
 
