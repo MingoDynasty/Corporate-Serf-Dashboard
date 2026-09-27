@@ -2,7 +2,7 @@ from datetime import datetime
 
 import plotly.graph_objs as go
 
-from source.kovaaks.data_models import Rank, RunData
+from source.kovaaks.data_models import Rank, RecordedSensitivity, RunData
 from source.plot.plot_service import (
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
@@ -222,6 +222,61 @@ def test_time_plot_point_hover_names_each_runs_own_sensitivity() -> None:
     # A day's average can span sensitivities, and the line has no customdata.
     for fig in (time_fig, sens_fig):
         assert "customdata" not in fig.data[1].hovertemplate
+
+
+def test_a_converted_runs_point_hover_names_the_setting_it_was_recorded_at() -> None:
+    when = datetime(2025, 1, 1, 10, 0, 0)
+    converted = RunData(
+        datetime_object=when,
+        score=100.0,
+        sens_scale="cm/360",
+        horizontal_sens=51.1,
+        scenario="1w4ts",
+        accuracy=0.5,
+        # A parsed DPI is a float, and the hover must still read 1600.
+        recorded_sensitivity=RecordedSensitivity(
+            value=0.16,
+            scale="Valorant",
+            dpi=1600.0,
+        ),
+    )
+    native = RunData(
+        datetime_object=when,
+        score=110.0,
+        sens_scale="cm/360",
+        horizontal_sens=40.8,
+        scenario="1w4ts",
+        accuracy=0.5,
+    )
+    sens_fig = generate_sensitivity_plot(
+        {"51.1 cm/360": [converted], "40.8 cm/360": [native]}, "1w4ts", False, []
+    )
+    time_fig = generate_time_plot(
+        {when.date(): [converted, native]}, "1w4ts", False, []
+    )
+
+    for fig in (sens_fig, time_fig):
+        points = fig.data[0]
+        assert [(row[2], row[3]) for row in points.customdata] == [
+            ("51.1 cm/360", " (0.16 Valorant at 1600 DPI)"),
+            # Nothing where the suffix would go.
+            ("40.8 cm/360", ""),
+        ]
+        assert (
+            "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
+            in points.hovertemplate
+        )
+
+    # The points' sensitivity line stands in for the x line; it doesn't repeat it.
+    assert sens_fig.data[0].hovertemplate.count("<b>Sensitivity</b>") == 1
+
+    # An average can span recorded settings, so its hover is exactly what it was.
+    assert sens_fig.data[1].hovertemplate == (
+        "<b>Average score</b>: %{y}<br><b>Sensitivity</b>: %{x}<extra></extra>"
+    )
+    assert time_fig.data[1].hovertemplate == (
+        "<b>Average score</b>: %{y}<br><b>Date</b>: %{x}<extra></extra>"
+    )
 
 
 def test_rank_overlays_omitted_when_switch_off() -> None:

@@ -26,6 +26,7 @@ from source.kovaaks.api_service import (
 from source.kovaaks.data_models import (
     PlaylistData,
     Rank,
+    RecordedSensitivity,
     RunData,
     Scenario,
     ScenarioStats,
@@ -748,24 +749,30 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     # is still unread when the first one arrives.
     sens_increment = _parse_optional_positive(raw_sens_increment)
     dpi = _parse_optional_positive(raw_dpi)
-    converted_cm360 = (
-        _converted_cm360(
+    recorded_sensitivity = None
+    if sens_scale != "cm/360" and sens_increment is not None and dpi is not None:
+        converted_cm360 = _converted_cm360(
             sens_increment,
             dpi,
             get_config().sens_round_decimal_places,
         )
-        if sens_scale != "cm/360" and sens_increment is not None and dpi is not None
-        else None
-    )
-    if converted_cm360 is not None:
-        # A run recorded on a game's own scale converts exactly, so it joins the
-        # cm/360 axis instead of sorting by a number from another scale.
-        horizontal_sens = converted_cm360
-        sens_scale = "cm/360"
-    else:
-        # Already cm/360, or too old to carry both fields: keep the recorded
-        # value and scale. Sometimes the sens looks like 20.123456789, so round
-        # it to look cleaner.
+        if converted_cm360 is not None:
+            # A run recorded on a game's own scale converts exactly, so it joins
+            # the cm/360 axis instead of sorting by a number from another scale.
+            # What the file recorded is kept for display, unrounded: at the
+            # shipped one decimal place, 0.16 Valorant would read as 0.2, a
+            # setting the run was never played at.
+            recorded_sensitivity = RecordedSensitivity(
+                value=horizontal_sens,
+                scale=sens_scale,
+                dpi=dpi,
+            )
+            horizontal_sens = converted_cm360
+            sens_scale = "cm/360"
+    if recorded_sensitivity is None:
+        # Already cm/360, too old to carry both fields, or not convertible:
+        # keep the recorded value and scale. Sometimes the sens looks like
+        # 20.123456789, so round it to look cleaner.
         horizontal_sens = round(
             horizontal_sens,
             get_config().sens_round_decimal_places,
@@ -779,6 +786,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         scenario=scenario,
         accuracy=accuracy,
         damage_accuracy=damage_accuracy,
+        recorded_sensitivity=recorded_sensitivity,
     )
 
 
