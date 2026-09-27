@@ -8,10 +8,13 @@ from dataclasses import dataclass, field
 from typing import Literal, TypeAlias
 from urllib.parse import urlencode
 
+import requests
+
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity, get_kovaaks_username
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import (
+    UnknownKovaaksUserError,
     get_cached_leaderboard_id,
     get_scenario_rank_info,
     hydrate_leaderboard_id_cache,
@@ -23,6 +26,7 @@ from source.kovaaks.data_service import (
     get_scenario_stats,
     is_scenario_in_database,
 )
+from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_RANK_MAX_WORKERS = 4
@@ -265,12 +269,28 @@ def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
             username,
             config.scenario_metadata_cache_ttl_hours,
         )
-    except Exception as exc:  # noqa: BLE001
-        # Best-effort: the per-scenario path can still resolve ranks without
-        # this optimization, and it converts expected API failures itself.
+    except requests.RequestException as exc:
+        # Expected whenever KovaaK's is slow or unreachable, and it recurs on
+        # every open; the catch-all below would log a traceback for it.
+        logger.warning(
+            "Failed to hydrate leaderboard metadata for playlist open: %s",
+            request_exception_summary(exc),
+        )
+    except UnknownKovaaksUserError as exc:
+        # An unknown configured username is rejected here on every open while
+        # a scenario stays unmapped. The message names the user, and a
+        # traceback per open would bury the log.
         logger.warning(
             "Failed to hydrate leaderboard metadata for playlist open: %s",
             exc,
+        )
+    except Exception:  # noqa: BLE001
+        # Best-effort: the per-scenario path can still resolve ranks without
+        # this optimization, and it converts expected API failures itself.
+        # What reaches here is unexpected, so it keeps the traceback.
+        logger.warning(
+            "Failed to hydrate leaderboard metadata for playlist open",
+            exc_info=True,
         )
 
 

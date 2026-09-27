@@ -300,7 +300,7 @@ def bind_server_socket(port: int, host: str = DEFAULT_HOST) -> list[socket.socke
         if error.errno not in (errno.EAFNOSUPPORT, errno.EADDRNOTAVAIL):
             _exit_port_taken(port, sockets)
         logger.info(
-            "No IPv6 loopback available (%s); serving on 127.0.0.1 only.",
+            "No IPv6 loopback available; serving on 127.0.0.1 only: %s",
             error,
         )
     return sockets

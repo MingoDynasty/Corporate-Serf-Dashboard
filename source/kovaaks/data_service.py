@@ -1054,10 +1054,15 @@ def load_playlist_from_code(  # noqa: PLR0911
             # Includes Evxl's HTTP 400 for unknown or mis-cased codes, but also
             # a connection error, so the refusal must not claim that no playlist
             # matches. The search's log line keeps the zero-versus-many detail.
+            detail = (
+                request_exception_summary(exc)
+                if isinstance(exc, requests.RequestException)
+                else exc.__class__.__name__
+            )
             logger.warning(
                 "Evxl playlist-by-code fallback failed for %r: %s",
                 input_playlist_code,
-                exc,
+                detail,
             )
             message = (
                 f"Couldn't load a playlist for the code {input_playlist_code}. "

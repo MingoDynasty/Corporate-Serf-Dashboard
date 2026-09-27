@@ -37,6 +37,7 @@ from source.kovaaks.data_service import (
     get_scenario_stats_snapshot,
 )
 from source.kovaaks.playlist_visibility_service import get_shown_playlist_codes
+from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
@@ -238,10 +239,24 @@ def _expected_failure_result(
     scenario_name: str,
     exc: BaseException,
 ) -> WarmupStepResult:
+    # A ``requests`` failure is an ``OSError`` too, so it is matched first and
+    # goes through the summary helper. The unknown-user rejection is this app's
+    # own message, and any other ``OSError`` that reaches here comes from the
+    # operating system, so both read as text. A ``ValidationError`` would dump
+    # its fields, and the remaining ``ValueError``s come from libraries (an
+    # out-of-range timestamp, a serialization failure) and may render as
+    # nothing, so those log their class name.
+    detail: object
+    if isinstance(exc, requests.RequestException):
+        detail = request_exception_summary(exc)
+    elif isinstance(exc, UnknownKovaaksUserError | OSError):
+        detail = exc
+    else:
+        detail = type(exc).__name__
     logger.warning(
         'Percentile warmup failed for "%s": %s',
         scenario_name,
-        exc,
+        detail,
     )
     return _failure_result(context, scenario_name, exc)
 

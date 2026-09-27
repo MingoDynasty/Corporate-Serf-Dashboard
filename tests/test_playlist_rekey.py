@@ -559,6 +559,7 @@ def test_import_refuses_when_search_empty_and_evxl_returns_http_400(
 def test_import_refuses_when_search_empty_and_evxl_connection_error(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
     monkeypatch.setattr(
@@ -570,17 +571,22 @@ def test_import_refuses_when_search_empty_and_evxl_connection_error(
 
     monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_down)
 
-    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+    with caplog.at_level(logging.WARNING, logger=data_service.logger.name):
+        message, imported_code = data_service.load_playlist_from_code("SomeCode")
 
     assert message == (
         "Couldn't load a playlist for the code SomeCode. Check the code and try again."
     )
     assert imported_code is None
+    assert caplog.messages == [
+        "Evxl playlist-by-code fallback failed for 'SomeCode': evxl unreachable"
+    ]
 
 
 def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     monkeypatch.setattr(
@@ -592,7 +598,8 @@ def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
     evxl = _evxl_playlist("Nameless", "   ", ["Scenario"])
     monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
 
-    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+    with caplog.at_level(logging.WARNING, logger=data_service.logger.name):
+        message, imported_code = data_service.load_playlist_from_code("SomeCode")
 
     assert message == (
         "Couldn't load a playlist for the code SomeCode. Check the code and try again."
@@ -600,6 +607,10 @@ def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
+    # The class name, not the validation error's field dump.
+    assert caplog.messages == [
+        "Evxl playlist-by-code fallback failed for 'SomeCode': ValidationError"
+    ]
 
 
 def test_import_falls_back_to_evxl_when_search_is_ambiguous(monkeypatch, tmp_path):

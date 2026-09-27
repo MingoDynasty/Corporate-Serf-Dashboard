@@ -10,6 +10,7 @@ import requests
 from source.config import settings_service
 from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
+from source.kovaaks.api_service import UnknownKovaaksUserError
 from source.kovaaks.data_models import PlaylistData, RunData, Scenario, ScenarioStats
 from source.kovaaks.playlist_scenarios_service import (
     build_playlist_scenario_rank_rows,
@@ -470,6 +471,56 @@ def test_hydration_unexpected_error_still_yields_full_rows(monkeypatch):
     rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
+
+
+@pytest.mark.parametrize(
+    ("make_error", "message", "has_traceback"),
+    [
+        # Empty text: the summary helper falls back to the class name.
+        (
+            requests.ConnectionError,
+            "Failed to hydrate leaderboard metadata for playlist open: ConnectionError",
+            False,
+        ),
+        (
+            lambda: UnknownKovaaksUserError(
+                "KovaaK's username \"Ghost\" wasn't found."
+            ),
+            "Failed to hydrate leaderboard metadata for playlist open: "
+            "KovaaK's username \"Ghost\" wasn't found.",
+            False,
+        ),
+        (
+            lambda: KeyError("data"),
+            "Failed to hydrate leaderboard metadata for playlist open",
+            True,
+        ),
+    ],
+)
+def test_hydration_failure_logs_each_route(
+    monkeypatch, caplog, make_error, message, has_traceback
+):
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": None, "Second": None})
+
+    def failing_hydrate(username, ttl):
+        raise make_error()
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        failing_hydrate,
+    )
+
+    with caplog.at_level(
+        logging.WARNING, logger=playlist_scenarios_service.logger.name
+    ):
+        playlist_scenarios_service._hydrate_playlist_leaderboard_ids(
+            ["First", "Second"]
+        )
+
+    [record] = caplog.records
+    assert record.getMessage() == message
+    assert (record.exc_info is not None) is has_traceback
 
 
 def test_hydration_probe_error_still_yields_full_rows(monkeypatch):
