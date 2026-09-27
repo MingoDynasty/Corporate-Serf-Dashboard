@@ -13,6 +13,82 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-27: The Manual-Refresh Hard Failure Stays Red
+
+Status: Accepted
+
+When a clicked position refresh gets nothing usable back, its toast stays red
+instead of softening to yellow. The app's color scale reserves red for an
+operation that failed, and a refresh the user asked for that returned nothing
+is exactly that. The outcome that falls back to a cached position stays
+yellow, so the two still differ by color as well as by title.
+
+**Ruling.** Ruled (user) 2026-09-27, in a decisions chat. It closes the color
+question the 2026-08-03 notification entry left open in `docs/tech_debt.md`
+("Manual-refresh failure color"), whose precondition, a title of its own for
+the served-stale toast, the 2026-09-14 copy sweep met. Nothing in the code
+changes: `_rank_refresh_problem_notification` in `source/pages/home.py` stays
+red "Position refresh failed" for a hard failure and yellow "Refresh failed ·
+data from cache" for a served-stale one, on one `rank-refresh-problem`
+channel.
+
+**Why red.** The severity scale makes red an operation that failed and yellow
+caution without anything having failed
+([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)).
+The routing policy gives a user-initiated failure, manual Refresh named among
+them, an error toast, and its peers are red: "Playlist import failed",
+"Cleanup failed", "Skip wasn't saved". For this pair the scale reads as
+whether anything usable came back: the served-stale outcome returned a cached
+position, the hard failure returned nothing.
+
+**The argument for yellow, rejected.** From the user's seat both outcomes
+leave an older position on screen: the hard failure leaves the field
+untouched, and the served-stale one re-serves the cache, so only the
+service's confirmation of the fallback differs. That is why they share one
+channel, but softening one toast turns the scale into an exception list for
+little gain, since an icon-bearing notification shows its color only as the
+icon's circle, not as Mantine's full-height bar.
+
+## 2026-09-27: The Scenario Table Drops Trailing Zeros From PB Score And PB cm/360
+
+Status: Accepted
+
+The playlist scenario table shows PB Score and PB cm/360 with up to two
+decimals and drops trailing zeros, so one column can read 710 beside 863.94.
+Audits kept flagging this as ragged decimals, and it is now ruled the intended
+style rather than a defect. The same rule makes the table show a sensitivity
+of 50 where the chart says 50.0 cm/360, and that difference is accepted too.
+
+**Ruling.** Ruled (user) 2026-09-27, in a decisions chat, on finding P8 of
+the 2026-07-12 UI audit, which proposed fixed precision (two decimals for
+scores, one for cm/360) and which every audit since re-raised as unruled.
+Both halves: stripping stays within a column (won't-fix), and the
+table-versus-chart difference for PB cm/360 stays. `_format_score` in
+`source/kovaaks/playlist_scenarios_service.py` formats both columns as
+`f"{value:,.2f}"` with trailing zeros and a bare point stripped; PB Accuracy
+keeps its fixed two decimals.
+
+**Why not fixed precision.** Fixed decimals pay off when a reader compares
+values by lined-up decimal points. The table's columns are left-aligned, and
+each row is a different scenario with its own score scale, so no comparison
+runs down the PB Score column, and `.00` on a whole-number scenario is noise.
+Right-aligning the numeric columns is a separate question this ruling does
+not take up.
+
+**Why the chart keeps `50.0 cm/360`.** The chart's axis and hover and the run
+toasts print `f"{horizontal_sens} {sens_scale}"`, which is also
+`sensitivity_key`, the Score vs Sensitivity grouping and first-sensitivity
+key. A chart reading `50 cm/360` would need a display-only string at plot
+time, never a change to the key, and the table already shows the same number.
+Rejected: a `docs/tech_debt.md` entry for the difference, since an entry
+nobody plans to work on is what kept the finding coming back.
+
+**Exactness.** Two decimals lose nothing while stored sensitivities carry two
+decimals or fewer, which holds at the shipped `sens_round_decimal_places` of
+one. A configured value above two would let the chart read `50.125` beside a
+table rounded to two places; the same chat ruled the knob's removal, with
+cm/360 fixed at one decimal, which closes that case.
+
 ## 2026-09-27: The Playlist Scenario Table Keeps Its Sort In The Page URL
 
 Status: Accepted
@@ -1291,7 +1367,9 @@ numbering is the proposal's.
 
 **Deliberately not changed.** Softening the red refresh-failure toast, whose
 title question this sweep answered and whose color question stays open in
-[tech_debt.md](./tech_debt.md); the configured-but-wrong username; the Steam ID
+[tech_debt.md](./tech_debt.md) *(resolved 2026-09-27: it stays red, see
+[The Manual-Refresh Hard Failure Stays Red](#2026-09-27-the-manual-refresh-hard-failure-stays-red))*;
+the configured-but-wrong username; the Steam ID
 mismatch toast's structure; the two `plot_service.py` empty-state messages the
 page callbacks never reach; the Aim Training Journey page beyond its banner
 and one label; the personal best celebration surfaces, already in the target
@@ -4337,6 +4415,8 @@ own, naming only the position read as though the total had refreshed. With no
 total on screen the message still names only the position, and the red hard
 failure keeps its message because it never sees what the field shows. See
 [scenario_rank.md](specs/scenario_rank.md#failure-handling).)*
+*(Resolved 2026-09-27: the hard failure stays red. See
+[The Manual-Refresh Hard Failure Stays Red](#2026-09-27-the-manual-refresh-hard-failure-stays-red).)*
 
 **Deliberately left open: do background rank events deserve a real toast?**
 "Your rank updated after that PB" and "Position update timed out" are
