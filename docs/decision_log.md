@@ -86,8 +86,9 @@ nobody plans to work on is what kept the finding coming back.
 **Exactness.** Two decimals lose nothing while stored sensitivities carry two
 decimals or fewer, which holds at the shipped `sens_round_decimal_places` of
 one. A configured value above two would let the chart read `50.125` beside a
-table rounded to two places; the same chat ruled the knob's removal, with
-cm/360 fixed at one decimal, which closes that case.
+table rounded to two places. That case stays open until the knob's removal
+ships: the same chat ruled the removal, with cm/360 fixed at one decimal, and
+queued it as a separate implementation.
 
 ## 2026-09-27: The Playlist Scenario Table Keeps Its Sort In The Page URL
 
