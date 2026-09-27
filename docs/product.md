@@ -11,7 +11,9 @@ it (see AGENTS.md "Shipping a proposal").
 
 One user, one machine: a KovaaK's aim-training enthusiast who generates
 dozens of runs per session and wants that data to direct their training
-instead of piling up unread. Everything in the app serves three questions:
+instead of piling up unread. Everything in the app serves three questions
+about their training over time, and two more that come up during play (see
+[When they ask them](#when-they-ask-them)):
 
 > *Am I improving? Where am I weak? What should I work on next?*
 
@@ -21,26 +23,36 @@ list in the roadmap.)
 
 ### When they ask them
 
-The user comes to the app at one of two moments. The moment decides which
-question they are asking and how much attention they have for the answer, so
-a feature is designed for a moment as well as for a question.
+The user comes to the app at one of two moments. The moment shapes how much
+attention they usually have, and so the form the answer must take. It
+doesn't decide the question: what to play next is asked before a session and
+again between scenarios within one, at a different scale. So a feature is
+designed for a moment as well as for a question.
 
 - **In session.** The user is playing with KovaaK's fullscreen and looks at
-  the app between runs: an alt-tab, a second monitor, or a phone. They have
-  a glance to spare, not a page. They are asking a question the three above
-  do not cover: *how is this session going?* Concretely: what rank are my
-  scores reaching, should I push for speed or for accuracy, how long have I
-  been playing, how many runs have I done, and which scenarios have I played.
-- **Between sessions.** The game is closed and the user has their full
-  attention. They look back (*am I improving?*, starting with how the last
-  session went) and look ahead (*where am I weak, and what should I work on
-  next?*). Looking back often leads straight into looking ahead in one
-  sitting.
+  the app between runs: an alt-tab, a second monitor, or a phone. Most looks
+  are a glance, so an answer here has to work at a glance. Two questions
+  come up that the three above don't cover. The first is *how did that run
+  go?*, which the run toast, the personal best celebration, and the plot
+  answer today. The second is *how is this session going?*, and it serves a
+  decision: keep pushing this scenario (and whether to push for speed or for
+  accuracy), switch to another, or stop. What rank the scores are reaching,
+  how long they've played, how many runs, and which scenarios are the
+  evidence for that call.
+- **Between sessions.** Before a session or after one. The user usually has
+  more attention to give, though not always: just before a session they
+  want to get playing. They look back (*am I improving?*, often starting
+  with how the last session went) and look ahead (*where am I weak, and what
+  should I work on next?*). Looking back often leads straight into looking
+  ahead in one sitting.
 
-The session, one continuous stretch of play, is what the two moments share.
-In session, the user watches the live session. Between sessions, the session
-that just ended is the first thing they look back on, so one view serves
-both.
+The session, one stretch of play including the pauses between runs, is what
+the two moments share: both read the same record. A session the user
+watched live stays reviewable once it ends. Between sessions the user may
+start from a recent session, a scenario's history over weeks, or their
+playlists' weak spots, and the question decides the starting point and how
+much history the answer needs. Whether the live and the finished session
+are one view or two is a design choice for the feature that builds them.
 
 ## What the app does today
 
