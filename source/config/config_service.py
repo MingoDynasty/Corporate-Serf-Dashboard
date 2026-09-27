@@ -58,7 +58,6 @@ class ConfigData:
     # 2_147_483_647 never fires, 2_147_483_648 fires at 0 ms). The upper bound
     # is browser representability, not a product cap on how slow a poll may be.
     polling_interval: Annotated[int, Field(gt=0, le=2_147_483_647)] = 1000
-    sens_round_decimal_places: int = 1
     debug: bool = False
     scenario_metadata_cache_ttl_hours: int = 24
     scenario_rank_cache_ttl_hours: int = 168
