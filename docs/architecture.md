@@ -413,7 +413,7 @@ flowchart LR
   generation token, the interval left disabled, and the condition stated in
   the status line (see decision log), so no lookup runs over a pass that would
   fetch nothing. A benchmark's `layout` adds the Rank and Next Rank columns
-  after Scenario. The table's sort lives in the page URL as `?sort=`:
+  after PB Score. The table's sort lives in the page URL as `?sort=`:
   `layout` seeds `initialSort` on a fresh copy of the column defs from a
   value valid for that page's columns, and a clientside callback on the
   grid's `columnState` rewrites the key with a raw `history.replaceState`,

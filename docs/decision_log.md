@@ -154,6 +154,15 @@ measured against the player's own runs, with recent form, a roadmap Future
 entry. Refreshing the table when a run lands: like PB Score, both columns
 stay as they were until the page reopens.
 
+**Superseded in part (2026-09-28).** The two columns now sit directly after
+PB Score, not after Scenario, at the maintainer's direction. Both compute from
+PB Score, so a row reads left to right from the score to the rank it reached
+and the gap to the next one, and the points in Next Rank's tooltip sit beside
+the score they count from. The accepted cost is that a narrow window has to
+scroll sideways to show them, where the old placement kept them in view. The
+placement was author-owned, not a ratified row, and D1, D2, and everything
+else here stand. Shipped in PR #323.
+
 **Provenance.** Proposal by `claude-opus-5-5` (PR #320), reviewed by
 `gpt-6-sol` and, as a supplementary seat, `claude-fable-5-1`. Shipped in PR
 #321.
