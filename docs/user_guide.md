@@ -102,6 +102,18 @@ KovaaK's API and saves it under `data/playlists`. Playlists imported this way
 carry no rank data — the benchmark-rank overlays come only from the bundled
 library.
 
+A benchmark's scenario table has two more columns after Scenario. **Rank** is
+the highest rank your personal best has reached on that scenario, or "No rank"
+below the first one. **Next Rank** says how much your personal best has to
+grow to reach the next rank: "+4.8% to Gold" means a personal best 4.8% higher
+earns Gold. Hover the cell to see Gold's threshold and the points still
+needed. Click the **Next Rank** header once to sort it ascending, and the
+scenarios closest to ranking up come first. A scenario past its last rank
+reads "Top rank", one you haven't played reads N/A, and both sort last. The
+columns use the personal best from your stats folder, the one PB Score shows,
+so they work without a KovaaK's username. A new personal best shows up in
+them when you reopen the table.
+
 A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh from the Playlists page
 starts it in playlist order; to clear a sort, click a sorted column's header

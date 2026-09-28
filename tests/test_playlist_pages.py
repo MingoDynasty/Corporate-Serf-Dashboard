@@ -17,7 +17,7 @@ from dash.exceptions import PreventUpdate
 from source.config import settings_service
 from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks import percentile_warmup_service as warmup
-from source.kovaaks.data_models import PlaylistData, Scenario
+from source.kovaaks.data_models import PlaylistData, Rank, Scenario
 from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
 from source.utilities.store_schema import UnsupportedSchemaError
 from tests.rendered_text import rendered_text
@@ -2158,11 +2158,19 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
     # Pin the exact set so adding a column forces a conscious tooltip decision.
     fields_with_header_tooltip = {
         column["field"]
-        for column in playlist_scenarios.TABLE_COLUMN_DEFS
+        for column in (
+            *playlist_scenarios.TABLE_COLUMN_DEFS,
+            *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
+        )
         if "headerTooltip" in column
     }
 
-    assert fields_with_header_tooltip == {"percentile_sort", "pb_cm360_sort"}
+    assert fields_with_header_tooltip == {
+        "tier_sort",
+        "next_tier_sort",
+        "percentile_sort",
+        "pb_cm360_sort",
+    }
 
 
 def test_playlist_scenarios_grid_uses_content_auto_size():
@@ -2330,11 +2338,13 @@ def test_playlist_scenarios_sorted_layout_leaves_the_shared_column_defs_alone():
     }
 
 
-def test_playlist_scenarios_sort_names_cover_every_column_once():
+def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlists):
     # The names are address-bar copy the maintainer ruled verbatim, and saved
     # links depend on them, so pin them exactly.
     assert playlist_scenarios.SORT_URL_NAMES == {
         "scenario": "scenario",
+        "rank": "tier_sort",
+        "next-rank": "next_tier_sort",
         "last-played": "last_played_sort",
         "runs": "runs_sort",
         "position": "rank_sort",
@@ -2345,11 +2355,119 @@ def test_playlist_scenarios_sort_names_cover_every_column_once():
         "pb-cm360": "pb_cm360_sort",
         "pb-accuracy": "pb_accuracy_sort",
     }
-    column_ids = [column["field"] for column in playlist_scenarios.TABLE_COLUMN_DEFS]
+    column_ids = [
+        column["field"]
+        for column in (
+            *playlist_scenarios.TABLE_COLUMN_DEFS,
+            *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
+        )
+    ]
     assert sorted(playlist_scenarios.SORT_URL_NAMES.values()) == sorted(column_ids)
     for name, column_id in playlist_scenarios.SORT_URL_NAMES.items():
-        page = playlist_scenarios.layout("KovaaKsTestCode", sort=f"{name}.desc")
+        page = playlist_scenarios.layout(BENCHMARK_CODE, sort=f"{name}.desc")
         assert _sort_seeds(page) == {column_id: ("desc", 0)}
+
+
+# --- a benchmark's table adds Rank and Next Rank ---
+
+BENCHMARK_CODE = "KovaaKsBenchmarkCode"
+PLAIN_PLAYLIST_CODE = "KovaaKsPlaylistCode"
+
+
+@pytest.fixture
+def benchmark_playlists(monkeypatch):
+    """Serve one benchmark and one plain playlist by code."""
+    ladder = [Rank(name="Iron", color="#ffffff", threshold=100)]
+    playlists_by_code = {
+        BENCHMARK_CODE: PlaylistData(
+            name="Test Benchmark",
+            code=BENCHMARK_CODE,
+            scenarios=[Scenario(name="First", ranks=ladder), Scenario(name="Second")],
+        ),
+        PLAIN_PLAYLIST_CODE: PlaylistData(
+            name="Test Playlist",
+            code=PLAIN_PLAYLIST_CODE,
+            scenarios=[Scenario(name="First")],
+        ),
+    }
+    monkeypatch.setattr(data_service, "playlist_database", playlists_by_code)
+
+
+def _column_fields(page) -> list[str]:
+    return [column["field"] for column in _scenario_grid(page).columnDefs]
+
+
+def test_playlist_scenarios_benchmark_table_leads_with_rank_columns(
+    benchmark_playlists,
+):
+    benchmark_fields = _column_fields(playlist_scenarios.layout(BENCHMARK_CODE))
+    plain_fields = _column_fields(playlist_scenarios.layout(PLAIN_PLAYLIST_CODE))
+    unknown_fields = _column_fields(playlist_scenarios.layout("KovaaKsMissingCode"))
+    table_fields = [column["field"] for column in playlist_scenarios.TABLE_COLUMN_DEFS]
+
+    assert benchmark_fields == [
+        "scenario",
+        "tier_sort",
+        "next_tier_sort",
+        *table_fields[1:],
+    ]
+    assert plain_fields == table_fields
+    assert unknown_fields == table_fields
+
+
+def test_playlist_scenarios_rank_column_defs():
+    rank, next_rank = playlist_scenarios.BENCHMARK_COLUMN_DEFS
+
+    assert rank == {
+        "headerName": "Rank",
+        "field": "tier_sort",
+        "headerTooltip": (
+            "The highest rank your PB score has reached on this scenario."
+        ),
+        "valueFormatter": {"function": "params.data.tier_display"},
+        "comparator": {"function": "nullsLastComparator"},
+        "sortable": True,
+        "minWidth": 100,
+    }
+    assert next_rank["headerName"] == "Next Rank"
+    assert next_rank["field"] == "next_tier_sort"
+    assert next_rank["headerTooltip"] == (
+        "How much your PB score has to grow to reach the next rank. Lower is closer."
+    )
+    assert next_rank["valueFormatter"] == {"function": "params.data.next_tier_display"}
+    # The cell tooltip, and its affordance, exist only when the row has one.
+    assert next_rank["tooltipValueGetter"] == {
+        "function": "params.data.next_tier_tooltip"
+    }
+    assert next_rank["cellClass"] == {
+        "function": (
+            "params.data.next_tier_tooltip == null ? null : 'cell-tooltip-affordance'"
+        )
+    }
+    assert next_rank["comparator"] == {"function": "nullsLastComparator"}
+    assert {"tier_sort", "next_tier_sort"} <= set(
+        playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+    )
+
+
+def test_playlist_scenarios_next_rank_sort_seeds_a_benchmark(benchmark_playlists):
+    page = playlist_scenarios.layout(BENCHMARK_CODE, sort="next-rank.asc")
+
+    assert _sort_seeds(page) == {"next_tier_sort": ("asc", 0)}
+
+
+@pytest.mark.parametrize(
+    "code", [PLAIN_PLAYLIST_CODE, "KovaaKsMissingCode"], ids=["plain", "unknown"]
+)
+@pytest.mark.parametrize(
+    "sort", ["rank.asc", "next-rank.asc", "percentile.desc,next-rank.asc"]
+)
+def test_playlist_scenarios_rank_sort_opens_a_plain_table_unsorted(
+    benchmark_playlists, code, sort
+):
+    page = playlist_scenarios.layout(code, sort=sort)
+
+    assert _sort_seeds(page) == {}
 
 
 def _sort_url_writer_spec():

@@ -2,6 +2,7 @@
 
 import copy
 import json
+from collections.abc import Collection
 from uuid import uuid4
 
 import dash
@@ -26,6 +27,7 @@ from source.kovaaks.playlist_scenarios_service import (
     PlaylistScenarioFillDrain,
     build_playlist_scenario_rank_rows,
     drain_playlist_scenario_fill,
+    is_benchmark_playlist,
     scenario_home_href,
     start_playlist_scenario_fill,
 )
@@ -51,6 +53,8 @@ dash.register_page(
 )
 
 AUTO_SIZE_COLUMN_KEYS = [
+    "tier_sort",
+    "next_tier_sort",
     "last_played_sort",
     "runs_sort",
     "rank_sort",
@@ -198,12 +202,46 @@ TABLE_COLUMN_DEFS = [
     },
 ]
 
+# Only a benchmark's table has these, directly after Scenario.
+BENCHMARK_COLUMN_DEFS = [
+    {
+        "headerName": "Rank",
+        "field": "tier_sort",
+        "headerTooltip": "The highest rank your PB score has reached on this scenario.",
+        "valueFormatter": {"function": "params.data.tier_display"},
+        "comparator": {"function": "nullsLastComparator"},
+        "sortable": True,
+        "minWidth": 100,
+    },
+    {
+        "headerName": "Next Rank",
+        "field": "next_tier_sort",
+        "headerTooltip": (
+            "How much your PB score has to grow to reach the next rank. "
+            "Lower is closer."
+        ),
+        "valueFormatter": {"function": "params.data.next_tier_display"},
+        "tooltipValueGetter": {"function": "params.data.next_tier_tooltip"},
+        "cellClass": {
+            "function": (
+                "params.data.next_tier_tooltip == null"
+                " ? null : 'cell-tooltip-affordance'"
+            )
+        },
+        "comparator": {"function": "nullsLastComparator"},
+        "sortable": True,
+        "minWidth": 150,
+    },
+]
+
 # The names ``?sort=`` uses in the address bar, mapped to column IDs. Other code
 # keys on the column IDs, so the names exist only where the URL is read and
 # written: a saved link survives a field rename, and "rank" never names the
 # Position column (Rank is the benchmark tier).
 SORT_URL_NAMES = {
     "scenario": "scenario",
+    "rank": "tier_sort",
+    "next-rank": "next_tier_sort",
     "last-played": "last_played_sort",
     "runs": "runs_sort",
     "position": "rank_sort",
@@ -217,13 +255,14 @@ SORT_URL_NAMES = {
 SORT_DIRECTIONS = ("asc", "desc")
 
 
-def _parse_sort(sort: object) -> list[tuple[str, str]]:
+def _parse_sort(sort: object, column_ids: Collection[str]) -> list[tuple[str, str]]:
     """Read a ``?sort=`` value as ``(column ID, direction)`` pairs, by priority.
 
     Anything not entirely valid reads as unsorted, an empty list: a missing,
-    empty, or repeated parameter, an unknown name, a bad direction, or a
-    duplicate name, which also caps the list at one entry per column. Matching
-    is exact, and no valid part of a mixed value is kept.
+    empty, or repeated parameter, an unknown name, a name for a column not in
+    ``column_ids``, a bad direction, or a duplicate name, which also caps the
+    list at one entry per column. Matching is exact, and no valid part of a
+    mixed value is kept.
     """
     if not isinstance(sort, str) or not sort:
         return []
@@ -231,8 +270,11 @@ def _parse_sort(sort: object) -> list[tuple[str, str]]:
     for entry in sort.split(","):
         name, _, direction = entry.partition(".")
         column_id = SORT_URL_NAMES.get(name)
+        # The name table serves every page, but only a benchmark's table has
+        # Rank and Next Rank. Seeding a column the page lacks raises KeyError.
         if (
             column_id is None
+            or column_id not in column_ids
             or direction not in SORT_DIRECTIONS
             or column_id in directions_by_id
         ):
@@ -241,17 +283,22 @@ def _parse_sort(sort: object) -> list[tuple[str, str]]:
     return list(directions_by_id.items())
 
 
-def _column_defs(sort: object) -> list[dict]:
+def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
     """Copy the column defs, seeding the grid's opening sort from ``?sort=``.
 
-    A fresh copy per call, because ``TABLE_COLUMN_DEFS`` is shared across
+    A benchmark's table adds Rank and Next Rank directly after Scenario. A
+    fresh copy per call, because the module's column defs are shared across
     requests. The seed is ``initialSort``, never ``sort``: AG Grid reapplies
     ``sort`` whenever column defs arrive again, overriding the user's header
     clicks.
     """
-    column_defs = copy.deepcopy(TABLE_COLUMN_DEFS)
+    column_defs: list[dict] = copy.deepcopy(TABLE_COLUMN_DEFS)
+    if benchmark:
+        column_defs[1:1] = copy.deepcopy(BENCHMARK_COLUMN_DEFS)
     columns_by_id = {column["field"]: column for column in column_defs}
-    for sort_index, (column_id, direction) in enumerate(_parse_sort(sort)):
+    for sort_index, (column_id, direction) in enumerate(
+        _parse_sort(sort, columns_by_id)
+    ):
         columns_by_id[column_id]["initialSort"] = direction
         columns_by_id[column_id]["initialSortIndex"] = sort_index
     return column_defs
@@ -513,6 +560,8 @@ def layout(
     ``sort`` is the raw ``?sort=`` query value, which Dash Pages passes as a
     string, or as a list when the parameter repeats.
     """
+    playlist = get_playlist_by_code(playlist_code) if playlist_code else None
+    benchmark = playlist is not None and is_benchmark_playlist(playlist)
     return dmc.Stack(
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
@@ -558,7 +607,7 @@ def layout(
             dag.AgGrid(
                 id="playlist-scenarios-grid",
                 className="ag-theme-quartz playlist-scenarios-grid",
-                columnDefs=_column_defs(sort),
+                columnDefs=_column_defs(sort, benchmark=benchmark),
                 defaultColDef={
                     "resizable": True,
                     "sortable": True,

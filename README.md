@@ -19,7 +19,8 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
 - **Leaderboard standing**: your global position and percentile per scenario, refreshed after a new
   personal best.
 - **Playlist scenarios table**: every scenario in a playlist with position, percentile, and
-  personal-best stats; sort by percentile to pick what to train.
+  personal-best stats, plus each benchmark rank; sort by percentile or by the gap to the next rank
+  to pick what to train.
 - **Benchmarks**: a bundled benchmark library, Voltaic and Viscose on by default, plus import of any
   playlist by share code; see [Playlists and Benchmarks](docs/user_guide.md#playlists-and-benchmarks).
 

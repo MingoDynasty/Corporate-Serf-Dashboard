@@ -285,6 +285,18 @@ are one view or two is a design choice for the feature that builds them.
   ascending surfaces plateaus — scenarios still being played whose best
   hasn't moved. A session-planning tool, checked at the start of a training
   session.
+- **Rank and next-rank gap on benchmarks** (PR #321; design in #320). A
+  benchmark's scenario table shows the rank each scenario's personal best has
+  reached and how much that personal best has to grow to reach the next one,
+  such as "+4.8% to Gold", with the threshold and the points still needed on
+  hover. Sorting the gap ascending lists the closest ranks first. Both come
+  from the bundled thresholds and the local personal best, so they appear
+  with the table and work offline. *Problem solved:* "which scenario is
+  closest to ranking up?" is the everyday benchmark question, the look ahead
+  between sessions and the quick pick just before one, and answering it meant
+  leaving the app for Evxl or KovaaK's in-game view. A percentage compares
+  scenarios whose scores run from single digits to millions, which raw points
+  can't.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I

@@ -4,10 +4,10 @@ The Playlists page is the one place playlists and benchmarks are managed, and
 it lists the playlists the user has chosen to see, with local aggregates. A
 benchmark is a playlist that also carries rank thresholds, and the bundled
 library ships with the app with only the popular ones visible. Clicking a row
-opens that playlist's scenario table, which paints local stats immediately and
-streams leaderboard positions in behind them. A background worker keeps the
-overview's percentile columns warm without getting in the way of anything the
-user is doing.
+opens that playlist's scenario table, which paints local stats and a
+benchmark's ranks immediately and streams leaderboard positions in behind
+them. A background worker keeps the overview's percentile columns warm without
+getting in the way of anything the user is doing.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -227,10 +227,10 @@ and [product.md](../product.md). Leaderboard placement is worded
 
 ## The per-playlist scenario table
 
-- Columns: Scenario, Last Played, Runs, Position, Total Players, Percentile,
-  PB Score, PB Date, PB cm/360, PB Accuracy. Position reads a formatted
-  rank, "Unranked", `N/A`, or, while pending, a blank cell with an animated
-  ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
+- Columns: Scenario, then Rank and Next Rank on a benchmark's table only,
+  then Last Played, Runs, Position, Total Players, Percentile, PB Score, PB
+  Date, PB cm/360, PB Accuracy. Position reads a formatted rank, "Unranked",
+  `N/A`, or, while pending, a blank cell with an animated ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
   Played keeps "Never"; the 30-second tick refreshes both timestamp columns
   ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)).
   PB cm/360 is known when the PB run's sensitivity is in cm/360, natively or
@@ -243,6 +243,28 @@ and [product.md](../product.md). Leaderboard placement is worded
   is the chart's `50.0 cm/360`
   ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)).
   PB Accuracy prefers damage accuracy, falling back to hit accuracy.
+- A table is a benchmark's when any of its scenarios carries a ladder, the
+  overview's Type test; a playlist's table has no Rank or Next Rank column,
+  and its rows carry no rank fields. Both columns compute from the row's own
+  PB Score, the local all-time high, so they fill in phase 1, with no
+  username, and offline. The ladder is walked in its stored order, never
+  sorted, from the bottom to the first threshold above the PB; a PB equal to
+  a threshold has reached it. Rank names the last rank passed: "No rank"
+  below the first threshold, `N/A` with no PB. Next Rank reads
+  "+{gap}% to {rank name}", the gap being `(next threshold - PB) / PB * 100`
+  rounded up to one decimal, never below 0.1, with thousands separators. Its
+  cell tooltip reads "{rank name} at {threshold} · {points} to go", the
+  points rounded up to two decimals, never below 0.01, and numbers formatted
+  as PB Score. Next Rank reads "Top rank" once the PB has passed every
+  threshold, whatever its value; otherwise it reads `N/A` with no PB or with
+  a PB of zero or less. Top rank and `N/A` carry no tooltip. A benchmark
+  scenario without a ladder reads `N/A` in both. Rank sorts by ladder
+  position with No rank lowest; Next Rank sorts by the unrounded gap; `N/A`,
+  and Next Rank's Top rank, sort last in both directions. The fill and a
+  cancelled fill's rebuild carry each row's ladder, so their update
+  transactions never blank the two cells. When a run lands, both stay as
+  they were until the page reopens, as PB Score does
+  ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
 - Opening the route has two phases. Phase 1 paints every row from local
   stats and TTL-ignored caches with explicit pending flags per unresolved
   Position, Total Players, and Percentile cell. Phase 2 hydrates leaderboard
@@ -283,6 +305,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   adds none. A value that is not entirely valid opens the table unsorted and
   is removed from the address, as is a sort cleared through the header
   ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+  A benchmark's table also takes `rank` and `next-rank`. On a playlist's
+  table they name no column, so a value holding either is not valid there
+  ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
 - The scenarios grid owns vertical scrolling inside the AppShell viewport
   with a 300px minimum height
   ([2026-07-06](../decision_log.md#2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling));

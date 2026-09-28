@@ -136,8 +136,11 @@ The sanctioned channels, each typed and single-purpose:
 - `playlist_scenarios_service._FILL_REGISTRY` — the progressive fill's
   generation-scoped rows and terminal tombstones, drained by the playlist
   scenarios page's interval callback into AG Grid transactions and a status
-  line. It carries grid rows, not notifications: the fill emits no toast at
-  all
+  line. Each generation's state holds its scenario names and, captured with
+  them, each scenario's rank ladder, which the cancelled-fill rebuild needs
+  so its rows keep Rank and Next Rank; both are released on terminal
+  consumption. It carries grid rows, not notifications: the fill emits no
+  toast at all
   ([2026-08-22](decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)).
 
 A background event that fits none of these gets its own typed queue or polled
@@ -409,11 +412,12 @@ flowchart LR
   skipped entirely — phase-1 rows with the pending flags cleared, a `None`
   generation token, the interval left disabled, and the condition stated in
   the status line (see decision log), so no lookup runs over a pass that would
-  fetch nothing. The table's sort lives in the page URL as `?sort=`: `layout`
-  seeds `initialSort` on a fresh copy of the column defs from a fully valid
-  value, and a clientside callback on the grid's `columnState` rewrites the
-  key with a raw `history.replaceState`, never through `dcc.Location` (see
-  decision log).
+  fetch nothing. A benchmark's `layout` adds the Rank and Next Rank columns
+  after Scenario. The table's sort lives in the page URL as `?sort=`:
+  `layout` seeds `initialSort` on a fresh copy of the column defs from a
+  value valid for that page's columns, and a clientside callback on the
+  grid's `columnState` rewrites the key with a raw `history.replaceState`,
+  never through `dcc.Location` (see decision log).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
@@ -523,7 +527,9 @@ flowchart LR
   per-playlist scenario table, then owns the generation-keyed progressive-fill
   registry, synchronous cancellation/tombstones, four-worker fill, and atomic
   interval drain. Every streamed/finalized item is a complete row merging
-  freshly read local stats with rank info.
+  freshly read local stats with rank info and, on a benchmark, the Rank and
+  Next Rank fields that `benchmark_rank_fields`, a pure function of the
+  scenario's ladder and local PB, computes on every path.
 - `playlist_overview_service.py` — builds rows for the playlist-level overview
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with

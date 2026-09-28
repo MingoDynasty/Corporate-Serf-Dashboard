@@ -1,6 +1,7 @@
 """Build and progressively refresh rows for the playlist scenarios page."""
 
 import logging
+import math
 import threading
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -19,7 +20,7 @@ from source.kovaaks.api_service import (
     get_scenario_rank_info,
     hydrate_leaderboard_id_cache,
 )
-from source.kovaaks.data_models import RunData, ScenarioStats
+from source.kovaaks.data_models import PlaylistData, Rank, RunData, ScenarioStats
 from source.kovaaks.data_service import (
     get_personal_best_run,
     get_playlist_by_code,
@@ -48,6 +49,10 @@ class _FillState:
 
     playlist_code: str
     scenario_names: tuple[str, ...]
+    # Captured with the names, from the same playlist object. The fill's rows
+    # and a cancelled fill's rebuild replace phase-1 rows whole, so a row built
+    # without its ladder would flip its Rank and Next Rank cells to N/A.
+    scenario_ladders: tuple[list[Rank] | None, ...]
     total: int
     unresolved_indices: set[int]
     cancel_event: threading.Event = field(default_factory=threading.Event)
@@ -108,6 +113,76 @@ def _format_accuracy(value: float | None) -> str:
     return f"{value:.2f}%"
 
 
+def _round_up(value: float, decimals: int) -> float:
+    # The inner round strips float noise that a bare ceiling would round up:
+    # 3.08 - 2.8 is 0.28000000000000025, which would read 0.29. It runs after
+    # scaling, because 0.28 * 100 is itself 28.000000000000004. The floor of
+    # one final unit keeps a remaining gap from reading "+0.0%" or "0 to go".
+    scale = 10**decimals
+    return max(1 / scale, math.ceil(round(value * scale, 6)) / scale)
+
+
+def is_benchmark_playlist(playlist: PlaylistData) -> bool:
+    """Tell whether any scenario carries a rank ladder, the overview's own test."""
+    return any(scenario.ranks for scenario in playlist.scenarios)
+
+
+def _scenario_ladders(playlist: PlaylistData) -> tuple[list[Rank] | None, ...]:
+    """Pick each row's ladder: ``None`` on a playlist, a list on a benchmark.
+
+    A benchmark scenario without a ladder gets an empty list, so its row still
+    carries the Rank and Next Rank fields and reads ``N/A`` in both.
+    """
+    if not is_benchmark_playlist(playlist):
+        return (None,) * len(playlist.scenarios)
+    return tuple(scenario.ranks or [] for scenario in playlist.scenarios)
+
+
+def benchmark_rank_fields(
+    ladder: list[Rank],
+    high_score: float | None,
+) -> PlaylistScenarioRow:
+    """Compute a benchmark row's Rank and Next Rank fields from its PB.
+
+    The walk starts at the bottom of the ladder and stops at the first
+    threshold above the PB, so a PB equal to a threshold has reached it. The
+    ladder keeps its stored order: a few upstream ladders tie or dip, and the
+    walk still never grants a rank past an unmet threshold, which also keeps
+    every gap positive. ``tier_sort`` counts the ranks passed, so No rank is 0.
+    ``next_tier_sort`` is the unrounded gap, and Top rank and ``N/A`` sort as
+    null. The display rounds up, so a gap that remains never reads as reached.
+    """
+    fields: PlaylistScenarioRow = {
+        "tier_display": "N/A",
+        "tier_sort": None,
+        "next_tier_display": "N/A",
+        "next_tier_sort": None,
+        "next_tier_tooltip": None,
+    }
+    if high_score is None or not ladder:
+        return fields
+    passed = 0
+    for rank in ladder:
+        if rank.threshold > high_score:
+            break
+        passed += 1
+    fields["tier_display"] = ladder[passed - 1].name if passed else "No rank"
+    fields["tier_sort"] = passed
+    if passed == len(ladder):
+        fields["next_tier_display"] = "Top rank"
+    elif high_score > 0:
+        next_rank = ladder[passed]
+        points = next_rank.threshold - high_score
+        gap = points / high_score * 100
+        fields["next_tier_display"] = f"+{_round_up(gap, 1):,.1f}% to {next_rank.name}"
+        fields["next_tier_sort"] = gap
+        fields["next_tier_tooltip"] = (
+            f"{next_rank.name} at {_format_score(next_rank.threshold)} · "
+            f"{_format_score(_round_up(points, 2))} to go"
+        )
+    return fields
+
+
 def _get_local_stats(scenario_name: str) -> ScenarioStats | None:
     if not is_scenario_in_database(scenario_name):
         return None
@@ -150,11 +225,16 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
     scenario_stats: ScenarioStats | None = None,
     personal_best_run: RunData | None = None,
     *,
+    ladder: list[Rank] | None = None,
     generation_token: str | None = None,
     playlist_code: str | None = None,
     mark_unresolved_pending: bool = False,
 ) -> PlaylistScenarioRow:
-    """Create one complete AG Grid row with display and numeric sort values."""
+    """Create one complete AG Grid row with display and numeric sort values.
+
+    ``ladder`` is ``None`` on a playlist's table, whose rows carry no Rank or
+    Next Rank fields, and the scenario's ladder on a benchmark's table.
+    """
     date_last_played = None
     number_of_runs = 0
     high_score = None
@@ -192,6 +272,8 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         "pb_accuracy_display": _format_accuracy(personal_best_accuracy),
         "pb_accuracy_sort": personal_best_accuracy,
     }
+    if ladder is not None:
+        row.update(benchmark_rank_fields(ladder, high_score))
 
     if rank_info.status == ScenarioRankStatus.RANKED:
         row["rank_display"] = _format_int(rank_info.rank)
@@ -301,6 +383,7 @@ def _build_row(  # noqa: PLR0913
     generation_token: str,
     playlist_code: str,
     *,
+    ladder: list[Rank] | None,
     mark_unresolved_pending: bool,
 ) -> PlaylistScenarioRow:
     """Re-read local data and build a complete transaction-safe row."""
@@ -326,6 +409,7 @@ def _build_row(  # noqa: PLR0913
         rank_info,
         scenario_stats,
         personal_best_run,
+        ladder=ladder,
         generation_token=generation_token,
         playlist_code=playlist_code,
         mark_unresolved_pending=mark_unresolved_pending,
@@ -342,7 +426,10 @@ def build_playlist_scenario_rank_rows(
         return []
 
     rows = []
-    for index, scenario in enumerate(playlist.scenarios):
+    ladders = _scenario_ladders(playlist)
+    for index, (scenario, ladder) in enumerate(
+        zip(playlist.scenarios, ladders, strict=True)
+    ):
         try:
             rank_info = _lookup_rank_info(scenario.name, allow_network=False)
         except Exception as exc:  # noqa: BLE001
@@ -354,6 +441,7 @@ def build_playlist_scenario_rank_rows(
                 rank_info,
                 generation_token,
                 playlist_code,
+                ladder=ladder,
                 mark_unresolved_pending=True,
             )
         )
@@ -414,6 +502,7 @@ def start_playlist_scenario_fill(
     state = _FillState(
         playlist_code=playlist_code,
         scenario_names=scenario_names,
+        scenario_ladders=_scenario_ladders(playlist),
         total=len(scenario_names),
         unresolved_indices=set(range(len(scenario_names))),
     )
@@ -423,7 +512,12 @@ def start_playlist_scenario_fill(
 
     thread = threading.Thread(
         target=_run_playlist_scenario_fill,
-        args=(generation_token, scenario_names, state.cancel_event),
+        args=(
+            generation_token,
+            scenario_names,
+            state.scenario_ladders,
+            state.cancel_event,
+        ),
         name=f"playlist-fill-{generation_token[:8]}",
         daemon=True,
     )
@@ -431,11 +525,12 @@ def start_playlist_scenario_fill(
     return True
 
 
-def _fetch_fill_row(
+def _fetch_fill_row(  # noqa: PLR0913
     generation_token: str,
     playlist_code: str,
     playlist_order: int,
     scenario_name: str,
+    ladder: list[Rank] | None,
     cancel_event: threading.Event,
 ) -> tuple[int, ScenarioRankInfo, PlaylistScenarioRow] | None:
     if cancel_event.is_set():
@@ -450,6 +545,7 @@ def _fetch_fill_row(
         rank_info,
         generation_token,
         playlist_code,
+        ladder=ladder,
         mark_unresolved_pending=False,
     )
     return playlist_order, rank_info, row
@@ -477,6 +573,7 @@ def _record_fill_result(
 def _run_playlist_scenario_fill(
     generation_token: str,
     scenario_names: tuple[str, ...],
+    scenario_ladders: tuple[list[Rank] | None, ...],
     cancel_event: threading.Event,
 ) -> None:
     """Hydrate once, fan out rank lookups, and stream results to the registry."""
@@ -506,9 +603,12 @@ def _run_playlist_scenario_fill(
                         playlist_code,
                         index,
                         scenario_name,
+                        ladder,
                         cancel_event,
                     )
-                    for index, scenario_name in enumerate(scenario_names)
+                    for index, (scenario_name, ladder) in enumerate(
+                        zip(scenario_names, scenario_ladders, strict=True)
+                    )
                 ]
                 for future in as_completed(futures):
                     result = future.result()
@@ -566,6 +666,7 @@ def _run_playlist_scenario_fill(
 def _build_cancelled_finalization_rows(
     playlist_code: str,
     scenario_names: tuple[str, ...],
+    scenario_ladders: tuple[list[Rank] | None, ...],
     generation_token: str,
     unresolved_indices: list[int],
 ) -> list[PlaylistScenarioRow]:
@@ -583,6 +684,7 @@ def _build_cancelled_finalization_rows(
                 rank_info,
                 generation_token,
                 playlist_code,
+                ladder=scenario_ladders[index],
                 mark_unresolved_pending=False,
             )
         )
@@ -606,13 +708,16 @@ def drain_playlist_scenario_fill(
         consuming_terminal = state.terminal is not None and not state.consumed
         unresolved_indices: list[int] = []
         scenario_names: tuple[str, ...] = ()
+        scenario_ladders: tuple[list[Rank] | None, ...] = ()
         if consuming_terminal:
             if state.terminal == "cancelled":
                 unresolved_indices = sorted(state.unresolved_indices)
                 scenario_names = state.scenario_names
+                scenario_ladders = state.scenario_ladders
             state.consumed = True
             state.unresolved_indices.clear()
             state.scenario_names = ()
+            state.scenario_ladders = ()
 
         snapshot = PlaylistScenarioFillDrain(
             generation_token=generation_token,
@@ -629,6 +734,7 @@ def drain_playlist_scenario_fill(
         final_rows = _build_cancelled_finalization_rows(
             state.playlist_code,
             scenario_names,
+            scenario_ladders,
             generation_token,
             unresolved_indices,
         )
