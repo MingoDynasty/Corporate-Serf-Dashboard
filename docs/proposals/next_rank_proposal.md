@@ -167,8 +167,12 @@ No rank lowest and `N/A` last in both directions.
 **Next Rank** reads "+{gap}% to {name}", with a cell tooltip naming the
 threshold and the points still needed. It reads "Top rank" once the PB has
 reached the last rank. It reads `N/A` with no PB, and with a PB of zero or
-less, where no percentage exists. It sorts by the unrounded gap, with Top
-rank and `N/A` last in both directions, so ascending lists the closest ranks
+less, where no percentage exists. Top rank comes first: a PB that passes
+every threshold reads Top rank whatever its value, so a PB of 0 on an
+all-zero ladder reads Top rank, not `N/A`. An `N/A` cell carries no tooltip,
+even when a next rank exists, as for a PB of 0 on a ladder `0, 250, …`. That
+keeps `N/A` one uniform state. It sorts by the unrounded gap, with Top rank
+and `N/A` last in both directions, so ascending lists the closest ranks
 first.
 
 A scenario that has no ladder inside a benchmark reads `N/A` in both
@@ -296,10 +300,10 @@ design adds:
 | Rank header | `Rank` | Title Case like every grid header. *Rank* means the benchmark tier in this app. |
 | Rank header tooltip | `The highest rank your PB score has reached on this scenario.` | Follows the Percentile tooltip's pattern. "PB score" is a paraphrased value, not a control name. |
 | Rank cell, below the first threshold | `No rank` | *Unranked* already means "no leaderboard entry" in the Position column ([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)), and one row can show both. KovaaK's own ladder calls tier 0 "No Rank". Sentence case per the copy rules. |
-| Rank and Next Rank cells, no PB | `N/A` | The table's existing sentinel for a missing PB value ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)). |
+| Rank and Next Rank cells, no PB; Next Rank for a PB of zero or less below the top rank | `N/A` | The table's existing sentinel for a missing PB value ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)). No tooltip. |
 | Next Rank header | `Next Rank` | Title Case. Names the target rather than the metric, so the header survives a D1 change of metric. |
 | Next Rank header tooltip | `How much your PB score has to grow to reach the next rank. Lower is closer.` | "Lower is closer." mirrors the Percentile tooltip's "Higher is better." and tells the reader which sort direction finds the closest ranks. |
-| Next Rank cell | `+{gap}% to {rank name}`, such as `+10.0% to Gold` | Reads as the maintainer's own sentence, "push my PB by 10% to reach Gold." A readout, so no period. The sign marks it as growth still needed. |
+| Next Rank cell | `+{gap}% to {rank name}`, such as `+10.0% to Gold` | Reads as the maintainer's own sentence, "push my PB by 10% to reach Gold." A readout, so no period. The sign marks it as growth still needed. The gap groups thousands as PB Score does: a PB of 50 against 940 reads `+1,780.0% to {rank name}` (`f"{gap:,.1f}"`). |
 | Next Rank cell tooltip | `{rank name} at {threshold} · {points} to go`, such as `Gold at 110 · 10 to go` | Carries the points D1 leaves out of the cell, rounded up to hundredths. A readout, so the middle dot and no period. Numbers format like PB Score: up to two decimals, trailing zeros dropped ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)). The points round up, so a remaining gap never reads `0 to go`. |
 | Next Rank cell, last rank reached | `Top rank` | States the fact without implying a failure. Sorts last, beside `N/A`. |
 
@@ -353,7 +357,11 @@ buy polish, not correctness.
   - the three non-monotonic shapes above, including the no-negative-gap
     property;
   - zero thresholds, including the all-zero ladder;
-  - a single-rank ladder, no PB, and a PB of zero or less;
+  - a single-rank ladder, no PB, and a PB of zero or less, including a PB
+    of 0 on the all-zero ladder (Top rank) and on `0, 250, …` (`N/A`, no
+    tooltip);
+  - a four-digit gap with its thousands separator (50 against 940 reads
+    "+1,780.0%");
   - rounding up (999.96 against 1,000 reads "+0.1%", and 999.999 against
     1,000 reads "0.01 to go") and float noise (2.8 against 3.08 reads
     "+10.0%" and "0.28 to go");
