@@ -25,6 +25,7 @@ from source.kovaaks.data_service import (
     get_personal_best_run,
     get_playlist_by_code,
     get_scenario_stats,
+    is_benchmark_playlist,
     is_scenario_in_database,
 )
 from source.kovaaks.request_logging import request_exception_summary
@@ -120,11 +121,6 @@ def _round_up(value: float, decimals: int) -> float:
     # one final unit keeps a remaining gap from reading "+0.0%" or "0 to go".
     scale = 10**decimals
     return max(1 / scale, math.ceil(round(value * scale, 6)) / scale)
-
-
-def is_benchmark_playlist(playlist: PlaylistData) -> bool:
-    """Tell whether any scenario carries a rank ladder, the overview's own test."""
-    return any(scenario.ranks for scenario in playlist.scenarios)
 
 
 def _scenario_ladders(playlist: PlaylistData) -> tuple[list[Rank] | None, ...]:

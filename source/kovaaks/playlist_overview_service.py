@@ -14,6 +14,7 @@ from source.kovaaks.data_service import (
     get_playlist_selector_options,
     get_scenario_stats_snapshot,
     get_user_root_playlist_codes,
+    is_benchmark_playlist,
 )
 from source.kovaaks.playlist_visibility_service import get_shown_playlist_codes
 
@@ -134,11 +135,10 @@ def format_playlist_overview_row(
         )
         lowest_percentile, lowest_scenario = min(percentiles)
 
-    is_benchmark = any(scenario.ranks for scenario in playlist.scenarios)
     return {
         "name": display_label,
         "code": playlist.code,
-        "type_display": "Benchmark" if is_benchmark else "Playlist",
+        "type_display": "Benchmark" if is_benchmark_playlist(playlist) else "Playlist",
         "played_display": f"{played_count}/{scenario_count}",
         "played_sort": (played_count / scenario_count) if scenario_count else None,
         "played_count": played_count,

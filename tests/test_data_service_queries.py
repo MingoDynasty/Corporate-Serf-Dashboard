@@ -250,6 +250,20 @@ def test_filter_known_playlist_codes_drops_unknown_and_keeps_order(playlists):
     assert data_service.filter_known_playlist_codes(["B", "Stale", "A"]) == ["B", "A"]
 
 
+def test_is_benchmark_playlist_needs_a_scenario_with_a_ladder():
+    ladder = [Rank(name="Bronze", color="#aaaaaa", threshold=10.0)]
+
+    assert not data_service.is_benchmark_playlist(
+        _playlist("P1", Scenario(name="First"))
+    )
+    assert not data_service.is_benchmark_playlist(
+        _playlist("P1", Scenario(name="First", ranks=[]))
+    )
+    assert data_service.is_benchmark_playlist(
+        _playlist("P1", Scenario(name="First"), Scenario(name="Second", ranks=ladder))
+    )
+
+
 def test_rank_data_for_a_known_scenario(playlists, caplog):
     ranks = [
         Rank(name="Bronze", color="#aaaaaa", threshold=80.0),

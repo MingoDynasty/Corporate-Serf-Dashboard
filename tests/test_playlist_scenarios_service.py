@@ -22,7 +22,6 @@ from source.kovaaks.playlist_scenarios_service import (
     benchmark_rank_fields,
     build_playlist_scenario_rank_rows,
     format_playlist_scenario_rank_row,
-    is_benchmark_playlist,
 )
 
 
@@ -1269,19 +1268,6 @@ def test_benchmark_rank_fields_never_pass_an_unmet_threshold(thresholds):
             assert ladder[passed].threshold > pb
         if fields["next_tier_sort"] is not None:
             assert fields["next_tier_sort"] > 0
-
-
-def test_is_benchmark_playlist_needs_a_scenario_with_a_ladder():
-    def playlist(*scenarios):
-        return PlaylistData(
-            name="Test", code="KovaaKsTestCode", scenarios=list(scenarios)
-        )
-
-    assert not is_benchmark_playlist(playlist(Scenario(name="First")))
-    assert not is_benchmark_playlist(playlist(Scenario(name="First", ranks=[])))
-    assert is_benchmark_playlist(
-        playlist(Scenario(name="First"), Scenario(name="Second", ranks=_ladder(10)))
-    )
 
 
 def test_format_playlist_scenario_rank_row_adds_rank_fields_for_a_ladder():

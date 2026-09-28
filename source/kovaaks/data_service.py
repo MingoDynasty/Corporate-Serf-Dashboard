@@ -473,6 +473,11 @@ def get_scenarios_from_playlist_code(playlist_code: str) -> list[str]:
     return [item.name for item in playlist.scenarios]
 
 
+def is_benchmark_playlist(playlist: PlaylistData) -> bool:
+    """Tell whether any scenario carries a rank ladder, which makes a benchmark."""
+    return any(scenario.ranks for scenario in playlist.scenarios)
+
+
 def get_rank_data_from_playlist_code(
     playlist_code: str,
     scenario_name: str,
