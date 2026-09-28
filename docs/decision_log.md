@@ -2329,10 +2329,11 @@ message a drain finds was never seen by an earlier one, and one appended
 mid-drain is caught by that drain or the next, exactly once either way. The
 cap sits two orders of magnitude above the default poll interval and
 comfortably above Chromium's intensive throttling, which slows a hidden tab's
-interval to about one tick per minute — and the tab is occluded during play,
-so a tight window would drop exactly the mid-session personal bests this
-exists for. The poll period is added because `polling_interval` carries no
-product cap: a run can be a whole period old through nothing but the drain's
+interval to about one tick per minute — and a tab can stay hidden through a
+whole session, minimized or behind another tab, so a tight window would drop
+exactly the mid-session personal bests this exists for. The poll period is
+added because `polling_interval` carries no product cap: a run can be a
+whole period old through nothing but the drain's
 cadence, and a fixed cap below the configured period would stamp every run
 stale and silently retire every toast liveness gates. The consequence, stated
 rather than hidden: a deliberately slow poll widens no-tab replay by exactly
@@ -2378,11 +2379,12 @@ on that reading and on mechanics: the master switch's persisted value lives on
 the Scenario Performance page, so the shell would need a second mirror store
 to see it.
 
-**A hidden tab holds the animation.** Chromium marks a fully occluded window's
-tab hidden, and the player is in KovaaK's fullscreen when a personal best
-lands, so a hard `document.hidden` drop would mean the animation never plays
-for a real personal best on a single-monitor setup — only from Preview. At
-most one celebration is held instead, a newer one replacing it, and it plays
+**A hidden tab holds the animation.** The ruling assumed that Chromium marks a
+fully occluded window's tab hidden. The player is in KovaaK's fullscreen when a
+personal best lands, so under that assumption a hard `document.hidden` drop
+would mean the animation never plays for a real personal best on a
+single-monitor setup — only from Preview. At most one celebration is held
+instead, a newer one replacing it, and it plays
 on the next `visibilitychange` to visible; playing while hidden would also
 dump a stalled burst on the next alt-tab, since a hidden tab throttles
 animation frames. The accepted cost, stated with the ruling: personal best
@@ -2392,8 +2394,14 @@ follow-up that does not touch the pending mechanism. The ruling needed no
 pre-ship evidence, and the asymmetry was the deciding argument: where the tab
 never reports hidden the pending path is dormant and behaviour is identical,
 and where occlusion does mark it hidden, pending is the only version that
-plays at all. The `visibilitychange` observation during a real fullscreen
-session remains a post-ship check.
+plays at all. The post-ship check, run on 2026-09-28, did not bear out the
+occlusion premise: on one Windows 11 machine (three monitors, both browsers
+moved onto the game's), Firefox 156 and Edge 154 never reported a tab hidden
+while KovaaK's covered the whole window, in borderless and exclusive
+fullscreen alike, though minimizing did. The ruling stands on its asymmetry.
+Where the game only covers the window, the pending path is dormant, the burst
+plays unseen under the game, and the sticky toast is what the player comes
+back to; a minimized window or a background tab still holds the burst.
 
 **The animation.** `canvas-confetti` 1.9.4 (ISC) is vendored unminified under
 `assets/vendor/`, with its LICENSE and a version pin, rather than hand-rolled:

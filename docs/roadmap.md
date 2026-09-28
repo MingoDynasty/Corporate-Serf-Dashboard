@@ -70,8 +70,8 @@ sequence.
   now gets a short burst of confetti and a toast that says so, on whatever page
   is open and for every scenario rather than only the one being watched. The
   toast stays until it is dismissed, because the run that earned it was played
-  in a fullscreen game, and if the window was covered when the run landed the
-  animation waits for the tab to come back. A Settings control picks the
+  in a fullscreen game, and if the tab was hidden when the run landed the
+  animation waits for it to come back. A Settings control picks the
   animation — Confetti, Fireworks, Cannons, or Stars — or turns the whole thing
   off, with a Preview button beside it, and it is independent of Run
   notifications. Run delivery moved into the app shell to make that possible,
