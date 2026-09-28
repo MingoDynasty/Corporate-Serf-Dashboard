@@ -187,25 +187,32 @@ behave like this:
   on an rxns ladder `0, 250, …` reads the first rank and "+150.0% to" the
   second.
 
-The cell rounds the gap **up** to one decimal, so a PB just under a threshold
-reads "+0.1%", never "+0.0%", which would look like the rank was reached
-(PB 999.96 against 1,000 is a 0.004% gap). The tooltip's points round up the
-same way, to the two decimals PB Score shows, so a remainder under 0.005
-reads "0.01 to go", never "0 to go". That case is real: run files record
-scores to as many as six decimals (1,388 of the 8,665 runs in the
-maintainer's stats folder on 2026-09-27), so a PB of 999.999 against 1,000
-can happen. The sort key stays unrounded, and both columns compare the
-unrounded PB with the threshold. PB Score beside them still displays that PB
-as `1,000`, as it does today. The tooltip is what shows a gap remains.
+The cell rounds the gap **up** to one decimal and never shows less than
+"+0.1%". A PB just under a threshold therefore reads "+0.1%", never "+0.0%",
+which would look like the rank was reached (PB 999.96 against 1,000 is a
+0.004% gap). The tooltip's points round up the same way, to the two decimals
+PB Score shows, and never read less than 0.01, so they never read "0 to go".
+The floors are always safe to apply, because the next threshold is always
+above the PB and every gap is positive.
 
-Both ceilings strip float noise first. Scale the value to the displayed
-unit, round that to six decimals, then take the ceiling:
-`ceil(round(x * 10**d, 6)) / 10**d`. A bare ceiling shows "+10.1%" for PB
-2.8 against 3.08, because the gap computes as `10.000000000000009`. It also
-shows "0.29 to go", because the difference computes as
-`0.28000000000000025`. Rounding before scaling doesn't fix the second case,
-because `0.28 * 100` is `28.000000000000004`. The recipe matched an exact
-decimal ceiling on 200,000 random score pairs.
+The floors are needed, not just safe. Run files record scores to as many as
+six decimals (1,388 of the 8,665 runs in the maintainer's stats folder on
+2026-09-27), and the run parser accepts any float. A PB of 9,999.999999
+against a 10,000 threshold is a gap of 0.00000001%, which a ceiling alone
+rounds to "+0.0%". A PB of 999.999999999 against 1,000 leaves 0.000000001
+points, which it rounds to "0 to go". The sort key stays unrounded, and both
+columns compare the unrounded PB with the threshold. PB Score beside them
+still displays such a PB as `1,000`, as it does today. The tooltip is what
+shows a gap remains.
+
+Each displayed value is `max(floor, ceil(round(x * 10**d, 6)) / 10**d)`, with
+a floor of 0.1 for the gap and 0.01 for the points. The inner rounding
+strips float noise. A bare ceiling shows "+10.1%" for PB 2.8 against 3.08,
+because the gap computes as `10.000000000000009`. It also shows "0.29 to
+go", because the difference computes as `0.28000000000000025`. Rounding
+before scaling doesn't fix the second case, because `0.28 * 100` is
+`28.000000000000004`. Above the floor, the recipe matched an exact decimal
+ceiling on 200,000 random score pairs.
 
 ### Where it lives
 
@@ -227,9 +234,16 @@ into the shared builder covers both phases.
 The column definitions gain the benchmark test. On a playlist the two
 definitions are left out. The URL sort names gain `rank` for Rank and
 `next-rank` for Next Rank. The existing comment on the name table already
-reserves `rank` for the benchmark tier, and this uses it that way. On a
-playlist's table the two names read as unknown, so the existing rule applies:
-the table opens unsorted and the value leaves the address
+reserves `rank` for the benchmark tier, and this uses it that way.
+
+The name table is page-independent, so the sort parser has to change. Today
+`_parse_sort` accepts any name in the table, and `_column_defs` then indexes
+the column that name maps to. On a playlist, `?sort=next-rank.asc` would
+raise `KeyError: 'next_tier_sort'`. The parser therefore checks each name
+against the columns the page actually has. A name for a column the page
+lacks makes the whole value invalid, as an unknown name does today. On a
+playlist's table the two names then read as unknown, so the existing rule
+applies: the table opens unsorted and the value leaves the address
 ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
 Both columns join the auto-size keys.
 
@@ -305,13 +319,17 @@ buy polish, not correctness.
   - a single-rank ladder, no PB, and a PB of zero or less;
   - rounding up (999.96 against 1,000 reads "+0.1%", and 999.999 against
     1,000 reads "0.01 to go") and float noise (2.8 against 3.08 reads
-    "+10.0%" and "0.28 to go").
+    "+10.0%" and "0.28 to go");
+  - the floors (9,999.999999 against 10,000 reads "+0.1%", and
+    999.999999999 against 1,000 reads "0.01 to go").
 - **The row builder:** a benchmark row carries the five fields. A playlist
   row carries none. A second-phase row built for the same scenario carries
   the same values as its first-phase row.
 - **The page:** a benchmark's column definitions include Rank and Next Rank
   after Scenario, and a playlist's don't. `?sort=next-rank.asc` seeds the
-  initial sort on a benchmark and reads as unsorted on a playlist.
+  initial sort on a benchmark. On a playlist, `?sort=rank.asc`,
+  `?sort=next-rank.asc`, and the mixed `?sort=percentile.desc,next-rank.asc`
+  each open unsorted without raising.
 - **Gates:** the standard local validation in AGENTS.md, including the docs
   test for this file's placement and links.
 - **Live check:** open a benchmark the maintainer plays and sort Next Rank
