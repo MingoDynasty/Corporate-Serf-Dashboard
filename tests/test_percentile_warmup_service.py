@@ -21,7 +21,6 @@ def _config(*, enabled: bool = True) -> ConfigData:
     return ConfigData(
         polling_interval=1000,
         port=8050,
-        sens_round_decimal_places=2,
         percentile_warmup_enabled=enabled,
     )
 
