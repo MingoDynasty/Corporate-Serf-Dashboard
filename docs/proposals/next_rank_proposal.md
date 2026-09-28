@@ -249,11 +249,24 @@ name *tier* avoids the row's existing `rank_*` fields, which hold the
 leaderboard position: that rename changed labels only
 ([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 
-Both phases of the table open build rows through the same row builder. The
-second phase applies its rows as AG Grid update transactions, which replace a
-row's data whole. So the fill must pass the same ladder into the builder, or
-a streamed row would erase its Rank and Next Rank cells. Passing the ladder
-into the shared builder covers both phases.
+The table builds rows from three sources, all through the same row builder:
+- phase 1, when the page opens;
+- the fill's streamed rows;
+- a cancelled fill's rebuild, run on its first terminal drain for the rows
+  the fill never resolved.
+
+The last two apply their rows as AG Grid update transactions, which replace a
+row's data whole. So a row built without its ladder would erase its Rank and
+Next Rank cells, and they would read as the no-ladder `N/A` until the page
+reopens.
+
+A cancelled fill is ordinary: opening any playlist in a second tab cancels
+the first tab's fill. The fill state therefore captures each scenario's
+ladder at registration, from the same playlist object as `scenario_names`,
+and it holds and releases the ladders the way it does the names. It hands
+them to both the fill and the cancelled rebuild. An optional ladder
+parameter would let a missed path type-check, so the tests below cover every
+path.
 
 The column definitions gain the benchmark test. On a playlist the two
 definitions are left out. The URL sort names gain `rank` for Rank and
@@ -319,7 +332,7 @@ design adds:
 One implementation PR, with no dependencies, startable once D1 and D2 are
 ratified:
 
-- The pure function, the five row fields in both phases, the two gated
+- The pure function, the five row fields on all three row paths, the two gated
   column definitions, the two URL sort names, and the tests below.
 - The shipping docs in the same PR: a decision-log entry, the playlists spec
   (column list and sort names), the user guide's Playlists and Benchmarks
@@ -347,8 +360,8 @@ buy polish, not correctness.
   - the floors (9,999.999999 against 10,000 reads "+0.1%", and
     999.999999999 against 1,000 reads "0.01 to go").
 - **The row builder:** a benchmark row carries the five fields. A playlist
-  row carries none. A second-phase row built for the same scenario carries
-  the same values as its first-phase row.
+  row carries none. A second-phase row and a cancelled fill's rebuilt row
+  each carry the same values as the first-phase row for the same scenario.
 - **The page:** a benchmark's column definitions include Rank and Next Rank
   after Scenario, and a playlist's don't. `?sort=next-rank.asc` seeds the
   initial sort on a benchmark. On a playlist, `?sort=rank.asc`,
