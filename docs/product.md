@@ -109,8 +109,8 @@ are one view or two is a design choice for the feature that builds them.
   personal best is an achievement whatever you happen to be watching. The
   toast stays until you dismiss it, because the run that earned it was played
   in a fullscreen game and the news should still be there when you alt-tab
-  back; if the window was covered when the run landed, the animation waits and
-  plays when you come back to it. It also triggers the background rank
+  back; a hidden tab (minimized, or behind another tab) holds the animation
+  until you come back to it. It also triggers the background rank
   refresh, as it always did. A Settings control picks which animation plays,
   Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with
   a Preview button beside it so the effect can be seen without setting a

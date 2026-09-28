@@ -445,8 +445,8 @@ def _component_ids(component) -> set[str]:
 
 def test_a_throttled_tick_old_run_is_still_live(monkeypatch, frozen_clock):
     # Chromium slows a hidden tab's interval to about one tick per minute, and
-    # the tab is occluded during play, so ~60 s is the ordinary case rather
-    # than the edge.
+    # a tab can stay hidden through a whole session, so ~60 s is an ordinary
+    # case rather than the edge.
     batch, notifications = _drain(
         monkeypatch,
         _message(score=830.0, age_seconds=60.0),

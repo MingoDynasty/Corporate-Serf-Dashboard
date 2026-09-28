@@ -49,10 +49,11 @@ PB_CELEBRATION_SIGNAL_STORE_ID = "pb-celebration-signal"
 # message a drain finds was never seen by an earlier one -- and this wall-clock
 # cap is all that remains. It sits two orders of magnitude above the default
 # poll interval and comfortably above Chromium's intensive throttling, which
-# slows a hidden tab's interval to about one tick per minute; the tab is
-# occluded during play, so a tighter window would drop the mid-session personal
-# bests this exists for. It also bounds replay: a queue that accumulated with
-# no tab open announces nothing older than the window on the next visit.
+# slows a hidden tab's interval to about one tick per minute; a tab can stay
+# hidden through a whole session, minimized or behind another tab, so a tighter
+# window would drop the mid-session personal bests this exists for. It also
+# bounds replay: a queue that accumulated with no tab open announces nothing
+# older than the window on the next visit.
 RUN_EVENT_FRESHNESS_CAP_SECONDS = 120
 
 APP_INDEX_STRING = """<!DOCTYPE html>

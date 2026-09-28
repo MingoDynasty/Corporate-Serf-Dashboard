@@ -205,11 +205,12 @@
             return;
         }
         if (document.hidden) {
-            // A fully occluded window counts as hidden under Chromium's
-            // occlusion tracking, and the player is in KovaaK's fullscreen
-            // when a personal best lands. A hidden tab throttles animation
-            // frames, so playing now would stall the burst and dump its
-            // remains on the next alt-tab. It is held instead.
+            // A hidden tab throttles animation frames, so playing now would
+            // stall the burst and dump its remains when the tab comes back.
+            // It is held instead. Hidden means minimized or a background tab:
+            // a window that a fullscreen game only covers stayed visible in
+            // Firefox and Edge (checked 2026-09-28), so there the burst plays
+            // unseen.
             pending = styleName;
             return;
         }

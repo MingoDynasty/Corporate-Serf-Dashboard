@@ -342,12 +342,14 @@ toasts under, and it applies to every toast the app adds from here on
   is what makes a repeat play at all: the same sequence never replays, and a
   payload naming no run plays nothing
   ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
-- While the tab is hidden — a fully occluded window counts as hidden under
-  Chromium's occlusion tracking — the burst is not dropped. At most one
-  celebration is held, a newer one replacing it, and it plays on the next
-  `visibilitychange` to visible; the toast is already on screen and stays
-  until dismissed. The Settings page's Preview never reaches that path,
-  because clicking it needs a visible tab
+- While the tab is hidden, minimized or behind another tab, the burst is not
+  dropped. At most one celebration is held, a newer one replacing it, and it
+  plays on the next `visibilitychange` to visible; the toast is already on
+  screen and stays until dismissed. A window the game only covers is not
+  hidden in the browsers checked, so there the burst plays unseen under the
+  game and the toast is what the player comes back to. The Settings page's
+  Preview never reaches the held path, because clicking it needs a visible
+  tab
   ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
 - Scenario Performance's `check_for_new_data` consumes `run-events-batch` as
   its only `Input`, with the follow switch and the scenario dropdown as
