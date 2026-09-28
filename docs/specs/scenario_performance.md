@@ -3,7 +3,9 @@
 The landing page plots the kept runs of one scenario as points over
 sensitivity or time, with the personal best, a configurable score goal, and
 playlist rank thresholds available as overlay lines; older runs recorded on a
-game's own sensitivity scale sit on the same cm/360 axis as everything else.
+game's own sensitivity scale sit on the same cm/360 axis as everything else,
+except the oldest, which can't be converted and show the exact setting they
+were recorded at.
 A collapsible Chart options panel tunes how the chart looks and which run
 notifications fire, and the browser remembers every control on the page — the
 chosen playlist and scenario included, so returning to the page shows the
