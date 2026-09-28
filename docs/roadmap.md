@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Rank and next-rank gap on benchmarks** — a benchmark's scenario table now
+  shows the rank each personal best has reached and how much it has to grow
+  to reach the next one, such as "+4.8% to Gold", with the threshold and the
+  points still needed on hover. Sorting that column ascending lists the
+  scenarios closest to ranking up, the question that used to send players to
+  Evxl. Both columns come from the bundled thresholds and the local personal
+  best, so they appear with the table and work offline. (PR #321; design in
+  #320) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Setup hints become notices** — the three plain-text lines that tell the
   user the app needs something from them (the stats-folder hint on Scenario
   Performance, its restart-pending twin, and the Settings page's restart
@@ -71,16 +80,6 @@ sequence.
   #272; design in #248) Design rationale distilled into
   [`decision_log.md`](./decision_log.md); the follow-up that turned the switch
   into the choice of styles landed in #272, which closes the arc.
-- **Alert color language** — the notices printed into the page now speak one
-  severity scale, the same one the toasts already spoke: blue for
-  information, yellow for caution, red for errors, each with a leading icon.
-  The first-run setup card used to be a white card on a white page and is now
-  tinted like the rest, turning yellow in the state where nothing can be
-  plotted until it is answered. The leftover-playlist-files notice became a
-  plain panel, so a screen reader is no longer told that a panel of buttons is
-  an alert. No wording changed anywhere. (PR #260; design in #256, rulings in
-  #259) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
 ---
 
 ## Upcoming milestones
@@ -114,11 +113,14 @@ expanded into its own roadmap entry when it becomes the next thing up.
   per scenario, answering "is my current training working?" Likely shipped
   against raw score data first; richer rank-trend analysis would need rank
   history infrastructure that doesn't yet exist.
-- **Next-rank threshold for benchmark playlists** — "+47 to Gold" motivational
-  target on benchmark scenarios. External tools (e.g. evxl.app) already
-  provide a substitute, so this is consolidation rather than net-new
-  capability. Proposed in
-  [`next_rank_proposal.md`](./proposals/next_rank_proposal.md).
+- **Difficulty measured against the player's own runs** — the shipped
+  next-rank gap counts every percent as equal. Two scenarios can both need
+  +5%, but if one's runs vary by 8% and the other's by 2%, only the first is
+  a good day away. Weighing the gap by the player's run-to-run spread, and
+  by recent form rather than the all-time personal best, would rank
+  "closest" by what the player can actually reach. The app holds every local
+  run, which external tools don't, so this could beat them rather than match
+  them.
 - **Aim Training Journey page polish** — the page already exists at
   `/aim-training-journey` (currently marked work-in-progress). It visualizes
   training-hour checkpoints across playlists, which is a different question
