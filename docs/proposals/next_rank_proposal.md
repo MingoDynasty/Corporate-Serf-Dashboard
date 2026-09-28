@@ -27,38 +27,62 @@ author-owned and open to challenge.
 Status: open. Maintainer lean (chat, 2026-09-27): this recommendation.
 
 **Recommendation: the next rank's threshold minus the PB, divided by the PB.**
-A PB of 100 with Gold at 110 reads "+10.0% to Gold". The number compares
-fairly across scenarios whose scores differ by orders of magnitude: bundled
-thresholds above zero run from 1 to 1,630,000. It needs no lower bound, so it
-works the same way below the first rank as above it. And it answers the
-question the column exists for, which is how much better the player has to
-get, so sorting it ascending lists the closest ranks first.
+A PB of 100 with Gold at 110 reads "+10.0% to Gold". Three properties carry
+the choice. It is defined below the first rank, where no lower threshold
+exists, so every No rank row gets a real number. It states an actionable
+target: how much better the player has to get. And it matches how the app
+already sets score goals, since the Scenario Performance page's score
+threshold is a percentage of the PB. The number is also scale-free, so
+scenarios whose thresholds run from 1 to 1,630,000 share one column. Sorted
+ascending, it lists the smallest gaps first.
+
+Scale-free is not the same as difficulty-normalized. The percentage gap
+counts every percent as equal, so a scenario with a compressed score scale
+always looks closer. The next bullet measures how often that changes which
+scenario reads as closest.
 
 Choosing differently:
 
 - **How far the PB sits through its current band** (PB 100 between 90 and
   110 reads 50%). KovaaK's benchmark progress uses this idea, and it makes a
-  natural progress bar. But it measures progress, not distance, and band
-  widths vary. Across the 23,791 bands of the corpus's strictly ascending
-  ladders with three or more ranks, a band spans
-  +3.5% (p10) to +18.9% (p90) of its lower threshold, median +8.3%. Within one
-  ladder the widest band is typically twice the narrowest (median 2.0×, p90
-  6.8×). So two rows that both read 50% can need about +1.7% and +8.6%, and the
-  sort ties them. Below the first rank there is no lower threshold. A zero
-  floor makes a PB of 850 against a first threshold of 940 read 90%, on a
-  scale no other row uses. 4,380 of the 4,384 ladders start above zero, so
-  nearly every No rank row would hit this.
-- **The PB as a percentage of the next threshold** ("at 90.9% of Gold").
-  This carries the same information in the same sort order, since it equals
-  1 / (1 + gap), with the gap as a fraction. It is bounded at 100% and reads as progress rather than as
-  the target to beat. Most rows would cluster between 85% and 99%.
-- **Points needed**, the "+47 to Gold" of the roadmap's Future entry. This is
-  exact, but it can't be compared across scenarios with different score
-  scales, so it can't order the table. The design shows it in the cell
-  tooltip instead.
+  natural progress bar. It counts every band as one equal step, and the
+  widths of those steps vary. Across the 23,791 bands of the corpus's
+  strictly ascending ladders with three or more ranks, a band spans +3.5%
+  (p10) to +18.9% (p90) of its lower threshold, median +8.3%. So two rows
+  that both read 50% can need about +1.7% and +8.6%. The widths vary about
+  as much across scenarios as within a ladder:
+  - Two bands of one ladder differ in percentage width by a median 1.40×
+    (p75 2.00×).
+  - Two scenarios' bands at the same rank of one benchmark differ by a
+    median 1.35× (p75 1.86×).
 
-Material consequence: the band fraction changes the sort order this feature
-exists for. The other two alternatives change only the wording.
+  Band widths are the only difficulty signal in the data, and neither metric
+  is difficulty-normalized. The two disagree about which scenario is
+  closest. A simulation placed a player in the same band on every scenario
+  of a benchmark, at a random position on each. In 22% of 40,920 trials, the
+  two metrics picked a different closest scenario, and the median Kendall τ
+  between the two orders was 0.74. The player's own run spread would settle
+  it; Out of scope lists that as a follow-up. What decides the choice today
+  is the first rank. Below it there is no lower threshold, so a band
+  fraction needs an invented floor. A zero floor makes a PB of 850 against a
+  first threshold of 940 read 90%, on a scale no other row uses. 4,380 of
+  the 4,384 ladders start above zero, so nearly every No rank row would hit
+  this.
+- **The PB as a percentage of the next threshold** ("at 90.9% of Gold").
+  This carries the same information, since it equals 1 / (1 + gap) with the
+  gap as a fraction. The closest rows sort first in descending order,
+  though, not ascending. It is bounded at 100% and reads as progress rather
+  than as the target to beat. Most rows would cluster between 85% and 99%.
+- **Points needed**, the "+47 to Gold" of the roadmap's Future entry. It
+  can't be compared across scenarios with different score scales, so it
+  can't order the table. The design shows it in the cell tooltip instead,
+  rounded up to hundredths.
+
+Material consequence: the band fraction would pick a different closest
+scenario about a fifth of the time, and it leaves No rank rows without a
+number. Points needed can't order the table at all. The PB as a percentage
+of the next threshold keeps the order but reverses the sort direction and
+the wording.
 
 ### D2 — Rank and gap read the local all-time PB, the row's own PB Score
 
@@ -263,7 +287,7 @@ design adds:
 | Next Rank header | `Next Rank` | Title Case. Names the target rather than the metric, so the header survives a D1 change of metric. |
 | Next Rank header tooltip | `How much your PB score has to grow to reach the next rank. Lower is closer.` | "Lower is closer." mirrors the Percentile tooltip's "Higher is better." and tells the reader which sort direction finds the closest ranks. |
 | Next Rank cell | `+{gap}% to {rank name}`, such as `+10.0% to Gold` | Reads as the maintainer's own sentence, "push my PB by 10% to reach Gold." A readout, so no period. The sign marks it as growth still needed. |
-| Next Rank cell tooltip | `{rank name} at {threshold} · {points} to go`, such as `Gold at 110 · 10 to go` | Carries the exact points D1 leaves out of the cell. A readout, so the middle dot and no period. Numbers format like PB Score: up to two decimals, trailing zeros dropped ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)). The points round up, so a remaining gap never reads `0 to go`. |
+| Next Rank cell tooltip | `{rank name} at {threshold} · {points} to go`, such as `Gold at 110 · 10 to go` | Carries the points D1 leaves out of the cell, rounded up to hundredths. A readout, so the middle dot and no period. Numbers format like PB Score: up to two decimals, trailing zeros dropped ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)). The points round up, so a remaining gap never reads `0 to go`. |
 | Next Rank cell, last rank reached | `Top rank` | States the fact without implying a failure. Sorts last, beside `N/A`. |
 
 ## Out of scope
