@@ -29,10 +29,6 @@ open_browser_on_launch = true
 # console on that network, which can run code on this machine.
 debug = false
 
-# How many decimal places to round the Sensitivity. The smaller the number, the more the Sensitivities are grouped.
-# For example, if Sensitivity=40.159, rounded to one digit -> 40.2
-sens_round_decimal_places = 1
-
 # How long to reuse total-play metadata before fetching it again.
 scenario_metadata_cache_ttl_hours = 24
 

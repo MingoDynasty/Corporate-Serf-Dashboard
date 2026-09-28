@@ -141,7 +141,7 @@ def test_extract_data_from_file_parses_valid_file() -> None:
         assert run is not None
         assert run.score == 123.45
         assert run.sens_scale == "Overwatch"
-        assert run.horizontal_sens == 2.35
+        assert run.horizontal_sens == 2.3456
         assert run.scenario == "1w4ts"
         assert run.accuracy == 0.5
         assert run.damage_accuracy == 0.75
@@ -372,18 +372,7 @@ def test_an_empty_store_lists_no_scenarios(empty_store) -> None:
 # --- Sensitivity normalization to cm/360 -------------------------------------
 
 
-@pytest.fixture
-def one_decimal_place(monkeypatch):
-    """Round sensitivities to one place, the way the shipped config does.
-
-    ``example.toml`` ships ``sens_round_decimal_places = 1``, so one place is what
-    the axis labels and the PB cm/360 cells really show. The suite-wide config
-    fixture uses two, which would hide that rounding here.
-    """
-    monkeypatch.setattr(data_service.get_config(), "sens_round_decimal_places", 1)
-
-
-def test_a_cm360_file_keeps_the_value_it_recorded(one_decimal_place):
+def test_a_cm360_file_keeps_the_value_it_recorded():
     # A run already on the cm/360 scale is the one case the conversion must not
     # touch, even though its file carries the same two fields.
     run = _extract_written_file(
@@ -415,7 +404,6 @@ def test_a_cm360_file_keeps_the_value_it_recorded(one_decimal_place):
     ],
 )
 def test_a_game_scale_run_converts_to_cm360(  # noqa: PLR0913
-    one_decimal_place,
     name,
     raw_sens,
     increment,
@@ -435,10 +423,10 @@ def test_a_game_scale_run_converts_to_cm360(  # noqa: PLR0913
     assert run.sens_scale == "cm/360"
 
 
-def test_a_converted_run_keeps_the_setting_its_file_recorded(one_decimal_place):
-    # Kept for the hover, and kept unrounded: the one decimal place an
-    # unconverted run is rounded to would show this run as 0.2 Valorant, a
-    # setting it was never played at.
+def test_a_converted_run_keeps_the_setting_its_file_recorded():
+    # Kept for the hover, and kept unrounded: the one decimal place its
+    # cm/360 is rounded to would show this run as 0.2 Valorant, a setting it
+    # was never played at.
     run = _extract_written_file(
         "recorded-0.16",
         sens_scale="Valorant",
@@ -456,9 +444,7 @@ def test_a_converted_run_keeps_the_setting_its_file_recorded(one_decimal_place):
     )
 
 
-def test_converted_runs_leave_the_group_raw_rounding_collapsed_them_into(
-    one_decimal_place,
-):
+def test_converted_runs_leave_the_group_raw_rounding_collapsed_them_into():
     # Rounding the raw sensitivity to one decimal place put 0.16, 0.2, and 0.25
     # Valorant in one "0.2 Valorant" group. Converting first separates them,
     # because one decimal place is the right precision for centimeters.
@@ -528,7 +514,6 @@ def test_the_conversion_matches_kovaaks_own_valorant_formula():
     ],
 )
 def test_an_already_normalized_scale_converts_to_the_same_centimeters(
-    one_decimal_place,
     name,
     expected_cm360,
     unrounded,
@@ -576,14 +561,13 @@ def test_an_already_normalized_scale_converts_to_the_same_centimeters(
         ("underflowing-dpi", {"sens_increment": "0.199886", "dpi": "5e-324"}),
         # The same product overflowing the other way returns 0.0 centimeters.
         ("overflowing-increment", {"sens_increment": "1e308", "dpi": "1e308"}),
-        # Finite, positive, and convertible, but 0.0130 cm rounds away at the
-        # shipped one decimal place. Storing that would invent a 0.0 cm/360
+        # Finite, positive, and convertible, but 0.0130 cm rounds away at
+        # cm/360's one decimal place. Storing that would invent a 0.0 cm/360
         # group rather than keep the run's recorded sensitivity.
         ("rounds-to-zero", {"sens_increment": "1000", "dpi": "1000"}),
     ],
 )
 def test_an_unusable_conversion_field_costs_the_conversion_not_the_run(
-    one_decimal_place,
     name,
     fields,
 ):
@@ -604,7 +588,7 @@ def test_an_unusable_conversion_field_costs_the_conversion_not_the_run(
     assert run.recorded_sensitivity is None
 
 
-def test_a_mid_write_dpi_line_costs_the_conversion_not_the_run(one_decimal_place):
+def test_a_mid_write_dpi_line_costs_the_conversion_not_the_run():
     # "DPI:" with no value column yet is what a half-written file looks like.
     # The required fields' own IndexError drops the run there; an optional
     # field's must not.
@@ -624,7 +608,6 @@ def test_a_mid_write_dpi_line_costs_the_conversion_not_the_run(one_decimal_place
 def test_an_unusable_conversion_field_cannot_abort_the_startup_scan(
     monkeypatch,
     tmp_path,
-    one_decimal_place,
 ):
     """A run the formula cannot use costs that conversion, not the whole scan.
 
@@ -667,16 +650,136 @@ def test_an_unusable_conversion_field_cannot_abort_the_startup_scan(
 def test_the_guarded_conversion_reports_unusable_inputs_as_none():
     # The pure helper still divides; the guard is what turns an arithmetic
     # failure, or a result that cannot be stored, into "no conversion".
-    assert data_service._converted_cm360(0.199886, 1600, 1) == 40.8
-    assert data_service._converted_cm360(5e-324, 1600, 1) is None
-    assert data_service._converted_cm360(1e308, 1e308, 1) is None
+    assert data_service._converted_cm360(0.199886, 1600) == 40.8
+    assert data_service._converted_cm360(5e-324, 1600) is None
+    assert data_service._converted_cm360(1e308, 1e308) is None
     # Rounds inside the guard, so a result that rounds away is rejected rather
-    # than stored as a real 0.0 cm/360 reading.
-    assert data_service._converted_cm360(1000, 1000, 1) is None
-    # The same inputs are usable at a precision that can represent them.
-    assert data_service._converted_cm360(1000, 1000, 3) == 0.013
+    # than stored as a real 0.0 cm/360 reading, although the unrounded
+    # conversion itself is a positive number.
+    assert data_service._converted_cm360(1000, 1000) is None
+    assert data_service._cm360_from_increment(1000, 1000) > 0
 
 
 @pytest.mark.parametrize("raw_value", ["inf", "-inf", "nan", "0", "-1", "abc", ""])
 def test_an_optional_field_only_accepts_a_finite_positive_number(raw_value):
     assert data_service._parse_optional_positive(raw_value) is None
+
+
+# --- Sensitivity precision per scale ----------------------------------------
+
+
+def _loaded_sensitivity_keys(stats_dir: Path, *runs: dict[str, str]) -> set[str]:
+    """Scan one stats file per run into the store and return its group keys."""
+    for minute, fields in enumerate(runs):
+        _write_stats_file(
+            stats_dir / f"run - Challenge - 2025.01.01-10.{minute:02d}.00 Stats.csv",
+            DAMAGE_SUB_CSV_ROW,
+            **fields,
+        )
+    data_service.initialize_kovaaks_data(str(stats_dir))
+    return set(data_service.get_sensitivities_vs_runs(SCENARIO_NAME))
+
+
+@pytest.mark.parametrize(
+    ("raw_sens", "sens_scale"),
+    [
+        # One decimal place read this as 0.3 Valorant, a setting never played.
+        ("0.32", "Valorant"),
+        # One decimal place merged these into 2.4 and 4.8 Overwatch.
+        ("2.38", "Overwatch"),
+        ("4.75", "Overwatch"),
+        # Two decimal places would still corrupt this: round(0.235, 2) is 0.23.
+        ("0.235", "Valorant"),
+    ],
+)
+def test_a_legacy_run_keeps_the_sensitivity_its_file_recorded(raw_sens, sens_scale):
+    # A file without ``Sens Increment`` and ``DPI`` can't convert, so it keeps
+    # its game scale, where the number is the setting the player typed.
+    run = _extract_written_file(
+        f"legacy-{raw_sens}",
+        sens_scale=sens_scale,
+        horizontal_sens=raw_sens,
+    )
+
+    assert run is not None
+    assert run.horizontal_sens == float(raw_sens)
+    assert run.sens_scale == sens_scale
+    assert run.recorded_sensitivity is None
+
+
+def test_legacy_settings_one_decimal_place_merged_stay_separate_groups(
+    empty_store,
+    tmp_path,
+):
+    keys = _loaded_sensitivity_keys(
+        tmp_path,
+        {"sens_scale": "Valorant", "horizontal_sens": "0.32"},
+        {"sens_scale": "Overwatch", "horizontal_sens": "2.38"},
+        {"sens_scale": "Overwatch", "horizontal_sens": "4.75"},
+        {"sens_scale": "Overwatch", "horizontal_sens": "4.8"},
+    )
+
+    assert keys == {
+        "0.32 Valorant",
+        "2.38 Overwatch",
+        "4.75 Overwatch",
+        "4.8 Overwatch",
+    }
+
+
+def test_a_conversion_that_rounds_away_keeps_the_recorded_value_unrounded():
+    # 0.013 cm/360 rounds to zero, so the run falls back to its game scale, and
+    # a game-scale value is kept as recorded, not rounded to 0.3.
+    run = _extract_written_file(
+        "rounds-away-0.32",
+        sens_scale="Valorant",
+        horizontal_sens="0.32",
+        sens_increment="1000",
+        dpi="1000",
+    )
+
+    assert run is not None
+    assert run.horizontal_sens == 0.32
+    assert run.sens_scale == "Valorant"
+    assert run.recorded_sensitivity is None
+
+
+def test_a_fractional_native_cm360_value_rounds_to_one_decimal():
+    run = _extract_written_file(
+        "native-34.56",
+        sens_scale="cm/360",
+        horizontal_sens="34.56",
+    )
+
+    assert run is not None
+    assert run.horizontal_sens == 34.6
+    assert run.sens_scale == "cm/360"
+
+
+def test_a_typed_and_a_converted_cm360_value_share_a_group(empty_store, tmp_path):
+    # What the one decimal place is for: 0.2 Valorant at 1600 DPI converts to
+    # 40.84 cm/360, a few hundredths from a player's typed 40.8.
+    keys = _loaded_sensitivity_keys(
+        tmp_path,
+        {"sens_scale": "cm/360", "horizontal_sens": "40.8"},
+        {
+            "sens_scale": "Valorant",
+            "horizontal_sens": "0.2",
+            "sens_increment": "0.199886",
+            "dpi": "1600",
+        },
+    )
+
+    assert keys == {"40.8 cm/360"}
+
+
+def test_cm360_values_are_bucketed_by_decimal_not_by_distance(empty_store, tmp_path):
+    # Two thousandths apart, but on either side of a bucket edge, so they
+    # stay apart: the rounding is not a tolerance that merges near values.
+    keys = _loaded_sensitivity_keys(
+        tmp_path,
+        {"sens_scale": "cm/360", "horizontal_sens": "40.849"},
+        {"sens_scale": "cm/360", "horizontal_sens": "40.851"},
+    )
+
+    assert keys == {"40.8 cm/360", "40.9 cm/360"}

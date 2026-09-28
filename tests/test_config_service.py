@@ -48,10 +48,7 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
         None,
         "not valid toml",
         "polling_interval = 1000  # missing the required port",
-        "polling_interval = 1000\n"
-        "port = 8050\n"
-        "sens_round_decimal_places = 1\n"
-        "kovaaks_api_timeout_seconds = 0",
+        "polling_interval = 1000\nport = 8050\nkovaaks_api_timeout_seconds = 0",
         "port = 70000",
     ],
     ids=[
@@ -127,12 +124,31 @@ def test_unknown_config_keys_are_named_in_one_warning_and_ignored(
     assert "polling_intervall" in message
 
 
+def test_a_config_still_setting_the_retired_sensitivity_precision_loads(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """``example.toml`` shipped this key, so a user's copy may still carry it."""
+    with caplog.at_level(logging.WARNING):
+        config = _load_from(
+            tmp_path, monkeypatch, "port = 8050\nsens_round_decimal_places = 2\n"
+        )
+
+    assert config.port == 8050
+    assert not hasattr(config, "sens_round_decimal_places")
+    warnings = [
+        record for record in caplog.records if record.levelno >= logging.WARNING
+    ]
+    assert len(warnings) == 1
+    assert "sens_round_decimal_places" in warnings[0].getMessage()
+
+
 def test_tuning_fields_default_when_omitted() -> None:
     """port is the only required field; the tuning knobs default."""
     config = ConfigData(port=8050)
 
     assert config.polling_interval == 1000
-    assert config.sens_round_decimal_places == 1
     # Every config predating the key parses as opted out.
     assert config.show_version_in_title is False
     # Every config predating the key opens the browser, as it always has.

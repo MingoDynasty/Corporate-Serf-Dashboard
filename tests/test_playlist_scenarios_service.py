@@ -853,11 +853,6 @@ def test_format_playlist_scenario_rank_row_fills_pb_cm360_for_a_converted_run(
     # this layer is exactly a legacy run. A converted PB only exists downstream
     # of the parser, so this one goes through it: a real Valorant-era stats
     # file, whose increment and DPI make its sensitivity 40.8 cm/360.
-    monkeypatch.setattr(
-        data_service.get_config(),
-        "sens_round_decimal_places",
-        1,
-    )
     file_path = tmp_path / "Converted PB - Challenge - 2025.03.04-21.30.00 Stats.csv"
     file_path.write_text(
         "\n".join(

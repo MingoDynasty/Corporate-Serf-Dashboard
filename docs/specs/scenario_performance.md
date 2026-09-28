@@ -3,7 +3,9 @@
 The landing page plots the kept runs of one scenario as points over
 sensitivity or time, with the personal best, a configurable score goal, and
 playlist rank thresholds available as overlay lines; older runs recorded on a
-game's own sensitivity scale sit on the same cm/360 axis as everything else.
+game's own sensitivity scale sit on the same cm/360 axis as everything else,
+except the oldest, which can't be converted and show the exact setting they
+were recorded at.
 A collapsible Chart options panel tunes how the chart looks and which run
 notifications fire, and the browser remembers every control on the page — the
 chosen playlist and scenario included, so returning to the page shows the
@@ -95,12 +97,18 @@ of scope here, apart from its chart toolbar, noted under The graph.
   `{scenario} (updated: {timestamp})`.
 - A run recorded under a game's own sensitivity scale is normalized to cm/360
   when its file is parsed, from the file's own `Sens Increment` and `DPI`
-  fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)` rounded to
-  `sens_round_decimal_places`; a run whose file lacks either field, or carries
-  one the conversion cannot use, keeps its recorded value and scale. Every consumer reads the normalized fields, so the
+  fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`; a run whose
+  file lacks either field, or carries one the conversion cannot use, keeps its
+  recorded value and scale. Every consumer reads the normalized fields, so the
   normalized sensitivity-and-scale group is the unit for grouping, for run
   placement, and for first-sensitivity detection
   ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  A cm/360 value, native or converted, is rounded to one decimal place, so a
+  typed value and a converted one a few hundredths apart share a group. The
+  buckets have hard edges: `40.849` and `40.851` land in `40.8` and `40.9`. A
+  value on any other scale keeps exactly what its file recorded, so
+  `0.32 Valorant` reads `0.32 Valorant`
+  ([2026-09-27](../decision_log.md#2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired)).
   A converted run also keeps the value, scale, and DPI its file recorded,
   unrounded, for the point hover only
   ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).

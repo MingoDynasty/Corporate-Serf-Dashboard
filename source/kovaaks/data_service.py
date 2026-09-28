@@ -17,7 +17,6 @@ import requests
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
-from source.config.config_service import get_config
 from source.kovaaks.api_service import (
     get_evxl_playlist,
     get_playlist_data,
@@ -68,6 +67,13 @@ logger = logging.getLogger(__name__)
 # count. Every ``Sens Increment`` a stats file records is the run's sensitivity
 # expressed on this scale, whatever per-game scale the run was played on.
 BASE_SCALE_YAW = 0.07
+
+# Decimal places every cm/360 sensitivity is stored at, native or converted.
+# The rounding buckets a typed value and a converted one a few hundredths apart
+# into one group: 40.8 typed and 40.84 converted both read 40.8. It is decimal
+# bucketing with hard edges, not a tolerance, so 40.849 and 40.851 still land
+# in different groups.
+CM360_DECIMAL_PLACES = 1
 
 # Deliberately unsynchronized: after startup the watchdog thread is the only
 # writer, and raced reads self-heal on re-render (the home page's polling
@@ -596,11 +602,7 @@ def _cm360_from_increment(increment: float, dpi: float) -> float:
     return 360 * 2.54 / (BASE_SCALE_YAW * increment * dpi)
 
 
-def _converted_cm360(
-    increment: float,
-    dpi: float,
-    decimal_places: int,
-) -> float | None:
+def _converted_cm360(increment: float, dpi: float) -> float | None:
     """Return the cm/360 to store, or None when the inputs cannot produce one.
 
     Rounds here rather than leaving it to the caller, so the value this
@@ -617,7 +619,7 @@ def _converted_cm360(
     around ``extract_data_from_file``.
     """
     try:
-        cm360 = round(_cm360_from_increment(increment, dpi), decimal_places)
+        cm360 = round(_cm360_from_increment(increment, dpi), CM360_DECIMAL_PLACES)
     except ZeroDivisionError:
         return None
     return cm360 if math.isfinite(cm360) and cm360 > 0 else None
@@ -751,17 +753,13 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     dpi = _parse_optional_positive(raw_dpi)
     recorded_sensitivity = None
     if sens_scale != "cm/360" and sens_increment is not None and dpi is not None:
-        converted_cm360 = _converted_cm360(
-            sens_increment,
-            dpi,
-            get_config().sens_round_decimal_places,
-        )
+        converted_cm360 = _converted_cm360(sens_increment, dpi)
         if converted_cm360 is not None:
             # A run recorded on a game's own scale converts exactly, so it joins
             # the cm/360 axis instead of sorting by a number from another scale.
-            # What the file recorded is kept for display, unrounded: at the
-            # shipped one decimal place, 0.16 Valorant would read as 0.2, a
-            # setting the run was never played at.
+            # What the file recorded is kept for display, unrounded like every
+            # game-scale value: one decimal place would show 0.16 Valorant as
+            # 0.2, a setting the run was never played at.
             recorded_sensitivity = RecordedSensitivity(
                 value=horizontal_sens,
                 scale=sens_scale,
@@ -769,14 +767,13 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
             )
             horizontal_sens = converted_cm360
             sens_scale = "cm/360"
-    if recorded_sensitivity is None:
-        # Already cm/360, too old to carry both fields, or not convertible:
-        # keep the recorded value and scale. Sometimes the sens looks like
-        # 20.123456789, so round it to look cleaner.
-        horizontal_sens = round(
-            horizontal_sens,
-            get_config().sens_round_decimal_places,
-        )
+    if recorded_sensitivity is None and sens_scale == "cm/360":
+        # A native cm/360 value is bucketed the way a converted one is, so the
+        # two share a group. Any other scale here is a run too old to carry
+        # both fields, or not convertible, and keeps the value its file
+        # recorded: one decimal place would show 0.32 Valorant as 0.3 and merge
+        # 4.75 Overwatch into 4.8.
+        horizontal_sens = round(horizontal_sens, CM360_DECIMAL_PLACES)
 
     return RunData(
         datetime_object=datetime_object,
