@@ -16,15 +16,17 @@ puts the closest ranks first.
 
 ## Decisions needed
 
-Two rows. Nothing is ratified. On 2026-09-27 the maintainer asked in chat for
-this feature and for the current-rank column, and leaned toward D1's
-recommendation and toward deferring D2's recent-form alternative. A lean is
-not a ruling. Every choice outside these rows, including the Copy block, is
-author-owned and open to challenge.
+Two rulings. The maintainer ratified both on 2026-09-27, when the proposal
+was ratified as a whole, after every reviewer had endorsed both rows at
+their current text. Each keeps its recommendation and the alternatives it
+rejected, for the record. Before ratifying, the maintainer had asked for
+this feature and for the current-rank column, and had leaned toward both
+recommendations. Everything else in this proposal, including the Copy
+block, is author-owned.
 
 ### D1 — The gap is how much the PB must grow, as a percentage of the PB
 
-Status: open. Maintainer lean (chat, 2026-09-27): this recommendation.
+Status: Ratified (user), 2026-09-27: accept the recommendation below.
 
 **Recommendation: the next rank's threshold minus the PB, divided by the PB.**
 A PB of 100 with Gold at 110 reads "+10.0% to Gold". Three properties carry
@@ -86,8 +88,8 @@ the wording.
 
 ### D2 — Rank and gap read the local all-time PB, the row's own PB Score
 
-Status: open. Maintainer lean (chat, 2026-09-27): defer recent form as a
-follow-up.
+Status: Ratified (user), 2026-09-27: accept the recommendation below, with
+recent form deferred as a follow-up.
 
 **Recommendation: both columns compute from the local high score the PB
 Score column already shows.** The row then agrees with itself: PB Score 100,
@@ -343,8 +345,8 @@ design adds:
 
 ## Delivery plan
 
-One implementation PR, with no dependencies, startable once D1 and D2 are
-ratified:
+One implementation PR, with no dependencies. D1 and D2 are ratified, so it
+can start once this proposal merges:
 
 - The pure function, the five row fields on all three row paths, the two gated
   column definitions, the two URL sort names, and the tests below.
