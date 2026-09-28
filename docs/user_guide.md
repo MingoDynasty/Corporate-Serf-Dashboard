@@ -102,7 +102,7 @@ KovaaK's API and saves it under `data/playlists`. Playlists imported this way
 carry no rank data — the benchmark-rank overlays come only from the bundled
 library.
 
-A benchmark's scenario table has two more columns after Scenario. **Rank** is
+A benchmark's scenario table has two more columns after PB Score. **Rank** is
 the highest rank your personal best has reached on that scenario, or "No rank"
 below the first one. **Next Rank** says how much your personal best has to
 grow to reach the next rank: "+4.8% to Gold" means a personal best 4.8% higher

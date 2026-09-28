@@ -227,8 +227,8 @@ and [product.md](../product.md). Leaderboard placement is worded
 
 ## The per-playlist scenario table
 
-- Columns: Scenario, then Rank and Next Rank on a benchmark's table only,
-  then Last Played, Runs, Position, Total Players, Percentile, PB Score, PB
+- Columns: Scenario, Last Played, Runs, Position, Total Players, Percentile,
+  PB Score, then Rank and Next Rank on a benchmark's table only, then PB
   Date, PB cm/360, PB Accuracy. Position reads a formatted rank, "Unranked",
   `N/A`, or, while pending, a blank cell with an animated ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
   Played keeps "Never"; the 30-second tick refreshes both timestamp columns
