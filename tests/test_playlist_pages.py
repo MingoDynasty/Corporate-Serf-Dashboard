@@ -2343,14 +2343,14 @@ def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlis
     # links depend on them, so pin them exactly.
     assert playlist_scenarios.SORT_URL_NAMES == {
         "scenario": "scenario",
-        "rank": "tier_sort",
-        "next-rank": "next_tier_sort",
         "last-played": "last_played_sort",
         "runs": "runs_sort",
         "position": "rank_sort",
         "total-players": "total_sort",
         "percentile": "percentile_sort",
         "pb-score": "high_score_sort",
+        "rank": "tier_sort",
+        "next-rank": "next_tier_sort",
         "pb-date": "pb_timestamp_sort",
         "pb-cm360": "pb_cm360_sort",
         "pb-accuracy": "pb_accuracy_sort",
@@ -2397,7 +2397,7 @@ def _column_fields(page) -> list[str]:
     return [column["field"] for column in _scenario_grid(page).columnDefs]
 
 
-def test_playlist_scenarios_benchmark_table_leads_with_rank_columns(
+def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
     benchmark_playlists,
 ):
     benchmark_fields = _column_fields(playlist_scenarios.layout(BENCHMARK_CODE))
@@ -2407,9 +2407,17 @@ def test_playlist_scenarios_benchmark_table_leads_with_rank_columns(
 
     assert benchmark_fields == [
         "scenario",
+        "last_played_sort",
+        "runs_sort",
+        "rank_sort",
+        "total_sort",
+        "percentile_sort",
+        "high_score_sort",
         "tier_sort",
         "next_tier_sort",
-        *table_fields[1:],
+        "pb_timestamp_sort",
+        "pb_cm360_sort",
+        "pb_accuracy_sort",
     ]
     assert plain_fields == table_fields
     assert unknown_fields == table_fields

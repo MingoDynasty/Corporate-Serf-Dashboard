@@ -53,14 +53,14 @@ dash.register_page(
 )
 
 AUTO_SIZE_COLUMN_KEYS = [
-    "tier_sort",
-    "next_tier_sort",
     "last_played_sort",
     "runs_sort",
     "rank_sort",
     "total_sort",
     "percentile_sort",
     "high_score_sort",
+    "tier_sort",
+    "next_tier_sort",
     "pb_timestamp_sort",
     "pb_cm360_sort",
     "pb_accuracy_sort",
@@ -202,7 +202,8 @@ TABLE_COLUMN_DEFS = [
     },
 ]
 
-# Only a benchmark's table has these, directly after Scenario.
+# Only a benchmark's table has these, directly after PB Score, the value both
+# compute from.
 BENCHMARK_COLUMN_DEFS = [
     {
         "headerName": "Rank",
@@ -240,14 +241,14 @@ BENCHMARK_COLUMN_DEFS = [
 # Position column (Rank is the benchmark tier).
 SORT_URL_NAMES = {
     "scenario": "scenario",
-    "rank": "tier_sort",
-    "next-rank": "next_tier_sort",
     "last-played": "last_played_sort",
     "runs": "runs_sort",
     "position": "rank_sort",
     "total-players": "total_sort",
     "percentile": "percentile_sort",
     "pb-score": "high_score_sort",
+    "rank": "tier_sort",
+    "next-rank": "next_tier_sort",
     "pb-date": "pb_timestamp_sort",
     "pb-cm360": "pb_cm360_sort",
     "pb-accuracy": "pb_accuracy_sort",
@@ -286,7 +287,7 @@ def _parse_sort(sort: object, column_ids: Collection[str]) -> list[tuple[str, st
 def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
     """Copy the column defs, seeding the grid's opening sort from ``?sort=``.
 
-    A benchmark's table adds Rank and Next Rank directly after Scenario. A
+    A benchmark's table adds Rank and Next Rank directly after PB Score. A
     fresh copy per call, because the module's column defs are shared across
     requests. The seed is ``initialSort``, never ``sort``: AG Grid reapplies
     ``sort`` whenever column defs arrive again, overriding the user's header
@@ -294,7 +295,11 @@ def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
     """
     column_defs: list[dict] = copy.deepcopy(TABLE_COLUMN_DEFS)
     if benchmark:
-        column_defs[1:1] = copy.deepcopy(BENCHMARK_COLUMN_DEFS)
+        fields = [column["field"] for column in column_defs]
+        after_pb_score = fields.index("high_score_sort") + 1
+        column_defs[after_pb_score:after_pb_score] = copy.deepcopy(
+            BENCHMARK_COLUMN_DEFS
+        )
     columns_by_id = {column["field"]: column for column in column_defs}
     for sort_index, (column_id, direction) in enumerate(
         _parse_sort(sort, columns_by_id)
