@@ -2379,11 +2379,12 @@ on that reading and on mechanics: the master switch's persisted value lives on
 the Scenario Performance page, so the shell would need a second mirror store
 to see it.
 
-**A hidden tab holds the animation.** Chromium marks a fully occluded window's
-tab hidden, and the player is in KovaaK's fullscreen when a personal best
-lands, so a hard `document.hidden` drop would mean the animation never plays
-for a real personal best on a single-monitor setup — only from Preview. At
-most one celebration is held instead, a newer one replacing it, and it plays
+**A hidden tab holds the animation.** The ruling assumed that Chromium marks a
+fully occluded window's tab hidden. The player is in KovaaK's fullscreen when a
+personal best lands, so under that assumption a hard `document.hidden` drop
+would mean the animation never plays for a real personal best on a
+single-monitor setup — only from Preview. At most one celebration is held
+instead, a newer one replacing it, and it plays
 on the next `visibilitychange` to visible; playing while hidden would also
 dump a stalled burst on the next alt-tab, since a hidden tab throttles
 animation frames. The accepted cost, stated with the ruling: personal best
