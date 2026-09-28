@@ -129,6 +129,16 @@ in-game benchmark view. The roadmap already lists this as the Future item
 "Next-rank threshold for benchmark playlists" and calls it consolidation
 rather than a new capability ([roadmap.md](../roadmap.md#future-briefly)).
 
+The question belongs to the between-sessions moment
+([product.md](../product.md#when-they-ask-them)). It is the look ahead at what
+to work on next, starting from a playlist's weak spots, and the quick pick
+just before a session. The table can't serve the in-session moment, where
+the rank the scores are reaching is evidence for the next call. It builds
+its rows when the page opens and doesn't refresh when a run lands. So after
+a new PB mid-session, Rank and Next Rank stay stale until the page reopens,
+as PB Score does today. The in-session rank question is left to a later
+feature.
+
 Everything the feature needs is local. The ladders ship in the bundled
 corpus as `Scenario.ranks` (`source/kovaaks/data_models.py`). The PB is
 `ScenarioStats.high_score`, which the row builder already reads for PB Score.
@@ -338,11 +348,21 @@ ratified:
 
 - The pure function, the five row fields on all three row paths, the two gated
   column definitions, the two URL sort names, and the tests below.
-- The shipping docs in the same PR: a decision-log entry, the playlists spec
-  (column list and sort names), the user guide's Playlists and Benchmarks
-  section, the product inventory, and the roadmap (the Future entry becomes
-  Shipped, and the own-runs difficulty follow-up becomes a Future entry). The
-  PR also deletes this proposal.
+- The shipping docs in the same PR:
+  - a decision-log entry;
+  - the playlists spec, for the column list and sort names;
+  - the user guide's Playlists and Benchmarks section;
+  - the product inventory;
+  - `docs/architecture.md`, whose scenario-table service entry says streamed
+    rows merge local stats with rank info and must now add the fields
+    computed from the ladder;
+  - the README's Features line for the table, which ends "sort by percentile
+    to pick what to train" and is amended in place rather than joined by a
+    new line;
+  - the roadmap, where the Future entry becomes Shipped and the own-runs
+    difficulty follow-up becomes a Future entry.
+
+  The PR also deletes this proposal.
 
 Recommended implementer: `claude-opus-5-5` at high. The spec is settled and
 mechanical, and unit tests plus one live check verify it; more effort would
