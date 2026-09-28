@@ -22,12 +22,12 @@ from source.config.settings_service import get_kovaaks_username
 from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_display_label,
+    is_benchmark_playlist,
 )
 from source.kovaaks.playlist_scenarios_service import (
     PlaylistScenarioFillDrain,
     build_playlist_scenario_rank_rows,
     drain_playlist_scenario_fill,
-    is_benchmark_playlist,
     scenario_home_href,
     start_playlist_scenario_fill,
 )
