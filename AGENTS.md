@@ -164,8 +164,12 @@ both by layering:
 - The summary is written and updated in the same PR as its payload, by the
   same author, and reviewed with it. A payload change that leaves the
   summary untouched should make the reviewer ask which layer is wrong.
-- No backfill: existing entries are converted only when a change touches
-  them anyway.
+- No backfill: an entry that predates this rule gains its summary only
+  when a payload change edits it anyway, never in a PR of its own. A
+  summary that exists but breaks these rules is a defect, not legacy:
+  bring it into line as its own commit in a PR that edits the file anyway,
+  or in a docs-only PR the maintainer asked for. An unrequested
+  summary-only PR is the backfill this rule refuses.
 - The prose rules above are writing guidance, held by same-PR review;
   `tests/test_docs.py` gates only the presence and order of the leading
   proposal sections, never prose quality or full Markdown rendering.
