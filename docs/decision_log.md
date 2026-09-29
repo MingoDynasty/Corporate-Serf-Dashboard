@@ -58,9 +58,9 @@ unmerged when #268, a real payload edit to the same spec, carried the same four
 sentences. That settled the instance and left the wording open until this
 ruling.
 
-**Main already practised the split.** Every merged summary-only fix rode as
-its own commit in a PR that edited the file: `e9e1aa2` and `a321393` (#302),
-`614568a` (#275), `baa2296` (#307), and `8885cd0` (#319).
+**Main already practised the split.** These merged summary fixes each rode
+as their own commit, touching only the summary, in a PR that edited the file:
+`e9e1aa2` and `a321393` (#302), `baa2296` (#307), and `8885cd0` (#319).
 
 **Scope.** This supersedes in part the
 [2026-08-01 Doc-Style Follow-Up entry](#2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index),
