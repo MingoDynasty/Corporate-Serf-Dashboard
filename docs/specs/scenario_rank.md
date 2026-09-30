@@ -6,13 +6,11 @@ else on the board. Placements are cached for a week and re-checked
 automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
-no username configured it makes no network calls at all. A fresh install is
-offered the account once, on the landing page, and can turn the whole
-feature down for good there. During normal
-play the field explains its own state beside the value instead of popping
-up a notification, and only two things still interrupt: a Refresh the
-player clicked, and a Steam ID that disagrees with the account KovaaK's
-found, said once per app session because the field has nowhere to put it.
+no username configured it makes no network calls at all. During normal play
+the field explains its own state beside the value instead of popping up a
+notification, and only two things still interrupt: a Refresh the player
+clicked, and a Steam ID that disagrees with the account KovaaK's found, said
+once per app session because the field has nowhere to put it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
