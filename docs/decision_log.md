@@ -3631,16 +3631,15 @@ in `README.md` rather than automated.
 Status: Accepted
 
 Every JSON file the app writes under `data/` now starts with
-`"schema_version": 1`. The point is future data migrations: before the app has
-users outside two machines, it needs a way to tell the format it understands
-from one it does not. A file the app cannot use is never deleted or rewritten
-behind the user's back. It is left exactly as it is, the app falls back to its
-first-run defaults, and the page that owns the setting says what happened and
-how to fix it. A file written by a *newer* version of the app is recognized as
-newer: the app reads nothing from it, refuses every write to it, and says the
-data is intact and an update will restore it. Existing installs are converted
-once by a script that ships with the release; the app itself has no migration
-code.
+`"schema_version": 1`, so future data migrations can tell a format the app
+understands from one it does not. A file the app cannot use is never deleted or
+rewritten behind the user's back: it is left exactly as it is, the app falls
+back to its first-run defaults, and the page that owns the setting says what
+happened and how to fix it. A file written by a *newer* version of the app is
+recognized as newer: the app reads nothing from it, refuses every write to it,
+and says the data is intact and an update will restore it. Existing installs
+are converted once by a script that ships with the release; the app itself has
+no migration code.
 
 Decision: settled with the maintainer on 2026-08-10 and 2026-08-11, after a
 review round on the contract. The premise is the public launch. `data/` is the
