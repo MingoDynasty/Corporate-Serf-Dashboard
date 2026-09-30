@@ -441,8 +441,6 @@ user problems (each becomes a roadmap milestone when it's next up):
 
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.
-- *"How close am I to the next rank?"* — "+47 to Gold" as a motivational
-  target on benchmark scenarios.
 - *"How did the rest of this session go?"* — a reviewable run history; the
   per-run toast is ephemeral and the console log is a developer-facing
   stopgap.
