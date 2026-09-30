@@ -102,8 +102,11 @@ expanded into its own roadmap entry when it becomes the next thing up.
 - **Per-family celebration staleness** — the run-event freshness window
   applies the quiet-return rule to celebrations and ordinary run toasts alike,
   so a personal best set with no tab open celebrates only if the dashboard is
-  opened within a couple of minutes of it, while a hidden tab's celebration is
-  delivered however late. Whether the celebration deserves its own longer or
+  opened within a couple of minutes of it, while any open tab keeps the
+  celebration toast until it is dismissed, however long the player is away. A
+  browser window the game only covers is not hidden (checked 2026-09-28), so
+  during play the burst itself plays unseen and the toast is what lasts.
+  Whether the celebration deserves its own longer or
   unbounded window is a question for real usage: whether the missed
   celebration in the play-then-open-the-dashboard flow grates, and how the late
   delivery feels when it fires. Nothing shipped forecloses the change; it is
