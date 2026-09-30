@@ -1,15 +1,17 @@
 # Glossary
 
 The words the app uses for its own concepts, and what each one means, for
-anyone writing the app's copy, its docs, or its code. An entry gives the meaning first, then
-the on-screen wording and the code name wherever they differ from the term.
-Which words may appear on screen is copy rule 7 in
+anyone writing the app's copy, its docs, or its code. An entry gives the
+meaning first, then the on-screen wording and the code name wherever they
+differ from the term. Which words may appear on screen is copy rule 7 in
 [AGENTS.md](../AGENTS.md#styling-conventions); this file says what they mean.
 
 A term is here only once the app, or [product.md](product.md), has its
 concept. Words for work still being designed stay in that work's proposal,
 whose **Terms** block the shipping PR moves here
 ([Shipping a proposal](../AGENTS.md#shipping-a-proposal-docs-definition-of-done)).
+Any PR that makes an entry untrue corrects it in the same PR
+([Documentation Habits](../AGENTS.md#documentation-habits)).
 
 ## Play
 
@@ -23,6 +25,8 @@ positions, and ranks each belong to one scenario.
 One finished attempt at a scenario. The app knows a run by its stats file:
 each `.csv` file KovaaK's writes to the stats folder is one run, and play that
 writes no file never reaches the app.
+
+- On screen: run file for the stats file, as in the Run not recorded toast.
 
 ### Stats folder
 
@@ -44,8 +48,9 @@ placement both compare runs within one sensitivity.
 
 The scale the app shows sensitivity in: centimeters of mouse travel per full
 360-degree turn, so higher is slower. A run recorded on a game's own scale is
-converted when its file is read. A file too old to carry what the conversion
-needs keeps its game's scale and the number as recorded
+converted when its file is read. A run whose file lacks fields the conversion
+can use, as the oldest files do, keeps its game's scale and the number as
+recorded
 ([2026-09-11](decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi),
 [2026-09-27](decision_log.md#2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired)).
 
@@ -54,6 +59,8 @@ needs keeps its game's scale and the number as recorded
 One stretch of play, including the pauses between runs, as
 [product.md](product.md#when-they-ask-them) defines it. The app has no rule
 yet for where one session ends; the first feature that needs one sets it.
+
+- Not an app session, which the specs use for one run of the server process.
 
 ### In session and between sessions
 
@@ -100,7 +107,7 @@ identity, because names aren't unique: imports, duplicate checks, and the
 ### Position
 
 The player's placement on a scenario's global KovaaK's leaderboard, such as
-11,290th. Fetching it is a position lookup. A player with no leaderboard
+11,290. Fetching it is a position lookup. A player with no leaderboard
 entry is Unranked, KovaaK's own word
 ([2026-07-06](decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 
@@ -194,6 +201,15 @@ leaderboard score
   `high_score_*` row fields. A run's `scenario_previous_best` is the PB it was
   chasing.
 
+### Accuracy
+
+The share of a run's shots that hit, which is what the chart's point hover
+shows. PB Accuracy on a scenario table is damage accuracy instead, damage done
+over damage possible, whenever the run's file records it, so one run can show
+two different accuracies.
+
+- In code: `accuracy` (hits over shots) and `damage_accuracy` on `RunData`.
+
 ### Score threshold
 
 A score goal set as a percentage of the PB, 95% by default. Its chart line
@@ -239,8 +255,9 @@ the delivery. An older PB in the same delivery gets at most an ordinary run
 notification, and a PB delivered later than that gets no toast. A tie doesn't
 celebrate, and neither does a scenario's first run
 ([2026-09-02](decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page),
-[notifications.md](specs/notifications.md#delivery)).
+[notifications.md](specs/notifications.md#run-notifications)).
 
 - On screen: the Personal best celebration control under Celebrations on the
-  Settings page, which picks the animation or turns it off.
+  Settings page, which picks the animation, or turns the celebration off,
+  toast included.
 - In code: the `pb-celebration` toast channel.
