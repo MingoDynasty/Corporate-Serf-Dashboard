@@ -32,6 +32,9 @@ app or `docs/product.md` already has the concept. The draft terms from the
 product brainstorm, such as visit, warm-up run, and typical score, stay leans
 until the proposal that ships them.
 
+**Ruling.** Ruled (user) 2026-09-30, in chat: D1, D2, and D3 as recommended,
+after both reviewers endorsed them.
+
 **D1, an entry's scope.** The meaning, plus the code name and the on-screen
 wording where they differ from the term: Position is `rank_*` in code, Rank
 is `tier_*`, and PB is `high_score`. Meaning alone would leave out exactly the
