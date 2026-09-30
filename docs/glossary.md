@@ -211,16 +211,18 @@ Where a new run's score places among the scenario's runs at the same
 sensitivity: first place is best, and the rest are Nth-best, such as 2nd-best.
 A placement within the Top N scores value earns a run notification.
 
-- On screen: the Top N scores control, which also sets how many scores per
-  sensitivity the chart plots, and toasts such as New 2nd-best score.
+- On screen: the Top N scores control and toasts such as New 2nd-best score.
+  The control also sets how many of the best scores in the selected date
+  range the chart plots: per sensitivity in Score vs Sensitivity, and per
+  day, across sensitivities, in Score vs Time.
 - In code: `nth_score` and `top_n_scores`.
 
 ### Run notification
 
 The one toast a run can earn on Scenario Performance: a score threshold
 verdict, a top-N placement, or both in one toast. A run that earns neither
-shows up only as its point on the chart. A run that beats the PB gets the
-personal best celebration instead while celebrations are on
+shows up only as its point on the chart. The run the personal best
+celebration picks, if any, gets that instead
 ([2026-08-03](decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy),
 [2026-08-21](decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
 
@@ -229,11 +231,15 @@ personal best celebration instead while celebrations are on
 
 ### Personal best celebration
 
-What a run that beats its scenario's PB gets: a short animation and a New
-personal best toast that stays until dismissed, on whatever page is open and
-for any scenario. A tie doesn't celebrate, and neither does a scenario's first
-run
-([2026-09-02](decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+The response to a new PB: a short animation and a New personal best toast
+that stays until dismissed, on whatever page is open and for any scenario. It
+picks at most one run from each delivery of new runs: the newest one that beat
+its scenario's previous PB and landed no more than about two minutes before
+the delivery. An older PB in the same delivery gets at most an ordinary run
+notification, and a PB delivered later than that gets no toast. A tie doesn't
+celebrate, and neither does a scenario's first run
+([2026-09-02](decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page),
+[notifications.md](specs/notifications.md#delivery)).
 
 - On screen: the Personal best celebration control under Celebrations on the
   Settings page, which picks the animation or turns it off.
