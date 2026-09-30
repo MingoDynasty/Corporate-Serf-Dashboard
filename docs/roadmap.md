@@ -141,6 +141,25 @@ expanded into its own roadmap entry when it becomes the next thing up.
 
 - **Answer the question, don't just show the data.** Charts and numbers are
   means; the user wants conclusions.
+- **Judge skill by the typical run, not the best run.** The typical run is
+  what the player's recent runs usually score. Judgments about skill (where
+  the player is weak, where their level stands, whether they're improving)
+  move toward it. A personal best is one run, and a lucky one makes a
+  scenario look stronger than it usually plays, so a list ordered by
+  personal bests ranks the consistent scenarios as the weak ones. The
+  personal best stays the achievement: KovaaK's ranks it, the app celebrates
+  it, and the rank and leaderboard position show it.
+- **Be honest about uncertainty.** Unknown isn't weak: a judgment with too few
+  runs behind it says so, and a scenario isn't ranked weak or strong until it
+  has enough. A figure that can only be a minimum is labelled one, such as
+  time spent in runs, since a restarted run leaves no file. An estimate is
+  shown as coarsely as it's known, such as "about 1 in 25 runs" rather than
+  "0.8%".
+- **State verdicts, not advice.** The app states facts and verdicts: the
+  typical run, a trend, a rank-up chance, "unknown", and whether a bar the
+  player set was met. A verdict answers the question, and what to do about it
+  stays the player's call, so the app doesn't tell them what to do. Moving
+  past verdicts needs strong evidence and a decision of its own.
 - **Compose, don't replicate.** Each milestone reuses the rank, percentile,
   threshold, and trend logic from earlier milestones rather than introducing
   parallel mechanisms.
