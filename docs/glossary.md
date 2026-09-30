@@ -179,7 +179,8 @@ points still needed. With every rank reached it reads Top rank
 
 The chart's rank threshold lines for the selected scenario, when the selected
 playlist has rank data. By default it draws only the ranks around the plotted
-scores; Show all ranks draws the whole ladder.
+scores; Show all ranks draws the whole ladder
+([scenario_performance.md](specs/scenario_performance.md#the-graph)).
 
 - On screen: the Rank thresholds switch in the Overlays group of Chart
   options, with the Show all ranks switch under it.
@@ -225,12 +226,14 @@ it was chasing, so a goal above 100% can pass
 
 Where a new run's score places among the scenario's runs at the same
 sensitivity: first place is best, and the rest are Nth-best, such as 2nd-best.
-A placement within the Top N scores value earns a run notification.
+A placement within the Top N scores value earns a run notification
+([notifications.md](specs/notifications.md#run-notifications)).
 
 - On screen: the Top N scores control and toasts such as New 2nd-best score.
   The control also sets how many of the best scores in the selected date
   range the chart plots: per sensitivity in Score vs Sensitivity, and per
-  day, across sensitivities, in Score vs Time.
+  day, across sensitivities, in Score vs Time
+  ([scenario_performance.md](specs/scenario_performance.md#the-graph)).
 - In code: `nth_score` and `top_n_scores`.
 
 ### Run notification
