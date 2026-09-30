@@ -32,8 +32,9 @@ app or `docs/product.md` already has the concept. The draft terms from the
 product brainstorm, such as visit, warm-up run, and typical score, stay leans
 until the proposal that ships them.
 
-**Ruling.** Ruled (user) 2026-09-30, in chat: D1, D2, and D3 as recommended,
-after both reviewers endorsed them.
+**Ruling.** Ruled (user) 2026-09-30, in chat, after both reviewers endorsed
+each row: D1, D2, and D3 as recommended, then D4 as amended in review, with
+four hooks.
 
 **D1, an entry's scope.** The meaning, plus the code name and the on-screen
 wording where they differ from the term: Position is `rank_*` in code, Rank
@@ -68,7 +69,8 @@ for specs. A "Shipping a proposal" step moves a proposal's Terms block in and
 corrects any entry the change makes untrue. The Terms block is described
 beside the Copy block rule, and the Layout list names the file. The same-PR
 duty is what keeps the glossary true: most PRs here ship without a proposal,
-and the proposal path alone would let an entry go stale silently. No test is
+and the proposal path alone would let an entry go stale silently. Three hooks
+on the proposal path alone were rejected for that reason. No test is
 added, because the glossary is prose held by review, and a rename already
 surfaces it to anyone who searches for the old name. The shipping step is
 step 3, between the spec update and the deletion of the proposal file,
