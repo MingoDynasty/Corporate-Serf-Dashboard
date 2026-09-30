@@ -301,8 +301,10 @@ are one view or two is a design choice for the feature that builds them.
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I
   touched this?"); absolute dates make the user do the math.
-- **Aim Training Journey page** (work in progress, currently unlinked from
-  the navbar). Visualizes training-hour checkpoints across playlists.
+- **Aim Training Journey page** (shelved, unlinked from the navbar).
+  Visualizes training-hour checkpoints across playlists. The page was left as
+  work in progress and shelved on 2026-09-28: its code stays, reachable only
+  by URL, and no work on it is planned.
 
 ### Getting data in
 
@@ -439,8 +441,6 @@ user problems (each becomes a roadmap milestone when it's next up):
 
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.
-- *"How close am I to the next rank?"* — "+47 to Gold" as a motivational
-  target on benchmark scenarios.
 - *"How did the rest of this session go?"* — a reviewable run history; the
   per-run toast is ephemeral and the console log is a developer-facing
   stopgap.

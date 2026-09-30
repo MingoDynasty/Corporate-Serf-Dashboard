@@ -6,6 +6,8 @@
 > likely change materially before then; the navigation/UI surface below is
 > intentionally left open and should be revisited at build time. Only the
 > durable data-model and sequencing decisions are meant to survive that long.
+> One of them, "sessions later", is now superseded, and a rewritten proposal
+> will replace this file.
 
 ## TL;DR
 
@@ -58,6 +60,11 @@ capture is required.
 - **Raw timestamps first; sessions are a later quality-of-life layer.** With
   timestamps visible, the user can eyeball the session boundary. Sessions
   automate that, but the views work without them.
+  - **Superseded** by row D4 of
+    [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327):
+    sessions and visits are built first, as the foundation the history views
+    and later features share, not as a later layer. Which view ships first
+    stays open for the rewrite that will replace this file.
 - **Sequencing within the feature:** ship view (2), the per-scenario history,
   first — it needs no sessionization. View (1), the current-session view,
   arrives *with* the sessionization layer, since "current session" is
