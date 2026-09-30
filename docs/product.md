@@ -301,8 +301,10 @@ are one view or two is a design choice for the feature that builds them.
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I
   touched this?"); absolute dates make the user do the math.
-- **Aim Training Journey page** (work in progress, currently unlinked from
-  the navbar). Visualizes training-hour checkpoints across playlists.
+- **Aim Training Journey page** (shelved, unlinked from the navbar).
+  Visualizes training-hour checkpoints across playlists. The page was left as
+  work in progress and shelved on 2026-09-28: its code stays, reachable only
+  by URL, and no work on it is planned.
 
 ### Getting data in
 
