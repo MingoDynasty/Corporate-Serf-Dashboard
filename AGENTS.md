@@ -54,8 +54,9 @@ uv run pytest tests --basetemp=ignore/pt --cov=source --cov=scripts --cov-report
   proposal ships, distill it into a `decision_log.md` entry and delete the
   file **in the shipping PR** — full checklist in "Shipping a proposal"
   below. `tests/test_docs.py` enforces proposal placement and `Status:`
-  lines (and their absence from specs) and fails on dangling doc links,
-  including heading-anchor links. Review handoff docs are ephemeral and
+  lines (and their absence from specs), counts the sentences of each
+  layer-1 summary, and fails on dangling doc links, including
+  heading-anchor links. Review handoff docs are ephemeral and
   never land on main (see the `/pr-review` skill).
 
 ## Workflow
@@ -154,10 +155,10 @@ both by layering:
 
 - **Layer 1 (maintainer).** Every new or materially-edited
   `decision_log.md` entry — and every `docs/specs/` file, once that layer
-  exists — opens with a 2–4 sentence plain-language summary: what changed,
-  why, and what a user or contributor would notice. One idea per sentence.
-  No cross-references, file paths, or embedded enumerations — those belong
-  in the payload.
+  exists — opens with a 2–4 sentence (as `tests/test_docs.py` counts them)
+  plain-language summary: what changed, why, and what a user or contributor
+  would notice. One idea per sentence. No cross-references, file paths, or
+  embedded enumerations — those belong in the payload.
 - **Layer 2 (agents).** The dense payload follows: invariants, edge cases,
   enumerations, cross-references. Write it as before — compression is a
   feature here.
@@ -171,8 +172,9 @@ both by layering:
   or in a docs-only PR the maintainer asked for. An unrequested
   summary-only PR is the backfill this rule refuses.
 - The prose rules above are writing guidance, held by same-PR review;
-  `tests/test_docs.py` gates only the presence and order of the leading
-  proposal sections, never prose quality or full Markdown rendering.
+  `tests/test_docs.py` gates the leading proposal sections and the summary
+  sentence count, 2–4 as it counts them, so a miscount is fixed by
+  rephrasing; it never judges prose quality or Markdown rendering.
 
 ### Initial proposal review posture
 
