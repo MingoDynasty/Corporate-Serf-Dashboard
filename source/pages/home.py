@@ -1074,6 +1074,25 @@ def _threshold_verdict(
     )
 
 
+def _shown_percentage(verdict: _ThresholdVerdict) -> float:
+    """Return the percentage of PB to print, held below each line the run missed.
+
+    Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
+    95.0%)" and a run 0.03% short of the PB as "100.0% of PB". So a miss shows
+    at most one tenth below the goal as printed, and a run below the PB shows
+    at most 99.9% whether it passed or not. Flooring would not do: float error
+    prints 407 / 500 as 81.3%.
+    """
+    shown = verdict.percentage
+    if not verdict.passed:
+        shown = min(shown, round(verdict.goal_percentage, 1) - 0.1)
+    # Float division and multiplication both round monotonically, so the
+    # percentage is below 100 exactly when the score is below the PB.
+    if verdict.percentage < 100:
+        shown = min(shown, 99.9)
+    return shown
+
+
 def _placement_phrase(nth_score: int) -> str:
     """Name a top-N placement: first place is "best", the rest are "Nth-best"."""
     return "best" if nth_score == 1 else f"{ordinal(nth_score)}-best"
@@ -1109,20 +1128,17 @@ def _build_live_run_notification(
             icon=local_icon("fontisto:line-chart"),
         )
 
+    shown_percentage = _shown_percentage(verdict)
     if verdict.passed:
         detail = f"Also {placement}." if placed else "Ready to move on."
         return toast(
             _RUN_VERDICT_CHANNEL,
             "Threshold passed",
-            f"{score}, {verdict.percentage:.1f}% of PB. {detail}",
+            f"{score}, {shown_percentage:.1f}% of PB. {detail}",
             color="green",
             icon=local_icon("material-symbols:check"),
         )
 
-    # Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
-    # 95.0%)", so a miss shows at most one tenth below the goal as printed.
-    # Flooring would not do: float error prints 407 / 500 as 81.3%.
-    shown_percentage = min(verdict.percentage, round(verdict.goal_percentage, 1) - 0.1)
     shortfall = f"{score}, {shown_percentage:.1f}% of PB "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
