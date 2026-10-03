@@ -49,8 +49,8 @@ uv run pytest tests --basetemp=ignore/pt --cov=source --cov=scripts --cov-report
   hand-edit)
 - `docs/` — living docs (architecture, `decision_log.md`, `glossary.md`,
   `product.md`, `user_guide.md`), current-behavior capability specs
-  (`docs/specs/`), plus proposals for in-flight work (`docs/proposals/`). One
-  file per proposal
+  (`docs/specs/`), retained research (`docs/research/`), plus proposals for
+  in-flight work (`docs/proposals/`). One file per proposal
   (git is the version history — no `_v2`/`_v3` filename suffixes); when a
   proposal ships, distill it into a `decision_log.md` entry and delete the
   file **in the shipping PR** — full checklist in "Shipping a proposal"
@@ -95,6 +95,12 @@ Codex <codex@local>
 ## Documentation Habits
 
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
+- Use [docs/research/](docs/research/README.md) for retained research: app
+  surveys, external evidence, and reusable observations that future
+  contributors should be able to find. Record the survey date and source
+  revision when available, and distinguish verified findings from
+  recommendations. Research does not ratify a direction. Feature-specific
+  working notes stay in `ignore/design-notes/` until they inform a proposal.
 - Use proposal docs under `docs/proposals/` for feature design that is in
   flight or planned, following the template below. The maintainer reads `Status:`,
   **TL;DR**, and **Decisions needed** by default and the dense body on
