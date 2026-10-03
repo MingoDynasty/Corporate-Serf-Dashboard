@@ -95,6 +95,12 @@ Codex <codex@local>
 ## Documentation Habits
 
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
+- Use [docs/research/](docs/research/README.md) for retained research: app
+  surveys, external evidence, and reusable observations that future
+  contributors should be able to find. Record the survey date and source
+  revision when available, and distinguish verified findings from
+  recommendations. Research does not ratify a direction. Feature-specific
+  working notes stay in `ignore/design-notes/` until they inform a proposal.
 - Use proposal docs under `docs/proposals/` for feature design that is in
   flight or planned, following the template below. The maintainer reads `Status:`,
   **TL;DR**, and **Decisions needed** by default and the dense body on
