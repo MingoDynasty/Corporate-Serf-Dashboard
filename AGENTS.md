@@ -49,8 +49,8 @@ uv run pytest tests --basetemp=ignore/pt --cov=source --cov=scripts --cov-report
   hand-edit)
 - `docs/` — living docs (architecture, `decision_log.md`, `glossary.md`,
   `product.md`, `user_guide.md`), current-behavior capability specs
-  (`docs/specs/`), plus proposals for in-flight work (`docs/proposals/`). One
-  file per proposal
+  (`docs/specs/`), retained research (`docs/research/`), plus proposals for
+  in-flight work (`docs/proposals/`). One file per proposal
   (git is the version history — no `_v2`/`_v3` filename suffixes); when a
   proposal ships, distill it into a `decision_log.md` entry and delete the
   file **in the shipping PR** — full checklist in "Shipping a proposal"

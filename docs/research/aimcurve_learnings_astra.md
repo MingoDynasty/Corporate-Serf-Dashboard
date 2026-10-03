@@ -1,6 +1,7 @@
 # Lessons from Aimcurve
 
 Date: 2026-10-01
+Author: gpt-6-astra · effort: xhigh
 
 Research note; recommendations remain unratified.
 
