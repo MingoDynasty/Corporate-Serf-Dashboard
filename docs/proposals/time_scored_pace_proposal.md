@@ -17,23 +17,23 @@ behavior.
 
 ## Decisions needed
 
-The maintainer's part of this proposal is decided:
+**The maintainer ratified this proposal as a whole on 2026-10-04,** after
+the reviewers had endorsed every author-owned row at its current text.
+Nothing in it is open:
 
 - **Settled constraints.** The maintainer agreed on 2026-09-28 that the
   behavior is a bug and set the constraints listed under
   [Settled by the maintainer](#settled-by-the-maintainer).
-- **Ruled rows.** P1, P2, and P8, all on 2026-10-04. P1 and P2 were ruled
-  together, each as its recommendation. They belong together because the
-  ratified decision P1 amends rests on the gap and the threshold measuring
-  the same way.
+- **Ruled rows.** P1, P2, and P8, all on 2026-10-04, before the
+  ratification. P1 and P2 were ruled together, each as its recommendation.
+  They belong together because the ratified decision P1 amends rests on the
+  gap and the threshold measuring the same way.
+- **Author-owned rows.** P3, P6, P7, P9, and P10, which Design tags by row
+  ID. The ratification settles them as written.
 
-Neither is a review target. A ruled row reopens only on material new
-evidence. Each keeps its recommendation and the alternatives it rejected,
-for the record.
-
-Everything else is author-owned and open to challenge. Design tags each such
-choice with its row ID: P3, P6, P7, P9, and P10. Those rows are still under
-review, so the proposal as a whole is not ratified.
+None of these is a review target. A settled row reopens only on material new
+evidence. Each ruled row keeps its recommendation and the alternatives it
+rejected, for the record.
 
 ### P1 — The Next Rank gap on a time-scored scenario is a pace gap
 
@@ -649,7 +649,7 @@ Changed entries:
 
 ## Delivery plan
 
-One implementation PR. P1 and P2 are ruled, so it can start once this
+One implementation PR. The proposal is ratified, so it can start once this
 proposal merges. It has no other dependency and can run beside the Run
 History work. Recommended implementer: `claude-opus-5-5` at high. The change
 is specified down to its strings, and unit tests plus one live check verify
