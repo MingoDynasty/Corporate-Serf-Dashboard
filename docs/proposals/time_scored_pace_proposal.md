@@ -342,9 +342,10 @@ Only ratios of scores were wrong.
 
 ### Detection (P9)
 
-**A scenario is time-scored when the performance file of its newest run that
-has one shows the score counting down from the file's time limit.** One run
-is enough.
+**A scenario is time-scored when the performance file of its newest run
+shows the score counting down from the file's time limit.** One run is
+enough. Where that file is missing or can't answer, an older run of the same
+version stands in (see Which file decides).
 
 The check reads these fields, by their names in KovaaK's schema: the
 header's `schema_version` and `scenario_hash`, its challenge profile's
@@ -353,23 +354,33 @@ delta. The file passes when all three hold:
 
 1. `schema_version` is 1.
 2. It has at least two score events.
-3. After every score event, the running score is within 0.05 of
+3. After every score event, the running score is within 0.5 of
    `time_limit − timescale × timestamp`.
 
 The constant `C` is then the file's `time_limit`, and the scenario version
-is its `scenario_hash`. If the file fails any condition, or can't be read or
-parsed, the app can't tell, and every surface keeps today's behavior.
+is its `scenario_hash`. A file that fails condition 2 or 3 answers that the
+scenario isn't time-scored. A file that fails condition 1, or can't be read
+or parsed, can't answer either way.
 
 **What each condition is for:**
 
 - **Condition 3 is the property itself,** checked at every second of the
   run: the score is the time left. A scenario that loses 1.5 points per
-  second is half a point off after one second, and fails. So does a
+  second is a full point off after two seconds, and fails. So does a
   scenario with no time limit whose score accumulates.
+- **The tolerance of 0.5 absorbs a start lag, not noise.** On the 84
+  countdown files the distance is set at the first score event, at 5 to
+  14 ms, and moves by under 10 ms after it. On the other paired files the
+  first score event's timestamp falls up to 72 ms short of one second, with
+  a 99th percentile of 31 ms. Every run in the data was played at 407 to 988
+  FPS, so a slower machine may lag more, and a missed file is silent: the
+  scenario just keeps today's numbers. Half a point is seven times the
+  largest lag seen and far inside the nearest other file, which is 42 away.
 - **Condition 2** is there because one event can't show a score falling.
   The shortest countdown file in the data has 60.
-- **Condition 1** turns a format change into "can't tell" instead of a
-  misread. All 1,764 files are version 1.
+- **Condition 1** keeps a format change from being misread. A file on
+  another schema version can't answer, and an older file stands in. All
+  1,764 files are version 1.
 - **`timescale`** is the scenario's own game speed. On the 363 files where
   it isn't 1.0, the time limit counts game time and the timestamps count
   real time: a limit of 54 at 0.9 ends at 60.0 s. So a slowed time-scored
@@ -379,18 +390,28 @@ parsed, the app can't tell, and every surface keeps today's behavior.
   doesn't depend on it either way: `C − s` is in the score's own clock, and
   a ratio of two times is the same in any clock.
 
-**Which file decides.** The app looks at the scenario's newest run that has
-a performance file. That file is found by name: the run's stats file name
-with ` Stats.csv` replaced by ` Performance.perf`, in the `performances`
-folder beside the stats folder. One file can decide because how a scenario
-scores belongs to its definition, which the hash identifies. No scenario in
-the data has files of both kinds, and each of the ten has one hash.
+**Which file decides.** The app takes the scenario's newest run and the
+older runs that share its hash, newest first, and stops at the first whose
+performance file can answer. That file decides. A performance file is found
+by name: the run's stats file name with ` Stats.csv` replaced by
+` Performance.perf`, in the `performances` folder beside the stats folder.
+
+One file can decide because how a scenario scores belongs to its
+definition, which the hash identifies. No scenario in the data has files of
+both kinds, and each of the ten has one hash. For the same reason, a file
+that can't answer says nothing about the scoring, and an older file of the
+same version still does. So a damaged file, or a file on a new schema
+version, doesn't turn a recognized scenario back to today's numbers.
+
+A file that answers "not time-scored" is not skipped. Every ordinary
+scenario's newest file answers that, and skipping it would mean reading that
+scenario's whole history.
 
 **The evidence,** from the maintainer's folders on 2026-10-04:
 
 - **The countdown is unmistakable.** The 84 countdown files stay within
   0.02 of the line at every event. The nearest of the other 1,680 files is
-  off by 42.
+  off by 42. Every tolerance from 0.02 to 40 recognizes the same 84 files.
 - **Every countdown file has a time limit of exactly 1,000, and no other
   file does.** Aimcurve, a community tool that reads the same files, reads
   1,000 as KovaaK's value for "no time limit". That reading isn't verified
@@ -420,31 +441,32 @@ the data has files of both kinds, and each of the ten has one hash.
 - none of the scenario's runs has a performance file, which is every
   scenario not played since build 3.9.0, the ten older single-run scenarios
   above among them;
-- the newest file fails the check, or can't be read or parsed.
+- no performance file of the newest run's version can answer.
 
 A file that can't be read costs only the detection, never the run, and isn't
 remembered, so the next look tries again.
 
 **When a run lands.** The watchdog already waits a second before it reads a
-new stats file, and by then the performance file is written. The new run's
-file is the scenario's newest, so the run is judged by its own file. If that
-file is missing, the scenario's newest paired file decides, as on every
-other surface. A scenario's first run on a current build therefore flips it
-to pace, and its numbers jump then. It flips back only if a newer run's file
-fails the check.
+new stats file, and by then the performance file is written. The new run is
+the scenario's newest, so the run is judged by its own file. If that file is
+missing or can't answer, an older file of the same version decides, as on
+every other surface. A scenario's first run on a current build therefore
+flips it to pace, and its numbers jump then. It flips back only if a newer
+run's file can answer and shows no countdown.
 
 **Paused runs.** No countdown file has a pause event, so a paused
 time-scored run is untested. The timestamps appear to leave paused time out:
 a fixed-length run paused for 7 s still ends at 60.0, and so does one paused
 for 2 s. That is an inference from those two runs. The live check adds a
-paused
-time-scored run, expecting it to be recognized. If it isn't, the scenario
-reads "can't tell" until its next unpaused run, and the shipping PR says so.
+paused time-scored run, expecting it to be recognized. If it isn't, the
+shipping PR counts a file with a pause event as one that can't answer, and
+says so.
 
 **Cost and memory.** The app lists the `performances` folder once at
-startup and parses nothing then. It parses a file only when a surface asks
-about that file's scenario, and remembers the result by file name, because a
-written file never changes. A 60-row benchmark table costs about 35 ms the
+startup and parses nothing then. A run that lands adds its file to that
+list, so the table and the chart see the file the watchdog read. The app
+parses a file only when a surface asks about that file's scenario, and
+remembers the result by file name, because a written file never changes. A 60-row benchmark table costs about 35 ms the
 first time it opens and nothing after. Nothing is written to disk. The run
 list it walks is the one `get_personal_best_run` already reads, under the
 same accepted concurrency terms
@@ -556,11 +578,11 @@ applies, unless noted. They follow AGENTS.md's nine copy rules.
 | Where | String | Why |
 |---|---|---|
 | Next Rank cell | `{gap}% faster to {rank name}`, such as `2.8% faster to Lavender` | "Faster" names the measure in one word. Keeping "+2.8%" would let a pace number read as a score number, the misreading this fixes. With the tooltip's "2.83 to go" beside it, "+2.8%" would also look like the percentage of those points. A readout, so no period. The gap formats and rounds as D1's does. |
-| Next Rank header tooltip, every benchmark table | `How much your PB score has to grow to reach the next rank. When the app can tell a scenario is scored by completion time, it's how much faster you have to finish than your PB. Lower is closer.` | The column holds two measures, and the header names both. The first sentence states the default, so a time-scored scenario the app can't recognize is still described truthfully. "Scored by completion time" describes the scenario in the player's terms instead of introducing the term *time-scored*. |
+| Next Rank header tooltip, every benchmark table | `How much your PB score has to grow to reach the next rank. A row that reads "faster" is a scenario scored by completion time, and shows how much faster you have to finish than your PB. Lower is closer.` | The column holds two measures, and the header names both. The second sentence is keyed to what the row shows, so it is true in every state: a row reads "faster" only where pace applies, and every other row, a time-scored one on score math included, is covered by the first sentence. "Scored by completion time" is the one place the app says why a row reads "faster", in the player's terms instead of the term *time-scored*. |
 | Threshold passed | `{scenario}: {score:.2f}, {pct:.1f}% of PB pace. Also your {best\|Nth-best} at {sensitivity}.`, or `... Ready to move on.` when not placed | One added word keeps the sentence the player already reads. |
 | Below threshold | `{scenario}: {score:.2f}, {pct:.1f}% of PB pace (need {goal:.1f}%).`, then ` Still your {best\|Nth-best} at {sensitivity}.` when placed | As above. The goal keeps its shape because it is the same setting. |
 | New personal best | `{scenario}: {score:.2f}. Finished {pct:.1f}% faster than your previous best of {previous:.2f}.` | "Finished" pairs "faster" with a verb, where "Up" describes a score. The previous best stays a score, the number the player sees in the game. |
-| Score threshold percentage help text, on every scenario | `Sets the score goal as a percentage of your personal best. When the app can tell a scenario is scored by completion time, it's a percentage of your personal best's pace instead. The overlay line tracks your current personal best. Notifications judge a run against the personal best you had before the run.` | The setting's meaning changes on these scenarios, and this is where the setting explains itself. The second sentence is the only change, and it promises pace only where the app recognizes the scenario. |
+| Score threshold percentage help text, on every scenario | `Sets the score goal as a percentage of your personal best. On a scenario scored by completion time, it's a percentage of your personal best's pace instead, when the app can measure pace reliably. Otherwise, it stays a percentage of your score. The overlay line tracks your current personal best. Notifications judge a run against the personal best you had before the run.` | The setting's meaning changes on these scenarios, and this is where the setting explains itself. The second and third sentences are the change. "When the app can measure pace reliably" covers every fallback at once: no performance file, a PB from another version of the scenario, and a time that isn't positive. The third sentence says what the goal is then. The verdict shows which one applied to a run: "% of PB pace" or "% of PB". |
 
 Unchanged on purpose:
 
@@ -581,9 +603,10 @@ ones.
 New entries:
 
 - **Time-scored scenario.** A scenario scored by the time left on its clock
-  when the task is done, so a faster finish scores higher. On one, the app's
-  percentages compare pace, not score. How the app recognizes one goes in
-  the Scenario Performance spec.
+  when the task is done, so a faster finish scores higher. On one, the app
+  measures by pace instead of score wherever it can measure pace reliably.
+  How it recognizes one, and when it can't measure pace, goes in the
+  Scenario Performance spec.
   - On screen: a scenario scored by completion time.
 - **Pace.** How fast a run finishes a time-scored scenario, set against
   another run: the other run's time divided by this one's. A run at 95% of
@@ -601,12 +624,12 @@ Changed entries:
 
 - **[Next Rank gap](../glossary.md#next-rank-gap).** How much a benchmark
   scenario's PB has to improve to reach its next rank: as a percentage of the
-  PB, such as +4.8% to Gold, or of its pace on a time-scored scenario, such
-  as 2.8% faster to Lavender. With every rank reached, it reads Top rank. The
-  links and the two bullets stay.
+  PB, such as +4.8% to Gold, or of its pace where the app measures a
+  time-scored scenario by pace, such as 2.8% faster to Lavender. With every
+  rank reached, it reads Top rank. The links and the two bullets stay.
 - **[Score threshold](../glossary.md#score-threshold).** A score goal set as
-  a percentage of the PB, or of the PB's pace on a time-scored scenario. The
-  links and the two bullets stay.
+  a percentage of the PB, or of the PB's pace where the app measures a
+  time-scored scenario by pace. The links and the two bullets stay.
 
 ## Out of scope
 
@@ -656,8 +679,8 @@ it.
     spec's summary is checked against its payload change.
   - `docs/glossary.md`: the Terms block above.
   - `docs/user_guide.md`: the "faster" reading in the Next Rank paragraph,
-    and when the app can tell, which is after one run of the scenario on a
-    current KovaaK's build.
+    and when the app can measure pace: after one run of the scenario on a
+    current KovaaK's build, with a PB from the scenario's current version.
   - `docs/architecture.md`: the new module, the run record's fields, the
     message's new fact, and `benchmark_rank_fields`'s new input.
   - the rest of the Shipping a proposal checklist in AGENTS.md: the product
@@ -676,22 +699,34 @@ are. They are the "unchanged" half.
 
 - **The reader and the check,** on small real files kept as fixtures plus
   files a test helper builds:
-  - a real countdown file returns its time limit and its hash;
-  - a real fixed-length file returns nothing;
-  - a scenario losing 1.5 points per second, built as 250 − 1.5 × t, returns
-    nothing;
+  - a real countdown file answers with its time limit and its hash;
+  - a real fixed-length file answers "not time-scored";
+  - a scenario losing 1.5 points per second, built as 250 − 1.5 × t, answers
+    "not time-scored";
   - a file whose first event grants the limit and whose later events are
-    gains returns nothing;
-  - a slowed countdown, built to lose 0.9 points per second at a timescale
-    of 0.9, returns its limit, and the same file at a timescale of 1.0
-    returns nothing;
-  - a short countdown of seven events returns its limit;
-  - one score event, no score events, a `schema_version` of 2, truncated
-    bytes, and an empty file each return nothing and never raise.
-- **The scenario's answer:** the newest run with a file decides; a newest
-  run with no file falls to the next; a stats folder with no `performances`
-  folder beside it recognizes nothing; a file that can't be read isn't
-  remembered.
+    gains answers "not time-scored";
+  - a slowed countdown of at least six events, built to lose 0.9 points per
+    second at a timescale of 0.9, answers with its limit, and the same file
+    at a timescale of 1.0 answers "not time-scored";
+  - a countdown whose events all sit 0.1 s early answers with its limit,
+    and one whose events sit 0.6 s early answers "not time-scored";
+  - a short countdown of seven events answers with its limit;
+  - one score event and no score events each answer "not time-scored";
+  - a `schema_version` of 2, truncated bytes, and an empty file each can't
+    answer, and none raises.
+- **The scenario's answer:**
+  - the newest run's file decides when it can answer;
+  - a newest run with no file, or with a file that can't answer, falls to
+    the next run of the same hash, so a `schema_version` of 2 on the newest
+    file leaves a recognized scenario recognized;
+  - an older file of another hash is never used;
+  - a newest file that answers "not time-scored" decides, and no older file
+    is read;
+  - a stats folder with no `performances` folder beside it recognizes
+    nothing;
+  - a file that can't be read isn't remembered;
+  - a file that appears after startup is seen by the table, the chart, and
+    the watchdog alike.
 - **Eligibility:** a PB whose hash differs from the file's keeps today's
   numbers on the row and the chart; a previous best whose hash differs keeps
   today's verdict and toast; a stats file with no `Hash:` still loads.
@@ -728,4 +763,6 @@ are. They are the "unchanged" half.
   "faster" and no longer fill the top four places. Open Ground Plaza Sparky
   V3 on Scenario Performance and check that the threshold line sits near
   890.7. Play a time-scored run and read the toast. Then pause one partway
-  through and confirm the scenario is still recognized.
+  through and confirm the scenario is still recognized. Last, play one with
+  the frame rate capped at 60 and confirm the same: every run in the data
+  was played above 400 FPS, and this is the check on the start lag.
