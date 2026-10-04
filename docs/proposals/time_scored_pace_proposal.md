@@ -163,11 +163,12 @@ file, game builds from 3.9.0 write a performance file, a `.perf`, to the
 `performances` folder next to the stats folder. KovaaK's publishes its
 format, a protobuf schema, at <https://wiki.kovaaks.com/performance.proto>.
 Two community tools already read these files, RefleK's and
-[Aimcurve](https://github.com/voidfill/aimcurve), and the surveys of both
-are arriving in the repo's research notes with
-[#331](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/331).
-The file's header carries the scenario's time limit, and its events carry
-the score second by second:
+[Aimcurve](https://github.com/voidfill/aimcurve). The repo's research notes
+survey both: the [RefleK's survey](../research/refleks_learnings.md) lists
+the file's fields, and an
+[Aimcurve survey](../research/aimcurve_learnings_opus.md) found the
+time-scored signal used here. The file's header carries the scenario's time
+limit, and its events carry the score second by second:
 
 | | Ground Plaza Sparky V3 | VT Controlsphere Intermediate S5 |
 |---|---|---|
@@ -292,8 +293,11 @@ because only the times have to be positive.
 and the constant to decimals before subtracting, then compares the
 cross-multiplied form, not the rounded ratio it displays. So a run exactly
 at the goal passes, as the 2026-07-08 entry requires. The displayed
-percentages keep today's rounding: the gap rounds up with a floor of 0.1, and
-a failing verdict is capped one tenth below the goal as printed.
+percentages keep today's rounding. The gap rounds up with a floor of 0.1. A
+verdict keeps both of its caps: a failing one prints at most one tenth below
+the goal, and a run below the previous best prints at most 99.9%. The second
+cap needs no change, because a run's pace is below the previous best's
+exactly when its score is.
 
 **Why pace and not time.** Three reasons, in order of weight:
 
@@ -692,8 +696,9 @@ are. They are the "unchanged" half.
   draws at 890.74. With no constant, it draws at 851.39 as today.
 - **The verdict** (`tests/test_home_run_events.py`): a pass and a fail by
   pace, with "% of PB pace" in the message. A run of 900 against a previous
-  best of 905 at 95% passes exactly at the goal. With no constant, the
-  message reads "% of PB". A time-scored previous best of zero or less is
+  best of 905 at 95% passes exactly at the goal. A run just short of the
+  previous best reads "99.9% of PB pace", never "100.0%". With no constant,
+  the message reads "% of PB". A time-scored previous best of zero or less is
   still judged when pace is defined.
 - **The New personal best toast** (`tests/test_app_shell_run_events.py`):
   "Finished 11.3% faster than your previous best of 884.41." for 884.41 →
