@@ -629,6 +629,20 @@ def _rank_display(value: str, hint: str | None) -> str | list:
     ]
 
 
+def _rank_updated_ts(rank_info: ScenarioRankInfo) -> float | None:
+    """Return when the displayed position was stored, as epoch seconds.
+
+    ``None`` when no position is displayed, and for a cache entry written
+    without a time: the hover then has nothing to date.
+    """
+    displayed = rank_info.status == ScenarioRankStatus.UNRANKED or (
+        rank_info.status == ScenarioRankStatus.RANKED and rank_info.rank is not None
+    )
+    if not displayed or rank_info.fetched_at is None:
+        return None
+    return rank_info.fetched_at.timestamp()
+
+
 def _derive_rank_hint(rank_info: ScenarioRankInfo) -> str | None:
     """Classify a rank result into the inline hint its value should carry."""
     if rank_info.served_stale:
@@ -696,20 +710,20 @@ def _render_scenario_rank(
     selected_scenario: str | None,
     allow_network: bool,
     allow_notifications: bool = True,
-) -> tuple[str | list, list[dict[str, object]]]:
+) -> tuple[str | list, float | None, list[dict[str, object]]]:
     """Render rank through either the normal lookup or the cache-only interval path.
 
-    Returns the Position value and any toast the render earned. Passive renders
-    do not toast their own state: an unconfigured username, a failed lookup,
-    and a value served from a stale cache are persistent conditions, so the
-    field says so itself. The Steam-ID mismatch has no such in-place home and
-    is the single exception.
+    Returns the Position value, when that position was stored, and any toast
+    the render earned. Passive renders do not toast their own state: an
+    unconfigured username, a failed lookup, and a value served from a stale
+    cache are persistent conditions, so the field says so itself. The Steam-ID
+    mismatch has no such in-place home and is the single exception.
 
     ``allow_notifications=False`` renders the value without spending the
     session's one mismatch toast -- for the render nobody triggered.
     """
     if not selected_scenario:
-        return "N/A", []
+        return "N/A", None, []
 
     lookup_config = _rank_lookup_config()
     username, steam_id = lookup_config[0], lookup_config[1]
@@ -722,20 +736,23 @@ def _render_scenario_rank(
         )
     except Exception:  # noqa: BLE001
         logger.exception('Failed to fetch scenario rank for "%s"', selected_scenario)
-        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), []
+        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), None, []
 
     value = format_scenario_rank(rank_info)
     display = _rank_display(
         value,
         _rank_hint(rank_info, username, selected_scenario, allow_network, value),
     )
+    updated_ts = _rank_updated_ts(rank_info)
     if not allow_notifications:
-        return display, []
-    return display, _steam_mismatch_notifications(rank_info, username, steam_id)
+        return display, updated_ts, []
+    notifications = _steam_mismatch_notifications(rank_info, username, steam_id)
+    return display, updated_ts, notifications
 
 
 @callback(
     Output("scenario_rank", "children"),
+    Output("rank-updated-ts", "data"),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
     Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
@@ -754,12 +771,45 @@ def get_scenario_rank(_, selected_scenario, _n_intervals):
     moment the user may not be looking at.
     """
     triggered = ctx.triggered
-    display, notifications = _render_scenario_rank(
+    display, updated_ts, notifications = _render_scenario_rank(
         selected_scenario,
         _rank_allows_network(triggered),
         allow_notifications=bool(triggered),
     )
-    return display, notifications or no_update
+    return display, updated_ts, notifications or no_update
+
+
+# The hover's age is worded in the browser, on each store change and every 30s
+# tick, so it stays current while a cached position sits untouched. "Last
+# updated", not "checked": a fetch that fails, and an automatic read whose
+# result the cache refuses, both leave the stored position and its time alone,
+# so the label stays true of the data while the app goes on trying.
+#
+# The tooltip is a fixed part of the layout rather than part of the value's
+# children: the interval rewrites those every tick, and Dash remounts component
+# children on each write, which blinks an open tooltip.
+clientside_callback(
+    """
+    (seconds, _nIntervals) => {
+        if (seconds === null || seconds === undefined) {
+            return ["", true, null, null];
+        }
+        const dagfuncs = window.dashAgGridFunctions;
+        const label =
+            "Last updated " +
+            dagfuncs.relativeTime(seconds, "") +
+            " · " +
+            dagfuncs.absoluteTime(seconds, "");
+        return [label, false, "cell-tooltip-affordance", 0];
+    }
+    """,
+    Output("rank-updated-tooltip", "label"),
+    Output("rank-updated-tooltip", "disabled"),
+    Output("scenario_rank", "className"),
+    Output("scenario_rank", "tabIndex"),
+    Input("rank-updated-ts", "data"),
+    Input("relative-time-interval", "n_intervals"),
+)
 
 
 def _rank_refresh_problem_notification(
@@ -881,6 +931,7 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
 
 @callback(
     Output("scenario_rank", "children", allow_duplicate=True),
+    Output("rank-updated-ts", "data", allow_duplicate=True),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
     Output("notification-container", "hideNotifications", allow_duplicate=True),
     Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
@@ -930,13 +981,15 @@ def refresh_rank(  # noqa: PLR0911
     page load must not force a network refresh or pop a stray toast.
     """
     if not n_clicks:
-        return no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
     if not selected_scenario:
-        return "N/A", no_update, no_update, no_update
+        return "N/A", None, no_update, no_update, no_update
+    # The value and the time it was stored: every outcome moves both or neither.
+    unchanged = (no_update, no_update)
     if not get_kovaaks_username():
         # ``no_update``: the field already reads "N/A · set your KovaaK's
         # username in Settings", so only the toast is new.
-        return no_update, *channel_toast(
+        return *unchanged, *channel_toast(
             _rank_refresh_username_unset_notification(), toast_channels
         )
 
@@ -948,7 +1001,7 @@ def refresh_rank(  # noqa: PLR0911
         )
     except Exception:  # noqa: BLE001
         logger.exception('Manual rank refresh failed for "%s"', selected_scenario)
-        return no_update, *channel_toast(
+        return *unchanged, *channel_toast(
             _rank_refresh_problem_notification(served_stale=False), toast_channels
         )
 
@@ -959,7 +1012,7 @@ def refresh_rank(  # noqa: PLR0911
             selected_scenario,
             rank_info.error_message,
         )
-        return no_update, *channel_toast(
+        return *unchanged, *channel_toast(
             _rank_refresh_problem_notification(served_stale=False), toast_channels
         )
 
@@ -968,14 +1021,14 @@ def refresh_rank(  # noqa: PLR0911
     rank_text = format_scenario_rank(rank_info)
     hint = _derive_rank_hint(rank_info)
     _last_rank_hints[selected_scenario] = (rank_text, hint)
-    display = _rank_display(rank_text, hint)
+    shown = (_rank_display(rank_text, hint), _rank_updated_ts(rank_info))
     if rank_info.served_stale:
         logger.warning(
             'Manual rank refresh for "%s" served a cached position: %s',
             selected_scenario,
             rank_info.warning_message,
         )
-        return display, *channel_toast(
+        return *shown, *channel_toast(
             _rank_refresh_problem_notification(
                 served_stale=True,
                 has_total=rank_info.total_players is not None,
@@ -989,7 +1042,7 @@ def refresh_rank(  # noqa: PLR0911
             'Manual rank refresh for "%s" could not re-read the leaderboard total.',
             selected_scenario,
         )
-        return display, *channel_toast(
+        return *shown, *channel_toast(
             _rank_refresh_total_failed_notification(
                 selected_scenario,
                 has_total=rank_info.total_players is not None,
@@ -1000,7 +1053,7 @@ def refresh_rank(  # noqa: PLR0911
                 _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
             ),
         )
-    return display, *channel_toast(
+    return *shown, *channel_toast(
         _rank_refresh_success_notification(selected_scenario),
         toast_channels,
         clears=(
@@ -2149,6 +2202,7 @@ def layout(
                 id="last-played-empty-value",
                 data="",
             ),
+            dcc.Store(id="rank-updated-ts"),  # raw epoch for the Position hover
             dcc.Interval(
                 id="startup-playlist-warning-interval",
                 interval=250,
@@ -2341,10 +2395,16 @@ def layout(
                                                         # (like "Last played:"
                                                         # above).
                                                         dcc.Loading(
-                                                            dmc.Text(
-                                                                id="scenario_rank",
-                                                                span=True,
-                                                                size="sm",
+                                                            dmc.Tooltip(
+                                                                dmc.Text(
+                                                                    id="scenario_rank",
+                                                                    span=True,
+                                                                    size="sm",
+                                                                ),
+                                                                disabled=True,
+                                                                events=TOOLTIP_EVENTS,
+                                                                id="rank-updated-tooltip",
+                                                                label="",
                                                             ),
                                                             delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
                                                             show_initially=False,

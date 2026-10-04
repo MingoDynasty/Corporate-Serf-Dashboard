@@ -121,6 +121,18 @@ from the cache routinely carries no mark
 
 - In code: `stale`, as in a result served stale.
 
+### Last updated
+
+When the app last stored a read of the player's position from KovaaK's
+leaderboard
+([2026-10-04](decision_log.md#2026-10-04-the-position-value-says-when-it-was-last-updated)).
+Where it appears is in [scenario_rank.md](specs/scenario_rank.md#caching).
+
+- In code: `fetched_at`.
+- Not when the app last tried: a failed attempt leaves it as it was.
+- Not when the position last moved: a read that finds the same position still
+  counts.
+
 ## Benchmark ranks
 
 ### Rank
