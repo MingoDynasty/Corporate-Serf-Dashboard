@@ -92,8 +92,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
   sessions at a gap between runs, and each session into visits, a visit being
   an unbroken stretch of runs on one scenario. Sessions and visits are built
   first, as the foundation the history views stand on, not as a later layer.
-  The milestone retires the interim console-log stopgap in `file_watchdog.py`.
-  Why it's next, and why sessions first:
+  The milestone retires the interim per-run lines the watchdog writes to the
+  debug log. Why it's next, and why sessions first:
   - Nearly every planned feature needs sessions and visits: history grouped
     by session, time spent in a session, the trend verdict built on session
     medians, and the typical run.
@@ -165,7 +165,7 @@ next.
 - **An overview** — time spent and activity across all scenarios. No design
   yet.
 - **KovaaK's own log** — the game's log records what stats files can't:
-  restarts, freeplay, and how long the game was open, which would give time
+  restarts, freeplay, and how long the game was open, which could give time
   spent an upper bound. A local archive outside the app is already collecting
   the maintainer's logs, so there's history to design against.
 - **Accuracy guideline** — the accuracy the top leaderboard players land at on
@@ -185,20 +185,22 @@ next.
   the player is weak, where their level stands, whether they're improving)
   move toward it. A personal best is one run, and a lucky one makes a
   scenario look stronger than it usually plays, so a list ordered by
-  personal bests ranks the consistent scenarios as the weak ones. The
-  personal best stays the achievement: KovaaK's ranks it, the app celebrates
-  it, and the rank and leaderboard position show it.
+  personal bests can rank a consistent scenario as weaker than a spiky one
+  that usually plays worse. The personal best stays the achievement:
+  KovaaK's ranks it, the app celebrates it, and the rank and leaderboard
+  position show it.
 - **Be honest about uncertainty.** Unknown isn't weak: a judgment with too few
   runs behind it says so, and a scenario isn't ranked weak or strong until it
   has enough. A figure that can only be a minimum is labelled one, such as
   time spent in runs, since a restarted run leaves no file. An estimate is
-  shown as coarsely as it's known, such as "about 1 in 25 runs" rather than
-  "0.8%".
+  shown no more precisely than it's known, such as "about 1 in 25 runs"
+  rather than "4.1%".
 - **State verdicts, not advice.** The app states facts and verdicts: the
   typical run, a trend, a rank-up chance, "unknown", and whether a bar the
   player set was met. A verdict answers the question, and what to do about it
-  stays the player's call, so the app doesn't tell them what to do. Moving
-  past verdicts needs strong evidence and a decision of its own.
+  in training stays the player's call: the app doesn't say what to play or
+  when to stop. Moving past verdicts needs strong evidence and a decision of
+  its own.
 - **Compose, don't replicate.** Each milestone reuses the rank, percentile,
   threshold, and trend logic from earlier milestones rather than introducing
   parallel mechanisms.
