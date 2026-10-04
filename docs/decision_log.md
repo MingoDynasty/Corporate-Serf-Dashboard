@@ -65,12 +65,12 @@ this app.
 behind it says so, and a scenario isn't ranked weak or strong until it has
 enough: unknown rows sort as a group of their own, never at either end of a
 weakness sort. A figure that can only be a minimum is labelled one wherever
-it's shown, such as time spent in runs, because a restarted attempt leaves no
-file. An estimate is shown no more precisely than it's known. Under-sampling
-is the common case: 23 of the 39 scenarios in the maintainer's current
-benchmark had fewer than 10 lifetime runs. How much is enough isn't set here,
-and it isn't only a run count: the runs also have to be comparable, and the
-estimate's model has to hold.
+it's shown, such as time spent in runs, which leaves out the time between
+runs and any attempt that wrote no file. An estimate is shown no more
+precisely than it's known. Under-sampling is the common case: 23 of the 39
+scenarios in the maintainer's current benchmark had fewer than 10 lifetime
+runs. How much is enough isn't set here, and it isn't only a run count: the
+runs also have to be comparable, and the estimate's model has to hold.
 
 **D3, verdicts, not advice.** The app states facts and verdicts: the typical
 run, a trend, a rank-up chance, "unknown", and whether a bar the player set,

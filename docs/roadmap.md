@@ -116,9 +116,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
   those scenarios look closer to ranking up and easier to pass than they
   are. The fix measures them by completion time instead. Why now: it's a bug
   in shipped features, and a small one. It's a correctness fix rather than a
-  milestone, so it runs beside Run history, and its proposal is being
-  written. It changes the ruled definition of the Next Rank gap, so it needs
-  a ruling of its own.
+  milestone, so it runs beside Run history, with a proposal of its own
+  (#329). It changes the ruled definition of the Next Rank gap, so it needs a
+  ruling of its own.
 ---
 
 ## Future (briefly)
@@ -165,10 +165,10 @@ next.
   run orders weaknesses better.
 - **An overview** — time spent and activity across all scenarios. No design
   yet.
-- **KovaaK's own log** — the game's log records what stats files can't:
-  restarts, freeplay, and how long the game was open, which could give time
-  spent an upper bound. A local archive outside the app is already collecting
-  the maintainer's logs, so there's history to design against.
+- **KovaaK's own log** — the game's log records what stats files usually
+  don't: restarts, freeplay, and how long the game was open, which could give
+  time spent an upper bound. A local archive outside the app is already
+  collecting the maintainer's logs, so there's history to design against.
 - **Accuracy guideline** — the accuracy the top leaderboard players land at on
   a scenario, as a reference for what good play looks like rather than a
   target.
@@ -193,9 +193,9 @@ next.
 - **Be honest about uncertainty.** Unknown isn't weak: a judgment with too few
   runs behind it says so, and a scenario isn't ranked weak or strong until it
   has enough. A figure that can only be a minimum is labelled one, such as
-  time spent in runs, since a restarted attempt leaves no file. An estimate is
-  shown no more precisely than it's known, such as "about 1 in 25 runs"
-  rather than "4.1%".
+  time spent in runs, which leaves out the time between runs and any attempt
+  that wrote no file. An estimate is shown no more precisely than it's known,
+  such as "about 1 in 25 runs" rather than "4.1%".
 - **State verdicts, not advice.** The app states facts and verdicts: the
   typical run, a trend, a rank-up chance, "unknown", and whether a bar the
   player set, such as the score threshold, was met. A verdict answers the
