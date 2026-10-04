@@ -343,6 +343,30 @@ def test_threshold_passes_exactly_at_a_goal_float_math_overshoots():
     assert notification["message"].startswith("Scenario A: 19.57, 95.0% of PB.")
 
 
+def test_threshold_pass_short_of_the_pb_never_reads_as_matching_it():
+    # 11523 / 11526 is 99.97% of PB: a pass at a 95% goal, but one-decimal
+    # rounding alone would print "100.0% of PB" for a run that fell short.
+    notification = _notification(
+        _payload(score=11523.0, scenario_previous_best=11526.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"] == (
+        "Scenario A: 11523.00, 99.9% of PB. Also your 2nd-best at 34.64 cm/360."
+    )
+
+
+def test_a_run_matching_the_pb_reads_as_all_of_it():
+    # The cap is for a run below the PB only: a tie is 100.0% and says so.
+    notification = _notification(
+        _payload(score=11526.0, scenario_previous_best=11526.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["message"].startswith("Scenario A: 11526.00, 100.0% of PB.")
+
+
 def test_threshold_fail_names_the_target_it_missed():
     notification = _notification(
         _payload(score=780.0, scenario_previous_best=800.0),
@@ -394,6 +418,20 @@ def test_a_new_pb_short_of_a_stretch_goal_still_reads_as_below_threshold():
     assert notification["message"] == (
         "Scenario A: 820.00, 102.5% of PB (need 105.0%). "
         "Still your best at 34.64 cm/360."
+    )
+
+
+def test_a_stretch_goal_miss_short_of_the_pb_never_reads_as_matching_it():
+    # A goal above 100% puts the failing cap above the PB too, so a run 0.03%
+    # short of the PB would still print "100.0% of PB (need 105.0%)".
+    notification = _notification(
+        _payload(score=11523.0, scenario_previous_best=11526.0, nth_score=9),
+        score_threshold_percentage=105.0,
+    )
+
+    assert notification["title"] == "Below threshold"
+    assert notification["message"] == (
+        "Scenario A: 11523.00, 99.9% of PB (need 105.0%)."
     )
 
 
