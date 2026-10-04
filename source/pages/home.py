@@ -60,7 +60,10 @@ from source.kovaaks.playlist_visibility_service import (
 )
 from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
-from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
+from source.pages.playlist_selector import (
+    PLAYLIST_SELECTOR_PRESET,
+    PLAYLIST_SELECTOR_SIZING,
+)
 from source.plot.plot_service import (
     POINT_SIZE_DEFAULT,
     POINT_SIZE_OPTIONS,
@@ -2177,6 +2180,7 @@ def layout(
                             children=[
                                 dmc.Select(
                                     **PLAYLIST_SELECTOR_PRESET,
+                                    **PLAYLIST_SELECTOR_SIZING,
                                     allowDeselect=False,
                                     autoSelectOnBlur=True,
                                     clearSearchOnFocus=True,
@@ -2242,7 +2246,7 @@ def layout(
                                     # The column, not the Select inside it, is
                                     # the flex item this row breaks lines on.
                                     # Mirrors the playlist filter beside it;
-                                    # see PLAYLIST_SELECTOR_PRESET for why the
+                                    # see PLAYLIST_SELECTOR_SIZING for why the
                                     # basis is the floor and not the 400px
                                     # target.
                                     flex="1 1 200px",

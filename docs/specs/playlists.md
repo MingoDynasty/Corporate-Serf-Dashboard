@@ -51,8 +51,8 @@ and [product.md](../product.md). Leaderboard placement is worded
 - `/playlists` and `/playlists/{playlistCode}` are stable contracts, and the
   bare-route selector dropdown is gone
   ([2026-07-03](../decision_log.md#2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional)).
-  `playlist_selector.py` is now only a shared prop preset for the Home and
-  Aim Training Journey dropdowns.
+  `playlist_selector.py` is now only the shared props, a preset and a sizing
+  rule, for the Home and Aim Training Journey dropdowns.
 - Overview rows are full-row click targets (pointer cursor, hover tint): a
   click on any cell except the two action cells navigates to
   `/playlists/{code}`. The Playlist name cell and the table's Scenario cell

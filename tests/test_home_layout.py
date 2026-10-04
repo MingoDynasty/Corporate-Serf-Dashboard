@@ -18,7 +18,10 @@ import pytest
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import home  # noqa: E402
-from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET  # noqa: E402
+from source.pages.playlist_selector import (  # noqa: E402
+    PLAYLIST_SELECTOR_PRESET,
+    PLAYLIST_SELECTOR_SIZING,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
@@ -299,13 +302,19 @@ def test_the_graph_keeps_the_class_the_resize_observer_finds_it_by():
     assert ".home-graph" in GRAPH_RESIZE_SCRIPT.read_text(encoding="utf-8")
 
 
-def test_playlist_preset_carries_the_shrink_rule():
-    """Both playlist dropdowns sit in wrapping rows, so the preset owns this."""
+def test_playlist_sizing_carries_the_shrink_rule():
+    """Both playlist dropdowns sit in wrapping rows, so one shared rule owns this."""
     grow, hypothetical, target = _sizing(
-        PLAYLIST_SELECTOR_PRESET["flex"],
-        PLAYLIST_SELECTOR_PRESET["miw"],
-        PLAYLIST_SELECTOR_PRESET["maw"],
+        PLAYLIST_SELECTOR_SIZING["flex"],
+        PLAYLIST_SELECTOR_SIZING["miw"],
+        PLAYLIST_SELECTOR_SIZING["maw"],
     )
 
     assert hypothetical < target
     assert grow >= 1
+
+
+def test_playlist_preset_books_no_width_of_its_own():
+    """The preset is splatted into a dropdown that may sit inside the flex
+    item, where a second box booking a width fights the first over the break."""
+    assert not set(PLAYLIST_SELECTOR_PRESET) & set(PLAYLIST_SELECTOR_SIZING)

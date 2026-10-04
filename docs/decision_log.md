@@ -4715,7 +4715,10 @@ Consequences and constraints:
 - **The sizing rule lives in `PLAYLIST_SELECTOR_PRESET`**, so the Aim Training
   Journey page's `dmc.MultiSelect` picks it up too. Both sit in wrapping rows
   and want the same behavior; splitting the rule to spare the second page would
-  cost more than it saves.
+  cost more than it saves. *(Renamed 2026-10-04: the rule is
+  `PLAYLIST_SELECTOR_SIZING`, a second dict in the same module, so a page can
+  put it on the column that holds its dropdown. Both pages still read the one
+  rule.)*
 
 ## 2026-08-03: One Quiet Notification Layer With Verdict-Carrying Copy
 
