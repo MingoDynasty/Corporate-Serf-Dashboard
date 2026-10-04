@@ -9,12 +9,14 @@ Research note; recommendations remain unratified.
 
 Aimcurve reads a second file that current KovaaK's builds write for each
 completed run, the `.perf` performance file. This app reads only the stats
-CSV. The `.perf` header states directly which scenarios are scored on
-completion time, which the open pace proposal infers from run lengths
-instead. That claim was checked here against the maintainer's own recordings
-and held on all 1,764 files. The rest of the survey is design input for the
-run-history work, plus one ingest risk worth reproducing before that work
-leans on run counts and medians.
+CSV. One run's `.perf` is enough to classify a scenario as scored on
+completion time, from two signals taken together: a sentinel in the header
+and score ticks that count down. The open pace proposal infers the same
+thing from run lengths across a scenario's runs. The two signals were
+checked here against the maintainer's own recordings and agreed on all
+1,764 files. The rest of the survey is design input for the run-history
+work, plus one ingest risk worth reproducing before that work leans on run
+counts and medians.
 
 ## Evidence and scope
 
@@ -45,16 +47,18 @@ leans on run counts and medians.
 
 ## Findings
 
-### 1. The `.perf` header identifies a time-scored scenario
+### 1. One `.perf` file classifies a time-scored scenario
 
 **Observed:** Aimcurve classifies each run from its own `.perf` file, using
 two independent signals. The header's `time_limit` holds `1000`, which
 KovaaK's uses as its "no time limit" value. The per-second score ticks count
 down with the clock: the first is positive and each later one is minus the
-seconds elapsed since the tick before. Aimcurve requires both, so that a
-format change degrades a scenario to "unsupported" instead of the wrong
-kind. In its corpus the two signals agree on 153 of 153 such runs, and
-score plus elapsed time is 1,000 on every one.
+seconds elapsed since the tick before. Neither signal is a scoring type on
+its own. The published schema has no such field, and `1000` says only that
+the run has no time limit. Aimcurve requires both, so that a run where they
+disagree, or a format change, degrades to "unsupported" instead of the
+wrong kind. In its corpus the two signals agree on 153 of 153 such runs,
+and score plus elapsed time is 1,000 on every one.
 [Scoring model, D2 and D3][scoring], [format notes][perf-format].
 
 **Verified locally:** The same two tests were applied to all 1,764 local
@@ -87,20 +91,25 @@ scenario's runs, with run length taken from the stats file's name and its
 `Challenge Start:` line. Its fitted constants are 999.48 to 999.71 with up
 to 0.53 s of spread, and it notes that thirteen single-run scenarios "are
 likely time-scored too, but one run can't show it". The
-[RefleK's survey](refleks_learnings.md) lists the header's fields without
-this use of them.
+[RefleK's survey](refleks_learnings.md) lists the file's header fields and
+events without this use of them.
 
 **Recommendation:** Put this evidence in front of the pace proposal's
 reviewers before its detection design is settled. Where any run of a
-scenario has a `.perf`, the header answers the question from one run, with
-the constant read instead of fitted. The fit stays necessary as the
-fallback for scenarios whose runs all predate `.perf`. Three costs come
-with it:
+scenario has a `.perf`, that one run can classify the scenario, provided
+the classification requires both signals: the `1000` sentinel and the
+countdown. The sentinel alone is not enough. A run with no time limit whose
+score accumulates has to stay unclassified, as it does in Aimcurve. With
+both signals present, the constant is read from the header instead of
+fitted. The fit stays necessary as the fallback for scenarios whose runs
+all predate `.perf`. Three costs come with it:
 
 - A second directory to read. `performances` sits beside `stats`, and the
   stats-folder setting names only `stats`.
-- A protobuf reader. The script's is about sixty lines of dependency-free
-  Python, and it decoded every local file without error.
+- A protobuf reader. The countdown test needs the score events as well as
+  the header, so the reader decodes the whole file. The script's is about
+  sixty lines of dependency-free Python, and it decoded every local file
+  without error.
 - An identity question. The header carries the scenario's hash, and our run
   model groups runs by name. Aimcurve saw no hash with both kinds.
 
