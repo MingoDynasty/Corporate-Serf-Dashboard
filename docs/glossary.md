@@ -109,8 +109,8 @@ percentile.
 ### Percentile
 
 The share of a scenario's leaderboard the player places above, as a
-percentage, so higher is better. It comes from position and total players; the
-formula is in [scenario_rank.md](specs/scenario_rank.md#domain-model).
+percentage, so higher is better. It comes from position and total players; how
+it is derived is in [scenario_rank.md](specs/scenario_rank.md#domain-model).
 
 ### From cache
 
@@ -143,6 +143,8 @@ How much a benchmark scenario's PB has to grow to reach its next rank, as a
 percentage of the PB, such as +4.8% to Gold. With every rank reached, it reads
 Top rank
 ([2026-09-27](decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
+How the gap is computed and shown is in
+[playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
 - On screen: the Next Rank column.
 - In code: `next_tier`.
