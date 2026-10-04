@@ -11,7 +11,7 @@ That is a bookkeeping choice, not a license conflict: this project is
 AGPL-3.0, whose section 13 permits combining with GPL-3.0 work, but any file
 taken from refleks would stay GPL-3.0 and need recording like the vendored
 assets (see the
-[AGPL decision](decision_log.md#2026-08-10-the-project-is-agpl-30-and-contributors-sign-nothing)),
+[AGPL decision](../decision_log.md#2026-08-10-the-project-is-agpl-30-and-contributors-sign-nothing)),
 and this tree keeps its own code under one license. Everything below is
 described at the idea/format level for that reason.
 
@@ -80,7 +80,7 @@ derive: real-TTK series, 5-kill moving average with linear-regression slope and
 R² (fatigue/warm-up within a run), cumulative accuracy over time, per-kill
 accuracy, kills-per-minute, TTK percentiles (p10/p90/median/stddev), longest
 no-kill gap, and KPM-vs-accuracy Pearson correlation. All new signal from files
-we already ingest — [data_service.py](../source/kovaaks/data_service.py)
+we already ingest — [data_service.py](../../source/kovaaks/data_service.py)
 currently reads only the summary/weapon sections.
 
 Day-boundary handling: kill timestamps are time-of-day only; deltas that go
@@ -97,7 +97,7 @@ sometimes emits non-UTF-8 files. Their detection order:
    BOM-less UTF-16; more nulls at odd offsets → LE, else BE.
 
 We open with plain `encoding="utf-8"`
-([data_service.py:395](../source/kovaaks/data_service.py)), which would raise
+([data_service.py:395](../../source/kovaaks/data_service.py)), which would raise
 on such a file.
 
 ## KovaaK's API learnings
@@ -110,7 +110,7 @@ GET /webapp-backend/user/scenario/last-scores/by-name?username=<name>&scenarioNa
 
 Recent scores for one user on one scenario. Refleks calls it with the Steam
 *persona name* (`internal/scenarios/service.go`). Candidate addition to
-[kovaaks_api_notes.md](kovaaks_api_notes.md) even if unused.
+[kovaaks_api_notes.md](../kovaaks_api_notes.md) even if unused.
 
 ### 5. Response shape of `/benchmarks/player-progress-rank-benchmark`
 
@@ -239,7 +239,7 @@ Impressive, but requires native input hooks — a heavy lift for a Dash app.
 
 1. Document the two API findings (last-scores endpoint; progress endpoint
    response shape and ×100 score scaling) in
-   [kovaaks_api_notes.md](kovaaks_api_notes.md).
+   [kovaaks_api_notes.md](../kovaaks_api_notes.md).
 2. Harden stats CSV reading against UTF-16/BOM encodings in
    `data_service.py`.
 3. Proposal: parse kill-event rows → within-run analytics (TTK trend,
