@@ -105,8 +105,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
     (#317) recommended building the session review first.
 
   The [current proposal](./proposals/run_history_proposal.md) predates this
-  order. Its "sessions later" decision is marked superseded, and a rewritten
-  proposal will replace it. Baseline in
+  order. Its "sessions later" decision and its view order are marked
+  superseded, and a rewritten proposal will replace it. Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
 - **Time-scored scenarios measured by pace** — some scenarios are scored as a
   constant minus the completion time, and on those a percentage of the score
@@ -199,8 +199,8 @@ next.
   typical run, a trend, a rank-up chance, "unknown", and whether a bar the
   player set was met. A verdict answers the question, and what to do about it
   in training stays the player's call: the app doesn't say what to play or
-  when to stop. Moving past verdicts needs strong evidence and a decision of
-  its own.
+  when to stop. Moving past verdicts takes a decision of its own, and advice
+  the app vouches for takes strong evidence first.
 - **Compose, don't replicate.** Each milestone reuses the rank, percentile,
   threshold, and trend logic from earlier milestones rather than introducing
   parallel mechanisms.
@@ -211,3 +211,7 @@ next.
   occasional-insight features, even when the latter are cheaper to build.
 - **Plan one horizon deep.** Detail what's next; keep the further-out work as
   brief mentions until it's the next thing up.
+
+The typical-run, uncertainty, and verdict principles are recorded with their
+evidence, its limits, and the options set aside in the
+[decision log](./decision_log.md#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice).
