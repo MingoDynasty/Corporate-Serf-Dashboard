@@ -6,8 +6,8 @@
 > likely change materially before then; the navigation/UI surface below is
 > intentionally left open and should be revisited at build time. Only the
 > durable data-model and sequencing decisions are meant to survive that long.
-> One of them, "sessions later", is now superseded, and a rewritten proposal
-> will replace this file.
+> Two of them are now superseded, "sessions later" and the order the views
+> ship in, and a rewritten proposal will replace this file.
 
 ## TL;DR
 
@@ -63,12 +63,16 @@ capture is required.
   - **Superseded** by row D4 of
     [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327):
     sessions and visits are built first, as the foundation the history views
-    and later features share, not as a later layer. Which view ships first
-    stays open for the rewrite that will replace this file.
+    and later features share, not as a later layer.
 - **Sequencing within the feature:** ship view (2), the per-scenario history,
   first — it needs no sessionization. View (1), the current-session view,
   arrives *with* the sessionization layer, since "current session" is
   precisely what requires a session boundary to exist.
+  - **Superseded** by row D4 of
+    [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327):
+    sessions and visits come before either view, so "it needs no
+    sessionization" no longer sets the order. Which view ships first is open,
+    for the rewrite to decide.
 - **Sessions are gap-based, not per-calendar-day.** A new session begins when
   the gap between consecutive runs exceeds a threshold. This handles
   morning-vs-night blocks automatically and crosses midnight cleanly, unlike a
