@@ -109,16 +109,17 @@ What we plan to do now or very soon, each with the reasons it comes next.
   order. Its "sessions later" decision and its view order are marked
   superseded, and a rewritten proposal will replace it. Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **Time-scored scenarios measured by pace** — some scenarios are scored as a
-  constant minus the completion time, and on those a percentage of the score
-  understates the real change several times over. So the percentages the app
-  shows there, the Next Rank gap and the score threshold among them, make
-  those scenarios look closer to ranking up and easier to pass than they
-  are. The fix measures them by completion time instead. Why now: it's a bug
-  in shipped features, and a small one. It's a correctness fix rather than a
-  milestone, so it runs beside Run history, with a proposal of its own
-  (#329). It changes the ruled definition of the Next Rank gap, so it needs a
-  ruling of its own.
+- **Time-scored scenarios measured by pace** — some scenarios score the time
+  left on a countdown when the task is done, and on those a percentage of the
+  score understates the real change several times over. So the percentages
+  the app shows there, the Next Rank gap and the score threshold among them,
+  make those scenarios look closer to ranking up and easier to pass than they
+  are. The fix measures them by pace: how fast a run finishes compared with
+  the personal best. Why now: it's a bug in shipped features, and a small
+  one. It's a correctness fix rather than a milestone, so it runs beside Run
+  history. Its design is ratified in
+  [`time_scored_pace_proposal.md`](./proposals/time_scored_pace_proposal.md),
+  and one implementation PR follows.
 ---
 
 ## Future (briefly)
@@ -194,8 +195,8 @@ next.
   runs behind it says so, and a scenario isn't ranked weak or strong until it
   has enough. A figure that can only be a minimum is labelled one, such as
   time spent in runs, which leaves out the time between runs and any attempt
-  that wrote no file. An estimate is shown no more precisely than it's known,
-  such as "about 1 in 25 runs" rather than "4.1%".
+  that wrote no stats file. An estimate is shown no more precisely than it's
+  known, such as "about 1 in 25 runs" rather than "4.1%".
 - **State verdicts, not advice.** The app states facts and verdicts: the
   typical run, a trend, a rank-up chance, "unknown", and whether a bar the
   player set, such as the score threshold, was met. A verdict answers the
