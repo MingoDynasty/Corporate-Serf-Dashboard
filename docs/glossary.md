@@ -88,6 +88,13 @@ identity, because names aren't unique
 - Also called share code, KovaaK's own name for it.
 - In code: `code` on a playlist, and `playlist_code` elsewhere.
 
+### Stalest
+
+Of the scenarios in a playlist that the player has played, the one played
+longest ago ([playlists.md](specs/playlists.md#the-overview)).
+
+- Not From cache, which the code calls `stale`.
+
 ## Leaderboard standing
 
 ### Position
@@ -123,6 +130,7 @@ from the cache routinely carries no mark
 ([scenario_rank.md](specs/scenario_rank.md#failure-handling)).
 
 - In code: `stale`, as in a result served stale.
+- Not Stalest, which is about when a scenario was last played.
 
 ## Benchmark ranks
 
