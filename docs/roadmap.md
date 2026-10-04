@@ -88,10 +88,11 @@ What we plan to do now or very soon, each with the reasons it comes next.
 
 - **Run history and sessions, sessions first** — a reviewable record of past
   runs that the per-run toast can't provide: the session in progress, recent
-  sessions, and a scenario's history over weeks. The app splits the runs into
-  sessions at a gap between runs, and each session into visits, a visit being
-  an unbroken stretch of runs on one scenario. Sessions and visits are built
-  first, as the foundation the history views stand on, not as a later layer.
+  sessions, and a scenario's history over weeks. The app will split the runs
+  into sessions at a gap between runs, and each session into visits, a visit
+  being an unbroken stretch of runs on one scenario. Sessions and visits are
+  built first, as the foundation the history views stand on, not as a later
+  layer.
   The milestone retires the interim per-run lines the watchdog writes to the
   debug log. Why it's next, and why sessions first:
   - Nearly every planned feature needs sessions and visits: history grouped
@@ -192,15 +193,16 @@ next.
 - **Be honest about uncertainty.** Unknown isn't weak: a judgment with too few
   runs behind it says so, and a scenario isn't ranked weak or strong until it
   has enough. A figure that can only be a minimum is labelled one, such as
-  time spent in runs, since a restarted run leaves no file. An estimate is
+  time spent in runs, since a restarted attempt leaves no file. An estimate is
   shown no more precisely than it's known, such as "about 1 in 25 runs"
   rather than "4.1%".
 - **State verdicts, not advice.** The app states facts and verdicts: the
   typical run, a trend, a rank-up chance, "unknown", and whether a bar the
-  player set was met. A verdict answers the question, and what to do about it
-  in training stays the player's call: the app doesn't say what to play or
-  when to stop. Moving past verdicts takes a decision of its own, and advice
-  the app vouches for takes strong evidence first.
+  player set, such as the score threshold, was met. A verdict answers the
+  question, and what to do about it in training stays the player's call: the
+  app doesn't say what to play or when to stop. Moving past verdicts takes a
+  decision of its own, and advice the app vouches for takes strong evidence
+  first.
 - **Compose, don't replicate.** Each milestone reuses the rank, percentile,
   threshold, and trend logic from earlier milestones rather than introducing
   parallel mechanisms.

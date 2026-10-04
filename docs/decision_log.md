@@ -65,7 +65,7 @@ this app.
 behind it says so, and a scenario isn't ranked weak or strong until it has
 enough: unknown rows sort as a group of their own, never at either end of a
 weakness sort. A figure that can only be a minimum is labelled one wherever
-it's shown, such as time spent in runs, because a restarted run leaves no
+it's shown, such as time spent in runs, because a restarted attempt leaves no
 file. An estimate is shown no more precisely than it's known. Under-sampling
 is the common case: 23 of the 39 scenarios in the maintainer's current
 benchmark had fewer than 10 lifetime runs. How much is enough isn't set here,
@@ -73,16 +73,16 @@ and it isn't only a run count: the runs also have to be comparable, and the
 estimate's model has to hold.
 
 **D3, verdicts, not advice.** The app states facts and verdicts: the typical
-run, a trend, a rank-up chance, "unknown", and whether a bar the player set
-was met. A result measured against something the player set is still a
-verdict. Telling the player what to play or when to stop is advice, and the
-app doesn't give it. The rule covers training decisions only, so a notice
-that asks for a setting isn't advice. Verdicts only is the simplest option
-and the easiest to reverse: adding advice later is cheap, and taking away
-advice people rely on is not. It keeps one player's regimen from being
-imposed on every user, and it matches every string the app shows today. The
-cost is accepted: a "leave now or keep going" line shrinks to the facts the
-player's own rule reads.
+run, a trend, a rank-up chance, "unknown", and whether a bar the player set,
+such as the score threshold, was met. A result measured against something the
+player set is still a verdict. Telling the player what to play or when to
+stop is advice, and the app doesn't give it. The rule covers training
+decisions only, so a notice that asks for a setting isn't advice. Verdicts
+only is the simplest option and the easiest to reverse: adding advice later
+is cheap, and taking away advice people rely on is not. It keeps one player's
+regimen from being imposed on every user, and it matches every string the app
+shows today. The cost is accepted: a "leave now or keep going" line shrinks
+to the facts the player's own rule reads.
 
 Two options were set aside for now. Rules the player sets would add rule
 semantics and a settings surface, and a default rule is advice by another
@@ -119,6 +119,10 @@ is one pure pass over runs the app already holds in time order. Which view
 ships first is open, for the proposal's rewrite to decide. The roadmap
 carries the milestone's reasons and the Future list, which is planned work in
 no particular order.
+
+**Terms.** Typical run, visit, and rank-up chance are working words here, not
+[glossary](glossary.md) terms: nothing ships them yet. The proposal that
+ships each one names and defines it in its Terms block, and may rename it.
 
 ## 2026-09-30: A Glossary Says What The App's Own Terms Mean
 

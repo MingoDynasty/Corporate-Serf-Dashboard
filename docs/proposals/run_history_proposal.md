@@ -62,17 +62,17 @@ capture is required.
   automate that, but the views work without them.
   - **Superseded** by row D4 of
     [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327):
-    sessions and visits are built first, as the foundation the history views
-    and later features share, not as a later layer.
+    sessions are built first, as the foundation the history views and later
+    features share, not as a later layer.
 - **Sequencing within the feature:** ship view (2), the per-scenario history,
   first — it needs no sessionization. View (1), the current-session view,
   arrives *with* the sessionization layer, since "current session" is
   precisely what requires a session boundary to exist.
   - **Superseded** by row D4 of
     [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327):
-    sessions and visits come before either view, so "it needs no
-    sessionization" no longer sets the order. Which view ships first is open,
-    for the rewrite to decide.
+    sessions come before either view, so "it needs no sessionization" no
+    longer sets the order. Which view ships first is open, for the rewrite to
+    decide.
 - **Sessions are gap-based, not per-calendar-day.** A new session begins when
   the gap between consecutive runs exceeds a threshold. This handles
   morning-vs-night blocks automatically and crosses midnight cleanly, unlike a
