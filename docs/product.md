@@ -442,8 +442,8 @@ user problems (each becomes a roadmap milestone when it's next up):
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.
 - *"How did the rest of this session go?"* — a reviewable run history; the
-  per-run toast is ephemeral and the console log is a developer-facing
-  stopgap.
+  per-run toast is ephemeral and the watchdog's debug-log lines are a
+  developer-facing stopgap.
 
 ## Maintaining this doc
 
