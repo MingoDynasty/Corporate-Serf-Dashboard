@@ -62,7 +62,8 @@ of scope here, apart from its chart toolbar, noted under The graph.
 
 ## The controls row
 
-- The row holds, in order: the "Playlist filter" select, the "Selected
+- The row holds, in order: the "Playlist filter" select, with the "Open
+  scenario table" link beneath it while a playlist is selected, the "Selected
   scenario" searchable select (placeholder "Select a scenario"), the
   "Follow newly played scenario" switch beneath it, the "Top N scores"
   number input (default `5`, minimum 1), the "Oldest date to consider" date
@@ -75,6 +76,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation
   ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
+- While the playlist filter holds a loaded playlist, the "Open scenario
+  table" link under it leads to that playlist's scenario table at
+  `/playlists/{code}`, which opens in playlist order
+  ([playlists.md](playlists.md#routes-and-navigation)). There is no link, and
+  no room held for one, while the filter is empty or holds a remembered code
+  that no longer resolves. The callback that lists the playlist's scenarios
+  writes the link, so it arrives with that list just after the page paints,
+  whether the selection was remembered, made by hand, or named by
+  `?playlist_code=`.
 - The row's responsive rules measure the content area rather than the
   window, and the two wide dropdowns narrow from their 400px target toward a
   200px floor before the row wraps
