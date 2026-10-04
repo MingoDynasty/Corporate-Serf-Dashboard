@@ -17,23 +17,32 @@ behavior.
 
 ## Decisions needed
 
-The maintainer's part of this proposal is in three states:
+The maintainer's part of this proposal is decided:
 
-- **Settled, and not review targets.** The maintainer agreed on 2026-09-28
-  that the behavior is a bug and set the constraints listed under
+- **Settled constraints.** The maintainer agreed on 2026-09-28 that the
+  behavior is a bug and set the constraints listed under
   [Settled by the maintainer](#settled-by-the-maintainer).
-- **Ruled.** P8, on 2026-10-04.
-- **Open.** P1 and P2. P1 changes a ratified decision, so it needs an
-  explicit ruling. The two should be ruled together: the ratified decision's
-  own rationale is that the gap and the threshold measure the same way, and
-  accepting one alone breaks that.
+- **Ruled rows.** P1, P2, and P8, all on 2026-10-04. P1 and P2 were ruled
+  together, each as its recommendation. They belong together because the
+  ratified decision P1 amends rests on the gap and the threshold measuring
+  the same way.
+
+Neither is a review target. A ruled row reopens only on material new
+evidence. Each keeps its recommendation and the alternatives it rejected,
+for the record.
 
 Everything else is author-owned and open to challenge. Design tags each such
-choice with its row ID: P3, P6, P7, P9, and P10. No row is ratified.
+choice with its row ID: P3, P6, P7, P9, and P10. Those rows are still under
+review, so the proposal as a whole is not ratified.
 
 ### P1 — The Next Rank gap on a time-scored scenario is a pace gap
 
-Status: Open. Amends a ratified decision, #320's D1, in part.
+Status: Ruled (user), 2026-10-04: accept the recommendation below. Amends a
+ratified decision, #320's D1, in part.
+
+The material consequence: wherever pace applies, the implementation computes
+the gap by pace and the cell reads "faster", and the shipping PR supersedes
+D1 in part.
 
 **Recommendation: on a time-scored scenario, the gap is how much faster the
 PB run has to finish to reach the next rank.** It is
@@ -90,7 +99,11 @@ Choosing differently:
 
 ### P2 — The Score Threshold on a time-scored scenario is a percentage of PB pace
 
-Status: Open.
+Status: Ruled (user), 2026-10-04: accept the recommendation below.
+
+The material consequence: wherever pace applies, the chart line and the
+verdict measure by pace, the setting stays one global percentage, and the
+shipping PR supersedes the 2026-07-08 verdict formula for those scenarios.
 
 **Recommendation: at 95%, a run passes when it is at least 95% as fast as
 the PB, which means finishing within the PB's time divided by 0.95.** The
@@ -613,11 +626,11 @@ Changed entries:
 
 ## Delivery plan
 
-One implementation PR, after P1 and P2 are ruled and this proposal merges.
-It has no other dependency and can run beside the Run History work.
-Recommended implementer: `claude-opus-5-5` at high. Once the rows are ruled,
-the change is specified down to its strings, and unit tests plus one live
-check verify it.
+One implementation PR. P1 and P2 are ruled, so it can start once this
+proposal merges. It has no other dependency and can run beside the Run
+History work. Recommended implementer: `claude-opus-5-5` at high. The change
+is specified down to its strings, and unit tests plus one live check verify
+it.
 
 - **Code:**
   - a reader for the performance file and the countdown check, as pure
