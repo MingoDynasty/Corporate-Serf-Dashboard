@@ -86,19 +86,32 @@ def test_help_icon_labels_inherit_the_input_label_font():
 def test_playlist_filters_start_at_the_pages_left_edge():
     """The filter is the first control in its row, so an indent on it puts
     the row outside the left rail the graph and everything below share."""
-    for page, component_id in (
-        (home.layout(), "playlist-dropdown-selection"),
-        (journey.layout(), "playlists-multi-select"),
+    home_page = home.layout()
+    # Home's filter sits in a column with its link, and an indent on the
+    # column moves the filter just as one on the filter would.
+    home_field = next(
+        (
+            component
+            for component in _walk_components(home_page)
+            if getattr(component, "className", None) == home.PLAYLIST_FIELD_CLASS
+        ),
+        None,
+    )
+    home_filter = _component_by_id(home_page, "playlist-dropdown-selection")
+    journey_picker = _component_by_id(journey.layout(), "playlists-multi-select")
+    for name, selector in (
+        ("playlist-dropdown-selection", home_filter),
+        (home.PLAYLIST_FIELD_CLASS, home_field),
+        ("playlists-multi-select", journey_picker),
     ):
-        selector = _component_by_id(page, component_id)
-        assert selector is not None, f"{component_id} is missing from its page"
+        assert selector is not None, f"{name} is missing from its page"
 
         offsets = {
             prop: getattr(selector, prop, None)
             for prop in LEFT_OFFSET_PROPS
             if getattr(selector, prop, None) is not None
         }
-        assert not offsets, f"{component_id} carries a left offset: {offsets}"
+        assert not offsets, f"{name} carries a left offset: {offsets}"
 
 
 def test_field_labels_are_bolded_by_the_class_they_all_share():

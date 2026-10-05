@@ -88,6 +88,13 @@ identity, because names aren't unique
 - Also called share code, KovaaK's own name for it.
 - In code: `code` on a playlist, and `playlist_code` elsewhere.
 
+### Stalest
+
+Of the scenarios in a playlist that the player has played, the one played
+longest ago ([playlists.md](specs/playlists.md#the-overview)).
+
+- Not From cache, which the code calls `stale`.
+
 ## Leaderboard standing
 
 ### Position
@@ -98,13 +105,17 @@ word
 ([2026-07-06](decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 How it is fetched and cached is in [scenario_rank.md](specs/scenario_rank.md).
 
-- In code: `rank`, kept by the label-only rename.
+- In code: `rank`, except in the scenario table's row fields, which say
+  `position`.
 - Not Rank, which is the benchmark tier.
 
 ### Total players
 
 How many players a scenario's leaderboard holds, the denominator of the
 percentile.
+
+- In code: `total_players`, or `total` for short, as in the scenario table's
+  row fields, and `leaderboard_total` where the count is handled on its own.
 
 ### Percentile
 
@@ -120,6 +131,19 @@ from the cache routinely carries no mark
 ([scenario_rank.md](specs/scenario_rank.md#failure-handling)).
 
 - In code: `stale`, as in a result served stale.
+- Not Stalest, which is about when a scenario was last played.
+
+### Last updated
+
+When the app last stored a read of the player's position from KovaaK's
+leaderboard
+([2026-10-04](decision_log.md#2026-10-04-the-position-value-says-when-it-was-last-updated)).
+Where it appears is in [scenario_rank.md](specs/scenario_rank.md#caching).
+
+- In code: `fetched_at`.
+- Not when the app last tried: a failed attempt leaves it as it was.
+- Not when the position last moved: a read that finds the same position still
+  counts.
 
 ## Benchmark ranks
 
@@ -132,8 +156,8 @@ threshold, and a PB below the first one has No rank
 How a PB is placed on the ladder is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
-- In code: `tier` in the scenario table's row fields, because there `rank`
-  already means the position. In the ladder data, `rank` does mean the tier.
+- In code: `tier` in the scenario table's row fields, and `rank` in the ladder
+  data.
 - Not Position. No rank is not Unranked: No rank is below the first tier, and
   Unranked is no leaderboard entry.
 
@@ -166,7 +190,9 @@ sensitivity. It's the player's own record, not their leaderboard score
 
 - On screen: PB, also as the prefix of the PB run's stats, as in PB Score.
   Prose says personal best.
-- In code: `high_score`. The PB a run was chasing is its previous best.
+- In code: `high_score` for the score, or `pb_score` in the scenario table's
+  row fields, and `personal_best` or `pb` for the run that set it and that
+  run's stats. The PB a run was chasing is its previous best.
 
 ### Accuracy
 
