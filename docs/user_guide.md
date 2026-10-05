@@ -131,6 +131,14 @@ on a current version of KovaaK's, and once your personal best is from the
 scenario's current version. Until then, that scenario reads as every other
 one does, in percent of your score.
 
+A benchmark's scenario table also has a **View on Evxl** link beside its
+title. It opens that benchmark on [Evxl.app](https://evxl.app) in a new tab,
+where you can see what this app doesn't show, such as your overall rank for
+the benchmark. With a Steam ID set on the Settings page, the link goes
+straight to your own sheet. Without one, it goes to a page where Evxl asks for
+your profile, and a few benchmarks that Evxl can't open that way show no link
+until a Steam ID is set.
+
 On the Scenario Performance page, the **Open scenario table** link under the
 **Playlist filter** opens the scenario table of the playlist selected there.
 
@@ -213,8 +221,9 @@ updates working.
 
 With no KovaaK's username set, the running app makes no network requests on its own. Requests to
 KovaaK's identify themselves with the app's name, its version, and this repository's address.
-The GitHub, Discord, and **Report a bug** links in the app open in your browser; the app itself
-does not contact those sites. Sharing a chart is per click and never automatic: the toolbar
+The GitHub, Discord, **Report a bug**, and **View on Evxl** links in the app open in your
+browser; the app itself does not contact those sites. The **View on Evxl** address includes your
+Steam ID when one is set, so that Evxl opens your own sheet. Sharing a chart is per click and never automatic: the toolbar
 button opens a confirmation naming Plotly Cloud, confirming opens Plotly Cloud in a new browser
 tab, and the chart is handed over only once you are signed in there. **Download plot as a PNG**
 beside it saves to your PC instead. Without a connection, the launcher starts the version you
