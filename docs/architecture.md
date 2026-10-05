@@ -153,7 +153,8 @@ state, not a field grafted onto someone else's schema.
   It is `CSD_STATE_DIR` when set (the launcher owns that variable; the app only
   reads it) and the current working directory otherwise, so a dev checkout
   behaves exactly as it always has. Read-only assets that ship with the code —
-  `resources/benchmarks/` — resolve against the **package root** instead
+  `resources/benchmarks/` and the Evxl benchmark snapshot,
+  `resources/evxl/benchmarks.json` — resolve against the **package root** instead
   (derived from `__file__`), because a deployed install runs code from a
   per-version directory while state lives at the install root.
 - **In-memory only, no database.** `data_service.py` holds the live stores as
@@ -236,6 +237,7 @@ flowchart LR
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
         OverviewService["kovaaks/playlist_<br/>overview_service.py"]
         Visibility["kovaaks/playlist_<br/>visibility_service.py"]
+        EvxlLinks["kovaaks/<br/>evxl_links.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -265,6 +267,7 @@ flowchart LR
     WarmupService --> Visibility
     PlaylistScenarios --> DataService
     PlaylistScenarios --> PlaylistService
+    PlaylistScenarios --> EvxlLinks
     Journey --> DataService
     Journey --> PlotService
     SettingsPage --> WarmupService
@@ -413,7 +416,9 @@ flowchart LR
   generation token, the interval left disabled, and the condition stated in
   the status line (see decision log), so no lookup runs over a pass that would
   fetch nothing. A benchmark's `layout` adds the Rank and Next Rank columns
-  after PB Score. The table's sort lives in the page URL as `?sort=`:
+  after PB Score, and its header a "View on Evxl" link built by
+  `evxl_links.evxl_benchmark_url`. The link is `html.A`, not `dmc.Anchor`,
+  which percent-decodes an href (see decision log). The table's sort lives in the page URL as `?sort=`:
   `layout` seeds `initialSort` on a fresh copy of the column defs from a
   value valid for that page's columns, and a clientside callback on the
   grid's `columnState` rewrites the key with a raw `history.replaceState`,
@@ -545,6 +550,13 @@ flowchart LR
   Playlists page renders it. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Scenario
   Performance filter, Journey picker, overview).
+- `evxl_links.py` — builds the address of a benchmark's page on Evxl
+  (`evxl_benchmark_url`): a player's sheet when a Steam ID is set, the
+  profile-less page otherwise, `None` when Evxl has no page the app can link.
+  Evxl's benchmark and difficulty names come from
+  `resources/evxl/benchmarks.json`, read once per process and keyed by
+  case-folded playlist code. No network: the browser opens the address
+  ([decision_log.md](decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
