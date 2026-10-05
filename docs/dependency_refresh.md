@@ -155,12 +155,13 @@ CI needs no edit, because `setup-uv` reads the pin from `pyproject.toml`.
 
 ### GitHub Actions
 
-A refresh reports these pins and does not move them on its own. The `test` job
-is this repository's copy of the
-[cross-repo tooling spec](decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)'s
-workflow. The spec, which the maintainer keeps outside this repository,
-carries these exact SHAs, and so does every other repository that follows it.
-Moving them here alone makes this copy drift from the spec.
+A refresh reports these pins and does not move them. They move through the
+[cross-repo tooling spec](decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec),
+which the maintainer keeps outside this repository. The `test` job is this
+repository's copy of the spec's workflow. The spec carries these exact SHAs,
+and so does every other repository that follows it, so moving them here alone
+makes this copy drift from the spec. A pin bump is a new version of the spec,
+which each repository then adopts.
 
 1. For each action in `.github/workflows/ci.yml`, find the latest release:
 
@@ -168,11 +169,11 @@ Moving them here alone makes this copy drift from the spec.
    gh api repos/<owner>/<action>/releases/latest --jq .tag_name
    ```
 
-2. Name any pin that is behind in the PR body. Whether to move it in the spec
-   is the maintainer's call.
+2. Name any pin that is behind in the PR body, as material for the next
+   version of the spec.
 
-When the maintainer says to move a pin, read the release notes for each major
-version crossed, and check the new SHA against its tag:
+When this repository adopts a spec version that moves a pin, read the release
+notes for each major version crossed, and check the new SHA against its tag:
 
 ```powershell
 gh api repos/<owner>/<action>/commits/<tag> --jq .sha

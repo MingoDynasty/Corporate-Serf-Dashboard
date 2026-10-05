@@ -96,6 +96,14 @@ every open branch on the old pin until that branch merges `main`.
 does not affect them; they have been on since 2026-08-30. The fix for an alert
 is a single-package upgrade made by hand, as its own PR.
 
+**The pinned GitHub Actions.** Ruled (user) 2026-10-04, in chat: they move
+through the cross-repo tooling spec
+([2026-07-06 entry](#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)),
+never in a refresh of this repository alone. The spec carries their SHAs, and
+every repository that follows it carries the same ones. A refresh therefore
+only reports a pin that is behind, and a bump arrives as a new version of the
+spec.
+
 ## 2026-09-30: A Glossary Says What The App's Own Terms Mean
 
 Status: Accepted
