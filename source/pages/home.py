@@ -1130,11 +1130,15 @@ def _build_live_run_notification(
 
     shown_percentage = _shown_percentage(verdict)
     if verdict.passed:
-        detail = f"Also {placement}." if placed else "Ready to move on."
+        # A pass ends at the fact: a line saying what to do next would be
+        # advice, and the app states verdicts only.
+        message = f"{score}, {shown_percentage:.1f}% of PB."
+        if placed:
+            message += f" Also {placement}."
         return toast(
             _RUN_VERDICT_CHANNEL,
             "Threshold passed",
-            f"{score}, {shown_percentage:.1f}% of PB. {detail}",
+            message,
             color="green",
             icon=local_icon("material-symbols:check"),
         )

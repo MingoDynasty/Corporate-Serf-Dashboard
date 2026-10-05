@@ -96,11 +96,12 @@ a default rule the app vouches for, and no check came before it. Ruled
 [in review](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179636701):
 the line is retired. That toast ends at the fact, and the placed variant and
 every other toast are unchanged. D3 supersedes that D4 in part: its other
-half, which dropped "Keep grinding...", stands. The string changes in
+half, which dropped "Keep grinding...", stands. The string changed in
+PR #341,
 [a PR of its own](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179646591),
-also ruled on 2026-10-04. That PR updates the notifications spec and the pace
-proposal's Copy block with it, and adds the supersession note to the
-2026-09-14 entry. Until it lands, the app still shows the line.
+as also ruled on 2026-10-04. That PR updated the notifications spec and the
+pace proposal's Copy block with it, and added the supersession note to the
+2026-09-14 entry.
 
 Two options were set aside for now. Rules the player sets would add rule
 semantics and a settings surface, and a default rule is advice by another
@@ -1717,7 +1718,11 @@ migration.
 
 ## 2026-09-14: App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-10-04 skill-judgment entry](#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice):
+D4 keeping "Ready to move on." on a passed run that did not place no longer
+holds, and that toast now ends at the fact. D4 dropping "Keep grinding..."
+from the below-threshold toast stands. Everything else here stands.
 
 The app's text was written one feature at a time, so the same condition read
 differently from page to page and some messages sounded like log lines. Every
