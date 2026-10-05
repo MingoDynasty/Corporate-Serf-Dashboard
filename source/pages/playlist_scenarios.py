@@ -117,7 +117,7 @@ TABLE_COLUMN_DEFS = [
         },
         "cellClass": {
             "function": (
-                "params.data.position_pending ? 'playlist-rank-pending' : null"
+                "params.data.position_pending ? 'playlist-cell-pending' : null"
             )
         },
         "comparator": {"function": "nullsLastComparator"},
@@ -131,7 +131,7 @@ TABLE_COLUMN_DEFS = [
             "function": "params.data.total_pending ? '' : params.data.total_display"
         },
         "cellClass": {
-            "function": ("params.data.total_pending ? 'playlist-rank-pending' : null")
+            "function": ("params.data.total_pending ? 'playlist-cell-pending' : null")
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -151,7 +151,7 @@ TABLE_COLUMN_DEFS = [
         },
         "cellClass": {
             "function": (
-                "params.data.percentile_pending ? 'playlist-rank-pending' : null"
+                "params.data.percentile_pending ? 'playlist-cell-pending' : null"
             )
         },
         "comparator": {"function": "nullsLastComparator"},

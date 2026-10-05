@@ -2123,7 +2123,7 @@ def test_playlist_scenarios_rank_columns_use_explicit_pending_flags():
         "function": "params.data.position_pending ? '' : params.data.position_display"
     }
     assert columns["position_sort"]["cellClass"] == {
-        "function": "params.data.position_pending ? 'playlist-rank-pending' : null"
+        "function": "params.data.position_pending ? 'playlist-cell-pending' : null"
     }
     assert "total_pending" in columns["total_sort"]["valueFormatter"]["function"]
     assert (
