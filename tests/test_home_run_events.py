@@ -747,6 +747,7 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         "get_time_vs_runs",
         lambda *_args: {"2026-07-06": [object()]},
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(
         home,
         "generate_time_plot",
@@ -790,6 +791,7 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
         "get_time_vs_runs",
         lambda *_args: {"2026-07-06": [object()]},
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(
         home,
         "generate_time_plot",
@@ -851,6 +853,7 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
         "get_time_vs_runs",
         lambda *_args: {"2026-07-06": [object()]},
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(
         home,
         "generate_time_plot",
