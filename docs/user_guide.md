@@ -122,10 +122,13 @@ straight to your own sheet. Without one, it goes to a page where Evxl asks for
 your profile, and a few benchmarks that Evxl can't open that way show no link
 until a Steam ID is set.
 
+On the Scenario Performance page, the **Open scenario table** link under the
+**Playlist filter** opens the scenario table of the playlist selected there.
+
 A playlist's scenario table keeps its sort when you come back to it with the
-browser's Back button, but opening the playlist fresh from the Playlists page
-starts it in playlist order; to clear a sort, click a sorted column's header
-until the table returns to that order.
+browser's Back button, but opening the playlist fresh, from the Playlists page
+or from that link, starts it in playlist order; to clear a sort, click a sorted
+column's header until the table returns to that order.
 
 ## Troubleshooting
 

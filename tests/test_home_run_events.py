@@ -309,16 +309,16 @@ def test_threshold_pass_headlines_over_the_placement_it_also_earned():
     )
 
 
-def test_threshold_pass_without_a_placement_points_at_the_next_scenario():
+def test_threshold_pass_without_a_placement_ends_at_the_fact():
+    # Verdicts, not advice: nothing after the percentage tells the player what
+    # to do next.
     notification = _notification(
         _payload(score=830.0, scenario_previous_best=800.0, nth_score=9),
         score_threshold_percentage=102.5,
     )
 
     assert notification["title"] == "Threshold passed"
-    assert notification["message"] == (
-        "Scenario A: 830.00, 103.8% of PB. Ready to move on."
-    )
+    assert notification["message"] == "Scenario A: 830.00, 103.8% of PB."
 
 
 def test_threshold_passes_at_exactly_the_goal():

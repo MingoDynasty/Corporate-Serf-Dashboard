@@ -625,16 +625,16 @@ a.playlist-scenarios-evxl-link:hover {
 /* Explicit progressive-fill state: values can legitimately be null after a
    lookup resolves, so the row's pending flags -- never value nullity -- enable
    this activity affordance. The static ellipsis is the animation fallback. */
-.playlist-rank-pending {
+.playlist-cell-pending {
     color: var(--mantine-color-dimmed);
 }
 
-.playlist-rank-pending::after {
-    animation: playlist-rank-pending-ellipsis 1.2s steps(3, end) infinite;
+.playlist-cell-pending::after {
+    animation: playlist-cell-pending-ellipsis 1.2s steps(3, end) infinite;
     content: "…";
 }
 
-@keyframes playlist-rank-pending-ellipsis {
+@keyframes playlist-cell-pending-ellipsis {
     0% {
         content: ".";
     }
