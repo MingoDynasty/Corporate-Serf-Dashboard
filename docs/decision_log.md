@@ -264,6 +264,110 @@ one with no performance file: both keep the score math.
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.
 
+## 2026-10-04: Upgrades Skip Package Versions Younger Than A Week
+
+Status: Accepted
+
+uv ignores any package version published in the last seven days. A hijacked
+package is usually caught and withdrawn within days, so the delay keeps one
+out of the lockfile and out of the next release. A contributor who needs a
+newer version sooner exempts that one package. A refresh holds the uv release
+it pins to the same week, by hand.
+
+**Ruling.** Ruled (user) 2026-10-04, in chat, on PR #340. The setting is
+`exclude-newer = "7 days"` under `[tool.uv]` in `pyproject.toml`. It lands
+with the first refresh after this entry, not with the entry: adding it changes
+`uv.lock`, and a change to `uv.lock` cuts a release.
+
+**Why.** Updates here are made by hand
+([2026-10-04 entry](#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook)),
+and a plain `uv lock --upgrade` takes the newest version of everything. On
+2026-10-04, 13 of the 25 pending updates would have resolved to a version
+under seven days old. Merging a lock cuts a release, so those versions reach
+installed copies.
+
+**Why in `pyproject.toml`.** Measured under uv 0.12.13 on 2026-10-04. uv
+records the setting in the lock's `[options]` as a span
+(`exclude-newer-span = "P7D"`) beside a placeholder date, so the lock does not
+go stale as time passes. `uv sync --locked`, which CI and the installer both
+run, compares those options with the project's. Passing `--exclude-newer` only
+on the upgrade command writes an option the project does not have, and
+`uv sync --locked` then exits 1. Adding the setting to an existing lock moves
+no package version.
+
+**The exemption.** `exclude-newer-package = { <name> = false }` lifts the limit
+for one package, and uv records it in the lock the same way. It is for a fix
+that cannot wait a week, usually one for a security alert. It comes out at the
+first refresh after the exempted version is a week old, never sooner: removed
+while the version is still under the limit, `uv lock` moves the package back
+to an older version and exits 0, which would undo the fix without a warning.
+
+**The uv pin.** Ruled (user) 2026-10-05, in the review of PR #340: the same
+week applies to the uv release a refresh pins. Every install downloads that
+exact build and runs it, so the reasoning for packages holds at least as
+strongly here. uv publishes often, with ten releases in the 23 days before
+2026-10-04, so its latest release is usually days old. The setting cannot
+enforce this, because it governs the packages uv resolves and not uv itself.
+A refresh applies it by hand and pins the newest release at least a week old.
+
+## 2026-10-04: Dependency Updates Stay Manual, Run From A Playbook
+
+Status: Accepted
+
+Dependencies and toolchain pins are updated by hand, about once a month, from
+a written playbook. No bot opens update PRs, and no scheduled job reports what
+is outdated. A contributor who wants newer versions runs the playbook at a
+quiet point in the project.
+
+**Ruling.** Ruled (user) 2026-10-04, in chat, on PR #340: updates stay manual,
+and no bot opens update PRs. The scheduled check was skipped "for now", so it
+is the part of this entry most likely to be revisited. The procedure is
+[docs/dependency_refresh.md](dependency_refresh.md).
+
+**Why no scheduled check.** It would answer a question whose answer is always
+yes. On 2026-10-04, 22 days after the previous refresh, 25 of the 84 locked
+packages had a newer release. The useful trigger is a quiet point in the
+project, which a timer cannot see: the uv pin is exact, so moving it strands
+every open branch on the old pin until that branch merges `main`.
+
+**Why no bot PRs.** Three reasons, the first of them mechanical.
+
+- Dependabot cannot run here. Its uv updater supports only the uv version it
+  bundles, and rejects an exact `required-version` pin that differs. Another
+  of the maintainer's repositories, on the same pin style, has failed every
+  monthly Dependabot uv run since 2026-08-01 with
+  `tool_version_not_supported`, and
+  [dependabot-core issue 13199](https://github.com/dependabot/dependabot-core/issues/13199)
+  was still open on 2026-10-04. The version Dependabot bundles was different
+  on each of those three runs (0.11.8, then 0.12.7, then 0.12.18), so no exact
+  pin could have kept up with it. The pin cannot be loosened to suit it: the
+  release job reads the pin into `release.json` and refuses anything but an
+  exact `==`, because every install provisions that version
+  ([2026-07-19 entry](#2026-07-19-the-installer-brings-its-own-toolchain-app-locally)).
+  Dependabot's security fix PRs run through the same updater, so they stay
+  off as well.
+- Renovate can refresh a uv lockfile, but it is a third-party app that needs
+  write access. On 2026-10-04 `main` required only the CI check, and a merge
+  that changes `uv.lock` cuts a release, so write access reaches installed
+  copies.
+- A green CI run does not make a version bump safe. plotly 7 put a new button
+  on both charts, which only a look at the running app could show
+  ([2026-09-12 entry](#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)),
+  and ruff 0.16 changed which rules were enabled. Two of the four refreshes
+  before this entry needed a judgment of that kind.
+
+**What stays automatic.** Dependabot alerts only read the lockfile, so the pin
+does not affect them; they have been on since 2026-08-30. The fix for an alert
+is a single-package upgrade made by hand, as its own PR.
+
+**The pinned GitHub Actions.** Ruled (user) 2026-10-04, in chat: they move
+through the cross-repo tooling spec
+([2026-07-06 entry](#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)),
+never in a refresh of this repository alone. The spec carries their SHAs, and
+every repository that follows it carries the same ones. A refresh therefore
+only reports a pin that is behind, and a bump arrives as a new version of the
+spec.
+
 ## 2026-10-04: A Benchmark's Scenario Page Links To Its Evxl Page
 
 Status: Accepted
