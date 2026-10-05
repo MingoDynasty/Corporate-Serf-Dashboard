@@ -9,6 +9,7 @@ import os
 import re
 import threading
 from collections import Counter, deque
+from collections.abc import Iterable
 from datetime import date, datetime
 from pathlib import Path
 
@@ -362,6 +363,35 @@ def get_personal_best_run(scenario_name: str) -> RunData | None:
 
     runs = kovaaks_database[scenario_name]["time_vs_runs"]
     return max(runs, key=lambda item: item.score, default=None)
+
+
+def new_high_score_runs(runs: Iterable[RunData]) -> set[RunData]:
+    """Find the runs that beat their scenario's PB when they were played.
+
+    ``runs`` is one scenario's whole history, at every sensitivity and in any
+    order; the runs are judged oldest first. A run counts when its score is
+    strictly above every earlier run's, the rule the personal best celebration
+    applies to a single new run. So a tie doesn't count and the earliest run
+    to reach a score holds it, and the first run only sets the baseline.
+    """
+    new_high_scores: set[RunData] = set()
+    best: float | None = None
+    for run in sorted(runs, key=lambda item: item.datetime_object):
+        if best is None:
+            best = run.score
+        elif run.score > best:
+            best = run.score
+            new_high_scores.add(run)
+    return new_high_scores
+
+
+def get_new_high_score_runs(scenario_name: str) -> set[RunData]:
+    """Return the runs of a scenario that were new PBs when they were played.
+
+    Judged over every run the scenario holds, never a filtered view of them:
+    a run the chart leaves out still decides which later runs beat the PB.
+    """
+    return new_high_score_runs(kovaaks_database[scenario_name]["time_vs_runs"])
 
 
 def get_sensitivities_vs_runs_filtered(

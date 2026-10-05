@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **New PB stars on the Score vs Time chart** — the chart now draws a gold
+  star on each plotted run that beat the scenario's personal best when it was
+  played, so it shows when each best was reached, including the ones a later
+  run the same day beat. The rule is the personal best celebration's, judged
+  over the scenario's whole history at every sensitivity. There is no
+  setting: the stars follow Point size, and the Score vs Sensitivity chart is
+  unchanged. The stars record achievements, and whether the player is
+  improving stays the trend verdict's question. (PR #346; design in #337)
+  Design rationale distilled into [`decision_log.md`](./decision_log.md).
 - **Rank and next-rank gap on benchmarks** — a benchmark's scenario table now
   shows the rank each personal best has reached and how much it has to grow
   to reach the next one, such as "+4.8% to Gold", with the threshold and the
@@ -66,20 +75,6 @@ sequence.
   the fields and keep their original label rather than being dropped. (PR
   #280; design in #277, rulings in #279) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **Personal best celebration** — a run that beats a scenario's personal best
-  now gets a short burst of confetti and a toast that says so, on whatever page
-  is open and for every scenario rather than only the one being watched. The
-  toast stays until it is dismissed, because the run that earned it was played
-  in a fullscreen game, and if the tab was hidden when the run landed the
-  animation waits for it to come back. A Settings control picks the
-  animation — Confetti, Fireworks, Cannons, or Stars — or turns the whole thing
-  off, with a Preview button beside it, and it is independent of Run
-  notifications. Run delivery moved into the app shell to make that possible,
-  which retired the "While you were away" catch-up digest: a run no longer
-  waits for a Scenario Performance visit to be announced. (PRs #261, #268,
-  #272; design in #248) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md); the follow-up that turned the switch
-  into the choice of styles landed in #272, which closes the arc.
 ---
 
 ## Upcoming milestones
