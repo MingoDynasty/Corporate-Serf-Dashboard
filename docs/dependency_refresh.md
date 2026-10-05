@@ -47,6 +47,38 @@ The Python version is not part of a refresh. Moving it touches
 `.python-version`, `requires-python`, and ruff's `target-version`, and is its
 own change.
 
+## Minimum package age
+
+`pyproject.toml` tells uv to ignore any package version published in the last
+seven days:
+
+```toml
+[tool.uv]
+exclude-newer = "7 days"
+```
+
+A hijacked package is usually caught and withdrawn within days. Without the
+setting, an upgrade takes versions that are hours old, and merging the lock
+ships them in the next release
+([2026-10-04 decision](decision_log.md#2026-10-04-upgrades-skip-package-versions-younger-than-a-week)).
+
+The setting lives in `pyproject.toml`, never only on the command line. uv
+records it in `uv.lock`, and `uv sync --locked`, which CI and the installer
+both run, fails when the lock and the project disagree. uv stores the value as
+a span, not a date, so the lock stays valid as time passes.
+
+A refresh starts by checking that the line is there. If it is missing, add it,
+run `uv lock`, and commit both files as
+`chore(deps): skip package versions younger than a week` before upgrading. No
+package version moves in that commit; `uv.lock` gains an `[options]` block.
+
+When a fix cannot wait a week, exempt that one package, with a comment naming
+why, and remove the exemption at the next refresh:
+
+```toml
+exclude-newer-package = { <name> = false }
+```
+
 ## Package pass
 
 1. See what would move. Read the release notes of anything crossing a major
@@ -228,4 +260,6 @@ uv lock --upgrade-package <name>
 uv sync
 ```
 
-Verify it by what moved, the same as a refresh.
+If the fixed version is under a week old, the
+[minimum package age](#minimum-package-age) hides it, so exempt the package
+first. Verify the fix by what moved, the same as a refresh.
