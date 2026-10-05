@@ -579,10 +579,15 @@ applies, unless noted. They follow AGENTS.md's nine copy rules.
 |---|---|---|
 | Next Rank cell | `{gap}% faster to {rank name}`, such as `2.8% faster to Lavender` | "Faster" names the measure in one word. Keeping "+2.8%" would let a pace number read as a score number, the misreading this fixes. With the tooltip's "2.83 to go" beside it, "+2.8%" would also look like the percentage of those points. A readout, so no period. The gap formats and rounds as D1's does. |
 | Next Rank header tooltip, every benchmark table | `How much your PB score has to grow to reach the next rank. A row that reads "faster" is a scenario scored by completion time, and shows how much faster you have to finish than your PB. Lower is closer.` | The column holds two measures, and the header names both. The second sentence is keyed to what the row shows, so it is true in every state: a row reads "faster" only where pace applies, and every other row, a time-scored one on score math included, is covered by the first sentence. "Scored by completion time" is the one place the app says why a row reads "faster", in the player's terms instead of the term *time-scored*. |
-| Threshold passed | `{scenario}: {score:.2f}, {pct:.1f}% of PB pace. Also your {best\|Nth-best} at {sensitivity}.`, or `... Ready to move on.` when not placed | One added word keeps the sentence the player already reads. |
+| Threshold passed | `{scenario}: {score:.2f}, {pct:.1f}% of PB pace. Also your {best\|Nth-best} at {sensitivity}.` when placed, else `{scenario}: {score:.2f}, {pct:.1f}% of PB pace.` | One added word keeps the sentence the player already reads. |
 | Below threshold | `{scenario}: {score:.2f}, {pct:.1f}% of PB pace (need {goal:.1f}%).`, then ` Still your {best\|Nth-best} at {sensitivity}.` when placed | As above. The goal keeps its shape because it is the same setting. |
 | New personal best | `{scenario}: {score:.2f}. Finished {pct:.1f}% faster than your previous best of {previous:.2f}.` | "Finished" pairs "faster" with a verb, where "Up" describes a score. The previous best stays a score, the number the player sees in the game. |
 | Score threshold percentage help text, on every scenario | `Sets the score goal as a percentage of your personal best. On a scenario scored by completion time, it's a percentage of your personal best's pace instead, when the app can measure pace reliably. Otherwise, it stays a percentage of your score. The overlay line tracks your current personal best. Notifications judge a run against the personal best you had before the run.` | The setting's meaning changes on these scenarios, and this is where the setting explains itself. The second and third sentences are the change. "When the app can measure pace reliably" covers every fallback at once: no performance file, a PB from another version of the scenario, and a time that isn't positive. The third sentence says what the goal is then. The verdict shows which one applied to a run: "% of PB pace" or "% of PB". |
+
+The Threshold passed row no longer ends "Ready to move on." when the run
+didn't place: the maintainer retired that line on 2026-10-04 under D3 of
+[#327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327)
+([ruling](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179636701)).
 
 Unchanged on purpose:
 
