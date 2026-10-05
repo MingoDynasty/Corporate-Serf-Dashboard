@@ -1664,8 +1664,8 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
             "scenario": "First",
             "playlist_order": 0,
             "status": "RANKED",
-            "rank_display": "10",
-            "rank_sort": 10,
+            "position_display": "10",
+            "position_sort": 10,
             "total_display": "100",
             "total_sort": 100,
             "percentile_display": "90.50%",
@@ -1858,7 +1858,7 @@ def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
         lambda _code, _token: [
             {
                 "scenario": "First",
-                "rank_pending": True,
+                "position_pending": True,
                 "total_pending": True,
                 "percentile_pending": True,
             }
@@ -1874,7 +1874,7 @@ def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
         playlist.code
     )
 
-    assert rows[0]["rank_pending"] is False
+    assert rows[0]["position_pending"] is False
     assert rows[0]["total_pending"] is False
     assert rows[0]["percentile_pending"] is False
     assert status == "Update interrupted"
@@ -1898,10 +1898,10 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
         lambda _code, _token: [
             {
                 "scenario": "First",
-                "rank_display": "N/A",
+                "position_display": "N/A",
                 "total_display": "N/A",
                 "percentile_display": "N/A",
-                "rank_pending": True,
+                "position_pending": True,
                 "total_pending": True,
                 "percentile_pending": True,
             }
@@ -1917,11 +1917,11 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
         playlist.code
     )
 
-    assert rows[0]["rank_display"] == "N/A"
+    assert rows[0]["position_display"] == "N/A"
     assert rows[0]["total_display"] == "N/A"
     assert rows[0]["percentile_display"] == "N/A"
     # Nothing may be left animating for a fill that will never run.
-    assert rows[0]["rank_pending"] is False
+    assert rows[0]["position_pending"] is False
     assert rows[0]["total_pending"] is False
     assert rows[0]["percentile_pending"] is False
     assert generation is None
@@ -2046,7 +2046,7 @@ def test_playlist_fill_cancelled_tick_finalizes_the_status(monkeypatch):
         updates=[
             {
                 "scenario": "First",
-                "rank_pending": False,
+                "position_pending": False,
                 "total_pending": False,
                 "percentile_pending": False,
             }
@@ -2073,7 +2073,7 @@ def test_playlist_scenarios_table_includes_local_stat_columns():
 
     assert "last_played_sort" in fields
     assert "runs_sort" in fields
-    assert "high_score_sort" in fields
+    assert "pb_score_sort" in fields
 
 
 def test_playlist_scenarios_scenario_home_href_url_encodes_values():
@@ -2119,11 +2119,11 @@ def test_playlist_scenarios_rank_columns_use_explicit_pending_flags():
         column["field"]: column for column in playlist_scenarios.TABLE_COLUMN_DEFS
     }
 
-    assert columns["rank_sort"]["valueFormatter"] == {
-        "function": "params.data.rank_pending ? '' : params.data.rank_display"
+    assert columns["position_sort"]["valueFormatter"] == {
+        "function": "params.data.position_pending ? '' : params.data.position_display"
     }
-    assert columns["rank_sort"]["cellClass"] == {
-        "function": "params.data.rank_pending ? 'playlist-rank-pending' : null"
+    assert columns["position_sort"]["cellClass"] == {
+        "function": "params.data.position_pending ? 'playlist-cell-pending' : null"
     }
     assert "total_pending" in columns["total_sort"]["valueFormatter"]["function"]
     assert (
@@ -2146,7 +2146,7 @@ def test_playlist_scenarios_pb_date_mirrors_last_played_look_and_feel():
     column = playlist_scenarios.TABLE_COLUMN_DEFS[fields.index("pb_timestamp_sort")]
 
     # The timestamp qualifies the PB Score beside it, so it sits directly after.
-    assert fields.index("pb_timestamp_sort") == fields.index("high_score_sort") + 1
+    assert fields.index("pb_timestamp_sort") == fields.index("pb_score_sort") + 1
     # Null copy is "N/A" to match the row's other PB columns, not "Never".
     assert column["valueFormatter"] == {"function": "relativeTime(params.value, 'N/A')"}
     assert column["tooltipValueGetter"] == {
@@ -2312,7 +2312,7 @@ def test_playlist_scenarios_sort_seeds_the_named_columns_in_priority_order():
 
     assert _sort_seeds(page) == {
         "percentile_sort": ("desc", 0),
-        "high_score_sort": ("asc", 1),
+        "pb_score_sort": ("asc", 1),
     }
     # ``sort`` would come back whenever the defs were sent again; only the
     # ``initial*`` pair leaves later header clicks alone.
@@ -2350,10 +2350,10 @@ def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlis
         "scenario": "scenario",
         "last-played": "last_played_sort",
         "runs": "runs_sort",
-        "position": "rank_sort",
+        "position": "position_sort",
         "total-players": "total_sort",
         "percentile": "percentile_sort",
-        "pb-score": "high_score_sort",
+        "pb-score": "pb_score_sort",
         "rank": "tier_sort",
         "next-rank": "next_tier_sort",
         "pb-date": "pb_timestamp_sort",
@@ -2414,10 +2414,10 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
         "scenario",
         "last_played_sort",
         "runs_sort",
-        "rank_sort",
+        "position_sort",
         "total_sort",
         "percentile_sort",
-        "high_score_sort",
+        "pb_score_sort",
         "tier_sort",
         "next_tier_sort",
         "pb_timestamp_sort",

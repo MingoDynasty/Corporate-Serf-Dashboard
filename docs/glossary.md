@@ -105,7 +105,8 @@ word
 ([2026-07-06](decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 How it is fetched and cached is in [scenario_rank.md](specs/scenario_rank.md).
 
-- In code: `rank`, kept by the label-only rename.
+- In code: `rank`, except in the scenario table's row fields, which say
+  `position`.
 - Not Rank, which is the benchmark tier.
 
 ### Total players
@@ -155,8 +156,8 @@ threshold, and a PB below the first one has No rank
 How a PB is placed on the ladder is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
-- In code: `tier` in the scenario table's row fields, because there `rank`
-  already means the position. In the ladder data, `rank` does mean the tier.
+- In code: `tier` in the scenario table's row fields, and `rank` in the ladder
+  data.
 - Not Position. No rank is not Unranked: No rank is below the first tier, and
   Unranked is no leaderboard entry.
 
@@ -189,9 +190,9 @@ sensitivity. It's the player's own record, not their leaderboard score
 
 - On screen: PB, also as the prefix of the PB run's stats, as in PB Score.
   Prose says personal best.
-- In code: `high_score` for the score, and `personal_best` or `pb` for the run
-  that set it and that run's stats. The PB a run was chasing is its previous
-  best.
+- In code: `high_score` for the score, or `pb_score` in the scenario table's
+  row fields, and `personal_best` or `pb` for the run that set it and that
+  run's stats. The PB a run was chasing is its previous best.
 
 ### Accuracy
 

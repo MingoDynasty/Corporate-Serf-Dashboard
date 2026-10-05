@@ -13,6 +13,70 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-10-04: The Scenario Table's Row Fields Use The Words On Screen
+
+Status: Accepted
+
+The code behind a playlist's scenario table now names its Position and PB
+Score columns the way the screen does. The Position fields were named for
+rank and sat beside fields named for tier that hold the Rank column, so the
+two words were swapped against what a user sees. Nothing a user sees or has
+saved changes. The rest of the code still says rank for a leaderboard
+position.
+
+**Direction.** The maintainer chose this on 2026-10-04, in chat, over leaving
+every identifier as it was and over parking the question. It supersedes one
+consequence of the
+[2026-07-06 entry](#2026-07-06-one-word-per-concept-in-leaderboard-verbiage),
+which kept row field names along with every other internal identifier.
+
+**What changed.** On the row a scenario table draws, `rank_sort`,
+`rank_display`, and `rank_pending` are now `position_sort`,
+`position_display`, and `position_pending`, and `high_score_sort` and
+`high_score_display` are now `pb_score_sort` and `pb_score_display`. The class
+on a cell whose value is still loading was `playlist-rank-pending` and is now
+`playlist-cell-pending`, because it marks the Position, Total Players, and
+Percentile cells and never the Rank column. The Rank column's `tier_*` and
+`next_tier_*` fields stay. Renaming them to `rank_*` in the same change would
+have made `rank_sort` mean the position in one commit and the tier in the
+next.
+
+**Why only here.** `rank` has three meanings in code: a leaderboard position,
+a benchmark tier, and KovaaK's own field name for the position. After this
+change it still appears about 870 times under `source/` and about 1,650 under
+`tests/` (counted 2026-10-04), and each use would need sorting into one of the
+three by hand. Renaming every position use would still not make the code
+consistent, because four kinds of name stay `rank` or cost something to
+change:
+
+- The fields KovaaK's sends, which the app cannot rename.
+- The `rank` key and the `RANKED` and `UNRANKED` statuses, which are written
+  to the cache.
+- The `scenario_rank_cache_ttl_hours` config key, which a user's `config.toml`
+  already holds.
+- The `leaderboard/user_rank/` cache folder, whose rename would orphan every
+  cached position.
+
+A blanket rename moves the boundary between the two words. It does not remove
+it. The scenario table was the one place where the two words met and pointed
+the wrong way: `"position": "rank_sort"` beside `"rank": "tier_sort"` in the
+table that maps `?sort=` names to column IDs.
+
+**Consequences.** The names in `?sort=` are unchanged, so a link saved before
+this change still sorts the table. `SORT_URL_NAMES` is the one place a name
+meets a column ID, which is what the
+[2026-09-27 entry](#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)
+set it up for. No stored state keys on a row field name: the page's stores
+hold nothing between visits, and the grid's column state is read only to
+write the address. Everything else that says `rank` for a position is
+unchanged, including `ScenarioRankInfo`, the Home page's component IDs, and
+the cache. The [glossary](glossary.md) gives the code words as they now
+stand. A new row field for a leaderboard position says `position`.
+
+**Provenance.** No proposal. The change came out of a check of the glossary
+against the code, whose docs-only half shipped in PR #333. Shipped in PR
+#342.
+
 ## 2026-10-04: The Position Value Says When It Was Last Updated
 
 Status: Accepted
@@ -794,6 +858,12 @@ Back/Forward/Back live check did not reproduce a mismatch.
 process on 2026-09-27. Three models reviewed the design and agreed on it:
 `claude-opus-5-5`, `claude-fable-5-1`, and `gpt-6-astra`. Shipped in PR
 #316.
+
+**Superseded in part (2026-10-04).** The column ID this entry names,
+`rank_sort`, is now `position_sort`, and the PB Score column's ID is now
+`pb_score_sort`. The names in the address did not change, so a link saved
+before the rename still sorts the table
+([2026-10-04](#2026-10-04-the-scenario-tables-row-fields-use-the-words-on-screen)).
 
 ## 2026-09-26: Log Lines Delimit Their Values By Kind
 
@@ -7242,6 +7312,12 @@ Consequences: Labels, plot annotations, and toasts follow the invariant.
 Internal identifiers, component ids, and row field names keep their old names
 because this is a label-only rename. New UI text must not reintroduce "rank" for
 leaderboard placement.
+
+**Superseded in part (2026-10-04).** Row field names no longer all keep their
+old names: the playlist scenario table's Position and PB Score fields now say
+`position` and `pb_score`. Every other internal identifier still keeps its
+old name
+([2026-10-04](#2026-10-04-the-scenario-tables-row-fields-use-the-words-on-screen)).
 
 ## 2026-07-06: Let The Playlist Scenarios Grid Own Vertical Scrolling
 
