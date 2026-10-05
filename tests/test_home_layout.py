@@ -18,14 +18,22 @@ import pytest
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import home  # noqa: E402
-from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET  # noqa: E402
+from source.pages.playlist_selector import (  # noqa: E402
+    PLAYLIST_SELECTOR_PRESET,
+    PLAYLIST_SELECTOR_SIZING,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
 GRAPH_RESIZE_SCRIPT = REPO_ROOT / "assets" / "homeGraphResize.js"
+PLAYLIST_SELECT_ID = "playlist-dropdown-selection"
 SCENARIO_SELECT_ID = "scenario-dropdown-selection"
-SCENARIO_FIELD_CLASS = "home-scenario-field"
-SHRINKABLE_SELECT_IDS = ("playlist-dropdown-selection", SCENARIO_SELECT_ID)
+# Each wide dropdown's column, by the class that marks it.
+FIELD_CLASSES = {
+    PLAYLIST_SELECT_ID: home.PLAYLIST_FIELD_CLASS,
+    SCENARIO_SELECT_ID: "home-scenario-field",
+}
+SHRINKABLE_SELECT_IDS = tuple(FIELD_CLASSES)
 _FLEX_SHORTHAND = re.compile(r"^(?P<grow>\d+) (?P<shrink>\d+) (?P<basis>\d+)px$")
 _PX_CLAMP = re.compile(r"^min\((?P<px>\d+)px, 100%\)$")
 
@@ -112,20 +120,15 @@ def test_breakpoints_are_a_copy_of_the_shared_theme_dict():
 def _sizing_carrier(select_id):
     """Find the flex item whose sizing decides when the controls row breaks.
 
-    The playlist filter is its own flex item. The scenario selector shares a
-    column with the follow switch stacked under it, so the column is the item
-    the row measures and the Select inside it just fills the column.
+    Each wide dropdown shares a column with what sits under it, the playlist
+    filter with its link and the scenario selector with the follow switch, so
+    the column is the item the row measures and the Select inside it just
+    fills the column.
     """
-
-    def is_carrier(component):
-        if select_id == SCENARIO_SELECT_ID:
-            return getattr(component, "className", None) == SCENARIO_FIELD_CLASS
-        return getattr(component, "id", None) == select_id
-
     return next(
         component
         for component in _walk_components(home.layout())
-        if is_carrier(component)
+        if getattr(component, "className", None) == FIELD_CLASSES[select_id]
     )
 
 
@@ -150,17 +153,36 @@ def test_wide_dropdowns_grow_back_toward_their_target(select_id):
     assert grow >= 1
 
 
-def test_the_scenario_column_carries_the_sizing_not_the_select_inside_it():
+@pytest.mark.parametrize("select_id", SHRINKABLE_SELECT_IDS)
+def test_the_column_carries_the_sizing_not_the_select_inside_it(select_id):
     """Two boxes both booking a width would fight over the same line break."""
     select = next(
         component
         for component in _walk_components(home.layout())
-        if getattr(component, "id", None) == SCENARIO_SELECT_ID
+        if getattr(component, "id", None) == select_id
     )
 
     assert getattr(select, "flex", None) is None
     assert getattr(select, "maw", None) is None
     assert getattr(select, "miw", None) is None
+
+
+def test_playlist_link_holder_sits_under_the_filter_and_starts_empty():
+    """The holder is the callback's output, so it is in the layout on every
+    visit. It starts empty because the layout cannot know the remembered
+    selection, and an empty holder must take no room under the filter."""
+    field = _sizing_carrier(PLAYLIST_SELECT_ID)
+    holder = field.children[1]
+
+    assert [getattr(child, "id", None) for child in field.children] == [
+        PLAYLIST_SELECT_ID,
+        home.PLAYLIST_TABLE_LINK_ID,
+    ]
+    assert getattr(holder, "children", None) is None
+    # A Stack's gap or a margin on the holder would be paid while there is no
+    # link to space; the link brings its own.
+    assert isinstance(field, dmc.Box)
+    assert getattr(holder, "mt", None) is None
 
 
 def test_both_wide_dropdowns_size_identically():
@@ -299,13 +321,19 @@ def test_the_graph_keeps_the_class_the_resize_observer_finds_it_by():
     assert ".home-graph" in GRAPH_RESIZE_SCRIPT.read_text(encoding="utf-8")
 
 
-def test_playlist_preset_carries_the_shrink_rule():
-    """Both playlist dropdowns sit in wrapping rows, so the preset owns this."""
+def test_playlist_sizing_carries_the_shrink_rule():
+    """Both playlist dropdowns sit in wrapping rows, so one shared rule owns this."""
     grow, hypothetical, target = _sizing(
-        PLAYLIST_SELECTOR_PRESET["flex"],
-        PLAYLIST_SELECTOR_PRESET["miw"],
-        PLAYLIST_SELECTOR_PRESET["maw"],
+        PLAYLIST_SELECTOR_SIZING["flex"],
+        PLAYLIST_SELECTOR_SIZING["miw"],
+        PLAYLIST_SELECTOR_SIZING["maw"],
     )
 
     assert hypothetical < target
     assert grow >= 1
+
+
+def test_playlist_preset_books_no_width_of_its_own():
+    """The preset is splatted into a dropdown that may sit inside the flex
+    item, where a second box booking a width fights the first over the break."""
+    assert not set(PLAYLIST_SELECTOR_PRESET) & set(PLAYLIST_SELECTOR_SIZING)

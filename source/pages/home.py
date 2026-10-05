@@ -60,7 +60,10 @@ from source.kovaaks.playlist_visibility_service import (
 )
 from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
-from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
+from source.pages.playlist_selector import (
+    PLAYLIST_SELECTOR_PRESET,
+    PLAYLIST_SELECTOR_SIZING,
+)
 from source.plot.plot_service import (
     POINT_SIZE_DEFAULT,
     POINT_SIZE_OPTIONS,
@@ -151,6 +154,12 @@ HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 # page on a route change and then this store triggers exactly one write, which
 # keeps the deep link out of the router's own callback graph.
 HOME_DEEP_LINK_STORE_ID = "home-deep-link"
+# The holder under the playlist filter for the link to that playlist's
+# scenario table. It is always in the layout so ``select_playlist`` has an
+# output to write to; the link itself comes and goes with the selection.
+PLAYLIST_TABLE_LINK_ID = "playlist-table-link"
+PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
+PLAYLIST_FIELD_CLASS = "home-playlist-field"
 
 # The chart options inspector. Its collapsed class is the open state: hiding
 # with ``display: none`` takes the controls out of the tab order and the
@@ -1183,11 +1192,15 @@ def _build_live_run_notification(
 
     shown_percentage = _shown_percentage(verdict)
     if verdict.passed:
-        detail = f"Also {placement}." if placed else "Ready to move on."
+        # A pass ends at the fact: a line saying what to do next would be
+        # advice, and the app states verdicts only.
+        message = f"{score}, {shown_percentage:.1f}% of PB."
+        if placed:
+            message += f" Also {placement}."
         return toast(
             _RUN_VERDICT_CHANNEL,
             "Threshold passed",
-            f"{score}, {shown_percentage:.1f}% of PB. {detail}",
+            message,
             color="green",
             icon=local_icon("material-symbols:check"),
         )
@@ -1596,25 +1609,52 @@ def _local_scenario_options() -> list:
     return get_scenario_names() if get_usable_stats_dir() else []
 
 
+def _playlist_table_link(playlist_code: str) -> dmc.Text:
+    """Build the link from the playlist filter to that playlist's scenario table."""
+    return dmc.Text(
+        dmc.Anchor(
+            PLAYLIST_TABLE_LINK_LABEL,
+            # The bare path, with no ``?sort=``: the table opens in playlist
+            # order, as it does from the Playlists page.
+            href=f"/playlists/{playlist_code}",
+            inherit=True,
+            refresh=False,
+        ),
+        # The spacing rides on the link, not on a gap in the column, so the
+        # holder takes no room while it is empty.
+        mt="xs",
+        size="sm",
+    )
+
+
 @callback(
     Output("scenario-dropdown-selection", "data"),
+    Output(PLAYLIST_TABLE_LINK_ID, "children"),
     Input("playlist-dropdown-selection", "value"),
     # Scheduling, not data: this Input looks removable and is not. The value
     # above is an output of ``apply_deep_link``, and the renderer prunes a
     # ready callback whose every Input is a declared output of a group member
     # that already ran and whose none was actually written. On a visit with no
     # ``?playlist_code=`` that callback returns ``no_update``, so without a
-    # second Input nothing writes this list and the scenario dropdown keeps
-    # the layout's full local set while the filter names a playlist. Nothing
-    # writes this store, so the prune's "every Input covered" test fails and
-    # the initial call survives. See the 2026-09-19 decision-log entry.
+    # second Input nothing writes these outputs: the scenario dropdown keeps
+    # the layout's full local set while the filter names a playlist, and that
+    # playlist's link never appears. Nothing writes this store, so the prune's
+    # "every Input covered" test fails and the initial call survives. See the
+    # 2026-09-19 decision-log entry.
     Input(HOME_DEEP_LINK_STORE_ID, "data"),
 )
 def select_playlist(selected_playlist, _deep_link):
-    """List scenarios for the selected playlist or all local scenarios."""
+    """List the selected playlist's scenarios and link to its scenario table.
+
+    With no playlist selected, or a remembered code that no longer resolves,
+    the list is every local scenario and there is no link.
+    """
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return _local_scenario_options()
-    return get_scenarios_from_playlist_code(selected_playlist)
+        return _local_scenario_options(), None
+    return (
+        get_scenarios_from_playlist_code(selected_playlist),
+        _playlist_table_link(selected_playlist),
+    )
 
 
 def _stats_dir_hint() -> list:
@@ -2181,6 +2221,7 @@ def layout(
 ):
     """Build the interactive home dashboard."""
     config = get_config()
+    playlist_options = get_visible_playlist_selector_options()
     scenario_options = _home_scenario_options(playlist_code)
 
     return dmc.Box(
@@ -2229,28 +2270,41 @@ def layout(
                     dmc.GridCol(
                         dmc.Flex(
                             children=[
-                                dmc.Select(
-                                    **PLAYLIST_SELECTOR_PRESET,
-                                    allowDeselect=False,
-                                    autoSelectOnBlur=True,
-                                    clearSearchOnFocus=True,
-                                    clearable=True,
-                                    data=get_visible_playlist_selector_options(),
-                                    id="playlist-dropdown-selection",
-                                    label="Playlist filter",
-                                    persistence=True,
-                                    # Never the query parameter, and never
-                                    # omitted. Dash pins a persisted edit to
-                                    # the layout value it was made against and
-                                    # discards the edit when a later visit
-                                    # renders a different one, so a default
-                                    # that varies per visit silently retires
-                                    # persistence. ``apply_deep_link`` carries
-                                    # the query parameter instead. Explicit
-                                    # ``None`` because an omitted prop is
-                                    # ``undefined``, which no longer matches
-                                    # what a browser already stored.
-                                    value=None,
+                                dmc.Box(
+                                    [
+                                        dmc.Select(
+                                            **PLAYLIST_SELECTOR_PRESET,
+                                            allowDeselect=False,
+                                            autoSelectOnBlur=True,
+                                            clearSearchOnFocus=True,
+                                            clearable=True,
+                                            data=playlist_options,
+                                            id="playlist-dropdown-selection",
+                                            label="Playlist filter",
+                                            persistence=True,
+                                            # Never the query parameter, and
+                                            # never omitted. Dash pins a
+                                            # persisted edit to the layout
+                                            # value it was made against and
+                                            # discards the edit when a later
+                                            # visit renders a different one,
+                                            # so a default that varies per
+                                            # visit silently retires
+                                            # persistence. ``apply_deep_link``
+                                            # carries the query parameter
+                                            # instead. Explicit ``None``
+                                            # because an omitted prop is
+                                            # ``undefined``, which no longer
+                                            # matches what a browser already
+                                            # stored.
+                                            value=None,
+                                        ),
+                                        dmc.Box(id=PLAYLIST_TABLE_LINK_ID),
+                                    ],
+                                    className=PLAYLIST_FIELD_CLASS,
+                                    # The column, not the Select inside it, is
+                                    # the flex item this row breaks lines on.
+                                    **PLAYLIST_SELECTOR_SIZING,
                                 ),
                                 dmc.Stack(
                                     [
@@ -2296,7 +2350,7 @@ def layout(
                                     # The column, not the Select inside it, is
                                     # the flex item this row breaks lines on.
                                     # Mirrors the playlist filter beside it;
-                                    # see PLAYLIST_SELECTOR_PRESET for why the
+                                    # see PLAYLIST_SELECTOR_SIZING for why the
                                     # basis is the floor and not the 400px
                                     # target.
                                     flex="1 1 200px",

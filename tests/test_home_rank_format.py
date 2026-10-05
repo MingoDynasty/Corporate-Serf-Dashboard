@@ -411,8 +411,55 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
 
     # The second argument is the deep-link store: a scheduling Input the
     # callback never reads. See select_playlist.
-    assert home.select_playlist("Old Playlist Name", None) == ["All"]
-    assert home.select_playlist("ValidCode", None) == ["ValidCode Scenario"]
+    assert home.select_playlist("Old Playlist Name", None) == (["All"], None)
+    scenarios, _link = home.select_playlist("ValidCode", None)
+    assert scenarios == ["ValidCode Scenario"]
+
+
+def test_select_playlist_links_the_selection_to_its_scenario_table(monkeypatch):
+    """The way back from a scenario to the table it was opened from."""
+    _known_playlist(monkeypatch)
+    monkeypatch.setattr(home, "get_scenarios_from_playlist_code", lambda _code: [])
+
+    _scenarios, link = home.select_playlist("KovaaKsTestCode", None)
+
+    (anchor,) = [
+        component
+        for component in _walk_components(link)
+        if isinstance(component, dmc.Anchor)
+    ]
+    assert anchor.children == "Open scenario table"
+    # The bare route: no ``?sort=``, so the table opens in playlist order.
+    assert anchor.href == "/playlists/KovaaKsTestCode"
+    # In-app navigation, as every other internal link on the page.
+    assert anchor.refresh is False
+
+
+@pytest.mark.parametrize("selected_playlist", [None, "", "KovaaKsGoneCode"])
+def test_select_playlist_shows_no_link_without_a_loaded_playlist(
+    monkeypatch, selected_playlist
+):
+    """A cleared filter and a remembered code that no longer resolves both
+    list every local scenario, so neither has a table to link."""
+    _known_playlist(monkeypatch)
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+
+    _scenarios, link = home.select_playlist(selected_playlist, None)
+
+    assert link is None
+
+
+def test_select_playlist_writes_the_link_holder_the_layout_carries():
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if "scenario-dropdown-selection.data" in entry["output"]
+    ]
+
+    assert _output_keys(registration) == {
+        "scenario-dropdown-selection.data",
+        f"{home.PLAYLIST_TABLE_LINK_ID}.children",
+    }
 
 
 def test_page_is_named_scenario_performance_and_keeps_the_root_route():

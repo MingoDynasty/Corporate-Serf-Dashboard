@@ -399,7 +399,9 @@ toasts under, and it applies to every toast the app adds from here on
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
   Pass: green, "Threshold passed",
   `{scenario}: {score:.2f}, {pct:.1f}% of PB. Also your {best|Nth-best} at {sensitivity}.`
-  when placed, else `{scenario}: {score:.2f}, {pct:.1f}% of PB. Ready to move on.`
+  when placed, else `{scenario}: {score:.2f}, {pct:.1f}% of PB.`, with no
+  coaching line after it
+  ([2026-10-04](../decision_log.md#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice)).
   Fail: yellow, "Below threshold",
   `{scenario}: {score:.2f}, {pct:.1f}% of PB (need {goal:.1f}%). Still your {best|Nth-best} at {sensitivity}.`,
   the "Still" sentence only when placed, and no coaching line after it.
