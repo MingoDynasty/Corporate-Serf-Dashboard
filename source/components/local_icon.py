@@ -1,4 +1,4 @@
-"""Render local SVG icons without runtime Iconify API requests."""
+"""Render local icon files without runtime requests for them."""
 
 from dataclasses import dataclass
 from typing import Any
@@ -12,7 +12,7 @@ _ARIA_HIDDEN: dict[str, Any] = {"aria-hidden": "true"}
 
 @dataclass(frozen=True)
 class IconAsset:
-    """Metadata for one vendored SVG icon."""
+    """Metadata for one vendored icon file."""
 
     file_name: str
     width: int
@@ -24,6 +24,9 @@ ICONS: dict[str, IconAsset] = {
     "bi:house-door-fill": IconAsset("bi-house-door-fill.svg", 16, 16),
     "clarity:date-line": IconAsset("clarity-date-line.svg", 36, 36),
     "clarity:settings-line": IconAsset("clarity-settings-line.svg", 36, 36),
+    # Evxl's own logo, a PNG and not an Iconify icon: assets/icons/README.md
+    # records whose it is and on what terms the app ships it.
+    "evxl:logo": IconAsset("evxl-logo.png", 102, 96, preserves_color=True),
     "fontisto:line-chart": IconAsset("fontisto-line-chart.svg", 32, 24),
     "ion:logo-github": IconAsset("ion-logo-github.svg", 512, 512),
     "logos:discord-icon": IconAsset(
@@ -104,7 +107,7 @@ def _get_icon_asset(name: str) -> IconAsset:
         return ICONS[name]
     except KeyError as exc:
         raise KeyError(
-            f"Unknown local icon {name!r}. Add its SVG under assets/icons/ "
+            f"Unknown local icon {name!r}. Add its file under assets/icons/ "
             "and register it in ICONS."
         ) from exc
 
@@ -118,7 +121,7 @@ def local_icon(  # noqa: PLR0913
     className: str | None = None,  # noqa: N803 - matches Dash prop naming.
     style: dict[str, Any] | None = None,
 ) -> Component:
-    """Build a local icon component for a vendored Iconify icon name."""
+    """Build a local icon component for a name registered in ``ICONS``."""
     asset = _get_icon_asset(name)
     icon_width, icon_height = _resolve_size(asset, width, height)
     asset_url = f"{ICON_ASSET_ROOT}/{asset.file_name}"

@@ -198,6 +198,40 @@ library most of which a user doesn't play. The profile-less page for everyone:
 it keeps the Steam ID out of the address, but drops the difficulty and costs a
 click on every visit.
 
+**Amended 2026-10-05: the link is Evxl's logo.** The link now shows Evxl's
+logo and no text. "View on Evxl" stays, as the link's tooltip and its
+accessible name. The addresses, the pages that get the link, and the new tab
+are as this entry describes them.
+
+- **Agreed in chat, not ruled.** On 2026-10-05 the maintainer chose the logo
+  alone with a tooltip, after the app header's GitHub and Discord links. The
+  author had recommended the logo in front of the text, because a logo alone
+  means nothing to someone who doesn't know Evxl. The maintainer's answer was
+  that Evxl is well known among aim trainers. The size, the placement, the
+  tooltip on keyboard focus, and the wording of the permission record are the
+  author's.
+- **Permission.** Evxl's owner told the maintainer in a direct message that
+  the app may use the logo, with no conditions. The logo stays its owner's
+  and is under no open license, and `assets/icons/README.md` holds the
+  record. The file is the site's 721×679 icon scaled down to 102×96 and
+  otherwise untouched.
+- **Bundled, never loaded from Evxl.** The logo is served from
+  `assets/icons/` through `local_icon`. Loading it from evxl.app would make
+  every benchmark page contact Evxl, and would break this entry's statement
+  that the app requests nothing from Evxl.
+- **Its name.** The logo is hidden from assistive technology, so an
+  `aria-label` names the link. The tooltip opens on keyboard focus as well as
+  on hover, which the header's two icon links don't do: it is the only place
+  a sighted keyboard user can read where the link goes.
+- **Focus ring.** The plain anchor had the browser's own ring, which in Edge
+  is `rgb(16, 16, 16)`: 1.23:1 against the dark theme's page. The link now
+  carries Mantine's `mantine-focus-auto` class, the ring `dmc.Anchor` brings.
+  Measured in headless Edge on 2026-10-05 it is 3.56:1 on the light theme and
+  3.09:1 on the dark one, against a floor of 3:1. Firefox was not measured.
+- **Known cost.** The logo is cyan and can't be recolored without its owner's
+  say. Rendered at its 24-pixel height it measures 2.0:1 against the light
+  theme's page and 6.82:1 against the dark one's.
+
 ## 2026-10-04: The Scenario Table's Row Fields Use The Words On Screen
 
 Status: Accepted
@@ -4539,6 +4573,12 @@ recording it the same way. `resources/` ships under the same contract but is
 imported data, not vendored code: the benchmark library, a snapshot of Evxl's
 benchmark index, and a KovaaK's game-settings response. No license is recorded
 for any of it, and this entry does not settle whether one should be.
+
+**Amended 2026-10-05: one bundled file is under no open license.**
+`assets/icons/evxl-logo.png` is Evxl's logo. It ships with its owner's
+permission, recorded in `assets/icons/README.md`, and neither the AGPL nor
+any icon collection's license covers it. The detail is in
+[the 2026-10-04 Evxl entry](#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page).
 
 **Why this license.** The priority is that derivatives stay free and open
 source. AGPL binds anyone who conveys a modified version, or offers one to
