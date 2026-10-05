@@ -913,9 +913,11 @@ def test_playlists_overview_layout_includes_quick_filter_input():
 
 
 def test_import_modal_help_names_the_import_button_in_bold():
+    # The Columns menu's checkboxes carry dict IDs, which cannot key a dict.
     components = {
-        getattr(component, "id", None): component
+        component.id: component
         for component in _walk_components(playlists.layout())
+        if isinstance(getattr(component, "id", None), str)
     }
     field = components["playlists-import-textinput"]
 
@@ -2642,3 +2644,253 @@ def test_a_delete_still_reports_when_the_visibility_write_is_refused(monkeypatch
     assert notifications[0]["title"] == "Playlist deleted"
     assert rows_refresh == 5
     assert opened is False
+
+
+# --- the Columns menu shows and hides each table's columns ---
+
+# The columns each table's structure depends on, which its menu never lists.
+OVERVIEW_STRUCTURAL_COLUMNS = {
+    "name",
+    playlists.VISIBILITY_COLUMN_ID,
+    playlists.DELETE_COLUMN_ID,
+}
+SCENARIO_STRUCTURAL_COLUMNS = {"scenario"}
+
+
+def _component_by_id(page, component_id):
+    return next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == component_id
+    )
+
+
+def _menu_checkboxes(page, menu_id) -> list[dmc.Checkbox]:
+    return [
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Checkbox)
+        and isinstance(component.id, dict)
+        and component.id["type"] == menu_id
+    ]
+
+
+def _menu_entries(page, menu_id) -> list[tuple[str, str]]:
+    return [
+        (checkbox.id["column"], checkbox.label)
+        for checkbox in _menu_checkboxes(page, menu_id)
+    ]
+
+
+def _initially_shown(column_defs) -> dict[str, bool]:
+    return {
+        column["field"]: not column.get("initialHide", False) for column in column_defs
+    }
+
+
+def test_playlists_overview_columns_menu_lists_every_hideable_column_in_order():
+    page = playlists.layout()
+    entries = _menu_entries(page, playlists.COLUMNS_MENU_ID)
+
+    # The labels are the proposal's Copy block: sentence case, as controls.
+    assert entries == [
+        ("type_display", "Type"),
+        ("played_sort", "Played"),
+        ("runs_sort", "Runs"),
+        ("last_played_sort", "Last played"),
+        ("median_percentile_sort", "Median percentile"),
+        ("lowest_percentile_sort", "Lowest percentile"),
+    ]
+    # Table order, with exactly the structural columns left out.
+    assert [column_id for column_id, _label in entries] == [
+        column["field"]
+        for column in playlists.TABLE_COLUMN_DEFS
+        if column["field"] not in OVERVIEW_STRUCTURAL_COLUMNS
+    ]
+
+
+def test_playlist_scenarios_columns_menu_lists_every_hideable_column_in_order(
+    benchmark_playlists,
+):
+    benchmark_page = playlist_scenarios.layout(BENCHMARK_CODE)
+    plain_page = playlist_scenarios.layout(PLAIN_PLAYLIST_CODE)
+    benchmark_entries = _menu_entries(
+        benchmark_page, playlist_scenarios.COLUMNS_MENU_ID
+    )
+    plain_entries = _menu_entries(plain_page, playlist_scenarios.COLUMNS_MENU_ID)
+
+    assert benchmark_entries == [
+        ("last_played_sort", "Last played"),
+        ("runs_sort", "Runs"),
+        ("position_sort", "Position"),
+        ("total_sort", "Total players"),
+        ("percentile_sort", "Percentile"),
+        ("pb_score_sort", "PB score"),
+        ("tier_sort", "Rank"),
+        ("next_tier_sort", "Next rank"),
+        ("pb_timestamp_sort", "PB date"),
+        ("pb_cm360_sort", "PB cm/360"),
+        ("pb_accuracy_sort", "PB accuracy"),
+    ]
+    # Rank and Next rank are a benchmark's alone.
+    assert plain_entries == [
+        entry
+        for entry in benchmark_entries
+        if entry[0] not in {"tier_sort", "next_tier_sort"}
+    ]
+    for page, entries in (
+        (benchmark_page, benchmark_entries),
+        (plain_page, plain_entries),
+    ):
+        assert [column_id for column_id, _label in entries] == [
+            field
+            for field in _column_fields(page)
+            if field not in SCENARIO_STRUCTURAL_COLUMNS
+        ]
+
+
+def test_columns_menu_checkbox_defaults_match_each_columns_initial_visibility(
+    benchmark_playlists,
+):
+    overview = playlists.layout()
+    benchmark_page = playlist_scenarios.layout(BENCHMARK_CODE)
+    plain_page = playlist_scenarios.layout(PLAIN_PLAYLIST_CODE)
+
+    for page, menu_id, column_defs in (
+        (overview, playlists.COLUMNS_MENU_ID, playlists.TABLE_COLUMN_DEFS),
+        (
+            benchmark_page,
+            playlist_scenarios.COLUMNS_MENU_ID,
+            _scenario_grid(benchmark_page).columnDefs,
+        ),
+        (
+            plain_page,
+            playlist_scenarios.COLUMNS_MENU_ID,
+            _scenario_grid(plain_page).columnDefs,
+        ),
+    ):
+        shown = _initially_shown(column_defs)
+        checkboxes = _menu_checkboxes(page, menu_id)
+        assert checkboxes
+        for checkbox in checkboxes:
+            # Passed explicitly, never left unset: the default is half of the
+            # value Dash stores, and a stored choice is dropped when it moves.
+            assert checkbox.checked is shown[checkbox.id["column"]]
+            assert checkbox.persistence is True
+
+    # One default per column on both kinds of table, for the same reason.
+    benchmark_defaults = {
+        checkbox.id["column"]: checkbox.checked
+        for checkbox in _menu_checkboxes(
+            benchmark_page, playlist_scenarios.COLUMNS_MENU_ID
+        )
+    }
+    for checkbox in _menu_checkboxes(plain_page, playlist_scenarios.COLUMNS_MENU_ID):
+        assert checkbox.checked is benchmark_defaults[checkbox.id["column"]]
+
+
+def test_columns_menus_keep_their_stored_choices_apart():
+    assert playlists.COLUMNS_MENU_ID != playlist_scenarios.COLUMNS_MENU_ID
+
+
+def test_playlists_overview_columns_button_sits_between_show_hidden_and_import():
+    page = playlists.layout()
+    toolbar = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Group)
+        and any(
+            getattr(child, "id", None) == "playlists-overview-show-hidden"
+            for child in component.children
+        )
+    )
+    button = _component_by_id(page, f"{playlists.COLUMNS_MENU_ID}-button")
+
+    assert button.children == "Columns"
+    assert [type(child) for child in toolbar.children] == [
+        dmc.Switch,
+        dmc.Popover,
+        dmc.Button,
+    ]
+    assert button in list(_walk_components(toolbar.children[1]))
+    assert toolbar.children[2].id == "playlists-import-open-button"
+
+
+def test_playlist_scenarios_columns_button_ends_the_filter_row():
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    filter_row = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Group)
+        and any(isinstance(child, dmc.Popover) for child in component.children)
+    )
+    button = _component_by_id(page, f"{playlist_scenarios.COLUMNS_MENU_ID}-button")
+
+    assert button.children == "Columns"
+    assert filter_row.justify == "space-between"
+    assert isinstance(filter_row.children[-1], dmc.Popover)
+    assert button in list(_walk_components(filter_row.children[-1]))
+    # The quick filter and the status line stay together at the row's start.
+    assert {
+        getattr(component, "id", None)
+        for component in _walk_components(filter_row.children[0])
+    } >= {"playlist-scenarios-quick-filter", "playlist-scenarios-status"}
+
+
+def _columns_menu_specs(menu_id):
+    checkboxes = '{"column":["ALL"],"type":"' + menu_id + '"}'
+    return checkboxes, [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if {"id": checkboxes, "property": "checked"} in spec["inputs"]
+    ]
+
+
+@pytest.mark.parametrize(
+    ("page_module", "grid_id"),
+    [
+        (playlists, "playlists-overview-grid"),
+        (playlist_scenarios, "playlist-scenarios-grid"),
+    ],
+    ids=["overview", "scenarios"],
+)
+def test_columns_menu_callback_applies_the_checkboxes_through_the_grid_api(
+    page_module, grid_id
+):
+    menu_id = page_module.COLUMNS_MENU_ID
+    checkboxes, specs = _columns_menu_specs(menu_id)
+    page = page_module.layout()
+    store_outputs = {
+        f"{component.id}.data"
+        for component in _walk_components(page)
+        if isinstance(component, dcc.Store)
+    }
+
+    # One callback per grid, over that menu's checkboxes and nothing else.
+    (spec,) = specs
+    assert spec["inputs"] == [{"id": checkboxes, "property": "checked"}]
+    assert spec["state"] == [{"id": checkboxes, "property": "id"}]
+    assert spec["output"] == f"{menu_id}-sink.data"
+    assert spec["output"] in store_outputs
+    # It must run as the page mounts, to apply the stored choices.
+    assert spec["prevent_initial_call"] is False
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+    assert f'getApiAsync("{grid_id}")' in source
+    # Visibility, then the hidden columns' sort, then the new columns' width.
+    steps = [
+        source.index("gridApi.setColumnsVisible(shown, true)"),
+        source.index("gridApi.setColumnsVisible(hidden, false)"),
+        source.index("gridApi.applyColumnState("),
+        source.index("gridApi.autoSizeColumns(added, false)"),
+    ]
+    assert steps == sorted(steps)
+    assert "({colId, sort: null})" in source
+    # Writing ``columnState`` would reorder the columns, and resending the
+    # column defs would reapply the sort and visibility they declare.
+    assert "columnState" not in source
+    assert "columnDefs" not in source
+    assert "set_props" not in source

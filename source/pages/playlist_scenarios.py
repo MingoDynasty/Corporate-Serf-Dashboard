@@ -18,6 +18,12 @@ from dash import (
     no_update,
 )
 
+from source.components.columns_menu import (
+    MenuColumn,
+    columns_menu,
+    columns_menu_sink,
+    register_columns_menu,
+)
 from source.config.settings_service import get_kovaaks_username
 from source.kovaaks.data_service import (
     get_playlist_by_code,
@@ -237,6 +243,32 @@ BENCHMARK_COLUMN_DEFS = [
     },
 ]
 
+COLUMNS_MENU_ID = "playlist-scenarios-columns"
+
+# The Columns menu's entries, in table order: every column the table can work
+# without. A column the table's structure depends on is never listed, and the
+# row means nothing without its Scenario cell, which is also the link into it.
+# The labels are kept by hand, in sentence case as controls, where the headers
+# they name keep Title Case.
+MENU_COLUMNS = [
+    MenuColumn("last_played_sort", "Last played"),
+    MenuColumn("runs_sort", "Runs"),
+    MenuColumn("position_sort", "Position"),
+    MenuColumn("total_sort", "Total players"),
+    MenuColumn("percentile_sort", "Percentile"),
+    MenuColumn("pb_score_sort", "PB score"),
+    MenuColumn("pb_timestamp_sort", "PB date"),
+    MenuColumn("pb_cm360_sort", "PB cm/360"),
+    MenuColumn("pb_accuracy_sort", "PB accuracy"),
+]
+
+# Rendered only on a benchmark's table, so a playlist's table leaves their
+# stored choices alone.
+BENCHMARK_MENU_COLUMNS = [
+    MenuColumn("tier_sort", "Rank"),
+    MenuColumn("next_tier_sort", "Next rank"),
+]
+
 # The names ``?sort=`` uses in the address bar, mapped to column IDs. Other code
 # keys on the column IDs, so the names exist only where the URL is read and
 # written: a saved link survives a field rename, and "rank" never names the
@@ -309,6 +341,16 @@ def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
         columns_by_id[column_id]["initialSort"] = direction
         columns_by_id[column_id]["initialSortIndex"] = sort_index
     return column_defs
+
+
+def _menu_columns(*, benchmark: bool) -> list[MenuColumn]:
+    """List the Columns menu's entries in the order the table shows them."""
+    columns = list(MENU_COLUMNS)
+    if benchmark:
+        column_ids = [column.column_id for column in columns]
+        after_pb_score = column_ids.index("pb_score_sort") + 1
+        columns[after_pb_score:after_pb_score] = BENCHMARK_MENU_COLUMNS
+    return columns
 
 
 @callback(
@@ -545,6 +587,9 @@ clientside_callback(
 )
 
 
+register_columns_menu(COLUMNS_MENU_ID, "playlist-scenarios-grid")
+
+
 def _page_header(playlist_code: str) -> dmc.Group:
     """Title the page with the playlist's display label and its share code."""
     return dmc.Group(
@@ -579,10 +624,11 @@ def layout(
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
             dcc.Store(id="playlist-scenarios-generation"),
             dcc.Store(id="playlist-scenarios-relative-time-refresh"),
-            # Dummy sinks for the client-side quick-filter and sort-URL
-            # callbacks' outputs.
+            # Dummy sinks for the client-side quick-filter, sort-URL, and
+            # Columns menu callbacks' outputs.
             dcc.Store(id="playlist-scenarios-quick-filter-sink"),
             dcc.Store(id="playlist-scenarios-sort-sink"),
+            columns_menu_sink(COLUMNS_MENU_ID),
             dcc.Interval(
                 id="playlist-scenarios-relative-time-interval",
                 interval=30_000,
@@ -600,16 +646,22 @@ def layout(
             *([_page_header(playlist_code)] if playlist_code is not None else []),
             dmc.Group(
                 children=[
-                    dmc.TextInput(
-                        id="playlist-scenarios-quick-filter",
-                        placeholder="Filter scenarios",
-                        size="sm",
-                        w=240,
+                    dmc.Group(
+                        children=[
+                            dmc.TextInput(
+                                id="playlist-scenarios-quick-filter",
+                                placeholder="Filter scenarios",
+                                size="sm",
+                                w=240,
+                            ),
+                            dmc.Text("", c="dimmed", id="playlist-scenarios-status"),
+                        ],
+                        gap="md",
+                        align="center",
                     ),
-                    dmc.Text("", c="dimmed", id="playlist-scenarios-status"),
+                    columns_menu(COLUMNS_MENU_ID, _menu_columns(benchmark=benchmark)),
                 ],
-                gap="md",
-                align="center",
+                justify="space-between",
             ),
             dag.AgGrid(
                 id="playlist-scenarios-grid",

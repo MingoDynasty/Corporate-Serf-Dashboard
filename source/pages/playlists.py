@@ -16,6 +16,12 @@ from dash import (
     no_update,
 )
 
+from source.components.columns_menu import (
+    MenuColumn,
+    columns_menu,
+    columns_menu_sink,
+    register_columns_menu,
+)
 from source.components.control_name import control_name
 from source.components.local_icon import local_icon
 from source.config.settings_service import get_kovaaks_username
@@ -342,6 +348,22 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 90,
         "maxWidth": 100,
     },
+]
+
+COLUMNS_MENU_ID = "playlists-overview-columns"
+
+# The Columns menu's entries, in table order: every column the table can work
+# without. A column the table's structure depends on is never listed. The row
+# means nothing without its name, and the action cells are the only way to hide
+# or delete a playlist. The labels are kept by hand, in sentence case as
+# controls, where the headers they name keep Title Case.
+MENU_COLUMNS = [
+    MenuColumn("type_display", "Type"),
+    MenuColumn("played_sort", "Played"),
+    MenuColumn("runs_sort", "Runs"),
+    MenuColumn("last_played_sort", "Last played"),
+    MenuColumn("median_percentile_sort", "Median percentile"),
+    MenuColumn("lowest_percentile_sort", "Lowest percentile"),
 ]
 
 
@@ -966,6 +988,9 @@ clientside_callback(
 )
 
 
+register_columns_menu(COLUMNS_MENU_ID, "playlists-overview-grid")
+
+
 def layout(**kwargs):  # noqa: ARG001
     """Build the playlist-level overview page."""
     return dmc.Stack(
@@ -983,8 +1008,10 @@ def layout(**kwargs):  # noqa: ARG001
             # Holds the code the delete confirmation modal is targeting.
             dcc.Store(id="playlists-delete-target"),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
-            # Dummy sink for the client-side quick-filter callback's output.
+            # Dummy sinks for the client-side quick-filter and Columns menu
+            # callbacks' outputs.
             dcc.Store(id="playlists-overview-quick-filter-sink"),
+            columns_menu_sink(COLUMNS_MENU_ID),
             dcc.Interval(
                 id="playlists-overview-relative-time-interval",
                 interval=30_000,
@@ -1028,6 +1055,7 @@ def layout(**kwargs):  # noqa: ARG001
                                 persistence=True,
                                 size="sm",
                             ),
+                            columns_menu(COLUMNS_MENU_ID, MENU_COLUMNS),
                             dmc.Button(
                                 "Import",
                                 id="playlists-import-open-button",
