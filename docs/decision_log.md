@@ -45,8 +45,10 @@ no package version.
 
 **The exemption.** `exclude-newer-package = { <name> = false }` lifts the limit
 for one package, and uv records it in the lock the same way. It is for a fix
-that cannot wait a week, usually one for a security alert, and it comes out at
-the next refresh.
+that cannot wait a week, usually one for a security alert. It comes out at the
+first refresh after the exempted version is a week old, never sooner: removed
+while the version is still under the limit, `uv lock` moves the package back
+to an older version and exits 0, which would undo the fix without a warning.
 
 ## 2026-10-04: Dependency Updates Stay Manual, Run From A Playbook
 

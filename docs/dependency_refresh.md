@@ -69,19 +69,31 @@ a span, not a date, so the lock stays valid as time passes.
 
 A refresh starts by checking that the line is there. If it is missing, add it,
 run `uv lock`, and commit both files as
-`chore(deps): skip package versions younger than a week` before upgrading. No
-package version moves in that commit; `uv.lock` gains an `[options]` block.
+`chore(deps): skip package versions younger than a week` before upgrading.
+`git diff uv.lock` must show no `version` line in that commit. It adds an
+`[options]` block, and uv may reorder the `resolution-markers` list, but no
+package moves.
 
 When a fix cannot wait a week, exempt that one package, with a comment naming
-why, and remove the exemption at the next refresh:
+why:
 
 ```toml
 exclude-newer-package = { <name> = false }
 ```
 
+Remove an exemption at the first refresh after the exempted version is a week
+old, never sooner. The `upload-time` beside that package in `uv.lock` is the
+date to count from. Removed too early, `uv lock` moves the package back to an
+older version and exits 0, and an upgrade does not bring the newer one back.
+After removing one, check that the package's `version` in `uv.lock` did not
+go down.
+
 ## Package pass
 
-1. See what would move. Read the release notes of anything crossing a major
+1. Do the two checks under [Minimum package age](#minimum-package-age): the
+   setting is there, and any exemption is old enough to remove.
+
+2. See what would move. Read the release notes of anything crossing a major
    version, and of every package that ships browser code (named under
    [Verify by what moved](#verify-by-what-moved)).
 
@@ -89,7 +101,7 @@ exclude-newer-package = { <name> = false }
    uv lock --upgrade --dry-run
    ```
 
-2. Upgrade the lock and the environment, and commit `uv.lock` alone as
+3. Upgrade the lock and the environment, and commit `uv.lock` alone as
    `chore(deps): upgrade locked dependencies`. The lock diff runs to hundreds
    of lines, so it stays apart from the hand edits that follow it.
 
@@ -97,11 +109,11 @@ exclude-newer-package = { <name> = false }
    uv sync --upgrade
    ```
 
-3. If ruff moved, set `rev` in `.pre-commit-config.yaml` to the locked ruff
+4. If ruff moved, set `rev` in `.pre-commit-config.yaml` to the locked ruff
    version. Left behind, the hook formats and lints with a different ruff than
    CI does. Commit as `chore: sync pre-commit ruff rev with the locked ruff`.
 
-4. Raise each floor in `pyproject.toml` to the version now locked. The floors
+5. Raise each floor in `pyproject.toml` to the version now locked. The floors
    record what is tested, and a stale one lets a resolver hand back a version
    nobody ran. `pandas-stubs` keeps its `~=` pin, which moves only when pandas
    changes its minor version. Then re-lock:
@@ -115,7 +127,7 @@ exclude-newer-package = { <name> = false }
    version moves in this step. Commit as
    `chore(deps): refresh dependency floors to the locked, tested versions`.
 
-5. Verify by what moved, then open the PR.
+6. Verify by what moved, then open the PR.
 
 ## Toolchain pass
 
