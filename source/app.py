@@ -42,6 +42,7 @@ from source.kovaaks.data_service import (
 from source.kovaaks.percentile_warmup_service import (
     start_percentile_warmup_worker,
 )
+from source.kovaaks.time_scored_service import index_performance_files
 from source.my_watchdog.file_watchdog import NewFileHandler
 from source.utilities.build_info import get_build_info
 from source.utilities.crash_logging import (
@@ -371,6 +372,7 @@ def main() -> None:
     else:
         # Initialize scenario data
         initialize_kovaaks_data(stats_dir)
+        index_performance_files(stats_dir)
 
     log_rank_lookup_availability()
 

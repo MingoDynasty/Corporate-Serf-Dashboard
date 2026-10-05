@@ -28,6 +28,25 @@ def _run(
     )
 
 
+def test_get_runs_newest_first_returns_a_copy_in_reverse_time_order(load_runs):
+    first = _run(100, START)
+    second = _run(300, START + timedelta(days=1))
+    third = _run(200, START + timedelta(days=2))
+    load_runs(second, third, first)
+
+    runs = data_service.get_runs_newest_first(SCENARIO_NAME)
+
+    assert runs == [third, second, first]
+    runs.clear()
+    assert len(data_service.get_runs_newest_first(SCENARIO_NAME)) == 3
+
+
+def test_get_runs_newest_first_is_empty_for_an_unknown_scenario(load_runs):
+    load_runs()
+
+    assert data_service.get_runs_newest_first("Never Played") == []
+
+
 def _playlist(code: str, *scenarios: Scenario) -> PlaylistData:
     return PlaylistData(name=f"{code} playlist", code=code, scenarios=list(scenarios))
 
