@@ -113,8 +113,8 @@ How it is fetched and cached is in [scenario_rank.md](specs/scenario_rank.md).
 How many players a scenario's leaderboard holds, the denominator of the
 percentile.
 
-- In code: `total_players`, and `leaderboard_total` where the count is handled
-  on its own.
+- In code: `total_players`, or `total` for short, as in the scenario table's
+  row fields, and `leaderboard_total` where the count is handled on its own.
 
 ### Percentile
 
