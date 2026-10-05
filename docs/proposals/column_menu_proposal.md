@@ -208,13 +208,24 @@ exactly as it does today until the user opens the menu.
 that identify a row stay together. It reads the bundled file's
 `generated_from.kovaaks_benchmark_id`. A playlist with no benchmark ID reads
 `N/A`: a playlist imported by code, which is built from scenario names alone,
-or a hand-made file.
+or any other file in the user's playlist folder.
 
-The playlist model starts reading that block. The value is optional and
-display-only, so a missing or malformed block reads as no ID and never
-rejects the playlist. A user file that loads today must still load. Imported
-playlists are written with unset fields left out, so their files don't
-change.
+The playlist model does not change. The bundled loader reads the ID from the
+raw file as it loads it, into a side table keyed by playlist code. That is
+how the loader already collects the seed's name and ID pairs, and it is
+rebuilt on every load as they are. Only bundled files are read, so a user
+file's stamp is ignored. A missing or malformed block reads as no ID and
+never stops the file from loading.
+
+The model has to stay as it is because the benchmark importer shares it. The
+importer's drift check compares each shipped file with a fresh rebuild by
+whole-model equality, and a rebuild carries no stamp. The check relies on the
+stamp not being a model field
+([2026-09-26](../decision_log.md#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
+Today a shipped file equals its stamp-free rebuild shape for 261 of 261
+files. With a benchmark-ID field on the model that would be 0 of 261: the
+next check would report every bundled file as drifted, and the importer
+would start writing the field into each file it regenerates.
 
 **Leaderboard ID** sits after Scenario on the scenario table. It reads the
 name-to-ID mapping, the value the app itself sends to KovaaK's, not the copy
@@ -303,6 +314,8 @@ for as long as it was sorted.
 ### What does not change
 
 - No cache, setting, network path, or notification is touched.
+- The playlist model, the benchmark importer, its drift check, and the
+  bundled files are untouched.
 - Column widths and column order are still not remembered.
 - The quick filter keeps matching visible columns only (fact 5), so hiding a
   column removes its values from the filter. The name column can't be hidden,
@@ -363,10 +376,10 @@ standing sections:
 One implementation PR, gated on D1 and D2:
 
 - The shared menu and its clientside callback, wired into both tables.
-- The two ID columns: the playlist model's benchmark ID, the overview row's
-  field, the scenario row's field on all three row paths, the two column
-  definitions, the selectable cell class, and the overview's navigation
-  exclusion.
+- The two ID columns: the bundled loader's benchmark-ID side table, the
+  overview row's field, the scenario row's field on all three row paths, the
+  two column definitions, the selectable cell class, and the overview's
+  navigation exclusion.
 - The tests and the live check below.
 - The shipping docs in the same PR:
   - a decision-log entry;
@@ -390,9 +403,11 @@ build. More effort would buy polish, not correctness.
 
 ## Testing
 
-- **The playlist model:** a bundled file loads with its benchmark ID. A file
-  with no `generated_from` block, and one with a malformed block, both load
-  with no ID. An imported playlist's written file is unchanged.
+- **The bundled loader:** a bundled file's benchmark ID lands in the side
+  table. A bundled file with no `generated_from` block, and one with a
+  malformed block, both load, with no ID. A user file's stamp is ignored. The
+  playlist model has no new field, and the importer's existing check tests
+  pass unchanged.
 - **The overview rows:** a bundled benchmark's row carries its ID, and an
   imported playlist's row carries none.
 - **The scenario rows:** a first-paint row, a streamed row, and a cancelled
