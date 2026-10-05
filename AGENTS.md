@@ -142,6 +142,11 @@ Codex <codex@local>
   has the evidence).
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
+- Use [docs/dependency_refresh.md](docs/dependency_refresh.md) as the playbook
+  when upgrading dependencies or toolchain pins: the lockfile, the dependency
+  floors, uv, the pinned GitHub Actions, and the vendored browser libraries.
+  Updates are made by hand from it. A refresh that finds a step wrong or
+  missing fixes the playbook in the same PR.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
   samples) goes under `ignore/` in a categorized subdirectory, never loose at
   the top level — routing table in [ignore/README.md](ignore/README.md).
