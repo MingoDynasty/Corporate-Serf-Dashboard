@@ -13,16 +13,19 @@ stars need no setting, and nothing else about the chart changes.
 
 ## Decisions needed
 
-Nothing in this proposal is ratified. Three choices need the maintainer's
-product judgment: M1, M2, and M3. Each carries a recommendation and what
-follows from choosing differently.
+Three rulings: M1, M2, and M3. The maintainer ratified this proposal on
+2026-10-05, after every reviewer had endorsed all five rows at their current
+text. That settles each of the three as its recommendation. Each keeps its
+recommendation and the alternatives it rejected, for the record.
 
-Everything else is author-owned and open to challenge. Design tags those
-choices M4 (the look and how it is built) and M5 (the copy and the term).
+Everything else is author-owned, and the ratification covers it too. Design
+tags those choices M4 (the look and how it is built) and M5 (the copy and the
+term). M4 carries one exception to an earlier ruling, which
+[The decision this touches](#the-decision-this-touches) names.
 
 ### M1 — A star marks every run that set a new PB, not only the current one
 
-Status: Open
+Status: Ratified (user), 2026-10-05: accept the recommendation below.
 
 The material consequence: the chart works out which of the scenario's runs
 beat the PB when they were played and marks each one it plots, so a
@@ -59,7 +62,7 @@ Choosing differently:
 
 ### M2 — Only Score vs Time is marked
 
-Status: Open
+Status: Ratified (user), 2026-10-05: accept the recommendation below.
 
 The material consequence: Score vs Sensitivity is drawn exactly as it is
 today. The chart opens on Score vs Sensitivity by default and remembers the
@@ -85,7 +88,7 @@ Choosing differently:
 
 ### M3 — The stars have no Chart options control
 
-Status: Open
+Status: Ratified (user), 2026-10-05: accept the recommendation below.
 
 The material consequence: the stars are always drawn on Score vs Time, and
 the Chart options panel stays as it is.
@@ -417,7 +420,7 @@ words, and it stays as written.
 
 ## Delivery plan
 
-One implementation PR. It starts once M1, M2, and M3 are ruled and this
+One implementation PR. M1, M2, and M3 are ruled, so it starts once this
 proposal has merged. It has no other dependency and can run beside the Run
 History and pace work. Recommended implementer: `claude-opus-5-5` at high, in
 a fresh session. The change is specified down to its one string, and unit
