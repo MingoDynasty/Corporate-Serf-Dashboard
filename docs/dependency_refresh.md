@@ -8,9 +8,9 @@ release.
 ## When to run
 
 Run a refresh about monthly, at a point when little other work is open. There
-is no reminder, because a refresh always finds something: a timer would say
-nothing the calendar does not. On 2026-10-04, 22 days after the previous
-refresh, 25 of the 84 locked packages had a newer release.
+is no reminder and no bot, because a refresh always finds something: a timer
+would say nothing the calendar does not. The reasons are in the
+[2026-10-04 decision](decision_log.md#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook).
 
 List the open work first:
 
@@ -210,11 +210,10 @@ the PR body. Lift the cap in a later refresh, once the breakage is gone.
 ## A security alert between refreshes
 
 GitHub's Dependabot alerts watch `uv.lock` and raise an alert when a locked
-package has a known vulnerability. Its automatic fix PRs are off, and its uv
-support fails on an exact `required-version` pin that differs from the uv it
-bundles
-([dependabot-core issue 13199](https://github.com/dependabot/dependabot-core/issues/13199),
-open on 2026-10-04). So the fix is made by hand, as its own PR:
+package has a known vulnerability. Its automatic fix PRs are off, because they
+cannot run against this repository's exact uv pin
+([2026-10-04 decision](decision_log.md#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook)).
+So the fix is made by hand, as its own PR:
 
 ```powershell
 uv lock --upgrade-package <name>
