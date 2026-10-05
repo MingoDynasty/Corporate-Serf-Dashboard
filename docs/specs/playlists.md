@@ -186,7 +186,9 @@ and [product.md](../product.md). Leaderboard placement is worded
 - Hiding a column is display only. Rows carry every field, no fetch stops,
   and each status line reads the same with its columns hidden. The quick
   filter matches visible columns only, so a hidden column's values find no
-  row. Hiding a sorted column clears its sort, and showing it again does not
+  row. Showing or hiding a column re-runs a filter that is already typed, so
+  the rows on screen always answer for the columns on screen. Hiding a sorted
+  column clears its sort, and showing it again does not
   bring the sort back. On the overview, hiding Last Played leaves the rows in
   name order, and showing it again keeps them there until the page is opened
   again

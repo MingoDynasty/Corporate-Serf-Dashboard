@@ -100,19 +100,26 @@ of the keyboard otherwise.
 **One clientside callback per table applies the checkboxes through the grid
 API.** It is the app's first pattern-matching callback, over that menu's
 checkboxes. It runs as the page mounts, with the stored values, and on every
-change, and does three things in order:
+change, and does four things in order:
 
 1. `setColumnsVisible` for the shown set and for the hidden set.
 2. Clears the sort of every hidden column, with `applyColumnState` and
    `sort: null`. A hidden column otherwise keeps its sort.
-3. `autoSizeColumns` on the columns it just showed. On the proposal's
+3. Re-runs the quick filter, with `onFilterChanged`. The proposal listed
+   three steps and not this one. AG Grid matches the quick filter against
+   visible columns, but on a visibility change it only drops the filter's
+   cached text and filters nothing again. Without this step, with `2336` in
+   the filter, hiding Benchmark ID left its row on screen, and showing the
+   column again left no rows, each until the text was next edited (found in
+   review of PR #344, and measured on both tables on 2026-10-05).
+4. `autoSizeColumns` on the columns it just showed. On the proposal's
    prototype (2026-10-04), a column shown through the API was not sized, and
    one shown as the page opened came up at its minimum width and clipped its
    header. With this step, on the real pages, Benchmark ID sized to 145 px
    and Leaderboard ID to 154 px after a toggle, a reload, and an in-app round
    trip alike (2026-10-05).
 
-Step 3 has one limit, which the page's own autosize shares: AG Grid sizes only
+Step 4 has one limit, which the page's own autosize shares: AG Grid sizes only
 the columns it has rendered. In a window narrower than the table, a column
 scrolled out of view keeps AG Grid's 200 px default, whether the page or the
 menu showed it (measured 2026-10-05 in a 1100 px window, where five columns

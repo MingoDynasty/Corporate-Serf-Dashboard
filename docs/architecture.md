@@ -514,8 +514,8 @@ flowchart LR
   label, default). `register_columns_menu()` registers one clientside callback
   per grid, the app's only pattern-matching callback, which applies the
   checkboxes through the grid API as the page mounts and on every change: it
-  sets visibility, clears the sort of every hidden column, and sizes the
-  columns it just showed. It never writes the grid's `columnState` prop and
+  sets visibility, clears the sort of every hidden column, re-runs the quick
+  filter, and sizes the columns it just showed. It never writes the grid's `columnState` prop and
   never resends column definitions. The choices live in the browser's local
   storage, so the server never learns which columns are shown
   ([decision_log.md](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).

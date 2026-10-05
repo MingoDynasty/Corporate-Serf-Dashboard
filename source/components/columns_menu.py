@@ -50,6 +50,11 @@ async (checked, ids) => {
         gridApi.applyColumnState({
             state: hidden.map((colId) => ({colId, sort: null})),
         });
+        // The quick filter matches visible columns only, but a visibility
+        // change makes AG Grid drop the filter's cached text and nothing
+        // more. Without this, the rows keep the answer for the columns as
+        // they were until the filter text is next edited.
+        gridApi.onFilterChanged();
         // setColumnsVisible does not size the column it shows, and one shown
         // as the page opens comes up at its minimum width.
         const added = shown.filter((colId) => !shownBefore.has(colId));
@@ -136,9 +141,10 @@ def columns_menu(menu_id: str, columns: Sequence[MenuColumn]) -> dmc.Popover:
 def register_columns_menu(menu_id: str, grid_id: str) -> None:
     """Register the callback that applies a menu's checkboxes to its grid.
 
-    It runs when the page mounts and on every change, and does three things in
+    It runs when the page mounts and on every change, and does four things in
     order: sets each column's visibility, clears the sort of every hidden
-    column, and sizes the columns it just showed. Call once per menu, at import.
+    column, re-runs the quick filter, and sizes the columns it just showed.
+    Call once per menu, at import.
     """
     clientside_callback(
         _APPLY_COLUMNS.replace("GRID_ID", json.dumps(grid_id)),

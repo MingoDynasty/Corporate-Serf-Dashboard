@@ -3038,15 +3038,25 @@ def test_columns_menu_callback_applies_the_checkboxes_through_the_grid_api(
         if spec["clientside_function"]["function_name"] in script
     )
     assert f'getApiAsync("{grid_id}")' in source
-    # Visibility, then the hidden columns' sort, then the new columns' width.
+    # Visibility, then the hidden columns' sort, then the quick filter, then
+    # the new columns' width.
     steps = [
         source.index("gridApi.setColumnsVisible(shown, true)"),
         source.index("gridApi.setColumnsVisible(hidden, false)"),
         source.index("gridApi.applyColumnState("),
+        source.index("gridApi.onFilterChanged()"),
         source.index("gridApi.autoSizeColumns(added, false)"),
     ]
     assert steps == sorted(steps)
     assert "({colId, sort: null})" in source
+    # The filter re-run is unconditional. A visibility change makes AG Grid
+    # drop the quick filter's cache but re-filter nothing, so a guard that
+    # skipped the call would leave rows matching columns that are off screen.
+    filter_call = source.index("gridApi.onFilterChanged()")
+    visibility_block = source[
+        source.index("gridApi.setColumnsVisible(hidden, false)") : filter_call
+    ]
+    assert "if (" not in visibility_block
     # Writing ``columnState`` would reorder the columns, and resending the
     # column defs would reapply the sort and visibility they declare.
     assert "columnState" not in source
