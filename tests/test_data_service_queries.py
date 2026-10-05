@@ -152,6 +152,74 @@ def test_sensitivities_filtered_oldest_date_is_inclusive(load_runs):
     assert _scores(result) == {"40.0 cm/360": [7.0, 5.0]}
 
 
+def test_new_high_score_is_a_run_above_every_earlier_run():
+    first, higher, lower, between, highest = (
+        _run(score, START + timedelta(hours=hour))
+        for hour, score in enumerate((50.0, 60.0, 40.0, 55.0, 70.0))
+    )
+
+    result = data_service.new_high_score_runs([first, higher, lower, between, highest])
+
+    # 55 beat the 40 played before it, and not the 60 before that.
+    assert result == {higher, highest}
+
+
+def test_new_high_score_skips_a_tie_so_the_earlier_run_keeps_it():
+    first = _run(50.0, START)
+    new_pb = _run(60.0, START + timedelta(hours=1))
+    # Told apart from the run it ties by its timestamp alone.
+    tie = _run(60.0, START + timedelta(hours=2))
+
+    assert data_service.new_high_score_runs([first, new_pb, tie]) == {new_pb}
+
+
+def test_new_high_score_skips_the_first_run():
+    assert data_service.new_high_score_runs([_run(50.0, START)]) == set()
+    assert data_service.new_high_score_runs([]) == set()
+
+
+def test_new_high_score_judges_runs_in_time_order_however_they_are_held():
+    oldest = _run(50.0, START)
+    middle = _run(70.0, START + timedelta(hours=1))
+    newest = _run(60.0, START + timedelta(hours=2))
+
+    # Held newest first, 60 would beat nothing and 70 would beat 60.
+    for held in ([newest, middle, oldest], [middle, newest, oldest]):
+        assert data_service.new_high_score_runs(held) == {middle}
+
+
+def test_new_high_score_compares_across_sensitivities():
+    first = _run(50.0, START, horizontal_sens=40.0)
+    best_at_another_sensitivity = _run(
+        45.0, START + timedelta(hours=1), horizontal_sens=30.0
+    )
+    new_pb = _run(55.0, START + timedelta(hours=2), horizontal_sens=30.0)
+
+    # 45 is the best run at its sensitivity and still below the scenario's 50.
+    assert data_service.new_high_score_runs(
+        [first, best_at_another_sensitivity, new_pb]
+    ) == {new_pb}
+
+
+def test_new_high_score_finds_none_when_scores_only_fall():
+    falling = [
+        _run(score, START + timedelta(hours=hour))
+        for hour, score in enumerate((70.0, 60.0, 60.0, 50.0))
+    ]
+
+    assert data_service.new_high_score_runs(falling) == set()
+
+
+def test_get_new_high_score_runs_reads_the_scenarios_whole_history(load_runs):
+    other_scenario = _run(999.0, START, scenario="Other")
+    first = _run(50.0, START + timedelta(hours=1), horizontal_sens=40.0)
+    new_pb = _run(60.0, START + timedelta(days=30), horizontal_sens=30.0)
+    load_runs(new_pb, other_scenario, first)
+
+    assert data_service.get_new_high_score_runs(SCENARIO_NAME) == {new_pb}
+    assert data_service.get_new_high_score_runs("Other") == set()
+
+
 @pytest.mark.parametrize(
     ("checkpoint_threshold", "expected_indices"),
     [(1, [0, 60, 120]), (2, [0, 120])],

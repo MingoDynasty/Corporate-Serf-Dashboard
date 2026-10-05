@@ -359,7 +359,15 @@ flowchart LR
   color are inputs to `apply_graph_appearance` instead, the cheap callback
   that themes the cached figure and then hands it to
   `plot_service.apply_point_appearance` — appearance never reruns the data
-  read, the overlays, or the notification logic.
+  read, the overlays, or the notification logic. That function restyles two
+  traces, each selected by name: the size and color go to the run trace, and
+  the size alone to the New PB stars.
+  The stars come from the rebuild. In Score vs Time `_build_scenario_figure`
+  asks `data_service.get_new_high_score_runs` which of the scenario's runs set
+  a new PB, over its whole history, and passes them to `generate_time_plot`
+  with the filtered runs it plots. The plot stars the ones it holds, matched
+  by run, in a third trace
+  ([decision_log.md](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
   The two notification controls draw nothing at all, and they differ in what
   flipping them costs. *Score threshold verdict* is an `Input` on
   `generate_graph`, so it re-runs the whole callback and rebuilds a figure
@@ -428,9 +436,12 @@ flowchart LR
   generation token, the interval left disabled, and the condition stated in
   the status line (see decision log), so no lookup runs over a pass that would
   fetch nothing. A benchmark's `layout` adds the Rank and Next Rank columns
-  after PB Score, and its header a "View on Evxl" link built by
-  `evxl_links.evxl_benchmark_url`. The link is `html.A`, not `dmc.Anchor`,
-  which percent-decodes an href (see decision log). The table's sort lives in
+  after PB Score, and its header the Evxl link, whose address
+  `evxl_links.evxl_benchmark_url` builds. The link is `html.A`, not
+  `dmc.Anchor`, which percent-decodes an href (see decision log). It holds
+  only Evxl's logo from `local_icon`, so a `dmc.Tooltip` and an `aria-label`
+  carry its name, and the `mantine-focus-auto` class its keyboard focus
+  ring. The table's sort lives in
   the page URL as `?sort=`: `layout` seeds `initialSort` on a fresh copy of
   the column defs from a value valid for that page's columns, and a
   clientside callback on the grid's `columnState` rewrites the key with a raw
@@ -500,9 +511,9 @@ flowchart LR
   line rather than escaping into a failed request the user cannot see.
 
 ### Shared UI components
-- `components/local_icon.py` — local SVG icon registry/helper used by the shell
-  and page controls. SVG files live under `assets/icons/` so the local app does
-  not fetch Iconify icon data at runtime.
+- `components/local_icon.py` — local icon registry/helper used by the shell
+  and page controls. Icon files live under `assets/icons/` so the local app does
+  not fetch Iconify icon data, or Evxl's logo, at runtime.
 - `components/control_name.py` — `control_name()`, the one bold span (`html.B`)
   for a control named in running text, used by every component sentence that
   names one; chart annotations write `<b>…</b>` into the string instead. The
@@ -531,6 +542,10 @@ flowchart LR
   A converted run also carries `RunData.recorded_sensitivity`, the unrounded
   value, scale, and DPI its file recorded, which only the chart hover reads
   ([decision_log.md](decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
+  `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
+  runs in time order, and `get_new_high_score_runs` applies it to everything
+  the scenario holds, never to a filtered view
+  ([decision_log.md](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
   `load_playlists` records each winning user-root code's actual file path
   (so deletion targets the real file, not a reconstructed name) and the user files it skips because
   a bundled code already won; `delete_user_playlist` and
@@ -735,7 +750,9 @@ flowchart LR
   load-bearing.
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
-- `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
+- `assets/icons/` — vendored icon files consumed by `components/local_icon.py`:
+  SVGs from licensed collections, and Evxl's logo, used by permission. Its
+  `README.md` records the terms of each.
 - `assets/vendor/` — third-party browser libraries, copied in unminified with
   their license and an exact version pin (`assets/vendor/README.md` holds the
   table and the update recipe). One entry today: `canvas-confetti` 1.9.4
@@ -757,7 +774,7 @@ flowchart LR
 | The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |
-| Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
+| Shared UI icons or vendored icon files | `components/local_icon.py` + `assets/icons/` |
 | How user-facing text is written, or a control named in a sentence | AGENTS.md styling conventions + [the 2026-09-14 app copy entry](decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out); `components/control_name.py` for the bold span; `tests/test_em_dash_guard.py` for the em-dash gate |
 | Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles, which the page runs behind its Detect button |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

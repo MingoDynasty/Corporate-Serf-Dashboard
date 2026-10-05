@@ -3,6 +3,7 @@
 import copy
 import json
 from collections.abc import Collection
+from typing import Any
 from uuid import uuid4
 
 import dash
@@ -25,6 +26,7 @@ from source.components.columns_menu import (
     columns_menu_sink,
     register_columns_menu,
 )
+from source.components.local_icon import local_icon
 from source.config.settings_service import get_kovaaks_username, get_steam_id
 from source.kovaaks.data_service import (
     get_playlist_by_code,
@@ -614,10 +616,19 @@ clientside_callback(
 register_columns_menu(COLUMNS_MENU_ID, "playlist-scenarios-grid")
 
 
+# The Evxl link's tooltip and its accessible name: the link shows only a
+# logo, so this is the one place its name is written.
+EVXL_LINK_LABEL = "View on Evxl"
+# ``Any`` because ``html.A`` takes ``aria-*`` as wildcard keywords: mypy
+# checks a ``dict[str, str]`` against every other parameter and fails.
+_EVXL_LINK_NAME: dict[str, Any] = {"aria-label": EVXL_LINK_LABEL}
+
+
 def _page_header(playlist_code: str, *, benchmark: bool) -> dmc.Group:
     """Title the page with the playlist's display label and its share code.
 
-    A benchmark that Evxl has a page for also gets a link to that page.
+    A benchmark that Evxl has a page for also gets a link to that page: Evxl's
+    logo, named by a tooltip.
     """
     children = [
         dmc.Title(get_playlist_display_label(playlist_code), order=2),
@@ -626,16 +637,30 @@ def _page_header(playlist_code: str, *, benchmark: bool) -> dmc.Group:
     evxl_url = evxl_benchmark_url(playlist_code, get_steam_id()) if benchmark else None
     if evxl_url is not None:
         children.append(
-            # ``html.A``, not ``dmc.Anchor``: the Mantine wrapper
-            # percent-decodes an href before rendering it, which turns an
-            # encoded ``/`` or ``#`` in a benchmark name into a path separator
-            # or a fragment.
-            html.A(
-                "View on Evxl",
-                id="playlist-scenarios-evxl-link",
-                className="playlist-scenarios-evxl-link",
-                href=evxl_url,
-                target="_blank",
+            dmc.Tooltip(
+                # ``html.A``, not ``dmc.Anchor``: the Mantine wrapper
+                # percent-decodes an href before rendering it, which turns an
+                # encoded ``/`` or ``#`` in a benchmark name into a path
+                # separator or a fragment.
+                html.A(
+                    local_icon("evxl:logo", height=24),
+                    id="playlist-scenarios-evxl-link",
+                    # ``mantine-focus-auto`` is the keyboard focus ring
+                    # ``dmc.Anchor`` would have brought. Without it the ring
+                    # is the browser's own, which is near-black in Chromium
+                    # and can't be seen on the dark theme.
+                    className="playlist-scenarios-evxl-link mantine-focus-auto",
+                    href=evxl_url,
+                    target="_blank",
+                    # The icon is hidden from assistive technology, so the
+                    # link would have no name without this.
+                    **_EVXL_LINK_NAME,
+                ),
+                label=EVXL_LINK_LABEL,
+                # On keyboard focus too: the tooltip is the only place the
+                # link's name is written.
+                events={"hover": True, "focus": True, "touch": False},
+                boxWrapperProps={"className": "playlist-scenarios-evxl-link-box"},
             )
         )
     return dmc.Group(align="baseline", gap="sm", children=children)

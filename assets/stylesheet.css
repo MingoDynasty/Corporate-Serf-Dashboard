@@ -411,19 +411,21 @@ a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 
-/* The Evxl link in a benchmark's page header. It is a plain anchor, because
-   dmc.Anchor percent-decodes its href and would break a benchmark name
-   holding an encoded slash, so this class gives it the look dmc.Anchor has at
-   size "sm". */
-a.playlist-scenarios-evxl-link,
-a.playlist-scenarios-evxl-link:visited {
-    color: var(--mantine-color-anchor);
-    font-size: var(--mantine-font-size-sm);
-    text-decoration: none;
+/* The Evxl link in a benchmark's page header: Evxl's logo as an icon-only
+   link. It is a plain anchor, because dmc.Anchor percent-decodes its href and
+   would break a benchmark name holding an encoded slash. As a flex box it is
+   exactly the icon's size, so the focus ring hugs the logo, not a line of
+   text. */
+a.playlist-scenarios-evxl-link {
+    display: flex;
+    border-radius: var(--mantine-radius-sm);
 }
 
-a.playlist-scenarios-evxl-link:hover {
-    text-decoration: underline;
+/* The tooltip's wrapper around the link. The header aligns its text on a
+   shared baseline, which would stand the logo on that line and lift it above
+   the title, so the wrapper centers itself on the row. */
+.playlist-scenarios-evxl-link-box {
+    align-self: center;
 }
 
 /* The overview's leftover-files notice ships hidden and is revealed by the

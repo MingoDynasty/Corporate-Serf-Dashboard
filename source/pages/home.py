@@ -46,6 +46,7 @@ from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch
 from source.kovaaks.data_service import (
     drain_startup_playlist_warnings,
     get_high_score,
+    get_new_high_score_runs,
     get_playlist_by_code,
     get_rank_data_from_playlist_code,
     get_scenario_names,
@@ -1354,6 +1355,7 @@ def _build_scenario_figure(  # noqa: PLR0913
                 rank_overlay_switch,
                 rank_data,
                 show_all_ranks_switch,
+                get_new_high_score_runs(selected_scenario),
             ),
             True,
         )
