@@ -248,6 +248,15 @@ compare the two. Run this in the browser console on a page with a chart drawn:
 JSON.stringify(document.querySelector(".js-plotly-plot")._context)
 ```
 
+A plotly bump also needs one look that no test can take. On Score vs Time,
+hover a New PB star that shares its point with a later run that tied it the
+same day. The hover must give the time of the run that set the PB, the earlier
+of the two. The app only places that run last in the trace. That plotly.js
+answers a shared point with its last point is observed, on 4.0.0 and 4.1.1,
+and not documented
+([2026-10-05 entry](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+If the later run's time shows, stop and ask the maintainer.
+
 A refresh changes versions, not behavior. If an upgrade adds or removes
 something a user can press, changes what a control does, or adds a new way for
 the app to reach an outside service, stop and ask the maintainer before
