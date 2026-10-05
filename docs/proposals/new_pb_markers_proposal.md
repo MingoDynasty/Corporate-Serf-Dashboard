@@ -51,13 +51,20 @@ Choosing differently:
 - **Count the first run.** It is the PB by definition when it is played, so
   every scenario would open with a star that says nothing. The celebration
   skips it for the same reason.
+- **One star per day,** on the run that held the PB when the day ended. That
+  is 421 stars where the recommendation draws 666. A star would stop matching
+  a celebration one to one, and its meaning would depend on the chart drawing
+  its axis in days. The 245 stars it drops are the ones a reader can't find
+  today, because a day's runs share one position.
 
 ### M2 — Only Score vs Time is marked
 
 Status: Open
 
 The material consequence: Score vs Sensitivity is drawn exactly as it is
-today.
+today. The chart opens on Score vs Sensitivity by default and remembers the
+choice per browser, so a fresh browser shows no stars until the reader
+switches to Score vs Time.
 
 **Recommendation: draw the stars on Score vs Time and leave Score vs
 Sensitivity alone.** Along the date axis the stars read left to right as the
@@ -85,10 +92,15 @@ the Chart options panel stays as it is.
 
 **Recommendation: no switch, and no color or shape setting.** Clicking New PB
 in the legend hides the stars, as it hides any trace. That choice is not
-remembered. The stars are expected back when the chart is next redrawn by a
-new run, a control change, or a theme change: plotly.js keeps a legend click
-across a new figure only when the figure sets `uirevision`, and this chart
-sets none. The live check verifies it.
+remembered. A new figure brings the stars back, because plotly.js keeps a
+legend click across figures only when the figure sets `uirevision`, and this
+chart sets none. That is reproduced on a standalone figure, and the live
+check confirms it in the app. The chart gets a new figure from a new run on
+the scenario, a control change, or a theme change.
+
+The celebration accepted the same density of new PBs on a lightly played
+scenario with its setting as the way out. The stars have no equivalent: in
+session, a legend click lasts until the next run on the scenario.
 
 Two reasons:
 
@@ -175,7 +187,11 @@ The four busiest charts would show 9 stars among 64 points, 5 among 62, 8
 among 55, and 9 among 55 on Score vs Time. The same four scenarios on Score
 vs Sensitivity would show 3 among 9, 5 among 10, 3 among 5, and 4 among 10.
 
-Two readings:
+Stars stack within a day on Score vs Time. 245 of the 666 stars (37%) are on
+a run that a later run the same day beat, and 174 of the 830 plotted days
+carry two or more stars.
+
+Three readings:
 
 - **The share falls as a scenario is played more.** A new scenario's runs are
   mostly PBs, and a practiced scenario's rarely are. The celebration's entry
@@ -184,6 +200,10 @@ Two readings:
   doesn't.** A day's filter drops a new PB only when five runs at or above
   its score follow it the same day. A sensitivity's filter drops every new PB
   that five later runs at that sensitivity have since beaten.
+- **A third of the stars are ones no reader can find today.** A run that a
+  later run the same day beat sits below that day's top point, at the same x
+  position. Those 245 stars are what this adds over reading each day's top
+  point. They are also a third of its density.
 
 ### The decision this touches
 
@@ -195,7 +215,13 @@ carries multiple semantic point categories".
 
 This proposal is that case. A new PB is a second category of point. The
 outcome proposed here is a symbol the app fixes, and still no symbol control.
-The entry stands as written, and the shipping entry links it.
+
+One sentence of the entry gains an exception. Its summary says "Nothing else
+on the chart became customizable", and the spec says size and color "restyle
+only the run trace". Under M4, Point size also sizes the stars. The set of
+controls doesn't change, but one control now restyles two traces. The
+shipping PR records that as the entry superseded in part. The rest of the
+entry stands.
 
 ### The direction this is held to
 
@@ -352,12 +378,14 @@ Unchanged on purpose:
 ### Terms (M5)
 
 The entry below is written as [docs/glossary.md](../glossary.md) would hold
-it. The shipping PR moves it in, under Scores and notifications.
+it. The shipping PR moves it in, under Scores and notifications, and
+repoints its link from there.
 
-- **New PB.** A run that beat its scenario's PB when it was played. It was
-  the PB until a later run beat it, so a scenario's new PBs are the history
-  of its PB. Where the chart marks them goes in the Scenario Performance
-  spec.
+- **New PB.** A run that beat its scenario's PB when it was played. It held
+  the PB until a later run beat it, and the latest one is the PB run. A
+  scenario's first run sets the PB without beating one, so it isn't a new PB.
+  Where the chart marks them is in
+  [scenario_performance.md](../specs/scenario_performance.md#the-graph).
   - On screen: New PB in the chart legend. The celebration toast's title
     says New personal best.
   - In code: `new_high_score`.
@@ -405,11 +433,15 @@ tests plus one live check verify it.
 - **Tests:** listed under Testing.
 - **Shipping docs, in the same PR:**
   - a decision-log entry, opening with its layer-1 summary. It links the
-    2026-08-20 and 2026-09-02 entries and supersedes neither.
+    2026-08-20, 2026-09-02, and 2026-10-04 entries. It says that Point size
+    now sizes the New PB trace too, and the 2026-08-20 entry gains a
+    superseded-in-part note for that one sentence. Nothing else is
+    superseded.
   - `docs/specs/scenario_performance.md`: the trace, the rule, and where a
     star is drawn in The graph; the star size beside the Point size
-    statement; the stars in the list of what a shared figure holds. The
-    summary is checked against the payload change.
+    statement; the statement that size and color restyle only the run trace;
+    the stars in the list of what a shared figure holds. The summary is
+    checked against the payload change.
   - `docs/glossary.md`: the Terms block above.
   - `docs/product.md`: the inventory entry and the problem it solves.
   - `docs/architecture.md`: the sentence on `apply_point_appearance`, which
