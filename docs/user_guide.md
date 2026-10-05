@@ -114,10 +114,13 @@ columns use the personal best from your stats folder, the one PB Score shows,
 so they work without a KovaaK's username. A new personal best shows up in
 them when you reopen the table.
 
+On the Scenario Performance page, the **Open scenario table** link under the
+**Playlist filter** opens the scenario table of the playlist selected there.
+
 A playlist's scenario table keeps its sort when you come back to it with the
-browser's Back button, but opening the playlist fresh from the Playlists page
-starts it in playlist order; to clear a sort, click a sorted column's header
-until the table returns to that order.
+browser's Back button, but opening the playlist fresh, from the Playlists page
+or from that link, starts it in playlist order; to clear a sort, click a sorted
+column's header until the table returns to that order.
 
 ## Troubleshooting
 

@@ -1,11 +1,11 @@
-"""Shared prop preset for the playlist-selector dropdowns.
+"""Shared props for the playlist-selector dropdowns.
 
 Home's ``dmc.Select`` filter and the Aim Training Journey ``dmc.MultiSelect``
 comparison picker stay distinct components with role-specific behavior
 (clearable/persistence/value semantics), but should share the same search,
 sizing, and scroll conventions so the two dropdowns look and behave
-consistently. This preset holds only the role-agnostic props; each call site
-splats it and adds its own role-specific props.
+consistently. This module holds only the role-agnostic props; each call site
+splats them and adds its own role-specific props.
 """
 
 # Splatted into both playlist dropdowns. Only props valid on both
@@ -14,6 +14,18 @@ splats it and adds its own role-specific props.
 # (clearable, persistence, value) stay at the call sites.
 PLAYLIST_SELECTOR_PRESET = {
     "checkIconPosition": "right",
+    "maxDropdownHeight": "75vh",
+    "placeholder": "Select a playlist",
+    "scrollAreaProps": {"type": "always"},
+    "searchable": True,
+}
+
+# How wide a playlist dropdown's flex item is in its wrapping row. Apart from
+# the preset because that item is not always the dropdown: a dropdown stacked
+# in a column with something under it leaves the column as the row's flex item,
+# and the same props on the dropdown inside would size it along the column's
+# axis instead.
+PLAYLIST_SELECTOR_SIZING = {
     # Target 400px, but narrow before the row wraps. Flex line-breaking uses
     # each item's *hypothetical* main size -- its flex-basis clamped by min/max
     # width -- and flex-shrink only redistributes space inside a line that has
@@ -25,11 +37,7 @@ PLAYLIST_SELECTOR_PRESET = {
     # high page zoom from overflowing a container narrower than either bound.
     "flex": "1 1 200px",
     "maw": "min(400px, 100%)",
-    "maxDropdownHeight": "75vh",
     # Explicit rather than the flex-item default of ``auto``: a min-content
     # floor above 200px would quietly raise the wrap threshold again.
     "miw": "min(200px, 100%)",
-    "placeholder": "Select a playlist",
-    "scrollAreaProps": {"type": "always"},
-    "searchable": True,
 }

@@ -29,6 +29,7 @@ from source.pages import (  # noqa: E402
     playlist_scenarios,
     playlists,
 )
+from source.pages.playlist_selector import PLAYLIST_SELECTOR_SIZING  # noqa: E402
 
 
 def test_playlists_overview_cell_click_routes_to_playlist():
@@ -1497,6 +1498,10 @@ def test_aim_training_journey_playlist_picker_shares_home_scroll_and_height():
     # scroll and cap height consistently once the library grows past a screen.
     assert picker.scrollAreaProps == {"type": "always"}
     assert picker.maxDropdownHeight == "75vh"
+    # The picker is its row's flex item, so it takes the shared sizing itself.
+    assert {
+        prop: getattr(picker, prop) for prop in PLAYLIST_SELECTOR_SIZING
+    } == PLAYLIST_SELECTOR_SIZING
 
 
 def test_aim_training_journey_layout_uses_graph_placeholder():

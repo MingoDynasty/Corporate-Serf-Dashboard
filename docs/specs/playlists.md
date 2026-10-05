@@ -51,8 +51,8 @@ and [product.md](../product.md). Leaderboard placement is worded
 - `/playlists` and `/playlists/{playlistCode}` are stable contracts, and the
   bare-route selector dropdown is gone
   ([2026-07-03](../decision_log.md#2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional)).
-  `playlist_selector.py` is now only a shared prop preset for the Home and
-  Aim Training Journey dropdowns.
+  `playlist_selector.py` is now only the shared props, a preset and a sizing
+  rule, for the Home and Aim Training Journey dropdowns.
 - Overview rows are full-row click targets (pointer cursor, hover tint): a
   click on any cell except the two action cells navigates to
   `/playlists/{code}`. The Playlist name cell and the table's Scenario cell
@@ -60,6 +60,13 @@ and [product.md](../product.md). Leaderboard placement is worded
   Performance page) are real anchors: a modified click (Ctrl/Cmd/Shift/Alt)
   keeps the native anchor and stops the grid's `cellClicked` navigation; a
   plain click does the opposite.
+- The Scenario Performance page links back to the table: while its Playlist
+  filter holds a loaded playlist, the "Open scenario table" link under the
+  filter leads to `/playlists/{code}`. The link carries no `?sort=`, so the
+  table opens unsorted, in playlist order. A plain click navigates inside the
+  app and a modified click keeps the native anchor. The link's own states are
+  specified in
+  [scenario_performance.md](scenario_performance.md#the-controls-row).
 - The table load is driven by the mounted layout's `playlist-scenarios-code`
   store, never by the URL change
   ([2026-04-29](../decision_log.md#2026-04-29-drive-playlist-table-loads-from-mounted-route-state)).
