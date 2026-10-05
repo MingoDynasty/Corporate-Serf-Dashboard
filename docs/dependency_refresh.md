@@ -95,10 +95,19 @@ go down.
 
 2. See what would move. Read the release notes of anything crossing a major
    version, and of every package that ships browser code (named under
-   [Verify by what moved](#verify-by-what-moved)).
+   [Verify by what moved](#verify-by-what-moved)). For plotly, read the
+   plotly.js notes too, for every version between the two it bundles: plotly's
+   own notes list only the notable changes.
 
    ```powershell
    uv lock --upgrade --dry-run
+   ```
+
+   The preview leaves out what the minimum package age is holding back. To see
+   that as well, lift the limit for one preview. It writes nothing:
+
+   ```powershell
+   uv lock --upgrade --dry-run --exclude-newer "0 days"
    ```
 
 3. Upgrade the lock and the environment, and commit `uv.lock` alone as
@@ -123,8 +132,9 @@ go down.
    uv lock
    ```
 
-   `git diff uv.lock` must show `specifier` lines only, because no package
-   version moves in this step. Commit as
+   `git diff uv.lock` must show no line starting `version = `, because no
+   package moves in this step. The `specifier` lines change, and uv may reorder
+   the `resolution-markers` list, as it may in the minimum-age commit. Commit as
    `chore(deps): refresh dependency floors to the locked, tested versions`.
 
 6. Check the vendored browser libraries, which no uv command sees. Compare
@@ -228,6 +238,24 @@ print its version before and after the upgrade:
 ```powershell
 uv run python -c "from plotly.offline import get_plotlyjs_version; print(get_plotlyjs_version())"
 ```
+
+Looking at a chart does not show a changed default. plotly.js 4.1.0 raised the
+double-click delay from 300 ms to 500 ms, and both toolbars stayed the same.
+To catch one, print each chart's settings before and after the upgrade and
+compare the two. Run this in the browser console on a page with a chart drawn:
+
+```js
+JSON.stringify(document.querySelector(".js-plotly-plot")._context)
+```
+
+A plotly bump also needs one look that no test can take. On Score vs Time,
+hover a New PB star that shares its point with a later run that tied it the
+same day. The hover must give the time of the run that set the PB, the earlier
+of the two. The app only places that run last in the trace. That plotly.js
+answers a shared point with its last point is observed, on 4.0.0 and 4.1.1,
+and not documented
+([2026-10-05 entry](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+If the later run's time shows, stop and ask the maintainer.
 
 A refresh changes versions, not behavior. If an upgrade adds or removes
 something a user can press, changes what a control does, or adds a new way for
