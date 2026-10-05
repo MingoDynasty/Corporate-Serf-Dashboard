@@ -10,6 +10,7 @@ from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_models import PlaylistData, ScenarioStats
 from source.kovaaks.data_service import (
+    get_bundled_benchmark_id,
     get_playlist_by_code,
     get_playlist_selector_options,
     get_scenario_stats_snapshot,
@@ -27,6 +28,14 @@ def _format_int(value: int | None) -> str:
     if value is None:
         return "N/A"
     return f"{value:,}"
+
+
+def _format_id(value: int | None) -> str:
+    # Never through ``_format_int``: an ID gets pasted into a request, so it
+    # takes no thousands separator.
+    if value is None:
+        return "N/A"
+    return str(value)
 
 
 def _format_percentile_aggregate(
@@ -139,6 +148,7 @@ def format_playlist_overview_row(
         "name": display_label,
         "code": playlist.code,
         "type_display": "Benchmark" if is_benchmark_playlist(playlist) else "Playlist",
+        "benchmark_id": _format_id(get_bundled_benchmark_id(playlist.code)),
         "played_display": f"{played_count}/{scenario_count}",
         "played_sort": (played_count / scenario_count) if scenario_count else None,
         "played_count": played_count,

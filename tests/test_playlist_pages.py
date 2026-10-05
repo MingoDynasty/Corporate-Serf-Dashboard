@@ -1360,6 +1360,7 @@ def test_playlists_overview_header_tooltips_cover_exactly_the_cryptic_columns():
 
     assert fields_with_header_tooltip == {
         "type_display",
+        "benchmark_id",
         "played_sort",
         "median_percentile_sort",
         "lowest_percentile_sort",
@@ -2173,6 +2174,7 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
     }
 
     assert fields_with_header_tooltip == {
+        "leaderboard_id",
         "tier_sort",
         "next_tier_sort",
         "percentile_sort",
@@ -2345,7 +2347,9 @@ def test_playlist_scenarios_sorted_layout_leaves_the_shared_column_defs_alone():
     }
 
 
-def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlists):
+def test_playlist_scenarios_sort_names_cover_every_sortable_column_once(
+    benchmark_playlists,
+):
     # The names are address-bar copy the maintainer ruled verbatim, and saved
     # links depend on them, so pin them exactly.
     assert playlist_scenarios.SORT_URL_NAMES == {
@@ -2362,14 +2366,19 @@ def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlis
         "pb-cm360": "pb_cm360_sort",
         "pb-accuracy": "pb_accuracy_sort",
     }
-    column_ids = [
+    # Every sortable column has a name. A sortable column without one would
+    # stop the address writer for as long as it was sorted.
+    sortable_column_ids = [
         column["field"]
         for column in (
             *playlist_scenarios.TABLE_COLUMN_DEFS,
             *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
         )
+        if column["sortable"]
     ]
-    assert sorted(playlist_scenarios.SORT_URL_NAMES.values()) == sorted(column_ids)
+    assert sorted(playlist_scenarios.SORT_URL_NAMES.values()) == sorted(
+        sortable_column_ids
+    )
     for name, column_id in playlist_scenarios.SORT_URL_NAMES.items():
         page = playlist_scenarios.layout(BENCHMARK_CODE, sort=f"{name}.desc")
         assert _sort_seeds(page) == {column_id: ("desc", 0)}
@@ -2414,6 +2423,7 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
 
     assert benchmark_fields == [
         "scenario",
+        "leaderboard_id",
         "last_played_sort",
         "runs_sort",
         "position_sort",
@@ -2695,6 +2705,7 @@ def test_playlists_overview_columns_menu_lists_every_hideable_column_in_order():
     # The labels are the proposal's Copy block: sentence case, as controls.
     assert entries == [
         ("type_display", "Type"),
+        ("benchmark_id", "Benchmark ID"),
         ("played_sort", "Played"),
         ("runs_sort", "Runs"),
         ("last_played_sort", "Last played"),
@@ -2720,6 +2731,7 @@ def test_playlist_scenarios_columns_menu_lists_every_hideable_column_in_order(
     plain_entries = _menu_entries(plain_page, playlist_scenarios.COLUMNS_MENU_ID)
 
     assert benchmark_entries == [
+        ("leaderboard_id", "Leaderboard ID"),
         ("last_played_sort", "Last played"),
         ("runs_sort", "Runs"),
         ("position_sort", "Position"),
@@ -2835,6 +2847,97 @@ def test_playlist_scenarios_columns_button_ends_the_filter_row():
         getattr(component, "id", None)
         for component in _walk_components(filter_row.children[0])
     } >= {"playlist-scenarios-quick-filter", "playlist-scenarios-status"}
+
+
+# --- the two KovaaK's ID columns, hidden until the Columns menu shows them ---
+
+STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+
+
+@pytest.mark.parametrize(
+    ("column_defs", "column_id", "header", "tooltip", "previous_column_id"),
+    [
+        pytest.param(
+            playlists.TABLE_COLUMN_DEFS,
+            "benchmark_id",
+            "Benchmark ID",
+            "The number KovaaK's uses to identify this benchmark in its API.",
+            "type_display",
+            id="benchmark-id",
+        ),
+        pytest.param(
+            playlist_scenarios.TABLE_COLUMN_DEFS,
+            "leaderboard_id",
+            "Leaderboard ID",
+            "The number KovaaK's uses to identify this scenario's leaderboard "
+            "in its API.",
+            "scenario",
+            id="leaderboard-id",
+        ),
+    ],
+)
+def test_id_column_is_hidden_unsortable_and_selectable(
+    column_defs, column_id, header, tooltip, previous_column_id
+):
+    fields = [column["field"] for column in column_defs]
+    column = column_defs[fields.index(column_id)]
+
+    assert column["headerName"] == header
+    assert column["headerTooltip"] == tooltip
+    assert fields.index(column_id) == fields.index(previous_column_id) + 1
+    # ``hide`` would come back whenever the column defs were sent again,
+    # overriding the menu. Only ``initialHide`` leaves the user's choice alone.
+    assert column["initialHide"] is True
+    assert "hide" not in column
+    assert column["sortable"] is False
+    assert column["cellClass"] == "cell-selectable-text"
+    # The row carries the text to show, so nothing regroups the digits.
+    assert "valueFormatter" not in column
+    # Every other column is shown.
+    assert all(
+        "hide" not in other and "initialHide" not in other
+        for other in column_defs
+        if other["field"] != column_id
+    )
+
+
+def test_benchmark_columns_are_shown_by_default():
+    assert all(
+        "hide" not in column and "initialHide" not in column
+        for column in playlist_scenarios.BENCHMARK_COLUMN_DEFS
+    )
+
+
+def test_selectable_cell_class_turns_text_selection_back_on():
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
+    rule = stylesheet.split(".ag-cell.cell-selectable-text {", 1)[1].split("}", 1)[0]
+
+    assert "user-select: text;" in rule
+    # An overview row hands its cells a pointer; the ID cell does not navigate.
+    assert "cursor: text;" in rule
+
+
+def test_playlists_overview_benchmark_id_cell_click_does_not_navigate():
+    # A double-click to select the number is two clicks on the cell.
+    assert (
+        playlists.route_to_clicked_playlist(
+            {"rowId": "KovaaKsTestCode", "colId": playlists.BENCHMARK_ID_COLUMN_ID}
+        )
+        is no_update
+    )
+    assert playlists.BENCHMARK_ID_COLUMN_ID == "benchmark_id"
+
+
+def test_leaderboard_id_column_has_no_sort_name(benchmark_playlists):
+    assert "leaderboard_id" not in playlist_scenarios.SORT_URL_NAMES.values()
+    for query in ("leaderboard-id.asc", "leaderboard_id.asc"):
+        page = playlist_scenarios.layout(BENCHMARK_CODE, sort=query)
+        assert _sort_seeds(page) == {}
+
+
+def test_id_columns_are_sized_with_the_other_content_columns():
+    assert "benchmark_id" in playlists.AUTO_SIZE_COLUMN_KEYS
+    assert "leaderboard_id" in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
 
 
 def _columns_menu_specs(menu_id):

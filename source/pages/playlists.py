@@ -61,6 +61,9 @@ VISIBILITY_COLUMN_ID = "hidden"
 # The delete action cell's colId. Matches the ``deletable`` row flag so the
 # renderer can hide itself on bundled rows; excluded from row navigation.
 DELETE_COLUMN_ID = "deletable"
+# The Benchmark ID cell's colId. Excluded from row navigation, because a
+# double-click to select the number is two clicks on the cell.
+BENCHMARK_ID_COLUMN_ID = "benchmark_id"
 WARMUP_REFRESH_INTERVAL_MS = 1_000
 
 # Reused from the former Settings-modal import control, with the trailing
@@ -167,6 +170,7 @@ dash.register_page(
 
 AUTO_SIZE_COLUMN_KEYS = [
     "type_display",
+    BENCHMARK_ID_COLUMN_ID,
     "played_sort",
     "runs_sort",
     "last_played_sort",
@@ -259,6 +263,20 @@ TABLE_COLUMN_DEFS = [
         # run before rows arrive, leaving the column at this floor, and 110
         # ellipsized the badge.
         "minWidth": 140,
+    },
+    {
+        "headerName": "Benchmark ID",
+        "field": BENCHMARK_ID_COLUMN_ID,
+        "headerTooltip": (
+            "The number KovaaK's uses to identify this benchmark in its API."
+        ),
+        "cellClass": "cell-selectable-text",
+        # Hidden until the Columns menu shows it. ``initialHide``, never
+        # ``hide``: AG Grid reapplies ``hide`` whenever column defs arrive
+        # again, which would override the user's choice.
+        "initialHide": True,
+        "sortable": False,
+        "minWidth": 90,
     },
     {
         "headerName": "Played",
@@ -359,6 +377,7 @@ COLUMNS_MENU_ID = "playlists-overview-columns"
 # controls, where the headers they name keep Title Case.
 MENU_COLUMNS = [
     MenuColumn("type_display", "Type"),
+    MenuColumn(BENCHMARK_ID_COLUMN_ID, "Benchmark ID", shown_by_default=False),
     MenuColumn("played_sort", "Played"),
     MenuColumn("runs_sort", "Runs"),
     MenuColumn("last_played_sort", "Last played"),
@@ -373,10 +392,17 @@ MENU_COLUMNS = [
     prevent_initial_call=True,
 )
 def route_to_clicked_playlist(cell_clicked):
-    """Navigate to a playlist's scenario table from any cell in its row."""
+    """Navigate to a playlist's scenario table from a cell in its row.
+
+    The action cells and the Benchmark ID cell do not navigate.
+    """
     if not isinstance(cell_clicked, dict):
         return no_update
-    if cell_clicked.get("colId") in (VISIBILITY_COLUMN_ID, DELETE_COLUMN_ID):
+    if cell_clicked.get("colId") in (
+        VISIBILITY_COLUMN_ID,
+        DELETE_COLUMN_ID,
+        BENCHMARK_ID_COLUMN_ID,
+    ):
         return no_update
     playlist_code = cell_clicked.get("rowId")
     if not isinstance(playlist_code, str) or not playlist_code:

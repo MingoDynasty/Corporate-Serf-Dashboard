@@ -58,7 +58,10 @@ dash.register_page(
     title=page_title(_page_title),
 )
 
+LEADERBOARD_ID_COLUMN_ID = "leaderboard_id"
+
 AUTO_SIZE_COLUMN_KEYS = [
+    LEADERBOARD_ID_COLUMN_ID,
     "last_played_sort",
     "runs_sort",
     "position_sort",
@@ -90,6 +93,24 @@ TABLE_COLUMN_DEFS = [
         "flex": 1,
         "minWidth": 280,
         "maxWidth": 400,
+    },
+    {
+        "headerName": "Leaderboard ID",
+        "field": LEADERBOARD_ID_COLUMN_ID,
+        "headerTooltip": (
+            "The number KovaaK's uses to identify this scenario's leaderboard "
+            "in its API."
+        ),
+        "cellClass": "cell-selectable-text",
+        # Hidden until the Columns menu shows it. ``initialHide``, never
+        # ``hide``: AG Grid reapplies ``hide`` whenever column defs arrive
+        # again, which would override the user's choice.
+        "initialHide": True,
+        # A sortable column needs a name in ``?sort=``. Without one the
+        # address writer stops writing for as long as the column is sorted,
+        # which silently ends sort memory.
+        "sortable": False,
+        "minWidth": 90,
     },
     {
         "headerName": "Last Played",
@@ -251,6 +272,7 @@ COLUMNS_MENU_ID = "playlist-scenarios-columns"
 # The labels are kept by hand, in sentence case as controls, where the headers
 # they name keep Title Case.
 MENU_COLUMNS = [
+    MenuColumn(LEADERBOARD_ID_COLUMN_ID, "Leaderboard ID", shown_by_default=False),
     MenuColumn("last_played_sort", "Last played"),
     MenuColumn("runs_sort", "Runs"),
     MenuColumn("position_sort", "Position"),

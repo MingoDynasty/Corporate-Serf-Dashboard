@@ -132,6 +132,7 @@ def test_format_playlist_overview_row_aggregates_played_and_cached_scenarios(
         "name": "Voltaic Benchmarks",
         "code": "KovaaKsTestCode",
         "type_display": "Benchmark",
+        "benchmark_id": "N/A",
         "played_display": "2/3",
         "played_sort": 2 / 3,
         "played_count": 2,
@@ -147,6 +148,35 @@ def test_format_playlist_overview_row_aggregates_played_and_cached_scenarios(
         "lowest_percentile_sort": 70.5,
         "lowest_scenario": "Third",
     }
+
+
+def test_format_playlist_overview_row_carries_a_bundled_benchmarks_id(monkeypatch):
+    _configure(monkeypatch)
+    _install_cached_ranks(monkeypatch, {})
+    bundled = PlaylistData(
+        name="Viscose Benchmark S2 - Medium",
+        code="KovaaKsBundledCode",
+        scenarios=[Scenario(name="First", ranks=RANKS)],
+    )
+    imported = PlaylistData(
+        name="Imported By Code",
+        code="KovaaKsImportedCode",
+        scenarios=[Scenario(name="First")],
+    )
+    # The side table the bundled loader fills, which holds bundled codes only.
+    monkeypatch.setattr(
+        data_service,
+        "_bundled_benchmark_ids",
+        {"KovaaKsBundledCode": 2336},
+    )
+
+    bundled_row = format_playlist_overview_row(bundled.name, bundled, {})
+    imported_row = format_playlist_overview_row(imported.name, imported, {})
+
+    # Bare digits: the number gets pasted into a request, so it takes no
+    # thousands separator, unlike the run count beside it.
+    assert bundled_row["benchmark_id"] == "2336"
+    assert imported_row["benchmark_id"] == "N/A"
 
 
 def test_format_playlist_overview_row_never_played(monkeypatch):
