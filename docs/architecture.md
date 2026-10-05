@@ -370,7 +370,11 @@ flowchart LR
   collapsing animates the inspector's grid track instead of removing it, so
   the graph resizes the way it does when the navbar collapses. The
   follow-newly-played-scenario switch is stacked directly under the scenario
-  selector it governs rather than living in the inspector.
+  selector it governs rather than living in the inspector. The playlist filter
+  is stacked the same way over a link: `select_playlist` writes the selected
+  playlist's scenario list and, into a holder under the filter, the link to
+  that playlist's scenario table (`/playlists/{code}`), or nothing when the
+  filter holds no loaded playlist.
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table.

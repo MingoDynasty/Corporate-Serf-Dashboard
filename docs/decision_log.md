@@ -13,6 +13,188 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-10-04: The Position Value Says When It Was Last Updated
+
+Status: Accepted
+
+Hovering the Position value on the Scenario Performance page now shows when
+that position was last updated. A cached position can be a week old, and
+nothing on screen told a fresh one from an old one. The age sits beside the
+Refresh button, so it comes with a way to act on it. The playlist pages don't
+show it, because they have no refresh of their own.
+
+**Settled in chat, 2026-10-04.** The maintainer directed the Scenario
+Performance-only scope. The wording is the maintainer's proposal, adopted over
+the author's "Checked"; it was not separately ruled.
+
+**Copy.** `Last updated {age} · {timestamp}`, as in `Last updated 3 days ago ·
+Oct 1, 2026, 4:18 AM`. It is a status readout, so it takes no period.
+
+**"Last updated", not "Checked".** The time is the rank cache entry's
+`fetched_at`, which moves only when a leaderboard read is stored. A fetch that
+fails leaves it alone, and so does an automatic read the monotonic writer
+refuses
+([2026-07-01](#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+"Checked" describes what the app did and is false in both cases: with KovaaK's
+unreachable for a month the app goes on trying, while the position on screen
+is a month old. "Last updated" describes the data and holds in every case. It
+does not mean the position moved, since a read that returns the same position
+restarts the age.
+
+**Scenario Performance only.** There the value sits beside **Refresh**, so an
+age is a reason to click or not. The playlist scenario table has no refresh
+control, so an age there is information with no action, and opening a playlist
+already re-reads every entry past the cache lifetime, so nearly every row
+would read under a week. Revisit if that table gains a refresh action. An age
+always visible beside the value was rejected too: it would mark every routine
+cache read, and the field keeps its marks for failures.
+
+**The time is the position's alone.** The readout joins two caches, and the
+leaderboard total carries its own time. A clicked Refresh and a PB catch-up
+re-read both together
+([2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)),
+but a lifetime-driven fetch does not, so the two can differ by up to the
+lifetime. The hover dates the position and shows no second time.
+
+**The tooltip is part of the layout, not of the value's children.** Home
+rewrites the value on every polling tick, and Dash remounts component children
+on each write. Built into the children, an open tooltip blinked off in 16 of
+72 samples over four seconds, and the value's node was replaced between
+samples, which would also drop keyboard focus (headless Edge, 2026-10-04). As
+a fixed element whose label a store feeds, it held in 73 of 73, and the value
+stays a plain text node. The age is worded in the browser by the helpers the
+Last played hover uses, on the same 30-second tick.
+
+## 2026-10-04: Skill Is Judged By The Typical Run, With Honest Uncertainty, In Verdicts Not Advice
+
+Status: Accepted
+
+The app's judgments about a player's skill are heading toward the typical
+run, what their recent runs usually score, and away from the personal best,
+which stays the achievement. A judgment the runs can't support says so
+instead of guessing, and the app reports what it found without telling the
+player what to do in training. One lucky run can make a scenario look
+stronger than it usually plays, and the evidence behind any training method
+is still thin. Every later proposal is held to these three rules, and Run
+history now builds sessions first.
+
+**Ruling.** Ruled (user) 2026-10-04, in chat, after both reviewers endorsed
+each row:
+[rows D1 to D5 of PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#issuecomment-5986985763)
+as recommended, with D3's evidence bar as amended in review. D5, what the
+roadmap's Future list holds, is recorded in the roadmap alone.
+
+The rules themselves are in the roadmap's
+[Guiding principles](roadmap.md#guiding-principles). This entry holds what
+the roadmap doesn't: the reasons, the evidence and its limits, and the
+options set aside.
+
+**D1, the typical run.** Judgments about skill, meaning where the player is
+weak, where their level stands, and whether they're improving, move toward
+the typical run. The personal best stays the achievement: KovaaK's ranks it,
+the app celebrates it, and the shipped Rank, Next Rank, Position, and
+Percentile columns keep reporting it. The two answer different questions, how
+a scenario usually plays and what the player has reached, so the app keeps
+both. Judging skill by the personal best alone was rejected. A personal best
+is one run, so a lucky one can rank a consistent scenario as weaker than a
+spiky one that usually plays worse. It also only rises, so it can't show a
+decline, and after one lucky run it reads as a plateau when there isn't one.
+What counts as the typical run (the window, the run count, the warm-up rule)
+is the Run History proposal's to set.
+
+**D1's evidence, and its limits.** The evidence is one player's history,
+checked on 2026-09-27. Ordering scenarios against each other by the typical
+run tracked the level the next time each scenario was played better than
+ordering by personal best: a rank correlation of 0.62 against 0.51, over
+eight sessions. Within one scenario the two tied, with an error spread of
+5.5% against 5.6% over 267 predictions across 69 scenarios, one per scenario
+per session. Neither comparison shows that practicing in that order causes
+more learning. A re-check of the ordering is due around 2026-10-09, and the
+columns that would rank weakness this way wait for it. The research on
+learning and performance supports judging learning apart from the scores
+during a session. It doesn't validate a particular window or warm-up rule for
+this app.
+
+**D2, honest uncertainty.** Unknown isn't weak. A judgment with too little
+behind it says so, and a scenario isn't ranked weak or strong until it has
+enough: unknown rows form a group of their own and are never ranked among the
+known ones. A figure that can only be a minimum is labelled one wherever it's
+shown, such as time spent in runs, which leaves out the time between runs and
+any attempt that wrote no stats file. An estimate is shown no more precisely
+than it's known. Under-sampling is the common case: on 2026-09-25, 23 of the
+39 scenarios in the maintainer's benchmark had fewer than 10 lifetime runs.
+How much is enough isn't set here, and it isn't only a run count: the runs
+also have to be comparable, and the estimate's model has to hold.
+
+**D3, verdicts, not advice.** The app states facts and verdicts: the typical
+run, a trend, a rank-up chance, "unknown", and whether a bar the player set,
+such as the score threshold, was met. A result measured against something the
+player set is still a verdict. Telling the player what to play or when to
+stop is advice, and the app doesn't give it. The rule covers training
+decisions only, so a notice that asks for a setting isn't advice. Verdicts
+only is the simplest option and the easiest to reverse: adding advice later
+is cheap, and taking away advice people rely on is not. It keeps one player's
+regimen from being imposed on every user, and it matches what the app shows
+today with one exception, which it retires. The cost is accepted: a "leave
+now or keep going" line shrinks to the facts the player's own rule reads.
+
+**The line D3 retires.** A run that passes the score threshold without
+placing gets a toast that ends "Ready to move on.", which tells the player
+when to stop. The
+[2026-09-14 copy entry](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)
+kept that line under its D4, ruled 2026-09-12. By the bar set out here it's
+a default rule the app vouches for, and no check came before it. Ruled
+(user) 2026-10-04,
+[in review](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179636701):
+the line is retired. That toast ends at the fact, and the placed variant and
+every other toast are unchanged. D3 supersedes that D4 in part: its other
+half, which dropped "Keep grinding...", stands. The string changed in
+PR #341,
+[a PR of its own](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179646591),
+as also ruled on 2026-10-04. That PR updated the notifications spec and the
+pace proposal's Copy block with it, and added the supersession note to the
+2026-09-14 entry.
+
+Two options were set aside for now. Rules the player sets would add rule
+semantics and a settings surface, and a default rule is advice by another
+name. A built-in training method makes the strongest claim, and published
+research supports general practice principles but no single aim-training
+method.
+
+**What would move D3.** Any move past verdicts takes a decision of its own.
+What else it takes depends on what the app would be claiming.
+
+- A rule the player writes, off until they write it and worded as theirs,
+  claims nothing about training. It's an ordinary product decision: whether
+  the convenience is worth a settings surface and the risk that it reads as
+  the app's advice. The verdicts it reads ship first, and the player can
+  override it and turn it off.
+- A default rule or a built-in method is advice the app vouches for, so it
+  takes strong evidence first. That means a check declared before its data
+  comes in, measuring the benefit the rule claims, on results after the
+  session rather than during it. A claim about learning needs retained
+  performance, not a score from the same session.
+- One player's results justify an opt-in experiment for that player. A method
+  shipped to everyone needs evidence across players and tasks. The app
+  collects none, so it would come from voluntary testing, results users
+  supply, or published research.
+
+**D4, Run history builds sessions first.** Sessions, and the visits inside
+them, are built before either history view, as the foundation the views and
+later features share. This reverses two durable decisions in the
+[Run History proposal](proposals/run_history_proposal.md): "raw timestamps
+first; sessions are a later quality-of-life layer", and the view order that
+followed from it. Both are marked superseded there, with their text kept.
+Nearly every planned feature needs sessions, and splitting the runs into them
+is one pure pass over runs the app already holds in time order. Which view
+ships first is open, for the proposal's rewrite to decide. The roadmap
+carries the milestone's reasons and the Future list, which is planned work in
+no particular order.
+
+**Terms.** Typical run, visit, and rank-up chance are working words here, not
+[glossary](glossary.md) terms: nothing ships them yet. The proposal that
+ships each one names and defines it in its Terms block, and may rename it.
+
 ## 2026-09-30: A Glossary Says What The App's Own Terms Mean
 
 Status: Accepted
@@ -1588,7 +1770,11 @@ migration.
 
 ## 2026-09-14: App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-10-04 skill-judgment entry](#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice):
+D4 keeping "Ready to move on." on a passed run that did not place no longer
+holds, and that toast now ends at the fact. D4 dropping "Keep grinding..."
+from the below-threshold toast stands. Everything else here stands.
 
 The app's text was written one feature at a time, so the same condition read
 differently from page to page and some messages sounded like log lines. Every
@@ -4715,7 +4901,10 @@ Consequences and constraints:
 - **The sizing rule lives in `PLAYLIST_SELECTOR_PRESET`**, so the Aim Training
   Journey page's `dmc.MultiSelect` picks it up too. Both sit in wrapping rows
   and want the same behavior; splitting the rule to spare the second page would
-  cost more than it saves.
+  cost more than it saves. *(Renamed 2026-10-04: the rule is
+  `PLAYLIST_SELECTOR_SIZING`, a second dict in the same module, so a page can
+  put it on the column that holds its dropdown. Both pages still read the one
+  rule.)*
 
 ## 2026-08-03: One Quiet Notification Layer With Verdict-Carrying Copy
 

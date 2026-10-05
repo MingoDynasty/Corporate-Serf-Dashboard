@@ -223,7 +223,8 @@ are one view or two is a design choice for the feature that builds them.
   shows your global leaderboard standing for the selected scenario —
   `Position: 11,290 of 63,892 (82.33% percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
-  personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
+  personal best, or on manual Refresh — not fetched live on every view.
+  Hovering the value shows when it was last updated. *Problem solved:* raw scores aren't comparable
   across scenarios, but percentile is; it turns "804.2" into "top 18%," which
   is the number a player actually reasons with.
 - **Score-aware rank refreshes** (PRs #38, #40). After a new personal best,
@@ -301,8 +302,10 @@ are one view or two is a design choice for the feature that builds them.
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I
   touched this?"); absolute dates make the user do the math.
-- **Aim Training Journey page** (work in progress, currently unlinked from
-  the navbar). Visualizes training-hour checkpoints across playlists.
+- **Aim Training Journey page** (shelved, unlinked from the navbar).
+  Visualizes training-hour checkpoints across playlists. The page was left as
+  work in progress and shelved on 2026-09-28: its code stays, reachable only
+  by URL, and no work on it is planned.
 
 ### Getting data in
 
@@ -439,11 +442,9 @@ user problems (each becomes a roadmap milestone when it's next up):
 
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.
-- *"How close am I to the next rank?"* — "+47 to Gold" as a motivational
-  target on benchmark scenarios.
 - *"How did the rest of this session go?"* — a reviewable run history; the
-  per-run toast is ephemeral and the console log is a developer-facing
-  stopgap.
+  per-run toast is ephemeral and the watchdog's debug-log lines are a
+  developer-facing stopgap.
 
 ## Maintaining this doc
 

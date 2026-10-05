@@ -18,7 +18,10 @@ from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
 from source.pages.page_title import page_title
-from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
+from source.pages.playlist_selector import (
+    PLAYLIST_SELECTOR_PRESET,
+    PLAYLIST_SELECTOR_SIZING,
+)
 from source.plot.plot_service import (
     apply_light_dark_mode,
     generate_aim_training_journey_plot,
@@ -129,6 +132,7 @@ def layout(**kwargs):  # noqa: ARG001
                             children=[
                                 dmc.MultiSelect(
                                     **PLAYLIST_SELECTOR_PRESET,
+                                    **PLAYLIST_SELECTOR_SIZING,
                                     clearable=True,
                                     data=get_visible_playlist_selector_options(),
                                     id="playlists-multi-select",
