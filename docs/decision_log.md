@@ -15,7 +15,7 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 
 ## 2026-10-04: Skill Is Judged By The Typical Run, With Honest Uncertainty, In Verdicts Not Advice
 
-Status: Proposed
+Status: Accepted
 
 The app's judgments about a player's skill are heading toward the typical
 run, what their recent runs usually score, and away from the personal best,
@@ -26,11 +26,11 @@ stronger than it usually plays, and the evidence behind any training method
 is still thin. Every later proposal is held to these three rules, and Run
 history now builds sessions first.
 
-**Ruling.** Not ruled yet. Both reviewers endorsed each rule and the Run
-history order in the review of
-[PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327),
-whose decision table holds them as rows D1 to D4. When the maintainer rules,
-this paragraph records the ruling and the Status becomes `Accepted`.
+**Ruling.** Ruled (user) 2026-10-04, in chat, after both reviewers endorsed
+each row:
+[rows D1 to D5 of PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#issuecomment-5986985763)
+as recommended, with D3's evidence bar as amended in review. D5, what the
+roadmap's Future list holds, is recorded in the roadmap alone.
 
 The rules themselves are in the roadmap's
 [Guiding principles](roadmap.md#guiding-principles). This entry holds what
