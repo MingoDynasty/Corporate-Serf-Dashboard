@@ -28,6 +28,16 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Time-scored scenarios measured by pace** — some scenarios score the time
+  left on a countdown when the task is done, and on those a percentage of the
+  score understates a real improvement several times over. The app now
+  recognizes such a scenario from the performance files KovaaK's writes beside
+  each run and measures it by pace, how fast a run finishes compared with the
+  personal best. Next Rank reads "2.8% faster to Lavender" there, the score
+  threshold line and its verdict judge by pace, and a new personal best says
+  how much faster it finished. A scenario the app can't recognize reads as it
+  did before. (PR #343; design in #329) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Rank and next-rank gap on benchmarks** — a benchmark's scenario table now
   shows the rank each personal best has reached and how much it has to grow
   to reach the next one, such as "+4.8% to Gold", with the threshold and the
@@ -66,20 +76,6 @@ sequence.
   the fields and keep their original label rather than being dropped. (PR
   #280; design in #277, rulings in #279) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **Personal best celebration** — a run that beats a scenario's personal best
-  now gets a short burst of confetti and a toast that says so, on whatever page
-  is open and for every scenario rather than only the one being watched. The
-  toast stays until it is dismissed, because the run that earned it was played
-  in a fullscreen game, and if the tab was hidden when the run landed the
-  animation waits for it to come back. A Settings control picks the
-  animation — Confetti, Fireworks, Cannons, or Stars — or turns the whole thing
-  off, with a Preview button beside it, and it is independent of Run
-  notifications. Run delivery moved into the app shell to make that possible,
-  which retired the "While you were away" catch-up digest: a run no longer
-  waits for a Scenario Performance visit to be announced. (PRs #261, #268,
-  #272; design in #248) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md); the follow-up that turned the switch
-  into the choice of styles landed in #272, which closes the arc.
 ---
 
 ## Upcoming milestones
@@ -109,17 +105,6 @@ What we plan to do now or very soon, each with the reasons it comes next.
   order. Its "sessions later" decision and its view order are marked
   superseded, and a rewritten proposal will replace it. Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **Time-scored scenarios measured by pace** — some scenarios score the time
-  left on a countdown when the task is done, and on those a percentage of the
-  score understates the real change several times over. So the percentages
-  the app shows there, the Next Rank gap and the score threshold among them,
-  make those scenarios look closer to ranking up and easier to pass than they
-  are. The fix measures them by pace: how fast a run finishes compared with
-  the personal best. Why now: it's a bug in shipped features, and a small
-  one. It's a correctness fix rather than a milestone, so it runs beside Run
-  history. Its design is ratified in
-  [`time_scored_pace_proposal.md`](./proposals/time_scored_pace_proposal.md),
-  and one implementation PR follows.
 ---
 
 ## Future (briefly)

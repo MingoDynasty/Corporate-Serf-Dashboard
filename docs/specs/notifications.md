@@ -271,6 +271,19 @@ toasts under, and it applies to every toast the app adds from here on
   sensitivity-and-scale group, so a run recorded on a game's own scale is
   judged against the runs its converted value lands beside
   ([scenario_performance.md](scenario_performance.md#the-graph)).
+- The message also carries `pace_constant`, the constant a time-scored
+  scenario's score counts down from, as a fact like the previous best. The
+  watchdog works it out before the message is queued, with the landed run
+  judged by its own performance file, and the shell's batch record copies
+  it. It is set only when the scenario is recognized as time-scored and both
+  the new run and the run that holds the previous best are eligible, and it
+  is `None` otherwise and on a scenario's first run, which nothing judges or
+  celebrates
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  Recognition and eligibility are specified in
+  [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
+  A lookup that fails costs the constant only: the run still imports, and
+  its message carries `None`.
 - The app shell's `publish_run_events` is the deque's sole consumer. On each
   `pb-celebration-interval` tick (`polling_interval`, default 1000 ms) it
   drains every pending message and publishes one `run-events-batch` payload:
@@ -318,6 +331,11 @@ toasts under, and it applies to every toast the app adds from here on
   `{scenario}: {score:.2f}. Up {pct:.1f}% on your previous best of {previous:.2f}.`;
   with a zero or negative one, which has no percentage to give, it is
   `{scenario}: {score:.2f}. Your previous best was {previous:.2f}.`
+  A run that carries a pace constant, with both times positive, reads
+  `{scenario}: {score:.2f}. Finished {pct:.1f}% faster than your previous best of {previous:.2f}.`
+  instead, `pct` being `((C − previous) / (C − score) − 1) × 100`, whatever
+  the previous best's sign. What counts as a new personal best is unchanged
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 - The animation lives in `assets/pbCelebration.js` and is driven by a
   clientside callback on `run-events-batch`, with the style store as `State`,
   so no server round trip separates the decision from the burst. It holds a
@@ -391,6 +409,18 @@ toasts under, and it applies to every toast the app adds from here on
   or fails, so a run 0.03% short reads `99.9%`, never `100.0%`.
   A run is placed when `nth_score` is at most the Top N value; first place is
   phrased "best" and the rest "Nth-best".
+- A run that carries a pace constant `C` is judged by pace wherever both
+  times are positive. It passes when
+  `(C − scenario_previous_best) × 100 >= goal × (C − score)`, compared as
+  decimals so a run exactly at the goal passes, and the message shows
+  `(C − scenario_previous_best) / (C − score) × 100`. The switch, the usable
+  goal, and the first-run-at-a-sensitivity rule gate it as above. The
+  positive previous best does not: pace needs positive times only, so a
+  time-scored previous best of zero or less is still judged. Both caps apply
+  unchanged, since a run's pace is below the previous best's exactly when
+  its score is. Where a time is zero or less, the run is judged by score as
+  above
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 - The page narrates only the batch's latest matching run, and only when the
   batch's decision does not name it and it is stamped live: a named run yields,
   because the celebration toast is its one notification, and a stale run
@@ -408,6 +438,13 @@ toasts under, and it applies to every toast the app adds from here on
   Unjudged and placed: green, "New best score" or "New {Nth}-best score",
   `{scenario}: {score:.2f} at {sensitivity}.`
   ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out))
+  A run judged by pace reads "% of PB pace" where these read "% of PB", and
+  is otherwise the same: `{scenario}: {score:.2f}, {pct:.1f}% of PB pace.`
+  on a pass, and
+  `{scenario}: {score:.2f}, {pct:.1f}% of PB pace (need {goal:.1f}%).` on a
+  miss, with the same placement sentences. The three titles are unchanged,
+  so the one word is what tells the player which measure judged the run
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 - Every other run in a batch earns nothing; its new point on the plot is its
   record. There is no catch-up digest: a batch of several runs rebuilds the
   graph once, auto-switches once, and toasts exactly as a single run would
