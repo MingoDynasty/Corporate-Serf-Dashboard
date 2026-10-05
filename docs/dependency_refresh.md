@@ -127,7 +127,12 @@ go down.
    version moves in this step. Commit as
    `chore(deps): refresh dependency floors to the locked, tested versions`.
 
-6. Verify by what moved, then open the PR.
+6. Check the vendored browser libraries, which no uv command sees. Compare
+   each row of [assets/vendor/README.md](../assets/vendor/README.md) with its
+   upstream project's latest release. To update one, follow that README's
+   steps, as its own commit.
+
+7. Verify by what moved, then open the PR.
 
 ## Toolchain pass
 
@@ -174,9 +179,8 @@ A refresh reports these pins and does not move them. They move through the
 [cross-repo tooling spec](decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec),
 which the maintainer keeps outside this repository. The `test` job is this
 repository's copy of the spec's workflow. The spec carries these exact SHAs,
-and so does every other repository that follows it, so moving them here alone
-makes this copy drift from the spec. A pin bump is a new version of the spec,
-which each repository then adopts.
+so moving them here alone makes this copy drift from the spec. A pin bump is a
+new version of the spec, which each repository then adopts.
 
 1. For each action in `.github/workflows/ci.yml`, find the latest release:
 
@@ -195,11 +199,13 @@ gh api repos/<owner>/<action>/commits/<tag> --jq .sha
 ```
 
 Replace the SHA and the version comment on every `uses:` line for that action,
-the release jobs' lines included, and commit as `ci: bump pinned actions`. The
-PR's CI runs a bumped action only in the `test` job. The `release-gate` and
-`release` jobs run on a push to `main`, so watch the first run on `main` after
-the merge. A failed release job can be rerun: it reuses its tag and resumes
-its draft.
+the release jobs' lines included, and commit as `ci: bump pinned actions`.
+
+The PR's CI runs a bumped action only in the `test` job. The first run on
+`main` after the merge adds `release-gate`. The `release` job is skipped for a
+workflow-only change, so its first run with the new pins is the next merge
+that cuts a release: watch that one. A failed release job can be rerun: it
+reuses its tag and resumes its draft.
 
 ## Verify by what moved
 
@@ -223,14 +229,23 @@ print its version before and after the upgrade:
 uv run python -c "from plotly.offline import get_plotlyjs_version; print(get_plotlyjs_version())"
 ```
 
-A refresh changes versions, not behavior. If an upgrade adds something a user
-can see or press, or a new way for the app to reach an outside service, stop
-and ask the maintainer before shipping it or hiding it. plotly 7 did both at
-once: it put a Share chart button on the charts by default
+A refresh changes versions, not behavior. If an upgrade adds or removes
+something a user can press, changes what a control does, or adds a new way for
+the app to reach an outside service, stop and ask the maintainer before
+shipping it or hiding it. A difference in appearance alone is named in the PR
+body. plotly 7 added a control and an outside service at once: it put a Share
+chart button on the charts by default
 ([2026-09-12 entry](decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)).
 What the maintainer accepts goes into
 [What it talks to](user_guide.md#what-it-talks-to) and the capability spec in
 the same PR.
+
+### Vendored browser libraries
+
+When a file under `assets/vendor/` moves, run the app and look at what that
+library draws. [assets/vendor/README.md](../assets/vendor/README.md) says what
+each one is for. The stop-and-ask rule for packages that ship browser code
+applies here too.
 
 ### ruff
 

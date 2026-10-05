@@ -86,7 +86,9 @@ every open branch on the old pin until that branch merges `main`.
   monthly Dependabot uv run since 2026-08-01 with
   `tool_version_not_supported`, and
   [dependabot-core issue 13199](https://github.com/dependabot/dependabot-core/issues/13199)
-  was still open on 2026-10-04. The pin cannot be loosened to suit it: the
+  was still open on 2026-10-04. The version Dependabot bundles was different
+  on each of those three runs (0.11.8, then 0.12.7, then 0.12.18), so no exact
+  pin could have kept up with it. The pin cannot be loosened to suit it: the
   release job reads the pin into `release.json` and refuses anything but an
   exact `==`, because every install provisions that version
   ([2026-07-19 entry](#2026-07-19-the-installer-brings-its-own-toolchain-app-locally)).
