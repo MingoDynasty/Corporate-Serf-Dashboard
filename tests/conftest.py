@@ -7,7 +7,7 @@ import pytest
 
 from source.config import config_service, settings_service
 from source.config.config_service import ConfigData, get_config
-from source.kovaaks import api_service
+from source.kovaaks import api_service, time_scored_service
 
 
 @pytest.fixture(autouse=True)
@@ -63,3 +63,16 @@ def forget_rank_over_total_warnings(monkeypatch: pytest.MonkeyPatch) -> None:
     warning would depend on which test ran first.
     """
     monkeypatch.setattr(api_service, "_warned_rank_over_total", {})
+
+
+@pytest.fixture(autouse=True)
+def forget_performance_files(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep one test's performance file listing out of the next.
+
+    A test that lists a folder leaves the listing and its remembered answers
+    in module state, and a later test's scenario would then read as
+    time-scored or not depending on which test ran first.
+    """
+    monkeypatch.setattr(time_scored_service, "_performance_dir", None)
+    monkeypatch.setattr(time_scored_service, "_performance_file_names", set())
+    monkeypatch.setattr(time_scored_service, "_readings", {})

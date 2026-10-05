@@ -101,6 +101,20 @@ are one view or two is a design choice for the feature that builds them.
   pile of toasts accumulating over a session — and, for a session where any
   interruption is one too many, a way to quiet the routine feedback without
   giving up the plot.
+- **Time-scored scenarios are measured by pace** (PR #343; design in #329).
+  Some scenarios score the time left on a countdown when you finish the task.
+  On those, the app measures by pace, how fast a run finishes compared with
+  your personal best: the Next Rank column reads "2.8% faster to Lavender",
+  the score threshold line and its verdict judge a percentage of your
+  personal best's pace, and a new personal best says how much faster you
+  finished. The app recognizes such a scenario on its own, from the
+  performance files KovaaK's writes beside your runs, and a scenario it can't
+  recognize reads as it always did. *Problem solved:* a few points on these
+  scenarios are a few seconds, a large share of the run and a tiny share of
+  the score, so every percentage of the score lied in the same direction. A
+  95% threshold passed every run, and "closest to ranking up" put these
+  scenarios first when they were several times further away than they
+  looked.
 - **Personal best celebration.** A run that beats a scenario's personal best
   gets a short burst of confetti and a toast of its own: "New personal best",
   naming the scenario, the score, and how far ahead of your old best it landed.

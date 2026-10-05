@@ -114,6 +114,23 @@ columns use the personal best from your stats folder, the one PB Score shows,
 so they work without a KovaaK's username. A new personal best shows up in
 them when you reopen the table.
 
+Some scenarios are scored by completion time: the score is the time left on a
+countdown when you finish the task, so a few points are a few seconds. On
+those, a percentage of the score makes a real improvement look many times
+smaller than it is, so the app measures by pace instead, which is how fast you
+finish compared with your personal best. **Next Rank** then reads "2.8% faster
+to Lavender": finish 2.8% faster than your personal best and you earn
+Lavender. On the Scenario Performance page, the **Score threshold percentage**
+becomes a percentage of your personal best's pace, so the threshold line and
+the run notification both judge by it, and the notification says "% of PB
+pace". A new personal best says how much faster you finished.
+
+The app works this out from the performance files KovaaK's writes next to
+your stats files, so it can measure pace on a scenario once you have played it
+on a current version of KovaaK's, and once your personal best is from the
+scenario's current version. Until then, that scenario reads as every other
+one does, in percent of your score.
+
 A benchmark's scenario table also has Evxl's logo beside its title. It is a
 link, and hovering it shows **View on Evxl**. It opens that benchmark on
 [Evxl.app](https://evxl.app) in a new tab, where you can see what this app

@@ -36,6 +36,16 @@ sequence.
   with digging the number out of a file. Both pages look as they did until
   the menu is used. (PR #344; design in #334) Design rationale distilled
   into [`decision_log.md`](./decision_log.md).
+- **Time-scored scenarios measured by pace** — some scenarios score the time
+  left on a countdown when the task is done, and on those a percentage of the
+  score understates a real improvement several times over. The app now
+  recognizes such a scenario from the performance files KovaaK's writes beside
+  each run and measures it by pace, how fast a run finishes compared with the
+  personal best. Next Rank reads "2.8% faster to Lavender" there, the score
+  threshold line and its verdict judge by pace, and a new personal best says
+  how much faster it finished. A scenario the app can't recognize reads as it
+  did before. (PR #343; design in #329) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **New PB stars on the Score vs Time chart** — the chart now draws a gold
   star on each plotted run that beat the scenario's personal best when it was
   played, so it shows when each best was reached, including the ones a later
@@ -62,14 +72,6 @@ sequence.
   orange the app reserves for a partly-committed action. No wording changed,
   and the Position field's inline hints stay value qualifiers. (PR #298;
   design in #281) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-- **App messaging consistency** — every string the app shows now follows one
-  short set of copy rules, so the same condition reads the same way on every
-  page: whole sentences with periods, one vocabulary, everyday contractions,
-  control names in bold, and no em dashes, which a test now keeps out of the
-  source. Some toasts that sounded like log lines now say what happened and
-  what to do. No new surface and no behavior change. (PR #291; design in
-  #247) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 ---
 
@@ -100,17 +102,6 @@ What we plan to do now or very soon, each with the reasons it comes next.
   order. Its "sessions later" decision and its view order are marked
   superseded, and a rewritten proposal will replace it. Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **Time-scored scenarios measured by pace** — some scenarios score the time
-  left on a countdown when the task is done, and on those a percentage of the
-  score understates the real change several times over. So the percentages
-  the app shows there, the Next Rank gap and the score threshold among them,
-  make those scenarios look closer to ranking up and easier to pass than they
-  are. The fix measures them by pace: how fast a run finishes compared with
-  the personal best. Why now: it's a bug in shipped features, and a small
-  one. It's a correctness fix rather than a milestone, so it runs beside Run
-  history. Its design is ratified in
-  [`time_scored_pace_proposal.md`](./proposals/time_scored_pace_proposal.md),
-  and one implementation PR follows.
 ---
 
 ## Future (briefly)

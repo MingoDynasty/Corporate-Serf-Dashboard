@@ -329,6 +329,29 @@ and [product.md](../product.md). Leaderboard placement is worded
   transactions never blank the two cells. When a run lands, both stay as
   they were until the page reopens, as PB Score does
   ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
+- On a time-scored scenario whose PB can be measured by pace, Next Rank reads
+  "{gap}% faster to {rank name}", such as "2.8% faster to Lavender". The gap
+  is `((C − PB) / (C − next threshold) − 1) × 100`, where `C` is the
+  scenario's constant: how much faster the PB run has to finish to reach the
+  next rank. It rounds up, floors at 0.1, and takes thousands separators as
+  the score gap does, and it sorts by its unrounded value among the score
+  gaps of the other rows. Rank, the cell tooltip in points, Top rank, and
+  `N/A` with no PB are the same as on any row. A pace gap needs only positive
+  times, so a time-scored PB of zero or less gets one. Where the gap is
+  undefined, with the PB or the next threshold at or above the constant, the
+  row reads as the bullet above says. Phase 1, the fill, and a cancelled
+  fill's rebuild all carry the same cell. The Next Rank header tooltip reads
+  "How much your PB score has to grow to reach the next rank. A row that
+  reads "faster" is a scenario scored by completion time, and shows how much
+  faster you have to finish than your PB. Lower is closer." on every
+  benchmark table
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  How a scenario is recognized, and when its PB can be measured by pace, is
+  in
+  [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
+  Only a row with a ladder and a PB asks, so a playlist's table reads no
+  performance file, and a lookup that fails costs the pace gap, never the
+  row.
 - A benchmark's page header carries a link to its Evxl page after the title
   and the playlist code, opening in a new tab, when Evxl's benchmark snapshot
   (`resources/evxl/benchmarks.json`) lists the playlist code, compared

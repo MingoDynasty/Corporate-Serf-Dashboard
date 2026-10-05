@@ -26,6 +26,11 @@ class RunData:
     everything that groups, sorts, or compares sensitivities reads those two.
     ``recorded_sensitivity`` keeps what a converted run's file recorded, for
     display only, and is ``None`` for every run that was not converted.
+
+    ``scenario_hash`` is the stats file's ``Hash:``, which names the version
+    of the scenario the run was played on, and is ``None`` when the file has
+    none. ``stats_file_name`` is the stats file's own name, which is how the
+    run's performance file is found.
     """
 
     datetime_object: datetime.datetime
@@ -36,6 +41,8 @@ class RunData:
     accuracy: float
     damage_accuracy: float | None = None
     recorded_sensitivity: RecordedSensitivity | None = None
+    scenario_hash: str | None = None
+    stats_file_name: str | None = None
 
 
 @dataclass()
