@@ -256,11 +256,13 @@ first run sets the baseline and is not one.
   keeps the later of two equal scores. That day then has a point at the PB's
   score and no star. Matching on the position would star it: on the
   maintainer's data, 4 stars on runs that never beat the PB.
-- **A star can share its position with a later tie.** When both runs are
-  plotted, their points coincide, and the star marks the earlier one. The
-  chart shows one hover for the pair, the later run's in the prototype, as it
-  does today for any two runs with the same day and score. That is 26 of the
-  666 stars on the maintainer's data.
+- **A star's hover names the run that set the PB.** When a new PB and a later
+  same-day tie are both plotted, their points coincide: 26 of the 666 stars
+  on the maintainer's data. The chart shows one hover for the pair, and today
+  it is the later run's, which never beat the PB. So the new PB is placed
+  last among the run points at its position, and its hover is the one shown
+  ([How it is built](#how-it-is-built-m4)). Nothing else moves: the same runs
+  are plotted at the same positions, and the Average score line is unchanged.
 - **No stars, no trace.** A chart where no plotted point is a new PB has no
   New PB legend entry.
 - **Several new PBs on one day stack in that day's column,** as its other
@@ -301,9 +303,14 @@ and gold run points.
   on top. The run trace keeps every run. Hiding the stars from the legend
   therefore leaves an ordinary point where each star was.
 - **The star takes no hover.** The trace sets `hoverinfo` to `skip`, so
-  hovering a star shows what the point under it shows today. On a shared
+  hovering a star shows the run trace's hover for that point. On a shared
   point plotly shows the run trace's hover even when the star trace has one,
   observed in the prototype on the bundled plotly.js.
+- **The run trace orders a new PB after the runs that share its position.**
+  Among points at one position, plotly shows the hover of the one that comes
+  last in the trace, also observed in the prototype. With the new PB last,
+  hovering its star shows that run's own time, sensitivity, and accuracy.
+  Only the order of points within the trace changes.
 - **Point size sizes the stars too.** `apply_point_appearance` sets 9 or 16
   on the New PB trace for Small or Large, and leaves the generated 12 on
   Default. Point color still selects only the run trace.
@@ -332,7 +339,8 @@ One string is added. It follows AGENTS.md's nine copy rules.
 
 Unchanged on purpose:
 
-- The run points' hover.
+- The run points' hover text. Which run's hover shows at a starred point
+  that a tie shares does change, as Where a star is drawn says.
 - The legend entries Run data point and Average score.
 - The chart annotation `PB score ({value})`.
 - Every Chart options label and help text.
@@ -387,6 +395,7 @@ tests plus one live check verify it.
   - the rule, as a function over a scenario's runs, named for the glossary's
     code word;
   - the New PB trace on the Score vs Time figure;
+  - the run trace's point order at a position a new PB shares;
   - the star size in `apply_point_appearance`;
   - the comment in the zoom-fit asset.
 - **Tests:** listed under Testing.
@@ -426,7 +435,7 @@ tests plus one live check verify it.
   - with Top N at 1 and a later same-day tie, the tie is the run kept and
     no star is drawn;
   - with a new PB and a later same-day tie both plotted, the trace holds one
-    star;
+    star, and the new PB comes after the tie in the run trace;
   - a chart with no new PB among its points has two traces;
   - Score vs Sensitivity has two traces.
 - **The appearance callback:**
@@ -443,4 +452,6 @@ tests plus one live check verify it.
   - an x zoom still refits the score axis, with the stars shown and hidden;
   - the three-entry legend clears the title at the narrowest chart, with the
     Chart options panel open just above its stacking width;
-  - a run that beats the PB gains its star when the chart rebuilds.
+  - a run that beats the PB gains its star when the chart rebuilds;
+  - a star whose point a later same-day tie shares, the two runs differing in
+    sensitivity or accuracy: the hover shows the new PB's time and values.
