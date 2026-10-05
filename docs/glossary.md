@@ -88,6 +88,13 @@ identity, because names aren't unique
 - Also called share code, KovaaK's own name for it.
 - In code: `code` on a playlist, and `playlist_code` elsewhere.
 
+### Stalest
+
+Of the scenarios in a playlist that the player has played, the one played
+longest ago ([playlists.md](specs/playlists.md#the-overview)).
+
+- Not From cache, which the code calls `stale`.
+
 ## Leaderboard standing
 
 ### Position
@@ -106,6 +113,9 @@ How it is fetched and cached is in [scenario_rank.md](specs/scenario_rank.md).
 How many players a scenario's leaderboard holds, the denominator of the
 percentile.
 
+- In code: `total_players`, or `total` for short, as in the scenario table's
+  row fields, and `leaderboard_total` where the count is handled on its own.
+
 ### Percentile
 
 The share of a scenario's leaderboard the player places above, as a
@@ -120,6 +130,7 @@ from the cache routinely carries no mark
 ([scenario_rank.md](specs/scenario_rank.md#failure-handling)).
 
 - In code: `stale`, as in a result served stale.
+- Not Stalest, which is about when a scenario was last played.
 
 ## Benchmark ranks
 
@@ -166,7 +177,9 @@ sensitivity. It's the player's own record, not their leaderboard score
 
 - On screen: PB, also as the prefix of the PB run's stats, as in PB Score.
   Prose says personal best.
-- In code: `high_score`. The PB a run was chasing is its previous best.
+- In code: `high_score` for the score, and `personal_best` or `pb` for the run
+  that set it and that run's stats. The PB a run was chasing is its previous
+  best.
 
 ### Accuracy
 
