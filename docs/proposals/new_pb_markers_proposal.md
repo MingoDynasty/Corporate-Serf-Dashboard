@@ -35,7 +35,9 @@ already uses
 a tie doesn't count, and a scenario's first run only sets the baseline. The
 comparison covers the scenario's whole history, at every sensitivity, whatever
 the page's oldest date is. A star then means one thing, whatever the chart's
-filters are set to: this run was the PB when it was played.
+filters are set to: this run was the PB when it was played. It marks an
+achievement and judges nothing
+([The direction this is held to](#the-direction-this-is-held-to)).
 
 Choosing differently:
 
@@ -134,11 +136,11 @@ Score vs Time a whole day's runs share one x position, so the order within a
 day is not visible at all. The second-highest point of a day may have been a
 PB for ten minutes, or may have come after the day's best.
 
-When the best score last moved, and how often it moves, is the most direct
-form of the look-back question the app exists for
-([product.md](../product.md#when-they-ask-them)): am I improving? The personal
-best celebration answers it at the moment of the run. Nothing answers it
-afterwards. The playlist tables' PB Date column gives the date of the current
+A new PB is an achievement, and the app treats it as one: the personal best
+celebration marks it at the moment of the run. Nothing marks it afterwards.
+A player looking back at a scenario between sessions
+([product.md](../product.md#when-they-ask-them)) can't see when they reached
+each best. The playlist tables' PB Date column gives the date of the current
 PB only.
 
 ### What the data shows
@@ -194,6 +196,28 @@ carries multiple semantic point categories".
 This proposal is that case. A new PB is a second category of point. The
 outcome proposed here is a symbol the app fixes, and still no symbol control.
 The entry stands as written, and the shipping entry links it.
+
+### The direction this is held to
+
+The 2026-10-04 entry
+([Skill Is Judged By The Typical Run, With Honest Uncertainty, In Verdicts Not Advice](../decision_log.md#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice))
+holds every later proposal to three rules. The first is the one that matters
+here. Judgments about skill, whether the player is improving among them, move
+toward the typical run, and the personal best stays the achievement.
+
+The stars sit on the achievement side of that line. They record what the
+player reached and when, as the celebration does. They are not a judgment of
+skill, and they are not a trend. A PB only rises, so a row of stars can't
+show a decline, and after one lucky run it reads as a plateau. Whether the
+player is improving stays the trend verdict's question, answered from session
+medians. On this chart the Average score line remains the read of how the
+scenario usually plays.
+
+The cost to weigh under M1 is emphasis. Gold stars draw the eye to the best
+runs, on a chart whose reading of skill is moving toward the typical run.
+
+The other two rules need nothing from this design. A star is a fact about a
+run, with no estimate in it and no advice.
 
 ## Design
 
@@ -335,10 +359,11 @@ words, and it stays as written.
   declined one, and the star follows the celebration's rule.
 - **New PBs anywhere else:** the playlist tables, the Aim Training Journey
   graph, or a list of them. Run History is the place for a list.
-- **The roadmap.** The product-direction PR
-  ([#327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327))
-  is rewriting it. The shipping PR adds the Shipped entry, and this PR
-  doesn't touch the file.
+- **A trend or a verdict read from the stars.** Whether the player is
+  improving is the trend verdict's question
+  ([The direction this is held to](#the-direction-this-is-held-to)).
+- **The roadmap.** This is a small chart feature beside the milestones, so
+  this PR adds no Upcoming entry. The shipping PR adds the Shipped entry.
 
 ## Delivery plan
 
