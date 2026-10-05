@@ -151,6 +151,7 @@ def _run_event(score: float) -> dict:
         "nth_score": 2,
         "score": score,
         "scenario_previous_best": 800.0,
+        "pace_constant": None,
         "is_new_sensitivity": False,
         "is_live": True,
     }

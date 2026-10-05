@@ -23,6 +23,7 @@ from source.kovaaks.playlist_scenarios_service import (
     build_playlist_scenario_rank_rows,
     format_playlist_scenario_rank_row,
 )
+from source.kovaaks.time_scored_service import PaceBasis
 
 
 def test_playlist_helpers_find_playlist_by_code(monkeypatch):
@@ -1270,6 +1271,112 @@ def test_benchmark_rank_fields_never_pass_an_unmet_threshold(thresholds):
             assert fields["next_tier_sort"] > 0
 
 
+_VISCOSE_LADDER = [
+    Rank(name="Cerulean", color="#ffffff", threshold=892.5),
+    Rank(name="Lavender", color="#ffffff", threshold=899),
+]
+
+
+def test_a_time_scored_rows_next_rank_gap_is_a_pace_gap():
+    fields = benchmark_rank_fields(_VISCOSE_LADDER, 896.2, 1000.0)
+
+    assert fields == {
+        "tier_display": "Cerulean",
+        "tier_sort": 1,
+        "next_tier_display": "2.8% faster to Lavender",
+        # The sort key is the unrounded pace gap, so a pace row and a score
+        # row sort together in the one column.
+        "next_tier_sort": pytest.approx(2.7723, abs=1e-4),
+        # The tooltip stays in points, and stays true.
+        "next_tier_tooltip": "Lavender at 899 · 2.8 to go",
+    }
+
+
+def test_the_same_row_without_a_constant_keeps_the_gap_as_a_share_of_the_pb():
+    fields = benchmark_rank_fields(_VISCOSE_LADDER, 896.2)
+
+    assert fields["next_tier_display"] == "+0.4% to Lavender"
+    assert fields["next_tier_sort"] == (899 - 896.2) / 896.2 * 100
+    assert fields["next_tier_tooltip"] == "Lavender at 899 · 2.8 to go"
+    assert fields == benchmark_rank_fields(_VISCOSE_LADDER, 896.2, None)
+
+
+@pytest.mark.parametrize(
+    ("threshold", "pb", "next_tier_display"),
+    [
+        # 33.33% rounds up, so a gap that remains never reads as smaller.
+        pytest.param(999.25, 999, "33.4% faster to Iron", id="rounds-up"),
+        pytest.param(900, 899.9999, "0.1% faster to Iron", id="floor"),
+        pytest.param(999.9, 0, "999,900.0% faster to Iron", id="thousands"),
+    ],
+)
+def test_a_pace_gap_formats_and_rounds_as_a_score_gap_does(
+    threshold, pb, next_tier_display
+):
+    fields = benchmark_rank_fields(_ladder(threshold), pb, 1000.0)
+
+    assert fields["next_tier_display"] == next_tier_display
+    assert fields["next_tier_sort"] > 0
+
+
+@pytest.mark.parametrize("pb", [0, -5])
+def test_a_time_scored_pb_of_zero_or_less_still_has_a_pace_gap(pb):
+    """Only the times have to be positive, so the row no longer reads N/A."""
+    assert benchmark_rank_fields(_ladder(100), pb)["next_tier_display"] == "N/A"
+
+    fields = benchmark_rank_fields(_ladder(100), pb, 1000.0)
+
+    assert fields["tier_display"] == "No rank"
+    assert fields["next_tier_display"].endswith("% faster to Iron")
+    assert fields["next_tier_sort"] == pytest.approx(
+        ((1000 - pb) / 900 - 1) * 100, rel=1e-9
+    )
+    assert fields["next_tier_tooltip"] == f"Iron at 100 · {100 - pb} to go"
+
+
+@pytest.mark.parametrize(
+    ("threshold", "pb", "next_tier_display"),
+    [
+        # A rank at the constant itself would take a time of zero.
+        pytest.param(1000, 999, "+0.2% to Iron", id="threshold-at-the-constant"),
+        pytest.param(1002, 1001, "+0.1% to Iron", id="pb-above-the-constant"),
+    ],
+)
+def test_an_undefined_pace_gap_falls_back_to_the_share_of_the_pb(
+    threshold, pb, next_tier_display
+):
+    fields = benchmark_rank_fields(_ladder(threshold), pb, 1000.0)
+
+    assert fields["next_tier_display"] == next_tier_display
+    assert fields == benchmark_rank_fields(_ladder(threshold), pb)
+
+
+def test_an_undefined_pace_gap_on_a_pb_of_zero_reads_na_as_it_does_today():
+    fields = benchmark_rank_fields(_ladder(1000), 0, 1000.0)
+
+    assert fields["tier_display"] == "No rank"
+    assert fields["next_tier_display"] == "N/A"
+    assert fields["next_tier_sort"] is None
+    assert fields["next_tier_tooltip"] is None
+
+
+def test_the_rank_column_is_the_same_with_and_without_a_constant():
+    """A higher score is always a faster finish, so the walk needs no pace."""
+    ladder = _ladder(880, 892.5, 899, 905)
+
+    for pb in (-5, 0, 879.99, 880, 896.2, 899, 904.99, 905, 990):
+        by_score = benchmark_rank_fields(ladder, pb)
+        by_pace = benchmark_rank_fields(ladder, pb, 1000.0)
+        assert by_pace["tier_display"] == by_score["tier_display"]
+        assert by_pace["tier_sort"] == by_score["tier_sort"]
+
+    assert benchmark_rank_fields(ladder, 990, 1000.0)["next_tier_display"] == (
+        "Top rank"
+    )
+    assert benchmark_rank_fields(ladder, None, 1000.0)["next_tier_display"] == "N/A"
+    assert benchmark_rank_fields([], 896.2, 1000.0)["next_tier_display"] == "N/A"
+
+
 def test_format_playlist_scenario_rank_row_adds_rank_fields_for_a_ladder():
     scenario_stats = ScenarioStats(
         date_last_played=datetime(2026, 5, 1, 8, 15, 0),
@@ -1459,3 +1566,143 @@ def test_cancelled_fill_rebuild_rows_equal_phase_one_rows(
         state = playlist_scenarios_service._FILL_REGISTRY["generation-1"]
         assert state.scenario_names == ()
         assert state.scenario_ladders == ()
+
+
+# --- Time-scored rows on the three row paths --------------------------------
+
+_PACE_HASH = "0123456789abcdef0123456789abcdef"
+
+
+def _pb_run(scenario_hash: str | None) -> RunData:
+    return RunData(
+        datetime_object=datetime(2026, 4, 1, 12, 0, 0),
+        score=105,
+        sens_scale="cm/360",
+        horizontal_sens=40.0,
+        scenario="Ranked",
+        accuracy=0.5,
+        scenario_hash=scenario_hash,
+    )
+
+
+def _serve_pace(monkeypatch, *, pb_hash: str | None = _PACE_HASH):
+    """Recognize every scenario as time-scored, with one PB run for "Ranked"."""
+    asked = []
+
+    def get_pace_basis(scenario_name):
+        asked.append(scenario_name)
+        return PaceBasis(1000.0, _PACE_HASH)
+
+    monkeypatch.setattr(playlist_scenarios_service, "get_pace_basis", get_pace_basis)
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_personal_best_run",
+        lambda scenario_name: _pb_run(pb_hash) if scenario_name == "Ranked" else None,
+    )
+    return asked
+
+
+def _next_ranks(rows) -> list[tuple[str, str]]:
+    return [(row["scenario"], row["next_tier_display"]) for row in rows]
+
+
+# 105 against Bronze at 110, at a constant of 1,000: 895 s against 890 s.
+_PACE_NEXT_RANKS = [
+    ("Ranked", "0.6% faster to Bronze"),
+    ("Unplayed", "N/A"),
+    ("No Ladder", "N/A"),
+    ("Top", "Top rank"),
+]
+
+
+def test_phase_one_rows_measure_a_time_scored_scenario_by_pace(
+    monkeypatch, rank_row_sources
+):
+    asked = _serve_pace(monkeypatch)
+
+    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+
+    assert _next_ranks(rows) == _PACE_NEXT_RANKS
+    assert rows[0]["next_tier_sort"] == pytest.approx((895 / 890 - 1) * 100)
+    assert rows[0]["tier_display"] == "Iron"
+    # A row with no ladder or no PB shows no gap, so nothing asks about it.
+    assert asked == ["Ranked"]
+
+
+def test_fill_rows_carry_the_same_pace_gap_as_phase_one(
+    monkeypatch, rank_row_sources, isolated_fill_registry
+):
+    _serve_pace(monkeypatch)
+    phase_one = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    target, args = _register_fill(monkeypatch, _BENCHMARK.code, "generation-1")
+
+    target(*args)
+    drain = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert drain is not None
+    assert drain.terminal == "complete"
+    fill_rows = sorted(drain.updates, key=lambda row: row["playlist_order"])
+    assert _next_ranks(fill_rows) == _PACE_NEXT_RANKS
+    assert fill_rows == phase_one
+
+
+def test_a_cancelled_fills_rebuild_carries_the_same_pace_gap_as_phase_one(
+    monkeypatch, rank_row_sources, isolated_fill_registry
+):
+    _serve_pace(monkeypatch)
+    phase_one = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    _register_fill(monkeypatch, _BENCHMARK.code, "generation-1")
+    _register_fill(monkeypatch, _PLAYLIST.code, "generation-2")
+
+    drain = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert drain is not None
+    assert drain.terminal == "cancelled"
+    assert _next_ranks(drain.updates) == _PACE_NEXT_RANKS
+    assert drain.updates == phase_one
+
+
+@pytest.mark.parametrize("pb_hash", ["ffffffffffffffffffffffffffffffff", None])
+def test_a_pb_from_another_version_keeps_the_gap_as_a_share_of_the_pb(
+    monkeypatch, rank_row_sources, pb_hash
+):
+    """The constant was read from one version, and the PB is not of it."""
+    _serve_pace(monkeypatch, pb_hash=pb_hash)
+
+    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+
+    assert _next_ranks(rows)[0] == ("Ranked", "+4.8% to Bronze")
+
+
+def test_a_playlists_table_never_asks_whether_a_scenario_is_time_scored(
+    monkeypatch, rank_row_sources
+):
+    asked = _serve_pace(monkeypatch)
+
+    rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+
+    assert len(rows) == 2
+    assert asked == []
+
+
+def test_a_failed_pace_lookup_costs_the_pace_gap_and_never_the_row(
+    monkeypatch, rank_row_sources, caplog
+):
+    _serve_pace(monkeypatch)
+
+    def fail(_scenario_name):
+        raise RuntimeError("the run list changed size during iteration")
+
+    monkeypatch.setattr(playlist_scenarios_service, "get_pace_basis", fail)
+
+    with caplog.at_level(logging.WARNING, logger=playlist_scenarios_service.__name__):
+        rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+
+    assert _next_ranks(rows)[0] == ("Ranked", "+4.8% to Bronze")
+    failures = [
+        record
+        for record in caplog.records
+        if record.getMessage() == 'Failed to tell whether "Ranked" is time-scored'
+    ]
+    assert len(failures) == 1
+    assert failures[0].exc_info is not None

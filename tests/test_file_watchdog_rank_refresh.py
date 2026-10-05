@@ -445,6 +445,7 @@ def test_the_run_message_carries_no_decision_field():
         "datetime_created",
         "is_new_sensitivity",
         "nth_score",
+        "pace_constant",
         "run_id",
         "scenario_name",
         "scenario_previous_best",

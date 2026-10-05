@@ -32,6 +32,13 @@ class NewFileMessage:
     scenario_previous_best: Optional[float]
     score: float
     sensitivity: str
+    # The constant a time-scored scenario's score counts down from: a score of
+    # ``s`` took ``pace_constant - s`` seconds. Set only when this run and the
+    # previous best can both be measured by pace. None when the scenario is
+    # not recognized as time-scored, when either run is from another version
+    # of the scenario, and on a scenario's first run. It is a fact like the
+    # previous best: each consumer derives its own pace percentage from it.
+    pace_constant: Optional[float]
 
 
 message_queue: deque[NewFileMessage] = deque()

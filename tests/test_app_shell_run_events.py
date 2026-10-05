@@ -39,6 +39,7 @@ def _message(
     is_new_sensitivity: bool = False,
     nth_score: int = 2,
     age_seconds: float = 0.0,
+    pace_constant: float | None = None,
 ) -> NewFileMessage:
     return NewFileMessage(
         datetime_created=_NOW - timedelta(seconds=age_seconds),
@@ -49,6 +50,7 @@ def _message(
         scenario_previous_best=scenario_previous_best,
         score=score,
         sensitivity="34.64 cm/360",
+        pace_constant=pace_constant,
     )
 
 
@@ -572,7 +574,11 @@ def test_a_message_appended_mid_drain_is_seen_exactly_once(monkeypatch, frozen_c
 # --- the toast body ----------------------------------------------------
 
 
-def _celebration_message(score: float, previous_best: float) -> str:
+def _celebration_message(
+    score: float,
+    previous_best: float,
+    pace_constant: float | None = None,
+) -> str:
     return app_shell._celebration_toast(
         {
             "run_id": "run-1.csv",
@@ -581,6 +587,7 @@ def _celebration_message(score: float, previous_best: float) -> str:
             "nth_score": 1,
             "score": score,
             "scenario_previous_best": previous_best,
+            "pace_constant": pace_constant,
             "is_new_sensitivity": False,
             "is_live": True,
         }
@@ -590,6 +597,55 @@ def _celebration_message(score: float, previous_best: float) -> str:
 def test_the_celebration_message_reports_the_gain_over_the_previous_best():
     assert _celebration_message(830.0, 800.0) == (
         "Scenario A: 830.00. Up 3.8% on your previous best of 800.00."
+    )
+
+
+def test_a_time_scored_celebration_reports_how_much_faster_the_run_finished():
+    # 115.59 s down to 103.83 s. As a share of the score it would read 1.3%.
+    assert _celebration_message(896.17, 884.41, 1000.0) == (
+        "Scenario A: 896.17. Finished 11.3% faster than your previous best of 884.41."
+    )
+    assert _celebration_message(896.17, 884.41) == (
+        "Scenario A: 896.17. Up 1.3% on your previous best of 884.41."
+    )
+
+
+@pytest.mark.parametrize("previous_best", [0.0, -5.0])
+def test_a_time_scored_celebration_needs_no_positive_previous_best(previous_best):
+    # Pace needs positive times only, so the percentage this toast drops for a
+    # score has a meaning here.
+    assert _celebration_message(10.0, previous_best, 1000.0) == (
+        f"Scenario A: 10.00. Finished {((1000 - previous_best) / 990 - 1) * 100:.1f}% "
+        f"faster than your previous best of {previous_best:.2f}."
+    )
+
+
+def test_a_celebration_with_an_undefined_pace_reports_the_score_gain():
+    # A score at the constant took no time at all, so there is no pace.
+    assert _celebration_message(1000.0, 800.0, 1000.0) == (
+        "Scenario A: 1000.00. Up 25.0% on your previous best of 800.00."
+    )
+
+
+def test_the_drain_carries_the_pace_constant_into_the_batch(monkeypatch, frozen_clock):
+    batch, _celebration = _drain(
+        monkeypatch,
+        _message(run_id="timed.csv", pace_constant=1000.0),
+        _message(run_id="ordinary.csv"),
+    )
+
+    assert [run["pace_constant"] for run in batch["runs"]] == [1000.0, None]
+
+
+def test_a_drained_time_scored_personal_best_toasts_by_pace(monkeypatch, frozen_clock):
+    _batch, (celebration,) = _drain(
+        monkeypatch,
+        _message(score=896.17, scenario_previous_best=884.41, pace_constant=1000.0),
+    )
+
+    assert celebration["title"] == "New personal best"
+    assert celebration["message"] == (
+        "Scenario A: 896.17. Finished 11.3% faster than your previous best of 884.41."
     )
 
 

@@ -19,6 +19,7 @@ from source.app_shell import (  # noqa: E402
 )
 from source.kovaaks import data_service  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
+from source.kovaaks.time_scored_service import PaceBasis  # noqa: E402
 from source.my_watchdog import file_watchdog  # noqa: E402
 from source.pages import home  # noqa: E402
 
@@ -30,6 +31,7 @@ def _run(
     nth_score: int = 2,
     score: float = 812.4,
     scenario_previous_best: float | None = 800.0,
+    pace_constant: float | None = None,
     is_new_sensitivity: bool = False,
     is_live: bool = True,
 ) -> RunEventData:
@@ -41,6 +43,7 @@ def _run(
         "nth_score": nth_score,
         "score": score,
         "scenario_previous_best": scenario_previous_best,
+        "pace_constant": pace_constant,
         "is_new_sensitivity": is_new_sensitivity,
         "is_live": is_live,
     }
@@ -442,6 +445,184 @@ def test_threshold_fail_without_a_placement_drops_the_placement_clause():
     )
 
     assert notification["message"] == ("Scenario A: 780.00, 97.5% of PB (need 98.8%).")
+
+
+def test_a_time_scored_pass_reads_as_a_percentage_of_pb_pace():
+    # 905 took 95 s and 902 took 98 s: 96.9% of the pace, where the score's
+    # own ratio would read 99.7%.
+    notification = _notification(
+        _payload(score=902.0, scenario_previous_best=905.0, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["color"] == "green"
+    assert notification["message"] == (
+        "Scenario A: 902.00, 96.9% of PB pace. Also your 2nd-best at 34.64 cm/360."
+    )
+
+
+def test_a_time_scored_pass_without_a_placement_ends_at_the_fact():
+    notification = _notification(
+        _payload(
+            score=902.0,
+            scenario_previous_best=905.0,
+            pace_constant=1000.0,
+            nth_score=9,
+        ),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["message"] == "Scenario A: 902.00, 96.9% of PB pace."
+
+
+def test_a_time_scored_fail_names_the_pace_it_missed():
+    # The proposal's worked run: 883.02 against a PB of 896.17 passes at 98.5%
+    # of the score, and is 88.8% of the pace.
+    notification = _notification(
+        _payload(score=883.02, scenario_previous_best=896.17, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Below threshold"
+    assert notification["color"] == "yellow"
+    assert notification["message"] == (
+        "Scenario A: 883.02, 88.8% of PB pace (need 95.0%). "
+        "Still your 2nd-best at 34.64 cm/360."
+    )
+
+
+def test_a_time_scored_fail_without_a_placement_drops_the_placement_clause():
+    notification = _notification(
+        _payload(
+            score=883.02,
+            scenario_previous_best=896.17,
+            pace_constant=1000.0,
+            nth_score=9,
+        ),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["message"] == (
+        "Scenario A: 883.02, 88.8% of PB pace (need 95.0%)."
+    )
+
+
+def test_a_time_scored_run_passes_at_exactly_the_goal():
+    # 95 s against 100 s is exactly 95% of the pace.
+    notification = _notification(
+        _payload(score=900.0, scenario_previous_best=905.0, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A: 900.00, 95.0% of PB pace.")
+
+
+def test_a_time_scored_run_passes_exactly_at_a_goal_float_math_undershoots():
+    # 198.74 s against 209.2 s is exactly 95%, and in floats both the ratio
+    # and the cross-multiplied form come out a hair under it.
+    notification = _notification(
+        _payload(score=790.8, scenario_previous_best=801.26, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A: 790.80, 95.0% of PB pace.")
+
+
+def test_a_time_scored_run_just_short_of_the_pb_never_reads_as_matching_it():
+    # 103.83 s against 103.86 s is 99.97% of the pace: a pass at a 95% goal,
+    # but one-decimal rounding alone would print "100.0% of PB pace".
+    notification = _notification(
+        _payload(score=896.14, scenario_previous_best=896.17, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A: 896.14, 99.9% of PB pace.")
+
+
+def test_a_time_scored_fail_never_reads_as_meeting_the_goal():
+    # 95 s against 100.02 s is 94.98% of the pace: short of 95%, but
+    # one-decimal rounding alone would print "95.0% of PB pace (need 95.0%)".
+    notification = _notification(
+        _payload(
+            score=899.98,
+            scenario_previous_best=905.0,
+            pace_constant=1000.0,
+            nth_score=9,
+        ),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Below threshold"
+    assert notification["message"] == (
+        "Scenario A: 899.98, 94.9% of PB pace (need 95.0%)."
+    )
+
+
+def test_a_run_with_no_constant_reads_as_a_percentage_of_pb():
+    # The same two scores as the time-scored pass, judged by score.
+    notification = _notification(
+        _payload(score=902.0, scenario_previous_best=905.0, pace_constant=None),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A: 902.00, 99.7% of PB.")
+
+
+def test_a_time_scored_previous_best_of_zero_or_less_is_still_judged():
+    # Pace needs positive times, not a positive previous best: 1,005 s against
+    # 1,020 s is 98.5% of the pace. By score this run has no verdict at all.
+    by_pace = _notification(
+        _payload(score=-20.0, scenario_previous_best=-5.0, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+    by_score = _notification(
+        _payload(score=-20.0, scenario_previous_best=-5.0, pace_constant=None),
+        score_threshold_percentage=95,
+    )
+
+    assert by_pace["title"] == "Threshold passed"
+    assert by_pace["message"].startswith("Scenario A: -20.00, 98.5% of PB pace.")
+    assert by_score["title"] == "New 2nd-best score"
+
+
+def test_an_undefined_pace_falls_back_to_the_score_verdict():
+    # A score at the constant took no time at all, so pace is undefined and the
+    # run is judged as any other scenario's would be.
+    notification = _notification(
+        _payload(score=1000.0, scenario_previous_best=905.0, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A: 1000.00, 110.5% of PB.")
+
+
+def test_an_undefined_pace_keeps_the_unjudged_rule_for_a_nonpositive_best():
+    notification = _notification(
+        _payload(score=1000.0, scenario_previous_best=0.0, pace_constant=1000.0),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "New 2nd-best score"
+
+
+def test_a_time_scored_first_run_at_a_sensitivity_is_still_unjudged():
+    notification = _notification(
+        _payload(
+            score=902.0,
+            scenario_previous_best=905.0,
+            pace_constant=1000.0,
+            is_new_sensitivity=True,
+        ),
+        score_threshold_percentage=95,
+    )
+
+    assert notification["title"] == "New 2nd-best score"
 
 
 def test_an_empty_threshold_percentage_leaves_the_run_unjudged():
@@ -888,6 +1069,114 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
     assert notifications == []
     assert hidden == []
     assert toast_channels is no_update
+
+
+# --- The score threshold line on a time-scored scenario ----------------------
+
+_LINE_HASH = "0123456789abcdef0123456789abcdef"
+
+
+def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
+    """Draw Scenario A's threshold line at 95% and return what the chart says."""
+    personal_best = RunData(
+        datetime_object=datetime(2026, 7, 6, 12),
+        score=896.2,
+        sens_scale="cm/360",
+        horizontal_sens=40.8,
+        scenario="Scenario A",
+        accuracy=0.5,
+        scenario_hash=pb_hash,
+    )
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+    monkeypatch.setattr(
+        home, "get_time_vs_runs", lambda *_args: {"2026-07-06": [object()]}
+    )
+    monkeypatch.setattr(home, "generate_time_plot", lambda *_args: go.Figure())
+    monkeypatch.setattr(home, "get_high_score", lambda _scenario: 896.2)
+    monkeypatch.setattr(home, "get_personal_best_run", lambda _scenario: personal_best)
+    monkeypatch.setattr(home, "get_pace_basis", lambda _scenario: basis)
+    monkeypatch.setattr(
+        home,
+        "ctx",
+        SimpleNamespace(triggered=[{"prop_id": "date-picker.value"}]),
+    )
+
+    plot_json, *_outputs = home.generate_graph(
+        None,
+        "Scenario A",
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        False,
+        True,
+        95,
+        True,
+        True,
+        None,
+        {},
+    )
+
+    plot = json.loads(plot_json)
+    (annotation,) = plot["layout"]["annotations"]
+    (line,) = plot["layout"]["shapes"]
+    # The label is the line's own height, rounded for display.
+    assert annotation["text"] == f"Score threshold ({line['y0']:.2f})"
+    return annotation["text"]
+
+
+def test_the_threshold_line_on_a_time_scored_scenario_sits_at_95_percent_of_pb_pace(
+    monkeypatch,
+):
+    # 103.8 s at 95% of the pace is 109.26 s, which is a score of 890.74. The
+    # annotation still names a score.
+    annotation = _threshold_line_annotation(
+        monkeypatch,
+        basis=PaceBasis(1000.0, _LINE_HASH),
+        pb_hash=_LINE_HASH,
+    )
+
+    assert annotation == "Score threshold (890.74)"
+
+
+def test_the_threshold_line_with_no_constant_sits_at_95_percent_of_the_pb_score(
+    monkeypatch,
+):
+    annotation = _threshold_line_annotation(monkeypatch, basis=None, pb_hash=_LINE_HASH)
+
+    assert annotation == "Score threshold (851.39)"
+
+
+def test_the_threshold_line_keeps_score_math_for_a_pb_from_another_version(
+    monkeypatch,
+):
+    annotation = _threshold_line_annotation(
+        monkeypatch,
+        basis=PaceBasis(1000.0, _LINE_HASH),
+        pb_hash="ffffffffffffffffffffffffffffffff",
+    )
+
+    assert annotation == "Score threshold (851.39)"
+
+
+def test_the_threshold_line_keeps_score_math_where_pace_is_undefined(monkeypatch):
+    # A PB at the constant took no time, so there is no pace to take 95% of.
+    personal_best = RunData(
+        datetime_object=datetime(2026, 7, 6, 12),
+        score=1000.0,
+        sens_scale="cm/360",
+        horizontal_sens=40.8,
+        scenario="Scenario A",
+        accuracy=0.5,
+        scenario_hash=_LINE_HASH,
+    )
+    monkeypatch.setattr(home, "get_personal_best_run", lambda _scenario: personal_best)
+    monkeypatch.setattr(
+        home, "get_pace_basis", lambda _scenario: PaceBasis(1000.0, _LINE_HASH)
+    )
+
+    assert home._score_threshold_line("Scenario A", 1000.0, 95.0) == 950.0
 
 
 # --- Normalized sensitivity groups, watchdog to toast ------------------------

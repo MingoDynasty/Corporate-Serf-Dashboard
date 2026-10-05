@@ -46,6 +46,7 @@ from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch
 from source.kovaaks.data_service import (
     drain_startup_playlist_warnings,
     get_high_score,
+    get_personal_best_run,
     get_playlist_by_code,
     get_rank_data_from_playlist_code,
     get_scenario_names,
@@ -55,9 +56,11 @@ from source.kovaaks.data_service import (
     get_time_vs_runs,
     is_scenario_in_database,
 )
+from source.kovaaks.pace import pace_goal_met, pace_percent, pace_threshold_score
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
+from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
 from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
 from source.pages.playlist_selector import (
@@ -111,7 +114,10 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         "current personal best."
     ),
     "score-threshold-percentage": (
-        "Sets the score goal as a percentage of your personal best. The "
+        "Sets the score goal as a percentage of your personal best. On a "
+        "scenario scored by completion time, it's a percentage of your "
+        "personal best's pace instead, when the app can measure pace "
+        "reliably. Otherwise, it stays a percentage of your score. The "
         "overlay line tracks your current personal best. Notifications judge "
         "a run against the personal best you had before the run."
     ),
@@ -1093,11 +1099,16 @@ def _normalize_score_threshold_percentage(
 
 
 class _ThresholdVerdict(NamedTuple):
-    """How a run measured up against the score threshold it was judged on."""
+    """How a run measured up against the score threshold it was judged on.
+
+    ``by_pace`` says which measure ``percentage`` is in: the run's pace as a
+    percentage of the previous best's, or its score as a percentage of it.
+    """
 
     passed: bool
     percentage: float
     goal_percentage: float
+    by_pace: bool = False
 
 
 def _threshold_verdict(
@@ -1112,6 +1123,10 @@ def _threshold_verdict(
     previous best to be a percentage of -- there is no denominator, not a
     failing one. The message carries the facts and this derives the gate; the
     two used to be bundled into one nullable field that meant both.
+
+    A run whose message carries a pace constant is judged by pace wherever
+    pace is defined, which needs positive times and not a positive previous
+    best. Where it is undefined, the run is judged by score as any other.
     """
     goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
     scenario_previous_best = latest["scenario_previous_best"]
@@ -1120,8 +1135,29 @@ def _threshold_verdict(
         or not goal_percentage
         or latest["is_new_sensitivity"]
         or scenario_previous_best is None
-        or scenario_previous_best <= 0
     ):
+        return None
+    pace_constant = latest["pace_constant"]
+    if pace_constant is not None:
+        passed_by_pace = pace_goal_met(
+            pace_constant,
+            scenario_previous_best,
+            latest["score"],
+            goal_percentage,
+        )
+        percentage_of_pace = pace_percent(
+            pace_constant,
+            scenario_previous_best,
+            latest["score"],
+        )
+        if passed_by_pace is not None and percentage_of_pace is not None:
+            return _ThresholdVerdict(
+                passed=passed_by_pace,
+                percentage=percentage_of_pace,
+                goal_percentage=goal_percentage,
+                by_pace=True,
+            )
+    if scenario_previous_best <= 0:
         return None
     # Compared as decimals: in floats, 20.6 * 95 / 100 is 19.570000000000004,
     # which fails a 19.57 run sitting exactly at 95% of a 20.60 PB. A float's
@@ -1149,7 +1185,9 @@ def _shown_percentage(verdict: _ThresholdVerdict) -> float:
     if not verdict.passed:
         shown = min(shown, round(verdict.goal_percentage, 1) - 0.1)
     # Float division and multiplication both round monotonically, so the
-    # percentage is below 100 exactly when the score is below the PB.
+    # percentage is below 100 exactly when the score is below the PB. That
+    # holds for a percentage of pace too: a run's time is longer than the
+    # PB's exactly when its score is lower.
     if verdict.percentage < 100:
         shown = min(shown, 99.9)
     return shown
@@ -1191,10 +1229,12 @@ def _build_live_run_notification(
         )
 
     shown_percentage = _shown_percentage(verdict)
+    # The one word that tells the player which measure judged the run.
+    measure = "PB pace" if verdict.by_pace else "PB"
     if verdict.passed:
         # A pass ends at the fact: a line saying what to do next would be
         # advice, and the app states verdicts only.
-        message = f"{score}, {shown_percentage:.1f}% of PB."
+        message = f"{score}, {shown_percentage:.1f}% of {measure}."
         if placed:
             message += f" Also {placement}."
         return toast(
@@ -1205,7 +1245,7 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {shown_percentage:.1f}% of PB "
+    shortfall = f"{score}, {shown_percentage:.1f}% of {measure} "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."
@@ -1259,6 +1299,28 @@ def _build_run_event_notification(  # noqa: PLR0913
         top_n_scores,
         verdict,
     )
+
+
+def _score_threshold_line(
+    selected_scenario: str,
+    high_score: float,
+    goal_percentage: float,
+) -> float:
+    """Return the score the threshold line is drawn at, from the current PB.
+
+    On a time-scored scenario whose PB can be measured by pace, the line sits
+    at the score that finishes at the goal percentage of the PB's pace. Every
+    other scenario keeps the goal as a percentage of the PB's score.
+    """
+    pace_constant = eligible_pace_constant(
+        get_pace_basis(selected_scenario),
+        get_personal_best_run(selected_scenario),
+    )
+    if pace_constant is not None:
+        pace_line = pace_threshold_score(pace_constant, high_score, goal_percentage)
+        if pace_line is not None:
+            return pace_line
+    return high_score * goal_percentage / 100
 
 
 def _empty_state_graph_response(
@@ -1471,7 +1533,11 @@ def generate_graph(  # noqa: PLR0913
             score_threshold_percentage
         )
         if score_threshold_overlay_switch and score_threshold_goal_percentage:
-            score_threshold = high_score * score_threshold_goal_percentage / 100
+            score_threshold = _score_threshold_line(
+                selected_scenario,
+                high_score,
+                score_threshold_goal_percentage,
+            )
             plot = add_score_threshold_overlay(plot, score_threshold)
 
         notifications = []

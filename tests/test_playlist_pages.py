@@ -2444,8 +2444,11 @@ def test_playlist_scenarios_rank_column_defs():
     }
     assert next_rank["headerName"] == "Next Rank"
     assert next_rank["field"] == "next_tier_sort"
+    # One header for both measures the column holds, on every benchmark table.
     assert next_rank["headerTooltip"] == (
-        "How much your PB score has to grow to reach the next rank. Lower is closer."
+        "How much your PB score has to grow to reach the next rank. A row that "
+        'reads "faster" is a scenario scored by completion time, and shows how '
+        "much faster you have to finish than your PB. Lower is closer."
     )
     assert next_rank["valueFormatter"] == {"function": "params.data.next_tier_display"}
     # The cell tooltip, and its affordance, exist only when the row has one.
