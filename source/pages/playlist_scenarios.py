@@ -225,6 +225,8 @@ BENCHMARK_COLUMN_DEFS = [
         "field": "next_tier_sort",
         "headerTooltip": (
             "How much your PB score has to grow to reach the next rank. "
+            'A row that reads "faster" is a scenario scored by completion '
+            "time, and shows how much faster you have to finish than your PB. "
             "Lower is closer."
         ),
         "valueFormatter": {"function": "params.data.next_tier_display"},

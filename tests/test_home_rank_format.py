@@ -534,7 +534,10 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
             "around your plotted scores. Needs **Rank thresholds** turned on."
         ),
         "score-threshold-percentage": (
-            "Sets the score goal as a percentage of your personal best. The "
+            "Sets the score goal as a percentage of your personal best. On a "
+            "scenario scored by completion time, it's a percentage of your "
+            "personal best's pace instead, when the app can measure pace "
+            "reliably. Otherwise, it stays a percentage of your score. The "
             "overlay line tracks your current personal best. Notifications judge "
             "a run against the personal best you had before the run."
         ),

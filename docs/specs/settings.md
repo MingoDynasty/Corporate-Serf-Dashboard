@@ -155,6 +155,16 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   (`get_usable_stats_dir`), so a directory appearing or vanishing mid-run
   changes nothing until a restart. A pin never resolved reads as unset
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+- The app also reads the `performances` folder beside the pinned stats
+  directory, the sibling of that name under the same parent, where KovaaK's
+  writes one performance file per run. There is no setting for it: it
+  follows the stats directory, startup lists it once after the initial scan,
+  and the app only ever reads it. A stats directory with no such folder
+  beside it, as when the setting points at a copy of the stats files, lists
+  nothing, and no scenario is then recognized as time-scored
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  What the files are read for is specified in
+  [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
 - Identity is a pair. Reads stay live until the first `get_identity` (or
   single-getter) call that observes a non-empty username, which freezes both
   values for the life of the process; a Steam ID without a username freezes

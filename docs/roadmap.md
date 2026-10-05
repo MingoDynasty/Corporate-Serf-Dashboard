@@ -28,6 +28,16 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Time-scored scenarios measured by pace** — some scenarios score the time
+  left on a countdown when the task is done, and on those a percentage of the
+  score understates a real improvement several times over. The app now
+  recognizes such a scenario from the performance files KovaaK's writes beside
+  each run and measures it by pace, how fast a run finishes compared with the
+  personal best. Next Rank reads "2.8% faster to Lavender" there, the score
+  threshold line and its verdict judge by pace, and a new personal best says
+  how much faster it finished. A scenario the app can't recognize reads as it
+  did before. (PR #343; design in #329) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **New PB stars on the Score vs Time chart** — the chart now draws a gold
   star on each plotted run that beat the scenario's personal best when it was
   played, so it shows when each best was reached, including the ones a later
@@ -63,18 +73,6 @@ sequence.
   what to do. No new surface and no behavior change. (PR #291; design in
   #247) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **Cross-scale sensitivity conversion** — a run recorded on a game's own
-  sensitivity scale, like `0.2 Valorant`, used to plot under that raw number,
-  so it sorted as 0.2 among centimeters and sat at the far left of the Score
-  vs Sensitivity axis instead of beside the 40.8 cm/360 it actually is. Those
-  runs now convert to cm/360 the moment their file is read, using two fields
-  every stats file has carried since 2024, so they group, sort, and earn run
-  notifications like every other run, and the playlist tables' PB cm/360
-  column fills in for them. Sensitivities that one-decimal rounding used to
-  collapse into one group separate correctly. Runs from 2019 to 2021 predate
-  the fields and keep their original label rather than being dropped. (PR
-  #280; design in #277, rulings in #279) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
 ---
 
 ## Upcoming milestones
@@ -104,17 +102,6 @@ What we plan to do now or very soon, each with the reasons it comes next.
   order. Its "sessions later" decision and its view order are marked
   superseded, and a rewritten proposal will replace it. Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **Time-scored scenarios measured by pace** — some scenarios score the time
-  left on a countdown when the task is done, and on those a percentage of the
-  score understates the real change several times over. So the percentages
-  the app shows there, the Next Rank gap and the score threshold among them,
-  make those scenarios look closer to ranking up and easier to pass than they
-  are. The fix measures them by pace: how fast a run finishes compared with
-  the personal best. Why now: it's a bug in shipped features, and a small
-  one. It's a correctness fix rather than a milestone, so it runs beside Run
-  history. Its design is ratified in
-  [`time_scored_pace_proposal.md`](./proposals/time_scored_pace_proposal.md),
-  and one implementation PR follows.
 ---
 
 ## Future (briefly)

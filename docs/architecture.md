@@ -13,9 +13,10 @@ endpoint behavior see `docs/kovaaks_api_notes.md`; for workflow/conventions see
 ever configured one (`stats_dir_detection.bootstrap_stats_dir`, before the pin
 so a first detection serves this boot), pins the stats directory for the process
 (`settings_service.resolve_stats_dir`), calls `initialize_kovaaks_data` to build
-the in-memory stores from existing CSVs, starts a watchdog `Observer` on that
-directory, and serves the Dash app with Waitress (Flask dev server when
-`config.debug`). With no usable stats directory — unset, or set but missing —
+the in-memory stores from existing CSVs, lists the `performances` folder beside
+it (`time_scored_service.index_performance_files`, which parses nothing), starts
+a watchdog `Observer` on the stats directory, and serves the Dash app with
+Waitress (Flask dev server when `config.debug`). With no usable stats directory — unset, or set but missing —
 the scan and the observer are both skipped and the app serves empty pages; only
 `port` is needed to serve.
 
@@ -46,7 +47,7 @@ flowchart TD
     Game["KovaaK's writes a new run CSV into stats_dir"]
 
     subgraph Watchdog["Watchdog observer thread"]
-        Handler["NewFileHandler<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>normalize sensitivity to cm/360,<br/>classify the score"]
+        Handler["NewFileHandler<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>normalize sensitivity to cm/360,<br/>classify the score,<br/>work out the pace constant"]
     end
 
     subgraph Timers["Rank-freshness timer chain (daemon threading.Timer)"]
@@ -57,8 +58,10 @@ flowchart TD
     Stores[("data_service module-global stores<br/>kovaaks_database, run_database,<br/>playlist_database")]
     Cache[("JSON cache under data/cache/<br/>rank, leaderboard, benchmark data")]
     API["KovaaK's HTTP API"]
+    Perf[("performances folder beside stats_dir<br/>one performance file per run, read only")]
 
     Game --> Handler
+    Handler -->|"before the load: lists the run's performance file, and reads it for the pace constant"| Perf
     Handler -->|"1. loads the run"| Stores
     Handler -->|"2. appends NewFileMessage after a successful load"| Queue
     Handler -->|"3. new high score: schedules"| Attempt
@@ -125,7 +128,10 @@ The sanctioned channels, each typed and single-purpose:
 - `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only,
   drained by the app shell's `publish_run_events` on every page. It carries
   facts about a run and no decision field, so each consumer derives its own
-  verdict and two of them can never disagree about one run.
+  verdict and two of them can never disagree about one run. One fact is
+  `pace_constant`, the constant of a time-scored scenario, which the
+  watchdog works out before it queues the message so that the drain and the
+  page read no store for it.
 - `data_service.playlist_startup_warning_queue` — boot-time playlist warnings,
   drained by a dedicated Scenario Performance interval callback.
 - `file_watchdog.run_import_failure_queue` — run files the watchdog thread
@@ -167,6 +173,12 @@ state, not a field grafted onto someone else's schema.
     `data/playlists/` second; the first file for a code wins, duplicate-code
     files warn visibly after the UI mounts, and a missing user root is treated
     as empty. New imports are written atomically under `data/playlists/`.
+- **Performance files, listed and remembered in memory.**
+  `time_scored_service.py` holds the names in the `performances` folder
+  beside the stats directory, listed once at startup, plus each parsed
+  file's answer keyed by file name. The watchdog adds a landed run's file to
+  the listing. Nothing is parsed until a surface asks about a scenario, and
+  nothing is written to disk.
 - **Cache layer** — KovaaK's API responses and resolved rank/leaderboard data
   persist as JSON under `data/cache/` (not committed), written atomically and
   read tolerantly. Subtrees include `scenario_leaderboards/`,
@@ -237,6 +249,9 @@ flowchart LR
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
         OverviewService["kovaaks/playlist_<br/>overview_service.py"]
         Visibility["kovaaks/playlist_<br/>visibility_service.py"]
+        TimeScored["kovaaks/time_scored_<br/>service.py"]
+        PerfFile["kovaaks/<br/>performance_file.py"]
+        Pace["kovaaks/<br/>pace.py"]
         EvxlLinks["kovaaks/<br/>evxl_links.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
@@ -249,13 +264,17 @@ flowchart LR
     App --> Shell
     App --> DataService
     App --> WarmupService
+    App --> TimeScored
     App --> FileWatchdog
 
     Shell --> LocalIcon
     Shell --> Queue
+    Shell --> Pace
     Home --> DataService
     Home --> ApiService
     Home --> PlotService
+    Home --> TimeScored
+    Home --> Pace
     Home --> LocalIcon
     Home --> ControlName
     Playlists --> ControlName
@@ -278,14 +297,20 @@ flowchart LR
 
     PlaylistService --> DataService
     PlaylistService --> ApiService
+    PlaylistService --> TimeScored
+    PlaylistService --> Pace
     OverviewService --> DataService
     OverviewService --> ApiService
     OverviewService --> Visibility
     Visibility --> DataService
     DataService --> ApiService
+    TimeScored --> DataService
+    TimeScored --> PerfFile
 
     FileWatchdog --> DataService
     FileWatchdog --> ApiService
+    FileWatchdog --> TimeScored
+    FileWatchdog --> Pace
     FileWatchdog --> Queue
 ```
 
@@ -519,6 +544,12 @@ flowchart LR
   A converted run also carries `RunData.recorded_sensitivity`, the unrounded
   value, scale, and DPI its file recorded, which only the chart hover reads
   ([decision_log.md](decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
+  Every run also carries `RunData.scenario_hash`, the stats file's `Hash:`,
+  or `None` when the file has none, and `RunData.stats_file_name`, the file's
+  own name. The hash names the scenario version a run was played on, and the
+  name is how its performance file is found. `get_runs_newest_first` hands
+  a scenario's runs to the time-scored lookup
+  ([decision_log.md](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
   `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
   runs in time order, and `get_new_high_score_runs` applies it to everything
   the scenario holds, never to a filtered view
@@ -553,7 +584,27 @@ flowchart LR
   interval drain. Every streamed/finalized item is a complete row merging
   freshly read local stats with rank info and, on a benchmark, the Rank and
   Next Rank fields that `benchmark_rank_fields`, a pure function of the
-  scenario's ladder and local PB, computes on every path.
+  scenario's ladder, its local PB, and an optional pace constant, computes on
+  every path. The constant is `None` for the gap as a percentage of the PB,
+  and `_build_row` supplies it, on a row with a ladder and a PB, when the
+  scenario is time-scored and the PB run is eligible.
+- `performance_file.py` — pure reader for a KovaaK's performance file and the
+  countdown check (`read_performance_file`): bytes in, one of three answers
+  out (`Scoring`: time-scored, not time-scored, can't answer), with the
+  file's time limit, scenario hash, score event count, and largest distance
+  from the countdown. It parses the protobuf wire format by hand, so the app
+  takes no protobuf dependency, and it never raises.
+- `time_scored_service.py` — which scenarios are time-scored. Lists the
+  `performances` folder (`index_performance_files`), adds a landed run's file
+  (`note_performance_file`), and answers `get_pace_basis`: a scenario's
+  constant and the hash it was read from, decided by the newest run's file or
+  the next older one of the same hash that can answer. Each answer is
+  remembered by file name. `eligible_pace_constant` returns the constant only
+  when every run in a comparison carries that hash.
+- `pace.py` — the pure pace formulas (`pace_percent`, `percent_faster`,
+  `pace_threshold_score`, `pace_goal_met`). Each returns `None` when a time
+  in the comparison is zero or less, and the caller then keeps its score
+  math.
 - `playlist_overview_service.py` — builds rows for the playlist-level overview
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with
@@ -587,11 +638,15 @@ flowchart LR
   theming). No I/O.
 
 ### Infrastructure
-- `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, update DBs,
-  push `NewFileMessage`, and schedule the bounded rank freshness poll on a new
-  high score.
+- `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its
+  performance file, work out the run's pace constant, update DBs, push
+  `NewFileMessage`, and schedule the bounded rank freshness poll on a new
+  high score. Its interim session lines in the debug log judge a
+  time-scored run by pace.
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
-  watchdog-to-UI hand-off, drained by the app shell.
+  watchdog-to-UI hand-off, drained by the app shell. Its `pace_constant`
+  field is copied into the shell's `RunEventData`, where the threshold
+  verdict and the New personal best toast read it.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
   Unknown keys are named in one warning and ignored, so a config carrying keys
   a release has retired still loads.
@@ -734,6 +789,7 @@ flowchart LR
 | What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
 | The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
+| How a time-scored scenario is recognized, or the pace math | `kovaaks/performance_file.py` for the file reader and the countdown check; `kovaaks/time_scored_service.py` for which file decides and which scores are eligible; `kovaaks/pace.py` for the formulas; the rules are in `docs/specs/scenario_performance.md` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
 | Any plot/figure | `plot/plot_service.py` |

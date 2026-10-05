@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 from source.components.local_icon import local_icon
 from source.config.config_service import ConfigData, get_config
+from source.kovaaks.pace import percent_faster
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.notifications import (
     CELEBRATION_CHANNEL,
@@ -127,6 +128,7 @@ class RunEventData(TypedDict):
     nth_score: int
     score: float
     scenario_previous_best: float | None
+    pace_constant: float | None
     is_new_sensitivity: bool
     is_live: bool
 
@@ -180,6 +182,7 @@ def _run_event_data(
         "nth_score": message.nth_score,
         "score": message.score,
         "scenario_previous_best": message.scenario_previous_best,
+        "pace_constant": message.pace_constant,
         "is_new_sensitivity": message.is_new_sensitivity,
         "is_live": age_seconds <= freshness_seconds,
     }
@@ -229,7 +232,21 @@ def _celebration_toast(run: RunEventData) -> dict[str, Any]:
     # celebrated, so there is always a figure to report here.
     assert previous_best is not None
     headline = f"{run['scenario_name']}: {run['score']:.2f}."
-    if previous_best > 0:
+    pace_constant = run["pace_constant"]
+    pace_gain = (
+        percent_faster(pace_constant, previous_best, run["score"])
+        if pace_constant is not None
+        else None
+    )
+    if pace_gain is not None:
+        # A time-scored run reports how much faster it finished. Its gain as a
+        # percentage of the score would understate that many times over, and
+        # it needs no positive previous best, only positive times.
+        message = (
+            f"{headline} Finished {pace_gain:.1f}% faster than your previous "
+            f"best of {previous_best:.2f}."
+        )
+    elif previous_best > 0:
         gain = (run["score"] / previous_best - 1) * 100
         message = (
             f"{headline} Up {gain:.1f}% on your previous best of {previous_best:.2f}."

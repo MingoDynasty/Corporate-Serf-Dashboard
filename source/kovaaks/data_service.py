@@ -365,6 +365,13 @@ def get_personal_best_run(scenario_name: str) -> RunData | None:
     return max(runs, key=lambda item: item.score, default=None)
 
 
+def get_runs_newest_first(scenario_name: str) -> list[RunData]:
+    """Return a copy of a scenario's runs, newest first, empty when it has none."""
+    if scenario_name not in kovaaks_database:
+        return []
+    return list(reversed(kovaaks_database[scenario_name]["time_vs_runs"]))
+
+
 def new_high_score_runs(runs: Iterable[RunData]) -> set[RunData]:
     """Find the runs that beat their scenario's PB when they were played.
 
@@ -707,6 +714,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     sens_scale = None
     raw_sens_increment = None
     raw_dpi = None
+    raw_scenario_hash = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -758,6 +766,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 raw_dpi = _optional_field_value(line)
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
+            elif line.startswith("Hash:"):
+                raw_scenario_hash = _optional_field_value(line)
     except OSError, ValueError, IndexError:
         # OSError: the CSV can be locked by a still-running KovaaK's or vanish
         # between listing and open. IndexError: a mid-write line like "Score:"
@@ -819,6 +829,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         accuracy=accuracy,
         damage_accuracy=damage_accuracy,
         recorded_sensitivity=recorded_sensitivity,
+        # An empty ``Hash:`` reads as no hash: it names no version of the
+        # scenario, so the run's score must never join a pace comparison.
+        scenario_hash=raw_scenario_hash or None,
+        stats_file_name=Path(full_file_path).name,
     )
 
 
