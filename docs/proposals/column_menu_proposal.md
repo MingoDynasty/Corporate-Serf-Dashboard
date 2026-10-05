@@ -33,7 +33,9 @@ action cells.** Hidden by default keeps the IDs out of the view every user
 gets. A general menu is a control any user understands, and it contains the
 ID columns as two entries among many. The scenario table also has ten columns
 on a playlist and twelve on a benchmark today, with no way to drop one a user
-never reads.
+never reads. That table keeps gaining columns: PB Date in August, then Rank
+and Next Rank in September. A menu gives a later optional column a place to
+start hidden, instead of a debate about the default width.
 
 Choosing differently:
 
@@ -53,6 +55,13 @@ Material consequence: only the recommendation lets a user hide columns in
 general. The alternatives are each a smaller build, and each leaves the
 tables as wide as they are.
 
+General hiding also narrows a ruled contract. The scenario table's sort was
+ruled to survive Back, Forward, a reload, and a copied link. Under this
+recommendation a sort on a column the browser has hidden is dropped on
+arrival and removed from the address, because the alternative is rows ordered
+by a column that is off screen (Design, Sort interplay). Accepting D1 accepts
+that amendment.
+
 ### D2 — Column choices are remembered in the browser, one set per table, shared by every playlist
 
 Status: open. No lean stated.
@@ -61,7 +70,10 @@ Status: open. No lean stated.
 browser's local storage, the way the Show hidden switch is.** The scenario
 table has one set of choices for every playlist. A choice about Rank or Next
 Rank applies to every benchmark. A browser that has never opened the app
-shows the defaults.
+shows the defaults, and so does one whose site data was cleared. Both fail
+toward the IDs being hidden. The celebration setting accepted the same costs
+when it chose the browser over the settings file
+([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 
 The table's sort was ruled into the page URL, because a sort belongs to one
 visit: a fresh visit starts unsorted, and Back restores the sort it left
@@ -100,19 +112,23 @@ ID. The app holds both:
   The maintainer's copy held 3,597 scenarios on 2026-10-04. All 4,384 scenario
   entries in the bundled library carry an ID, and startup folds them into the
   mapping
-  ([2026-07-20](../decision_log.md#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus)),
-  so a bundled scenario has its ID with no username and no network.
+  ([2026-07-20](../decision_log.md#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus)).
+  The fold leaves out a name on which two bundled files disagree. Of the
+  3,219 distinct names, one is in that state today: CB SmoothTrack, which one
+  file gives as 97841 and two give as 92603. Every other bundled scenario has
+  its ID with no username and no network.
 - The benchmark ID of every bundled benchmark sits in that file's
   `generated_from` block, as `kovaaks_benchmark_id`. All 261 files carry one,
   and the 261 values are distinct. The app never reads the block: the playlist
   model ignores unknown fields, and nothing under `source/` names
   `generated_from`.
 
-No page shows either number. Both are parameters of KovaaK's endpoints
-([kovaaks_api_notes.md](../kovaaks_api_notes.md)): `leaderboardId` on the
-leaderboard scores endpoint, and `benchmarkId` on the benchmark progress
-endpoint. Trying a request by hand therefore starts with a text search of one
-of those files.
+No page shows either number. Both are parameters of KovaaK's endpoints, which
+the API notes describe ([kovaaks_api_notes.md](../kovaaks_api_notes.md)). The
+leaderboard scores endpoint takes `leaderboardId`. The benchmark progress
+endpoint takes the benchmark ID as `benchmarkId`, a name the notes don't
+spell and `get_benchmark_json` sends. Trying a request by hand therefore
+starts with a text search of one of those files.
 
 **They don't belong in the default view.** The app is public, and an ID is
 noise to a player who isn't calling the API. So the need is for a place that
@@ -132,7 +148,9 @@ one grid configured like the two pages (`columnSize="autoSize"` with a key
 list, a flex name column, `unSortIcon`, rows delivered by a callback), driven
 in headless Edge. Versions: dash 4.4.1, dash-ag-grid 35.3.0,
 dash-mantine-components 2.8.0. The prototype is not the real pages. The
-build's live check repeats each item there.
+build's live check repeats each item there. Facts 8 and 9 were measured
+during review, on separate probes with the same versions, and were not re-run
+by the author.
 
 1. **A persisted checkbox inside a closed popover restores without being
    opened.** With the popover closed, its checkboxes are not in the DOM. After
@@ -171,6 +189,20 @@ build's live check repeats each item there.
    default, such as `[true,false]`. Not measured here, but known from the
    renderer's source: Dash drops a stored value whose recorded default no
    longer matches the layout's.
+8. **A cleared default sort stays cleared until the next page load.** On a
+   grid whose column definition declares `sort: "desc"`, as the overview's
+   Last Played does, hiding the column cleared the sort. It stayed cleared
+   through a `rowData` refresh and a row transaction, and a reload with the
+   column still hidden ended unsorted. Declaring `initialSort` instead
+   behaved the same. Showing the column again did not restore the sort in
+   that visit. The next page load did.
+9. **The address writer drops a hidden column's sort and nothing else.** A
+   probe used the scenario page's real column definitions, sort parser, and
+   address writer, over synthetic rows, with this design's checkboxes and
+   callback. Hiding Runs under `runs.asc,scenario.desc` left `scenario.desc`
+   in the address and kept the other query parameters and the hash. Arriving
+   with a sort on a stored-hidden column removed only that sort, and removed
+   `?sort=` altogether when no other sort was left.
 
 ## Design
 
@@ -186,7 +218,7 @@ label). A checked column is shown. A change applies at once, and the menu
 stays open until the user clicks outside it or presses Escape, so several
 columns can be changed in one visit to the menu.
 
-The menu lists every column except the ones that can't be hidden:
+The menu lists every column the table can work without:
 
 - **Playlists overview:** Type, Benchmark ID, Played, Runs, Last Played,
   Median Percentile, Lowest Percentile. The Playlist column and the two
@@ -196,9 +228,11 @@ The menu lists every column except the ones that can't be hidden:
   benchmark's menu also lists Rank and Next Rank, in their place after PB
   Score. The Scenario column is always shown.
 
-The name column stays because the row means nothing without it, and because
-it is the link into the row. The action cells stay because hiding them would
-remove the only way to hide or delete a playlist.
+The rule is a property, not a list of three: a column the table's structure
+depends on is never listed. The name column is one, because the row means
+nothing without it and it is the link into the row. The action cells are the
+others, because hiding them would remove the only way to hide or delete a
+playlist. A later column of that kind is left out the same way.
 
 Every column is shown by default except the two ID columns. The page looks
 exactly as it does today until the user opens the menu.
@@ -230,12 +264,18 @@ would start writing the field into each file it regenerates.
 
 **Leaderboard ID** sits after Scenario on the scenario table. It reads the
 name-to-ID mapping, the value the app itself sends to KovaaK's, not the copy
-embedded in the playlist file. The two agree for bundled scenarios unless a
-learned entry has since replaced the seeded one, and the learned entry is the
-one a request made by hand should use. A scenario the app hasn't resolved
-reads `N/A`. The fill resolves leaderboard IDs before it fetches positions,
-so a row the fill streams in carries the ID it found. With no username the
-fill is skipped, and an unresolved scenario stays `N/A`.
+embedded in the playlist file. For a bundled scenario the two normally
+agree. They differ in two cases: a learned entry has replaced the seeded
+one, or the seed left the name out because two bundled files embed different
+IDs for it, as with CB SmoothTrack. The mapping is the right source in both,
+because it names the leaderboard that the Position beside the cell came
+from.
+
+A scenario the app hasn't resolved reads `N/A`. The fill resolves leaderboard
+IDs before it fetches positions, so a row the fill streams in carries the ID
+it found. With no username the fill is skipped, and an unresolved scenario
+stays `N/A`. That includes a name the seed left out: its cell reads `N/A`
+beside a file that embeds an ID, until a lookup learns one.
 
 The table builds rows on three paths: the first paint, the fill's streamed
 rows, and a cancelled fill's rebuild. The last two replace a row's data
@@ -300,12 +340,25 @@ a column the browser has hidden: a copied link, or Back to an entry that
 predates the hiding. The server can't know, so it seeds the sort as it does
 today. The callback then hides the column and clears that sort, the grid
 publishes its new state (fact 4), and the existing writer removes the name
-from the address. Other sorts in the value are kept. The prototype had no
-address writer, so this last step rests on the writer's contract and is
-checked live at build.
+from the address. Other sorts in the value are kept (fact 9).
+
+This narrows a ruled contract. The sort ruling has Back and Forward restore
+an entry's sort, and a reload or a copied link keep it
+([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+For a sort on a hidden column neither holds any more. D1's material
+consequence names the amendment, and the shipping PR records it (Delivery
+plan).
+
+Showing a column again does not bring its sort back (fact 4).
 
 The overview's default sort is Last Played, newest first. Hiding Last Played
-clears it, and the rows fall back to name order.
+clears it, and the rows fall back to name order, including when the rows
+rebuild. Showing Last Played again leaves them in name order for the rest of
+that visit. The next page load sorts by Last Played again, because the
+default is declared in the column definition and seeded on every mount (fact
+8). So the overview can show Last Played with its rows in name order until
+the page is reopened. That state is accepted, and the column definition
+needs no change.
 
 The ID columns never take part, because they are not sortable. That matters
 for the address writer: it stops writing as soon as a sorted column has no
@@ -321,7 +374,19 @@ for as long as it was sorted.
 - The quick filter keeps matching visible columns only (fact 5), so hiding a
   column removes its values from the filter. The name column can't be hidden,
   so filtering by name always works. Typing an ID finds a row only while the
-  ID column is shown.
+  ID column is shown. A later column the filter must always match is a
+  structural column, and stays out of the menu.
+- The status lines stay as they are. Each reports on a fetch, not on a
+  column, so it stays true when its columns are hidden. The scenario table
+  can read "Updating positions from KovaaK's… 3/40" or "Positions
+  unavailable. Set your KovaaK's username in Settings." with Position, Total
+  Players, and Percentile all hidden. The overview can read "Percentiles
+  unavailable. Set your KovaaK's username in Settings.", or show its warmup
+  line, with both percentile columns hidden. The copy decision split the two
+  username lines because each names the columns its own page empties
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  A page showing its line with none of those columns on screen is accepted,
+  and is not a copy bug.
 
 ### Copy
 
@@ -384,8 +449,13 @@ One implementation PR, gated on D1 and D2:
   navigation exclusion.
 - The tests and the live check below.
 - The shipping docs in the same PR:
-  - a decision-log entry;
-  - the playlists spec, for both column lists, the menu, and the sort rule;
+  - a decision-log entry, which also marks the 2026-09-27 sort entry as
+    amended for a hidden column's sort, and records that the menu's labels
+    follow the casing rule for controls;
+  - the playlists spec, for both column lists, the menu, and the sort rule.
+    Two of its sentences change: the sort bullet's "a reload or a copied link
+    keeps it" gains the hidden-column exception, and the corpus section's
+    "the app ignores it" stops being true of the stamp's benchmark ID;
   - the glossary, from the Terms block;
   - the user guide's Playlists and Benchmarks section;
   - the product inventory and the roadmap;
@@ -414,7 +484,8 @@ build. More effort would buy polish, not correctness.
   imported playlist's row carries none.
 - **The scenario rows:** a first-paint row, a streamed row, and a cancelled
   fill's rebuilt row each carry the leaderboard ID for a mapped scenario, and
-  none for an unmapped one.
+  none for an unmapped one. A name the seed leaves out, because two bundled
+  files disagree on it, carries none until the mapping learns one.
 - **The column definitions:** each ID column is hidden initially, not
   sortable, and carries the selectable class. Every other column is shown.
 - **The menu:** each table's menu lists exactly its hideable columns, in
@@ -435,6 +506,9 @@ build. More effort would buy polish, not correctness.
   - hiding a sorted column returns the table to playlist order and removes
     its name from `?sort=`, and opening `?sort=` on a hidden column does the
     same;
+  - on the overview, hiding Last Played leaves the rows in name order, and
+    they are still in name order after turning on the **Show hidden** switch
+    rebuilds them;
   - double-clicking an ID selects it, and on the overview it does not
     navigate;
   - the relative-time refresh keeps running with Last Played hidden.
