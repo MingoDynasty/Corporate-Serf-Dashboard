@@ -2454,10 +2454,39 @@ def test_playlist_scenarios_benchmark_header_links_its_evxl_page(
     # dmc.Anchor would percent-decode the href in the browser, which splits a
     # benchmark name holding an encoded slash into two path segments.
     assert isinstance(link, html.A)
-    assert link.children == "View on Evxl"
     assert link.href == "https://evxl.app/u/7656/Test%20Benchmark/Easy"
     # A new tab, so the table and its streamed positions stay open.
     assert link.target == "_blank"
+
+
+def test_playlist_scenarios_evxl_link_is_a_named_icon(benchmark_playlists, monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "evxl_benchmark_url",
+        lambda _code, _steam_id: "https://evxl.app/benchmarks/Test%20Benchmark",
+    )
+
+    page = playlist_scenarios.layout(BENCHMARK_CODE)
+    (link,) = _evxl_links(page)
+    (tooltip,) = [
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Tooltip) and component.children is link
+    ]
+    icon = link.children
+
+    # The bundled file: an address on evxl.app here would make every benchmark
+    # page contact Evxl.
+    assert isinstance(icon, html.Img)
+    assert icon.src == "/assets/icons/evxl-logo.png"
+    # The logo is hidden from assistive technology and the link holds no text,
+    # so the label is its only name, and the tooltip shows the same words.
+    assert link.to_plotly_json()["props"]["aria-label"] == "View on Evxl"
+    assert tooltip.label == "View on Evxl"
+    assert tooltip.events["focus"] is True
+    # Mantine's keyboard focus ring. A plain anchor without this class falls
+    # back to the browser's ring, which can't be seen on the dark theme.
+    assert "mantine-focus-auto" in link.className.split()
 
 
 def test_playlist_scenarios_benchmark_without_an_evxl_page_gets_no_link(
