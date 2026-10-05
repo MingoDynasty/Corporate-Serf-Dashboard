@@ -44,7 +44,9 @@ name, which is not Evxl's: "Viscose Benchmark S2 - Medium" is "Viscose
 Benchmarks S2" and "Medium" there. `source/kovaaks/evxl_links.py` reads both
 names from `resources/evxl/benchmarks.json`, the snapshot the importer
 generates the bundled library from, once per process, keyed by playlist code.
-The file already ships in the release zip. Rejected: having the importer write
+The file already ships in the release zip, and the release's archive contract
+names it, so a release that would ship without it fails its draft instead of
+silently losing every link. Rejected: having the importer write
 the names into each bundled file. That is the tidier data model, but it bumps
 the generated schema and regenerates all 261 files against live KovaaK's
 data, and the diff would carry whatever thresholds KovaaK's had changed since
