@@ -58,7 +58,7 @@ AUTO_SIZE_COLUMN_KEYS = [
     "position_sort",
     "total_sort",
     "percentile_sort",
-    "high_score_sort",
+    "pb_score_sort",
     "tier_sort",
     "next_tier_sort",
     "pb_timestamp_sort",
@@ -160,8 +160,8 @@ TABLE_COLUMN_DEFS = [
     },
     {
         "headerName": "PB Score",
-        "field": "high_score_sort",
-        "valueFormatter": {"function": "params.data.high_score_display"},
+        "field": "pb_score_sort",
+        "valueFormatter": {"function": "params.data.pb_score_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 120,
@@ -248,7 +248,7 @@ SORT_URL_NAMES = {
     "position": "position_sort",
     "total-players": "total_sort",
     "percentile": "percentile_sort",
-    "pb-score": "high_score_sort",
+    "pb-score": "pb_score_sort",
     "rank": "tier_sort",
     "next-rank": "next_tier_sort",
     "pb-date": "pb_timestamp_sort",
@@ -298,7 +298,7 @@ def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
     column_defs: list[dict] = copy.deepcopy(TABLE_COLUMN_DEFS)
     if benchmark:
         fields = [column["field"] for column in column_defs]
-        after_pb_score = fields.index("high_score_sort") + 1
+        after_pb_score = fields.index("pb_score_sort") + 1
         column_defs[after_pb_score:after_pb_score] = copy.deepcopy(
             BENCHMARK_COLUMN_DEFS
         )

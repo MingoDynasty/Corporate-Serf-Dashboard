@@ -118,8 +118,8 @@ def test_format_playlist_scenario_rank_row_ranked():
         "last_played_sort": datetime(2026, 5, 3, 19, 0, 0).timestamp(),
         "runs_display": "1,234",
         "runs_sort": 1234,
-        "high_score_display": "3,180",
-        "high_score_sort": 3180,
+        "pb_score_display": "3,180",
+        "pb_score_sort": 3180,
         "pb_timestamp_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
         "pb_cm360_display": "45",
         "pb_cm360_sort": 45,
@@ -145,8 +145,8 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
     assert row["last_played_sort"] is None
     assert row["runs_display"] == "0"
     assert row["runs_sort"] == 0
-    assert row["high_score_display"] == "N/A"
-    assert row["high_score_sort"] is None
+    assert row["pb_score_display"] == "N/A"
+    assert row["pb_score_sort"] is None
     assert row["pb_timestamp_sort"] is None
     assert row["pb_cm360_display"] == "N/A"
     assert row["pb_cm360_sort"] is None
@@ -177,8 +177,8 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["percentile_sort"] is None
     assert row["runs_display"] == "3"
     assert row["runs_sort"] == 3
-    assert row["high_score_display"] == "863.93"
-    assert row["high_score_sort"] == 863.935
+    assert row["pb_score_display"] == "863.93"
+    assert row["pb_score_sort"] == 863.935
     assert row["pb_timestamp_sort"] is None
     assert row["pb_cm360_display"] == "N/A"
     assert row["pb_cm360_sort"] is None
@@ -334,12 +334,12 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert rows[1]["position_display"] == "N/A"
     assert rows[1]["status"] == "UNKNOWN"
     assert rows[1]["runs_display"] == "0"
-    assert rows[1]["high_score_display"] == "N/A"
+    assert rows[1]["pb_score_display"] == "N/A"
     assert rows[1]["pb_cm360_display"] == "N/A"
     assert rows[1]["pb_accuracy_display"] == "N/A"
     assert rows[2]["position_display"] == "30"
     assert rows[2]["runs_display"] == "30"
-    assert rows[2]["high_score_display"] == "3,000.5"
+    assert rows[2]["pb_score_display"] == "3,000.5"
     assert rows[2]["pb_cm360_display"] == "45"
     assert rows[2]["pb_accuracy_display"] == "82.34%"
     assert all(row["generation_token"] == "generation-1" for row in rows)

@@ -2073,7 +2073,7 @@ def test_playlist_scenarios_table_includes_local_stat_columns():
 
     assert "last_played_sort" in fields
     assert "runs_sort" in fields
-    assert "high_score_sort" in fields
+    assert "pb_score_sort" in fields
 
 
 def test_playlist_scenarios_scenario_home_href_url_encodes_values():
@@ -2146,7 +2146,7 @@ def test_playlist_scenarios_pb_date_mirrors_last_played_look_and_feel():
     column = playlist_scenarios.TABLE_COLUMN_DEFS[fields.index("pb_timestamp_sort")]
 
     # The timestamp qualifies the PB Score beside it, so it sits directly after.
-    assert fields.index("pb_timestamp_sort") == fields.index("high_score_sort") + 1
+    assert fields.index("pb_timestamp_sort") == fields.index("pb_score_sort") + 1
     # Null copy is "N/A" to match the row's other PB columns, not "Never".
     assert column["valueFormatter"] == {"function": "relativeTime(params.value, 'N/A')"}
     assert column["tooltipValueGetter"] == {
@@ -2312,7 +2312,7 @@ def test_playlist_scenarios_sort_seeds_the_named_columns_in_priority_order():
 
     assert _sort_seeds(page) == {
         "percentile_sort": ("desc", 0),
-        "high_score_sort": ("asc", 1),
+        "pb_score_sort": ("asc", 1),
     }
     # ``sort`` would come back whenever the defs were sent again; only the
     # ``initial*`` pair leaves later header clicks alone.
@@ -2353,7 +2353,7 @@ def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlis
         "position": "position_sort",
         "total-players": "total_sort",
         "percentile": "percentile_sort",
-        "pb-score": "high_score_sort",
+        "pb-score": "pb_score_sort",
         "rank": "tier_sort",
         "next-rank": "next_tier_sort",
         "pb-date": "pb_timestamp_sort",
@@ -2417,7 +2417,7 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
         "position_sort",
         "total_sort",
         "percentile_sort",
-        "high_score_sort",
+        "pb_score_sort",
         "tier_sort",
         "next_tier_sort",
         "pb_timestamp_sort",

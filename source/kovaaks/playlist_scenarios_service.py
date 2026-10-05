@@ -256,8 +256,8 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         ),
         "runs_display": _format_int(number_of_runs),
         "runs_sort": number_of_runs,
-        "high_score_display": _format_score(high_score),
-        "high_score_sort": high_score,
+        "pb_score_display": _format_score(high_score),
+        "pb_score_sort": high_score,
         "pb_timestamp_sort": (
             personal_best_run.datetime_object.timestamp()
             if personal_best_run is not None
