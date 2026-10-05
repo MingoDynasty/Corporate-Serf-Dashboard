@@ -245,8 +245,8 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         "scenario": scenario_name,
         "playlist_order": playlist_order,
         "status": rank_info.status.value,
-        "rank_display": "N/A",
-        "rank_sort": None,
+        "position_display": "N/A",
+        "position_sort": None,
         "total_display": "N/A",
         "total_sort": None,
         "percentile_display": "N/A",
@@ -256,8 +256,8 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         ),
         "runs_display": _format_int(number_of_runs),
         "runs_sort": number_of_runs,
-        "high_score_display": _format_score(high_score),
-        "high_score_sort": high_score,
+        "pb_score_display": _format_score(high_score),
+        "pb_score_sort": high_score,
         "pb_timestamp_sort": (
             personal_best_run.datetime_object.timestamp()
             if personal_best_run is not None
@@ -272,20 +272,20 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         row.update(benchmark_rank_fields(ladder, high_score))
 
     if rank_info.status == ScenarioRankStatus.RANKED:
-        row["rank_display"] = _format_int(rank_info.rank)
-        row["rank_sort"] = rank_info.rank
+        row["position_display"] = _format_int(rank_info.rank)
+        row["position_sort"] = rank_info.rank
         row["total_display"] = _format_int(rank_info.total_players)
         row["total_sort"] = rank_info.total_players
         row["percentile_display"] = _format_percentile(rank_info.percentile)
         row["percentile_sort"] = rank_info.percentile
     elif rank_info.status == ScenarioRankStatus.UNRANKED:
-        row["rank_display"] = "Unranked"
+        row["position_display"] = "Unranked"
         row["total_display"] = _format_int(rank_info.total_players)
         row["total_sort"] = rank_info.total_players
 
     if generation_token is not None:
         row["generation_token"] = generation_token
-        row["rank_pending"] = mark_unresolved_pending and not (
+        row["position_pending"] = mark_unresolved_pending and not (
             rank_info.status == ScenarioRankStatus.UNRANKED
             or rank_info.rank is not None
         )

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import dash
@@ -7,7 +7,7 @@ import dash_mantine_components as dmc
 import pytest
 import requests
 from dash import dcc, no_update
-from dash._callback import GLOBAL_CALLBACK_LIST
+from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
 
 from source.config import settings_service
 from source.kovaaks import api_service, data_service
@@ -39,7 +39,7 @@ def _forget_session_notices():
 
 def _rendered_rank(*args, **kwargs):
     """Render the Position value, discarding any toast the render earned."""
-    display, _notifications = home._render_scenario_rank(*args, **kwargs)
+    display, _updated_ts, _notifications = home._render_scenario_rank(*args, **kwargs)
     return display
 
 
@@ -49,11 +49,12 @@ class _RefreshClient:
     def __init__(self) -> None:
         self.toast_channels: dict[str, str | None] = {}
         self.clicks = 0
+        self.updated_ts = None
 
     def click(self, scenario: str | None):
         """Return this click's (display, shown payloads, hidden ids)."""
         self.clicks += 1
-        display, shown, hidden, patch = home.refresh_rank(
+        display, self.updated_ts, shown, hidden, patch = home.refresh_rank(
             self.clicks, scenario, self.toast_channels
         )
         self.toast_channels.update(_registry_writes(patch))
@@ -410,8 +411,55 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
 
     # The second argument is the deep-link store: a scheduling Input the
     # callback never reads. See select_playlist.
-    assert home.select_playlist("Old Playlist Name", None) == ["All"]
-    assert home.select_playlist("ValidCode", None) == ["ValidCode Scenario"]
+    assert home.select_playlist("Old Playlist Name", None) == (["All"], None)
+    scenarios, _link = home.select_playlist("ValidCode", None)
+    assert scenarios == ["ValidCode Scenario"]
+
+
+def test_select_playlist_links_the_selection_to_its_scenario_table(monkeypatch):
+    """The way back from a scenario to the table it was opened from."""
+    _known_playlist(monkeypatch)
+    monkeypatch.setattr(home, "get_scenarios_from_playlist_code", lambda _code: [])
+
+    _scenarios, link = home.select_playlist("KovaaKsTestCode", None)
+
+    (anchor,) = [
+        component
+        for component in _walk_components(link)
+        if isinstance(component, dmc.Anchor)
+    ]
+    assert anchor.children == "Open scenario table"
+    # The bare route: no ``?sort=``, so the table opens in playlist order.
+    assert anchor.href == "/playlists/KovaaKsTestCode"
+    # In-app navigation, as every other internal link on the page.
+    assert anchor.refresh is False
+
+
+@pytest.mark.parametrize("selected_playlist", [None, "", "KovaaKsGoneCode"])
+def test_select_playlist_shows_no_link_without_a_loaded_playlist(
+    monkeypatch, selected_playlist
+):
+    """A cleared filter and a remembered code that no longer resolves both
+    list every local scenario, so neither has a table to link."""
+    _known_playlist(monkeypatch)
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+
+    _scenarios, link = home.select_playlist(selected_playlist, None)
+
+    assert link is None
+
+
+def test_select_playlist_writes_the_link_holder_the_layout_carries():
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if "scenario-dropdown-selection.data" in entry["output"]
+    ]
+
+    assert _output_keys(registration) == {
+        "scenario-dropdown-selection.data",
+        f"{home.PLAYLIST_TABLE_LINK_ID}.children",
+    }
 
 
 def test_page_is_named_scenario_performance_and_keeps_the_root_route():
@@ -973,7 +1021,7 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
     # it toasts -- but once for the session, not once per scenario switch.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
 
-    display, notifications = home._render_scenario_rank(
+    display, _updated_ts, notifications = home._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -989,14 +1037,14 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
         assert home._render_scenario_rank(
             scenario_name,
             allow_network=allow_network,
-        ) == (display, [])
+        ) == (display, None, [])
 
 
 def test_steam_id_mismatch_toast_persists_until_dismissed(monkeypatch, tmp_path):
     # It can fire while nobody is looking at the page, so it must not expire.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
 
-    _display, notifications = home._render_scenario_rank(
+    _display, _updated_ts, notifications = home._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -1010,7 +1058,7 @@ def test_matching_steam_id_never_toasts(monkeypatch, tmp_path):
         {"kovaaks_username": "MingoDynasty", "steam_id": "different-steam-id"}
     )
 
-    _display, notifications = home._render_scenario_rank(
+    _display, _updated_ts, notifications = home._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -1028,7 +1076,7 @@ def test_a_rank_render_nobody_triggered_keeps_the_sessions_mismatch_toast(
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
     monkeypatch.setattr(home, "ctx", SimpleNamespace(triggered=[]))
 
-    display, notifications = home.get_scenario_rank(None, scenario_name, 0)
+    display, _updated_ts, notifications = home.get_scenario_rank(None, scenario_name, 0)
 
     assert display == "10 of 100 (90.50% percentile)"
     assert notifications is no_update
@@ -1038,7 +1086,9 @@ def test_a_rank_render_nobody_triggered_keeps_the_sessions_mismatch_toast(
         "ctx",
         SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
     )
-    _display, notifications = home.get_scenario_rank(None, scenario_name, 0)
+    _display, _updated_ts, notifications = home.get_scenario_rank(
+        None, scenario_name, 0
+    )
 
     assert [notification["id"] for notification in notifications] == [
         "steam-id-mismatch"
@@ -1054,14 +1104,16 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
         SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
     )
 
-    _display, notifications = home.get_scenario_rank(None, scenario_name, 0)
+    _display, _updated_ts, notifications = home.get_scenario_rank(
+        None, scenario_name, 0
+    )
 
     assert notifications is no_update
 
 
 def test_passive_rank_render_points_an_unset_username_at_settings():
     # The fixture store leaves identity unset -- the fresh-install default.
-    rendered, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = home._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -1088,7 +1140,7 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
         ),
     )
 
-    rendered, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = home._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -1111,7 +1163,7 @@ def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
         ),
     )
 
-    rendered, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = home._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -1801,6 +1853,7 @@ def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
         no_update,
         no_update,
         no_update,
+        no_update,
     )
 
 
@@ -1815,6 +1868,7 @@ def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch)
 
     assert home.refresh_rank(1, None, {}) == (
         "N/A",
+        None,
         no_update,
         no_update,
         no_update,
@@ -1831,7 +1885,10 @@ def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
             component
             for component in _walk_components(page)
             if isinstance(component, dcc.Loading)
-            and getattr(component.children, "id", None) == "scenario_rank"
+            and any(
+                getattr(child, "id", None) == "scenario_rank"
+                for child in _walk_components(component.children)
+            )
         ),
         None,
     )
@@ -1846,3 +1903,236 @@ def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
         if getattr(component, "id", None) == "rank-refresh-button"
     )
     assert refresh_button.children == "Refresh"
+
+
+STORED_AT = datetime(2026, 10, 1, 6, 24, 30, tzinfo=UTC)
+
+
+def test_position_hover_starts_disabled_around_the_value(monkeypatch):
+    """Until a render dates a position there is nothing to hover for."""
+    components = _layout_components(monkeypatch)
+    tooltip = components["rank-updated-tooltip"]
+    value = tooltip.children
+
+    assert value.id == "scenario_rank"
+    assert tooltip.disabled is True
+    assert tooltip.label == ""
+    assert tooltip.events == home.TOOLTIP_EVENTS
+    assert getattr(value, "className", None) is None
+    assert getattr(value, "tabIndex", None) is None
+    assert getattr(components["rank-updated-ts"], "data", None) is None
+
+
+@pytest.mark.parametrize(
+    ("rank_info", "expected"),
+    [
+        (
+            ScenarioRankInfo(
+                status=ScenarioRankStatus.RANKED, rank=10, fetched_at=STORED_AT
+            ),
+            STORED_AT.timestamp(),
+        ),
+        (
+            ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED, fetched_at=STORED_AT),
+            STORED_AT.timestamp(),
+        ),
+        # The field reads N/A for both of these, so there is nothing to date,
+        # whatever the entry carries.
+        (
+            ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN, fetched_at=STORED_AT),
+            None,
+        ),
+        (
+            ScenarioRankInfo(status=ScenarioRankStatus.RANKED, fetched_at=STORED_AT),
+            None,
+        ),
+        # A cache entry written without a time.
+        (ScenarioRankInfo(status=ScenarioRankStatus.RANKED, rank=10), None),
+    ],
+)
+def test_rank_updated_ts_dates_only_a_displayed_position(rank_info, expected):
+    assert home._rank_updated_ts(rank_info) == expected
+
+
+def _seed_dated_rank_cache(monkeypatch, tmp_path) -> str:
+    """Cache a ranked position that records when it was stored."""
+    scenario_name = "Cached Scenario"
+    leaderboard_id = 98330
+    username = "MingoDynasty"
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
+    settings_service.save_settings({"kovaaks_username": username})
+    api_service.make_cache()
+    api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
+    api_service.save_scenario_rank(
+        leaderboard_id,
+        username,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            score=100.0,
+            fetched_at=STORED_AT,
+        ),
+    )
+    api_service.save_leaderboard_total(leaderboard_id, 100)
+    monkeypatch.setattr(
+        api_service,
+        "get_user_scenario_total_play",
+        lambda *_args: None,
+    )
+    return scenario_name
+
+
+def test_both_render_paths_date_the_position_from_its_cache_entry(
+    monkeypatch,
+    tmp_path,
+):
+    """The hover dates the stored read, so a cache hit must not restart its age."""
+    scenario_name = _seed_dated_rank_cache(monkeypatch, tmp_path)
+
+    for allow_network in (True, False):
+        display, updated_ts, _notifications = home._render_scenario_rank(
+            scenario_name,
+            allow_network=allow_network,
+        )
+
+        assert display == "10 of 100 (90.50% percentile)"
+        assert updated_ts == STORED_AT.timestamp()
+
+
+def test_a_render_with_no_position_dates_nothing(monkeypatch):
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message="Failed to fetch leaderboard position for Scenario.",
+        ),
+    )
+
+    rendered, updated_ts, _notifications = home._render_scenario_rank(
+        "Scenario",
+        allow_network=True,
+    )
+
+    assert _rank_text(rendered) == "N/A · lookup failed"
+    assert updated_ts is None
+    assert home._render_scenario_rank(None, allow_network=True) == ("N/A", None, [])
+
+
+def test_a_refresh_restarts_the_stored_time(monkeypatch, tmp_path):
+    """The fetch's own time replaces the one the field was showing."""
+    scenario_name = _seed_dated_rank_cache(monkeypatch, tmp_path)
+    refreshed_at = datetime(2026, 10, 4, 11, 0, tzinfo=UTC)
+    monkeypatch.setattr(api_service, "fetch_leaderboard_total", lambda *_args: 1000)
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        lambda *_args: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=25,
+            leaderboard_id=98330,
+            score=100.0,
+            fetched_at=refreshed_at,
+        ),
+    )
+
+    client = _RefreshClient()
+    display, notifications, _hidden = client.click(scenario_name)
+
+    assert _rank_text(display) == "25 of 1,000 (97.55% percentile)"
+    assert notifications[0]["color"] == "green"
+    assert client.updated_ts == refreshed_at.timestamp()
+
+
+def test_a_served_stale_refresh_keeps_the_stored_time(monkeypatch, tmp_path):
+    """A failed fetch re-serves the cached position, so its age must not restart.
+
+    This is the case "Last updated" is worded for: the app tried again just
+    now, and the position on screen is still the one stored earlier.
+    """
+    scenario_name = _seed_dated_rank_cache(monkeypatch, tmp_path)
+
+    def fetch_rank(*_args):
+        raise requests.RequestException("leaderboard unreachable")
+
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", fetch_rank)
+
+    client = _RefreshClient()
+    display, notifications, _hidden = client.click(scenario_name)
+
+    assert _rank_text(display) == "10 of 100 (90.50% percentile) · from cache"
+    assert notifications[0]["color"] == "yellow"
+    assert client.updated_ts == STORED_AT.timestamp()
+
+
+def test_a_failed_refresh_leaves_the_stored_time_alone(monkeypatch):
+    """The value stays on screen untouched, and so does the time that dates it."""
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message="Rank lookup failed.",
+        ),
+    )
+
+    client = _RefreshClient()
+    display, notifications, _hidden = client.click("Scenario")
+
+    assert display is no_update
+    assert notifications[0]["color"] == "red"
+    assert client.updated_ts is no_update
+
+
+def test_every_writer_of_the_position_value_also_writes_its_time():
+    """A value written without its time would sit under a hover dating another.
+
+    The passive render and the Refresh click both replace the value, and the
+    hover reads one store, so each has to carry the time of what it wrote.
+    """
+    value_writers = [
+        _output_keys(spec)
+        for spec in GLOBAL_CALLBACK_LIST
+        if "scenario_rank.children" in _output_keys(spec)
+    ]
+
+    assert len(value_writers) == 2
+    for outputs in value_writers:
+        assert "rank-updated-ts.data" in outputs
+
+
+def test_position_hover_is_worded_in_the_browser_from_the_stored_time():
+    """The age is recomputed on the 30s tick, so a parked page stays current."""
+    (spec,) = [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if "rank-updated-tooltip.label" in _output_keys(spec)
+    ]
+
+    assert spec["clientside_function"] is not None
+    assert _output_keys(spec) == {
+        "rank-updated-tooltip.label",
+        "rank-updated-tooltip.disabled",
+        "scenario_rank.className",
+        "scenario_rank.tabIndex",
+    }
+    assert spec["inputs"] == [
+        {"id": "rank-updated-ts", "property": "data"},
+        {"id": "relative-time-interval", "property": "n_intervals"},
+    ]
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+    # The copy, and the shared helpers that word the age and the timestamp the
+    # same way the Last played hover does.
+    assert '"Last updated "' in source
+    assert '" · "' in source
+    assert "relativeTime(seconds" in source
+    assert "absoluteTime(seconds" in source
+    assert "cell-tooltip-affordance" in source

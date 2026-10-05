@@ -55,10 +55,10 @@ dash.register_page(
 AUTO_SIZE_COLUMN_KEYS = [
     "last_played_sort",
     "runs_sort",
-    "rank_sort",
+    "position_sort",
     "total_sort",
     "percentile_sort",
-    "high_score_sort",
+    "pb_score_sort",
     "tier_sort",
     "next_tier_sort",
     "pb_timestamp_sort",
@@ -111,12 +111,14 @@ TABLE_COLUMN_DEFS = [
     },
     {
         "headerName": "Position",
-        "field": "rank_sort",
+        "field": "position_sort",
         "valueFormatter": {
-            "function": "params.data.rank_pending ? '' : params.data.rank_display"
+            "function": "params.data.position_pending ? '' : params.data.position_display"
         },
         "cellClass": {
-            "function": ("params.data.rank_pending ? 'playlist-rank-pending' : null")
+            "function": (
+                "params.data.position_pending ? 'playlist-cell-pending' : null"
+            )
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -129,7 +131,7 @@ TABLE_COLUMN_DEFS = [
             "function": "params.data.total_pending ? '' : params.data.total_display"
         },
         "cellClass": {
-            "function": ("params.data.total_pending ? 'playlist-rank-pending' : null")
+            "function": ("params.data.total_pending ? 'playlist-cell-pending' : null")
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -149,7 +151,7 @@ TABLE_COLUMN_DEFS = [
         },
         "cellClass": {
             "function": (
-                "params.data.percentile_pending ? 'playlist-rank-pending' : null"
+                "params.data.percentile_pending ? 'playlist-cell-pending' : null"
             )
         },
         "comparator": {"function": "nullsLastComparator"},
@@ -158,8 +160,8 @@ TABLE_COLUMN_DEFS = [
     },
     {
         "headerName": "PB Score",
-        "field": "high_score_sort",
-        "valueFormatter": {"function": "params.data.high_score_display"},
+        "field": "pb_score_sort",
+        "valueFormatter": {"function": "params.data.pb_score_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 120,
@@ -243,10 +245,10 @@ SORT_URL_NAMES = {
     "scenario": "scenario",
     "last-played": "last_played_sort",
     "runs": "runs_sort",
-    "position": "rank_sort",
+    "position": "position_sort",
     "total-players": "total_sort",
     "percentile": "percentile_sort",
-    "pb-score": "high_score_sort",
+    "pb-score": "pb_score_sort",
     "rank": "tier_sort",
     "next-rank": "next_tier_sort",
     "pb-date": "pb_timestamp_sort",
@@ -296,7 +298,7 @@ def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
     column_defs: list[dict] = copy.deepcopy(TABLE_COLUMN_DEFS)
     if benchmark:
         fields = [column["field"] for column in column_defs]
-        after_pb_score = fields.index("high_score_sort") + 1
+        after_pb_score = fields.index("pb_score_sort") + 1
         column_defs[after_pb_score:after_pb_score] = copy.deepcopy(
             BENCHMARK_COLUMN_DEFS
         )
@@ -369,7 +371,7 @@ def load_playlist_scenario_rows(playlist_code):
 def _clear_pending_flags(rows: list[dict]) -> None:
     """Settle every position cell for rows no fill will ever update."""
     for row in rows:
-        row["rank_pending"] = False
+        row["position_pending"] = False
         row["total_pending"] = False
         row["percentile_pending"] = False
 
