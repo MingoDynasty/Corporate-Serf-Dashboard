@@ -148,7 +148,7 @@ PB only.
 Measured on the maintainer's stats folder on 2026-10-04: 8,880 runs over 866
 scenarios. The chart filters are the page defaults, Top N scores of 5 and an
 oldest date of January 1. A run counts as a new PB under M1's rule, and it
-gets a star when a plotted point has its position
+gets a star when the chart plots it
 ([Where a star is drawn](#where-a-star-is-drawn-m2)).
 
 - 480 scenarios have at least one run this year, so they have a chart.
@@ -159,21 +159,21 @@ How many plotted points would be stars:
 
 | Scenarios | Score vs Time | Score vs Sensitivity |
 |---|---|---|
-| All 480 | 670 of 2,220 (30%) | 592 of 1,355 (44%) |
-| The 75 with 20 or more runs | 243 of 1,195 (20%) | 177 of 413 (43%) |
+| All 480 | 666 of 2,220 (30%) | 584 of 1,355 (43%) |
+| The 75 with 20 or more runs | 240 of 1,195 (20%) | 172 of 413 (42%) |
 | The 9 with 100 or more runs | 24 of 208 (12%) | 13 of 41 (32%) |
 
 How many of this year's new PBs get a star, after the Top N filter:
 
 | Scenarios | Score vs Time | Score vs Sensitivity |
 |---|---|---|
-| All 480 | 670 of 691 (97%) | 592 of 691 (86%) |
-| The 75 with 20 or more runs | 243 of 255 (95%) | 177 of 255 (69%) |
+| All 480 | 666 of 691 (96%) | 584 of 691 (85%) |
+| The 75 with 20 or more runs | 240 of 255 (94%) | 172 of 255 (67%) |
 | The 9 with 100 or more runs | 24 of 24 | 13 of 24 (54%) |
 
 The four busiest charts would show 9 stars among 64 points, 5 among 62, 8
-among 55, and 10 among 55 on Score vs Time. The same four scenarios on Score
-vs Sensitivity would show 3 among 9, 5 among 10, 3 among 5, and 6 among 10.
+among 55, and 9 among 55 on Score vs Time. The same four scenarios on Score
+vs Sensitivity would show 3 among 9, 5 among 10, 3 among 5, and 4 among 10.
 
 Two readings:
 
@@ -181,9 +181,9 @@ Two readings:
   mostly PBs, and a practiced scenario's rarely are. The celebration's entry
   accepted the same pattern and declined a minimum run count.
 - **Score vs Time keeps nearly every new PB, and Score vs Sensitivity
-  doesn't.** A day's filter drops a new PB only when five higher runs follow
-  it the same day. A sensitivity's filter drops every new PB that five later
-  runs at that sensitivity have since beaten.
+  doesn't.** A day's filter drops a new PB only when five runs at or above
+  its score follow it the same day. A sensitivity's filter drops every new PB
+  that five later runs at that sensitivity have since beaten.
 
 ### The decision this touches
 
@@ -244,13 +244,23 @@ first run sets the baseline and is not one.
 ### Where a star is drawn (M2)
 
 - **Score vs Time only.**
-- **On a plotted point.** A new PB gets a star when a plotted run has its day
-  and its score. Matching on the position, not on the run itself, keeps the
-  star when a later run that day tied the score and the Top N filter kept
-  that one.
-- **A new PB with no plotted point gets no star.** That happens when the Top
+- **On the run that set it.** A star is drawn on a plotted run that is a new
+  PB. The match is on the run, not on its position on the chart. A later run
+  the same day with the same score sits at the same position, and it is not a
+  new PB.
+- **A new PB the chart doesn't plot gets no star.** That happens when the Top
   N filter dropped it, or when it is older than the oldest date. Such a run
   still counts in the comparison.
+- **A kept tie doesn't inherit the star.** With Top N low enough, the day's
+  filter can drop a new PB and keep a later run that tied it, because it
+  keeps the later of two equal scores. That day then has a point at the PB's
+  score and no star. Matching on the position would star it: on the
+  maintainer's data, 4 stars on runs that never beat the PB.
+- **A star can share its position with a later tie.** When both runs are
+  plotted, their points coincide, and the star marks the earlier one. The
+  chart shows one hover for the pair, the later run's in the prototype, as it
+  does today for any two runs with the same day and score. That is 26 of the
+  666 stars on the maintainer's data.
 - **No stars, no trace.** A chart where no plotted point is a new PB has no
   New PB legend entry.
 - **Several new PBs on one day stack in that day's column,** as its other
@@ -291,8 +301,8 @@ and gold run points.
   on top. The run trace keeps every run. Hiding the stars from the legend
   therefore leaves an ordinary point where each star was.
 - **The star takes no hover.** The trace sets `hoverinfo` to `skip`, so
-  hovering a star shows the run's own hover, unchanged. On a shared point
-  plotly shows the run trace's hover even when the star trace has one,
+  hovering a star shows what the point under it shows today. On a shared
+  point plotly shows the run trace's hover even when the star trace has one,
   observed in the prototype on the bundled plotly.js.
 - **Point size sizes the stars too.** `apply_point_appearance` sets 9 or 16
   on the New PB trace for Small or Large, and leaves the generated 12 on
@@ -413,7 +423,10 @@ tests plus one live check verify it.
   - a run older than the oldest date counts in the comparison and isn't
     drawn;
   - a new PB the Top N filter dropped has no star;
-  - with Top N at 1 and a same-day tie, the star is still drawn;
+  - with Top N at 1 and a later same-day tie, the tie is the run kept and
+    no star is drawn;
+  - with a new PB and a later same-day tie both plotted, the trace holds one
+    star;
   - a chart with no new PB among its points has two traces;
   - Score vs Sensitivity has two traces.
 - **The appearance callback:**
