@@ -50,6 +50,14 @@ first refresh after the exempted version is a week old, never sooner: removed
 while the version is still under the limit, `uv lock` moves the package back
 to an older version and exits 0, which would undo the fix without a warning.
 
+**The uv pin.** Ruled (user) 2026-10-05, in the review of PR #340: the same
+week applies to the uv release a refresh pins. Every install downloads that
+exact build and runs it, so the reasoning for packages holds at least as
+strongly here. uv publishes often, with ten releases in the 23 days before
+2026-10-04, so its latest release is usually days old. The setting cannot
+enforce this, because it governs the packages uv resolves and not uv itself.
+A refresh applies it by hand and pins the newest release at least a week old.
+
 ## 2026-10-04: Dependency Updates Stay Manual, Run From A Playbook
 
 Status: Accepted

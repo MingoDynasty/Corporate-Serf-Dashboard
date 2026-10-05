@@ -39,7 +39,7 @@ differently:
 | Dependency floors | `dependencies` and the `dev` group in `pyproject.toml` | `uv tree --depth 1` prints the locked version of each |
 | `pandas-stubs` | the `dev` group, as a `~=` pin | follows pandas' major.minor line |
 | pre-commit ruff | `rev` in `.pre-commit-config.yaml` | must equal the locked ruff |
-| uv | `required-version` and the `uv_build` range in `pyproject.toml` | `gh api repos/astral-sh/uv/releases/latest --jq .tag_name` |
+| uv | `required-version` and the `uv_build` range in `pyproject.toml` | the newest release at least a week old; see [uv](#uv) |
 | GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | the same `gh api` call, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
@@ -133,13 +133,16 @@ go down.
 
 ### uv
 
-1. Find the latest release, and confirm that the installer for it is being
-   served. An installed copy downloads exactly the pinned version from that
-   address, so a version it does not serve breaks installs
+1. Find the newest release that is at least a week old, and confirm that the
+   installer for it is being served. The
+   [minimum package age](#minimum-package-age) applies to this pin too, by
+   hand, because uv's own setting does not govern it. An installed copy
+   downloads exactly the pinned version from that address and runs it, so a
+   version it does not serve breaks installs
    ([Release and install](specs/release_and_install.md)).
 
    ```powershell
-   gh api repos/astral-sh/uv/releases/latest --jq .tag_name
+   gh api repos/astral-sh/uv/releases --jq '.[] | "\(.tag_name) \(.published_at)"'
    (Invoke-WebRequest -Method Head -UseBasicParsing -Uri https://astral.sh/uv/<version>/install.ps1).StatusCode
    ```
 
