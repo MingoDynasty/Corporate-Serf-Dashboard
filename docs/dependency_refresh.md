@@ -40,7 +40,7 @@ differently:
 | `pandas-stubs` | the `dev` group, as a `~=` pin | follows pandas' major.minor line |
 | pre-commit ruff | `rev` in `.pre-commit-config.yaml` | must equal the locked ruff |
 | uv | `required-version` and the `uv_build` range in `pyproject.toml` | the newest release at least a week old; see [uv](#uv) |
-| GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | the same `gh api` call, per action; report only, see [GitHub Actions](#github-actions) |
+| GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
 The Python version is not part of a refresh. Moving it touches
@@ -70,9 +70,9 @@ a span, not a date, so the lock stays valid as time passes.
 A refresh starts by checking that the line is there. If it is missing, add it,
 run `uv lock`, and commit both files as
 `chore(deps): skip package versions younger than a week` before upgrading.
-`git diff uv.lock` must show no `version` line in that commit. It adds an
-`[options]` block, and uv may reorder the `resolution-markers` list, but no
-package moves.
+`git diff uv.lock` must show no line starting `version = ` in that commit. It
+adds an `[options]` block, and uv may reorder the `resolution-markers` list,
+but no package moves.
 
 When a fix cannot wait a week, exempt that one package, with a comment naming
 why:

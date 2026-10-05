@@ -20,7 +20,8 @@ Status: Accepted
 uv ignores any package version published in the last seven days. A hijacked
 package is usually caught and withdrawn within days, so the delay keeps one
 out of the lockfile and out of the next release. A contributor who needs a
-newer version sooner exempts that one package.
+newer version sooner exempts that one package. A refresh holds the uv release
+it pins to the same week, by hand.
 
 **Ruling.** Ruled (user) 2026-10-04, in chat, on PR #340. The setting is
 `exclude-newer = "7 days"` under `[tool.uv]` in `pyproject.toml`. It lands
