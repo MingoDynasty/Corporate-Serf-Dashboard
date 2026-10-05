@@ -122,6 +122,25 @@ browser's Back button, but opening the playlist fresh, from the Playlists page
 or from that link, starts it in playlist order; to clear a sort, click a sorted
 column's header until the table returns to that order.
 
+The Playlists table and a playlist's scenario table each have a **Columns**
+button. It opens a menu with one checkbox per column. Clear a checkbox to hide
+that column, and check it to show the column again. The menu stays open while
+you change several, and closes when you click outside it or press Escape. Your
+choices are kept in this browser, and the scenario table's choices apply to
+every playlist. The Playlist and Scenario columns are always shown.
+
+Hiding a column changes only what you see. The filter box above the table
+matches the columns on screen, so it no longer finds a hidden column's values.
+If the table is sorted by a column you hide, that sort is dropped, and showing
+the column again doesn't bring it back.
+
+Two columns start hidden, for trying a KovaaK's API request by hand:
+**Benchmark ID** on the Playlists table and **Leaderboard ID** on a scenario
+table. Each shows the number KovaaK's uses for that benchmark, or for that
+scenario's leaderboard. Double-click the number to select it. A playlist you
+imported has no benchmark ID and reads N/A, and so does a scenario whose
+leaderboard the app hasn't looked up yet.
+
 ## Troubleshooting
 
 Each entry starts with what you see. The logs are the last one.

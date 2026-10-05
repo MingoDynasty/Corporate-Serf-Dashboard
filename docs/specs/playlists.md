@@ -6,8 +6,9 @@ benchmark is a playlist that also carries rank thresholds, and the bundled
 library ships with the app with only the popular ones visible. Clicking a row
 opens that playlist's scenario table, which paints local stats and a
 benchmark's ranks immediately and streams leaderboard positions in behind
-them. A background worker keeps the overview's percentile columns warm without
-getting in the way of anything the user is doing.
+them, while a background worker keeps the overview's percentile columns warm.
+Each table has a Columns menu that shows or hides its columns and remembers
+the choice in the browser, and one KovaaK's ID column that starts hidden.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -54,8 +55,8 @@ and [product.md](../product.md). Leaderboard placement is worded
   `playlist_selector.py` is now only the shared props, a preset and a sizing
   rule, for the Home and Aim Training Journey dropdowns.
 - Overview rows are full-row click targets (pointer cursor, hover tint): a
-  click on any cell except the two action cells navigates to
-  `/playlists/{code}`. The Playlist name cell and the table's Scenario cell
+  click on any cell except the Benchmark ID cell and the two action cells
+  navigates to `/playlists/{code}`. The Playlist name cell and the table's Scenario cell
   (prebuilt `/?playlist_code=<code>&scenario=<name>`, the Scenario
   Performance page) are real anchors: a modified click (Ctrl/Cmd/Shift/Alt)
   keeps the native anchor and stops the grid's `cellClicked` navigation; a
@@ -75,9 +76,10 @@ and [product.md](../product.md). Leaderboard placement is worded
 
 ## The overview
 
-- Columns: Playlist, Type, Played (`played/total`, sorted by ratio), Runs,
-  Last Played (default sort, descending), Median Percentile, Lowest
-  Percentile, then the show/hide and delete action cells. The numeric and
+- Columns: Playlist, Type, Benchmark ID (hidden until the Columns menu shows
+  it), Played (`played/total`, sorted by ratio), Runs, Last Played (default
+  sort, descending), Median Percentile, Lowest Percentile, then the show/hide
+  and delete action cells. The numeric and
   timestamp columns use the repo-owned `nullsLastComparator`, referenced by
   bare name
   ([2026-04-29](../decision_log.md#2026-04-29-use-controlled-ag-grid-js-for-null-aware-sorting),
@@ -89,6 +91,15 @@ and [product.md](../product.md). Leaderboard placement is worded
   as amended by
   [2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
   The hover adds a "Stalest: {scenario}, {relative}" second line.
+- Benchmark ID is KovaaK's numeric ID for a bundled benchmark, read from the
+  bundled file's `generated_from` stamp. It shows as bare digits with no
+  thousands separator, such as `2336`, and reads `N/A` for a playlist with no
+  benchmark ID: one imported by code, or any other file in the user's
+  playlist folder. The column is not sortable, its text can be selected, and
+  a click on its cell does not open the playlist, so a double-click selects
+  the number. Its header tooltip reads "The number KovaaK's uses to identify
+  this benchmark in its API."
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
 - Percentile aggregates cover played scenarios only. Until every played
   scenario is display-resolved (UNRANKED, or RANKED with a cached percentile)
   both cells read `{resolved}/{played} cached`; a resolved all-UNRANKED
@@ -155,6 +166,31 @@ and [product.md](../product.md). Leaderboard placement is worded
 - Both grids feed their quick filter into AG Grid's built-in one client-side.
   Both log AG Grid's `columnSizeOptions` warning on every mount
   ([2026-07-18](../decision_log.md#2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning)).
+- Both tables have a **Columns** button: on the overview between the **Show
+  hidden** switch and the **Import** button, and on the scenario table at the
+  right end of the filter row. It opens a menu of one checkbox per column the
+  table can work without, in table order, labelled in sentence case. The
+  overview's menu lists Type, Benchmark ID, Played, Runs, Last played, Median
+  percentile, and Lowest percentile. The scenario table's lists Leaderboard
+  ID, Last played, Runs, Position, Total players, Percentile, PB score, PB
+  date, PB cm/360, and PB accuracy, with Rank and Next rank after PB score on
+  a benchmark's table only. The Playlist column, the Scenario column, and the
+  overview's action cells are never listed. A checked column is shown, a
+  change applies at once, and the menu stays open until an outside click or
+  Escape. Every column is shown by default except the two ID columns.
+- Each column's shown or hidden state is kept in the browser's local storage,
+  one set per table, and the scenario table's set is shared by every
+  playlist. A choice about Rank or Next Rank is left alone on a playlist's
+  table. A browser with no stored choice shows the defaults. Column widths
+  and column order are not remembered.
+- Hiding a column is display only. Rows carry every field, no fetch stops,
+  and each status line reads the same with its columns hidden. The quick
+  filter matches visible columns only, so a hidden column's values find no
+  row. Hiding a sorted column clears its sort, and showing it again does not
+  bring the sort back. On the overview, hiding Last Played leaves the rows in
+  name order, and showing it again keeps them there until the page is opened
+  again
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
 
 ## Import and delete
 
@@ -234,9 +270,10 @@ and [product.md](../product.md). Leaderboard placement is worded
 
 ## The per-playlist scenario table
 
-- Columns: Scenario, Last Played, Runs, Position, Total Players, Percentile,
-  PB Score, then Rank and Next Rank on a benchmark's table only, then PB
-  Date, PB cm/360, PB Accuracy. Position reads a formatted rank, "Unranked",
+- Columns: Scenario, Leaderboard ID (hidden until the Columns menu shows it),
+  Last Played, Runs, Position, Total Players, Percentile, PB Score, then Rank
+  and Next Rank on a benchmark's table only, then PB Date, PB cm/360, PB
+  Accuracy. Position reads a formatted rank, "Unranked",
   `N/A`, or, while pending, a blank cell with an animated ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
   Played keeps "Never"; the 30-second tick refreshes both timestamp columns
   ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)).
@@ -250,6 +287,20 @@ and [product.md](../product.md). Leaderboard placement is worded
   is the chart's `50.0 cm/360`
   ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)).
   PB Accuracy prefers damage accuracy, falling back to hit accuracy.
+- Leaderboard ID is KovaaK's numeric ID for the scenario's global
+  leaderboard, read from the app's name-to-ID mapping, the value the app
+  itself sends to KovaaK's, and never from the copy embedded in the playlist
+  file. It shows as bare digits with no thousands separator, such as
+  `184106`, and reads `N/A` for a scenario the app hasn't resolved. That
+  includes a name the corpus seed leaves out because two bundled files
+  disagree on it, until a lookup learns an ID for it. The first paint, the
+  fill's streamed rows, and a cancelled fill's rebuild all carry it, and a
+  streamed row carries an ID its own lookup just learned. The column is not
+  sortable, so it has no `?sort=` name, and its text can be selected. Its
+  header tooltip reads "The number KovaaK's uses to identify this scenario's
+  leaderboard in its API."
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  The menu that shows it is specified under [the overview](#the-overview).
 - A table is a benchmark's when any of its scenarios carries a ladder, the
   overview's Type test; a playlist's table has no Rank or Next Rank column,
   and its rows carry no rank fields. Both columns compute from the row's own
@@ -312,6 +363,12 @@ and [product.md](../product.md). Leaderboard placement is worded
   adds none. A value that is not entirely valid opens the table unsorted and
   is removed from the address, as is a sort cleared through the header
   ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+  The exception is a sort on a column the Columns menu has hidden. Back,
+  Forward, a reload, and a copied link do not restore or keep it: it is
+  cleared on arrival and its name is removed from the address, while any
+  other sort in the value is kept, as are the other query parameters and the
+  hash
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
   A benchmark's table also takes `rank` and `next-rank`. On a playlist's
   table they name no column, so a value holding either is not valid there
   ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
@@ -379,8 +436,15 @@ and [product.md](../product.md). Leaderboard placement is worded
   the app's KovaaK's benchmark cache under `data/cache/benchmarks/`; Evxl is
   re-queried on every regeneration. The stamp holds sharecode, benchmark ID,
   ordered rank-color pairs, timestamp, generator, and `schema_version`
-  (currently 2); the app ignores it. An empty bundled root also suppresses
-  removals.
+  (currently 2). The app reads one field of it, the benchmark ID, and ignores
+  the rest. The loader reads that ID into a table keyed by playlist code,
+  beside the playlist model and never into it, so the importer's
+  whole-benchmark drift check still finds a shipped file equal to its rebuild.
+  Only a bundled file's stamp is read, a missing or malformed one reads as no
+  ID without stopping the file from loading, and when two bundled files share
+  a code the table holds the winner's ID
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  An empty bundled root also suppresses removals.
 - `scripts/benchmark_importer/` resolves playlist names and codes and the
   ordered (rank name, color) ladder through Evxl, and thresholds plus each
   scenario's `leaderboard_id` through KovaaK's, pairing the ladder with
