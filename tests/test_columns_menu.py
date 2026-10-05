@@ -44,12 +44,19 @@ def test_columns_menu_keeps_its_closed_dropdown_mounted():
 
 
 def test_columns_menu_is_reachable_from_the_keyboard():
-    menu = columns_menu(MENU_ID, COLUMNS)
-
     # The dropdown renders in a portal at the end of the page, so focus has to
-    # be moved into it on open and handed back to the button on close.
-    assert menu.trapFocus is True
-    assert menu.returnFocus is True
+    # be moved into it on open.
+    assert columns_menu(MENU_ID, COLUMNS).trapFocus is True
+
+
+def test_columns_menu_leaves_focus_where_a_dismissing_click_put_it():
+    # ``returnFocus`` hands focus back to the button on every close, including
+    # one caused by a click on another control. Text typed next went to the
+    # button, where a space reopens the menu and flips a checkbox. Escape
+    # returns focus without the prop.
+    props = columns_menu(MENU_ID, COLUMNS).to_plotly_json()["props"]
+
+    assert props.get("returnFocus") is not True
 
 
 def test_columns_menu_sink_carries_the_id_the_callback_outputs_to():

@@ -177,7 +177,11 @@ and [product.md](../product.md). Leaderboard placement is worded
   a benchmark's table only. The Playlist column, the Scenario column, and the
   overview's action cells are never listed. A checked column is shown, a
   change applies at once, and the menu stays open until an outside click or
-  Escape. Every column is shown by default except the two ID columns.
+  Escape. Opening the menu moves keyboard focus to its first checkbox, and
+  Escape returns focus to the button. A click that closes the menu also acts
+  on what it lands on and keeps the focus it gave, so on the overview a click
+  on a row opens that playlist. Every column is shown by default except the
+  two ID columns.
 - Each column's shown or hidden state is kept in the browser's local storage,
   one set per table, and the scenario table's set is shared by every
   playlist. A choice about Rank or Next Rank is left alone on a playlist's

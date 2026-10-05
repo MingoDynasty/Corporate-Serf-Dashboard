@@ -93,9 +93,17 @@ that mounts as a new render draws from the props its parent last passed down,
 not from its current ones. With `keepMounted` set on the popover, the same
 steps showed the checkbox unchecked and the first click showed the column.
 The stored choices still reach the grid as the page mounts, before the menu
-is ever opened. The popover also traps focus and returns it,
-because the dropdown renders in a portal at the end of the page, out of reach
-of the keyboard otherwise.
+is ever opened.
+
+**The popover traps focus, and does not return it.** The dropdown renders in
+a portal at the end of the page, out of reach of the keyboard otherwise, so
+opening the menu moves focus to its first checkbox. `returnFocus` stays off.
+It hands focus back to the button on every close, including one caused by a
+click on another control, and that click still lands. With it on, text typed
+into the filter after such a click went to the button instead: the first
+space reopened the menu and the second flipped a checkbox, which hid the
+column just shown and stored that (found in review of PR #344, and measured
+on both tables on 2026-10-05). Escape returns focus to the button without it.
 
 **One clientside callback per table applies the checkboxes through the grid
 API.** It is the app's first pattern-matching callback, over that menu's

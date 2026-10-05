@@ -98,9 +98,12 @@ def columns_menu(menu_id: str, columns: Sequence[MenuColumn]) -> dmc.Popover:
         keepMounted=True,
         # The menu renders in a portal at the end of the page, so without the
         # trap a keyboard user who opens it has to tab through the rest of the
-        # page to reach the first checkbox.
+        # page to reach the first checkbox. ``returnFocus`` stays off: it hands
+        # focus back to the button on every close, including one caused by a
+        # click on another control. Text then typed for that control went to
+        # the button instead, where a space reopens the menu and flips a
+        # checkbox. Escape returns focus to the button without it.
         trapFocus=True,
-        returnFocus=True,
         children=[
             dmc.PopoverTarget(
                 dmc.Button(
