@@ -15,15 +15,17 @@ from dash import (
     callback,
     clientside_callback,
     dcc,
+    html,
     no_update,
 )
 
-from source.config.settings_service import get_kovaaks_username
+from source.config.settings_service import get_kovaaks_username, get_steam_id
 from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_display_label,
     is_benchmark_playlist,
 )
+from source.kovaaks.evxl_links import evxl_benchmark_url
 from source.kovaaks.playlist_scenarios_service import (
     PlaylistScenarioFillDrain,
     build_playlist_scenario_rank_rows,
@@ -545,16 +547,31 @@ clientside_callback(
 )
 
 
-def _page_header(playlist_code: str) -> dmc.Group:
-    """Title the page with the playlist's display label and its share code."""
-    return dmc.Group(
-        align="baseline",
-        gap="sm",
-        children=[
-            dmc.Title(get_playlist_display_label(playlist_code), order=2),
-            dmc.Text(playlist_code, c="dimmed", size="sm"),
-        ],
-    )
+def _page_header(playlist_code: str, *, benchmark: bool) -> dmc.Group:
+    """Title the page with the playlist's display label and its share code.
+
+    A benchmark that Evxl has a page for also gets a link to that page.
+    """
+    children = [
+        dmc.Title(get_playlist_display_label(playlist_code), order=2),
+        dmc.Text(playlist_code, c="dimmed", size="sm"),
+    ]
+    evxl_url = evxl_benchmark_url(playlist_code, get_steam_id()) if benchmark else None
+    if evxl_url is not None:
+        children.append(
+            # ``html.A``, not ``dmc.Anchor``: the Mantine wrapper
+            # percent-decodes an href before rendering it, which turns an
+            # encoded ``/`` or ``#`` in a benchmark name into a path separator
+            # or a fragment.
+            html.A(
+                "View on Evxl",
+                id="playlist-scenarios-evxl-link",
+                className="playlist-scenarios-evxl-link",
+                href=evxl_url,
+                target="_blank",
+            )
+        )
+    return dmc.Group(align="baseline", gap="sm", children=children)
 
 
 def layout(
@@ -597,7 +614,11 @@ def layout(
             # No playlist selected: skip the header and let the status line
             # in the filter row below prompt the user to pick one from the
             # Playlists page.
-            *([_page_header(playlist_code)] if playlist_code is not None else []),
+            *(
+                [_page_header(playlist_code, benchmark=benchmark)]
+                if playlist_code is not None
+                else []
+            ),
             dmc.Group(
                 children=[
                     dmc.TextInput(

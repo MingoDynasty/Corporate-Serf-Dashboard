@@ -272,6 +272,18 @@ and [product.md](../product.md). Leaderboard placement is worded
   transactions never blank the two cells. When a run lands, both stay as
   they were until the page reopens, as PB Score does
   ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
+- A benchmark's page header carries a "View on Evxl" link after the title and
+  the playlist code, opening in a new tab, when Evxl's benchmark snapshot
+  (`resources/evxl/benchmarks.json`) lists the playlist code, compared
+  case-insensitively. A playlist's page never carries it. With a Steam ID set
+  the address is `https://evxl.app/u/{Steam ID}/{benchmark}/{difficulty}`;
+  without one it is `https://evxl.app/benchmarks/{benchmark}`, and a
+  benchmark whose name holds one of `; / ? : @ & = + $ , #` then has no link,
+  because that page can't open such a name. The names are Evxl's, each
+  percent-encoded as one path segment, and the address has no query. A
+  snapshot that is missing or in another shape removes the link and logs one
+  warning. The app requests nothing from Evxl for the link
+  ([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 - Opening the route has two phases. Phase 1 paints every row from local
   stats and TTL-ignored caches with explicit pending flags per unresolved
   Position, Total Players, and Percentile cell. Phase 2 hydrates leaderboard
