@@ -46,16 +46,18 @@ a scenario usually plays and what the player has reached, so the app keeps
 both. Judging skill by the personal best alone was rejected. A personal best
 is one run, so a lucky one can rank a consistent scenario as weaker than a
 spiky one that usually plays worse. It also only rises, so it can't show a
-plateau. What counts as the typical run (the window, the run count, the
-warm-up rule) is the Run History proposal's to set.
+decline, and after one lucky run it reads as a plateau when there isn't one.
+What counts as the typical run (the window, the run count, the warm-up rule)
+is the Run History proposal's to set.
 
 **D1's evidence, and its limits.** The evidence is one player's history,
 checked on 2026-09-27. Ordering scenarios against each other by the typical
-run tracked the next visit's level better than ordering by personal best: a
-rank correlation of 0.62 against 0.51, over eight sessions. Within one
-scenario the two tied, with an error spread of 5.5% against 5.6% over 267
-visits. Neither comparison shows that practicing in that order causes more
-learning. A re-check of the ordering is due around 2026-10-09, and the
+run tracked the level the next time each scenario was played better than
+ordering by personal best: a rank correlation of 0.62 against 0.51, over
+eight sessions. Within one scenario the two tied, with an error spread of
+5.5% against 5.6% over 267 predictions across 69 scenarios, one per scenario
+per session. Neither comparison shows that practicing in that order causes
+more learning. A re-check of the ordering is due around 2026-10-09, and the
 columns that would rank weakness this way wait for it. The research on
 learning and performance supports judging learning apart from the scores
 during a session. It doesn't validate a particular window or warm-up rule for
@@ -63,14 +65,14 @@ this app.
 
 **D2, honest uncertainty.** Unknown isn't weak. A judgment with too little
 behind it says so, and a scenario isn't ranked weak or strong until it has
-enough: unknown rows sort as a group of their own, never at either end of a
-weakness sort. A figure that can only be a minimum is labelled one wherever
-it's shown, such as time spent in runs, which leaves out the time between
-runs and any attempt that wrote no stats file. An estimate is shown no more
-precisely than it's known. Under-sampling is the common case: 23 of the 39
-scenarios in the maintainer's current benchmark had fewer than 10 lifetime
-runs. How much is enough isn't set here, and it isn't only a run count: the
-runs also have to be comparable, and the estimate's model has to hold.
+enough: unknown rows form a group of their own and are never ranked among the
+known ones. A figure that can only be a minimum is labelled one wherever it's
+shown, such as time spent in runs, which leaves out the time between runs and
+any attempt that wrote no stats file. An estimate is shown no more precisely
+than it's known. Under-sampling is the common case: on 2026-09-25, 23 of the
+39 scenarios in the maintainer's benchmark had fewer than 10 lifetime runs.
+How much is enough isn't set here, and it isn't only a run count: the runs
+also have to be comparable, and the estimate's model has to hold.
 
 **D3, verdicts, not advice.** The app states facts and verdicts: the typical
 run, a trend, a rank-up chance, "unknown", and whether a bar the player set,
@@ -80,9 +82,25 @@ stop is advice, and the app doesn't give it. The rule covers training
 decisions only, so a notice that asks for a setting isn't advice. Verdicts
 only is the simplest option and the easiest to reverse: adding advice later
 is cheap, and taking away advice people rely on is not. It keeps one player's
-regimen from being imposed on every user, and it matches every string the app
-shows today. The cost is accepted: a "leave now or keep going" line shrinks
-to the facts the player's own rule reads.
+regimen from being imposed on every user, and it matches what the app shows
+today with one exception, which it retires. The cost is accepted: a "leave
+now or keep going" line shrinks to the facts the player's own rule reads.
+
+**The line D3 retires.** A run that passes the score threshold without
+placing gets a toast that ends "Ready to move on.", which tells the player
+when to stop. The
+[2026-09-14 copy entry](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)
+kept that line under its D4, ruled 2026-09-12. By the bar set out here it's
+a default rule the app vouches for, and no check came before it. Ruled
+(user) 2026-10-04,
+[in review](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179636701):
+the line is retired. That toast ends at the fact, and the placed variant and
+every other toast are unchanged. D3 supersedes that D4 in part: its other
+half, which dropped "Keep grinding...", stands. The string changes in
+[a PR of its own](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#discussion_r4179646591),
+also ruled on 2026-10-04. That PR updates the notifications spec and the pace
+proposal's Copy block with it, and adds the supersession note to the
+2026-09-14 entry. Until it lands, the app still shows the line.
 
 Two options were set aside for now. Rules the player sets would add rule
 semantics and a settings surface, and a default rule is advice by another
