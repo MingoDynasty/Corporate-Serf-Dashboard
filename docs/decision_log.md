@@ -131,9 +131,9 @@ score delta.
 - *Not time-scored:* any other file that can answer.
 - *Can't answer:* the bytes do not parse, or `schema_version` is not 1. The
   proposal left four header cases open, and each also can't answer: no
-  header, no scenario hash, a time limit that is missing or not positive,
-  and a timescale that is missing or not positive. No file in the
-  maintainer's folder has any of them.
+  header, no scenario hash, a time limit that is missing, not positive, or
+  not a finite number, and a timescale that is any of those three. No file
+  in the maintainer's folder has any of them.
 
 **Which file decides.** The scenario's newest run names the version. That
 run and the older runs of the same hash are tried newest first, and the
@@ -248,13 +248,19 @@ fix. On a playlist that holds time-scored scenarios the graph keeps
 overstating how close earlier runs were to the PB. A plan that revives the
 page carries this fix with it.
 
-**Untested when this shipped.** No countdown file in the data has a pause
-event. A fixed-length run's timestamps appear to leave paused time out,
-which is an inference from two runs. If a paused time-scored run turns out
-not to be recognized, a file with a pause event should count as one that
-can't answer. And no run in the data was played below 407 FPS, so the start
-lag on a slower machine is unmeasured. The debug log records each parsed
-file's largest distance from the countdown, which is the number to read.
+**Checked in the game before the merge.** Two cases had no run in the
+data, so the maintainer played one of each on 2026-10-05, on Air Pure
+Easier No UFO and game build 3.9.10. A run paused for 15 s partway through
+was recognized, with a largest distance of 0.011. Its file carries one
+pause event, and its timestamps leave the paused time out: the run took
+about 102 s by the clock, and its last event is stamped 87.2 s. So a file
+with a pause event needs no special case. A run at a 60 FPS cap was
+recognized with a largest distance of 0.027, where that scenario's six
+earlier files sit at 0.006 to 0.008. That is one run, so it shows the
+typical lag and not its tail, and half a point is about nineteen times
+it. The debug log records each parsed file's largest distance from the
+countdown, which is the number to read if a scenario is ever not
+recognized.
 
 **Out of scope.** Run History, including a run length field and a
 per-scenario threshold. A per-bot breakdown. Anything else the performance

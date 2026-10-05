@@ -249,8 +249,10 @@ of scope here, apart from its chart toolbar, noted under The graph.
   `time_limit`, and the scenario version is its `scenario_hash`. Any other
   file that can answer says the scenario is not time-scored. A file can't
   answer when its bytes do not parse, when its `schema_version` is not 1, or
-  when its header lacks a scenario hash, a positive time limit, or a
-  positive timescale
+  when its header lacks a scenario hash, or a time limit or a timescale
+  that is a positive, finite number. A run paused partway through is
+  recognized like any other, because the file's timestamps leave paused
+  time out
   ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 - The scenario's newest run names the version. That run and the older runs
   with the same stats-file `Hash:` are tried newest first, and the first
@@ -282,9 +284,9 @@ of scope here, apart from its chart toolbar, noted under The graph.
   tries again. A missing, unreadable, or malformed performance file costs
   only the detection, never the run
   ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
-  The first time a file is parsed, the debug log records its answer, its
-  time limit, its score event count, and its largest distance from the
-  countdown.
+  The first time a file is parsed, the debug log records its answer. For a
+  file that can answer, the line also carries its time limit, its score
+  event count, and its largest distance from the countdown.
 
 ## Chart options panel
 
