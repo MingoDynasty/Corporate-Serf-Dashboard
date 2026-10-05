@@ -252,6 +252,12 @@ rebuilt on every load as they are. Only bundled files are read, so a user
 file's stamp is ignored. A missing or malformed block reads as no ID and
 never stops the file from loading.
 
+Reading the raw file must not change how a broken file is reported. Today
+the loader parses and validates in one step, and reports a file that isn't
+valid JSON by catching the model's validation error. A separate JSON parse
+raises a different error, so the loader has to keep turning it into the same
+startup warning.
+
 The model has to stay as it is because the benchmark importer shares it. The
 importer's drift check compares each shipped file with a fresh rebuild by
 whole-model equality, and a rebuild carries no stamp. The check relies on the
@@ -479,7 +485,9 @@ build. More effort would buy polish, not correctness.
   table. A bundled file with no `generated_from` block, and one with a
   malformed block, both load, with no ID. A user file's stamp is ignored. The
   playlist model has no new field, and the importer's existing check tests
-  pass unchanged.
+  pass unchanged. A bundled file that isn't valid JSON still produces the
+  "isn't valid JSON" startup warning and is skipped, which no test pins
+  today.
 - **The overview rows:** a bundled benchmark's row carries its ID, and an
   imported playlist's row carries none.
 - **The scenario rows:** a first-paint row, a streamed row, and a cancelled
