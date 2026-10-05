@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
-from dash import dcc, no_update
+from dash import dcc, html, no_update
 from dash._callback import (
     GLOBAL_CALLBACK_LIST,
     GLOBAL_CALLBACK_MAP,
@@ -2426,6 +2426,61 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
     ]
     assert plain_fields == table_fields
     assert unknown_fields == table_fields
+
+
+def _evxl_links(page) -> list:
+    return [
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlist-scenarios-evxl-link"
+    ]
+
+
+def test_playlist_scenarios_benchmark_header_links_its_evxl_page(
+    benchmark_playlists, monkeypatch
+):
+    asked = []
+
+    def fake_url(playlist_code, steam_id):
+        asked.append((playlist_code, steam_id))
+        return "https://evxl.app/u/7656/Test%20Benchmark/Easy"
+
+    monkeypatch.setattr(playlist_scenarios, "evxl_benchmark_url", fake_url)
+    monkeypatch.setattr(playlist_scenarios, "get_steam_id", lambda: "7656")
+
+    (link,) = _evxl_links(playlist_scenarios.layout(BENCHMARK_CODE))
+
+    assert asked == [(BENCHMARK_CODE, "7656")]
+    # dmc.Anchor would percent-decode the href in the browser, which splits a
+    # benchmark name holding an encoded slash into two path segments.
+    assert isinstance(link, html.A)
+    assert link.children == "View on Evxl"
+    assert link.href == "https://evxl.app/u/7656/Test%20Benchmark/Easy"
+    # A new tab, so the table and its streamed positions stay open.
+    assert link.target == "_blank"
+
+
+def test_playlist_scenarios_benchmark_without_an_evxl_page_gets_no_link(
+    benchmark_playlists, monkeypatch
+):
+    monkeypatch.setattr(
+        playlist_scenarios, "evxl_benchmark_url", lambda _code, _steam_id: None
+    )
+
+    assert _evxl_links(playlist_scenarios.layout(BENCHMARK_CODE)) == []
+
+
+def test_playlist_scenarios_plain_playlist_gets_no_evxl_link(
+    benchmark_playlists, monkeypatch
+):
+    # Even for a code Evxl lists: the link goes with the rank columns.
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "evxl_benchmark_url",
+        lambda _code, _steam_id: "https://evxl.app/benchmarks/Anything",
+    )
+
+    assert _evxl_links(playlist_scenarios.layout(PLAIN_PLAYLIST_CODE)) == []
 
 
 def test_playlist_scenarios_rank_column_defs():

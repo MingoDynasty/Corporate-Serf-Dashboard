@@ -411,6 +411,21 @@ a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 
+/* The Evxl link in a benchmark's page header. It is a plain anchor, because
+   dmc.Anchor percent-decodes its href and would break a benchmark name
+   holding an encoded slash, so this class gives it the look dmc.Anchor has at
+   size "sm". */
+a.playlist-scenarios-evxl-link,
+a.playlist-scenarios-evxl-link:visited {
+    color: var(--mantine-color-anchor);
+    font-size: var(--mantine-font-size-sm);
+    text-decoration: none;
+}
+
+a.playlist-scenarios-evxl-link:hover {
+    text-decoration: underline;
+}
+
 /* The overview's leftover-files notice ships hidden and is revealed by the
    render_superseded_alert callback, which toggles this class on and off. */
 .playlists-superseded-alert-hidden {
