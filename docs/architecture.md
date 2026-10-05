@@ -422,11 +422,11 @@ flowchart LR
   fetch nothing. A benchmark's `layout` adds the Rank and Next Rank columns
   after PB Score, and its header a "View on Evxl" link built by
   `evxl_links.evxl_benchmark_url`. The link is `html.A`, not `dmc.Anchor`,
-  which percent-decodes an href (see decision log). The table's sort lives in the page URL as `?sort=`:
-  `layout` seeds `initialSort` on a fresh copy of the column defs from a
-  value valid for that page's columns, and a clientside callback on the
-  grid's `columnState` rewrites the key with a raw `history.replaceState`,
-  never through `dcc.Location` (see decision log).
+  which percent-decodes an href (see decision log). The table's sort lives in
+  the page URL as `?sort=`: `layout` seeds `initialSort` on a fresh copy of
+  the column defs from a value valid for that page's columns, and a
+  clientside callback on the grid's `columnState` rewrites the key with a raw
+  `history.replaceState`, never through `dcc.Location` (see decision log).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
