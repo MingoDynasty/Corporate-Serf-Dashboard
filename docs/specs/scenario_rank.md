@@ -128,6 +128,16 @@ benchmark tier) — see the
   replaces a known better value; only a user-clicked Refresh is
   board-authoritative and may write a lower score or `UNRANKED`
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+- The Scenario Performance Position value says when its position was stored:
+  hovering or focusing it shows `Last updated {age} · {timestamp}`, from the
+  rank cache entry's `fetched_at`, and the value takes the dotted underline
+  the Last played value has. The time moves only when a leaderboard read is
+  stored, so a failed fetch and an automatic read the monotonic writer refuses
+  both leave it as it was. It dates the position alone; the leaderboard total
+  beside it is cached separately with its own time. `N/A` has no hover, and
+  neither does a cache entry written without a time. The age is worded in the
+  browser and re-worded every 30 seconds. The playlist pages show no such time
+  ([2026-10-04](../decision_log.md#2026-10-04-the-position-value-says-when-it-was-last-updated)).
 
 ## HTTP behavior
 

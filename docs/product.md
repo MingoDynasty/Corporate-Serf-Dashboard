@@ -223,7 +223,8 @@ are one view or two is a design choice for the feature that builds them.
   shows your global leaderboard standing for the selected scenario —
   `Position: 11,290 of 63,892 (82.33% percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
-  personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
+  personal best, or on manual Refresh — not fetched live on every view.
+  Hovering the value shows when it was last updated. *Problem solved:* raw scores aren't comparable
   across scenarios, but percentile is; it turns "804.2" into "top 18%," which
   is the number a player actually reasons with.
 - **Score-aware rank refreshes** (PRs #38, #40). After a new personal best,
