@@ -29,6 +29,11 @@ uv run mypy source
 uv run python -m compileall source tests
 ```
 
+GitHub's CodeQL default setup also scans the Python, the JavaScript, and the
+workflow files on every pull request, on every push to `main`, and weekly. It
+is switched on in the repository's settings, so no workflow file defines its
+`Analyze` checks, and they are not required to merge.
+
 Coverage is a local measurement, never a CI gate; pytest-cov is a dev
 dependency and `pyproject.toml` carries its settings. The app-startup tests run
 `source/app.py` in child processes that change into temp state roots, so the
