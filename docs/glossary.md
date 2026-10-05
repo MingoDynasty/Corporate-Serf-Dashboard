@@ -218,6 +218,19 @@ sensitivity. It's the player's own record, not their leaderboard score
   row fields, and `personal_best` or `pb` for the run that set it and that
   run's stats. The PB a run was chasing is its previous best.
 
+### New PB
+
+A run that beat its scenario's PB when it was played. It held the PB until a
+later run beat it, and the latest one is the PB run. A scenario's first run
+sets the PB without beating one, so it isn't a new PB. Where the chart marks
+them is in
+[scenario_performance.md](specs/scenario_performance.md#the-graph).
+
+- On screen: New PB in the chart legend. The celebration toast's title says
+  New personal best.
+- In code: `new_high_score`.
+- Not the PB run, the one run that holds the PB now.
+
 ### Accuracy
 
 The share of a run's shots that hit. PB Accuracy on a scenario table means

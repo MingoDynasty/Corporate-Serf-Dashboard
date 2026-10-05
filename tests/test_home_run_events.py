@@ -928,6 +928,7 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         "get_time_vs_runs",
         lambda *_args: {"2026-07-06": [object()]},
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(
         home,
         "generate_time_plot",
@@ -971,6 +972,7 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
         "get_time_vs_runs",
         lambda *_args: {"2026-07-06": [object()]},
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(
         home,
         "generate_time_plot",
@@ -1032,6 +1034,7 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
         "get_time_vs_runs",
         lambda *_args: {"2026-07-06": [object()]},
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(
         home,
         "generate_time_plot",
@@ -1092,6 +1095,7 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
         home, "get_time_vs_runs", lambda *_args: {"2026-07-06": [object()]}
     )
     monkeypatch.setattr(home, "generate_time_plot", lambda *_args: go.Figure())
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(home, "get_high_score", lambda _scenario: 896.2)
     monkeypatch.setattr(home, "get_personal_best_run", lambda _scenario: personal_best)
     monkeypatch.setattr(home, "get_pace_basis", lambda _scenario: basis)

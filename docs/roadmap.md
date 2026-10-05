@@ -38,6 +38,15 @@ sequence.
   how much faster it finished. A scenario the app can't recognize reads as it
   did before. (PR #343; design in #329) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
+- **New PB stars on the Score vs Time chart** — the chart now draws a gold
+  star on each plotted run that beat the scenario's personal best when it was
+  played, so it shows when each best was reached, including the ones a later
+  run the same day beat. The rule is the personal best celebration's, judged
+  over the scenario's whole history at every sensitivity. There is no
+  setting: the stars follow Point size, and the Score vs Sensitivity chart is
+  unchanged. The stars record achievements, and whether the player is
+  improving stays the trend verdict's question. (PR #346; design in #337)
+  Design rationale distilled into [`decision_log.md`](./decision_log.md).
 - **Rank and next-rank gap on benchmarks** — a benchmark's scenario table now
   shows the rank each personal best has reached and how much it has to grow
   to reach the next one, such as "+4.8% to Gold", with the threshold and the
@@ -63,18 +72,6 @@ sequence.
   source. Some toasts that sounded like log lines now say what happened and
   what to do. No new surface and no behavior change. (PR #291; design in
   #247) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-- **Cross-scale sensitivity conversion** — a run recorded on a game's own
-  sensitivity scale, like `0.2 Valorant`, used to plot under that raw number,
-  so it sorted as 0.2 among centimeters and sat at the far left of the Score
-  vs Sensitivity axis instead of beside the 40.8 cm/360 it actually is. Those
-  runs now convert to cm/360 the moment their file is read, using two fields
-  every stats file has carried since 2024, so they group, sort, and earn run
-  notifications like every other run, and the playlist tables' PB cm/360
-  column fills in for them. Sensitivities that one-decimal rounding used to
-  collapse into one group separate correctly. Runs from 2019 to 2021 predate
-  the fields and keep their original label rather than being dropped. (PR
-  #280; design in #277, rulings in #279) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 ---
 

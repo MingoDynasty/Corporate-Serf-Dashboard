@@ -380,7 +380,15 @@ flowchart LR
   color are inputs to `apply_graph_appearance` instead, the cheap callback
   that themes the cached figure and then hands it to
   `plot_service.apply_point_appearance` — appearance never reruns the data
-  read, the overlays, or the notification logic.
+  read, the overlays, or the notification logic. That function restyles two
+  traces, each selected by name: the size and color go to the run trace, and
+  the size alone to the New PB stars.
+  The stars come from the rebuild. In Score vs Time `_build_scenario_figure`
+  asks `data_service.get_new_high_score_runs` which of the scenario's runs set
+  a new PB, over its whole history, and passes them to `generate_time_plot`
+  with the filtered runs it plots. The plot stars the ones it holds, matched
+  by run, in a third trace
+  ([decision_log.md](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
   The two notification controls draw nothing at all, and they differ in what
   flipping them costs. *Score threshold verdict* is an `Input` on
   `generate_graph`, so it re-runs the whole callback and rebuilds a figure
@@ -542,6 +550,10 @@ flowchart LR
   name is how its performance file is found. `get_runs_newest_first` hands
   a scenario's runs to the time-scored lookup
   ([decision_log.md](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
+  runs in time order, and `get_new_high_score_runs` applies it to everything
+  the scenario holds, never to a filtered view
+  ([decision_log.md](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
   `load_playlists` records each winning user-root code's actual file path
   (so deletion targets the real file, not a reconstructed name) and the user files it skips because
   a bundled code already won; `delete_user_playlist` and

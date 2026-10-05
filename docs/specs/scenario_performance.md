@@ -2,7 +2,8 @@
 
 The landing page plots the kept runs of one scenario as points over
 sensitivity or time, with the personal best, a configurable score goal, and
-playlist rank thresholds available as overlay lines; older runs recorded on a
+playlist rank thresholds available as overlay lines, and the chart over time
+stars each run that set a new personal best; older runs recorded on a
 game's own sensitivity scale sit on the same cm/360 axis as everything else,
 except the oldest, which can't be converted and show the exact setting they
 were recorded at.
@@ -105,6 +106,21 @@ of scope here, apart from its chart toolbar, noted under The graph.
   scores are kept per sensitivity, or per day in Score vs Time. The date
   range is inclusive of the selected date; the plot title reads
   `{scenario} (updated: {timestamp})`.
+- Score vs Time also marks each plotted run that set a
+  [new PB](../glossary.md#new-pb) with a star: a third trace, legend "New PB",
+  drawn over the other two. A new PB is a run whose score is strictly above
+  every earlier run of its scenario, judged oldest first over the scenario's
+  whole history, at every sensitivity and including runs older than the
+  selected date. So a tie is not one, the earliest run to reach a score holds
+  it, and the scenario's first run is not one. A star belongs to its run, not
+  to a position on the chart. A new PB the chart doesn't plot, because the
+  top N filter dropped it or it is older than the selected date, gets no star
+  and still counts in the comparison. A later run the same day with the same
+  score is plotted at the same position and is not a new PB, so when the
+  day's filter keeps that tie and drops the new PB, the point has no star.
+  With no new PB among its points the chart has no New PB trace and no legend
+  entry, and Score vs Sensitivity never has one
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - A run recorded under a game's own sensitivity scale is normalized to cm/360
   when its file is parsed, from the file's own `Sens Increment` and `DPI`
   fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`; a run whose
@@ -134,6 +150,13 @@ of scope here, apart from its chart toolbar, noted under The graph.
   group's x value, since one group can hold runs recorded at different
   settings
   ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
+  A star takes no hover of its own, so hovering one shows its run's hover.
+  Runs at one position share one hover, the one whose point comes last in the
+  run trace. Where a new PB and a later same-day tie are both plotted, the
+  new PB is ordered last among the run points there, so the star's hover
+  names the run that set the PB; elsewhere a day's points keep their order,
+  ascending by score with ties in time order
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - Three overlay families, all dashed labelled lines. "PB score ({value})"
   and "Score threshold ({value})" draw at the current post-run personal best
   and at the
@@ -159,9 +182,10 @@ of scope here, apart from its chart toolbar, noted under The graph.
   lines lag the selection until the next rebuild (a control change, a
   scenario change, or a new run).
 - Zooming the x axis refits the score axis to the runs in view: the run
-  points and Average Score line inside the x window, padded by 5% of their
-  span. Overlay lines are not part of the fit, so a line beyond the fitted
-  range is out of view while zoomed. A trace hidden from the legend is left
+  points, the Average score line, and the New PB stars inside the x window,
+  padded by 5% of their span. The stars repeat run points, so they never
+  change the fit. Overlay lines are not part of the fit, so a line beyond the
+  fitted range is out of view while zoomed. A trace hidden from the legend is left
   out too, and showing or hiding one while zoomed refits. A window holding no
   runs leaves the score axis as it was. Double-clicking the plot, "Reset
   axes", "Autoscale", and any new figure (a rebuild or an appearance change)
@@ -188,9 +212,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
   ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
   as amended by
   [2026-08-21](../decision_log.md#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme)).
+  A New PB star is plotly's `star` symbol, gold `#fab005` with a 1px
+  `#5f3d00` outline, the same in both themes
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - "Point size" is a Small | Default | Large preset (Small 4px, Large 10px);
   Default leaves the generated size untouched rather than writing a pixel
-  count. "Point color" accepts eight curated swatches on one row, a picker,
+  count. It sizes the New PB stars too: 9px on Small, 16px on Large, and the
+  12px they are generated with on Default
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  "Point color" accepts eight curated swatches on one row, a picker,
   or a typed hex value; the empty value means Default (placeholder
   "Default"), a "Use default" button is the only way back to it, and
   anything unparseable falls back to the generated color. The empty field's
@@ -198,12 +228,22 @@ of scope here, apart from its chart toolbar, noted under The graph.
   ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
   as amended by
   [2026-08-21](../decision_log.md#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme)).
-- Size and color restyle only the run trace, selected by its "Run Data
-  Point" name, in a cheap presentation callback applied after theming — the
+- Color restyles only the run trace, and size restyles the run trace and the
+  New PB trace. Each is selected by its name, "Run data point" or "New PB", in
+  a cheap presentation callback applied after theming — the
   expensive graph rebuild never reruns for an appearance change, and
-  placeholder and empty figures pass through untouched. Nothing else on the
-  chart is customizable, and that boundary is deliberate
-  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)).
+  placeholder and empty figures pass through untouched, as does a figure with
+  no New PB trace. Nothing else on the chart is customizable, the stars' own
+  color and shape included, and that boundary is deliberate
+  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there),
+  with the stars' size as its one exception, set by
+  [2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+- The stars have no control. Clicking "New PB" in the legend hides them and
+  leaves every run point, and the choice is not remembered: the figure sets
+  no `uirevision`, so the next figure draws them again, whether it comes from
+  a new run on the scenario, a control that rebuilds the chart, or an
+  appearance change
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - The chart keeps plotly.js's default modebar, which offers "Download plot as
   a PNG", a save to this PC, and "Share chart...". Pressing "Share chart..."
   opens plotly.js's confirmation naming Plotly Cloud, and nothing is sent
@@ -212,7 +252,8 @@ of scope here, apart from its chart toolbar, noted under The graph.
   there; a blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
   accuracy, sensitivity, and x value, the setting a converted run was
-  recorded at, the Average score line, and the label and value of each
+  recorded at, the Average score line, the New PB stars, which repeat the
+  date and score of runs already in it, and the label and value of each
   overlay line drawn. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the

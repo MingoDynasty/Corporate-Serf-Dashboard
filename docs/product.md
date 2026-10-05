@@ -167,6 +167,20 @@ are one view or two is a design choice for the feature that builds them.
   default it draws only the bands around your scores, so the runs fill the
   chart; a **Show all ranks** chart option draws the whole ladder instead, for
   when you want to see how far the climb goes rather than what is next.
+- **New PB stars on the time chart** (Scenario Performance page, PR #346;
+  design in #337). On Score vs Time, a gold star marks each plotted run that
+  beat the scenario's personal best when it was played. The rule is the
+  celebration's: strictly above every earlier run of the scenario, at any
+  sensitivity and however far back, so a tie and a scenario's first run get
+  no star. There is no setting. The stars follow Point size, and clicking
+  New PB in the legend hides them until the chart next redraws. *Problem
+  solved:* a new personal best was celebrated at the moment of the run and
+  then left no trace. Every run on the chart was the same dot, and a day's
+  runs share one position, so the runs that set each best could only be found
+  by comparing every dot with all the ones before it, and within a day not at
+  all. The chart now shows what you reached and when. The stars record
+  achievements and judge nothing: a personal best only ever rises, so a row
+  of stars can't say whether you're improving.
 - **Point size and color** (Scenario Performance page, PR #241; design in
   #238). Chart options can make the raw run points smaller, larger, or a color
   you choose, from eight curated swatches or any hex value. *Problem solved:*
