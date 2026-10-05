@@ -60,7 +60,10 @@ from source.kovaaks.playlist_visibility_service import (
 )
 from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
-from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
+from source.pages.playlist_selector import (
+    PLAYLIST_SELECTOR_PRESET,
+    PLAYLIST_SELECTOR_SIZING,
+)
 from source.plot.plot_service import (
     POINT_SIZE_DEFAULT,
     POINT_SIZE_OPTIONS,
@@ -151,6 +154,12 @@ HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 # page on a route change and then this store triggers exactly one write, which
 # keeps the deep link out of the router's own callback graph.
 HOME_DEEP_LINK_STORE_ID = "home-deep-link"
+# The holder under the playlist filter for the link to that playlist's
+# scenario table. It is always in the layout so ``select_playlist`` has an
+# output to write to; the link itself comes and goes with the selection.
+PLAYLIST_TABLE_LINK_ID = "playlist-table-link"
+PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
+PLAYLIST_FIELD_CLASS = "home-playlist-field"
 
 # The chart options inspector. Its collapsed class is the open state: hiding
 # with ``display: none`` takes the controls out of the tab order and the
@@ -629,6 +638,20 @@ def _rank_display(value: str, hint: str | None) -> str | list:
     ]
 
 
+def _rank_updated_ts(rank_info: ScenarioRankInfo) -> float | None:
+    """Return when the displayed position was stored, as epoch seconds.
+
+    ``None`` when no position is displayed, and for a cache entry written
+    without a time: the hover then has nothing to date.
+    """
+    displayed = rank_info.status == ScenarioRankStatus.UNRANKED or (
+        rank_info.status == ScenarioRankStatus.RANKED and rank_info.rank is not None
+    )
+    if not displayed or rank_info.fetched_at is None:
+        return None
+    return rank_info.fetched_at.timestamp()
+
+
 def _derive_rank_hint(rank_info: ScenarioRankInfo) -> str | None:
     """Classify a rank result into the inline hint its value should carry."""
     if rank_info.served_stale:
@@ -696,20 +719,20 @@ def _render_scenario_rank(
     selected_scenario: str | None,
     allow_network: bool,
     allow_notifications: bool = True,
-) -> tuple[str | list, list[dict[str, object]]]:
+) -> tuple[str | list, float | None, list[dict[str, object]]]:
     """Render rank through either the normal lookup or the cache-only interval path.
 
-    Returns the Position value and any toast the render earned. Passive renders
-    do not toast their own state: an unconfigured username, a failed lookup,
-    and a value served from a stale cache are persistent conditions, so the
-    field says so itself. The Steam-ID mismatch has no such in-place home and
-    is the single exception.
+    Returns the Position value, when that position was stored, and any toast
+    the render earned. Passive renders do not toast their own state: an
+    unconfigured username, a failed lookup, and a value served from a stale
+    cache are persistent conditions, so the field says so itself. The Steam-ID
+    mismatch has no such in-place home and is the single exception.
 
     ``allow_notifications=False`` renders the value without spending the
     session's one mismatch toast -- for the render nobody triggered.
     """
     if not selected_scenario:
-        return "N/A", []
+        return "N/A", None, []
 
     lookup_config = _rank_lookup_config()
     username, steam_id = lookup_config[0], lookup_config[1]
@@ -722,20 +745,23 @@ def _render_scenario_rank(
         )
     except Exception:  # noqa: BLE001
         logger.exception('Failed to fetch scenario rank for "%s"', selected_scenario)
-        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), []
+        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), None, []
 
     value = format_scenario_rank(rank_info)
     display = _rank_display(
         value,
         _rank_hint(rank_info, username, selected_scenario, allow_network, value),
     )
+    updated_ts = _rank_updated_ts(rank_info)
     if not allow_notifications:
-        return display, []
-    return display, _steam_mismatch_notifications(rank_info, username, steam_id)
+        return display, updated_ts, []
+    notifications = _steam_mismatch_notifications(rank_info, username, steam_id)
+    return display, updated_ts, notifications
 
 
 @callback(
     Output("scenario_rank", "children"),
+    Output("rank-updated-ts", "data"),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
     Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
@@ -754,12 +780,45 @@ def get_scenario_rank(_, selected_scenario, _n_intervals):
     moment the user may not be looking at.
     """
     triggered = ctx.triggered
-    display, notifications = _render_scenario_rank(
+    display, updated_ts, notifications = _render_scenario_rank(
         selected_scenario,
         _rank_allows_network(triggered),
         allow_notifications=bool(triggered),
     )
-    return display, notifications or no_update
+    return display, updated_ts, notifications or no_update
+
+
+# The hover's age is worded in the browser, on each store change and every 30s
+# tick, so it stays current while a cached position sits untouched. "Last
+# updated", not "checked": a fetch that fails, and an automatic read whose
+# result the cache refuses, both leave the stored position and its time alone,
+# so the label stays true of the data while the app goes on trying.
+#
+# The tooltip is a fixed part of the layout rather than part of the value's
+# children: the interval rewrites those every tick, and Dash remounts component
+# children on each write, which blinks an open tooltip.
+clientside_callback(
+    """
+    (seconds, _nIntervals) => {
+        if (seconds === null || seconds === undefined) {
+            return ["", true, null, null];
+        }
+        const dagfuncs = window.dashAgGridFunctions;
+        const label =
+            "Last updated " +
+            dagfuncs.relativeTime(seconds, "") +
+            " · " +
+            dagfuncs.absoluteTime(seconds, "");
+        return [label, false, "cell-tooltip-affordance", 0];
+    }
+    """,
+    Output("rank-updated-tooltip", "label"),
+    Output("rank-updated-tooltip", "disabled"),
+    Output("scenario_rank", "className"),
+    Output("scenario_rank", "tabIndex"),
+    Input("rank-updated-ts", "data"),
+    Input("relative-time-interval", "n_intervals"),
+)
 
 
 def _rank_refresh_problem_notification(
@@ -881,6 +940,7 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
 
 @callback(
     Output("scenario_rank", "children", allow_duplicate=True),
+    Output("rank-updated-ts", "data", allow_duplicate=True),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
     Output("notification-container", "hideNotifications", allow_duplicate=True),
     Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
@@ -930,13 +990,15 @@ def refresh_rank(  # noqa: PLR0911
     page load must not force a network refresh or pop a stray toast.
     """
     if not n_clicks:
-        return no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
     if not selected_scenario:
-        return "N/A", no_update, no_update, no_update
+        return "N/A", None, no_update, no_update, no_update
+    # The value and the time it was stored: every outcome moves both or neither.
+    unchanged = (no_update, no_update)
     if not get_kovaaks_username():
         # ``no_update``: the field already reads "N/A · set your KovaaK's
         # username in Settings", so only the toast is new.
-        return no_update, *channel_toast(
+        return *unchanged, *channel_toast(
             _rank_refresh_username_unset_notification(), toast_channels
         )
 
@@ -948,7 +1010,7 @@ def refresh_rank(  # noqa: PLR0911
         )
     except Exception:  # noqa: BLE001
         logger.exception('Manual rank refresh failed for "%s"', selected_scenario)
-        return no_update, *channel_toast(
+        return *unchanged, *channel_toast(
             _rank_refresh_problem_notification(served_stale=False), toast_channels
         )
 
@@ -959,7 +1021,7 @@ def refresh_rank(  # noqa: PLR0911
             selected_scenario,
             rank_info.error_message,
         )
-        return no_update, *channel_toast(
+        return *unchanged, *channel_toast(
             _rank_refresh_problem_notification(served_stale=False), toast_channels
         )
 
@@ -968,14 +1030,14 @@ def refresh_rank(  # noqa: PLR0911
     rank_text = format_scenario_rank(rank_info)
     hint = _derive_rank_hint(rank_info)
     _last_rank_hints[selected_scenario] = (rank_text, hint)
-    display = _rank_display(rank_text, hint)
+    shown = (_rank_display(rank_text, hint), _rank_updated_ts(rank_info))
     if rank_info.served_stale:
         logger.warning(
             'Manual rank refresh for "%s" served a cached position: %s',
             selected_scenario,
             rank_info.warning_message,
         )
-        return display, *channel_toast(
+        return *shown, *channel_toast(
             _rank_refresh_problem_notification(
                 served_stale=True,
                 has_total=rank_info.total_players is not None,
@@ -989,7 +1051,7 @@ def refresh_rank(  # noqa: PLR0911
             'Manual rank refresh for "%s" could not re-read the leaderboard total.',
             selected_scenario,
         )
-        return display, *channel_toast(
+        return *shown, *channel_toast(
             _rank_refresh_total_failed_notification(
                 selected_scenario,
                 has_total=rank_info.total_players is not None,
@@ -1000,7 +1062,7 @@ def refresh_rank(  # noqa: PLR0911
                 _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
             ),
         )
-    return display, *channel_toast(
+    return *shown, *channel_toast(
         _rank_refresh_success_notification(selected_scenario),
         toast_channels,
         clears=(
@@ -1130,11 +1192,15 @@ def _build_live_run_notification(
 
     shown_percentage = _shown_percentage(verdict)
     if verdict.passed:
-        detail = f"Also {placement}." if placed else "Ready to move on."
+        # A pass ends at the fact: a line saying what to do next would be
+        # advice, and the app states verdicts only.
+        message = f"{score}, {shown_percentage:.1f}% of PB."
+        if placed:
+            message += f" Also {placement}."
         return toast(
             _RUN_VERDICT_CHANNEL,
             "Threshold passed",
-            f"{score}, {shown_percentage:.1f}% of PB. {detail}",
+            message,
             color="green",
             icon=local_icon("material-symbols:check"),
         )
@@ -1543,25 +1609,52 @@ def _local_scenario_options() -> list:
     return get_scenario_names() if get_usable_stats_dir() else []
 
 
+def _playlist_table_link(playlist_code: str) -> dmc.Text:
+    """Build the link from the playlist filter to that playlist's scenario table."""
+    return dmc.Text(
+        dmc.Anchor(
+            PLAYLIST_TABLE_LINK_LABEL,
+            # The bare path, with no ``?sort=``: the table opens in playlist
+            # order, as it does from the Playlists page.
+            href=f"/playlists/{playlist_code}",
+            inherit=True,
+            refresh=False,
+        ),
+        # The spacing rides on the link, not on a gap in the column, so the
+        # holder takes no room while it is empty.
+        mt="xs",
+        size="sm",
+    )
+
+
 @callback(
     Output("scenario-dropdown-selection", "data"),
+    Output(PLAYLIST_TABLE_LINK_ID, "children"),
     Input("playlist-dropdown-selection", "value"),
     # Scheduling, not data: this Input looks removable and is not. The value
     # above is an output of ``apply_deep_link``, and the renderer prunes a
     # ready callback whose every Input is a declared output of a group member
     # that already ran and whose none was actually written. On a visit with no
     # ``?playlist_code=`` that callback returns ``no_update``, so without a
-    # second Input nothing writes this list and the scenario dropdown keeps
-    # the layout's full local set while the filter names a playlist. Nothing
-    # writes this store, so the prune's "every Input covered" test fails and
-    # the initial call survives. See the 2026-09-19 decision-log entry.
+    # second Input nothing writes these outputs: the scenario dropdown keeps
+    # the layout's full local set while the filter names a playlist, and that
+    # playlist's link never appears. Nothing writes this store, so the prune's
+    # "every Input covered" test fails and the initial call survives. See the
+    # 2026-09-19 decision-log entry.
     Input(HOME_DEEP_LINK_STORE_ID, "data"),
 )
 def select_playlist(selected_playlist, _deep_link):
-    """List scenarios for the selected playlist or all local scenarios."""
+    """List the selected playlist's scenarios and link to its scenario table.
+
+    With no playlist selected, or a remembered code that no longer resolves,
+    the list is every local scenario and there is no link.
+    """
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return _local_scenario_options()
-    return get_scenarios_from_playlist_code(selected_playlist)
+        return _local_scenario_options(), None
+    return (
+        get_scenarios_from_playlist_code(selected_playlist),
+        _playlist_table_link(selected_playlist),
+    )
 
 
 def _stats_dir_hint() -> list:
@@ -2128,6 +2221,7 @@ def layout(
 ):
     """Build the interactive home dashboard."""
     config = get_config()
+    playlist_options = get_visible_playlist_selector_options()
     scenario_options = _home_scenario_options(playlist_code)
 
     return dmc.Box(
@@ -2149,6 +2243,7 @@ def layout(
                 id="last-played-empty-value",
                 data="",
             ),
+            dcc.Store(id="rank-updated-ts"),  # raw epoch for the Position hover
             dcc.Interval(
                 id="startup-playlist-warning-interval",
                 interval=250,
@@ -2175,28 +2270,41 @@ def layout(
                     dmc.GridCol(
                         dmc.Flex(
                             children=[
-                                dmc.Select(
-                                    **PLAYLIST_SELECTOR_PRESET,
-                                    allowDeselect=False,
-                                    autoSelectOnBlur=True,
-                                    clearSearchOnFocus=True,
-                                    clearable=True,
-                                    data=get_visible_playlist_selector_options(),
-                                    id="playlist-dropdown-selection",
-                                    label="Playlist filter",
-                                    persistence=True,
-                                    # Never the query parameter, and never
-                                    # omitted. Dash pins a persisted edit to
-                                    # the layout value it was made against and
-                                    # discards the edit when a later visit
-                                    # renders a different one, so a default
-                                    # that varies per visit silently retires
-                                    # persistence. ``apply_deep_link`` carries
-                                    # the query parameter instead. Explicit
-                                    # ``None`` because an omitted prop is
-                                    # ``undefined``, which no longer matches
-                                    # what a browser already stored.
-                                    value=None,
+                                dmc.Box(
+                                    [
+                                        dmc.Select(
+                                            **PLAYLIST_SELECTOR_PRESET,
+                                            allowDeselect=False,
+                                            autoSelectOnBlur=True,
+                                            clearSearchOnFocus=True,
+                                            clearable=True,
+                                            data=playlist_options,
+                                            id="playlist-dropdown-selection",
+                                            label="Playlist filter",
+                                            persistence=True,
+                                            # Never the query parameter, and
+                                            # never omitted. Dash pins a
+                                            # persisted edit to the layout
+                                            # value it was made against and
+                                            # discards the edit when a later
+                                            # visit renders a different one,
+                                            # so a default that varies per
+                                            # visit silently retires
+                                            # persistence. ``apply_deep_link``
+                                            # carries the query parameter
+                                            # instead. Explicit ``None``
+                                            # because an omitted prop is
+                                            # ``undefined``, which no longer
+                                            # matches what a browser already
+                                            # stored.
+                                            value=None,
+                                        ),
+                                        dmc.Box(id=PLAYLIST_TABLE_LINK_ID),
+                                    ],
+                                    className=PLAYLIST_FIELD_CLASS,
+                                    # The column, not the Select inside it, is
+                                    # the flex item this row breaks lines on.
+                                    **PLAYLIST_SELECTOR_SIZING,
                                 ),
                                 dmc.Stack(
                                     [
@@ -2242,7 +2350,7 @@ def layout(
                                     # The column, not the Select inside it, is
                                     # the flex item this row breaks lines on.
                                     # Mirrors the playlist filter beside it;
-                                    # see PLAYLIST_SELECTOR_PRESET for why the
+                                    # see PLAYLIST_SELECTOR_SIZING for why the
                                     # basis is the floor and not the 400px
                                     # target.
                                     flex="1 1 200px",
@@ -2341,10 +2449,16 @@ def layout(
                                                         # (like "Last played:"
                                                         # above).
                                                         dcc.Loading(
-                                                            dmc.Text(
-                                                                id="scenario_rank",
-                                                                span=True,
-                                                                size="sm",
+                                                            dmc.Tooltip(
+                                                                dmc.Text(
+                                                                    id="scenario_rank",
+                                                                    span=True,
+                                                                    size="sm",
+                                                                ),
+                                                                disabled=True,
+                                                                events=TOOLTIP_EVENTS,
+                                                                id="rank-updated-tooltip",
+                                                                label="",
                                                             ),
                                                             delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
                                                             show_initially=False,
