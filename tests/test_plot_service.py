@@ -1,9 +1,11 @@
-from datetime import datetime
+import json
+from datetime import date, datetime
 
 import plotly.graph_objs as go
 
 from source.kovaaks.data_models import Rank, RecordedSensitivity, RunData
 from source.plot.plot_service import (
+    NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
     _add_rank_overlays,
@@ -143,6 +145,118 @@ def test_generate_time_plot_has_expected_traces() -> None:
     assert len(fig.data) == 2
     assert fig.data[0].name == "Run data point"
     assert fig.data[1].name == "Average score"
+
+
+def test_time_plot_stars_each_plotted_new_pb_in_a_third_trace() -> None:
+    first = _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))
+    second = _build_run(110.0, 2.0, datetime(2025, 1, 1, 11, 0, 0))
+    third = _build_run(120.0, 2.0, datetime(2025, 1, 2, 10, 0, 0))
+    data = {date(2025, 1, 1): [first, second], date(2025, 1, 2): [third]}
+
+    fig = generate_time_plot(data, "1w4ts", False, [], False, {second, third})
+
+    # After Average score, so the stars are drawn over the other two traces.
+    assert [trace.name for trace in fig.data] == [
+        "Run data point",
+        "Average score",
+        "New PB",
+    ]
+    stars = fig.data[2]
+    assert stars.mode == "markers"
+    assert stars.hoverinfo == "skip"
+    assert stars.marker.symbol == "star"
+    assert stars.marker.size == 12
+    assert stars.marker.color == "#fab005"
+    assert stars.marker.line.color == "#5f3d00"
+    assert stars.marker.line.width == 1
+    assert list(zip(stars.x, stars.y, strict=True)) == [
+        (date(2025, 1, 1), 110.0),
+        (date(2025, 1, 2), 120.0),
+    ]
+    # The run trace still holds every run, so hiding the stars from the
+    # legend leaves an ordinary point where each one was.
+    assert list(fig.data[0].y) == [100.0, 110.0, 120.0]
+
+
+def test_new_pb_stars_reach_the_browser_on_their_run_points_date_values() -> None:
+    first = _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))
+    second = _build_run(110.0, 2.0, datetime(2025, 1, 1, 11, 0, 0))
+    third = _build_run(120.0, 2.0, datetime(2025, 1, 2, 10, 0, 0))
+    data = {date(2025, 1, 1): [first, second], date(2025, 1, 2): [third]}
+
+    fig = generate_time_plot(data, "1w4ts", False, [], False, {second, third})
+    runs, _average, stars = json.loads(fig.to_json())["data"]
+
+    # The two traces are built from different sources. A star whose x value
+    # serialized differently from its run's would sit beside the point.
+    assert runs["x"] == ["2025-01-01", "2025-01-01", "2025-01-02"]
+    assert stars["x"] == ["2025-01-01", "2025-01-02"]
+
+
+def test_time_plot_has_no_new_pb_trace_when_no_plotted_run_is_one() -> None:
+    plotted = _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))
+    filtered_out = _build_run(90.0, 2.0, datetime(2024, 12, 31, 10, 0, 0))
+    data = {date(2025, 1, 1): [plotted]}
+
+    for new_high_score_runs in ((), {filtered_out}):
+        fig = generate_time_plot(data, "1w4ts", False, [], False, new_high_score_runs)
+
+        assert [trace.name for trace in fig.data] == ["Run data point", "Average score"]
+
+
+def test_new_pb_star_belongs_to_the_run_and_not_to_its_position() -> None:
+    # The day's filter kept the later of two equal scores and dropped the
+    # earlier one, which is the run that set the PB.
+    new_pb = _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))
+    kept_tie = _build_run(100.0, 2.0, datetime(2025, 1, 1, 11, 0, 0))
+    data = {date(2025, 1, 1): [kept_tie]}
+
+    fig = generate_time_plot(data, "1w4ts", False, [], False, {new_pb})
+
+    assert [trace.name for trace in fig.data] == ["Run data point", "Average score"]
+
+
+def test_time_plot_draws_a_new_pb_after_the_runs_that_share_its_point() -> None:
+    # One day as ``get_time_vs_runs`` returns it: ascending by score, ties in
+    # time order. Each run has its own sensitivity so the points can be told
+    # apart.
+    lower = _build_run(80.0, 1.0, datetime(2025, 1, 1, 9, 0, 0))
+    new_pb = _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 1, 0))
+    tie = _build_run(100.0, 3.0, datetime(2025, 1, 1, 10, 5, 0))
+    later_tie = _build_run(100.0, 4.0, datetime(2025, 1, 1, 10, 9, 0))
+    higher = _build_run(110.0, 5.0, datetime(2025, 1, 1, 10, 30, 0))
+    day_runs = [lower, new_pb, tie, later_tie, higher]
+    data = {date(2025, 1, 1): day_runs}
+
+    def sensitivities(fig: go.Figure) -> list[str]:
+        return [row[2] for row in fig.data[0].customdata]
+
+    plain = generate_time_plot(data, "1w4ts", False, [])
+    starred = generate_time_plot(data, "1w4ts", False, [], False, {new_pb, higher})
+
+    assert sensitivities(plain) == [
+        "1.0 Overwatch",
+        "2.0 Overwatch",
+        "3.0 Overwatch",
+        "4.0 Overwatch",
+        "5.0 Overwatch",
+    ]
+    # plotly answers a hover at a shared point with the last point there, so
+    # the run that set the PB has to be the last of the three at 100.
+    assert sensitivities(starred) == [
+        "1.0 Overwatch",
+        "3.0 Overwatch",
+        "4.0 Overwatch",
+        "2.0 Overwatch",
+        "5.0 Overwatch",
+    ]
+    # Only the order within the trace changed: the same scores at the same
+    # positions, one star for the three runs at 100, and the same average.
+    assert list(starred.data[0].y) == list(plain.data[0].y)
+    assert list(starred.data[0].x) == list(plain.data[0].x)
+    assert list(starred.data[2].y) == [100.0, 110.0]
+    assert list(starred.data[1].y) == list(plain.data[1].y) == [98.0]
+    assert day_runs == [lower, new_pb, tie, later_tie, higher]
 
 
 def test_score_plots_lay_the_legend_above_the_plot() -> None:
@@ -408,6 +522,34 @@ def test_apply_point_appearance_ignores_values_it_does_not_recognize() -> None:
     figure = apply_point_appearance(_point_figure(), "Small", "#12345")
     assert figure.data[1].marker.size == POINT_SIZE_PRESET_PX["Small"]
     assert figure.data[1].marker.color is None
+
+
+def test_apply_point_appearance_sizes_the_new_pb_trace_by_name() -> None:
+    def starred_figure() -> go.Figure:
+        # Stars first, so a selection by index would size the wrong trace.
+        return go.Figure(
+            data=[
+                go.Scatter(
+                    name=NEW_PB_TRACE_NAME,
+                    y=[2],
+                    marker={"symbol": "star", "size": 12, "color": "#fab005"},
+                ),
+                go.Scatter(name="Average score", y=[1, 2]),
+                go.Scatter(name=RUN_DATA_POINT_TRACE_NAME, y=[1, 2]),
+            ]
+        )
+
+    for point_size, star_size in (("Small", 9), ("Default", 12), ("Large", 16)):
+        figure = apply_point_appearance(starred_figure(), point_size, "#1c7ed6")
+        stars, average, run_trace = figure.data
+
+        assert stars.marker.size == star_size
+        # Point color is the run points' alone.
+        assert stars.marker.color == "#fab005"
+        assert stars.marker.symbol == "star"
+        assert run_trace.marker.size == POINT_SIZE_PRESET_PX.get(point_size)
+        assert run_trace.marker.color == "#1c7ed6"
+        assert average.marker.size is None
 
 
 def test_apply_point_appearance_tolerates_figures_without_a_run_trace() -> None:

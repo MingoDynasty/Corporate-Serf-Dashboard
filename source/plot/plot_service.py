@@ -4,7 +4,7 @@ This module handles functions around plots.
 
 import logging
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Generic, TypeVar
@@ -40,6 +40,21 @@ POINT_SIZE_DEFAULT = "Default"
 # changes flow through without migrating a stored pixel count.
 POINT_SIZE_OPTIONS = ("Small", POINT_SIZE_DEFAULT, "Large")
 POINT_SIZE_PRESET_PX = {"Small": 4, "Large": 10}
+
+# The trace of stars on the Score vs Time runs that set a new PB, and the
+# handle the Point size preference sizes it by. Its name is the legend entry.
+NEW_PB_TRACE_NAME = "New PB"
+# One gold for both themes. On the light plot background the fill alone is
+# too faint to find, so the dark outline is what carries the mark there, and
+# the star shape keeps it apart from run points set to the same gold.
+_NEW_PB_FILL_COLOR = "#fab005"
+_NEW_PB_OUTLINE_COLOR = "#5f3d00"
+# A star reads smaller than a circle of the same size, so each of these is
+# about twice the run point's size at that preset. The Default size is
+# written into the generated figure, where the run points leave theirs to
+# plotly: plotly's default is the run point's size, not a star's.
+NEW_PB_SIZE_DEFAULT_PX = 12
+NEW_PB_SIZE_PRESET_PX = {"Small": 9, "Large": 16}
 
 # The run points' sensitivity hover line, shared by both chart modes so they
 # can't drift apart. ``customdata[3]`` is empty for a run that wasn't converted,
@@ -215,6 +230,29 @@ def _recorded_sensitivity_suffix(run_data: RunData) -> str:
     )
 
 
+def _new_high_scores_last(
+    runs: list[RunData],
+    new_high_score_runs: Collection[RunData],
+) -> list[RunData]:
+    """Order a group's runs so a new PB follows the runs that tie its score.
+
+    A group's runs with one score are drawn at one point, and plotly.js
+    answers a hover there with whichever comes last in the trace (observed on
+    the bundled plotly.js, not documented). In time order that is the later
+    run, which only tied the PB, so the star's hover would name the wrong
+    run. Nothing else moves, and a group with no new PB keeps its order.
+    """
+    last_with_score = {run.score: index for index, run in enumerate(runs)}
+
+    def draw_order(indexed_run: tuple[int, RunData]) -> tuple[int, bool]:
+        index, run = indexed_run
+        if run in new_high_score_runs:
+            return last_with_score[run.score], True
+        return index, False
+
+    return [run for _, run in sorted(enumerate(runs), key=draw_order)]
+
+
 def _generate_xy_plot(  # noqa: PLR0913
     scenario_data: dict[_K, list[RunData]],
     scenario_name: str,
@@ -222,18 +260,15 @@ def _generate_xy_plot(  # noqa: PLR0913
     rank_data: list[Rank],
     show_all_ranks: bool,
     axis: _AxisDescriptor[_K],
+    new_high_score_runs: Collection[RunData],
 ) -> go.Figure:
-    """
-    Build a scatter-plus-average-line score plot against a configurable x axis.
+    """Build a scatter-plus-average-line score plot against a configurable x axis.
 
-    :param scenario_data: the scenario data to use for the plot.
-    :param scenario_name: the name of the scenario to use for the plot.
-    :param rank_overlay_switch: enable/disable rank overlay.
-    :param rank_data: an optional list of ranks to plot.
-    :param show_all_ranks: draw the full rank ladder instead of the bracketing
-        selection around the plotted score range.
-    :param axis: descriptor for the x column, values, and hover label.
-    :return: go.Figure Plot
+    ``axis`` describes the x column, its values, and the hover labels.
+    ``show_all_ranks`` draws the full rank ladder instead of the bracketing
+    selection around the plotted score range. Each run in
+    ``new_high_score_runs`` that ``scenario_data`` holds gets a star, in a
+    trace that exists only when there is one to draw.
     """
     if not scenario_data:
         return generate_empty_plot(
@@ -257,12 +292,22 @@ def _generate_xy_plot(  # noqa: PLR0913
         "Score": [],
         axis_title: [],
     }
+    new_pb_x: list[float | str | date] = []
+    new_pb_scores: list[float] = []
 
     for key, runs_data in scenario_data.items():
-        for run_data in runs_data:
+        for run_data in _new_high_scores_last(runs_data, new_high_score_runs):
+            x_value = axis.scatter_x(key, run_data)
             scores.append(run_data.score)
             scatter_plot_data["Score"].append(run_data.score)
-            scatter_plot_data[axis_title].append(axis.scatter_x(key, run_data))
+            scatter_plot_data[axis_title].append(x_value)
+            # Matched on the run, never on where it is plotted. A later run
+            # the same day with the same score sits at the same point, and
+            # the day's filter can keep that tie while dropping the new PB,
+            # so a match on position would star a run that never beat the PB.
+            if run_data in new_high_score_runs:
+                new_pb_x.append(x_value)
+                new_pb_scores.append(run_data.score)
             scatter_plot_data["Datetime"].append(
                 format_absolute_timestamp(
                     run_data.datetime_object, include_seconds=True
@@ -356,6 +401,25 @@ def _generate_xy_plot(  # noqa: PLR0913
     figure_combined["data"][0]["showlegend"] = True
     figure_combined["data"][1]["name"] = "Average score"
     figure_combined["data"][1]["showlegend"] = True
+    if new_pb_x:
+        figure_combined.add_trace(
+            go.Scatter(
+                x=new_pb_x,
+                y=new_pb_scores,
+                mode="markers",
+                name=NEW_PB_TRACE_NAME,
+                # The run point under each star already answers a hover with
+                # that run's time, sensitivity, and accuracy. A label from
+                # this trace would compete for the same point with less to say.
+                hoverinfo="skip",
+                marker={
+                    "symbol": "star",
+                    "size": NEW_PB_SIZE_DEFAULT_PX,
+                    "color": _NEW_PB_FILL_COLOR,
+                    "line": {"color": _NEW_PB_OUTLINE_COLOR, "width": 1},
+                },
+            )
+        )
 
     _add_rank_overlays(
         figure_combined,
@@ -401,25 +465,30 @@ def generate_sensitivity_plot(
             # rather than repeating it.
             hover_point_lines=_RUN_SENSITIVITY_HOVER_LINE,
         ),
+        # Empty on purpose: the stars are Score vs Time's alone. This chart
+        # keeps only the top scores at each sensitivity, so it would draw the
+        # latest new PBs and silently leave out the ones since beaten.
+        new_high_score_runs=(),
     )
 
 
-def generate_time_plot(
+def generate_time_plot(  # noqa: PLR0913
     scenario_data: dict[date, list[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
     show_all_ranks: bool = False,
+    new_high_score_runs: Collection[RunData] = (),
 ) -> go.Figure:
-    """
-    Generate a plot using the scenario data.
-    :param scenario_data: the scenario data to use for the plot.
-    :param scenario_name: the name of the scenario to use for the plot.
-    :param rank_overlay_switch: enable/disable rank overlay.
-    :param rank_data: an optional list of ranks to plot.
-    :param show_all_ranks: draw the full rank ladder instead of the bracketing
-        selection around the plotted score range.
-    :return: go.Figure Plot
+    """Build the Score vs Time figure from a scenario's kept runs, grouped by day.
+
+    ``new_high_score_runs`` is the scenario's new PBs, judged over its whole
+    history and not over ``scenario_data``, which holds only the runs the
+    page's filters kept. Each one that is plotted gets a star in a third
+    trace, named ``NEW_PB_TRACE_NAME`` and drawn over the other two, and with
+    none plotted the figure has no such trace. ``show_all_ranks`` draws the
+    full rank ladder instead of the bracketing selection around the plotted
+    score range.
     """
     return _generate_xy_plot(
         scenario_data,
@@ -436,6 +505,7 @@ def generate_time_plot(
             # A day's runs can span sensitivities, so each point names its own.
             hover_point_lines="<b>Date</b>: %{x}<br>" + _RUN_SENSITIVITY_HOVER_LINE,
         ),
+        new_high_score_runs=new_high_score_runs,
     )
 
 
@@ -474,17 +544,16 @@ def apply_point_appearance(
     point_size: str | None,
     point_color: str | None,
 ) -> go.Figure:
-    """Apply the Run Data Points preferences to the raw-run scatter trace.
+    """Apply the Run Data Points preferences to a themed figure, in place.
 
-    Runs after the theme template, so an explicit color wins over the
-    colorway the template just applied. Everything unrecognized falls through
-    to the generated appearance: the Default size, an empty or malformed
-    color, a figure whose traces are the empty state's (none), and a figure
-    from a version that named its traces differently.
-    :param figure: themed figure to restyle in place.
-    :param point_size: a value from ``POINT_SIZE_OPTIONS``, or anything else.
-    :param point_color: a hex color string, or anything else for Default.
-    :return: the same figure, restyled where the preferences applied.
+    ``point_size`` is a value from ``POINT_SIZE_OPTIONS`` and ``point_color``
+    a hex color string. Both restyle the raw-run trace, and the size also
+    sizes the New PB stars, which keep their own fill and outline whatever
+    the color. Runs after the theme template, so an explicit color wins over
+    the colorway the template just applied. Everything unrecognized falls
+    through to the generated appearance: the Default size, an empty or
+    malformed color, a figure whose traces are the empty state's (none), and
+    a figure from a version that named its traces differently.
     """
     marker: dict[str, int | str] = {}
     size = POINT_SIZE_PRESET_PX.get(point_size or "")
@@ -492,11 +561,17 @@ def apply_point_appearance(
         marker["size"] = size
     if isinstance(point_color, str) and _HEX_COLOR_PATTERN.fullmatch(point_color):
         marker["color"] = point_color
-    if not marker:
-        return figure
-    # Merges into whatever marker the trace already carries, and selects
-    # nothing at all on figures without a raw-run trace.
-    figure.update_traces(marker=marker, selector={"name": RUN_DATA_POINT_TRACE_NAME})
+    # Each update merges into whatever marker its trace already carries, and
+    # selects nothing at all on a figure without a trace of that name.
+    if marker:
+        figure.update_traces(
+            marker=marker, selector={"name": RUN_DATA_POINT_TRACE_NAME}
+        )
+    new_pb_size = NEW_PB_SIZE_PRESET_PX.get(point_size or "")
+    if new_pb_size is not None:
+        figure.update_traces(
+            marker={"size": new_pb_size}, selector={"name": NEW_PB_TRACE_NAME}
+        )
     return figure
 
 
