@@ -345,6 +345,53 @@ The app consumes only `playlist_name`, `playlist_code`, and
 `Evxl*` models in `api_models.py`). The stored code is Evxl's canonical
 `playlist_code`, never the pasted input.
 
+## Evxl benchmark pages (linked, never fetched)
+
+Not an endpoint. These are two page addresses on Evxl's site that a
+benchmark's scenario page links to. The app builds the address and the user's
+browser opens it; the app requests nothing from Evxl for it.
+
+```text
+https://evxl.app/u/{steamId64}/{benchmarkName}/{difficultyName}
+https://evxl.app/benchmarks/{benchmarkName}
+```
+
+Observed behavior, measured 2026-10-04 by opening the addresses in a browser:
+
+- The first is one player's sheet for one difficulty. The second asks for a
+  Steam profile and a difficulty, with the benchmark's first difficulty
+  preselected. It takes no difficulty segment:
+  `/benchmarks/{benchmarkName}/{difficultyName}` is Evxl's 404 page.
+- Both names are Evxl's own, the `benchmarkName` and `difficultyName` of the
+  benchmark snapshot, matched exactly and case-sensitively. They are not the
+  KovaaK's playlist name: the playlist "Viscose Benchmark S2 - Medium" is
+  "Viscose Benchmarks S2" and "Medium" on Evxl. A lowercased or unknown name
+  is the 404 page.
+- Evxl appends `?tab=` itself, from the tab the visitor last used, so an
+  address the app builds carries no query.
+- The sheet address resolved for every name tried, each segment
+  percent-encoded on its own: spaces, `( )`, `[ ]`, `'`, `!`, `#`, `&`, `:`,
+  `+`, a `/` sent as `%2F`, and non-ASCII such as `β` and `✯`. Evxl's own
+  links to these sheets encode the same way.
+- The profile-less address answered 404 for every benchmark name holding `+`,
+  `/`, `&`, or `:`, percent-encoded or not ("Aimerz+ S1", "NRS 360 / Macro
+  Benchmarks", "m0narcS & hizku Tracking", "SCP: Roleplay Benchmark"), and
+  resolved for names holding spaces, `( )`, `[ ]`, and non-ASCII. The four
+  that fail are among the characters JavaScript's `decodeURI` leaves encoded
+  (`; / ? : @ & = + $ , #`), which fits a route that decodes with it. That
+  cause is inferred, not confirmed. `evxl_links.py` offers no profile-less
+  address for a name holding any character of that set, which covered 14
+  benchmark names and 25 bundled files on that date.
+- A snapshot `sharecode` can differ in letter case from the code its bundled
+  file carries, the casing drift noted under the benchmark endpoint: "Revosect
+  S4 / Easy" is `KovaaKsExitFraggingWideCamp` in the snapshot and
+  `KovaaKsExitfraggingWideCamp` in the file. Matched case-folded, all 261
+  bundled files found their names, and no two snapshot codes differed only by
+  case.
+
+The app consumes only `benchmarkName`, `difficulties[].difficultyName`, and
+`difficulties[].sharecode` from the snapshot (see `evxl_links.py`).
+
 ## `/game-settings`
 
 Not called at runtime. The app carries a capture of it instead:

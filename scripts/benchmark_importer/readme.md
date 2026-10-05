@@ -15,7 +15,11 @@ thresholds.
 1. Unless `--offline` is set, validate the live
    [Evxl benchmarks data](https://evxl.app/data/benchmarks) and atomically
    refresh `resources/evxl/benchmarks.json`. A live candidate that removes any
-   existing sharecode is rejected unless `--accept-removals` is set.
+   existing sharecode is rejected unless `--accept-removals` is set. The app
+   reads this snapshot too, for the benchmark and difficulty names behind a
+   benchmark page's "View on Evxl" link, so a committed refresh changes those
+   links
+   ([decision log](../../docs/decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 2. Resolve each playlist name and code through Evxl, fetch its rank thresholds
    from KovaaK's, and merge the data.
 3. Write benchmark JSON to `scripts/benchmark_importer/generated/`, with
