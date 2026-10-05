@@ -55,7 +55,7 @@ dash.register_page(
 AUTO_SIZE_COLUMN_KEYS = [
     "last_played_sort",
     "runs_sort",
-    "rank_sort",
+    "position_sort",
     "total_sort",
     "percentile_sort",
     "high_score_sort",
@@ -111,12 +111,14 @@ TABLE_COLUMN_DEFS = [
     },
     {
         "headerName": "Position",
-        "field": "rank_sort",
+        "field": "position_sort",
         "valueFormatter": {
-            "function": "params.data.rank_pending ? '' : params.data.rank_display"
+            "function": "params.data.position_pending ? '' : params.data.position_display"
         },
         "cellClass": {
-            "function": ("params.data.rank_pending ? 'playlist-rank-pending' : null")
+            "function": (
+                "params.data.position_pending ? 'playlist-rank-pending' : null"
+            )
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -243,7 +245,7 @@ SORT_URL_NAMES = {
     "scenario": "scenario",
     "last-played": "last_played_sort",
     "runs": "runs_sort",
-    "position": "rank_sort",
+    "position": "position_sort",
     "total-players": "total_sort",
     "percentile": "percentile_sort",
     "pb-score": "high_score_sort",
@@ -369,7 +371,7 @@ def load_playlist_scenario_rows(playlist_code):
 def _clear_pending_flags(rows: list[dict]) -> None:
     """Settle every position cell for rows no fill will ever update."""
     for row in rows:
-        row["rank_pending"] = False
+        row["position_pending"] = False
         row["total_pending"] = False
         row["percentile_pending"] = False
 

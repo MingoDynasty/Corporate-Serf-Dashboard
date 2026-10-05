@@ -109,8 +109,8 @@ def test_format_playlist_scenario_rank_row_ranked():
         "scenario": "VT Pasu Intermediate S5",
         "playlist_order": 3,
         "status": "RANKED",
-        "rank_display": "11,290",
-        "rank_sort": 11290,
+        "position_display": "11,290",
+        "position_sort": 11290,
         "total_display": "63,892",
         "total_sort": 63892,
         "percentile_display": "82.33%",
@@ -136,8 +136,8 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
 
     row = format_playlist_scenario_rank_row("Unplayed Scenario", 0, rank_info)
 
-    assert row["rank_display"] == "Unranked"
-    assert row["rank_sort"] is None
+    assert row["position_display"] == "Unranked"
+    assert row["position_sort"] is None
     assert row["total_display"] == "63,892"
     assert row["total_sort"] == 63892
     assert row["percentile_display"] == "N/A"
@@ -169,8 +169,8 @@ def test_format_playlist_scenario_rank_row_unknown():
         scenario_stats,
     )
 
-    assert row["rank_display"] == "N/A"
-    assert row["rank_sort"] is None
+    assert row["position_display"] == "N/A"
+    assert row["position_sort"] is None
     assert row["total_display"] == "N/A"
     assert row["total_sort"] is None
     assert row["percentile_display"] == "N/A"
@@ -330,14 +330,14 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert {row["scenario"] for row in rows} == {"First", "Second", "Third"}
     assert set(seen) == {"First", "Second", "Third"}
     assert [row["scenario"] for row in rows] == ["First", "Second", "Third"]
-    assert rows[0]["rank_display"] == "10"
-    assert rows[1]["rank_display"] == "N/A"
+    assert rows[0]["position_display"] == "10"
+    assert rows[1]["position_display"] == "N/A"
     assert rows[1]["status"] == "UNKNOWN"
     assert rows[1]["runs_display"] == "0"
     assert rows[1]["high_score_display"] == "N/A"
     assert rows[1]["pb_cm360_display"] == "N/A"
     assert rows[1]["pb_accuracy_display"] == "N/A"
-    assert rows[2]["rank_display"] == "30"
+    assert rows[2]["position_display"] == "30"
     assert rows[2]["runs_display"] == "30"
     assert rows[2]["high_score_display"] == "3,000.5"
     assert rows[2]["pb_cm360_display"] == "45"
@@ -584,9 +584,9 @@ def test_phase_one_pending_flags_are_explicit_per_cell():
         mark_unresolved_pending=True,
     )
 
-    assert row["rank_sort"] is None
-    assert row["rank_display"] == "Unranked"
-    assert row["rank_pending"] is False
+    assert row["position_sort"] is None
+    assert row["position_display"] == "Unranked"
+    assert row["position_pending"] is False
     assert row["total_pending"] is False
     assert row["percentile_pending"] is True
     assert row["href"].endswith("scenario=Cached+Unranked")
@@ -719,7 +719,7 @@ def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
     assert drain.terminal == "cancelled"
     assert drain.consuming_terminal is True
     assert len(drain.updates) == len(scenario_names)
-    assert all(row["rank_pending"] is False for row in drain.updates)
+    assert all(row["position_pending"] is False for row in drain.updates)
     assert all(row["total_pending"] is False for row in drain.updates)
     assert all(row["percentile_pending"] is False for row in drain.updates)
 
@@ -853,7 +853,7 @@ def test_new_fill_cancels_synchronously_and_banks_inflight_fetch(
     assert drain.terminal == "cancelled"
     assert drain.done_count == 0
     assert len(drain.updates) == 3
-    assert all(row["rank_pending"] is False for row in drain.updates)
+    assert all(row["position_pending"] is False for row in drain.updates)
     assert all(row["total_pending"] is False for row in drain.updates)
     assert all(row["percentile_pending"] is False for row in drain.updates)
 
