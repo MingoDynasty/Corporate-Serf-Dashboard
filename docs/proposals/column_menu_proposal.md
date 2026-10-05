@@ -181,9 +181,10 @@ the **Show hidden** switch and the **Import** button. On a playlist's scenario
 table it sits at the right end of the filter row.
 
 The button opens a menu of checkboxes, one per column, in table order, each
-labelled with the column's header. A checked column is shown. A change
-applies at once, and the menu stays open until the user clicks outside it or
-presses Escape, so several columns can be changed in one visit to the menu.
+labelled with the column's name in sentence case (the Copy block lists every
+label). A checked column is shown. A change applies at once, and the menu
+stays open until the user clicks outside it or presses Escape, so several
+columns can be changed in one visit to the menu.
 
 The menu lists every column except the ones that can't be hidden:
 
@@ -329,7 +330,8 @@ Every string this design adds:
 | Where | String | Why |
 |---|---|---|
 | Both pages, the button | `Columns` | Sentence case, as a control. One word that names what the menu holds. |
-| Menu checkboxes | The column's header, verbatim, such as `Last Played` and `PB Score` | The label is the column's name, so it takes the header's Title Case. Sentence case would put two casings of one name on one screen. |
+| Overview menu checkboxes | `Type`, `Benchmark ID`, `Played`, `Runs`, `Last played`, `Median percentile`, `Lowest percentile` | A checkbox is a control, so its label takes sentence case while the header it names keeps Title Case. The app already pairs the two: the chart's **PB score** switch names what the table's header calls PB Score. `ID` keeps its capitals. |
+| Scenario table menu checkboxes | `Leaderboard ID`, `Last played`, `Runs`, `Position`, `Total players`, `Percentile`, `PB score`, `Rank`, `Next rank`, `PB date`, `PB cm/360`, `PB accuracy` | The same rule. `ID`, `PB`, and `cm/360` keep their own casing. `Rank` and `Next rank` appear on a benchmark only. |
 | Overview header | `Benchmark ID` | Title Case, as every grid header. |
 | Overview header tooltip | `The number KovaaK's uses to identify this benchmark in its API.` | Says what the number is and where it is used. A sentence, so it takes a period. |
 | Scenario table header | `Leaderboard ID` | Title Case, as every grid header. |
@@ -416,10 +418,10 @@ build. More effort would buy polish, not correctness.
 - **The column definitions:** each ID column is hidden initially, not
   sortable, and carries the selectable class. Every other column is shown.
 - **The menu:** each table's menu lists exactly its hideable columns, in
-  table order, with the header as label. The name column and the action
-  cells are absent. Rank and Next Rank appear only on a benchmark. Every
-  checkbox's default matches its column's initial visibility and is the same
-  on a benchmark and a playlist.
+  table order, each with its Copy block label. The name column and the
+  action cells are absent. Rank and Next rank appear only on a benchmark.
+  Every checkbox's default matches its column's initial visibility and is
+  the same on a benchmark and a playlist.
 - **Navigation:** a click on the Benchmark ID cell does not open the
   playlist.
 - **Live check,** scripted in headless Edge against the real pages:
