@@ -382,7 +382,7 @@ def _generate_xy_plot(  # noqa: PLR0913
             "size": 14,
         },
         # Lay the legend out horizontally above the plot instead of taking
-        # Plotly's default right-hand column: two entries never earned a
+        # Plotly's default right-hand column: a few entries never earned a
         # reserved column, and the plot is the scarce thing on this page. It
         # lands in the top margin the title already reserved, so the plot area
         # keeps its full height and gains the column's width. Right-anchored

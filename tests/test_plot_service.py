@@ -261,7 +261,7 @@ def test_time_plot_draws_a_new_pb_after_the_runs_that_share_its_point() -> None:
 
 def test_score_plots_lay_the_legend_above_the_plot() -> None:
     # Horizontal and anchored above the plot area, so the legend stops
-    # reserving a right-hand column of chart width for its two entries.
+    # reserving a right-hand column of chart width for its few entries.
     day = datetime(2025, 1, 1).date()
     runs = [_build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))]
 
