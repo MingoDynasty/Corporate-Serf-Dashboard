@@ -40,7 +40,7 @@ differently:
 | `pandas-stubs` | the `dev` group, as a `~=` pin | follows pandas' major.minor line |
 | pre-commit ruff | `rev` in `.pre-commit-config.yaml` | must equal the locked ruff |
 | uv | `required-version` and the `uv_build` range in `pyproject.toml` | `gh api repos/astral-sh/uv/releases/latest --jq .tag_name` |
-| GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | the same `gh api` call, per action |
+| GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | the same `gh api` call, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
 The Python version is not part of a refresh. Moving it touches
@@ -123,27 +123,35 @@ CI needs no edit, because `setup-uv` reads the pin from `pyproject.toml`.
 
 ### GitHub Actions
 
-1. For each action in `.github/workflows/ci.yml`, find the latest release and
-   the commit it points at:
+A refresh reports these pins and does not move them on its own. The `test` job
+is this repository's copy of the
+[cross-repo tooling spec](decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)'s
+workflow. The spec, which the maintainer keeps outside this repository,
+carries these exact SHAs, and so does every other repository that follows it.
+Moving them here alone makes this copy drift from the spec.
+
+1. For each action in `.github/workflows/ci.yml`, find the latest release:
 
    ```powershell
    gh api repos/<owner>/<action>/releases/latest --jq .tag_name
-   gh api repos/<owner>/<action>/commits/<tag> --jq .sha
    ```
 
-2. Replace the SHA and the version comment on every `uses:` line for that
-   action. Read the release notes for each major version crossed.
+2. Name any pin that is behind in the PR body. Whether to move it in the spec
+   is the maintainer's call.
 
-3. Commit as `ci: bump pinned actions`, and name the pins that moved in the PR
-   body. The `test` job is this repository's copy of the
-   [cross-repo tooling spec](decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)'s
-   workflow, so a bump here makes it differ from the canonical one until that
-   moves too.
+When the maintainer says to move a pin, read the release notes for each major
+version crossed, and check the new SHA against its tag:
 
-The PR's CI runs a bumped action only in the `test` job. The `release-gate`
-and `release` jobs run on a push to `main`, so watch the first run on `main`
-after the merge. A failed release job can be rerun: it reuses its tag and
-resumes its draft.
+```powershell
+gh api repos/<owner>/<action>/commits/<tag> --jq .sha
+```
+
+Replace the SHA and the version comment on every `uses:` line for that action,
+the release jobs' lines included, and commit as `ci: bump pinned actions`. The
+PR's CI runs a bumped action only in the `test` job. The `release-gate` and
+`release` jobs run on a push to `main`, so watch the first run on `main` after
+the merge. A failed release job can be rerun: it reuses its tag and resumes
+its draft.
 
 ## Verify by what moved
 
