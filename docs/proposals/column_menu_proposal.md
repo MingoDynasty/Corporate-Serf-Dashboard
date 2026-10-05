@@ -16,16 +16,17 @@ hidden.
 
 ## Decisions needed
 
-Two product judgments. Nothing is ratified. The maintainer proposed this
-shape in the design chat on 2026-10-04 and stated a lean on D1 there. A lean
-is recorded below as a lean and stays open to challenge. Everything else in
-this proposal, including the Copy and Terms blocks, is author-owned.
+Two rulings. The maintainer ratified both on 2026-10-05, after every reviewer
+had endorsed both rows at their current text. Each keeps its recommendation
+and the alternatives it rejected, for the record. The maintainer had proposed
+this shape in the design chat on 2026-10-04: hidden-by-default ID columns
+with a show and hide option, and a menu that covers every column. Everything
+else in this proposal, including the Copy and Terms blocks, is author-owned.
 
 ### D1 — The IDs are optional columns, behind a Columns menu that covers every column
 
-Status: open. Maintainer lean (chat, 2026-10-04): this recommendation. The
-maintainer proposed hidden-by-default ID columns with a show and hide option,
-and, asked what the menu should cover, chose every column.
+Status: Ratified (user), 2026-10-05: accept the recommendation below,
+including the sort amendment its material consequence names.
 
 **Recommendation: one ID column per table, hidden by default, and a Columns
 menu that lists every column except the name column and the overview's two
@@ -59,12 +60,12 @@ General hiding also narrows a ruled contract. The scenario table's sort was
 ruled to survive Back, Forward, a reload, and a copied link. Under this
 recommendation a sort on a column the browser has hidden is dropped on
 arrival and removed from the address, because the alternative is rows ordered
-by a column that is off screen (Design, Sort interplay). Accepting D1 accepts
-that amendment.
+by a column that is off screen (Design, Sort interplay). The ratification of
+D1 covers that amendment.
 
 ### D2 — Column choices are remembered in the browser, one set per table, shared by every playlist
 
-Status: open. No lean stated.
+Status: Ratified (user), 2026-10-05: accept the recommendation below.
 
 **Recommendation: each column's shown or hidden state is kept in the
 browser's local storage, the way the Show hidden switch is.** The scenario
@@ -446,7 +447,8 @@ standing sections:
 
 ## Delivery plan
 
-One implementation PR, gated on D1 and D2:
+One implementation PR, with no dependencies. D1 and D2 are ratified, so it
+can start once this proposal merges:
 
 - The shared menu and its clientside callback, wired into both tables.
 - The two ID columns: the bundled loader's benchmark-ID side table, the
