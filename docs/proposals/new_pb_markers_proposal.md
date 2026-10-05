@@ -210,11 +210,15 @@ player reached and when, as the celebration does. They are not a judgment of
 skill, and they are not a trend. A PB only rises, so a row of stars can't
 show a decline, and after one lucky run it reads as a plateau. Whether the
 player is improving stays the trend verdict's question, answered from session
-medians. On this chart the Average score line remains the read of how the
-scenario usually plays.
+medians.
+
+This chart has no typical-run read of its own. Its Average score line
+averages only the runs each day plots, the top N, so on a busy day it is the
+average of that day's best.
 
 The cost to weigh under M1 is emphasis. Gold stars draw the eye to the best
-runs, on a chart whose reading of skill is moving toward the typical run.
+runs, on a chart that already plots each day's best, in an app whose reading
+of skill is moving toward the typical run.
 
 The other two rules need nothing from this design. A star is a fact about a
 run, with no estimate in it and no advice.
