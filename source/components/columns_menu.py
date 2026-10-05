@@ -28,44 +28,78 @@ class MenuColumn(NamedTuple):
 # ``columnState`` with ``applyOrder: true``, so the write would also set the
 # column order, and resent definitions reapply every ``sort`` and ``hide`` they
 # declare over the user's own.
+#
+# The source is a function that returns the callback, so the two variables it
+# closes over last for the life of the page. Dash evaluates the source once,
+# and each grid registers its own copy.
 _APPLY_COLUMNS = """
-async (checked, ids) => {
-    const noUpdate = window.dash_clientside.no_update;
-    if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
-        return noUpdate;
-    }
+(() => {
+    let latestRun = 0;
+    const gridsFitted = new WeakSet();
 
-    try {
-        const gridApi = await window.dash_ag_grid.getApiAsync(GRID_ID);
-        const shown = [];
-        const hidden = [];
-        ids.forEach((id, index) => (checked[index] ? shown : hidden).push(id.column));
-        const shownBefore = new Set(
-            gridApi.getAllDisplayedColumns().map((column) => column.getColId())
-        );
-        gridApi.setColumnsVisible(shown, true);
-        gridApi.setColumnsVisible(hidden, false);
-        // A hidden column keeps its sort, which would leave the rows ordered
-        // by a column that is off screen, with no header to show why.
-        gridApi.applyColumnState({
-            state: hidden.map((colId) => ({colId, sort: null})),
-        });
-        // The quick filter matches visible columns only, but a visibility
-        // change makes AG Grid drop the filter's cached text and nothing
-        // more. Without this, the rows keep the answer for the columns as
-        // they were until the filter text is next edited.
-        gridApi.onFilterChanged();
-        // setColumnsVisible does not size the column it shows, and one shown
-        // as the page opens comes up at its minimum width.
-        const added = shown.filter((colId) => !shownBefore.has(colId));
-        if (added.length) {
-            gridApi.autoSizeColumns(added, false);
+    return async (checked, ids) => {
+        const noUpdate = window.dash_clientside.no_update;
+        if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
+            return noUpdate;
         }
-    } catch (error) {
-        console.warn("Failed to apply the Columns menu to the grid.", GRID_ID, error);
-    }
-    return noUpdate;
-}
+
+        latestRun += 1;
+        const run = latestRun;
+        try {
+            const gridApi = await window.dash_ag_grid.getApiAsync(GRID_ID);
+            // Each run waits for the grid on its own timer, so an older run
+            // can land after a newer one and would put its values back.
+            if (run !== latestRun) {
+                return noUpdate;
+            }
+            const shown = [];
+            const hidden = [];
+            ids.forEach((id, index) => (checked[index] ? shown : hidden).push(id.column));
+            const shownBefore = new Set(
+                gridApi.getAllDisplayedColumns().map((column) => column.getColId())
+            );
+            gridApi.setColumnsVisible(shown, true);
+            gridApi.setColumnsVisible(hidden, false);
+            // A hidden column keeps its sort, which would leave the rows
+            // ordered by a column that is off screen, with no header to show
+            // why.
+            gridApi.applyColumnState({
+                state: hidden.map((colId) => ({colId, sort: null})),
+            });
+            // The quick filter matches visible columns only, but a visibility
+            // change makes AG Grid drop the filter's cached text and nothing
+            // more. Without this, the rows keep the answer for the columns as
+            // they were until the filter text is next edited.
+            gridApi.onFilterChanged();
+            // setColumnsVisible does not size the column it shows, and one
+            // shown as the page opens comes up at its minimum width.
+            const added = shown.filter((colId) => !shownBefore.has(colId));
+            if (added.length) {
+                gridApi.autoSizeColumns(added, false);
+            }
+            // The grid's own autosize runs right after this callback's first
+            // run, and it leaves columns that a visibility change has just
+            // brought into view at their minimum width, with the header
+            // clipped. Fitting them in this task does not hold: it has to
+            // come after that autosize. It is for the first run only, or
+            // every later toggle would undo widths the user set by hand.
+            const firstRun = !gridsFitted.has(gridApi);
+            gridsFitted.add(gridApi);
+            const changed = added.length > 0
+                || hidden.some((colId) => shownBefore.has(colId));
+            if (firstRun && changed) {
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    if (!gridApi.isDestroyed()) {
+                        gridApi.autoSizeColumns(shown, false);
+                    }
+                }));
+            }
+        } catch (error) {
+            console.warn("Failed to apply the Columns menu to the grid.", GRID_ID, error);
+        }
+        return noUpdate;
+    };
+})()
 """
 
 
@@ -147,7 +181,10 @@ def register_columns_menu(menu_id: str, grid_id: str) -> None:
     It runs when the page mounts and on every change, and does four things in
     order: sets each column's visibility, clears the sort of every hidden
     column, re-runs the quick filter, and sizes the columns it just showed.
-    Call once per menu, at import.
+    Its first run for a grid, when it changed any column's visibility, also
+    fits every shown column two frames later. Only the newest run applies
+    anything, so a run that waited longer for the grid cannot undo a later
+    one. Call once per menu, at import.
     """
     clientside_callback(
         _APPLY_COLUMNS.replace("GRID_ID", json.dumps(grid_id)),

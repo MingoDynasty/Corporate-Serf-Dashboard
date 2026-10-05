@@ -3091,3 +3091,64 @@ def test_columns_menu_callback_applies_the_checkboxes_through_the_grid_api(
     assert "columnState" not in source
     assert "columnDefs" not in source
     assert "set_props" not in source
+
+
+@pytest.mark.parametrize(
+    "page_module", [playlists, playlist_scenarios], ids=["overview", "scenarios"]
+)
+def test_columns_menu_callback_lets_only_the_newest_run_apply(page_module):
+    _checkboxes, (spec,) = _columns_menu_specs(page_module.COLUMNS_MENU_ID)
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+
+    # Each run waits for the grid on its own timer, so an older run can land
+    # after a newer one. The run takes its number before it waits, and gives up
+    # after the wait, before it touches the grid, unless it is still the
+    # newest.
+    numbered = source.index("const run = latestRun;")
+    waited = source.index("await window.dash_ag_grid.getApiAsync(")
+    gave_up = source.index("if (run !== latestRun) {")
+    applied = source.index("gridApi.setColumnsVisible(shown, true)")
+    assert numbered < waited < gave_up < applied
+    assert "latestRun += 1;" in source[:numbered]
+    # The counter outlives one call: it sits in the closure the source builds
+    # once, never inside the callback, where every run would start from zero.
+    assert source.index("let latestRun = 0;") < source.index(
+        "return async (checked, ids) => {"
+    )
+
+
+@pytest.mark.parametrize(
+    "page_module", [playlists, playlist_scenarios], ids=["overview", "scenarios"]
+)
+def test_columns_menu_callback_refits_every_shown_column_after_its_first_run(
+    page_module,
+):
+    _checkboxes, (spec,) = _columns_menu_specs(page_module.COLUMNS_MENU_ID)
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+
+    # The grid's own autosize runs right after the callback's first run and
+    # leaves columns a visibility change just revealed at their minimum width,
+    # header clipped. The wider fit has to come after it, so it waits two
+    # frames, and a fit in the same task would not hold.
+    fit_added = source.index("gridApi.autoSizeColumns(added, false)")
+    gate = source.index("if (firstRun && changed) {")
+    fit_shown = source.index("gridApi.autoSizeColumns(shown, false)")
+    assert fit_added < gate < fit_shown
+    deferred = source[gate:fit_shown]
+    assert deferred.count("requestAnimationFrame(") == 2
+    # A grid that unmounted in those two frames is left alone.
+    assert "if (!gridApi.isDestroyed()) {" in deferred
+    # First run only, and only when it changed something: a later toggle must
+    # not undo a width set by hand, and an untouched table keeps the page's
+    # own sizing.
+    assert source.count("gridApi.autoSizeColumns(shown, false)") == 1
+    assert "const firstRun = !gridsFitted.has(gridApi);" in source
+    assert "gridsFitted.add(gridApi);" in source

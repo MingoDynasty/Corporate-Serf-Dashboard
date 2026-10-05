@@ -127,11 +127,35 @@ change, and does four things in order:
    and Leaderboard ID to 154 px after a toggle, a reload, and an in-app round
    trip alike (2026-10-05).
 
-Step 4 has one limit, which the page's own autosize shares: AG Grid sizes only
+Step 4 alone does not keep every header whole. The columns it shows are not
+the only ones at risk as the page opens. dash-ag-grid's own autosize runs
+right after the callback's first run, and it leaves any column that the
+visibility change has just brought into view at its minimum width, which is
+narrower than its header. With Position, Total Players, and Percentile
+stored as hidden, a benchmark's table in a 1920 px window opened with PB
+cm/360 and PB Accuracy clipped, on every load (found in review of PR #344,
+2026-10-05). Which stored sets clip depends on the window width and the
+data: of 26 sets on a benchmark, one clipped at 1920 px, eleven at 2400 px,
+and none at 2560 px. So the callback's first run for a grid, when it changed
+any column's visibility, also fits every shown column in the menu two
+animation frames later, after the grid's autosize. With that, none of the 26
+clipped at 1920 px or at 2400 px.
+
+- The second fit waits. In the review's probe, fitting every shown column in
+  the same task as the first run cleared the reported sets and clipped three
+  others.
+- The second fit is for the first run only. On a later run it would undo a
+  width the user set by hand.
+
+One limit remains, which the page's own autosize shares: AG Grid sizes only
 the columns it has rendered. In a window narrower than the table, a column
 scrolled out of view keeps AG Grid's 200 px default, whether the page or the
-menu showed it (measured 2026-10-05 in a 1100 px window, where five columns
-of an untouched benchmark table sat at 200 px).
+menu showed it. With nothing stored, a benchmark's table shows that from 1680
+px down (measured 2026-10-05).
+
+Only the newest run of the callback applies anything. Each run waits for the
+grid API on its own timer, so a run that started earlier can finish later,
+and it would put its older values back over the newer ones.
 
 It never writes the grid's `columnState` prop, which dash-ag-grid applies with
 `applyOrder: true`, and never resends column definitions, whose `sort` and
