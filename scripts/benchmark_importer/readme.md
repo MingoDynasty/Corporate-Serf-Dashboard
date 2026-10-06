@@ -213,11 +213,17 @@ Groups cross KovaaK's categories: KovaaKsExample (Example Benchmark.json)
   and the exit code ignores it. IRIS Mixed Benchmarks Easy is on the list.
 - The comparison runs only where a benchmark is built. A normal run skips a
   benchmark whose resume state is current, and that state includes the
-  layout: the manifest records the `categories` each benchmark was last
-  compared under. So when a snapshot refresh changes a benchmark's layout,
-  the next run builds it again, through the benchmark cache, and compares it.
-  A manifest entry written before layouts were recorded holds none, so the
-  first run after that change builds every such entry once.
+  layout: the manifest records the `categories` a benchmark was last compared
+  under, and only when that comparison found no crossing. So when a snapshot
+  refresh changes a benchmark's layout, the next run builds it again, through
+  the benchmark cache, and compares it. A manifest entry written before
+  layouts were recorded holds none, so the first run after that change builds
+  every such entry once.
+- A benchmark whose groups cross is never current. Every normal run builds it
+  again and reports the crossing again, so the exit code stays nonzero until
+  the code is on the exclusion list, and turns nonzero again on the first run
+  after the code leaves it. That costs one rebuild per run for each such
+  benchmark, the excluded ones included.
 - A run narrowed with `--only` compares only the sharecodes it names, although
   it refreshes the whole snapshot unless `--offline` is set. `--check` is the
   comparison over the whole corpus, which is one reason the

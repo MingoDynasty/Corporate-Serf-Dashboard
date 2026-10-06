@@ -352,7 +352,9 @@ def should_skip_generation(
     group comparison runs only where a benchmark is built, and the app draws
     its groups from the snapshot this run may just have refreshed. Skipping a
     benchmark whose layout changed would let a layout that now crosses
-    KovaaK's categories through with a clean exit.
+    KovaaK's categories through with a clean exit. The manifest holds a layout
+    only after a clean comparison, so a benchmark whose groups crossed is
+    never current.
     """
     if force or entry is None:
         return False
@@ -849,7 +851,12 @@ def generate_playlist(
             kovaaks_benchmark_id=evxl_database_item.kovaaksBenchmarkId,
             rank_colors=rank_colors,
             generated_at=generated_at,
-            categories=evxl_database_item.categories,
+            # Only a clean comparison makes the layout current. Recording a
+            # layout that crossed would let the next run skip the benchmark
+            # and exit clean with the crossing still there. That holds for an
+            # excluded benchmark too: its crossing has to block again on the
+            # first run after its code leaves the exclusion list.
+            categories=evxl_database_item.categories if crossings is None else None,
         )
         write_manifest(
             manifest,

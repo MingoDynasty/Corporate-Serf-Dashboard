@@ -142,7 +142,13 @@ refreshed, so the layout is part of the resume state: the manifest records
 the layout each benchmark was last compared under, and a benchmark whose
 layout changed is built and compared again although its ID, its ladder, and
 its generated file are unchanged. A manifest entry written before layouts
-were recorded matches no live item, so it is built once. A run narrowed with
+were recorded matches no live item, so it is built once. The manifest records
+a layout only after a comparison that found no crossing. A benchmark whose
+groups cross is therefore never current: every normal run builds it again
+and reports the crossing again, so the failure keeps blocking across resumed
+runs, and blocks again on the first run after its code leaves the exclusion
+list. An excluded benchmark is rebuilt on every run as well, which is the
+price of that. A run narrowed with
 `--only` still compares only what it names, so the drift check, which the
 refresh runbook requires, stays the comparison over the whole corpus.
 

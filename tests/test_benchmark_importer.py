@@ -2614,3 +2614,62 @@ def test_generation_records_the_layout_and_then_skips_until_it_changes(
     assert refreshed.generated == ["KovaaKsStraddling"]
     assert refreshed.group_crossings["KovaaKsStraddling"].lines == (_STRADDLING_LINE,)
     assert refreshed.exit_code == 1
+
+
+def test_a_crossing_keeps_blocking_on_every_resumed_run_until_it_is_handled(
+    tmp_path, monkeypatch
+):
+    item = _straddling_benchmark(monkeypatch)
+    database = {"KovaaKsStraddling": item}
+
+    def run() -> script.RunSummary:
+        return script.run_importer(database, {}, generated_dir=tmp_path)
+
+    def recorded_layout():
+        return script.load_manifest(tmp_path / "manifest.json")[
+            "KovaaKsStraddling"
+        ].categories
+
+    first = run()
+    # Nothing changed between the two runs. Skipping the second would lose the
+    # diagnostic and exit clean with the rows still mislabeled.
+    unchanged = run()
+
+    for summary in (first, unchanged):
+        assert summary.skipped == []
+        assert summary.generated == ["KovaaKsStraddling"]
+        assert summary.group_crossings["KovaaKsStraddling"].lines == (_STRADDLING_LINE,)
+        assert summary.group_crossings["KovaaKsStraddling"].excluded is False
+        assert summary.exit_code == 1
+    assert recorded_layout() is None
+
+    # Handled: the code goes on the app's exclusion list. The crossing is
+    # still reported on every run, and no longer fails the exit code.
+    monkeypatch.setattr(
+        script, "GROUP_EXCLUDED_PLAYLIST_CODES", frozenset({"KovaaKsStraddling"})
+    )
+    for summary in (run(), run()):
+        assert summary.skipped == []
+        assert summary.group_crossings["KovaaKsStraddling"].excluded is True
+        assert summary.exit_code == 0
+    assert recorded_layout() is None
+
+    # The code leaves the list while the layout still crosses: blocking again
+    # on the very next run, with no rebuild forced by hand.
+    monkeypatch.setattr(script, "GROUP_EXCLUDED_PLAYLIST_CODES", frozenset())
+    relapsed = run()
+    assert relapsed.group_crossings["KovaaKsStraddling"].excluded is False
+    assert relapsed.exit_code == 1
+
+    # Evxl corrects the layout: compared clean, recorded, and then skipped.
+    database["KovaaKsStraddling"] = EvxlDatabaseItem(
+        kovaaksBenchmarkId=item.kovaaksBenchmarkId,
+        rankColors=item.rankColors,
+        categories=_group_layout(("", [("Clicking", 2), ("Tracking", 1)])),
+    )
+    corrected = run()
+    assert corrected.generated == ["KovaaKsStraddling"]
+    assert corrected.group_crossings == {}
+    assert corrected.exit_code == 0
+    assert recorded_layout() == database["KovaaKsStraddling"].categories
+    assert run().skipped == ["KovaaKsStraddling"]

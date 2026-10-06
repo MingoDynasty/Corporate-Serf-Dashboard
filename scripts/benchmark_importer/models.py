@@ -57,9 +57,11 @@ class ManifestEntry(BaseModel):
     kovaaks_benchmark_id: int
     rank_colors: list[tuple[str, str]]
     generated_at: str
-    # The Evxl layout the benchmark's groups were last compared under. An
-    # entry written before this field existed holds none, which no live item
-    # matches, so it is built and compared once rather than skipped forever.
+    # The Evxl layout the benchmark's groups were last compared under and
+    # found to cross nothing. None means no clean comparison is on record,
+    # which no live item matches, so the benchmark is built and compared
+    # again: an entry written before this field existed, and one whose groups
+    # crossed KovaaK's categories when it was last built.
     categories: list[EvxlCategory] | None = None
 
 
