@@ -98,9 +98,10 @@ What we plan to do now or very soon, each with the reasons it comes next.
   - All three seats that reviewed the in-session and between-sessions framing
     (#317) recommended building the session review first.
 
-  The [current proposal](./proposals/run_history_proposal.md) predates this
-  order. Its "sessions later" decision and its view order are marked
-  superseded, and a rewritten proposal will replace it. Baseline in
+  The [proposal](./proposals/run_history_proposal.md) is rewritten on this
+  order. It defines the session, the visit, and the warm-up run, and
+  recommends which view ships first. Its Decisions needed section says which
+  of its choices are settled. Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
 ---
 
