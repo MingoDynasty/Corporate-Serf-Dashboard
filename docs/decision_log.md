@@ -56,9 +56,14 @@ unchanged.
 
 **Why a push to main is never cancelled or queued.** The `release` job needs
 `test`, so a cancelled run on `main` would drop a release, and a queued one
-would delay it behind an unrelated push. The run ID gives every push a group
-of its own, and `cancel-in-progress` is false for a push, so either guard
-alone is enough. The `release` job's own `release` group is separate and
+would delay it behind an unrelated push. The guarantee rests on the run ID,
+which gives every push a group of its own: runs that share no group can
+neither cancel one another nor wait behind one another. `cancel-in-progress`
+is also false for a push, but that alone would not be enough. In a shared
+group it only keeps the running member alive: the next push would still wait,
+and a third push would replace the one waiting, which drops its release. So
+the run-ID fallback has to stay, even though the event check looks as if it
+already covers `main`. The `release` job's own `release` group is separate and
 unchanged ([2026-07-19 entry](#2026-07-19-releases-are-automated-calver-tags-cut-by-ci)).
 
 **Why the block sits on the workflow.** On the `test` job, every leg of the OS
