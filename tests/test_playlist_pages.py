@@ -19,6 +19,7 @@ from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks import percentile_warmup_service as warmup
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
 from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
+from source.kovaaks.scenario_groups import ScenarioGroup
 from source.utilities.store_schema import UnsupportedSchemaError
 from tests.rendered_text import rendered_text
 
@@ -2582,14 +2583,20 @@ def test_playlist_scenarios_rank_sort_opens_a_plain_table_unsorted(
     assert _sort_seeds(page) == {}
 
 
-def _sort_url_writer_spec():
+def _column_state_spec(sink_id: str):
+    """Find the clientside callback on the grid's column state by its sink."""
     (spec,) = [
         spec
         for spec in GLOBAL_CALLBACK_LIST
         if {"id": "playlist-scenarios-grid", "property": "columnState"}
         in spec["inputs"]
+        and spec["output"] == f"{sink_id}.data"
     ]
     return spec
+
+
+def _sort_url_writer_spec():
+    return _column_state_spec("playlist-scenarios-sort-sink")
 
 
 def test_playlist_scenarios_sort_url_writer_replaces_the_history_entry():
@@ -3166,3 +3173,311 @@ def test_columns_menu_callback_fits_only_the_columns_it_showed(page_module):
     # sets that were whole without it.
     assert "requestAnimationFrame" not in source
     assert "setTimeout" not in source
+
+
+# --- a benchmark with groups adds Category and Subcategory ahead of Scenario ---
+
+TWO_LEVEL_CODE = "KovaaKsTwoLevelCode"
+ONE_LEVEL_CODE = "KovaaKsOneLevelCode"
+
+
+@pytest.fixture
+def grouped_benchmarks(monkeypatch, benchmark_playlists):
+    """Serve a two-level and a one-level benchmark beside the ungrouped tables."""
+    ladder = [Rank(name="Iron", color="#ffffff", threshold=100)]
+    for code in (TWO_LEVEL_CODE, ONE_LEVEL_CODE):
+        data_service.playlist_database[code] = PlaylistData(
+            name=code,
+            code=code,
+            scenarios=[
+                Scenario(name="First", ranks=ladder),
+                Scenario(name="Second", ranks=ladder),
+            ],
+        )
+    groups_by_code = {
+        TWO_LEVEL_CODE: (
+            ScenarioGroup("Clicking", "#111111", 0, "Static", "#aaaaaa", 0),
+            ScenarioGroup("Clicking", "#111111", 0, "Dynamic", "#bbbbbb", 1),
+        ),
+        ONE_LEVEL_CODE: (
+            ScenarioGroup("Arm", "#111111", 0, "", None, 0),
+            ScenarioGroup("Wrist", "#222222", 1, "", None, 1),
+        ),
+    }
+    monkeypatch.setattr(playlist_scenarios, "get_scenario_groups", groups_by_code.get)
+
+
+def _column_ids(page) -> list[str]:
+    return [
+        column.get("colId", column["field"])
+        for column in _scenario_grid(page).columnDefs
+    ]
+
+
+def _group_columns(page) -> list[dict]:
+    return [
+        column
+        for column in _scenario_grid(page).columnDefs
+        if column.get("colId") in {"category", "subcategory"}
+    ]
+
+
+def test_playlist_scenarios_group_columns_follow_the_levels_a_benchmark_names(
+    grouped_benchmarks,
+):
+    two_level = _column_ids(playlist_scenarios.layout(TWO_LEVEL_CODE))
+    one_level = _column_ids(playlist_scenarios.layout(ONE_LEVEL_CODE))
+    ungrouped_benchmark = _column_ids(playlist_scenarios.layout(BENCHMARK_CODE))
+    plain = _column_ids(playlist_scenarios.layout(PLAIN_PLAYLIST_CODE))
+    unknown = _column_ids(playlist_scenarios.layout("KovaaKsMissingCode"))
+
+    # Ahead of Scenario, the category first.
+    assert two_level[:3] == ["category", "subcategory", "scenario"]
+    assert one_level[:2] == ["category", "scenario"]
+    assert "subcategory" not in one_level
+    # A table without groups is unchanged.
+    assert two_level[2:] == ungrouped_benchmark
+    for column_ids in (ungrouped_benchmark, plain, unknown):
+        assert column_ids[0] == "scenario"
+        assert not {"category", "subcategory"} & set(column_ids)
+
+
+def test_playlist_scenarios_group_column_ids_are_the_one_way_choice():
+    # A stored Columns menu choice is keyed by the ID, so renaming one resets
+    # that choice in every browser. Changing this test is that decision.
+    assert [column.column_id for column in playlist_scenarios.GROUP_COLUMNS] == [
+        "category",
+        "subcategory",
+    ]
+
+
+def test_playlist_scenarios_group_column_defs(grouped_benchmarks):
+    category, subcategory = _group_columns(playlist_scenarios.layout(TWO_LEVEL_CODE))
+
+    assert category == {
+        "colId": "category",
+        "headerName": "Category",
+        "headerTooltip": "Category",
+        "headerClass": "playlist-scenario-group-header",
+        "field": "category_run",
+        "spanRows": True,
+        "getQuickFilterText": {"function": "params.data.category_name"},
+        "tooltipValueGetter": {"function": "params.data.category_name || null"},
+        "cellRenderer": "ScenarioGroupLabel",
+        "cellRendererParams": {"nameField": "category_name"},
+        "cellStyle": {"function": "scenarioGroupCellStyle(params.data.category_color)"},
+        "cellClass": "playlist-scenario-group-cell",
+        "pinned": "left",
+        "lockPinned": True,
+        "suppressMovable": True,
+        "sortable": False,
+        "resizable": False,
+        "width": 34,
+        "minWidth": 34,
+        "maxWidth": 34,
+        "suppressAutoSize": True,
+    }
+    assert subcategory == {
+        key: (
+            value.replace("category", "subcategory").replace("Category", "Subcategory")
+            if isinstance(value, str)
+            else {
+                inner: text.replace("category", "subcategory")
+                for inner, text in value.items()
+            }
+            if isinstance(value, dict)
+            else value
+        )
+        for key, value in category.items()
+    }
+
+
+def test_playlist_scenarios_group_columns_merge_on_the_run_and_filter_on_the_name(
+    grouped_benchmarks,
+):
+    for column in _group_columns(playlist_scenarios.layout(TWO_LEVEL_CODE)):
+        level = column["colId"]
+        # The grid merges neighboring cells with equal values, and two groups
+        # can share a name across a category boundary.
+        assert column["spanRows"] is True
+        assert column["field"] == f"{level}_run"
+        # The run is a number, so without this a typed digit would match it.
+        assert column["getQuickFilterText"] == {"function": f"params.data.{level}_name"}
+
+
+def test_playlist_scenarios_group_columns_are_fixed_pinned_and_never_sorted(
+    grouped_benchmarks,
+):
+    page = playlist_scenarios.layout(TWO_LEVEL_CODE)
+
+    for column in _group_columns(page):
+        # Pinned so a tall group's label can follow the scroll.
+        assert column["pinned"] == "left"
+        assert column["width"] == column["minWidth"] == column["maxWidth"] == 34
+        assert column["resizable"] is False
+        assert column["sortable"] is False
+        # Out of both auto-sizing passes: the grid's own, by its key list,
+        # and the Columns menu's, which fits whatever it has just shown.
+        assert column["suppressAutoSize"] is True
+        assert column["colId"] not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+        assert column["field"] not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+        # No ``?sort=`` name, and never an opening sort.
+        assert column["colId"] not in playlist_scenarios.SORT_URL_NAMES.values()
+        assert column["field"] not in playlist_scenarios.SORT_URL_NAMES.values()
+        assert "initialSort" not in column
+
+
+def test_playlist_scenarios_scenario_cell_learns_the_levels_to_name(
+    grouped_benchmarks,
+):
+    def scenario_params(code):
+        columns = _scenario_grid(playlist_scenarios.layout(code)).columnDefs
+        (scenario,) = [column for column in columns if column["field"] == "scenario"]
+        return scenario.get("cellRendererParams")
+
+    assert scenario_params(TWO_LEVEL_CODE) == {
+        "groupLevels": [
+            {"columnId": "category", "nameField": "category_name"},
+            {"columnId": "subcategory", "nameField": "subcategory_name"},
+        ]
+    }
+    assert scenario_params(ONE_LEVEL_CODE) == {
+        "groupLevels": [{"columnId": "category", "nameField": "category_name"}]
+    }
+    assert scenario_params(BENCHMARK_CODE) is None
+    assert scenario_params(PLAIN_PLAYLIST_CODE) is None
+    # The module's shared definitions are never written to.
+    assert "cellRendererParams" not in playlist_scenarios.TABLE_COLUMN_DEFS[0]
+
+
+def test_playlist_scenarios_columns_menu_lists_the_group_levels_first(
+    grouped_benchmarks,
+):
+    menu_id = playlist_scenarios.COLUMNS_MENU_ID
+    two_level = playlist_scenarios.layout(TWO_LEVEL_CODE)
+    one_level = playlist_scenarios.layout(ONE_LEVEL_CODE)
+    ungrouped = _menu_entries(playlist_scenarios.layout(BENCHMARK_CODE), menu_id)
+
+    # The Copy block's labels, which for one word are the headers' own.
+    assert _menu_entries(two_level, menu_id) == [
+        ("category", "Category"),
+        ("subcategory", "Subcategory"),
+        *ungrouped,
+    ]
+    assert _menu_entries(one_level, menu_id) == [("category", "Category"), *ungrouped]
+    # A table without groups renders neither, so it leaves both stored
+    # choices alone.
+    for code in (BENCHMARK_CODE, PLAIN_PLAYLIST_CODE):
+        entries = _menu_entries(playlist_scenarios.layout(code), menu_id)
+        assert not {"category", "subcategory"} & {column for column, _ in entries}
+    # Shown by default, matching the columns, which declare no ``initialHide``.
+    for page in (two_level, one_level):
+        checkboxes = {
+            checkbox.id["column"]: checkbox
+            for checkbox in _menu_checkboxes(page, menu_id)
+        }
+        for column in _group_columns(page):
+            assert "initialHide" not in column
+            assert "hide" not in column
+            assert checkboxes[column["colId"]].checked is True
+            assert checkboxes[column["colId"]].persistence is True
+
+
+@pytest.mark.parametrize(
+    ("sort", "grouped"),
+    [
+        (None, True),
+        ("", True),
+        ("last-played.desc", False),
+        ("rank.asc,runs.desc", False),
+        # Not a valid value, so the table opens unsorted, which is grouped.
+        ("last-played.sideways", True),
+        ("category.asc", True),
+        (["runs.asc", "runs.desc"], True),
+    ],
+)
+def test_playlist_scenarios_a_sort_in_the_address_opens_the_table_ungrouped(
+    grouped_benchmarks, sort, grouped
+):
+    grid = _scenario_grid(playlist_scenarios.layout(TWO_LEVEL_CODE, sort=sort))
+
+    assert grid.dashGridOptions["context"] == {"grouped": grouped}
+
+
+def test_playlist_scenarios_cell_spanning_is_on_only_for_a_table_with_groups(
+    grouped_benchmarks,
+):
+    for code in (TWO_LEVEL_CODE, ONE_LEVEL_CODE):
+        options = _scenario_grid(playlist_scenarios.layout(code)).dashGridOptions
+        assert options["enableCellSpan"] is True
+        # Beside the Columns menu's option and the grid's own, replacing none.
+        assert options["suppressColumnVirtualisation"] is True
+        assert options["animateRows"] is False
+        assert "getRowId" in options
+        # Cell spanning rules these out on the same grid.
+        assert "enableCellTextSelection" not in options
+        assert "rowSelection" not in options
+        assert "cellSelection" not in options
+    for code in (BENCHMARK_CODE, PLAIN_PLAYLIST_CODE, "KovaaKsMissingCode"):
+        options = _scenario_grid(playlist_scenarios.layout(code)).dashGridOptions
+        assert "enableCellSpan" not in options
+        assert "context" not in options
+
+
+def test_playlist_scenarios_grouped_state_callback_reads_the_grid_and_redraws():
+    spec = _column_state_spec("playlist-scenarios-group-sink")
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    store_outputs = {
+        f"{component.id}.data"
+        for component in _walk_components(page)
+        if isinstance(component, dcc.Store)
+    }
+
+    assert spec["output"] in store_outputs
+    # A sort and the filter box both set the state, so it listens to both.
+    assert spec["inputs"] == [
+        {"id": "playlist-scenarios-grid", "property": "columnState"},
+        {"id": "playlist-scenarios-quick-filter", "property": "value"},
+    ]
+    assert spec["state"] == []
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+    # The JavaScript reads the Python column IDs, never a hand-copied list.
+    assert '["category", "subcategory"]' in source
+    assert "GROUP_COLUMN_IDS" not in source
+    # Filter text that is only spaces counts as empty.
+    assert '(filterText || "").trim()' in source
+    # The cells that read the state are the ones redrawn.
+    assert 'columns: [...groupColumnIds, "scenario"]' in source
+    # It only reads the column state. Writing that prop from Dash also sets
+    # the column order.
+    assert "applyColumnState" not in source
+    assert "set_props" not in source
+
+
+def test_playlist_scenarios_stale_merged_cells_are_rebuilt_after_each_model_update():
+    # A workaround for AG Grid 35.3.1, which leaves merged cells stale after
+    # two sort changes and then none. Remove it, and this test, when
+    # dash-ag-grid bundles AG Grid 36.1.0 or later.
+    spec = _column_state_spec("playlist-scenarios-group-sink")
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+
+    # Only on a grid that merges cells, and once per grid, however often the
+    # callback runs.
+    assert 'if (gridApi.getGridOption("enableCellSpan"))' in source
+    assert "repairedGrids.has(gridApi)" in source
+    assert 'gridApi.addEventListener("modelUpdated"' in source
+    # Hide, then show: the grid builds the cells again only for a column it
+    # has just shown. Only the columns showing at that moment are touched, so
+    # one the Columns menu has hidden stays hidden.
+    hide = source.index("gridApi.setColumnsVisible(shown, false);")
+    show = source.index("gridApi.setColumnsVisible(shown, true);")
+    assert source.index("column.isVisible()") < hide < show
+    assert source.count("setColumnsVisible(") == 2
