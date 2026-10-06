@@ -139,6 +139,7 @@ def _next_rank() -> str:
         "generation-1",
         "KovaaKsTestCode",
         ladder=LADDER,
+        group=None,
         mark_unresolved_pending=False,
     )
     return row["next_tier_display"]

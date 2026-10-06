@@ -24,12 +24,14 @@ from source.kovaaks.data_models import PlaylistData, Rank, RunData, ScenarioStat
 from source.kovaaks.data_service import (
     get_personal_best_run,
     get_playlist_by_code,
+    get_scenario_groups,
     get_scenario_stats,
     is_benchmark_playlist,
     is_scenario_in_database,
 )
 from source.kovaaks.pace import percent_faster
 from source.kovaaks.request_logging import request_exception_summary
+from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
 from source.utilities.stopwatch import Stopwatch
 
@@ -56,6 +58,9 @@ class _FillState:
     # and a cancelled fill's rebuild replace phase-1 rows whole, so a row built
     # without its ladder would flip its Rank and Next Rank cells to N/A.
     scenario_ladders: tuple[list[Rank] | None, ...]
+    # Captured the same way, for the same reason: a row built without its
+    # group would blank its Category and Subcategory cells.
+    scenario_groups: tuple[ScenarioGroup | None, ...]
     total: int
     unresolved_indices: set[int]
     cancel_event: threading.Event = field(default_factory=threading.Event)
@@ -142,6 +147,33 @@ def _scenario_ladders(playlist: PlaylistData) -> tuple[list[Rank] | None, ...]:
     if not is_benchmark_playlist(playlist):
         return (None,) * len(playlist.scenarios)
     return tuple(scenario.ranks or [] for scenario in playlist.scenarios)
+
+
+def _scenario_groups(playlist: PlaylistData) -> tuple[ScenarioGroup | None, ...]:
+    """Pick each row's group: ``None`` wherever the playlist has no groups."""
+    groups = get_scenario_groups(playlist.code)
+    # The join sizes the groups to the scenario list it was given. A list of
+    # another length would hand rows their neighbors' groups.
+    if groups is None or len(groups) != len(playlist.scenarios):
+        return (None,) * len(playlist.scenarios)
+    return groups
+
+
+def scenario_group_fields(group: ScenarioGroup) -> PlaylistScenarioRow:
+    """Build the fields a row carries when its benchmark has groups.
+
+    The two runs are the group cells' values, never the names: the grid
+    merges neighboring cells whose values are equal, and two groups can share
+    a name across a category boundary.
+    """
+    return {
+        "category_name": group.category,
+        "category_color": group.category_color,
+        "category_run": group.category_run,
+        "subcategory_name": group.subcategory,
+        "subcategory_color": group.subcategory_color,
+        "subcategory_run": group.subcategory_run,
+    }
 
 
 def benchmark_rank_fields(
@@ -252,6 +284,7 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
     leaderboard_id: int | None = None,
     ladder: list[Rank] | None = None,
     pace_constant: float | None = None,
+    group: ScenarioGroup | None = None,
     generation_token: str | None = None,
     playlist_code: str | None = None,
     mark_unresolved_pending: bool = False,
@@ -262,7 +295,9 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
     ``None`` for a scenario the app hasn't resolved. ``ladder`` is ``None`` on
     a playlist's table, whose rows carry no Rank or Next Rank fields, and the
     scenario's ladder on a benchmark's table. ``pace_constant`` is set only
-    where the Next Rank gap is measured by pace.
+    where the Next Rank gap is measured by pace. ``group`` is the scenario's
+    category and subcategory, or ``None`` on a table without groups, whose
+    rows carry none of the group fields.
     """
     date_last_played = None
     number_of_runs = 0
@@ -304,6 +339,8 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
     }
     if ladder is not None:
         row.update(benchmark_rank_fields(ladder, high_score, pace_constant))
+    if group is not None:
+        row.update(scenario_group_fields(group))
 
     if rank_info.status == ScenarioRankStatus.RANKED:
         row["position_display"] = _format_int(rank_info.rank)
@@ -414,6 +451,7 @@ def _build_row(  # noqa: PLR0913
     playlist_code: str,
     *,
     ladder: list[Rank] | None,
+    group: ScenarioGroup | None,
     mark_unresolved_pending: bool,
 ) -> PlaylistScenarioRow:
     """Re-read local data and build a complete transaction-safe row."""
@@ -474,6 +512,7 @@ def _build_row(  # noqa: PLR0913
         leaderboard_id=leaderboard_id,
         ladder=ladder,
         pace_constant=pace_constant,
+        group=group,
         generation_token=generation_token,
         playlist_code=playlist_code,
         mark_unresolved_pending=mark_unresolved_pending,
@@ -491,8 +530,9 @@ def build_playlist_scenario_rank_rows(
 
     rows = []
     ladders = _scenario_ladders(playlist)
-    for index, (scenario, ladder) in enumerate(
-        zip(playlist.scenarios, ladders, strict=True)
+    groups = _scenario_groups(playlist)
+    for index, (scenario, ladder, group) in enumerate(
+        zip(playlist.scenarios, ladders, groups, strict=True)
     ):
         try:
             rank_info = _lookup_rank_info(scenario.name, allow_network=False)
@@ -506,6 +546,7 @@ def build_playlist_scenario_rank_rows(
                 generation_token,
                 playlist_code,
                 ladder=ladder,
+                group=group,
                 mark_unresolved_pending=True,
             )
         )
@@ -567,6 +608,7 @@ def start_playlist_scenario_fill(
         playlist_code=playlist_code,
         scenario_names=scenario_names,
         scenario_ladders=_scenario_ladders(playlist),
+        scenario_groups=_scenario_groups(playlist),
         total=len(scenario_names),
         unresolved_indices=set(range(len(scenario_names))),
     )
@@ -580,6 +622,7 @@ def start_playlist_scenario_fill(
             generation_token,
             scenario_names,
             state.scenario_ladders,
+            state.scenario_groups,
             state.cancel_event,
         ),
         name=f"playlist-fill-{generation_token[:8]}",
@@ -595,6 +638,7 @@ def _fetch_fill_row(  # noqa: PLR0913
     playlist_order: int,
     scenario_name: str,
     ladder: list[Rank] | None,
+    group: ScenarioGroup | None,
     cancel_event: threading.Event,
 ) -> tuple[int, ScenarioRankInfo, PlaylistScenarioRow] | None:
     if cancel_event.is_set():
@@ -610,6 +654,7 @@ def _fetch_fill_row(  # noqa: PLR0913
         generation_token,
         playlist_code,
         ladder=ladder,
+        group=group,
         mark_unresolved_pending=False,
     )
     return playlist_order, rank_info, row
@@ -638,6 +683,7 @@ def _run_playlist_scenario_fill(
     generation_token: str,
     scenario_names: tuple[str, ...],
     scenario_ladders: tuple[list[Rank] | None, ...],
+    scenario_groups: tuple[ScenarioGroup | None, ...],
     cancel_event: threading.Event,
 ) -> None:
     """Hydrate once, fan out rank lookups, and stream results to the registry."""
@@ -668,10 +714,16 @@ def _run_playlist_scenario_fill(
                         index,
                         scenario_name,
                         ladder,
+                        group,
                         cancel_event,
                     )
-                    for index, (scenario_name, ladder) in enumerate(
-                        zip(scenario_names, scenario_ladders, strict=True)
+                    for index, (scenario_name, ladder, group) in enumerate(
+                        zip(
+                            scenario_names,
+                            scenario_ladders,
+                            scenario_groups,
+                            strict=True,
+                        )
                     )
                 ]
                 for future in as_completed(futures):
@@ -727,10 +779,11 @@ def _run_playlist_scenario_fill(
     )
 
 
-def _build_cancelled_finalization_rows(
+def _build_cancelled_finalization_rows(  # noqa: PLR0913
     playlist_code: str,
     scenario_names: tuple[str, ...],
     scenario_ladders: tuple[list[Rank] | None, ...],
+    scenario_groups: tuple[ScenarioGroup | None, ...],
     generation_token: str,
     unresolved_indices: list[int],
 ) -> list[PlaylistScenarioRow]:
@@ -749,6 +802,7 @@ def _build_cancelled_finalization_rows(
                 generation_token,
                 playlist_code,
                 ladder=scenario_ladders[index],
+                group=scenario_groups[index],
                 mark_unresolved_pending=False,
             )
         )
@@ -773,15 +827,18 @@ def drain_playlist_scenario_fill(
         unresolved_indices: list[int] = []
         scenario_names: tuple[str, ...] = ()
         scenario_ladders: tuple[list[Rank] | None, ...] = ()
+        scenario_groups: tuple[ScenarioGroup | None, ...] = ()
         if consuming_terminal:
             if state.terminal == "cancelled":
                 unresolved_indices = sorted(state.unresolved_indices)
                 scenario_names = state.scenario_names
                 scenario_ladders = state.scenario_ladders
+                scenario_groups = state.scenario_groups
             state.consumed = True
             state.unresolved_indices.clear()
             state.scenario_names = ()
             state.scenario_ladders = ()
+            state.scenario_groups = ()
 
         snapshot = PlaylistScenarioFillDrain(
             generation_token=generation_token,
@@ -799,6 +856,7 @@ def drain_playlist_scenario_fill(
             state.playlist_code,
             scenario_names,
             scenario_ladders,
+            scenario_groups,
             generation_token,
             unresolved_indices,
         )

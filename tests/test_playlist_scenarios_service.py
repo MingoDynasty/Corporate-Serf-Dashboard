@@ -23,6 +23,7 @@ from source.kovaaks.playlist_scenarios_service import (
     build_playlist_scenario_rank_rows,
     format_playlist_scenario_rank_row,
 )
+from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import PaceBasis
 
 
@@ -613,6 +614,7 @@ def test_fill_drain_consumes_terminal_updates_once(isolated_fill_registry):
         playlist_code="KovaaKsTestCode",
         scenario_names=("First",),
         scenario_ladders=(None,),
+        scenario_groups=(None,),
         total=1,
         unresolved_indices=set(),
         pending_updates=[{"scenario": "First"}],
@@ -640,6 +642,7 @@ def test_fill_outcomes_use_structural_stale_marker(isolated_fill_registry):
         playlist_code="KovaaKsTestCode",
         scenario_names=("Mismatch", "Stale", "Unknown"),
         scenario_ladders=(None, None, None),
+        scenario_groups=(None, None, None),
         total=3,
         unresolved_indices={0, 1, 2},
     )
@@ -687,10 +690,12 @@ def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
 ):
     scenario_names = ("First", "Second")
     scenario_ladders = (None, None)
+    scenario_groups = (None, None)
     state = playlist_scenarios_service._FillState(
         playlist_code="KovaaKsTestCode",
         scenario_names=scenario_names,
         scenario_ladders=scenario_ladders,
+        scenario_groups=scenario_groups,
         total=len(scenario_names),
         unresolved_indices=set(range(len(scenario_names))),
     )
@@ -721,6 +726,7 @@ def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
             "generation-1",
             scenario_names,
             scenario_ladders,
+            scenario_groups,
             state.cancel_event,
         )
 
@@ -757,6 +763,7 @@ def test_tombstone_retention_evicts_consumed_before_unconsumed(
                 playlist_code=token,
                 scenario_names=(),
                 scenario_ladders=(),
+                scenario_groups=(),
                 total=0,
                 unresolved_indices=set(),
                 consumed=consumed,
@@ -1446,6 +1453,22 @@ _PLAYLIST = PlaylistData(
 # The name-to-ID mapping the row paths read. "Unplayed" and "No Ladder" are
 # scenarios the app hasn't resolved.
 _LEADERBOARD_IDS = {"Ranked": 184106, "Top": 97841}
+# The benchmark's groups, one per scenario. The playlist has none. "Micro"
+# ends one category and begins the next, as two real benchmarks have it.
+_BENCHMARK_GROUPS = (
+    ScenarioGroup("Clicking", "#111111", 0, "Static", "#aaaaaa", 0),
+    ScenarioGroup("Clicking", "#111111", 0, "Micro", "#bbbbbb", 1),
+    ScenarioGroup("Tracking", "#222222", 1, "Micro", "#bbbbbb", 2),
+    ScenarioGroup("Tracking", "#222222", 1, "Reactive", None, 3),
+)
+GROUP_FIELDS = (
+    "category_name",
+    "category_color",
+    "category_run",
+    "subcategory_name",
+    "subcategory_color",
+    "subcategory_run",
+)
 
 
 @pytest.fixture
@@ -1460,6 +1483,11 @@ def rank_row_sources(monkeypatch):
         data_service,
         "playlist_database",
         {playlist.code: playlist for playlist in (_BENCHMARK, _PLAYLIST)},
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_scenario_groups",
+        {_BENCHMARK.code: _BENCHMARK_GROUPS}.get,
     )
     settings_service.save_settings(
         {"kovaaks_username": "MingoDynasty", "steam_id": "steam-id"}
@@ -1521,6 +1549,55 @@ def test_phase_one_rows_carry_rank_fields_only_on_a_benchmark(rank_row_sources):
     assert all(not set(RANK_FIELDS) & set(row) for row in playlist_rows)
 
 
+def test_phase_one_rows_carry_group_fields_only_on_a_grouped_benchmark(
+    rank_row_sources,
+):
+    benchmark_rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    playlist_rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+
+    assert [tuple(row[field] for field in GROUP_FIELDS) for row in benchmark_rows] == [
+        ("Clicking", "#111111", 0, "Static", "#aaaaaa", 0),
+        ("Clicking", "#111111", 0, "Micro", "#bbbbbb", 1),
+        ("Tracking", "#222222", 1, "Micro", "#bbbbbb", 2),
+        ("Tracking", "#222222", 1, "Reactive", None, 3),
+    ]
+    # Two neighboring groups with one name stay two groups: the grid merges
+    # cells on the run, which is the cell's value.
+    assert (
+        benchmark_rows[1]["subcategory_name"] == benchmark_rows[2]["subcategory_name"]
+    )
+    assert benchmark_rows[1]["subcategory_run"] != benchmark_rows[2]["subcategory_run"]
+    assert all(not set(GROUP_FIELDS) & set(row) for row in playlist_rows)
+
+
+def test_a_benchmark_without_groups_carries_no_group_fields(
+    monkeypatch, rank_row_sources
+):
+    monkeypatch.setattr(
+        playlist_scenarios_service, "get_scenario_groups", lambda _code: None
+    )
+
+    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+
+    assert all(not set(GROUP_FIELDS) & set(row) for row in rows)
+    assert all(set(RANK_FIELDS) <= set(row) for row in rows)
+
+
+def test_groups_of_another_length_are_dropped_and_never_shifted(
+    monkeypatch, rank_row_sources
+):
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_scenario_groups",
+        lambda _code: _BENCHMARK_GROUPS[:-1],
+    )
+
+    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+
+    assert len(rows) == len(_BENCHMARK.scenarios)
+    assert all(not set(GROUP_FIELDS) & set(row) for row in rows)
+
+
 def _register_fill(monkeypatch, playlist_code, generation_token):
     """Register a fill without starting its daemon; return the daemon's call.
 
@@ -1563,6 +1640,12 @@ def test_fill_rows_equal_phase_one_rows(
     assert drain is not None
     assert drain.terminal == "complete"
     assert sorted(drain.updates, key=lambda row: row["playlist_order"]) == phase_one
+    # The equality above is only as strong as phase 1: say outright that a
+    # streamed row of a grouped benchmark holds its group.
+    assert all(
+        (set(GROUP_FIELDS) <= set(row)) == (playlist is _BENCHMARK)
+        for row in drain.updates
+    )
 
 
 @pytest.mark.parametrize(
@@ -1585,10 +1668,15 @@ def test_cancelled_fill_rebuild_rows_equal_phase_one_rows(
     assert drain.terminal == "cancelled"
     assert drain.consuming_terminal is True
     assert drain.updates == phase_one
+    assert all(
+        (set(GROUP_FIELDS) <= set(row)) == (playlist is _BENCHMARK)
+        for row in drain.updates
+    )
     with playlist_scenarios_service._FILL_REGISTRY_LOCK:
         state = playlist_scenarios_service._FILL_REGISTRY["generation-1"]
         assert state.scenario_names == ()
         assert state.scenario_ladders == ()
+        assert state.scenario_groups == ()
 
 
 # --- every row path carries the scenario's leaderboard ID ---
