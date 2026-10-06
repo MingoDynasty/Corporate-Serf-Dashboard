@@ -519,8 +519,9 @@ spec has that section.
 
 The table's row order keeps its existing name, playlist order. "Grouped" and
 "ungrouped" name the table's two states in this proposal and in the spec
-section the shipping PR writes. Neither appears on screen, so neither is a
-glossary entry.
+section the shipping PR writes. Each means only how the table is laid out,
+which the glossary leaves to the capability specs, so neither is a glossary
+entry.
 
 ## Out of scope
 
@@ -548,9 +549,11 @@ One implementation PR, once D1 is ruled, with no dependencies. Its first
 step puts the comparison where it will keep running:
 
 - The importer's group comparison, at generation and in the drift check,
-  with its tests. Then one run of the drift check over the corpus, which
-  should name IRIS Mixed Benchmarks Easy and no other benchmark, and goes in
-  the PR.
+  with its tests. Then one run of the drift check over the corpus, which goes
+  in the PR. The group comparison should name IRIS Mixed Benchmarks Easy and
+  no other benchmark. The same run also reports whatever else has drifted
+  since the corpus was last refreshed, which on 2026-10-05 included the
+  scenarios of Coach Ben - VALORANT Strafe Aim Benchmark.
 - The shared snapshot read and the join, the row fields on all three row
   paths, the gated and pinned column definitions and their menu entries, the
   state flag and its callback, the two renderers, the styles, and the tests
