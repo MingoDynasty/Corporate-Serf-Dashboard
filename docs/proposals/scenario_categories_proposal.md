@@ -30,7 +30,7 @@ rejected the alternative, for reasons that apply here unchanged. The choice
 is therefore author-owned now, and it sits in Design under "Getting the
 groups", with the alternative it rejects.
 
-### D1 — What the group columns show when the rows leave benchmark order
+### D1 — What the group columns show when the table is sorted or filtered
 
 Status: open
 
@@ -38,16 +38,16 @@ A vertical label needs its group's whole height. Evxl's table can't be
 sorted, so its groups are always whole. This table sorts and filters, and
 then most groups are a single 42 px row, which fits about five letters of a
 vertical label. On Viscose S2 Medium sorted by Last Played, 33 of the 46
-vertical labels the grid had rendered were clipped. So benchmark order can
-use the benchmark-sheet layout, and the decision is what a sorted or
-filtered table shows in its place.
+vertical labels the grid had rendered were clipped. So a table in playlist
+order with nothing filtered can use the benchmark-sheet layout, and the
+decision is what a sorted or filtered table shows in its place.
 
 **Recommendation: keep the two narrow columns where they are, and name each
-row's group under its scenario.** In benchmark order with no filter text,
+row's group under its scenario.** In playlist order with no filter text,
 every group is one merged cell with a vertical label, as on Evxl. Under any
 sort or filter text, the cells keep their colors and drop their labels, and
 each Scenario cell gains a second line such as "Control Tracking · Arm". The
-columns are 34 px wide in both modes, so no column moves when the mode
+columns are 34 px wide in both states, so no column moves when the state
 changes, and both lines fit the row height the table has today.
 
 Choosing differently:
@@ -61,18 +61,19 @@ Choosing differently:
   whenever a sort starts or ends. The Last Played header is 150 px wide, so
   the header just clicked can leave the pointer, and a second click to
   reverse the direction then sorts the neighboring column.
-- **One horizontal column in every mode.** There are no modes and nothing
-  moves. It spends that 115 px to 150 px in benchmark order too, against
-  68 px, on a table that already scrolls sideways in a 1500 px window. The
-  Columns menu now lets a user drop columns they don't read, which eases
-  that for them and leaves the default view as wide as before. This option
-  also gives up the benchmark-sheet layout the request asked for.
-- **Hide the group columns outside benchmark order.** This is the least
+- **One horizontal column in every state.** There are no two states and
+  nothing moves. It spends that 115 px to 150 px in playlist order too,
+  against 68 px, on a table that already scrolls sideways in a 1500 px
+  window. The Columns menu now lets a user drop columns they don't read,
+  which eases that for them and leaves the default view as wide as before.
+  This option also gives up the benchmark-sheet layout the request asked
+  for.
+- **Hide the group columns under a sort or a filter.** This is the least
   code. A sorted table would then say nothing about groups, which is the
   view the maintainer's question was about. The filter box also couldn't
   match a category name while a sort is active, because the grid's quick
   filter skips hidden columns. A user who wants the columns gone can already
-  hide them through the Columns menu, in every mode.
+  hide them through the Columns menu, in either state.
 
 Material consequence: the swap moves the column headers on the first click
 of every sort. The single horizontal column spends 47 px to 82 px more in
@@ -111,8 +112,9 @@ Everything the feature needs is local, and it makes no network call.
 
 Surveyed against `main` at `fb2f679`, with the snapshot last refreshed on
 2026-09-26. Neither the bundled files nor the snapshot has changed on `main`
-since, as of `89b7006`. The grid measurements and the prototype date from
-2026-10-04, before the Columns menu shipped.
+since, as of `bb71988`. The grid measurements and the prototype date from
+2026-10-04, before the Columns menu shipped. The tall-group probe dates from
+2026-10-05.
 
 - **The bundled files carry no grouping.** A scenario has a name, a ladder,
   and a leaderboard ID. The importer walks KovaaK's categories in order and
@@ -120,28 +122,31 @@ since, as of `89b7006`. The grid measurements and the prototype date from
 - **The snapshot does.** `resources/evxl/benchmarks.json` has 266 difficulty
   entries. Each lists categories in order, and each category lists
   subcategories with a name, a color, and a scenario count. It holds no
-  scenario names, so Evxl itself can only place scenarios by position.
+  scenario names.
 - **The app already reads the snapshot.** The View on Evxl link takes each
   benchmark's Evxl names from it, once per process, matched to the playlist
   code without regard to case. The release contract names the file, so a
   release can't ship without it
   ([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 - **KovaaK's has one level and no colors.** Its benchmark payload groups
-  scenarios under category keys with progress, a rank, and thresholds. In
-  the five payloads cached in the maintainer's checkout on 2026-10-03, those
-  categories match Evxl's subcategories one for one in size and order. Their
-  names differ, such as "WideWall" against "Widewall", and one payload pads
-  a repeated name with a space. The category level and every color exist
-  only in Evxl's data.
-- **260 of the 261 bundled files join.** Matching a file's playlist code to
-  a snapshot sharecode without regard to case finds an entry whose counts
-  add up to the file's scenario count. One file matches only that way:
-  Revosect Season 4 Easy's code differs from its sharecode in the case of
-  one letter. PureG S1 - Worthless doesn't join: the file holds 14 scenarios
-  and Evxl counts 12.
-- **The slice reproduces Evxl's page.** The maintainer's screenshot of
-  Evxl's Viscose S2 Medium sheet, shared in chat on 2026-10-04, shows all 39
-  scenarios in the bundled file's order, under the groups the slice assigns.
+  scenarios under category keys with progress, a rank, and thresholds. Their
+  names differ from Evxl's, such as "WideWall" against "Widewall", and one
+  payload pads a repeated name with a space. The category level and every
+  color exist only in Evxl's data.
+- **260 of the 261 bundled files join by count.** Matching a file's playlist
+  code to a snapshot sharecode without regard to case finds an entry whose
+  counts add up to the file's scenario count. One file matches only that
+  way: Revosect Season 4 Easy's code differs from its sharecode in the case
+  of one letter. PureG S1 - Worthless doesn't join: the file holds 14
+  scenarios and Evxl counts 12.
+- **Where the groups fall is checked on 5 of the 260.** A matching total
+  doesn't show that each count cuts the list in the right place. In the five
+  KovaaK's payloads cached in the maintainer's checkout on 2026-10-03,
+  KovaaK's category sizes equal the snapshot's subcategory counts in order.
+  The maintainer's screenshot of Evxl's Viscose S2 Medium sheet, shared in
+  chat on 2026-10-04, shows all 39 scenarios in the bundled file's order,
+  under the groups the slice assigns. The other 255 need KovaaK's payloads,
+  which are not cached. "Getting the groups" says what checks them.
 - **One or two levels.** Of the 260, 181 name both levels. 22 name
   categories only. 56 name one level that Evxl stores as subcategories under
   an unnamed category. 1 names nothing. No benchmark mixes named and unnamed
@@ -149,30 +154,51 @@ since, as of `89b7006`. The grid measurements and the prototype date from
 - **Loose ends in the data.** 16 names carry leading or trailing spaces. Two
   colors use the short form `#FFF`. One sharecode appears on two entries,
   with the same layout. One entry has an empty sharecode.
+- **Two groups can share a name across a category boundary.** CONTINIUM
+  TacFPS Benchmarks E1 has MICRO as the last subcategory of FLICKING and the
+  first of DYNAMIC, and vAim Benchmarks v1 has Blending on both sides of the
+  boundary between Tracking and Switching.
 - **The grid can merge cells without a license.** dash-ag-grid 35.3.0 bundles
   AG Grid 35.3.1, whose Community build includes cell spanning
   (`enableCellSpan` on the grid, `spanRows` on a column). It merges
   neighboring cells with equal values, over the rows as displayed. The
   merges were checked through a sort, a filter, and a whole-row update
   transaction.
-- **Every label fits in benchmark order.** In a bold 11 px uppercase label,
-  all 1,854 labels fit their merged cells. That is a calculation from
-  measured letter widths, not a rendering of each. 72 groups are one row
-  tall, and their authors already abbreviate them, such as "Sta" and "Ref".
-  The tightest is "Static" on one row, with 0.2 px to spare.
+- **A whole group's label fits its cell.** The 1,856 named groups draw as
+  1,854 labels once same-named neighbors merge, and in a bold 11 px
+  uppercase label every one fits its merged cell. That is a calculation from
+  letter widths measured in one Chromium-based browser, not a rendering of
+  each. 72 groups are one row tall, and their authors already abbreviate
+  them, such as "Sta" and "Ref". The tightest is "Static" on one row, with
+  0.2 px to spare, so another browser's fonts may cut it.
+- **A whole group can be taller than the window.** Four groups span 30 rows
+  or more: 40 on TSK Ultimate Benchmarks - All Scenarios, 36 twice on
+  Hewchy's Smoothness - VAI Complete, and 30 on TSK Static Benchmarks -
+  ClickTrack. A 36-row cell is 1,511 px tall. A label centered in it is out
+  of view on a fresh visit, which a reviewer measured with the prototype's
+  renderers.
+- **A label can follow the scroll.** A standalone grid with the table's
+  options and one 36-row group was probed in a Chromium-based browser. With
+  the two group columns pinned left and the label positioned `sticky`, the
+  label stayed whole and in view at the start, middle, and end of the group,
+  in a 546 px and a 248 px viewport. It was cut only once less of the cell
+  was showing than the label is long. Without the pin the label scrolled
+  away, because the unpinned columns sit inside their own sideways scroll
+  container. Firefox was not probed, and neither was the app's own page.
 
 A prototype of the recommended design, and of D1's swap alternative, is on
 the local branch `claude/scenario-categories-prototype` in the maintainer's
 checkout. It stamps the groups into the bundled files with a one-off script,
 which is not the data path proposed here, and four fill-state tests fail on
 it. It also predates the Columns menu and was not rebuilt on it, so nothing
-under "The Columns menu" below has been run. It is evidence for the grid
-mechanics, not a starting point to merge.
+under "The Columns menu" below has been run, and it centers its labels
+without pinning. It is evidence for the grid mechanics, not a starting point
+to merge.
 
 ## Design
 
 The design below follows D1's recommendation. A different ruling changes the
-"Two modes" section and what follows from it.
+"Grouped and ungrouped" section and what follows from it.
 
 ### What the table shows
 
@@ -184,41 +210,52 @@ unchanged: a plain playlist, a playlist imported by code, PureG S1 -
 Worthless, and the one benchmark that names nothing.
 
 Each column is 34 px wide, with no visible header text, and it can't be
-resized or sorted. Its cells merge down each run of neighboring rows that
-share a group, and each merged cell is filled with the group's color. The
-text is black or white, whichever reads better on the fill. Colors come from
-the snapshot in either hex form, and any other value leaves the cell
+resized or sorted. Both are pinned to the table's left edge. That keeps them
+in view when the table scrolls sideways, and it is what lets a tall group's
+label follow the scroll. Their cells merge down each run of neighboring rows
+that share a group, and each merged cell is filled with the group's color.
+The text is black or white, whichever reads better on the fill. Colors come
+from the snapshot in either hex form, and any other value leaves the cell
 unfilled.
 
-Clicking a group cell does nothing. Rank, Next Rank, and every other column
-are untouched, and the columns add no `?sort=` name
+Hovering a group cell names its group, in both states below. Clicking one
+does nothing. Rank, Next Rank, and every other column are untouched, and the
+columns add no `?sort=` name
 ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
-The filter box matches group names in both modes, so typing "arm" on
-Viscose S2 Medium leaves its three Arm scenarios.
 
-### Two modes
+The filter box matches group names in both states, so typing "arm" on
+Viscose S2 Medium leaves its three Arm scenarios. Each group column supplies
+its group's name as its text for the filter. Its cell value is a run key
+("Where it lives"), which the filter must never match.
 
-The table is in **benchmark order** while it has no sort and no filter
-text. That is how a fresh visit opens, and clearing a sort through its
-header returns to it.
+### Grouped and ungrouped
 
-- **In benchmark order,** each group is whole, so its merged cell is tall
-  enough for a vertical label. The label reads bottom to top in uppercase,
-  as on the benchmark's sheet. A label too long for its cell is cut with an
-  ellipsis and shown in full on hover. The corpus has none today.
-- **Otherwise,** the cells keep their colors and lose their labels, with the
-  group's name on hover. Each Scenario cell gains a second line under the
-  scenario link: the category and subcategory joined by a middle dot, or the
-  category alone on a one-level benchmark. Neighboring rows that still share
-  a group keep merging, which only makes a taller block of color.
+The table is **grouped** while it is in playlist order and the filter box is
+empty. That is how a fresh visit opens. A sort, or any filter text, makes it
+**ungrouped**, and clearing both makes it grouped again. Filter text that is
+only spaces counts as empty.
 
-The mode is one flag for the whole table, not a judgment per cell. A sort
+- **Grouped.** Each group is whole, so its merged cell is tall enough for a
+  vertical label. The label reads bottom to top in uppercase, as on the
+  benchmark's sheet, and sits in the middle of its cell. When that middle is
+  scrolled out of view, the label moves to the nearer edge of the part still
+  showing, so a group taller than the window stays named. A label longer
+  than its cell is cut with an ellipsis, and one longer than the part of its
+  cell still showing is cut at the window's edge. Either way the cell's
+  tooltip names the group.
+- **Ungrouped.** The cells keep their colors and lose their labels. Each
+  Scenario cell gains a second line under the scenario name: the category
+  and subcategory joined by a middle dot, or the category alone on a
+  one-level benchmark. Neighboring rows that still share a group keep
+  merging, which only makes a taller block of color.
+
+The state is one flag for the whole table, not a judgment per cell. A sort
 and a filter both break groups apart, and one rule for both is easier to
 predict than labels that appear wherever a group happens to survive. A link
-that already carries a `?sort=` opens straight in the second mode.
+that already carries a `?sort=` opens ungrouped.
 
 In the prototype the two lines measure 39 px inside the 41 px cell, and no
-column changes width between modes.
+column changes width between the states.
 
 ### The Columns menu
 
@@ -243,30 +280,36 @@ Two parts of the menu's mechanics need care:
 - A stored choice is keyed by the column's ID. The two IDs are chosen once,
   because renaming one later resets that choice.
 
-### How the modes meet the table's other state
+### How the two states meet the table's other state
 
-The mode is a new piece of grid state, so it is set against each piece the
-table already has, with that piece active:
+Grouped or ungrouped is a new piece of grid state, so it is set against each
+piece the table already has, with that piece active:
 
-- **A sort.** Any sorted column puts the table in the second mode. The
-  Columns menu clears the sort of a column it hides, and a `?sort=` on a
-  hidden column is cleared on arrival
+- **A sort.** Any sorted column makes the table ungrouped. The Columns menu
+  clears the sort of a column it hides, and a `?sort=` on a hidden column is
+  cleared on arrival
   ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
-  When that leaves no sort and no filter text, the table is back in
-  benchmark order and the labels return.
-- **Filter text.** Text in the filter box puts the table in the second mode,
+  When that leaves no sort and an empty filter box, the table is grouped
+  again and the labels return.
+- **Filter text.** Text in the filter box makes the table ungrouped,
   whatever it matches. Showing or hiding a column re-runs the filter, and
-  the mode doesn't change.
+  the state doesn't change.
 - **The position fill.** Its update transactions replace rows whole. The
-  rows carry their group fields, and a redrawn cell reads the current mode,
+  rows carry their group fields, and a redrawn cell reads the current state,
   so a row that streams in during a sort draws its second line.
 - **The timestamp refresh.** Every 30 seconds it redraws the two timestamp
   columns and nothing else.
 - **A stored column choice.** It applies as the page opens. The Scenario
-  cell reads which group columns are shown when it draws, and it is redrawn
-  when that changes.
-- **Navigation.** The second line sits inside the Scenario cell, so a click
-  on it opens the scenario, as a click anywhere else in that cell does.
+  cell reads which group columns are shown when it draws. The Columns menu
+  redraws no cells, so the state callback does: the grid's column state
+  carries each column's visibility, and a change to a group column's
+  visibility redraws the Scenario cells even when the table stays grouped or
+  stays ungrouped.
+- **Navigation.** The second line is part of the scenario link, so a plain
+  click on it opens the scenario and a modified click opens it in a new tab,
+  as on the name. The link's accessible name then carries the group names
+  while the table is ungrouped, which is when the group cells have no label
+  to read.
 
 ### Getting the groups
 
@@ -289,18 +332,48 @@ it and adds the join:
 Only bundled benchmarks are joined. A playlist the user imported has its own
 scenario order, which the counts don't describe.
 
-A snapshot that is missing, unreadable, or in an unexpected shape already
-costs every benchmark its Evxl link and logs one warning. It would cost the
-groups as well, and the warning would say so. Every table then renders as it
-does today, and no message reaches the screen, because nothing the user
-asked for failed.
+The link's own validation stays as it is. Each entry's layout is validated
+separately, so an entry whose layout is unusable has no groups and keeps its
+link. A snapshot the link can't read at all costs the groups as well, and
+the one warning it logs says so. Every table then renders as it does today,
+and no message reaches the screen, because nothing the user asked for
+failed.
 
-One thing follows from joining by position. The importer rewrites the
-snapshot on every run. A refresh can therefore change a benchmark's counts
-before its file is regenerated, and that benchmark then loses its groups. A
-test over the committed corpus pins the list of benchmarks that don't join,
-one today, so such a refresh fails in the PR that commits it rather than
-passing silently.
+**The premise, and what holds it.** The join assigns groups by position. It
+is right only if the snapshot's counts, taken in order, cut the bundled
+file's scenario list where the benchmark's author cut it. A matching total
+doesn't show that: two groups swapped, or a boundary moved by one scenario,
+keep the total and mislabel rows. Three things hold the premise:
+
+- **The file's order is KovaaK's.** The importer writes scenarios in
+  KovaaK's category order, and its drift check, which the refresh runbook
+  requires, reports a file whose scenario list no longer matches KovaaK's
+  ([2026-09-26](../decision_log.md#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
+  That check compares KovaaK's with KovaaK's. It never looks at the
+  snapshot.
+- **A new comparison in the importer looks at both.** The importer holds
+  KovaaK's categories and the snapshot at once. For each benchmark it
+  compares where the table would draw a boundary between two groups with
+  where KovaaK's categories begin. Every boundary the table draws has to
+  fall on a boundary between two of KovaaK's categories. Evxl may gather
+  several of KovaaK's categories under one name, which passes. A boundary
+  inside one of KovaaK's categories fails. The comparison runs at generation
+  and in the drift check, and each reports a benchmark that fails by name.
+- **A benchmark that fails gets no groups.** Its playlist code goes on a
+  short exclusion list beside the join, kept by hand, because each failure
+  needs a look and usually a report to Evxl. The corpus test below pins that
+  list together with the benchmarks whose counts don't add up.
+
+The comparison has not been run over the corpus. Five payloads are cached,
+and the other 255 need live requests to KovaaK's. The implementation PR runs
+it once as its first step, through the drift check, and records the result
+there and in the decision log. Whatever it finds changes how many benchmarks
+show groups, not this design.
+
+The importer also rewrites the snapshot on every run. A refresh can
+therefore change a benchmark's counts before its file is regenerated, and
+that benchmark then stops joining. The corpus test fails in the PR that
+commits such a refresh, so it can't pass silently.
 
 The app makes no new network call, so the user guide's
 [What it talks to](../user_guide.md#what-it-talks-to) section doesn't
@@ -314,11 +387,10 @@ whatever thresholds KovaaK's changed upstream into the same diff
 ([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 For groups it costs one thing more. The playlist model would gain fields,
 and the importer's drift check compares a shipped file with its rebuild by
-whole-model equality
-([2026-09-26](../decision_log.md#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
-A snapshot refresh that renamed a group would then report every affected
-file as drifted. What the alternative buys is bundled files that describe
-themselves. The app's runtime read of the snapshot exists either way.
+whole-model equality. A snapshot refresh that renamed a group would then
+report every affected file as drifted. What the alternative buys is bundled
+files that describe themselves. The app's runtime read of the snapshot
+exists either way.
 
 ### Where it lives
 
@@ -334,13 +406,18 @@ themselves. The app's runtime read of the snapshot exists either way.
   `PlaylistData`, as the benchmark ID does, because the importer shares that
   model
   ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  The exclusion list sits beside it.
+- **The boundary comparison** goes in `scripts/benchmark_importer/`, where
+  generation and the drift check already hold KovaaK's payload and the
+  snapshot together.
 - **The row builder** in `source/kovaaks/playlist_scenarios_service.py` adds
   each row's names, colors, and two run keys. A key numbers a run of
   neighbors that share a group, and it is the cell's value. The grid merges
-  cells whose values are equal, so two groups that share a name, such as
-  Reading under two categories, would merge if the name were the value.
-  dash-ag-grid 35.3.0 doesn't pass a `spanRows` function through to the
-  grid, which leaves value equality as the only merge test.
+  cells whose values are equal, so with the name as the value, two groups
+  that share a name across a category boundary would merge, as the two
+  benchmarks in Verified facts would today. dash-ag-grid 35.3.0 doesn't pass
+  a `spanRows` function through to the grid, which leaves value equality as
+  the only merge test.
 - **All three row sources carry the groups.** Phase 1, the fill's streamed
   rows, and a cancelled fill's rebuild each replace a row whole
   ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
@@ -348,8 +425,10 @@ themselves. The app's runtime read of the snapshot exists either way.
   ladders, or an update would blank the group cells.
 - **The page** adds the column definitions and the menu entries for the
   levels present, turns on `enableCellSpan` beside the Columns menu's grid
-  options, and seeds the mode from `?sort=`. A clientside callback on the
-  grid's column state and the filter text flips the mode and redraws the
+  options, and seeds the state from `?sort=`. Each group column is pinned
+  left and supplies its name through `getQuickFilterText`, which
+  dash-ag-grid passes through as a function. A clientside callback on the
+  grid's column state and the filter text sets the state and redraws the
   group and Scenario cells. It only reads the column state. Writing that
   prop from Dash also sets the column order, which is why the Columns menu
   applies its own changes through the grid API.
@@ -357,14 +436,20 @@ themselves. The app's runtime read of the snapshot exists either way.
   fill function in `assets/dashAgGridFunctions.js` under a bare name
   ([2026-06-20](../decision_log.md#2026-06-20-reference-dash-ag-grid-grid-functions-by-bare-name)),
   and the styles in `assets/stylesheet.css`. The Scenario renderer keeps its
-  anchor and click handling, and wraps the anchor only in the second mode.
+  anchor and click handling, and puts the second line inside the anchor.
+- **The label follows the scroll** through `position: sticky`, set toward
+  both the top and the bottom of the grid's scrolling viewport. That needs
+  the group columns pinned, because an unpinned cell's nearest scroll
+  container is the one that scrolls the columns sideways, and it needs the
+  group cell's overflow left visible.
 
 Cell spanning rules out a few grid features on the same grid: the grid-wide
 text selection option, click row selection, cell selection, and editing or
-row dragging on a spanning column. The table uses none of them. The
-Leaderboard ID cell's selectable text comes from a cell class, not from the
-grid-wide option, so the two don't conflict. The implementation records the
-constraint beside the grid option.
+row dragging on a spanning column. That list is read from the validation
+rules in the installed AG Grid 35.3.1 bundle, not from its documentation.
+The table uses none of them. The Leaderboard ID cell's selectable text comes
+from a cell class, not from the grid-wide option, so the two don't conflict.
+The implementation records the constraint beside the grid option.
 
 ### Copy
 
@@ -376,8 +461,8 @@ stored, after trimming. Every string this design adds:
 | First group column's header: accessible name and header tooltip, no visible text | `Category` | Title Case like every grid header. A 34 px header can't fit the word, so it stays in the name and the tooltip. |
 | Second group column's header, same treatment | `Subcategory` | As above. Absent on a one-level benchmark. |
 | Columns menu checkboxes | `Category`, `Subcategory` | Sentence case, as controls, which for one word is the header's own casing. `Subcategory` is absent on a one-level benchmark, and both are absent on a table with no groups. |
-| Scenario cell, second line, outside benchmark order | `{category} · {subcategory}`, such as `Control Tracking · Arm`, or one name when one level is shown | A readout, so the middle dot and no period (copy rule 2). |
-| Group cell tooltip, outside benchmark order | the group's name | The cell holds only a color there. No tooltip in benchmark order, where the label is on the cell. |
+| Scenario cell, second line, while ungrouped | `{category} · {subcategory}`, such as `Control Tracking · Arm`, or one name when one level is shown | A readout, so the middle dot and no period (copy rule 2). |
+| Group cell tooltip, in both states | the group's name | While ungrouped the cell holds only a color. While grouped the label can be cut, or sit in a part of a tall cell the user hasn't scrolled to yet. |
 
 The vertical labels are the names in uppercase. That is a presentation
 choice, made in the stylesheet, to match the benchmark sheets, and it
@@ -394,8 +479,9 @@ Playlists:
 > Clicking or Tracking. Only a benchmark from the bundled library has
 > categories.
 >
-> - Not the `Category` of KovaaK's benchmark payload, whose groups are this
->   app's subcategories.
+> - Not the `Category` of KovaaK's benchmark payload. KovaaK's has one level
+>   of groups. They are this app's subcategories on a benchmark with two
+>   levels, and its categories on a benchmark with one.
 >
 > ### Subcategory
 >
@@ -404,6 +490,11 @@ Playlists:
 
 Each entry links the playlists spec for how the table draws it, once the
 spec has that section.
+
+The table's row order keeps its existing name, playlist order. "Grouped" and
+"ungrouped" name the table's two states in this proposal and in the spec
+section the shipping PR writes. Neither appears on screen, so neither is a
+glossary entry.
 
 ## Out of scope
 
@@ -417,31 +508,36 @@ spec has that section.
 - **Groups for playlists imported by code.** Nothing upstream describes
   them. A benchmark that Evxl lists but the corpus lacks gets groups when it
   joins the corpus, not when a user imports its code.
-- **Sorting by group, and collapsing a group.** Benchmark order already
+- **Sorting by group, and collapsing a group.** Playlist order already
   groups the table. Collapsible groups are AG Grid's row grouping, which is
   an Enterprise feature.
-- **Pinning the group columns** so they stay in view during a sideways
-  scroll. Scenario isn't pinned either. This is a cheap follow-up if wanted.
+- **Pinning the Scenario column.** The group columns are pinned for the
+  label's sake. Scenario still scrolls sideways with the rest.
 - **Fixing PureG S1 - Worthless upstream.** Its counts disagree between Evxl
   and KovaaK's. The table simply shows it without groups.
 
 ## Delivery plan
 
-One implementation PR, once D1 is ruled, with no dependencies:
+One implementation PR, once D1 is ruled, with no dependencies. Its first
+step settles which benchmarks show groups:
 
+- The importer's boundary comparison, at generation and in the drift check,
+  with its tests. Then one run of the drift check over the corpus, whose
+  result goes in the PR and seeds the exclusion list.
 - The shared snapshot read and the join, the row fields on all three row
-  paths, the gated column definitions and their menu entries, the mode flag
-  and its callback, the two renderers, the styles, and the tests below.
+  paths, the gated and pinned column definitions and their menu entries, the
+  state flag and its callback, the two renderers, the styles, and the tests
+  below.
 - The shipping docs in the same PR:
-  - a decision-log entry;
-  - the playlists spec, for the columns, the two modes, the menu entries,
+  - a decision-log entry, which records the comparison's result;
+  - the playlists spec, for the columns, the two states, the menu entries,
     and the join;
   - the glossary, from the Terms block;
   - the user guide's Playlists and Benchmarks section;
   - the product inventory;
   - `docs/architecture.md`, for the join and the row fields;
-  - the importer readme, whose note on the app reading the snapshot names
-    only the link;
+  - the importer readme, for the comparison, the exclusion list, and its
+    note on the app reading the snapshot, which names only the link;
   - the release contract's comment on the snapshot, for the same reason;
   - the README's Features line for the scenario table, amended in place;
   - the roadmap's Shipped list.
@@ -454,9 +550,9 @@ prototype, not its code.
 
 Recommended implementer: `claude-opus-5-5` at high. Once D1 is ruled the
 spec is settled, and unit tests plus one live check verify it. The prototype
-shows cell spanning and the mode flag working, so what is left to discover
-is how they sit beside the Columns menu, and the live check below covers
-that.
+and the tall-group probe show cell spanning, the state flag, and the
+following label each working alone. What is left to discover is how they sit
+together beside the Columns menu, and the live check below covers that.
 
 ## Testing
 
@@ -464,40 +560,58 @@ that.
   - a two-level layout, a one-level layout stored as subcategories, and a
     layout that names nothing;
   - counts that don't add up to the scenario count;
+  - a boundary moved by one scenario with the total unchanged, which changes
+    which group the scenario beside it lands in;
   - a code that differs from its sharecode only in case;
   - a sharecode on two entries, where the first listing is the one used;
   - padded names, a short-form color, and a color that is not a hex value;
+  - an entry whose layout is unusable, which gets no groups and keeps its
+    Evxl link;
+  - a code on the exclusion list, which gets no groups;
   - a missing snapshot, one that is not valid JSON, and one in an unexpected
     shape, each of which leaves every benchmark without groups and without
     its Evxl link.
-- **The corpus:** every bundled benchmark joins the committed snapshot,
-  except a pinned list that holds PureG S1 - Worthless today.
+- **The importer's comparison:** equal sizes pass. Several of KovaaK's
+  categories under one group pass. A boundary inside one of KovaaK's
+  categories fails, at generation and in the drift check, and names the
+  benchmark.
+- **The corpus:** a test pins which bundled benchmarks join the committed
+  snapshot by count and are not excluded. It covers which benchmarks show
+  groups. It does not show where their groups fall, which the importer's
+  comparison does.
 - **The row builder:** a grouped row carries its names, colors, and keys.
   Two neighboring groups with one name get different keys. A playlist's row
   carries none of the fields. A second-phase row and a cancelled fill's
   rebuilt row carry the same group fields as the first-phase row.
 - **The page:** a two-level benchmark gets both columns ahead of Scenario, a
-  one-level benchmark one, and a playlist none. The Columns menu lists the
-  same levels first, shown by default. The group columns opt out of
-  auto-sizing. A `?sort=` value opens the table in the second mode, and no
-  value opens it in benchmark order.
+  one-level benchmark one, and a playlist none. Each group column is pinned
+  left, opts out of auto-sizing, and supplies its name as its filter text.
+  The Columns menu lists the same levels first, shown by default. A `?sort=`
+  value opens the table ungrouped, and no value opens it grouped.
 - **Gates:** the standard local validation in AGENTS.md, including the docs
   test for this file's placement and links.
 - **Live check**, in Edge and in Firefox, on Viscose S2 Medium, Voltaic S5.5
   Intermediate, a one-level benchmark, and a playlist imported by code, in
   both themes:
-  - benchmark order shows the merged, labeled cells, matching Evxl's sheet;
+  - playlist order shows the merged, labeled cells, matching Evxl's sheet;
+  - on Hewchy's Smoothness - VAI Complete, at the start, the middle, and the
+    end of its 36-row group, each label is in view and hovering either cell
+    names its group, at the table's normal height and at its 300 px
+    minimum;
   - sorting by Last Played drops the labels, adds the second line, and moves
     no column;
   - clearing the sort restores the labels;
   - typing "arm" in the filter box leaves the three Arm scenarios;
+  - typing a digit leaves the same rows with the group columns shown as with
+    them hidden, so no run key is matched;
+  - typing only a space leaves the table grouped;
   - the position fill, with a username set, leaves the group cells intact
-    while rows stream in, in both modes;
+    while rows stream in, grouped and ungrouped;
   - hiding Subcategory through the Columns menu removes the column and its
     name from the second line, with a sort active and with filter text
     typed, and showing it again leaves the column 34 px wide;
   - a stored choice that hides a group column opens the table that way after
     a reload;
-  - hiding a sorted column through the menu returns the table to benchmark
-    order and the labels;
-  - a click on the second line opens the scenario.
+  - hiding a sorted column through the menu makes the table grouped again;
+  - a plain click on the second line opens the scenario, and a Ctrl-click
+    opens it in a new tab.
