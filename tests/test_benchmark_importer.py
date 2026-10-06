@@ -93,6 +93,7 @@ def _manifest_entry(
     playlist_name: str = "Generated Playlist",
     benchmark_id: int = 42,
     rank_colors: list[tuple[str, str]] | None = None,
+    categories: list[EvxlCategory] | None = None,
 ) -> ManifestEntry:
     return ManifestEntry(
         file=file,
@@ -100,6 +101,8 @@ def _manifest_entry(
         kovaaks_benchmark_id=benchmark_id,
         rank_colors=rank_colors or [("Bronze", "#111"), ("Silver", "#222")],
         generated_at="2026-07-03T12:00:00+00:00",
+        # An item built without a layout holds an empty one.
+        categories=categories or [],
     )
 
 
@@ -1567,6 +1570,7 @@ def _seed_intact_output(tmp_path, sharecode, item):
         kovaaks_benchmark_id=item.kovaaksBenchmarkId,
         rank_colors=list(item.rankColors.items()),
         generated_at="2026-07-03T12:00:00+00:00",
+        categories=item.categories,
     )
     _write_generated_file(tmp_path / entry.file, sharecode, entry)
     script.write_manifest({sharecode: entry}, tmp_path / "manifest.json")
@@ -2523,3 +2527,90 @@ def test_check_exits_zero_for_a_crossing_on_the_exclusion_list(tmp_path, monkeyp
 
     assert summary.group_crossings == {"KovaaKsA": crossings}
     assert summary.exit_code == 0
+
+
+# --- resume state: a changed layout is compared again ---
+
+
+def test_manifest_skip_requires_the_layout_the_groups_were_compared_under(tmp_path):
+    sharecode = "KovaaKsGenerated"
+    layout = _group_layout(("Clicking", [("Static", 2)]))
+    moved = _group_layout(("Clicking", [("Static", 1), ("Dynamic", 1)]))
+    ladder = {"Bronze": "#111", "Silver": "#222"}
+    entry = _manifest_entry(categories=layout)
+    _write_generated_file(tmp_path / entry.file, sharecode, entry)
+
+    def skips(categories, manifest_entry=entry) -> bool:
+        item = EvxlDatabaseItem(
+            kovaaksBenchmarkId=42, rankColors=ladder, categories=categories
+        )
+        return script.should_skip_generation(sharecode, item, manifest_entry, tmp_path)
+
+    assert skips(layout)
+    # The total is the same, so nothing but a rebuild would compare it.
+    assert not skips(moved)
+    assert not skips([])
+
+
+def test_a_manifest_entry_from_before_layouts_were_recorded_is_built_once(tmp_path):
+    sharecode = "KovaaKsGenerated"
+    layout = _group_layout(("Clicking", [("Static", 2)]))
+    legacy = json.loads(_manifest_entry().model_dump_json())
+    del legacy["categories"]
+    entry = ManifestEntry.model_validate(legacy)
+    _write_generated_file(tmp_path / entry.file, sharecode, entry)
+    item = EvxlDatabaseItem(
+        kovaaksBenchmarkId=42,
+        rankColors={"Bronze": "#111", "Silver": "#222"},
+        categories=layout,
+    )
+
+    assert entry.categories is None
+    assert not script.should_skip_generation(sharecode, item, entry, tmp_path)
+    # Even against an item with no layout: the entry was never compared.
+    assert not script.should_skip_generation(
+        sharecode,
+        EvxlDatabaseItem(
+            kovaaksBenchmarkId=42, rankColors={"Bronze": "#111", "Silver": "#222"}
+        ),
+        entry,
+        tmp_path,
+    )
+
+
+def test_generation_records_the_layout_and_then_skips_until_it_changes(
+    tmp_path, monkeypatch
+):
+    item = _straddling_benchmark(monkeypatch)
+    nested = EvxlDatabaseItem(
+        kovaaksBenchmarkId=item.kovaaksBenchmarkId,
+        rankColors=item.rankColors,
+        categories=_group_layout(("", [("Clicking", 2), ("Tracking", 1)])),
+    )
+
+    first = script.run_importer(
+        {"KovaaKsStraddling": nested}, {}, generated_dir=tmp_path
+    )
+    again = script.run_importer(
+        {"KovaaKsStraddling": nested}, {}, generated_dir=tmp_path
+    )
+
+    assert first.generated == ["KovaaKsStraddling"]
+    assert first.group_crossings == {}
+    assert (
+        script.load_manifest(tmp_path / "manifest.json")["KovaaKsStraddling"].categories
+        == nested.categories
+    )
+    assert again.skipped == ["KovaaKsStraddling"]
+    assert again.exit_code == 0
+
+    # A snapshot refresh moves a boundary. The benchmark's ID, its ladder, and
+    # its generated file are all unchanged, and the total still adds up.
+    refreshed = script.run_importer(
+        {"KovaaKsStraddling": item}, {}, generated_dir=tmp_path
+    )
+
+    assert refreshed.skipped == []
+    assert refreshed.generated == ["KovaaKsStraddling"]
+    assert refreshed.group_crossings["KovaaKsStraddling"].lines == (_STRADDLING_LINE,)
+    assert refreshed.exit_code == 1

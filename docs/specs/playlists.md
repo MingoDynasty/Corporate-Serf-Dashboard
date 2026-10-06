@@ -520,8 +520,9 @@ except where another entry is linked.
   builds a benchmark: where a drawn group and a KovaaK's category meet, one
   has to contain the other. A benchmark that fails is named, and gets no
   groups through a hand-kept list of playlist codes, which holds IRIS Mixed
-  Benchmarks Easy. A corpus test pins the bundled benchmarks that get no
-  groups. Where Evxl subdivides one of KovaaK's categories, nothing else
+  Benchmarks Easy. A normal importer run builds a benchmark again, and so
+  compares it again, when a snapshot refresh has changed its layout. A corpus
+  test pins the bundled benchmarks that get no groups. Where Evxl subdivides one of KovaaK's categories, nothing else
   confirms where the subdivision falls.
 - After each update to the table's rows, the page hides and then shows the
   group columns that are showing, through the grid API. It is a workaround

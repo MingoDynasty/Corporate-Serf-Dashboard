@@ -110,7 +110,7 @@ delete `failures.json` at any time to clear the whole ledger.
 ## Drift check
 
 A normal run regenerates a benchmark only when its Evxl metadata (benchmark
-id and rank ladder) changes. KovaaK's can move a benchmark's thresholds or
+id, rank ladder, and categories) changes. KovaaK's can move a benchmark's thresholds or
 swap a scenario while Evxl's entry stays byte-identical, and neither side
 publishes a signal for that, so the bundled file goes stale silently and the
 app draws wrong rank badges from it. `--check` finds those files:
@@ -211,6 +211,17 @@ Groups cross KovaaK's categories: KovaaKsExample (Example Benchmark.json)
 - A crossing fails the exit code, of a normal run and of `--check`, until its
   code is on that list. After that it is logged at INFO, as already handled,
   and the exit code ignores it. IRIS Mixed Benchmarks Easy is on the list.
+- The comparison runs only where a benchmark is built. A normal run skips a
+  benchmark whose resume state is current, and that state includes the
+  layout: the manifest records the `categories` each benchmark was last
+  compared under. So when a snapshot refresh changes a benchmark's layout,
+  the next run builds it again, through the benchmark cache, and compares it.
+  A manifest entry written before layouts were recorded holds none, so the
+  first run after that change builds every such entry once.
+- A run narrowed with `--only` compares only the sharecodes it names, although
+  it refreshes the whole snapshot unless `--offline` is set. `--check` is the
+  comparison over the whole corpus, which is one reason the
+  [refresh runbook](#refresh-runbook) runs it before anything is committed.
 - The comparison can't see one thing. Where Evxl subdivides one of KovaaK's
   categories, nothing confirms where the subdivision falls.
 

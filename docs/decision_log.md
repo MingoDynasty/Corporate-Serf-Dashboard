@@ -135,6 +135,17 @@ benchmark's playlist code is already on the exclusion list, where it is
 logged for information. Without that, the check could never exit zero again
 while an excluded benchmark stays in the corpus.
 
+**A refreshed layout is compared again.** The comparison runs only where a
+benchmark is built, and a normal run skips a benchmark whose resume state is
+current. The app draws its groups from the snapshot that run may just have
+refreshed, so the layout is part of the resume state: the manifest records
+the layout each benchmark was last compared under, and a benchmark whose
+layout changed is built and compared again although its ID, its ladder, and
+its generated file are unchanged. A manifest entry written before layouts
+were recorded matches no live item, so it is built once. A run narrowed with
+`--only` still compares only what it names, so the drift check, which the
+refresh runbook requires, stays the comparison over the whole corpus.
+
 **The comparison's result.** The proposal's one-off run, on payloads fetched
 for every bundled benchmark on 2026-10-05, compared 258 benchmarks. On 221,
 KovaaK's categories begin exactly where the drawn groups do. On 34, Evxl is

@@ -346,12 +346,20 @@ def should_skip_generation(
     *,
     force: bool = False,
 ) -> bool:
-    """Return whether manifest state and its output are current and intact."""
+    """Return whether manifest state and its output are current and intact.
+
+    The layout is part of that state although no generated file holds it. The
+    group comparison runs only where a benchmark is built, and the app draws
+    its groups from the snapshot this run may just have refreshed. Skipping a
+    benchmark whose layout changed would let a layout that now crosses
+    KovaaK's categories through with a clean exit.
+    """
     if force or entry is None:
         return False
     return (
         entry.kovaaks_benchmark_id == item.kovaaksBenchmarkId
         and entry.rank_colors == _ordered_rank_colors(item)
+        and entry.categories == item.categories
         and _has_intact_generated_file(sharecode, entry, generated_dir)
     )
 
@@ -841,6 +849,7 @@ def generate_playlist(
             kovaaks_benchmark_id=evxl_database_item.kovaaksBenchmarkId,
             rank_colors=rank_colors,
             generated_at=generated_at,
+            categories=evxl_database_item.categories,
         )
         write_manifest(
             manifest,

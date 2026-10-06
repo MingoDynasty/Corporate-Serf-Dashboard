@@ -57,6 +57,10 @@ class ManifestEntry(BaseModel):
     kovaaks_benchmark_id: int
     rank_colors: list[tuple[str, str]]
     generated_at: str
+    # The Evxl layout the benchmark's groups were last compared under. An
+    # entry written before this field existed holds none, which no live item
+    # matches, so it is built and compared once rather than skipped forever.
+    categories: list[EvxlCategory] | None = None
 
 
 class Manifest(RootModel[dict[str, ManifestEntry]]):
