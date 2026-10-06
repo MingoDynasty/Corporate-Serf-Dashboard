@@ -13,6 +13,976 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-10-05: A Columns Menu Shows And Hides Table Columns, And KovaaK's IDs Are Optional Ones
+
+Status: Accepted
+
+The app knows the KovaaK's leaderboard ID of every scenario it has resolved
+and the benchmark ID of every bundled benchmark, but it showed neither, so
+trying a KovaaK's API request by hand meant digging the number out of a file.
+The Playlists table and a playlist's scenario table now each have a Columns
+menu that shows or hides any column and remembers the choice in the browser.
+Each table also has one ID column that starts hidden, so both pages look as
+they did until the menu is used. A sort on a column the user has hidden is
+dropped, because the rows would otherwise be ordered by something off screen.
+
+**Rulings.** Ratified (user) 2026-10-05, on the proposal
+([PR #334](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/334)),
+after two review waves in which every reviewer endorsed both rows.
+
+- **D1. The IDs are optional columns, behind a menu that covers every
+  column.** One ID column per table, hidden by default, and a **Columns** menu
+  that lists every column the table can work without. Rejected: a menu that
+  lists only the ID column, and a "Show IDs" switch, which both put a control
+  on a page every user sees for a need only an API caller has; a hover tooltip
+  on the name cell, whose text can't be selected and which nothing on screen
+  announces; and no UI, which leaves the lookup a file search.
+- **D2. Choices are remembered in the browser, one set per table.** Each
+  column's shown or hidden state is kept in local storage, as the Show hidden
+  switch is, and the scenario table's set is shared by every playlist. A
+  browser that has never opened the app shows the defaults, which fails toward
+  the IDs being hidden; the celebration setting accepted the same costs
+  ([2026-09-02](#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  Rejected: the URL, as the sort uses, because which columns a user reads is a
+  standing preference and not part of one visit; one set per playlist, which
+  multiplies the stored state for no stated need; the settings file, which
+  needs a server write path and a schema stamp for a display preference; and
+  no memory, which makes hiding a column pointless.
+
+**What the menu lists.** Every column the table can work without, in table
+order. The rule is a property, not a list: a column the table's structure
+depends on is never listed. That is the name column, because the row means
+nothing without it and it is the link into the row, and the overview's action
+cells, because they are the only way to hide or delete a playlist.
+
+- Overview: Type, Benchmark ID, Played, Runs, Last Played, Median Percentile,
+  Lowest Percentile.
+- Scenario table: Leaderboard ID, Last Played, Runs, Position, Total Players,
+  Percentile, PB Score, PB Date, PB cm/360, PB Accuracy, with Rank and Next
+  Rank after PB Score on a benchmark's table only.
+
+A checked column is shown. A change applies at once, and the menu stays open
+until an outside click or Escape, so several columns can be set in one visit.
+Every column is shown by default except the two ID columns. The checkbox
+labels are sentence case, as controls, while the headers they name keep Title
+Case
+([2026-09-14](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+They are two lists kept by hand; the labels are not derived from the headers.
+
+**One persisted checkbox per column, never one checkbox group.** Dash stores a
+persisted prop as the pair of the chosen value and the layout's default, and
+drops the stored value when the default no longer matches. A group's value is
+the list of shown columns, and that list's default differs between a
+benchmark's table and a playlist's, so moving between the two would reset the
+choice every time, and a column added in a later release would reset it once
+more. With one checkbox per column, each default is a constant: checked for a
+default-shown column, unchecked for an ID column, the same on both kinds of
+table. A benchmark-only column's checkbox is rendered only on a benchmark's
+table, so a playlist's table leaves its stored value alone. The checkbox ID,
+`{"type": <menu ID>, "column": <column ID>}`, is the storage key
+(`_dash_persistence.<id>.checked.true`), so renaming a menu or a column ID
+resets that one stored choice once.
+
+**The menu's dropdown stays mounted while closed.** Measured on the real pages
+in headless Edge on 2026-10-05 (dash 4.4.1, dash-mantine-components 2.8.0): a
+popover that unmounts its closed dropdown brought a checkbox back in its old
+state. Hide a column, close the menu, open it again, and the checkbox read
+checked beside a hidden column, and the first click on it did nothing. The
+cause was read in Dash's renderer source, not traced at run time: a component
+that mounts as a new render draws from the props its parent last passed down,
+not from its current ones. With `keepMounted` set on the popover, the same
+steps showed the checkbox unchecked and the first click showed the column.
+The stored choices still reach the grid as the page mounts, before the menu
+is ever opened.
+
+**The popover traps focus, and does not return it.** The dropdown renders in
+a portal at the end of the page, out of reach of the keyboard otherwise, so
+opening the menu moves focus to its first checkbox. `returnFocus` stays off.
+It hands focus back to the button on every close, including one caused by a
+click on another control, and that click still lands. With it on, text typed
+into the filter after such a click went to the button instead: the first
+space reopened the menu and the second flipped a checkbox, which hid the
+column just shown and stored that (found in review of PR #344, and measured
+on both tables on 2026-10-05). Escape returns focus to the button without it.
+
+**One clientside callback per table applies the checkboxes through the grid
+API.** It is the app's first pattern-matching callback, over that menu's
+checkboxes. It runs as the page mounts, with the stored values, and on every
+change, and does four things in order:
+
+1. `setColumnsVisible` for the shown set and for the hidden set.
+2. Clears the sort of every hidden column, with `applyColumnState` and
+   `sort: null`. A hidden column otherwise keeps its sort.
+3. Re-runs the quick filter, with `onFilterChanged`. The proposal listed
+   three steps and not this one. AG Grid matches the quick filter against
+   visible columns, but on a visibility change it only drops the filter's
+   cached text and filters nothing again. Without this step, with `2336` in
+   the filter, hiding Benchmark ID left its row on screen, and showing the
+   column again left no rows, each until the text was next edited (found in
+   review of PR #344, and measured on both tables on 2026-10-05).
+4. `autoSizeColumns` on the columns it just showed. On the proposal's
+   prototype (2026-10-04), a column shown through the API was not sized, and
+   one shown as the page opened came up at its minimum width and clipped its
+   header. With this step, on the real pages, Benchmark ID sized to 145 px
+   and Leaderboard ID to 154 px after a toggle, a reload, and an in-app round
+   trip alike (2026-10-05).
+
+Step 4 fits only the columns a run showed, so a toggle never undoes a width
+the user set by hand. Every other column is left to the grid's own autosize,
+and for that to work both grids turn column virtualization off
+(`suppressColumnVirtualisation`).
+
+With virtualization on, AG Grid renders only the columns inside the window. A
+stored choice changes which columns those are as the page opens, and the
+grid's own autosize, which runs right after the callback's first run, then
+left each column that had just come into the window at its minimum width,
+narrower than its header. With Position, Total Players, and Percentile stored
+as hidden, a benchmark's table in a 1920 px window opened with PB cm/360 and
+PB Accuracy clipped, on every load (found in review of PR #344, 2026-10-05).
+Which stored sets clipped depended on the window width, the data, and the
+browser. Why AG Grid sizes such a column to its minimum was not traced.
+
+Two fixes that fit the columns again were tried first and rejected:
+
+- *In the same task as the first run.* In the review's probe it cleared the
+  reported sets and clipped three others.
+- *Two animation frames later.* It cleared every reported case in Edge. In
+  Firefox it clipped sets that had been whole without it: 18 of 26 stored
+  sets on a benchmark at 2000 px. A fit timed by frames or by a delay has a
+  browser, a width, or a machine where it runs too early.
+
+With every column rendered there is nothing to time. None of the review's
+stored sets clipped a header: 26 sets on a benchmark, in Edge at window
+widths from 1366 px to 2400 px and in Firefox 157 from 1920 px to 2400 px, 22
+on a playlist, and 16 on the overview (measured 2026-10-05). The tables have
+at most 13 columns, so rendering them all costs nothing visible.
+
+Turning virtualization off also changes the default view in a narrow window.
+Before, a column scrolled out of view when the page opened kept AG Grid's 200
+px default, which a benchmark's table showed from 1680 px down. Now every
+column is sized to its header and its content, whether the page or the menu
+showed it.
+
+Only the newest run of the callback applies anything. Each run waits for the
+grid API on its own timer, so a run that started earlier can finish later,
+and it would put its older values back over the newer ones.
+
+It never writes the grid's `columnState` prop, which dash-ag-grid applies with
+`applyOrder: true`, and never resends column definitions, whose `sort` and
+`hide` AG Grid reapplies over the user's own. For the same reason the ID
+columns declare `initialHide`, never `hide`. The control and the callback body
+live in one module both pages import. The server never learns which columns
+are shown: rows always carry every field, and hiding Position, Total Players,
+or Percentile stops none of their fetches.
+
+**Sort: hiding a sorted column clears its sort.** This amends the ruled sort
+contract
+([2026-09-27](#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)),
+and D1's ratification covers the amendment. That entry has Back and Forward
+restore an entry's sort, and a reload or a copied link keep it. For a sort on
+a hidden column neither holds any more. The server cannot know which columns
+the browser hides, so on arrival it seeds the sort from `?sort=` as before;
+the callback then hides the column and clears that sort, the grid publishes
+its new state, and the existing address writer removes that name. Other sorts
+in the value are kept, as are the other query parameters and the hash, and no
+history entry is added. Showing the column again does not bring its sort back.
+
+The ID columns are not sortable. A sortable column on the scenario table
+needs a name in `?sort=`, and the address writer stops writing for as long as
+a sorted column has none, which would silently end sort memory.
+
+**Two states are accepted, not bugs.**
+
+- *The overview can show Last Played with its rows in name order.* Its
+  default sort, Last Played newest first, is declared in the column
+  definition and seeded on every mount. Hiding Last Played clears it, and the
+  rows fall back to name order, including when they rebuild. Showing Last
+  Played again leaves name order for the rest of that visit, and the next
+  page load sorts by it again. The column definition is not changed to avoid
+  this.
+- *A status line can report on columns that are hidden.* Each status line
+  reports on a fetch, not on a column, so "Updating positions from KovaaK's…"
+  and the two username lines read the same with Position, Total Players,
+  Percentile, or both percentile columns hidden.
+
+**Benchmark ID comes from a side table, not from the model.** The bundled
+loader reads `generated_from.kovaaks_benchmark_id` from each bundled file's
+raw text into a table keyed by playlist code, rebuilt on every load, as it
+already collects the seed's name and ID pairs. `PlaylistData` gains no field,
+because the benchmark importer shares the model: its drift check compares a
+shipped file with a stamp-free rebuild by whole-model equality
+([2026-09-26](#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)),
+so a field would report all 261 bundled files as drifted, and the importer
+would start writing it into every file it regenerates.
+
+- Only bundled files are read, so a user file's stamp is ignored. A playlist
+  imported by code has no benchmark ID and reads `N/A`.
+- A missing or malformed block reads as no ID and never stops the file from
+  loading.
+- When two bundled files claim one code, the table holds the ID of the file
+  that won it.
+- Validation stays the only judge of a broken file. The loader validates the
+  text first and reads the stamp with a second, tolerant parse after it. One
+  `json.loads` in place of both raises an error the loader does not catch, so
+  a file that isn't valid JSON would lose its startup warning. The second
+  parse costs about 10 ms over the 261 files (3.8 MB, measured 2026-10-05).
+
+**Leaderboard ID comes from the name-to-ID mapping.** That is the value the
+app itself sends to KovaaK's, not the copy embedded in the playlist file. The
+two differ when a learned entry has replaced the seeded one, or when the seed
+left the name out because two bundled files embed different IDs for it
+([2026-07-20](#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus)).
+One name is in that state today: CB SmoothTrack, which one file gives as
+97841 and two give as 92603. The mapping is the right source in both cases,
+because it names the leaderboard the Position beside the cell came from. A
+scenario the app hasn't resolved reads `N/A`, which includes that excluded
+name on an install with no username, until a lookup learns an ID for it.
+
+The table builds rows on three paths: the first paint, the fill's streamed
+rows, and a cancelled fill's rebuild. The last two replace a row's data
+whole, so a path that dropped the field would blank the cell. All three go
+through one row builder, which reads the mapping. The fill looks a position up
+before it builds the row, so a streamed row carries an ID that lookup just
+learned.
+
+**Both ID columns.** The value is bare digits, such as `184106`, with no
+thousands separator, because it gets pasted into a request. The cell's text
+can be selected, through one cell class that sets `user-select: text`; the
+grid-wide `enableCellTextSelection` option is not used. On the overview every
+other cell opens the playlist on a click, so the Benchmark ID cell is left
+out of that navigation, as the action cells are: a double-click is two
+clicks. Each header carries a tooltip saying what the number is.
+
+**Unchanged.** Column widths and column order are still not remembered. The
+quick filter keeps matching visible columns only, which is AG Grid's default,
+so typing an ID finds a row only while the ID column is shown. No cache,
+setting, network path, or notification is touched.
+
+**Out of scope.** An ID readout on the Scenario Performance page, for a
+scenario in no playlist; a reset or show-all control; reordering columns from
+the menu; a copy button in the ID cell; and skipping the fetch for a hidden
+column.
+
+**Provenance.** Proposal in PR #334, ratified 2026-10-05. Shipped in
+PR #344.
+
+## 2026-10-05: Time-Scored Scenarios Are Measured By Pace
+
+Status: Accepted
+
+Some scenarios score the time left on a countdown when the task is done, and
+on those the app now measures by pace: how fast a run finishes compared with
+the personal best. A percentage of such a score understates a real
+improvement many times over, so these scenarios looked closer to the next
+rank and easier to pass than they were. A player sees "faster" in the Next
+Rank column and "PB pace" in a run's verdict wherever pace applies. Where the
+app can't tell whether a scenario is time-scored, everything reads as it did
+before.
+
+**Ruling.** Ratified (user) 2026-10-04 as a whole, after three review waves
+on the proposal (PR #329, merged as `3efebe5`; the P1 and P2 rulings recorded
+at `72eec3e`, the ratification at `18174de`). P1 and P2 were ruled together,
+each as recommended, and P8 was ruled as a deferral. The author-owned rows
+P3, P6, P7, P9, and P10 were reviewed and settled by the ratification. The
+maintainer had already set three constraints: it is a bug fixed on its own
+track (2026-09-28); the app detects such a scenario from the player's own
+runs, accepts any constant, and falls back whenever it is unsure
+(2026-09-28); and it adds no run length to the run record (2026-10-04).
+
+**Supersedes in part**, for time-scored scenarios only, D1 of the
+[2026-09-27 entry](#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)
+and the verdict formula of the
+[2026-07-08 entry](#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb).
+Each keeps its text and gains a note. Every other scenario keeps both
+unchanged.
+
+**What a time-scored scenario is.** It has no fixed length. It ends when the
+player finishes a task, such as killing six bots, and its score is the time
+left on a clock that counts down from a constant. So the score is the
+constant minus the completion time, and one point is one second. A
+percentage of a score assumes the score starts at zero, and this one starts
+at the constant. For a small change, the percentage of the score understates
+the percentage of pace by the score divided by the run's time, a factor of 4
+to 16 across the maintainer's 99 runs of ten such scenarios (2026-10-04).
+
+**The pace formulas.** With constant `C`, a score `s` took `C − s` seconds.
+`T` is the next rank's threshold, `g` the goal percentage, and `prev` the PB
+before the run. Each percentage that divided one score by another divides
+the other way round on times, and nothing else in its formula changes:
+
+| Surface | Score math | Pace math |
+|---|---|---|
+| Next Rank gap | `(T − PB) / PB × 100` | `((C − PB) / (C − T) − 1) × 100` |
+| Threshold line | `PB × g / 100` | `C − (C − PB) × 100 / g` |
+| Verdict passes when | `s × 100 ≥ prev × g` | `(C − prev) × 100 ≥ g × (C − s)` |
+| Verdict shows | `s / prev × 100` | `(C − prev) / (C − s) × 100` |
+| Personal best gain | `(s / prev − 1) × 100` | `((C − prev) / (C − s) − 1) × 100` |
+
+**Pace applies only when it is defined.** A surface uses pace when the
+scenario is recognized, every score in the comparison is eligible, and both
+times are positive. Otherwise it runs the code it ran before, with that
+code's own `N/A` and unjudged rules. One consequence is deliberate: a
+time-scored PB of zero or less still gets a pace percentage, because only
+the times have to be positive. The verdict converts each score and the
+constant to decimals before subtracting and compares the cross-multiplied
+form, so a run exactly at the goal passes, as the 2026-07-08 entry requires.
+Display rounding is unchanged. The gap rounds up with a floor of 0.1, and a
+verdict keeps both of its caps: a miss prints at most one tenth below the
+goal, and a run below the previous best prints at most 99.9%. The second cap
+needs no change, because a run's pace is below the previous best's exactly
+when its score is.
+
+**Why pace and not time: both are a percentage of throughput.** On a
+fixed-length scenario the time is fixed and the score is the work done in
+it, so score divided by PB score is a ratio of throughput. On a time-scored
+scenario the work is fixed and the time varies, so throughput is one over
+the time, and its ratio to the PB's is the PB's time divided by the run's.
+That is pace. So the one global threshold setting keeps one meaning, a
+higher setting still demands more, and a pace gap and a score gap can share
+one sorted column. It also lets every formula carry over with only the ratio
+replaced, so the rounding, capping, and boundary rules needed nothing new.
+
+**P1: the Next Rank gap on a time-scored scenario is a pace gap.** It is how
+much faster the PB run has to finish to reach the next rank. D1's three
+reasons all survive: the gap is defined below the first rank, it states the
+target to beat, and it still matches the score threshold, which P2 moves the
+same way. The ladder walk, the Rank column, the round-up and its floor, the
+unrounded sort key, Top rank's precedence, and the tooltip in points are
+unchanged, because a higher score is always a faster finish. One rule
+narrows: D1's `N/A` for a PB of zero or less now applies to a time-scored
+row only where pace is undefined. Rejected: keeping D1, which understated
+these gaps 9 to 12 times on the maintainer's Viscose rows and floated all
+four to the top of an ascending sort; the gap in seconds, which is exact but
+can't be compared across scenarios and already sits in the tooltip; percent
+less time, which is not what "faster" means and would measure differently
+from P2; and `N/A`, which drops the one answer the column exists for.
+
+**P2: the score threshold on a time-scored scenario is a percentage of PB
+pace.** At 95%, a run passes when it is at least 95% as fast as the PB,
+which means finishing within the PB's time divided by 0.95. The chart line
+sits at the score that finishes exactly then, from the current PB, and the
+verdict judges against the previous PB, as before. A goal above 100% puts
+the line above the PB. The setting stays one global percentage. Judged
+after the fact on the maintainer's six time-scored scenarios with at least
+five runs, the score form passed 86 of 86 runs and the pace form 59.
+Rejected: keeping a percentage of the score; reading the percentage as
+time, which taken literally demands a run 5% faster than the PB and
+otherwise needs a translation of the setting that no other scenario uses;
+turning the threshold off on these scenarios; and a separate or
+per-scenario percentage, which is a Run History question.
+
+**Detection: one performance file answers one of three ways (P9).**
+KovaaK's writes a performance file beside each run's stats file. The check
+reads the header's `schema_version` and `scenario_hash`, its challenge
+profile's `time_limit` and `timescale`, and each event's `timestamp` and
+score delta.
+
+- *Time-scored:* the file has at least two score events, and after every
+  one the running score is within 0.5 of
+  `time_limit − timescale × timestamp`. The constant is the file's
+  `time_limit`, and the scenario version is its `scenario_hash`.
+- *Not time-scored:* any other file that can answer.
+- *Can't answer:* the bytes do not parse, or `schema_version` is not 1. The
+  proposal left four header cases open, and each also can't answer: no
+  header, no scenario hash, a time limit that is missing, not positive, or
+  not a finite number, and a timescale that is any of those three. No file
+  in the maintainer's folder has any of them.
+
+**Which file decides.** The scenario's newest run names the version. That
+run and the older runs of the same hash are tried newest first, and the
+first whose performance file can answer decides. A file that can't answer
+is skipped, so a damaged file, or a schema change in the game, doesn't turn
+a recognized scenario back. A file that answers "not time-scored" is not
+skipped: every ordinary scenario's newest file answers that, and skipping
+it would read that scenario's whole history. No file that can answer means
+the app can't tell. So does a newest run with no hash, which names no
+version. One file can decide because how a scenario scores belongs to its
+definition, which the hash identifies. A scenario's first run on a current
+build therefore flips it to pace, and it flips back only if a newer run's
+file can answer and shows no countdown.
+
+**The tolerance absorbs a start lag, not noise.** From the maintainer's
+1,764 performance files on 2026-10-04: the 84 countdown files, across 10
+scenarios, stay within 0.02 of the line at every event, and the nearest of
+the other 1,680 is off by 42. Every tolerance from 0.02 to 40 recognizes
+the same 84. The distance is set at the first score event and barely moves
+after it. On the other paired files that first event's timestamp falls up
+to 72 ms short of one second, with a 99th percentile of 31 ms. Every run in
+the data was played at 407 to 988 FPS, so a slower machine may lag more,
+and a missed file is silent. Half a point is seven times the largest lag
+seen. `timescale` is the scenario's own game speed: the time limit counts
+game time and the timestamps count real time, so a slowed time-scored
+scenario should lose `timescale` points per real second. No such run is in
+the data, and if the game does otherwise the check fails and the scenario
+falls back.
+
+**The file facts the app relies on.** KovaaK's publishes the format, a
+protobuf schema, at <https://wiki.kovaaks.com/performance.proto>, and the
+app reads it by hand, with no protobuf dependency. Game builds from 3.9.0
+write the files, into the `performances` folder beside the stats folder. A
+run's file is found by name: the stats file's name with ` Stats.csv`
+replaced by ` Performance.perf`. Of the 1,757 stats files written since the
+first performance file, 1,756 have one of the same name, and on all 1,756
+the header's hash equals the stats file's `Hash:`. The game writes the
+performance file within 10 ms of the stats file, and the watchdog already
+waits a second before reading a new stats file. Every file in the folder is
+schema version 1. There is no new setting, and the app only reads the
+folder.
+
+**Eligibility is by hash (P10).** A run record keeps the stats file's
+`Hash:` and the stats file's own name, and no run length. A score is
+eligible for a pace comparison only when its run's hash equals the deciding
+file's. That covers the row's PB, the chart's PB, the verdict's and the
+celebration's previous best, and the new run. A rank threshold comes from
+the benchmark file and counts as eligible. A stats file with no `Hash:`
+still loads, and its score is never eligible. So a PB from an older version
+of the scenario keeps the score math until a run on the current version
+beats it: the constant was read from one version, and nothing shows that
+another scores the same way. Of the maintainer's 866 scenarios, 15 have
+more than one hash, and none of the ten time-scored ones do.
+
+**The constant travels with the run.** The watchdog works the constant out
+before it queues a run's message, with the landed run judged by its own
+file, and the message and the batch record carry it as a fact, like the
+previous best. It is absent when the scenario isn't recognized, when the
+new run or the previous best isn't eligible, and on a scenario's first run,
+which nothing judges or celebrates. So the toast agrees with the chart,
+which rebuilds after the run lands, and neither the drain nor the page
+reads the stores for it.
+
+**Cost and memory.** Startup lists the `performances` folder once and
+parses nothing. A run that lands adds its file to that listing, so the
+table and the chart see the file the watchdog read. A file is parsed only
+when a surface asks about its scenario, and each answer is remembered by
+file name, because a written file never changes. A file that can't be read
+is not remembered, so the next look tries again. Reading one costs about
+0.6 ms in plain Python for a median file of 4.7 KB. Nothing is written to
+disk. A missing, unreadable, or malformed performance file costs only the
+detection, never the run. The stores are read on the terms of the
+[2026-07-09 entry](#2026-07-09-accept-unsynchronized-in-memory-stores-single-writer).
+
+**Five surfaces.** Next Rank reads "{gap}% faster to {rank name}" and sorts
+by the unrounded pace gap, on all three row paths. The Score threshold line
+draws at the pace line, and its annotation still shows a score. The
+threshold verdict says "% of PB pace". The New personal best toast says
+"Finished {pct}% faster than your previous best of {previous}." The session
+debug log judges by pace at its fixed 95%, because left on score it would
+pass every run the toast fails. Anything that orders or places scores is
+unchanged: the chart's points and axis, the Average score line, the PB
+line, the rank lines, the Rank column, top-N placement, and the
+celebration's strictly-greater test. The Next Rank header tooltip and the
+Score threshold percentage help text name both measures, in wording that
+stays true in every fallback. No completion time is shown anywhere.
+
+**Rejected: inferring it from the stats files.** A stats file gives a run's
+length only as its name's time stamp less its start time and pause
+duration, precise to about a second, and a detector can fit score plus
+length to a constant across a scenario's runs. The proposal's first design
+did. It needs five runs, and four of the ten scenarios have fewer. A fit
+through noisy lengths can't establish one point per second. Its constant
+came out 0.3 to 0.5 s low, which distorts a short run's percentages. And
+the stats file can't see a slowed scenario: its time dilation field reads
+1.0 on all 363 runs whose performance file records another timescale.
+Keeping the inference as a fallback was rejected too, since on the
+maintainer's data it recognizes nothing the file doesn't. Also rejected: a
+hand-kept list of scenarios, which can't cover what public users play; the
+header alone, since a time limit says how long a run may last and not how
+it scores; requiring a time limit of exactly 1,000, which would hard-code
+the constant; and parsing every file at startup, which grows with every
+run.
+
+**P8: the Aim Training Journey graph keeps its score ratios.** That graph
+averages each scenario's best score so far as a share of its PB, the same
+ratio corrected here. The page was ruled shelved on 2026-09-28, as recorded
+in
+[#327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327),
+so leaving it alone is a deferral under that ruling, separable from this
+fix. On a playlist that holds time-scored scenarios the graph keeps
+overstating how close earlier runs were to the PB. A plan that revives the
+page carries this fix with it.
+
+**Checked in the game before the merge.** Two cases had no run in the
+data, so the maintainer played one of each on 2026-10-05, on Air Pure
+Easier No UFO and game build 3.9.10. A run paused for 15 s partway through
+was recognized, with a largest distance of 0.011. Its file carries one
+pause event, and its timestamps leave the paused time out: the run took
+about 102 s by the clock, and its last event is stamped 87.2 s. So a file
+with a pause event needs no special case. A run at a 60 FPS cap was
+recognized with a largest distance of 0.027, where that scenario's six
+earlier files sit at 0.006 to 0.008. That is one run, so it shows the
+typical lag and not its tail, and half a point is about nineteen times
+it. The debug log records each parsed file's largest distance from the
+countdown, which is the number to read if a scenario is ever not
+recognized.
+
+**Out of scope.** Run History, including a run length field and a
+per-scenario threshold. A per-bot breakdown. Anything else the performance
+file holds. A scenario whose score isn't the time left on its clock, and
+one with no performance file: both keep the score math.
+
+**Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
+`gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.
+
+## 2026-10-05: The Score vs Time Chart Marks Each New PB With A Star
+
+Status: Accepted
+
+The Score vs Time chart now draws a gold star on each plotted run that beat
+the scenario's personal best when it was played. Every run used to be the same
+dot, and a day's runs share one position, so the runs that set each best could
+only be found by comparing every dot with all the ones before it. The stars
+need no setting, and the Score vs Sensitivity chart is drawn exactly as
+before. They record what the player reached and when, and they don't judge
+whether the player is improving.
+
+**Ruling.** Ruled (user) 2026-10-05, on PR #337: the maintainer ratified the
+whole proposal after two review waves, with every reviewer endorsing every
+row. That settled the rule, the chart it applies to, and the absence of a
+control as recommended. It also covered the author-owned look, build, copy,
+and term, and with them one exception to an earlier entry, named under
+**Point size sizes the stars**.
+
+**The rule.** A new PB is a run whose score is strictly above every earlier
+run of its scenario. It is the rule the personal best celebration applies to
+one new run
+([2026-09-02](#2026-09-02-a-new-personal-best-celebrates-on-every-page)), so a
+star and a celebration judge a run the same way.
+
+- One pass over the scenario's runs from oldest to newest, at every
+  sensitivity, including the runs older than the page's oldest date. A star
+  then means one thing whatever the chart's filters are set to: this run was
+  the PB when it was played.
+- A tie is not a new PB, so the earliest run to reach a score holds the star.
+  The playlist tables' PB Date already reads a tied PB that way.
+- The scenario's first run sets the baseline and is not one.
+- Nothing is stored. The pass runs when the chart is rebuilt, and the
+  maintainer's largest scenario had 463 runs on 2026-10-04.
+- A higher score is better on every scenario, time-scored ones included, so
+  pace doesn't change the rule.
+
+Rejected:
+
+- **Mark only the current PB.** One star per chart, on the point the PB score
+  line already touches. It adds nothing the line doesn't show, and it can't
+  say when the earlier PBs happened.
+- **Judge against the plotted window only,** restarting the comparison at the
+  oldest date. The star's meaning would move with a chart control, and it
+  would mark runs that were never a PB: 86 of them, across 45 of the 188
+  scenarios with runs older than the window.
+- **Count the first run.** Every scenario would open with a star that says
+  nothing. The celebration skips it for the same reason.
+- **One star per day,** on the run that held the PB when the day ended: 421
+  stars where the rule draws 666. A star would stop matching the celebration's
+  rule one to one, and its meaning would depend on the chart drawing its axis
+  in days. The 245 stars it drops are the ones a reader couldn't find before,
+  because a day's runs share one position.
+
+**Only Score vs Time is marked.** Score vs Sensitivity keeps its two traces.
+The chart opens on Score vs Sensitivity and remembers the choice per browser,
+so a fresh browser shows no stars until the reader switches. Along the date
+axis the stars read left to right as the history of the PB, and along the
+sensitivity axis they have no order. That chart also keeps only the top scores
+at each sensitivity, which are mostly the latest new PBs. About four in ten of
+its points would be stars (584 of 1,355), and on the 75 scenarios with 20 or
+more runs it would draw only 172 of the 255 new PBs, with nothing to show
+which are missing. Rejected: marking both charts at that cost, and marking
+only the current PB on Score vs Sensitivity, where the PB score line already
+touches that point and the star would mean something different on each chart.
+
+**A star belongs to the run, not to a position.** A star is drawn on a plotted
+run that is a new PB.
+
+- A new PB the chart doesn't plot gets no star, whether the Top N filter
+  dropped it or it is older than the oldest date. It still counts in the
+  comparison. By this rule 666 of the year's 691 new PBs get a star.
+- A later run the same day with the same score sits at the same position, and
+  it is not a new PB.
+- **A kept tie doesn't inherit the star.** The day's filter keeps the later of
+  two equal scores, so with Top N low enough it drops a new PB and keeps the
+  run that tied it. That day then has a point at the PB's score and no star.
+  A match on the position would star it: 4 stars on runs that never beat the
+  PB.
+- A chart where no plotted point is a new PB has no New PB trace and no legend
+  entry.
+
+**The hover names the run that set the PB.** When a new PB and a later
+same-day tie are both plotted, their points coincide: 26 of the 666 stars. The
+chart shows one hover for the pair. Among points at one position plotly.js
+shows the hover of the one that comes last in the trace, and in time order
+that is the later run, which never beat the PB. So the run trace places a new
+PB after the runs that share its position, and its hover is the one shown.
+Only the order of points within the trace changes: the same runs are plotted
+at the same positions, and the Average score line is unchanged.
+
+That order is an observed behavior of the bundled plotly.js 4, not a
+documented one. A unit test pins the order within the trace. Which point
+plotly.js answers with can only be seen in a browser, and the implementation's
+scripted check does that: on a real shared star it read the new PB's own time
+and accuracy at six cursor positions across the star. A plotly.js upgrade is
+where it could change.
+
+**The look.** One color for both themes, with no theme logic.
+
+| Property | Value |
+|---|---|
+| Symbol | plotly's `star` |
+| Fill | `#fab005`, Mantine yellow 6 |
+| Outline | `#5f3d00`, 1 px |
+| Size | 12 with Point size on Default, 9 on Small, 16 on Large |
+
+- **Gold,** the usual color of an award. Yellow is also one of the four color
+  families the Point color swatches leave out, so no swatch can match it.
+- **An outline, because gold alone fails on white.** Gold has 1.86:1 against
+  the light plot background and 8.34:1 against the dark one. The outline has
+  9.75:1 against white and 5.24:1 against the gold. The
+  [2026-08-20 entry](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+  dropped yellow from the swatches for the same contrast reason.
+- **A shape as well as a color.** Point color accepts any hex value, so a
+  player can set the run points to this exact gold. The star and its outline
+  still stand apart then, and the mark never depends on color alone.
+- **About twice the run point's size.** A star reads smaller than a circle of
+  the same size. The run points are 4, 6, and 10 px at the three presets. The
+  Large star is 16 and not 20, so stars on neighboring days don't crowd.
+
+The values were chosen from a prototype built through the app's own plot
+functions on the maintainer's runs, in both themes, at the three sizes, and
+with gold run points.
+
+**How it is built.** A third trace named New PB, added after Average score so
+that it is drawn on top.
+
+- The run trace keeps every run, so hiding the stars from the legend leaves an
+  ordinary point where each star was.
+- The star trace sets `hoverinfo` to `skip`, so hovering a star shows the run
+  trace's hover for that point.
+- Share chart and Download plot as a PNG carry the stars, as they carry
+  everything plotted. The figure holds no new data: each star repeats a
+  plotted run's date and score.
+- The zoom fit is unchanged. It reads every visible trace, and the stars sit
+  on run points, so the fitted range is the same with the stars shown or
+  hidden.
+- The legend's three entries were 364 px wide and on one row at the narrowest
+  chart the open Chart options panel leaves, where the plot area was 497 px
+  wide (headless Edge, 2026-10-05).
+- A star on a recent PB can sit under the PB score label, which is drawn at
+  the right end of its line. Where the overlay labels go is a separate
+  question, and this entry doesn't move them.
+
+**Point size sizes the stars, an exception to the 2026-08-20 entry.** That
+entry
+([Run Points Get A Size Preset And A Color, And The Chart Stops There](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there))
+says "Nothing else on the chart became customizable", and its point
+preferences restyle only the run trace. Point size now sizes the New PB trace
+too: 9 on Small, 16 on Large, and the generated 12 on Default. Point color
+still restyles only the run trace. The set of controls doesn't change, but one
+control now restyles two traces, so that entry is superseded in part, for that
+one sentence and nothing else.
+
+The same entry says when to look at symbols again: "reconsider marker symbols
+only if the graph ever carries multiple semantic point categories". This is
+that case, since a new PB is a second category of point. The outcome is a
+symbol the app fixes, and still no symbol control.
+
+**No control.** Nothing in the Chart options panel changed: no switch, no
+color or shape setting, and no new persisted id.
+
+- Clicking New PB in the legend hides the stars, as it hides any trace. That
+  choice is not remembered. A new figure brings the stars back, because
+  plotly.js keeps a legend click across figures only when the figure sets
+  `uirevision`, and this chart sets none on purpose. The chart gets a new
+  figure from a new run on the scenario, a control that rebuilds it, or an
+  appearance change: Point size, Point color, or the theme.
+- The celebration accepted the same density of new PBs on a lightly played
+  scenario with its setting as the way out. The stars have no equivalent: in
+  session, a legend click lasts until the next run on the scenario.
+- No workflow asks for a control yet. The 2026-08-20 entry asks that a chart
+  control answer a recognizable user goal, and keeps "nothing else until a
+  real workflow demands it".
+- A star costs little to ignore. It sits on a point that is drawn anyway, so
+  the axes cover the same runs with or without it. An overlay line differs: it
+  can stretch the score axis, as the full rank ladder does.
+
+Rejected:
+
+- **A New PB switch in Overlays.** Hiding the stars would persist like the
+  other switches, at the cost of a fourth control in a group of three, one
+  more persisted id, and one more input that rebuilds the chart. It can be
+  added later without migrating anything, so waiting to see whether the stars
+  bother anyone loses nothing.
+- **Letting the PB score switch hide the stars too.** No new control, and the
+  choice would persist. But the switch is named for the line, and the line
+  stretches the score axis where the stars don't. A player who turns the line
+  off to see recent runs closer would lose the stars with it.
+- **A color or shape setting.** The 2026-08-20 entry stops chart customization
+  at the run points' size and color, and nothing here needs it moved.
+
+**Achievements, not a trend.** The
+[2026-10-04 direction entry](#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice)
+moves judgments about skill toward the typical run and keeps the personal best
+as the achievement. The stars sit on the achievement side of that line.
+
+- They record what the player reached and when, as the celebration does. They
+  are not a judgment of skill, and they are not a trend.
+- A PB only rises, so a row of stars can't show a decline, and after one lucky
+  run it reads as a plateau. Whether the player is improving stays the trend
+  verdict's question, answered from session medians.
+- This chart has no typical-run read of its own. Its Average score line
+  averages only the runs each day plots, the top N, so on a busy day it is the
+  average of that day's best.
+- The cost accepted is emphasis: gold stars draw the eye to the best runs, on
+  a chart that already plots each day's best, in an app whose reading of skill
+  is moving toward the typical run.
+- A star is a fact about a run, with no estimate in it and no advice, so that
+  entry's other two rules ask nothing of it.
+
+**Measured.** On the maintainer's stats folder on 2026-10-04: 8,880 runs over
+866 scenarios, at the page defaults of Top N scores 5 and an oldest date of
+January 1. The folder has grown since, so it no longer gives these counts.
+
+- 480 scenarios have a run this year, so they have a chart. 691 runs this year
+  were new PBs, and 284 of the 480 charts show at least one star.
+- 666 of the 2,220 plotted points are stars (30%). The share falls as a
+  scenario is played more: 240 of 1,195 (20%) on the 75 scenarios with 20 or
+  more runs, and 24 of 208 (12%) on the 9 with 100 or more.
+- 245 of the 666 stars (37%) are on a run that a later run the same day beat,
+  and 174 of the 830 plotted days carry two or more stars. Those 245 are what
+  the stars add over reading each day's top point, and a third of their
+  density.
+
+**Copy and term.** The legend entry is `New PB`, the short form of the
+celebration toast's New personal best that the chart already uses in PB score.
+The glossary gains New PB, with `new_high_score` as its code word. "PB run"
+was taken: it is the one run that holds the PB now.
+
+**Out of scope.** A hover line on a marked run, such as the PB it beat.
+Keeping a new PB that the Top N filter drops, which would change which runs
+the chart plots and the Average score line with them. A minimum run count or
+margin before a run counts, which the celebration declined. New PBs anywhere
+else: the playlist tables, the Aim Training Journey graph, or a list of them.
+A trend or a verdict read from the stars.
+
+Design in [#337](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/337),
+implementation in [#346](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/346).
+
+## 2026-10-04: Upgrades Skip Package Versions Younger Than A Week
+
+Status: Accepted
+
+uv ignores any package version published in the last seven days. A hijacked
+package is usually caught and withdrawn within days, so the delay keeps one
+out of the lockfile and out of the next release. A contributor who needs a
+newer version sooner exempts that one package. A refresh holds the uv release
+it pins to the same week, by hand.
+
+**Ruling.** Ruled (user) 2026-10-04, in chat, on PR #340. The setting is
+`exclude-newer = "7 days"` under `[tool.uv]` in `pyproject.toml`. It lands
+with the first refresh after this entry, not with the entry: adding it changes
+`uv.lock`, and a change to `uv.lock` cuts a release.
+
+**Why.** Updates here are made by hand
+([2026-10-04 entry](#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook)),
+and a plain `uv lock --upgrade` takes the newest version of everything. On
+2026-10-04, 13 of the 25 pending updates would have resolved to a version
+under seven days old. Merging a lock cuts a release, so those versions reach
+installed copies.
+
+**Why in `pyproject.toml`.** Measured under uv 0.12.13 on 2026-10-04. uv
+records the setting in the lock's `[options]` as a span
+(`exclude-newer-span = "P7D"`) beside a placeholder date, so the lock does not
+go stale as time passes. `uv sync --locked`, which CI and the installer both
+run, compares those options with the project's. Passing `--exclude-newer` only
+on the upgrade command writes an option the project does not have, and
+`uv sync --locked` then exits 1. Adding the setting to an existing lock moves
+no package version.
+
+**The exemption.** `exclude-newer-package = { <name> = false }` lifts the limit
+for one package, and uv records it in the lock the same way. It is for a fix
+that cannot wait a week, usually one for a security alert. It comes out at the
+first refresh after the exempted version is a week old, never sooner: removed
+while the version is still under the limit, `uv lock` moves the package back
+to an older version and exits 0, which would undo the fix without a warning.
+
+**The uv pin.** Ruled (user) 2026-10-05, in the review of PR #340: the same
+week applies to the uv release a refresh pins. Every install downloads that
+exact build and runs it, so the reasoning for packages holds at least as
+strongly here. uv publishes often, with ten releases in the 23 days before
+2026-10-04, so its latest release is usually days old. The setting cannot
+enforce this, because it governs the packages uv resolves and not uv itself.
+A refresh applies it by hand and pins the newest release at least a week old.
+
+## 2026-10-04: Dependency Updates Stay Manual, Run From A Playbook
+
+Status: Accepted
+
+Dependencies and toolchain pins are updated by hand, about once a month, from
+a written playbook. No bot opens update PRs, and no scheduled job reports what
+is outdated. A contributor who wants newer versions runs the playbook at a
+quiet point in the project.
+
+**Ruling.** Ruled (user) 2026-10-04, in chat, on PR #340: updates stay manual,
+and no bot opens update PRs. The scheduled check was skipped "for now", so it
+is the part of this entry most likely to be revisited. The procedure is
+[docs/dependency_refresh.md](dependency_refresh.md).
+
+**Why no scheduled check.** It would answer a question whose answer is always
+yes. On 2026-10-04, 22 days after the previous refresh, 25 of the 84 locked
+packages had a newer release. The useful trigger is a quiet point in the
+project, which a timer cannot see: the uv pin is exact, so moving it strands
+every open branch on the old pin until that branch merges `main`.
+
+**Why no bot PRs.** Three reasons, the first of them mechanical.
+
+- Dependabot cannot run here. Its uv updater supports only the uv version it
+  bundles, and rejects an exact `required-version` pin that differs. Another
+  of the maintainer's repositories, on the same pin style, has failed every
+  monthly Dependabot uv run since 2026-08-01 with
+  `tool_version_not_supported`, and
+  [dependabot-core issue 13199](https://github.com/dependabot/dependabot-core/issues/13199)
+  was still open on 2026-10-04. The version Dependabot bundles was different
+  on each of those three runs (0.11.8, then 0.12.7, then 0.12.18), so no exact
+  pin could have kept up with it. The pin cannot be loosened to suit it: the
+  release job reads the pin into `release.json` and refuses anything but an
+  exact `==`, because every install provisions that version
+  ([2026-07-19 entry](#2026-07-19-the-installer-brings-its-own-toolchain-app-locally)).
+  Dependabot's security fix PRs run through the same updater, so they stay
+  off as well.
+- Renovate can refresh a uv lockfile, but it is a third-party app that needs
+  write access. On 2026-10-04 `main` required only the CI check, and a merge
+  that changes `uv.lock` cuts a release, so write access reaches installed
+  copies.
+- A green CI run does not make a version bump safe. plotly 7 put a new button
+  on both charts, which only a look at the running app could show
+  ([2026-09-12 entry](#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)),
+  and ruff 0.16 changed which rules were enabled. Two of the four refreshes
+  before this entry needed a judgment of that kind.
+
+**What stays automatic.** Dependabot alerts only read the lockfile, so the pin
+does not affect them; they have been on since 2026-08-30. The fix for an alert
+is a single-package upgrade made by hand, as its own PR.
+
+**The pinned GitHub Actions.** Ruled (user) 2026-10-04, in chat: they move
+through the cross-repo tooling spec
+([2026-07-06 entry](#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)),
+never in a refresh of this repository alone. The spec carries their SHAs, and
+every repository that follows it carries the same ones. A refresh therefore
+only reports a pin that is behind, and a bump arrives as a new version of the
+spec.
+
+## 2026-10-04: A Benchmark's Scenario Page Links To Its Evxl Page
+
+Status: Accepted
+
+A benchmark's scenario page now carries a View on Evxl link that opens the
+same benchmark on Evxl in a new browser tab. Evxl shows what this app doesn't,
+such as the overall rank a benchmark awards, and getting there used to mean
+finding the benchmark on Evxl by hand. With a Steam ID set the link opens the
+player's own sheet, and without one it opens the page where Evxl asks for a
+profile. The app builds the address and requests nothing from Evxl itself.
+
+**Agreed before the PR.** In chat on 2026-10-04 the maintainer agreed to the
+placement, the header of the per-playlist scenario page, and asked for the
+build. The rest of this entry is the author's, open to review: where the names
+come from, the page a missing Steam ID falls back to, and the label "View on
+Evxl".
+
+**Addresses.** `https://evxl.app/u/{Steam ID}/{benchmark}/{difficulty}` with a
+Steam ID, and `https://evxl.app/benchmarks/{benchmark}` without one. Both
+names are Evxl's own, matched exactly and case-sensitively, and each is
+percent-encoded as one path segment, so a `/` inside a name travels as `%2F`.
+Neither address carries a query: Evxl appends `?tab=` from the visitor's
+remembered tab, and a link that set one would override that choice. The
+measurements are in
+[kovaaks_api_notes.md](kovaaks_api_notes.md#evxl-benchmark-pages-linked-never-fetched).
+
+**Where the names come from.** A bundled file carries the KovaaK's playlist
+name, which is not Evxl's: "Viscose Benchmark S2 - Medium" is "Viscose
+Benchmarks S2" and "Medium" there. `source/kovaaks/evxl_links.py` reads both
+names from `resources/evxl/benchmarks.json`, the snapshot the importer
+generates the bundled library from, once per process, keyed by playlist code.
+The file already ships in the release zip, and the release's archive contract
+names it, so a release that would ship without it fails its draft instead of
+silently losing every link. Rejected: having the importer write
+the names into each bundled file. That is the tidier data model, but it bumps
+the generated schema and regenerates all 261 files against live KovaaK's
+data, and the diff would carry whatever thresholds KovaaK's had changed since
+the last refresh. The cost accepted
+instead is that the running app now reads a file only the importer read
+before. A snapshot that is missing or in another shape logs one warning and
+removes the link, and nothing else. The importer refreshes the snapshot before
+it generates, so the names move at the corpus's own cadence, and a benchmark
+Evxl renames is a 404 until the next refresh.
+
+**Matching a code.** Codes compare case-folded, because the snapshot has
+carried a code in different letter case from the bundled file's. A code the
+snapshot lists twice keeps its first listing, the one the importer generates
+the file from.
+
+**Which pages get it.** A benchmark's page, by the test that adds the Rank and
+Next Rank columns, when the snapshot lists its code. A playlist's page never
+gets it, whatever Evxl lists: the link goes with the rank columns.
+
+**No Steam ID.** The profile-less page is the fallback rather than no link, so
+the link doesn't silently vanish for a user who skipped the account setup, and
+that address holds nothing personal. Evxl's profile-less page answers 404 for
+a benchmark name holding `+`, `/`, `&`, or `:`, so those benchmarks show no
+link until a Steam ID is set, which was 25 of the 261 bundled files on the day
+it was measured. The code excludes the wider set JavaScript's `decodeURI`
+leaves encoded, the likely cause, so that the unmeasured characters fail
+toward no link instead of a broken one.
+
+**A plain anchor.** The link is `html.A` with its own stylesheet class, not
+`dmc.Anchor`. dash-mantine-components 2.8.0 bundles `@braintree/sanitize-url`,
+which runs `decodeURIComponent` over an href and rebuilds it through `URL`, so
+`%2F` reached the DOM as `/` and split "NRS 360 / Macro Benchmarks" into two
+segments. Dash 4.4.1's `html.A` passes an href through
+`dash_clientside.clean_url`, which returns it unchanged unless its scheme is
+dangerous.
+
+**Disclosure.** The user guide's What it talks to section names the link
+beside the app's other browser-opened links and says its address holds the
+Steam ID. It is not a row in that section's table, which lists what the app
+itself reaches.
+
+**Rejected.** A link in each row of the Playlists overview: the link is about
+one benchmark, and the overview would carry the control on every row of a
+library most of which a user doesn't play. The profile-less page for everyone:
+it keeps the Steam ID out of the address, but drops the difficulty and costs a
+click on every visit.
+
+**Amended 2026-10-05: the link is Evxl's logo.** The link now shows Evxl's
+logo and no text. "View on Evxl" stays, as the link's tooltip and its
+accessible name. The addresses, the pages that get the link, and the new tab
+are as this entry describes them.
+
+- **Agreed in chat, not ruled.** On 2026-10-05 the maintainer chose the logo
+  alone with a tooltip, after the app header's GitHub and Discord links. The
+  author had recommended the logo in front of the text, because a logo alone
+  means nothing to someone who doesn't know Evxl. The maintainer's answer was
+  that Evxl is well known among aim trainers. The size, the placement, the
+  tooltip on keyboard focus, and the wording of the permission record are the
+  author's.
+- **Permission.** Evxl's owner told the maintainer in a direct message that
+  the app may use the logo, with no conditions. The logo stays its owner's
+  and is under no open license, and `assets/icons/README.md` holds the
+  record. The file is the site's 721×679 icon scaled down to 102×96 and
+  otherwise untouched.
+- **Bundled, never loaded from Evxl.** The logo is served from
+  `assets/icons/` through `local_icon`. Loading it from evxl.app would make
+  every benchmark page contact Evxl, and would break this entry's statement
+  that the app requests nothing from Evxl.
+- **Its name.** The logo is hidden from assistive technology, so an
+  `aria-label` names the link. The tooltip opens on keyboard focus as well as
+  on hover, which the header's two icon links don't do: it is the only place
+  a sighted keyboard user can read where the link goes.
+- **Focus ring.** The plain anchor had the browser's own ring, which in Edge
+  is `rgb(16, 16, 16)`: 1.23:1 against the dark theme's page. The link now
+  carries Mantine's `mantine-focus-auto` class, the ring `dmc.Anchor` brings.
+  Measured in headless Edge on 2026-10-05 it is 3.56:1 on the light theme and
+  3.09:1 on the dark one, against a floor of 3:1. Firefox was not measured.
+- **Known cost.** The logo is cyan and can't be recolored without its owner's
+  say. Rendered at its 24-pixel height it measures 2.0:1 against the light
+  theme's page and 6.82:1 against the dark one's.
+
 ## 2026-10-04: The Scenario Table's Row Fields Use The Words On Screen
 
 Status: Accepted
@@ -608,6 +1578,15 @@ scroll sideways to show them, where the old placement kept them in view. The
 placement was author-owned, not a ratified row, and D1, D2, and everything
 else here stand. Shipped in PR #323.
 
+**Superseded in part (2026-10-05).** On a time-scored scenario, wherever the
+app can measure pace, D1's gap is a pace gap: how much faster the PB run has
+to finish to reach the next rank, shown as "2.8% faster to Lavender". There,
+D1's `N/A` for a PB of zero or less applies only where pace is undefined.
+Every other row keeps D1 as written, and the ladder walk, the Rank column,
+the rounding, the sort, and the tooltip are unchanged for all rows. The
+[2026-10-05 entry](#2026-10-05-time-scored-scenarios-are-measured-by-pace)
+holds the formula and the reasons. Shipped in PR #343.
+
 **Provenance.** Proposal by `claude-opus-5-5` (PR #320), reviewed by
 `gpt-6-sol` and, as a supplementary seat, `claude-fable-5-1`. Shipped in PR
 #321.
@@ -769,7 +1748,11 @@ carries one decimal place, so the case can't arise. See
 
 ## 2026-09-27: The Playlist Scenario Table Keeps Its Sort In The Page URL
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-10-05](#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones):
+a sort on a column the Columns menu has hidden is cleared, on arrival too, so
+Back, Forward, a reload, and a copied link no longer restore or keep that one
+sort)
 
 A sort on a playlist's scenario table used to be lost as soon as you left the
 page. The sort now rides in the page's address, so Back, Forward, a reload,
@@ -3929,6 +4912,12 @@ preview swatch were revised the next day; see the
 handle this entry selects the run trace by, now holds "Run data point". The
 point preferences are unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
 
+**Superseded in part (2026-10-05).** Point size now sizes the New PB stars on
+the Score vs Time chart as well as the run points, so "Nothing else on the
+chart became customizable" has one exception. The set of controls is
+unchanged, Point color still restyles only the run trace, and the rest of this
+entry stands. See [The Score vs Time Chart Marks Each New PB With A Star](#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star).
+
 ## 2026-08-14: The Listen Address Is Configurable, Loopback By Default
 
 Status: Accepted
@@ -4354,6 +5343,12 @@ recording it the same way. `resources/` ships under the same contract but is
 imported data, not vendored code: the benchmark library, a snapshot of Evxl's
 benchmark index, and a KovaaK's game-settings response. No license is recorded
 for any of it, and this entry does not settle whether one should be.
+
+**Amended 2026-10-05: one bundled file is under no open license.**
+`assets/icons/evxl-logo.png` is Evxl's logo. It ships with its owner's
+permission, recorded in `assets/icons/README.md`, and neither the AGPL nor
+any icon collection's license covers it. The detail is in
+[the 2026-10-04 Evxl entry](#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page).
 
 **Why this license.** The priority is that derivatives stay free and open
 source. AGPL binds anyone who conveys a modified version, or offers one to
@@ -6876,6 +7871,15 @@ the configured margin. New-scenario and new-sensitivity events still carry
 `previous_high_score=None`, so they remain verdict-less. Backlog summaries keep
 judging only the batch's latest run; fuller historical pass/fail review belongs
 to run history.
+
+**Superseded in part (2026-10-05).** On a time-scored scenario, wherever the
+app can measure pace, the verdict compares pace instead of score: a run
+passes when it is at least the goal percentage as fast as the previous PB.
+The reasons above stand there too: the verdict still judges against the
+previous PB, and still compares exactly rather than through the ratio it
+displays. Every other scenario keeps the formula as written. The
+[2026-10-05 entry](#2026-10-05-time-scored-scenarios-are-measured-by-pace)
+holds the pace formula.
 
 ## 2026-04-27: Use JSON Files For Runtime API Caches
 

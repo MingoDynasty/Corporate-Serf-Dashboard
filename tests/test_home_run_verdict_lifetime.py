@@ -133,6 +133,7 @@ def plotting(monkeypatch):
     monkeypatch.setattr(
         home, "get_time_vs_runs", lambda *_a: {"2026-07-06": [object()]}
     )
+    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(home, "generate_time_plot", lambda *_a: go.Figure())
     monkeypatch.setattr(home, "get_high_score", lambda _scenario: 830.0)
     monkeypatch.setattr(
@@ -151,6 +152,7 @@ def _run_event(score: float) -> dict:
         "nth_score": 2,
         "score": score,
         "scenario_previous_best": 800.0,
+        "pace_constant": None,
         "is_new_sensitivity": False,
         "is_live": True,
     }

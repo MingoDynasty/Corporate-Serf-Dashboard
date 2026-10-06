@@ -114,6 +114,31 @@ columns use the personal best from your stats folder, the one PB Score shows,
 so they work without a KovaaK's username. A new personal best shows up in
 them when you reopen the table.
 
+Some scenarios are scored by completion time: the score is the time left on a
+countdown when you finish the task, so a few points are a few seconds. On
+those, a percentage of the score makes a real improvement look many times
+smaller than it is, so the app measures by pace instead, which is how fast you
+finish compared with your personal best. **Next Rank** then reads "2.8% faster
+to Lavender": finish 2.8% faster than your personal best and you earn
+Lavender. On the Scenario Performance page, the **Score threshold percentage**
+becomes a percentage of your personal best's pace, so the threshold line and
+the run notification both judge by it, and the notification says "% of PB
+pace". A new personal best says how much faster you finished.
+
+The app works this out from the performance files KovaaK's writes next to
+your stats files, so it can measure pace on a scenario once you have played it
+on a current version of KovaaK's, and once your personal best is from the
+scenario's current version. Until then, that scenario reads as every other
+one does, in percent of your score.
+
+A benchmark's scenario table also has Evxl's logo beside its title. It is a
+link, and hovering it shows **View on Evxl**. It opens that benchmark on
+[Evxl.app](https://evxl.app) in a new tab, where you can see what this app
+doesn't show, such as your overall rank for the benchmark. With a Steam ID set
+on the Settings page, the link goes straight to your own sheet. Without one,
+it goes to a page where Evxl asks for your profile, and a few benchmarks that
+Evxl can't open that way show no link until a Steam ID is set.
+
 On the Scenario Performance page, the **Open scenario table** link under the
 **Playlist filter** opens the scenario table of the playlist selected there.
 
@@ -121,6 +146,25 @@ A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh, from the Playlists page
 or from that link, starts it in playlist order; to clear a sort, click a sorted
 column's header until the table returns to that order.
+
+The Playlists table and a playlist's scenario table each have a **Columns**
+button. It opens a menu with one checkbox per column. Clear a checkbox to hide
+that column, and check it to show the column again. The menu stays open while
+you change several, and closes when you click outside it or press Escape. Your
+choices are kept in this browser, and the scenario table's choices apply to
+every playlist. The Playlist and Scenario columns are always shown.
+
+Hiding a column changes only what you see. The filter box above the table
+matches the columns on screen, so it no longer finds a hidden column's values.
+If the table is sorted by a column you hide, that sort is dropped, and showing
+the column again doesn't bring it back.
+
+Two columns start hidden, for trying a KovaaK's API request by hand:
+**Benchmark ID** on the Playlists table and **Leaderboard ID** on a scenario
+table. Each shows the number KovaaK's uses for that benchmark, or for that
+scenario's leaderboard. Double-click the number to select it. A playlist you
+imported has no benchmark ID and reads N/A, and so does a scenario whose
+leaderboard the app hasn't looked up yet.
 
 ## Troubleshooting
 
@@ -196,8 +240,10 @@ updates working.
 
 With no KovaaK's username set, the running app makes no network requests on its own. Requests to
 KovaaK's identify themselves with the app's name, its version, and this repository's address.
-The GitHub, Discord, and **Report a bug** links in the app open in your browser; the app itself
-does not contact those sites. Sharing a chart is per click and never automatic: the toolbar
+The GitHub, Discord, Evxl, and **Report a bug** links in the app open in your browser; the app
+itself does not contact those sites, and the Evxl logo on its link is a file the app ships. The
+Evxl link's address includes your Steam ID when one is set, so that Evxl opens your own sheet.
+Sharing a chart is per click and never automatic: the toolbar
 button opens a confirmation naming Plotly Cloud, confirming opens Plotly Cloud in a new browser
 tab, and the chart is handed over only once you are signed in there. **Download plot as a PNG**
 beside it saves to your PC instead. Without a connection, the launcher starts the version you

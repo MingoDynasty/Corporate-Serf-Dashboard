@@ -24,6 +24,7 @@ from dash._callback import GLOBAL_CALLBACK_MAP  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.plot.plot_service import (  # noqa: E402
+    NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
     apply_light_dark_mode,
@@ -84,10 +85,24 @@ def cached_plot(request) -> str:
     return figure.to_json()
 
 
+@pytest.fixture
+def starred_plot() -> str:
+    """A cached Score vs Time payload whose second run set a new PB."""
+    runs = [_run(100.0), _run(120.0)]
+    figure = generate_time_plot(
+        {datetime(2025, 1, 1).date(): runs}, "1w4ts", False, [], False, {runs[1]}
+    )
+    return figure.to_json()
+
+
 def _run_trace(figure: go.Figure):
     return next(
         trace for trace in figure.data if trace.name == RUN_DATA_POINT_TRACE_NAME
     )
+
+
+def _new_pb_trace(figure: go.Figure):
+    return next(trace for trace in figure.data if trace.name == NEW_PB_TRACE_NAME)
 
 
 def test_run_data_points_group_sits_between_overlays_and_score_threshold(components):
@@ -242,6 +257,52 @@ def test_size_and_color_reach_only_the_run_trace_in_both_graph_modes(cached_plot
     assert [trace.name for trace in figure.data] == [
         trace.name for trace in untouched.data
     ]
+
+
+def test_point_size_sizes_the_new_pb_stars_and_default_leaves_them_generated(
+    starred_plot,
+):
+    sizes = {
+        point_size: _new_pb_trace(
+            home.apply_graph_appearance("light", starred_plot, point_size, "")
+        ).marker.size
+        for point_size in ("Small", "Default", "Large")
+    }
+
+    assert sizes == {"Small": 9, "Default": 12, "Large": 16}
+
+    # Default writes nothing: the 12 is the size the figure was generated with.
+    styled = home.apply_graph_appearance("light", starred_plot, "Default", "").to_json()
+    themed_only = apply_light_dark_mode(
+        go.Figure(json.loads(starred_plot)), "light"
+    ).to_json()
+    assert styled == themed_only
+
+
+def test_point_color_changes_the_run_points_and_never_the_new_pb_stars(starred_plot):
+    for color_scheme in ("light", "dark"):
+        # The stars' own gold, which a player is free to give the run points.
+        figure = home.apply_graph_appearance(
+            color_scheme, starred_plot, "Large", "#fab005"
+        )
+
+        assert _run_trace(figure).marker.color == "#fab005"
+        stars = _new_pb_trace(figure)
+        assert stars.marker.symbol == "star"
+        assert stars.marker.color == "#fab005"
+        assert stars.marker.line.color == "#5f3d00"
+        assert stars.marker.line.width == 1
+        assert stars.hoverinfo == "skip"
+
+
+def test_a_figure_with_no_new_pb_trace_passes_through_the_star_sizing(cached_plot):
+    figure = home.apply_graph_appearance("light", cached_plot, "Large", "")
+
+    assert [trace.name for trace in figure.data] == [
+        RUN_DATA_POINT_TRACE_NAME,
+        "Average score",
+    ]
+    assert _run_trace(figure).marker.size == POINT_SIZE_PRESET_PX["Large"]
 
 
 def test_unusable_preferences_fall_back_to_the_generated_appearance(cached_plot):

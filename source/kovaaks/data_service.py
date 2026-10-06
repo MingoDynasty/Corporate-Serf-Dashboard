@@ -9,6 +9,7 @@ import os
 import re
 import threading
 from collections import Counter, deque
+from collections.abc import Iterable
 from datetime import date, datetime
 from pathlib import Path
 
@@ -111,6 +112,13 @@ _superseded_user_playlist_files: list[tuple[Path, str]] = []
 # load_playlists() run.
 _bundled_seed_pairs: list[tuple[str, int]] = []
 _bundled_corpus_load_complete: bool = True
+# KovaaK's benchmark IDs by playlist code, read from each bundled file's
+# ``generated_from`` stamp. A side table, never a ``PlaylistData`` field: the
+# benchmark importer shares the model, and its drift check compares a shipped
+# file with a stamp-free rebuild by whole-model equality, so a model field
+# would report every bundled file as drifted. Reset on each load_playlists()
+# run.
+_bundled_benchmark_ids: dict[str, int] = {}
 playlist_startup_warning_queue: deque[str] = deque()
 _PLAYLIST_IO_LOCK = threading.RLock()
 
@@ -362,6 +370,42 @@ def get_personal_best_run(scenario_name: str) -> RunData | None:
 
     runs = kovaaks_database[scenario_name]["time_vs_runs"]
     return max(runs, key=lambda item: item.score, default=None)
+
+
+def get_runs_newest_first(scenario_name: str) -> list[RunData]:
+    """Return a copy of a scenario's runs, newest first, empty when it has none."""
+    if scenario_name not in kovaaks_database:
+        return []
+    return list(reversed(kovaaks_database[scenario_name]["time_vs_runs"]))
+
+
+def new_high_score_runs(runs: Iterable[RunData]) -> set[RunData]:
+    """Find the runs that beat their scenario's PB when they were played.
+
+    ``runs`` is one scenario's whole history, at every sensitivity and in any
+    order; the runs are judged oldest first. A run counts when its score is
+    strictly above every earlier run's, the rule the personal best celebration
+    applies to a single new run. So a tie doesn't count and the earliest run
+    to reach a score holds it, and the first run only sets the baseline.
+    """
+    new_high_scores: set[RunData] = set()
+    best: float | None = None
+    for run in sorted(runs, key=lambda item: item.datetime_object):
+        if best is None:
+            best = run.score
+        elif run.score > best:
+            best = run.score
+            new_high_scores.add(run)
+    return new_high_scores
+
+
+def get_new_high_score_runs(scenario_name: str) -> set[RunData]:
+    """Return the runs of a scenario that were new PBs when they were played.
+
+    Judged over every run the scenario holds, never a filtered view of them:
+    a run the chart leaves out still decides which later runs beat the PB.
+    """
+    return new_high_score_runs(kovaaks_database[scenario_name]["time_vs_runs"])
 
 
 def get_sensitivities_vs_runs_filtered(
@@ -677,6 +721,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     sens_scale = None
     raw_sens_increment = None
     raw_dpi = None
+    raw_scenario_hash = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -728,6 +773,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 raw_dpi = _optional_field_value(line)
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
+            elif line.startswith("Hash:"):
+                raw_scenario_hash = _optional_field_value(line)
     except OSError, ValueError, IndexError:
         # OSError: the CSV can be locked by a still-running KovaaK's or vanish
         # between listing and open. IndexError: a mid-write line like "Score:"
@@ -789,6 +836,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         accuracy=accuracy,
         damage_accuracy=damage_accuracy,
         recorded_sensitivity=recorded_sensitivity,
+        # An empty ``Hash:`` reads as no hash: it names no version of the
+        # scenario, so the run's score must never join a pace comparison.
+        scenario_hash=raw_scenario_hash or None,
+        stats_file_name=Path(full_file_path).name,
     )
 
 
@@ -799,16 +850,48 @@ def _collect_bundled_seed_pairs(playlist_data: PlaylistData) -> None:
             _bundled_seed_pairs.append((scenario.name, scenario.leaderboard_id))
 
 
-def _load_bundled_playlist_file(playlist_file: Path) -> PlaylistData | None:
+def _read_bundled_benchmark_id(json_data: str) -> int | None:
+    """Read the KovaaK's benchmark ID from a bundled file's provenance stamp.
+
+    Tolerant by contract: a missing or malformed ``generated_from`` block reads
+    as no ID, so the stamp can never stop a file the model accepted from
+    loading.
+    """
+    try:
+        payload = json.loads(json_data)
+    except ValueError:
+        return None
+    generated_from = (
+        payload.get("generated_from") if isinstance(payload, dict) else None
+    )
+    if not isinstance(generated_from, dict):
+        return None
+    benchmark_id = generated_from.get("kovaaks_benchmark_id")
+    # ``True`` is an ``int`` to ``isinstance``, and would read as the ID 1.
+    if isinstance(benchmark_id, bool) or not isinstance(benchmark_id, int):
+        return None
+    return benchmark_id
+
+
+def _load_bundled_playlist_file(
+    playlist_file: Path,
+) -> tuple[PlaylistData | None, int | None]:
     """Parse one bundled corpus file, warning and skipping on failure.
 
-    The bundled root is unstamped by design: it ships with the code that reads
-    it, so its format can never be older or newer than this build.
+    Returns the playlist and the benchmark ID its file is stamped with, or
+    ``(None, None)`` for a file that was skipped. The bundled root is unstamped
+    by design: it ships with the code that reads it, so its format can never be
+    older or newer than this build.
     """
     global _bundled_corpus_load_complete  # noqa: PLW0603
     try:
         json_data = playlist_file.read_text(encoding="utf-8")
-        return PlaylistData.model_validate_json(json_data)
+        # Validation stays the only judge of a broken file. The stamp is read
+        # by a second, separate parse after it: a bare ``json.loads`` in its
+        # place raises neither error caught here, so a file that isn't valid
+        # JSON would escape the startup warning.
+        playlist_data = PlaylistData.model_validate_json(json_data)
+        return playlist_data, _read_bundled_benchmark_id(json_data)
     except OSError:
         _bundled_corpus_load_complete = False
         _record_startup_playlist_warning(
@@ -825,7 +908,7 @@ def _load_bundled_playlist_file(playlist_file: Path) -> PlaylistData | None:
             _record_startup_playlist_warning(
                 f"The playlist file isn't valid JSON. File: {playlist_file}"
             )
-    return None
+    return None, None
 
 
 def _load_user_playlist_file(playlist_file: Path) -> PlaylistData | None:
@@ -856,6 +939,7 @@ def load_playlists() -> None:  # noqa: PLR0912
     _user_root_playlist_files.clear()
     _superseded_user_playlist_files.clear()
     _bundled_seed_pairs.clear()
+    _bundled_benchmark_ids.clear()
     _bundled_corpus_load_complete = True
     playlist_sources: dict[str, Path] = {}
     bundled_parsed = 0
@@ -864,8 +948,10 @@ def load_playlists() -> None:  # noqa: PLR0912
         (USER_PLAYLIST_DIRECTORY_PATH, True),
     ):
         for playlist_file in _iter_playlist_files(root, missing_ok=missing_ok):
+            # Only a bundled file's stamp is read, so a user file's is ignored.
+            benchmark_id = None
             if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
-                playlist_data = _load_bundled_playlist_file(playlist_file)
+                playlist_data, benchmark_id = _load_bundled_playlist_file(playlist_file)
             else:
                 playlist_data = _load_user_playlist_file(playlist_file)
             if playlist_data is None:
@@ -905,6 +991,10 @@ def load_playlists() -> None:  # noqa: PLR0912
                 continue
             playlist_database[playlist_data.code] = playlist_data
             playlist_sources[playlist_data.code] = playlist_file
+            # Recorded here, past the duplicate-code check, so the table holds
+            # the ID of the file that won the code.
+            if benchmark_id is not None:
+                _bundled_benchmark_ids[playlist_data.code] = benchmark_id
             if root == USER_PLAYLIST_DIRECTORY_PATH:
                 _user_root_playlist_codes.add(playlist_data.code)
                 _user_root_playlist_files.setdefault(playlist_data.code, []).append(
@@ -926,6 +1016,16 @@ def load_playlists() -> None:  # noqa: PLR0912
         len(playlist_startup_warning_queue),
         len(_superseded_user_playlist_files),
     )
+
+
+def get_bundled_benchmark_id(playlist_code: str) -> int | None:
+    """Return the KovaaK's benchmark ID a bundled benchmark's file carries.
+
+    ``None`` for any playlist that is not a bundled benchmark, and for a
+    bundled file whose stamp is missing or malformed. Call after
+    load_playlists().
+    """
+    return _bundled_benchmark_ids.get(playlist_code)
 
 
 def get_bundled_leaderboard_seed() -> tuple[dict[str, int], bool]:

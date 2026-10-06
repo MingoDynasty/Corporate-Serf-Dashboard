@@ -2,7 +2,8 @@
 
 The landing page plots the kept runs of one scenario as points over
 sensitivity or time, with the personal best, a configurable score goal, and
-playlist rank thresholds available as overlay lines; older runs recorded on a
+playlist rank thresholds available as overlay lines, and the chart over time
+stars each run that set a new personal best; older runs recorded on a
 game's own sensitivity scale sit on the same cm/360 axis as everything else,
 except the oldest, which can't be converted and show the exact setting they
 were recorded at.
@@ -105,6 +106,21 @@ of scope here, apart from its chart toolbar, noted under The graph.
   scores are kept per sensitivity, or per day in Score vs Time. The date
   range is inclusive of the selected date; the plot title reads
   `{scenario} (updated: {timestamp})`.
+- Score vs Time also marks each plotted run that set a
+  [new PB](../glossary.md#new-pb) with a star: a third trace, legend "New PB",
+  drawn over the other two. A new PB is a run whose score is strictly above
+  every earlier run of its scenario, judged oldest first over the scenario's
+  whole history, at every sensitivity and including runs older than the
+  selected date. So a tie is not one, the earliest run to reach a score holds
+  it, and the scenario's first run is not one. A star belongs to its run, not
+  to a position on the chart. A new PB the chart doesn't plot, because the
+  top N filter dropped it or it is older than the selected date, gets no star
+  and still counts in the comparison. A later run the same day with the same
+  score is plotted at the same position and is not a new PB, so when the
+  day's filter keeps that tie and drops the new PB, the point has no star.
+  With no new PB among its points the chart has no New PB trace and no legend
+  entry, and Score vs Sensitivity never has one
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - A run recorded under a game's own sensitivity scale is normalized to cm/360
   when its file is parsed, from the file's own `Sens Increment` and `DPI`
   fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`; a run whose
@@ -134,12 +150,27 @@ of scope here, apart from its chart toolbar, noted under The graph.
   group's x value, since one group can hold runs recorded at different
   settings
   ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
+  A star takes no hover of its own, so hovering one shows its run's hover.
+  Runs at one position share one hover, the one whose point comes last in the
+  run trace. Where a new PB and a later same-day tie are both plotted, the
+  new PB is ordered last among the run points there, so the star's hover
+  names the run that set the PB; elsewhere a day's points keep their order,
+  ascending by score with ties in time order
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - Three overlay families, all dashed labelled lines. "PB score ({value})"
   and "Score threshold ({value})" draw at the current post-run personal best
   and at the
   configured percentage of it — while the verdict in run notifications
   judges against the PB the run was chasing
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
+  On a [time-scored scenario](#time-scored-scenarios) whose PB can be
+  measured by pace, the threshold line draws at the score that finishes at
+  that percentage of the PB's pace, `C − (C − PB) × 100 / goal` for the
+  scenario's constant `C`: a PB of 896.2 at 95% and a constant of 1,000
+  draws at 890.74, where the score form would draw at 851.39. A goal above
+  100% puts the line above the PB. The annotation is unchanged and still
+  shows a score
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
   "Rank thresholds" draws the selected playlist's rank lines, in ladder
   order and color: the ranks whose thresholds land inside the plotted score
   range plus every rank tied at the nearest threshold below and at the
@@ -151,9 +182,10 @@ of scope here, apart from its chart toolbar, noted under The graph.
   lines lag the selection until the next rebuild (a control change, a
   scenario change, or a new run).
 - Zooming the x axis refits the score axis to the runs in view: the run
-  points and Average Score line inside the x window, padded by 5% of their
-  span. Overlay lines are not part of the fit, so a line beyond the fitted
-  range is out of view while zoomed. A trace hidden from the legend is left
+  points, the Average score line, and the New PB stars inside the x window,
+  padded by 5% of their span. The stars repeat run points, so they never
+  change the fit. Overlay lines are not part of the fit, so a line beyond the
+  fitted range is out of view while zoomed. A trace hidden from the legend is left
   out too, and showing or hiding one while zoomed refits. A window holding no
   runs leaves the score axis as it was. Double-clicking the plot, "Reset
   axes", "Autoscale", and any new figure (a rebuild or an appearance change)
@@ -180,9 +212,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
   ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
   as amended by
   [2026-08-21](../decision_log.md#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme)).
+  A New PB star is plotly's `star` symbol, gold `#fab005` with a 1px
+  `#5f3d00` outline, the same in both themes
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - "Point size" is a Small | Default | Large preset (Small 4px, Large 10px);
   Default leaves the generated size untouched rather than writing a pixel
-  count. "Point color" accepts eight curated swatches on one row, a picker,
+  count. It sizes the New PB stars too: 9px on Small, 16px on Large, and the
+  12px they are generated with on Default
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  "Point color" accepts eight curated swatches on one row, a picker,
   or a typed hex value; the empty value means Default (placeholder
   "Default"), a "Use default" button is the only way back to it, and
   anything unparseable falls back to the generated color. The empty field's
@@ -190,12 +228,22 @@ of scope here, apart from its chart toolbar, noted under The graph.
   ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
   as amended by
   [2026-08-21](../decision_log.md#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme)).
-- Size and color restyle only the run trace, selected by its "Run Data
-  Point" name, in a cheap presentation callback applied after theming — the
+- Color restyles only the run trace, and size restyles the run trace and the
+  New PB trace. Each is selected by its name, "Run data point" or "New PB", in
+  a cheap presentation callback applied after theming — the
   expensive graph rebuild never reruns for an appearance change, and
-  placeholder and empty figures pass through untouched. Nothing else on the
-  chart is customizable, and that boundary is deliberate
-  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)).
+  placeholder and empty figures pass through untouched, as does a figure with
+  no New PB trace. Nothing else on the chart is customizable, the stars' own
+  color and shape included, and that boundary is deliberate
+  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there),
+  with the stars' size as its one exception, set by
+  [2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+- The stars have no control. Clicking "New PB" in the legend hides them and
+  leaves every run point, and the choice is not remembered: the figure sets
+  no `uirevision`, so the next figure draws them again, whether it comes from
+  a new run on the scenario, a control that rebuilds the chart, or an
+  appearance change
+  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 - The chart keeps plotly.js's default modebar, which offers "Download plot as
   a PNG", a save to this PC, and "Share chart...". Pressing "Share chart..."
   opens plotly.js's confirmation naming Plotly Cloud, and nothing is sent
@@ -204,13 +252,82 @@ of scope here, apart from its chart toolbar, noted under The graph.
   there; a blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
   accuracy, sensitivity, and x value, the setting a converted run was
-  recorded at, the Average score line, and the label and value of each
+  recorded at, the Average score line, the New PB stars, which repeat the
+  date and score of runs already in it, and the label and value of each
   overlay line drawn. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow; its figure is the playlist lines, their dates and
   progress percentages, and the aim-training-hours checkpoint labels
   ([2026-09-12](../decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)).
+
+## Time-scored scenarios
+
+- A time-scored scenario scores the time left on a clock that counts down
+  from a constant when the task is done, so a score of `s` took `C − s`
+  seconds. Wherever the app can measure pace on one, five surfaces divide
+  times instead of scores: the Next Rank gap
+  ([playlists.md](playlists.md#the-per-playlist-scenario-table)), the Score
+  threshold line (The graph), the threshold verdict and the New personal
+  best toast ([notifications.md](notifications.md#run-notifications)), and
+  the watchdog's session lines in the debug log, at their fixed 95%.
+  Anything that orders or places scores is unchanged, because a higher score
+  is always a faster finish: the chart's points and axis, the Average score
+  line, the PB score line, the rank lines, the Rank column, and top-N
+  placement. No completion time is shown anywhere
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+- Pace applies to a comparison only when three things hold: the scenario is
+  recognized as time-scored, every score in the comparison is eligible, and
+  both times are positive. Otherwise the surface behaves exactly as it does
+  on any other scenario, with its own `N/A` and unjudged rules. A
+  time-scored PB of zero or less still gets a pace percentage, because only
+  the times have to be positive
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+- A scenario is recognized from a performance file, the file KovaaK's writes
+  beside each run's stats file. The file is time-scored when it has at least
+  two score events and, after every one, the running score is within 0.5 of
+  `time_limit − timescale × timestamp`. Then the constant is the file's
+  `time_limit`, and the scenario version is its `scenario_hash`. Any other
+  file that can answer says the scenario is not time-scored. A file can't
+  answer when its bytes do not parse, when its `schema_version` is not 1, or
+  when its header lacks a scenario hash, or a time limit or a timescale
+  that is a positive, finite number. A run paused partway through is
+  recognized like any other, because the file's timestamps leave paused
+  time out
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+- The scenario's newest run names the version. That run and the older runs
+  with the same stats-file `Hash:` are tried newest first, and the first
+  whose performance file can answer decides. A file that can't be read or
+  can't answer is skipped. A file that answers "not time-scored" decides,
+  and no older file is read. The app can't tell, and every surface keeps its
+  score math, when no file of that version can answer, when none of the
+  scenario's runs has a performance file, when the newest run has no
+  `Hash:`, or when the stats folder has no `performances` folder beside it.
+  A scenario's first run on a game build that writes these files therefore
+  turns it to pace, and its numbers move then
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+- A score is eligible for a pace comparison only when its run's `Hash:`
+  equals the deciding file's `scenario_hash`. A rank threshold counts as
+  eligible. A run whose stats file has no `Hash:` still loads, and its score
+  is never eligible. So a PB set on an older version of the scenario keeps
+  the score math, on the table and the chart, until a run on the current
+  version beats it
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+- A run's performance file is found by name: the stats file's name with
+  ` Stats.csv` replaced by ` Performance.perf`, in the `performances` folder
+  beside the stats folder
+  ([settings.md](settings.md#restart-scope-and-pinning)). Startup lists that
+  folder once and parses nothing. A run that lands adds its file to the
+  listing, so the table and the chart see the file the watchdog judged the
+  run by, with no restart. A file is parsed only when a surface asks about
+  its scenario, and its answer is remembered by file name for the life of
+  the process. A file that can't be read is not remembered, so the next look
+  tries again. A missing, unreadable, or malformed performance file costs
+  only the detection, never the run
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  The first time a file is parsed, the debug log records its answer. For a
+  file that can answer, the line also carries its time limit, its score
+  event count, and its largest distance from the countdown.
 
 ## Chart options panel
 
@@ -234,6 +351,14 @@ of scope here, apart from its chart toolbar, noted under The graph.
   **Rank thresholds** turned on.", "Needs **Run notifications** turned on.",
   and the Top N scores help's "or per day in **Score vs Time**"
   ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+- The Score threshold percentage help text reads the same on every scenario:
+  "Sets the score goal as a percentage of your personal best. On a scenario
+  scored by completion time, it's a percentage of your personal best's pace
+  instead, when the app can measure pace reliably. Otherwise, it stays a
+  percentage of your score. The overlay line tracks your current personal
+  best. Notifications judge a run against the personal best you had before
+  the run."
+  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 - Every control in the panel persists via Dash persistence in the browser's
   local storage, so preferences are per browser and per origin — which is
   why every human-facing URL says `localhost`

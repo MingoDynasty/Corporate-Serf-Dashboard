@@ -49,7 +49,7 @@ Client identification:
 | `/user/scenario/total-play` | Metadata hydration/upsert for `scenarioName -> leaderboardId` | No | Can lag behind current score/rank. Returns `null` for unknown usernames. |
 | `/user/profile/by-username` | Identity detection: verify a local Steam persona against a KovaaK's profile | No | Unauthenticated. HTTP `409` is the confirmed "no such player" answer. Request parameters are never logged. |
 | `/scenario/popular` | Exact-name fallback for leaderboard ID resolution | No | Search can return many variants; require exact `scenarioName` match. |
-| `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires benchmark ID, so it does not cover all playlists. |
+| `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires a benchmark ID, sent as `benchmarkId`, so it does not cover all playlists. |
 | `/playlist/playlists` | Playlist discovery/metadata inspection | No | Does not include leaderboard IDs in observed responses. |
 | `/game-settings` | Provenance for the in-repo sensitivity-scale capture; not called at runtime | No | Per-scale conversion formulas. Captured to `resources/sensitivity converter/response.json`. |
 
@@ -66,6 +66,12 @@ Example total-ranked-players lookup:
 ```text
 GET /leaderboard/scores/global?leaderboardId=98330&page=0&max=1
 ```
+
+Where to find a `leaderboardId`: a playlist's scenario table shows it in the
+Leaderboard ID column, which starts hidden and is shown from the table's
+**Columns** menu. The number there is the one the app itself sends to this
+endpoint, from its permanent name-to-ID mapping. A scenario the app hasn't
+resolved reads `N/A`.
 
 Fields we rely on:
 
@@ -232,11 +238,22 @@ refusal.
 
 Existing app behavior uses this endpoint for benchmark progress.
 
+Example request, as `get_benchmark_json` sends it:
+
+```text
+GET /benchmarks/player-progress-rank-benchmark?benchmarkId=2336&steamId=00000000000000000
+```
+
 Important limitation:
 
-- Requires a benchmark ID.
+- Requires a benchmark ID, sent as the `benchmarkId` query parameter.
 - Works for benchmark playlists, but not every playlist is a benchmark.
 - Scenario rank display should not depend on this endpoint.
+
+Where to find a `benchmarkId`: the Playlists table shows a bundled
+benchmark's in the Benchmark ID column, which starts hidden and is shown from
+the table's **Columns** menu. The app reads it from the bundled file's
+`generated_from` stamp. A playlist imported by code has none and reads `N/A`.
 
 Leaderboard-ID facts (verified 2026-07-19; used by leaderboard-ID seeding —
 see the 2026-07-20 decision log entry):
@@ -327,6 +344,53 @@ The app consumes only `playlist_name`, `playlist_code`, and
 `scenario_list[].scenario_name` (see `api_service.get_evxl_playlist` and the
 `Evxl*` models in `api_models.py`). The stored code is Evxl's canonical
 `playlist_code`, never the pasted input.
+
+## Evxl benchmark pages (linked, never fetched)
+
+Not an endpoint. These are two page addresses on Evxl's site that a
+benchmark's scenario page links to. The app builds the address and the user's
+browser opens it; the app requests nothing from Evxl for it.
+
+```text
+https://evxl.app/u/{steamId64}/{benchmarkName}/{difficultyName}
+https://evxl.app/benchmarks/{benchmarkName}
+```
+
+Observed behavior, measured 2026-10-04 by opening the addresses in a browser:
+
+- The first is one player's sheet for one difficulty. The second asks for a
+  Steam profile and a difficulty, with the benchmark's first difficulty
+  preselected. It takes no difficulty segment:
+  `/benchmarks/{benchmarkName}/{difficultyName}` is Evxl's 404 page.
+- Both names are Evxl's own, the `benchmarkName` and `difficultyName` of the
+  benchmark snapshot, matched exactly and case-sensitively. They are not the
+  KovaaK's playlist name: the playlist "Viscose Benchmark S2 - Medium" is
+  "Viscose Benchmarks S2" and "Medium" on Evxl. A lowercased or unknown name
+  is the 404 page.
+- Evxl appends `?tab=` itself, from the tab the visitor last used, so an
+  address the app builds carries no query.
+- The sheet address resolved for every name tried, each segment
+  percent-encoded on its own: spaces, `( )`, `[ ]`, `'`, `!`, `#`, `&`, `:`,
+  `+`, a `/` sent as `%2F`, and non-ASCII such as `β` and `✯`. Evxl's own
+  links to these sheets encode the same way.
+- The profile-less address answered 404 for every benchmark name holding `+`,
+  `/`, `&`, or `:`, percent-encoded or not ("Aimerz+ S1", "NRS 360 / Macro
+  Benchmarks", "m0narcS & hizku Tracking", "SCP: Roleplay Benchmark"), and
+  resolved for names holding spaces, `( )`, `[ ]`, and non-ASCII. The four
+  that fail are among the characters JavaScript's `decodeURI` leaves encoded
+  (`; / ? : @ & = + $ , #`), which fits a route that decodes with it. That
+  cause is inferred, not confirmed. `evxl_links.py` offers no profile-less
+  address for a name holding any character of that set, which covered 14
+  benchmark names and 25 bundled files on that date.
+- A snapshot `sharecode` can differ in letter case from the code its bundled
+  file carries, the casing drift noted under the benchmark endpoint: "Revosect
+  S4 / Easy" is `KovaaKsExitFraggingWideCamp` in the snapshot and
+  `KovaaKsExitfraggingWideCamp` in the file. Matched case-folded, all 261
+  bundled files found their names, and no two snapshot codes differed only by
+  case.
+
+The app consumes only `benchmarkName`, `difficulties[].difficultyName`, and
+`difficulties[].sharecode` from the snapshot (see `evxl_links.py`).
 
 ## `/game-settings`
 

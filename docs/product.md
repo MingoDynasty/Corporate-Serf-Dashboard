@@ -101,6 +101,20 @@ are one view or two is a design choice for the feature that builds them.
   pile of toasts accumulating over a session — and, for a session where any
   interruption is one too many, a way to quiet the routine feedback without
   giving up the plot.
+- **Time-scored scenarios are measured by pace** (PR #343; design in #329).
+  Some scenarios score the time left on a countdown when you finish the task.
+  On those, the app measures by pace, how fast a run finishes compared with
+  your personal best: the Next Rank column reads "2.8% faster to Lavender",
+  the score threshold line and its verdict judge a percentage of your
+  personal best's pace, and a new personal best says how much faster you
+  finished. The app recognizes such a scenario on its own, from the
+  performance files KovaaK's writes beside your runs, and a scenario it can't
+  recognize reads as it always did. *Problem solved:* a few points on these
+  scenarios are a few seconds, a large share of the run and a tiny share of
+  the score, so every percentage of the score lied in the same direction. A
+  95% threshold passed every run, and "closest to ranking up" put these
+  scenarios first when they were several times further away than they
+  looked.
 - **Personal best celebration.** A run that beats a scenario's personal best
   gets a short burst of confetti and a toast of its own: "New personal best",
   naming the scenario, the score, and how far ahead of your old best it landed.
@@ -153,6 +167,20 @@ are one view or two is a design choice for the feature that builds them.
   default it draws only the bands around your scores, so the runs fill the
   chart; a **Show all ranks** chart option draws the whole ladder instead, for
   when you want to see how far the climb goes rather than what is next.
+- **New PB stars on the time chart** (Scenario Performance page, PR #346;
+  design in #337). On Score vs Time, a gold star marks each plotted run that
+  beat the scenario's personal best when it was played. The rule is the
+  celebration's: strictly above every earlier run of the scenario, at any
+  sensitivity and however far back, so a tie and a scenario's first run get
+  no star. There is no setting. The stars follow Point size, and clicking
+  New PB in the legend hides them until the chart next redraws. *Problem
+  solved:* a new personal best was celebrated at the moment of the run and
+  then left no trace. Every run on the chart was the same dot, and a day's
+  runs share one position, so the runs that set each best could only be found
+  by comparing every dot with all the ones before it, and within a day not at
+  all. The chart now shows what you reached and when. The stars record
+  achievements and judge nothing: a personal best only ever rises, so a row
+  of stars can't say whether you're improving.
 - **Point size and color** (Scenario Performance page, PR #241; design in
   #238). Chart options can make the raw run points smaller, larger, or a color
   you choose, from eight curated swatches or any hex value. *Problem solved:*
@@ -298,6 +326,18 @@ are one view or two is a design choice for the feature that builds them.
   leaving the app for Evxl or KovaaK's in-game view. A percentage compares
   scenarios whose scores run from single digits to millions, which raw points
   can't.
+- **Columns menu and KovaaK's ID columns** (PR #344; design in #334). The
+  Playlists table and a playlist's scenario table each have a Columns menu
+  that shows or hides any column and remembers the choice in the browser.
+  Each table also has one column that starts hidden: a benchmark's KovaaK's
+  ID on the Playlists table, and a scenario's leaderboard ID on the scenario
+  table. *Problem solved:* a benchmark's scenario table had grown to twelve
+  columns with no way to drop one a player never reads, and it keeps gaining
+  them. The IDs were a second gap: the app already knew both numbers, but
+  trying a KovaaK's API request by hand started with a text search of a
+  file. An ID is noise to a player who isn't calling that API, so it stays
+  off until asked for, and the menu gives any later optional column the same
+  place to start hidden.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I

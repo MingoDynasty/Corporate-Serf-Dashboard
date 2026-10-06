@@ -411,6 +411,23 @@ a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 
+/* The Evxl link in a benchmark's page header: Evxl's logo as an icon-only
+   link. It is a plain anchor, because dmc.Anchor percent-decodes its href and
+   would break a benchmark name holding an encoded slash. As a flex box it is
+   exactly the icon's size, so the focus ring hugs the logo, not a line of
+   text. */
+a.playlist-scenarios-evxl-link {
+    display: flex;
+    border-radius: var(--mantine-radius-sm);
+}
+
+/* The tooltip's wrapper around the link. The header aligns its text on a
+   shared baseline, which would stand the logo on that line and lift it above
+   the title, so the wrapper centers itself on the row. */
+.playlist-scenarios-evxl-link-box {
+    align-self: center;
+}
+
 /* The overview's leftover-files notice ships hidden and is revealed by the
    render_superseded_alert callback, which toggles this class on and off. */
 .playlists-superseded-alert-hidden {
@@ -490,6 +507,16 @@ a.playlist-scenario-link-cell:hover {
 .playlist-scenarios-grid .ag-header-cell-text,
 .playlist-overview-grid .ag-header-cell-text {
     font-weight: bold;
+}
+
+/* Grid cells whose value gets copied out (a KovaaK's ID). AG Grid turns text
+   selection off on every cell; this turns it back on for one column without
+   the grid-wide enableCellTextSelection option. The text cursor also overrides
+   the pointer an overview row hands its cells. */
+.ag-cell.cell-selectable-text {
+    -webkit-user-select: text;
+    cursor: text;
+    user-select: text;
 }
 
 /* Overview rows are full-row navigation targets (routes decision 2026-07-03:

@@ -8,8 +8,9 @@
     // a y range this asset set and never one the user dragged themselves.
     const lastFit = new WeakMap();
 
-    // Only traces (the run points and the Average Score line) are fitted.
-    // Overlay lines are shapes and stay out on purpose: the PB Score line
+    // Only traces are fitted: the run points, the Average score line, and
+    // the New PB stars, which repeat run points and so never move the fit.
+    // Overlay lines are shapes and stay out on purpose: the PB score line
     // sits at or above every run, so fitting it would pin the axis top there
     // and undo most of the refit.
     function visibleScoreRange(gd) {

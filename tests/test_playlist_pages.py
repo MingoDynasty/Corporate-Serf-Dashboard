@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
-from dash import dcc, no_update
+from dash import dcc, html, no_update
 from dash._callback import (
     GLOBAL_CALLBACK_LIST,
     GLOBAL_CALLBACK_MAP,
@@ -913,9 +913,11 @@ def test_playlists_overview_layout_includes_quick_filter_input():
 
 
 def test_import_modal_help_names_the_import_button_in_bold():
+    # The Columns menu's checkboxes carry dict IDs, which cannot key a dict.
     components = {
-        getattr(component, "id", None): component
+        component.id: component
         for component in _walk_components(playlists.layout())
+        if isinstance(getattr(component, "id", None), str)
     }
     field = components["playlists-import-textinput"]
 
@@ -1358,6 +1360,7 @@ def test_playlists_overview_header_tooltips_cover_exactly_the_cryptic_columns():
 
     assert fields_with_header_tooltip == {
         "type_display",
+        "benchmark_id",
         "played_sort",
         "median_percentile_sort",
         "lowest_percentile_sort",
@@ -2171,6 +2174,7 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
     }
 
     assert fields_with_header_tooltip == {
+        "leaderboard_id",
         "tier_sort",
         "next_tier_sort",
         "percentile_sort",
@@ -2343,7 +2347,9 @@ def test_playlist_scenarios_sorted_layout_leaves_the_shared_column_defs_alone():
     }
 
 
-def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlists):
+def test_playlist_scenarios_sort_names_cover_every_sortable_column_once(
+    benchmark_playlists,
+):
     # The names are address-bar copy the maintainer ruled verbatim, and saved
     # links depend on them, so pin them exactly.
     assert playlist_scenarios.SORT_URL_NAMES == {
@@ -2360,14 +2366,19 @@ def test_playlist_scenarios_sort_names_cover_every_column_once(benchmark_playlis
         "pb-cm360": "pb_cm360_sort",
         "pb-accuracy": "pb_accuracy_sort",
     }
-    column_ids = [
+    # Every sortable column has a name. A sortable column without one would
+    # stop the address writer for as long as it was sorted.
+    sortable_column_ids = [
         column["field"]
         for column in (
             *playlist_scenarios.TABLE_COLUMN_DEFS,
             *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
         )
+        if column["sortable"]
     ]
-    assert sorted(playlist_scenarios.SORT_URL_NAMES.values()) == sorted(column_ids)
+    assert sorted(playlist_scenarios.SORT_URL_NAMES.values()) == sorted(
+        sortable_column_ids
+    )
     for name, column_id in playlist_scenarios.SORT_URL_NAMES.items():
         page = playlist_scenarios.layout(BENCHMARK_CODE, sort=f"{name}.desc")
         assert _sort_seeds(page) == {column_id: ("desc", 0)}
@@ -2412,6 +2423,7 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
 
     assert benchmark_fields == [
         "scenario",
+        "leaderboard_id",
         "last_played_sort",
         "runs_sort",
         "position_sort",
@@ -2426,6 +2438,90 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
     ]
     assert plain_fields == table_fields
     assert unknown_fields == table_fields
+
+
+def _evxl_links(page) -> list:
+    return [
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlist-scenarios-evxl-link"
+    ]
+
+
+def test_playlist_scenarios_benchmark_header_links_its_evxl_page(
+    benchmark_playlists, monkeypatch
+):
+    asked = []
+
+    def fake_url(playlist_code, steam_id):
+        asked.append((playlist_code, steam_id))
+        return "https://evxl.app/u/7656/Test%20Benchmark/Easy"
+
+    monkeypatch.setattr(playlist_scenarios, "evxl_benchmark_url", fake_url)
+    monkeypatch.setattr(playlist_scenarios, "get_steam_id", lambda: "7656")
+
+    (link,) = _evxl_links(playlist_scenarios.layout(BENCHMARK_CODE))
+
+    assert asked == [(BENCHMARK_CODE, "7656")]
+    # dmc.Anchor would percent-decode the href in the browser, which splits a
+    # benchmark name holding an encoded slash into two path segments.
+    assert isinstance(link, html.A)
+    assert link.href == "https://evxl.app/u/7656/Test%20Benchmark/Easy"
+    # A new tab, so the table and its streamed positions stay open.
+    assert link.target == "_blank"
+
+
+def test_playlist_scenarios_evxl_link_is_a_named_icon(benchmark_playlists, monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "evxl_benchmark_url",
+        lambda _code, _steam_id: "https://evxl.app/benchmarks/Test%20Benchmark",
+    )
+
+    page = playlist_scenarios.layout(BENCHMARK_CODE)
+    (link,) = _evxl_links(page)
+    (tooltip,) = [
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Tooltip) and component.children is link
+    ]
+    icon = link.children
+
+    # The bundled file: an address on evxl.app here would make every benchmark
+    # page contact Evxl.
+    assert isinstance(icon, html.Img)
+    assert icon.src == "/assets/icons/evxl-logo.png"
+    # The logo is hidden from assistive technology and the link holds no text,
+    # so the label is its only name, and the tooltip shows the same words.
+    assert link.to_plotly_json()["props"]["aria-label"] == "View on Evxl"
+    assert tooltip.label == "View on Evxl"
+    assert tooltip.events["focus"] is True
+    # Mantine's keyboard focus ring. A plain anchor without this class falls
+    # back to the browser's ring, which can't be seen on the dark theme.
+    assert "mantine-focus-auto" in link.className.split()
+
+
+def test_playlist_scenarios_benchmark_without_an_evxl_page_gets_no_link(
+    benchmark_playlists, monkeypatch
+):
+    monkeypatch.setattr(
+        playlist_scenarios, "evxl_benchmark_url", lambda _code, _steam_id: None
+    )
+
+    assert _evxl_links(playlist_scenarios.layout(BENCHMARK_CODE)) == []
+
+
+def test_playlist_scenarios_plain_playlist_gets_no_evxl_link(
+    benchmark_playlists, monkeypatch
+):
+    # Even for a code Evxl lists: the link goes with the rank columns.
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "evxl_benchmark_url",
+        lambda _code, _steam_id: "https://evxl.app/benchmarks/Anything",
+    )
+
+    assert _evxl_links(playlist_scenarios.layout(PLAIN_PLAYLIST_CODE)) == []
 
 
 def test_playlist_scenarios_rank_column_defs():
@@ -2444,8 +2540,11 @@ def test_playlist_scenarios_rank_column_defs():
     }
     assert next_rank["headerName"] == "Next Rank"
     assert next_rank["field"] == "next_tier_sort"
+    # One header for both measures the column holds, on every benchmark table.
     assert next_rank["headerTooltip"] == (
-        "How much your PB score has to grow to reach the next rank. Lower is closer."
+        "How much your PB score has to grow to reach the next rank. A row that "
+        'reads "faster" is a scenario scored by completion time, and shows how '
+        "much faster you have to finish than your PB. Lower is closer."
     )
     assert next_rank["valueFormatter"] == {"function": "params.data.next_tier_display"}
     # The cell tooltip, and its affordance, exist only when the row has one.
@@ -2642,3 +2741,428 @@ def test_a_delete_still_reports_when_the_visibility_write_is_refused(monkeypatch
     assert notifications[0]["title"] == "Playlist deleted"
     assert rows_refresh == 5
     assert opened is False
+
+
+# --- the Columns menu shows and hides each table's columns ---
+
+# The columns each table's structure depends on, which its menu never lists.
+OVERVIEW_STRUCTURAL_COLUMNS = {
+    "name",
+    playlists.VISIBILITY_COLUMN_ID,
+    playlists.DELETE_COLUMN_ID,
+}
+SCENARIO_STRUCTURAL_COLUMNS = {"scenario"}
+
+
+def _component_by_id(page, component_id):
+    return next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == component_id
+    )
+
+
+def _menu_checkboxes(page, menu_id) -> list[dmc.Checkbox]:
+    return [
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Checkbox)
+        and isinstance(component.id, dict)
+        and component.id["type"] == menu_id
+    ]
+
+
+def _menu_entries(page, menu_id) -> list[tuple[str, str]]:
+    return [
+        (checkbox.id["column"], checkbox.label)
+        for checkbox in _menu_checkboxes(page, menu_id)
+    ]
+
+
+def _initially_shown(column_defs) -> dict[str, bool]:
+    return {
+        column["field"]: not column.get("initialHide", False) for column in column_defs
+    }
+
+
+def test_playlists_overview_columns_menu_lists_every_hideable_column_in_order():
+    page = playlists.layout()
+    entries = _menu_entries(page, playlists.COLUMNS_MENU_ID)
+
+    # The labels are the proposal's Copy block: sentence case, as controls.
+    assert entries == [
+        ("type_display", "Type"),
+        ("benchmark_id", "Benchmark ID"),
+        ("played_sort", "Played"),
+        ("runs_sort", "Runs"),
+        ("last_played_sort", "Last played"),
+        ("median_percentile_sort", "Median percentile"),
+        ("lowest_percentile_sort", "Lowest percentile"),
+    ]
+    # Table order, with exactly the structural columns left out.
+    assert [column_id for column_id, _label in entries] == [
+        column["field"]
+        for column in playlists.TABLE_COLUMN_DEFS
+        if column["field"] not in OVERVIEW_STRUCTURAL_COLUMNS
+    ]
+
+
+def test_playlist_scenarios_columns_menu_lists_every_hideable_column_in_order(
+    benchmark_playlists,
+):
+    benchmark_page = playlist_scenarios.layout(BENCHMARK_CODE)
+    plain_page = playlist_scenarios.layout(PLAIN_PLAYLIST_CODE)
+    benchmark_entries = _menu_entries(
+        benchmark_page, playlist_scenarios.COLUMNS_MENU_ID
+    )
+    plain_entries = _menu_entries(plain_page, playlist_scenarios.COLUMNS_MENU_ID)
+
+    assert benchmark_entries == [
+        ("leaderboard_id", "Leaderboard ID"),
+        ("last_played_sort", "Last played"),
+        ("runs_sort", "Runs"),
+        ("position_sort", "Position"),
+        ("total_sort", "Total players"),
+        ("percentile_sort", "Percentile"),
+        ("pb_score_sort", "PB score"),
+        ("tier_sort", "Rank"),
+        ("next_tier_sort", "Next rank"),
+        ("pb_timestamp_sort", "PB date"),
+        ("pb_cm360_sort", "PB cm/360"),
+        ("pb_accuracy_sort", "PB accuracy"),
+    ]
+    # Rank and Next rank are a benchmark's alone.
+    assert plain_entries == [
+        entry
+        for entry in benchmark_entries
+        if entry[0] not in {"tier_sort", "next_tier_sort"}
+    ]
+    for page, entries in (
+        (benchmark_page, benchmark_entries),
+        (plain_page, plain_entries),
+    ):
+        assert [column_id for column_id, _label in entries] == [
+            field
+            for field in _column_fields(page)
+            if field not in SCENARIO_STRUCTURAL_COLUMNS
+        ]
+
+
+def test_columns_menu_checkbox_defaults_match_each_columns_initial_visibility(
+    benchmark_playlists,
+):
+    overview = playlists.layout()
+    benchmark_page = playlist_scenarios.layout(BENCHMARK_CODE)
+    plain_page = playlist_scenarios.layout(PLAIN_PLAYLIST_CODE)
+
+    for page, menu_id, column_defs in (
+        (overview, playlists.COLUMNS_MENU_ID, playlists.TABLE_COLUMN_DEFS),
+        (
+            benchmark_page,
+            playlist_scenarios.COLUMNS_MENU_ID,
+            _scenario_grid(benchmark_page).columnDefs,
+        ),
+        (
+            plain_page,
+            playlist_scenarios.COLUMNS_MENU_ID,
+            _scenario_grid(plain_page).columnDefs,
+        ),
+    ):
+        shown = _initially_shown(column_defs)
+        checkboxes = _menu_checkboxes(page, menu_id)
+        assert checkboxes
+        for checkbox in checkboxes:
+            # Passed explicitly, never left unset: the default is half of the
+            # value Dash stores, and a stored choice is dropped when it moves.
+            assert checkbox.checked is shown[checkbox.id["column"]]
+            assert checkbox.persistence is True
+
+    # One default per column on both kinds of table, for the same reason.
+    benchmark_defaults = {
+        checkbox.id["column"]: checkbox.checked
+        for checkbox in _menu_checkboxes(
+            benchmark_page, playlist_scenarios.COLUMNS_MENU_ID
+        )
+    }
+    for checkbox in _menu_checkboxes(plain_page, playlist_scenarios.COLUMNS_MENU_ID):
+        assert checkbox.checked is benchmark_defaults[checkbox.id["column"]]
+
+
+def test_columns_menus_keep_their_stored_choices_apart():
+    assert playlists.COLUMNS_MENU_ID != playlist_scenarios.COLUMNS_MENU_ID
+
+
+def test_playlists_overview_columns_button_sits_between_show_hidden_and_import():
+    page = playlists.layout()
+    toolbar = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Group)
+        and any(
+            getattr(child, "id", None) == "playlists-overview-show-hidden"
+            for child in component.children
+        )
+    )
+    button = _component_by_id(page, f"{playlists.COLUMNS_MENU_ID}-button")
+
+    assert button.children == "Columns"
+    assert [type(child) for child in toolbar.children] == [
+        dmc.Switch,
+        dmc.Popover,
+        dmc.Button,
+    ]
+    assert button in list(_walk_components(toolbar.children[1]))
+    assert toolbar.children[2].id == "playlists-import-open-button"
+
+
+def test_playlist_scenarios_columns_button_ends_the_filter_row():
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    filter_row = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Group)
+        and any(isinstance(child, dmc.Popover) for child in component.children)
+    )
+    button = _component_by_id(page, f"{playlist_scenarios.COLUMNS_MENU_ID}-button")
+
+    assert button.children == "Columns"
+    assert filter_row.justify == "space-between"
+    assert isinstance(filter_row.children[-1], dmc.Popover)
+    assert button in list(_walk_components(filter_row.children[-1]))
+    # The quick filter and the status line stay together at the row's start.
+    assert {
+        getattr(component, "id", None)
+        for component in _walk_components(filter_row.children[0])
+    } >= {"playlist-scenarios-quick-filter", "playlist-scenarios-status"}
+
+
+# --- the two KovaaK's ID columns, hidden until the Columns menu shows them ---
+
+STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+
+
+@pytest.mark.parametrize(
+    ("column_defs", "column_id", "header", "tooltip", "previous_column_id"),
+    [
+        pytest.param(
+            playlists.TABLE_COLUMN_DEFS,
+            "benchmark_id",
+            "Benchmark ID",
+            "The number KovaaK's uses to identify this benchmark in its API.",
+            "type_display",
+            id="benchmark-id",
+        ),
+        pytest.param(
+            playlist_scenarios.TABLE_COLUMN_DEFS,
+            "leaderboard_id",
+            "Leaderboard ID",
+            "The number KovaaK's uses to identify this scenario's leaderboard "
+            "in its API.",
+            "scenario",
+            id="leaderboard-id",
+        ),
+    ],
+)
+def test_id_column_is_hidden_unsortable_and_selectable(
+    column_defs, column_id, header, tooltip, previous_column_id
+):
+    fields = [column["field"] for column in column_defs]
+    column = column_defs[fields.index(column_id)]
+
+    assert column["headerName"] == header
+    assert column["headerTooltip"] == tooltip
+    assert fields.index(column_id) == fields.index(previous_column_id) + 1
+    # ``hide`` would come back whenever the column defs were sent again,
+    # overriding the menu. Only ``initialHide`` leaves the user's choice alone.
+    assert column["initialHide"] is True
+    assert "hide" not in column
+    assert column["sortable"] is False
+    assert column["cellClass"] == "cell-selectable-text"
+    # The row carries the text to show, so nothing regroups the digits.
+    assert "valueFormatter" not in column
+    # Every other column is shown.
+    assert all(
+        "hide" not in other and "initialHide" not in other
+        for other in column_defs
+        if other["field"] != column_id
+    )
+
+
+def test_benchmark_columns_are_shown_by_default():
+    assert all(
+        "hide" not in column and "initialHide" not in column
+        for column in playlist_scenarios.BENCHMARK_COLUMN_DEFS
+    )
+
+
+def test_selectable_cell_class_turns_text_selection_back_on():
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
+    rule = stylesheet.split(".ag-cell.cell-selectable-text {", 1)[1].split("}", 1)[0]
+
+    assert "user-select: text;" in rule
+    # An overview row hands its cells a pointer; the ID cell does not navigate.
+    assert "cursor: text;" in rule
+
+
+def test_playlists_overview_benchmark_id_cell_click_does_not_navigate():
+    # A double-click to select the number is two clicks on the cell.
+    assert (
+        playlists.route_to_clicked_playlist(
+            {"rowId": "KovaaKsTestCode", "colId": playlists.BENCHMARK_ID_COLUMN_ID}
+        )
+        is no_update
+    )
+    assert playlists.BENCHMARK_ID_COLUMN_ID == "benchmark_id"
+
+
+def test_leaderboard_id_column_has_no_sort_name(benchmark_playlists):
+    assert "leaderboard_id" not in playlist_scenarios.SORT_URL_NAMES.values()
+    for query in ("leaderboard-id.asc", "leaderboard_id.asc"):
+        page = playlist_scenarios.layout(BENCHMARK_CODE, sort=query)
+        assert _sort_seeds(page) == {}
+
+
+def test_id_columns_are_sized_with_the_other_content_columns():
+    assert "benchmark_id" in playlists.AUTO_SIZE_COLUMN_KEYS
+    assert "leaderboard_id" in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+
+
+def _columns_menu_specs(menu_id):
+    checkboxes = '{"column":["ALL"],"type":"' + menu_id + '"}'
+    return checkboxes, [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if {"id": checkboxes, "property": "checked"} in spec["inputs"]
+    ]
+
+
+@pytest.mark.parametrize(
+    ("page_module", "grid_id"),
+    [
+        (playlists, "playlists-overview-grid"),
+        (playlist_scenarios, "playlist-scenarios-grid"),
+    ],
+    ids=["overview", "scenarios"],
+)
+def test_columns_menu_callback_applies_the_checkboxes_through_the_grid_api(
+    page_module, grid_id
+):
+    menu_id = page_module.COLUMNS_MENU_ID
+    checkboxes, specs = _columns_menu_specs(menu_id)
+    page = page_module.layout()
+    store_outputs = {
+        f"{component.id}.data"
+        for component in _walk_components(page)
+        if isinstance(component, dcc.Store)
+    }
+
+    # One callback per grid, over that menu's checkboxes and nothing else.
+    (spec,) = specs
+    assert spec["inputs"] == [{"id": checkboxes, "property": "checked"}]
+    assert spec["state"] == [{"id": checkboxes, "property": "id"}]
+    assert spec["output"] == f"{menu_id}-sink.data"
+    assert spec["output"] in store_outputs
+    # It must run as the page mounts, to apply the stored choices.
+    assert spec["prevent_initial_call"] is False
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+    assert f'getApiAsync("{grid_id}")' in source
+    # Visibility, then the hidden columns' sort, then the quick filter, then
+    # the new columns' width.
+    steps = [
+        source.index("gridApi.setColumnsVisible(shown, true)"),
+        source.index("gridApi.setColumnsVisible(hidden, false)"),
+        source.index("gridApi.applyColumnState("),
+        source.index("gridApi.onFilterChanged()"),
+        source.index("gridApi.autoSizeColumns(added, false)"),
+    ]
+    assert steps == sorted(steps)
+    assert "({colId, sort: null})" in source
+    # The filter re-run is unconditional. A visibility change makes AG Grid
+    # drop the quick filter's cache but re-filter nothing, so a guard that
+    # skipped the call would leave rows matching columns that are off screen.
+    filter_call = source.index("gridApi.onFilterChanged()")
+    visibility_block = source[
+        source.index("gridApi.setColumnsVisible(hidden, false)") : filter_call
+    ]
+    assert "if (" not in visibility_block
+    # Writing ``columnState`` would reorder the columns, and resending the
+    # column defs would reapply the sort and visibility they declare.
+    assert "columnState" not in source
+    assert "columnDefs" not in source
+    assert "set_props" not in source
+
+
+@pytest.mark.parametrize(
+    "page_module", [playlists, playlist_scenarios], ids=["overview", "scenarios"]
+)
+def test_columns_menu_callback_lets_only_the_newest_run_apply(page_module):
+    _checkboxes, (spec,) = _columns_menu_specs(page_module.COLUMNS_MENU_ID)
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+
+    # Each run waits for the grid on its own timer, so an older run can land
+    # after a newer one. The run takes its number before it waits, and gives up
+    # after the wait, before it touches the grid, unless it is still the
+    # newest.
+    numbered = source.index("const run = latestRun;")
+    waited = source.index("await window.dash_ag_grid.getApiAsync(")
+    gave_up = source.index("if (run !== latestRun) {")
+    applied = source.index("gridApi.setColumnsVisible(shown, true)")
+    assert numbered < waited < gave_up < applied
+    assert "latestRun += 1;" in source[:numbered]
+    # The counter outlives one call: it sits in the closure the source builds
+    # once, never inside the callback, where every run would start from zero.
+    assert source.index("let latestRun = 0;") < source.index(
+        "return async (checked, ids) => {"
+    )
+
+
+@pytest.mark.parametrize(
+    ("page_module", "grid_id"),
+    [
+        (playlists, "playlists-overview-grid"),
+        (playlist_scenarios, "playlist-scenarios-grid"),
+    ],
+    ids=["overview", "scenarios"],
+)
+def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
+    grid = _component_by_id(page_module.layout(), grid_id)
+
+    # With column virtualization on, a stored column choice opened the table
+    # with clipped headers on every load: the grid's own autosize left each
+    # column that the choice had just brought into the window at its minimum
+    # width. With every column rendered that does not happen.
+    assert grid.dashGridOptions["suppressColumnVirtualisation"] is True
+    # The option rides beside the grid's own, and replaces none of them.
+    assert grid.dashGridOptions["animateRows"] is False
+    assert "getRowId" in grid.dashGridOptions
+    assert grid.columnSize == "autoSize"
+
+
+@pytest.mark.parametrize(
+    "page_module", [playlists, playlist_scenarios], ids=["overview", "scenarios"]
+)
+def test_columns_menu_callback_fits_only_the_columns_it_showed(page_module):
+    _checkboxes, (spec,) = _columns_menu_specs(page_module.COLUMNS_MENU_ID)
+    source = next(
+        script
+        for script in GLOBAL_INLINE_SCRIPTS
+        if spec["clientside_function"]["function_name"] in script
+    )
+
+    # One fit, of the columns this run showed. A wider fit on any later run
+    # would undo a width the user set by hand.
+    assert source.count("autoSizeColumns(") == 1
+    assert "gridApi.autoSizeColumns(added, false)" in source
+    # Nothing is fitted after a wait. A fit timed by frames or by a delay ran
+    # before the headers existed in Firefox at some window widths, and clipped
+    # sets that were whole without it.
+    assert "requestAnimationFrame" not in source
+    assert "setTimeout" not in source

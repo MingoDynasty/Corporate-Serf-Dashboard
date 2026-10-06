@@ -23,6 +23,17 @@ Any PR that makes an entry untrue corrects it in the same PR
 A KovaaK's aim-training exercise, identified by its name. Runs, PBs,
 positions, and ranks each belong to one scenario.
 
+### Time-scored scenario
+
+A scenario scored by the time left on its clock when the task is done, so a
+faster finish scores higher. On one, the app measures by pace instead of
+score wherever it can measure pace reliably
+([2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+How it recognizes one, and when it can't measure pace, is in
+[scenario_performance.md](specs/scenario_performance.md#time-scored-scenarios).
+
+- On screen: a scenario scored by completion time.
+
 ### Run
 
 One finished attempt at a scenario, recorded as one stats file in the stats
@@ -35,6 +46,17 @@ folder. Play that writes no stats file isn't a run.
 The KovaaK's folder of stats files that the app reads runs from.
 
 - In code: `stats_dir`.
+
+### Performance file
+
+The file KovaaK's writes beside a run's stats file, recording the run's
+events second by second. The app reads it only to tell whether a scenario is
+time-scored
+([2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+
+- Not a run on its own: an abandoned attempt can leave a performance file and
+  no stats file.
+- In code: `.perf`, the file's extension.
 
 ### Sensitivity
 
@@ -88,6 +110,17 @@ identity, because names aren't unique
 - Also called share code, KovaaK's own name for it.
 - In code: `code` on a playlist, and `playlist_code` elsewhere.
 
+### Benchmark ID
+
+KovaaK's numeric identifier for a benchmark. It is not the playlist code,
+which identifies the same benchmark as a playlist. Only a bundled benchmark
+carries one
+([2026-10-05](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+Where it is shown is in [playlists.md](specs/playlists.md#the-overview).
+
+- In code: `kovaaks_benchmark_id` in a bundled file, and `benchmark_id`
+  elsewhere.
+
 ### Stalest
 
 Of the scenarios in a playlist that the player has played, the one played
@@ -122,6 +155,16 @@ percentile.
 The share of a scenario's leaderboard the player places above, as a
 percentage, so higher is better. It comes from position and total players; how
 it is derived is in [scenario_rank.md](specs/scenario_rank.md#domain-model).
+
+### Leaderboard ID
+
+KovaaK's numeric identifier for a scenario's global leaderboard. Position,
+total players, and percentile all come from that leaderboard
+([2026-10-05](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+Where it is shown is in
+[playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
+
+- In code: `leaderboard_id`.
 
 ### From cache
 
@@ -163,10 +206,12 @@ How a PB is placed on the ladder is in
 
 ### Next Rank gap
 
-How much a benchmark scenario's PB has to grow to reach its next rank, as a
-percentage of the PB, such as +4.8% to Gold. With every rank reached, it reads
-Top rank
-([2026-09-27](decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
+How much a benchmark scenario's PB has to improve to reach its next rank: as
+a percentage of the PB, such as +4.8% to Gold, or of its pace where the app
+measures a time-scored scenario by pace, such as 2.8% faster to Lavender. With
+every rank reached, it reads Top rank
+([2026-09-27](decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one),
+[2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 How the gap is computed and shown is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
@@ -194,6 +239,19 @@ sensitivity. It's the player's own record, not their leaderboard score
   row fields, and `personal_best` or `pb` for the run that set it and that
   run's stats. The PB a run was chasing is its previous best.
 
+### New PB
+
+A run that beat its scenario's PB when it was played. It held the PB until a
+later run beat it, and the latest one is the PB run. A scenario's first run
+sets the PB without beating one, so it isn't a new PB. Where the chart marks
+them is in
+[scenario_performance.md](specs/scenario_performance.md#the-graph).
+
+- On screen: New PB in the chart legend. The celebration toast's title says
+  New personal best.
+- In code: `new_high_score`.
+- Not the PB run, the one run that holds the PB now.
+
 ### Accuracy
 
 The share of a run's shots that hit. PB Accuracy on a scenario table means
@@ -201,10 +259,22 @@ damage accuracy instead, the share of possible damage done, when the run
 records it, so one run can show two different accuracies
 ([playlists.md](specs/playlists.md#the-per-playlist-scenario-table)).
 
+### Pace
+
+How fast a run finishes a time-scored scenario, set against another run: the
+other run's time divided by this one's. A run at 95% of PB pace takes the PB's
+time divided by 0.95
+([2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+
+- On screen: PB pace in a verdict, and faster in the Next Rank column and the
+  New personal best toast.
+
 ### Score threshold
 
-A score goal set as a percentage of the PB
-([2026-07-08](decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
+A score goal set as a percentage of the PB, or of the PB's pace where the app
+measures a time-scored scenario by pace
+([2026-07-08](decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb),
+[2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 How a run is judged against it is in
 [notifications.md](specs/notifications.md#run-notifications).
 

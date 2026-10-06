@@ -146,6 +146,24 @@ separators is a judgment call about intended spacing rather than a mechanical
 fix. The graph-settings modal that held the other `Space(h="xs")` is gone
 (PR #209), so the three above are all that remain.
 
+### A stored column choice can apply after the scenario table's first rows
+
+On a machine a quarter to a half slower than the maintainer's, a playlist's
+scenario table with a stored **Columns** choice draws its rows in the default
+columns for 0.1 to 0.5 s, and then the columns change. The choice is applied
+in the browser, through the grid API (`source/components/columns_menu.py`),
+and on a slower CPU the rows arrive while the grid is still being created.
+Measured in the review of PR #344 at `a14fb4f`, with CPU throttling: 2 of 8
+loads at 1.25×, 7 of 8 at 1.5×, 8 of 8 at 2×, none unthrottled, and none on
+the overview. Nothing is wrong afterwards.
+
+Deferred from PR #344 with the reviewer's agreement
+([thread](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/344#discussion_r4190057623)).
+Waiting for the grid faster does not help. The direction that can hold is to
+keep the grid out of sight until the first run has applied. Nobody has
+verified one, and it has to leave the loading overlay in view
+([2026-07-16](decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
+
 ## Performance
 
 ### One global lock serializes every cache file operation

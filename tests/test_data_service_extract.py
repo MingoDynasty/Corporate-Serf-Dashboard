@@ -149,6 +149,33 @@ def test_extract_data_from_file_parses_valid_file() -> None:
         file_path.unlink(missing_ok=True)
 
 
+def test_extract_data_from_file_reads_the_hash_and_the_file_name() -> None:
+    run = _extract_written_file(
+        "hashed", extra_line="Hash:,b084b3c448c9417a770afac883f6a1a2"
+    )
+
+    assert run is not None
+    assert run.scenario_hash == "b084b3c448c9417a770afac883f6a1a2"
+    assert run.stats_file_name == "hashed - Challenge - 2025.01.01-10.00.00 Stats.csv"
+
+
+@pytest.mark.parametrize(
+    "hash_line",
+    [
+        pytest.param(None, id="no Hash line"),
+        pytest.param("Hash:", id="a Hash line with no value column yet"),
+        pytest.param("Hash:,", id="an empty Hash value"),
+    ],
+)
+def test_extract_data_from_file_loads_a_file_with_no_usable_hash(hash_line) -> None:
+    """A hash is never worth the run: without one the run still loads."""
+    run = _extract_written_file("unhashed", extra_line=hash_line)
+
+    assert run is not None
+    assert run.score == 123.45
+    assert run.scenario_hash is None
+
+
 def test_extract_data_from_file_tolerates_missing_damage_columns() -> None:
     fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "generated"
     fixtures_dir.mkdir(parents=True, exist_ok=True)

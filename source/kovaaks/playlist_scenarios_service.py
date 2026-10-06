@@ -28,7 +28,9 @@ from source.kovaaks.data_service import (
     is_benchmark_playlist,
     is_scenario_in_database,
 )
+from source.kovaaks.pace import percent_faster
 from source.kovaaks.request_logging import request_exception_summary
+from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
 from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_RANK_MAX_WORKERS = 4
@@ -96,6 +98,14 @@ def _format_int(value: int | None) -> str:
     return f"{value:,}"
 
 
+def _format_id(value: int | None) -> str:
+    # Never through ``_format_int``: an ID gets pasted into a request, so it
+    # takes no thousands separator.
+    if value is None:
+        return "N/A"
+    return str(value)
+
+
 def _format_percentile(value: float | None) -> str:
     if value is None:
         return "N/A"
@@ -137,6 +147,7 @@ def _scenario_ladders(playlist: PlaylistData) -> tuple[list[Rank] | None, ...]:
 def benchmark_rank_fields(
     ladder: list[Rank],
     high_score: float | None,
+    pace_constant: float | None = None,
 ) -> PlaylistScenarioRow:
     """Compute a benchmark row's Rank and Next Rank fields from its PB.
 
@@ -147,6 +158,14 @@ def benchmark_rank_fields(
     every gap positive. ``tier_sort`` counts the ranks passed, so No rank is 0.
     ``next_tier_sort`` is the unrounded gap, and Top rank and ``N/A`` sort as
     null. The display rounds up, so a gap that remains never reads as reached.
+
+    ``pace_constant`` is the constant of a time-scored scenario whose PB is
+    eligible for a pace comparison, and ``None`` for every other row. With it
+    the gap is how much faster the PB run has to finish, and the cell reads
+    "faster". A pace gap needs only positive times, so it is defined for a PB
+    of zero or less. Where it is undefined, the row falls back to the gap as a
+    percentage of the PB. The walk and the Rank are the same either way,
+    because a higher score is always a faster finish.
     """
     fields: PlaylistScenarioRow = {
         "tier_display": "N/A",
@@ -166,11 +185,20 @@ def benchmark_rank_fields(
     fields["tier_sort"] = passed
     if passed == len(ladder):
         fields["next_tier_display"] = "Top rank"
+        return fields
+    next_rank = ladder[passed]
+    points = next_rank.threshold - high_score
+    gap = None
+    if pace_constant is not None:
+        gap = percent_faster(pace_constant, high_score, next_rank.threshold)
+    if gap is not None:
+        fields["next_tier_display"] = (
+            f"{_round_up(gap, 1):,.1f}% faster to {next_rank.name}"
+        )
     elif high_score > 0:
-        next_rank = ladder[passed]
-        points = next_rank.threshold - high_score
         gap = points / high_score * 100
         fields["next_tier_display"] = f"+{_round_up(gap, 1):,.1f}% to {next_rank.name}"
+    if gap is not None:
         fields["next_tier_sort"] = gap
         fields["next_tier_tooltip"] = (
             f"{next_rank.name} at {_format_score(next_rank.threshold)} · "
@@ -221,15 +249,20 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
     scenario_stats: ScenarioStats | None = None,
     personal_best_run: RunData | None = None,
     *,
+    leaderboard_id: int | None = None,
     ladder: list[Rank] | None = None,
+    pace_constant: float | None = None,
     generation_token: str | None = None,
     playlist_code: str | None = None,
     mark_unresolved_pending: bool = False,
 ) -> PlaylistScenarioRow:
     """Create one complete AG Grid row with display and numeric sort values.
 
-    ``ladder`` is ``None`` on a playlist's table, whose rows carry no Rank or
-    Next Rank fields, and the scenario's ladder on a benchmark's table.
+    ``leaderboard_id`` is the scenario's entry in the name-to-ID mapping, or
+    ``None`` for a scenario the app hasn't resolved. ``ladder`` is ``None`` on
+    a playlist's table, whose rows carry no Rank or Next Rank fields, and the
+    scenario's ladder on a benchmark's table. ``pace_constant`` is set only
+    where the Next Rank gap is measured by pace.
     """
     date_last_played = None
     number_of_runs = 0
@@ -243,6 +276,7 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
     personal_best_accuracy = _personal_best_accuracy(personal_best_run)
     row: PlaylistScenarioRow = {
         "scenario": scenario_name,
+        "leaderboard_id": _format_id(leaderboard_id),
         "playlist_order": playlist_order,
         "status": rank_info.status.value,
         "position_display": "N/A",
@@ -269,7 +303,7 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         "pb_accuracy_sort": personal_best_accuracy,
     }
     if ladder is not None:
-        row.update(benchmark_rank_fields(ladder, high_score))
+        row.update(benchmark_rank_fields(ladder, high_score, pace_constant))
 
     if rank_info.status == ScenarioRankStatus.RANKED:
         row["position_display"] = _format_int(rank_info.rank)
@@ -399,13 +433,47 @@ def _build_row(  # noqa: PLR0913
             exc_info=True,
         )
         personal_best_run = None
+    # Read from the mapping, the value the app itself sends to KovaaK's, and
+    # read on every row path: the fill's rows and a cancelled fill's rebuild
+    # replace a row whole, so a row built without it would blank the cell. The
+    # fill looks the position up first, so its row carries an ID it just
+    # learned.
+    try:
+        leaderboard_id = get_cached_leaderboard_id(scenario_name)
+    except Exception:  # noqa: BLE001 - a bad mapping read must not cost the row
+        logger.warning(
+            'Failed to read the leaderboard ID for "%s"',
+            scenario_name,
+            exc_info=True,
+        )
+        leaderboard_id = None
+    pace_constant = None
+    # Only a row with a ladder and a PB shows a gap, so a playlist's table
+    # never reads a performance file.
+    if ladder and personal_best_run is not None:
+        try:
+            pace_constant = eligible_pace_constant(
+                get_pace_basis(scenario_name),
+                personal_best_run,
+            )
+        except Exception:  # noqa: BLE001 -- a fill worker's exception ends the fill.
+            # The lookup handles a missing or unreadable performance file
+            # itself. Anything else must cost the pace gap only, never the
+            # row, so the cell falls back to the gap as a percentage of the PB.
+            logger.warning(
+                'Failed to tell whether "%s" is time-scored',
+                scenario_name,
+                exc_info=True,
+            )
     return format_playlist_scenario_rank_row(
         scenario_name,
         playlist_order,
         rank_info,
         scenario_stats,
         personal_best_run,
+        leaderboard_id=leaderboard_id,
         ladder=ladder,
+        pace_constant=pace_constant,
         generation_token=generation_token,
         playlist_code=playlist_code,
         mark_unresolved_pending=mark_unresolved_pending,

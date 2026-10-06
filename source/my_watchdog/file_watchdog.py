@@ -15,12 +15,20 @@ from watchdog.events import FileSystemEventHandler
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity
 from source.kovaaks.api_service import schedule_rank_freshness_refresh
+from source.kovaaks.data_models import RunData
 from source.kovaaks.data_service import (
     extract_data_from_file,
     get_high_score,
+    get_personal_best_run,
     get_sensitivities_vs_runs,
     is_scenario_in_database,
     load_csv_file_into_database,
+)
+from source.kovaaks.pace import pace_goal_met, pace_threshold_score, percent_faster
+from source.kovaaks.time_scored_service import (
+    eligible_pace_constant,
+    get_pace_basis,
+    note_performance_file,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.utilities import ordinal
@@ -57,6 +65,11 @@ def drain_run_import_failures() -> list[str]:
 # thread can't read, so this constant only matches the UI verdict when the UI
 # is left at 95% (the usual case). The score and percent-from-high-score
 # figures logged next to it are always correct regardless.
+#
+# On a time-scored scenario the log judges by pace, as the toast does: the
+# goal is 95% of the high score's pace, and the percentage logged is how much
+# faster or slower the run finished. Left on score, the log would pass every
+# run the toast fails.
 SESSION_LOG_SCORE_THRESHOLD_PCT = 0.95
 
 
@@ -105,6 +118,105 @@ def _refresh_rank_after_high_score(
         logger.exception('Failed to schedule rank refresh for "%s"', scenario_name)
 
 
+def _pace_constant_for_landed_run(
+    run_data: RunData,
+    previous_best_run: RunData | None,
+) -> float | None:
+    """Work out the constant a landed run's message carries, or None.
+
+    The run is not in the stores yet, so the lookup is handed it: a scenario's
+    newest run names its version, and this run is judged by its own
+    performance file.
+    """
+    try:
+        return eligible_pace_constant(
+            get_pace_basis(run_data.scenario, landed_run=run_data),
+            run_data,
+            previous_best_run,
+        )
+    except Exception:  # noqa: BLE001 -- on_created's guard would drop the run.
+        # The lookup handles a missing or unreadable performance file itself.
+        # Anything else must cost the pace math only: the run still imports,
+        # and its message carries no constant, so every consumer keeps score.
+        logger.warning(
+            'Failed to tell whether "%s" is time-scored',
+            run_data.scenario,
+            exc_info=True,
+        )
+        return None
+
+
+def _log_run_against_high_score(
+    score: float,
+    high_score: float,
+    pace_constant: float | None,
+) -> None:
+    """Log one run's interim pass or fail against the session log's fixed goal."""
+    goal_percentage = SESSION_LOG_SCORE_THRESHOLD_PCT * 100
+    passed_by_pace = None
+    if pace_constant is not None:
+        passed_by_pace = pace_goal_met(
+            pace_constant, high_score, score, goal_percentage
+        )
+    if pace_constant is not None and passed_by_pace is not None:
+        score_threshold = pace_threshold_score(
+            pace_constant, high_score, goal_percentage
+        )
+        logger.debug(
+            "Current score (%g) is %+.2f%% from high score (%g) by pace "
+            "with score threshold (%.2f)",
+            score,
+            percent_faster(pace_constant, high_score, score),
+            high_score,
+            score_threshold,
+        )
+        if score > high_score:
+            logger.debug(
+                "Score threshold increased from (%.2f) to (%.2f)",
+                score_threshold,
+                pace_threshold_score(pace_constant, score, goal_percentage),
+            )
+        passed = passed_by_pace
+    else:
+        score_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT * high_score
+        if high_score > 0:
+            pct_diff = (score / high_score - 1) * 100
+            logger.debug(
+                "Current score (%g) is %+.2f%% from high score (%g) "
+                "with score threshold (%.2f)",
+                score,
+                pct_diff,
+                high_score,
+                score_threshold,
+            )
+        else:
+            # KovaaK's scores are unconstrained floats, so a scenario whose
+            # stored runs all scored 0 divides by zero here and drops the run
+            # before it is ever loaded. There is no usable denominator, not a
+            # zero-percent one, so log the raw figures instead -- the same
+            # judgment _threshold_verdict makes in source/pages/home.py.
+            logger.debug(
+                "Current score (%g) has no percentage from high score (%g) "
+                "with score threshold (%.2f)",
+                score,
+                high_score,
+                score_threshold,
+            )
+        if score > high_score:
+            logger.debug(
+                "Score threshold increased from (%.2f) to (%.2f)",
+                score_threshold,
+                SESSION_LOG_SCORE_THRESHOLD_PCT * score,
+            )
+        passed = score > score_threshold
+    if passed:
+        logger.debug(
+            "Successfully passed the score threshold! Ready to move onto the next scenario."
+        )
+    else:
+        logger.debug("Failed to meet the score threshold. Keep grinding...")
+
+
 class NewFileHandler(FileSystemEventHandler):
     """
     This class handles monitoring a specified directory for newly created files.
@@ -145,6 +257,12 @@ class NewFileHandler(FileSystemEventHandler):
 
         sensitivity_key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
 
+        # The game writes a run's performance file within milliseconds of its
+        # stats file, so the wait before the stats file is read covers it.
+        # Listing it for every run, a scenario's first included, is what lets
+        # the table and the chart see the file this thread judges the run by.
+        note_performance_file(run_data)
+
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
             logger.debug('Found new scenario: "%s"', run_data.scenario)
@@ -163,6 +281,8 @@ class NewFileHandler(FileSystemEventHandler):
                 scenario_previous_best=None,
                 score=run_data.score,
                 sensitivity=sensitivity_key,
+                # Nothing judges or celebrates a scenario's first run.
+                pace_constant=None,
             )
             if _enqueue_after_loading(file, message):
                 _refresh_rank_after_high_score(run_data.scenario, run_data.score)
@@ -170,45 +290,13 @@ class NewFileHandler(FileSystemEventHandler):
 
         high_score = get_high_score(run_data.scenario)
         is_new_high_score = run_data.score > high_score
-
-        pct_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT
-        score_threshold = pct_threshold * high_score
-        if high_score > 0:
-            pct_diff = (run_data.score / high_score - 1) * 100
-            logger.debug(
-                "Current score (%g) is %+.2f%% from high score (%g) "
-                "with score threshold (%.2f)",
-                run_data.score,
-                pct_diff,
-                high_score,
-                score_threshold,
-            )
-        else:
-            # KovaaK's scores are unconstrained floats, so a scenario whose
-            # stored runs all scored 0 divides by zero here and drops the run
-            # before it is ever loaded. There is no usable denominator, not a
-            # zero-percent one, so log the raw figures instead -- the same
-            # judgment _threshold_verdict makes in source/pages/home.py.
-            logger.debug(
-                "Current score (%g) has no percentage from high score (%g) "
-                "with score threshold (%.2f)",
-                run_data.score,
-                high_score,
-                score_threshold,
-            )
-        if is_new_high_score:
-            new_score_threshold = pct_threshold * run_data.score
-            logger.debug(
-                "Score threshold increased from (%.2f) to (%.2f)",
-                score_threshold,
-                new_score_threshold,
-            )
-        if run_data.score > score_threshold:
-            logger.debug(
-                "Successfully passed the score threshold! Ready to move onto the next scenario."
-            )
-        else:
-            logger.debug("Failed to meet the score threshold. Keep grinding...")
+        # Worked out here, before the run is stored and its message queued, so
+        # the toast agrees with the chart that rebuilds once the run lands.
+        pace_constant = _pace_constant_for_landed_run(
+            run_data,
+            get_personal_best_run(run_data.scenario),
+        )
+        _log_run_against_high_score(run_data.score, high_score, pace_constant)
 
         # Case 2: new sensitivity.
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
@@ -223,6 +311,7 @@ class NewFileHandler(FileSystemEventHandler):
                 scenario_previous_best=high_score,
                 score=run_data.score,
                 sensitivity=sensitivity_key,
+                pace_constant=pace_constant,
             )
             if _enqueue_after_loading(file, message) and is_new_high_score:
                 _refresh_rank_after_high_score(run_data.scenario, run_data.score)
@@ -257,6 +346,7 @@ class NewFileHandler(FileSystemEventHandler):
             scenario_previous_best=high_score,
             score=run_data.score,
             sensitivity=sensitivity_key,
+            pace_constant=pace_constant,
         )
         if _enqueue_after_loading(file, message) and is_new_high_score:
             _refresh_rank_after_high_score(run_data.scenario, run_data.score)

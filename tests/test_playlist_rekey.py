@@ -1353,3 +1353,205 @@ def test_the_duplicate_code_refusal_still_runs_before_the_point_check(
 
     assert imported_code == "LoadedCode"
     assert message == 'The playlist code LoadedCode is already imported as "Loaded".'
+
+
+# --- the bundled loader reads each file's KovaaK's benchmark ID into a side table ---
+
+
+def _configure_benchmark_id_roots(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> tuple[Path, Path]:
+    # The side table is module state, so each test gets its own.
+    monkeypatch.setattr(data_service, "_bundled_benchmark_ids", {})
+    return _configure_roots(monkeypatch, tmp_path)
+
+
+def _stamped_bundled_payload(playlist: PlaylistData, **extra) -> str:
+    """Serialize a bundled-style file with extra top-level keys beside the model."""
+    payload = json.loads(playlist.model_dump_json(exclude_none=True))
+    return json.dumps({**payload, **extra}, indent=2)
+
+
+def _generated_from(benchmark_id) -> dict:
+    return {
+        "sharecode": "KovaaKsTestSharecode",
+        "kovaaks_benchmark_id": benchmark_id,
+        "schema_version": 2,
+    }
+
+
+def test_a_bundled_files_benchmark_id_lands_in_the_side_table(monkeypatch, tmp_path):
+    bundled_root, _user_root = _configure_benchmark_id_roots(monkeypatch, tmp_path)
+    stamped = _playlist("Stamped", "StampedCode")
+    _write_raw_playlist(
+        bundled_root / "stamped.json",
+        _stamped_bundled_payload(stamped, generated_from=_generated_from(2336)),
+    )
+
+    data_service.load_playlists()
+
+    assert data_service.get_bundled_benchmark_id("StampedCode") == 2336
+    assert data_service.get_bundled_benchmark_id("UnknownCode") is None
+    # The stamp rides beside the model, never in it.
+    assert data_service.playlist_database == {"StampedCode": stamped}
+    assert data_service.drain_startup_playlist_warnings() == []
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        pytest.param({}, id="no-block"),
+        pytest.param({"generated_from": None}, id="null-block"),
+        pytest.param({"generated_from": "KovaaKsTestSharecode"}, id="string-block"),
+        pytest.param({"generated_from": [2336]}, id="list-block"),
+        pytest.param({"generated_from": {}}, id="empty-block"),
+        pytest.param({"generated_from": _generated_from(None)}, id="null-id"),
+        pytest.param({"generated_from": _generated_from("2336")}, id="string-id"),
+        pytest.param({"generated_from": _generated_from(2336.5)}, id="float-id"),
+        pytest.param({"generated_from": _generated_from(True)}, id="bool-id"),
+        pytest.param({"generated_from": _generated_from([2336])}, id="list-id"),
+    ],
+)
+def test_a_bundled_file_without_a_usable_stamp_loads_with_no_benchmark_id(
+    monkeypatch, tmp_path, extra
+):
+    bundled_root, _user_root = _configure_benchmark_id_roots(monkeypatch, tmp_path)
+    playlist = _playlist("Unstamped", "UnstampedCode")
+    _write_raw_playlist(
+        bundled_root / "unstamped.json",
+        _stamped_bundled_payload(playlist, **extra),
+    )
+
+    data_service.load_playlists()
+
+    # A missing or malformed block never stops the file from loading.
+    assert data_service.playlist_database == {"UnstampedCode": playlist}
+    assert data_service.get_bundled_benchmark_id("UnstampedCode") is None
+    assert data_service.drain_startup_playlist_warnings() == []
+    asserted, load_complete = data_service.get_bundled_leaderboard_seed()
+    assert load_complete is True
+    assert asserted == {}
+
+
+def test_a_user_files_benchmark_id_stamp_is_ignored(monkeypatch, tmp_path):
+    bundled_root, user_root = _configure_benchmark_id_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    user = _playlist("User", "UserCode")
+    _write_raw_playlist(
+        user_root / "user.json",
+        _stamped_bundled_payload(
+            user, schema_version=1, generated_from=_generated_from(2336)
+        ),
+    )
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database["UserCode"] == user
+    assert data_service.get_bundled_benchmark_id("UserCode") is None
+
+
+def test_the_winning_bundled_files_benchmark_id_is_the_one_kept(monkeypatch, tmp_path):
+    bundled_root, _user_root = _configure_benchmark_id_roots(monkeypatch, tmp_path)
+    # ``A.json`` sorts first and wins each code; ``b.json`` is the duplicate.
+    for code, winner_id, skipped_id in (
+        ("BothStamped", 111, 222),
+        ("OnlySkippedStamped", None, 333),
+    ):
+        for prefix, benchmark_id in (("A", winner_id), ("b", skipped_id)):
+            extra = (
+                {}
+                if benchmark_id is None
+                else {"generated_from": _generated_from(benchmark_id)}
+            )
+            _write_raw_playlist(
+                bundled_root / f"{prefix} {code}.json",
+                _stamped_bundled_payload(_playlist(prefix, code), **extra),
+            )
+
+    data_service.load_playlists()
+
+    assert data_service.get_bundled_benchmark_id("BothStamped") == 111
+    # A skipped duplicate never lends its ID to the file that won the code.
+    assert data_service.get_bundled_benchmark_id("OnlySkippedStamped") is None
+
+
+def test_the_benchmark_id_table_is_rebuilt_on_every_load(monkeypatch, tmp_path):
+    bundled_root, _user_root = _configure_benchmark_id_roots(monkeypatch, tmp_path)
+    playlist = _playlist("Stamped", "StampedCode")
+    path = bundled_root / "stamped.json"
+    _write_raw_playlist(
+        path, _stamped_bundled_payload(playlist, generated_from=_generated_from(2336))
+    )
+    data_service.load_playlists()
+    assert data_service.get_bundled_benchmark_id("StampedCode") == 2336
+
+    _write_playlist(path, playlist)
+    data_service.load_playlists()
+
+    assert data_service.get_bundled_benchmark_id("StampedCode") is None
+
+
+def test_a_bundled_file_that_isnt_valid_json_warns_and_is_skipped(
+    monkeypatch, tmp_path
+):
+    bundled_root, _user_root = _configure_benchmark_id_roots(monkeypatch, tmp_path)
+    valid = _playlist("Valid", "ValidCode")
+    _write_raw_playlist(
+        bundled_root / "valid.json",
+        _stamped_bundled_payload(valid, generated_from=_generated_from(2336)),
+    )
+    # Truncated mid-stamp: the model's parse and the stamp's parse both reject
+    # it, and only the model's is allowed to report it.
+    _write_raw_playlist(
+        bundled_root / "broken.json",
+        _stamped_bundled_payload(
+            _playlist("Broken", "BrokenCode"), generated_from=_generated_from(999)
+        )[:-20],
+    )
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database == {"ValidCode": valid}
+    assert data_service.get_bundled_benchmark_id("ValidCode") == 2336
+    assert data_service.get_bundled_benchmark_id("BrokenCode") is None
+    assert data_service.drain_startup_playlist_warnings() == [
+        "The playlist file isn't valid JSON. "
+        f"File: {bundled_root.resolve() / 'broken.json'}"
+    ]
+    _asserted, load_complete = data_service.get_bundled_leaderboard_seed()
+    assert load_complete is False
+
+
+def test_playlist_data_gains_no_benchmark_id_field():
+    """The importer's drift check compares a file with a stamp-free rebuild.
+
+    It does so by whole-model equality, so the stamp must stay invisible to the
+    model: a field for it would report every bundled file as drifted.
+    """
+    assert not {"generated_from", "kovaaks_benchmark_id", "benchmark_id"} & set(
+        PlaylistData.model_fields
+    )
+    playlist = _playlist("Stamped", "StampedCode")
+    stamped = PlaylistData.model_validate_json(
+        _stamped_bundled_payload(playlist, generated_from=_generated_from(2336))
+    )
+    assert stamped == playlist
+
+
+def test_committed_bundled_playlists_all_carry_a_benchmark_id():
+    # The loader's own reader, over the real corpus: a change to the stamp the
+    # importer writes would otherwise blank the Benchmark ID column silently.
+    playlist_paths = _committed_bundled_playlist_paths()
+
+    assert playlist_paths
+    missing_benchmark_ids = [
+        playlist_path.relative_to(REPO_ROOT).as_posix()
+        for playlist_path in playlist_paths
+        if data_service._read_bundled_benchmark_id(
+            playlist_path.read_text(encoding="utf-8")
+        )
+        is None
+    ]
+
+    assert not missing_benchmark_ids

@@ -29,6 +29,11 @@ uv run mypy source
 uv run python -m compileall source tests
 ```
 
+GitHub's CodeQL default setup also scans the Python, the JavaScript, and the
+workflow files on every pull request, on every push to `main`, and weekly. It
+is switched on in the repository's settings, so no workflow file defines its
+`Analyze` checks, and they are not required to merge.
+
 Coverage is a local measurement, never a CI gate; pytest-cov is a dev
 dependency and `pyproject.toml` carries its settings. The app-startup tests run
 `source/app.py` in child processes that change into temp state roots, so the
@@ -142,6 +147,11 @@ Codex <codex@local>
   has the evidence).
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
+- Use [docs/dependency_refresh.md](docs/dependency_refresh.md) as the playbook
+  when upgrading dependencies or toolchain pins: the lockfile, the dependency
+  floors, uv, the pinned GitHub Actions, and the vendored browser libraries.
+  Updates are made by hand from it. A refresh that finds a step wrong or
+  missing fixes the playbook in the same PR.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
   samples) goes under `ignore/` in a categorized subdirectory, never loose at
   the top level — routing table in [ignore/README.md](ignore/README.md).
