@@ -1,24 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from pydantic import BaseModel, RootModel
+
+# The app's own model of a layout, so the importer's comparison walks exactly
+# the shape the app's join does.
+from source.kovaaks.evxl_snapshot import EvxlCategory
 
 
 @dataclass()
 class EvxlDatabaseItem:
     kovaaksBenchmarkId: int
     rankColors: dict[str, str]
-
-
-class EvxlSubcategory(BaseModel):
-    subcategoryName: str
-    color: str
-    scenarioCount: int
-
-
-class EvxlCategory(BaseModel):
-    categoryName: str
-    color: str
-    subcategories: list[EvxlSubcategory]
+    categories: list[EvxlCategory] = field(default_factory=list)
 
 
 class EvxlDifficulty(BaseModel):

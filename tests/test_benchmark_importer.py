@@ -8,12 +8,15 @@ from pydantic import ValidationError
 
 from scripts.benchmark_importer import script
 from scripts.benchmark_importer.models import (
+    EvxlData,
     EvxlDatabaseItem,
     EvxlPlaylist,
     EvxlPlaylistScenario,
     ManifestEntry,
 )
+from source.kovaaks.api_models import BenchmarksAPIResponse
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
+from source.kovaaks.evxl_snapshot import EvxlCategory
 from source.utilities import atomic_write
 
 
@@ -1661,7 +1664,7 @@ def test_build_playlist_passes_use_cache_through_and_returns_the_merge(monkeypat
     assert benchmark_calls == [
         ((42, None, False), {"attempts": 4, "backoff_seconds": (2, 4, 8)})
     ]
-    assert built == PlaylistData(
+    assert built.playlist == PlaylistData(
         name="Built Playlist",
         code="KovaaKsBuilt",
         scenarios=[
@@ -1672,6 +1675,8 @@ def test_build_playlist_passes_use_cache_through_and_returns_the_merge(monkeypat
             )
         ],
     )
+    # No layout on the item, so the app would draw no groups to compare.
+    assert built.group_crossings is None
 
 
 # --- --check: drift between bundled files and a live rebuild ---
@@ -1754,7 +1759,8 @@ def _bundle(tmp_path: Path, *sharecodes: str):
 def _fake_build(calls: list, outcomes: dict | None = None):
     """Rebuild each sharecode as ``_bundle`` wrote it unless ``outcomes`` says not.
 
-    An exception outcome is raised; a playlist outcome is returned.
+    An exception outcome is raised; a playlist outcome is returned, with no
+    group crossings unless the outcome is a ``BuiltPlaylist`` that holds some.
     """
 
     def fake(sharecode, _item, *, use_cache):
@@ -1762,7 +1768,11 @@ def _fake_build(calls: list, outcomes: dict | None = None):
         outcome = (outcomes or {}).get(sharecode)
         if isinstance(outcome, Exception):
             raise outcome
-        return outcome or _check_playlist("A", code=sharecode)
+        if isinstance(outcome, script.BuiltPlaylist):
+            return outcome
+        return script.BuiltPlaylist(
+            outcome or _check_playlist("A", code=sharecode), None
+        )
 
     return fake
 
@@ -2178,3 +2188,338 @@ def test_main_check_skips_the_snapshot_refresh_and_the_importer(monkeypatch):
     assert check_calls == [
         ((database, {}), {"only": ["KovaaKsA"], "max_consecutive_failures": 3})
     ]
+
+
+# --- the group comparison: drawn groups against KovaaK's categories ---
+
+
+def _kovaaks_response(**categories: list[str]) -> BenchmarksAPIResponse:
+    """Build a KovaaK's benchmark payload from category names and scenario names."""
+    return BenchmarksAPIResponse.model_validate(
+        {
+            "benchmark_progress": 0,
+            "overall_rank": 0,
+            "categories": {
+                category_name: {
+                    "benchmark_progress": 0,
+                    "category_rank": 0,
+                    "rank_maxes": [100],
+                    "scenarios": {
+                        scenario_name: {
+                            "score": 0,
+                            "leaderboard_rank": None,
+                            "scenario_rank": 0,
+                            "rank_maxes": [100],
+                            "leaderboard_id": index,
+                        }
+                        for index, scenario_name in enumerate(scenario_names)
+                    },
+                }
+                for category_name, scenario_names in categories.items()
+            },
+            "ranks": [],
+        }
+    )
+
+
+def _group_layout(*categories: tuple[str, list[tuple[str, int]]]) -> list[EvxlCategory]:
+    return [
+        EvxlCategory.model_validate(
+            {
+                "categoryName": category_name,
+                "color": "#111111",
+                "subcategories": [
+                    {
+                        "subcategoryName": name,
+                        "color": "#222222",
+                        "scenarioCount": count,
+                    }
+                    for name, count in subcategories
+                ],
+            }
+        )
+        for category_name, subcategories in categories
+    ]
+
+
+_KOVAAKS = _kovaaks_response(Clicking=["A", "B", "C"], Tracking=["D", "E", "F"])
+
+
+@pytest.mark.parametrize(
+    "layout",
+    [
+        # Groups begin where KovaaK's categories do.
+        _group_layout(("Clicking", [("", 3)]), ("Tracking", [("", 3)])),
+        _group_layout(("", [("Clicking", 3), ("Tracking", 3)])),
+        # Groups subdivide a KovaaK's category, as on Voltaic S5.
+        _group_layout(
+            ("Clicking", [("Static", 2), ("Dynamic", 1)]),
+            ("Tracking", [("Precise", 1), ("Reactive", 2)]),
+        ),
+        # KovaaK's categories subdivide a group, as on Control Track DOJO.
+        _group_layout(("Everything", [("", 6)])),
+        _group_layout(("Everything", [("All", 6)])),
+        # Subdivided on one side of a boundary and whole on the other.
+        _group_layout(("Clicking", [("Static", 1), ("Dynamic", 2)]), ("", [("", 3)])),
+    ],
+    ids=[
+        "equal, as categories",
+        "equal, as subcategories",
+        "groups are finer",
+        "KovaaK's is finer, one level",
+        "KovaaK's is finer, two levels",
+        "finer on one side",
+    ],
+)
+def test_groups_that_nest_with_kovaaks_categories_pass(layout):
+    assert script.find_group_crossings(_KOVAAKS, layout) == []
+
+
+def test_a_group_that_straddles_a_kovaaks_boundary_fails():
+    # The total still adds up: only the comparison sees the moved boundary.
+    layout = _group_layout(("", [("Clicking", 2), ("Tracking", 4)]))
+
+    assert script.find_group_crossings(_KOVAAKS, layout) == [
+        "KovaaK's category 'Clicking' (scenarios 1-3) and the group "
+        "'Tracking' (scenarios 3-6) share only 'C'",
+    ]
+
+
+def test_a_straddling_subcategory_is_named_with_its_category():
+    # As on IRIS Mixed Benchmarks Easy: the last Clicking scenario is counted
+    # into the first Tracking subcategory.
+    layout = _group_layout(
+        ("Clicking", [("Static", 2)]),
+        ("Tracking", [("Precise", 2), ("Reactive", 2)]),
+    )
+
+    assert script.find_group_crossings(_KOVAAKS, layout) == [
+        "KovaaK's category 'Clicking' (scenarios 1-3) and the group 'Tracking' "
+        "(scenarios 3-6) share only 'C'",
+        "KovaaK's category 'Clicking' (scenarios 1-3) and the group "
+        "'Tracking / Precise' (scenarios 3-4) share only 'C'",
+        "KovaaK's category 'Tracking' (scenarios 4-6) and the group "
+        "'Tracking / Precise' (scenarios 3-4) share only 'D'",
+    ]
+
+
+def test_a_category_can_straddle_where_its_subcategories_do_not():
+    kovaaks = _kovaaks_response(One=["A", "B", "C"], Two=["D"])
+    layout = _group_layout(
+        ("First", [("a", 2)]),
+        ("Second", [("b", 1), ("c", 1)]),
+    )
+
+    assert script.find_group_crossings(kovaaks, layout) == [
+        "KovaaK's category 'One' (scenarios 1-3) and the group 'Second' "
+        "(scenarios 3-4) share only 'C'",
+    ]
+
+
+@pytest.mark.parametrize(
+    "layout",
+    [
+        # Counts that don't add up, and a layout that names nothing: the app
+        # draws no groups, so there is nothing to compare.
+        _group_layout(("Clicking", [("Static", 2)]), ("Tracking", [("Precise", 2)])),
+        _group_layout(("", [("", 2), ("", 4)])),
+        [],
+    ],
+    ids=["counts", "unnamed", "no layout"],
+)
+def test_a_benchmark_the_app_draws_no_groups_for_is_not_compared(layout):
+    assert script.find_group_crossings(_KOVAAKS, layout) == []
+
+
+def test_load_evxl_data_keeps_each_entrys_layout(tmp_path):
+    data_path = tmp_path / "benchmarks.json"
+    _write_evxl_data(
+        data_path,
+        [
+            {
+                "benchmarkName": "Aim",
+                "difficulties": [_difficulty("KovaaKsListed", 10, {}, "Easy")],
+            }
+        ],
+    )
+
+    database, _conflicts = script.load_evxl_data(data_path)
+
+    (category,) = database["KovaaKsListed"].categories
+    assert category.categoryName == "Clicking"
+    assert category.subcategories[0].scenarioCount == 1
+
+
+def test_the_importers_snapshot_model_reads_the_committed_layouts():
+    # The importer validates the layout with the app's own model, so a field
+    # the two disagreed on would fail the refresh, not the app.
+    evxl_data = EvxlData.model_validate_json(
+        script.EVXL_BENCHMARKS_JSON_FILE.read_text(encoding="utf-8")
+    )
+
+    assert all(
+        isinstance(category, EvxlCategory)
+        for benchmark in evxl_data.root
+        for difficulty in benchmark.difficulties
+        for category in difficulty.categories
+    )
+
+
+_STRADDLING = [
+    {
+        "categoryName": "",
+        "color": "#111",
+        "subcategories": [
+            {"subcategoryName": "Clicking", "color": "#222", "scenarioCount": 1},
+            {"subcategoryName": "Tracking", "color": "#333", "scenarioCount": 2},
+        ],
+    }
+]
+
+
+def _straddling_benchmark(monkeypatch, code: str = "KovaaKsStraddling"):
+    """Serve a benchmark whose second scenario Evxl and KovaaK's group apart."""
+    playlist = EvxlPlaylist(
+        playlist_name="Straddling Benchmark",
+        playlist_code=code,
+        scenario_list=[],
+    )
+    monkeypatch.setattr(script, "get_evxl_playlist", lambda _code: playlist)
+    monkeypatch.setattr(
+        script,
+        "get_benchmark_json",
+        lambda *_args, **_kwargs: _kovaaks_response(
+            Clicking=["A", "B"], Tracking=["C"]
+        ).model_dump(mode="json"),
+    )
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+    return EvxlDatabaseItem(
+        kovaaksBenchmarkId=42,
+        rankColors={"Bronze": "#111"},
+        categories=[EvxlCategory.model_validate(item) for item in _STRADDLING],
+    )
+
+
+_STRADDLING_LINE = (
+    "KovaaK's category 'Clicking' (scenarios 1-2) and the group 'Tracking' "
+    "(scenarios 2-3) share only 'B'"
+)
+
+
+def test_generation_reports_a_crossing_by_name_and_still_writes_the_file(
+    tmp_path, monkeypatch, caplog
+):
+    item = _straddling_benchmark(monkeypatch)
+    caplog.set_level(logging.INFO, logger=script.__name__)
+
+    summary = script.run_importer(
+        {"KovaaKsStraddling": item}, {}, generated_dir=tmp_path
+    )
+    script.log_summary(summary)
+
+    assert summary.generated == ["KovaaKsStraddling"]
+    assert (tmp_path / "Straddling Benchmark.json").exists()
+    assert summary.group_crossings == {
+        "KovaaKsStraddling": script.GroupCrossings(
+            playlist_name="Straddling Benchmark",
+            lines=(_STRADDLING_LINE,),
+            excluded=False,
+        )
+    }
+    assert summary.exit_code == 1
+    assert "group_crossings=1" in caplog.text
+    errors = [
+        record.message for record in caplog.records if record.levelno == logging.ERROR
+    ]
+    # Once as it is generated and once in the summary, each time by name.
+    assert (
+        errors.count(
+            "Groups cross KovaaK's categories: KovaaKsStraddling (Straddling Benchmark)"
+        )
+        == 2
+    )
+    assert f"  {_STRADDLING_LINE}" in errors
+    assert "GROUP_EXCLUDED_PLAYLIST_CODES" in errors[-1]
+
+
+def test_a_crossing_on_the_exclusion_list_is_reported_and_exits_zero(
+    tmp_path, monkeypatch, caplog
+):
+    item = _straddling_benchmark(monkeypatch)
+    monkeypatch.setattr(
+        script, "GROUP_EXCLUDED_PLAYLIST_CODES", frozenset({"KovaaKsStraddling"})
+    )
+    caplog.set_level(logging.INFO, logger=script.__name__)
+
+    summary = script.run_importer(
+        {"KovaaKsStraddling": item}, {}, generated_dir=tmp_path
+    )
+    script.log_summary(summary)
+
+    assert summary.group_crossings["KovaaKsStraddling"].excluded is True
+    assert summary.exit_code == 0
+    assert (
+        "Groups cross KovaaK's categories, and the app's exclusion list already "
+        "leaves them out: KovaaKsStraddling (Straddling Benchmark)"
+    ) in caplog.messages
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+def test_check_reports_a_crossing_by_name_beside_the_buckets(
+    tmp_path, monkeypatch, caplog
+):
+    item = _straddling_benchmark(monkeypatch)
+    bundled_dir = tmp_path / "benchmarks"
+    bundled_dir.mkdir()
+    # The shipped file matches its rebuild, so nothing has drifted.
+    shipped = script.build_playlist("KovaaKsStraddling", item, use_cache=False)
+    _write_bundled(
+        bundled_dir,
+        "Straddling Benchmark.json",
+        shipped.playlist,
+        "KovaaKsStraddling",
+    )
+    caplog.set_level(logging.INFO, logger=script.__name__)
+
+    summary = script.run_check({"KovaaKsStraddling": item}, {}, bundled_dir=bundled_dir)
+    script.log_check_summary(summary)
+
+    assert summary.identical == ["KovaaKsStraddling"]
+    assert summary.drifted == {}
+    assert summary.failed == {}
+    assert summary.group_crossings["KovaaKsStraddling"].lines == (_STRADDLING_LINE,)
+    assert summary.exit_code == 1
+    assert (
+        "Check summary: identical=1, drifted=0, failed=0, not_checked=0, "
+        "group_crossings=1"
+    ) in caplog.messages
+    assert (
+        "Groups cross KovaaK's categories: KovaaKsStraddling "
+        "(Straddling Benchmark.json)"
+    ) in caplog.messages
+    # Regenerating can't fix a crossing, so it never reaches the paste line.
+    assert not any(message.startswith("uv run") for message in caplog.messages)
+
+
+def test_check_exits_zero_for_a_crossing_on_the_exclusion_list(tmp_path, monkeypatch):
+    bundled_dir, database = _bundle(tmp_path, "KovaaKsA")
+    crossings = script.GroupCrossings(
+        playlist_name="A", lines=("crossing",), excluded=True
+    )
+    monkeypatch.setattr(
+        script,
+        "build_playlist",
+        _fake_build(
+            [],
+            {
+                "KovaaKsA": script.BuiltPlaylist(
+                    _check_playlist("A", code="KovaaKsA"), crossings
+                )
+            },
+        ),
+    )
+
+    summary = script.run_check(database, {}, bundled_dir=bundled_dir)
+
+    assert summary.group_crossings == {"KovaaKsA": crossings}
+    assert summary.exit_code == 0
