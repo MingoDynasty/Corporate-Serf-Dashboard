@@ -23,10 +23,11 @@ age is removed, within a day of the first refresh switching it on. Nothing now
 keeps a version published hours earlier out of the lockfile, and the
 maintainer chose to handle a bad release if one arrives.
 
-**Direction.** The maintainer, 2026-10-05, in chat, on
+**Ruling.** Ruled (user) 2026-10-05, in chat, on
 [#349](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/349): "I
 vote to simply remove the `exclude-newer = "7 days"` line. I'll deal with the
-issue if a broken package makes it way in." It supersedes the
+issue if a broken package makes it way in." Asked whether that was a ruling,
+the maintainer answered "Yes, ruling." It supersedes the
 [2026-10-04 entry](#2026-10-04-upgrades-skip-package-versions-younger-than-a-week).
 
 **What changed.** `exclude-newer` is gone from `[tool.uv]` in `pyproject.toml`,
@@ -50,11 +51,10 @@ refreshes
 the playbook's release-note reading and its checks by what moved; and
 Dependabot alerts on the lockfile.
 
-**The uv pin.** The week no longer applies to it either. A refresh pins the
-latest uv release whose installer is being served. The maintainer's words
-above name only the setting. The 2026-10-04 entry tied the pin's week to the
-same reasoning, and earlier in the same chat the maintainer had this refresh
-pin 0.12.23 at three days old.
+**The uv pin.** Ruled (user) 2026-10-05, in the same chat: "remove the one
+week requirement everywhere." The week no longer applies to the uv release a
+refresh pins. A refresh pins the latest release whose installer is being
+served, and this one pinned 0.12.23 at three days old.
 
 **Bringing it back.** The 2026-10-04 entry records what uv requires: the
 setting has to live in `pyproject.toml`, and an exemption has to stay until its
