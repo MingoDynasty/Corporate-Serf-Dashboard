@@ -17,12 +17,18 @@ nothing new is fetched.
 
 ## Decisions needed
 
-Two rulings, and nothing is ratified. The maintainer asked for the feature
-in chat on 2026-10-03. On 2026-10-04 they asked whether one combined column
+One ruling, and nothing is ratified. The maintainer asked for the feature in
+chat on 2026-10-03. On 2026-10-04 they asked whether one combined column
 would do, and whether Evxl's vertical labels are worth adopting, naming a
 table sorted by Last Played as the one worry. Those were questions, not
 leans. Everything else in this proposal, including the Copy and Terms
 blocks, is author-owned and open to challenge.
+
+The data path was a second row when this proposal opened. A decision that
+shipped on 2026-10-04 took the same path for the View on Evxl link and
+rejected the alternative, for reasons that apply here unchanged. The choice
+is therefore author-owned now, and it sits in Design under "Getting the
+groups", with the alternative it rejects.
 
 ### D1 — What the group columns show when the rows leave benchmark order
 
@@ -57,63 +63,21 @@ Choosing differently:
   reverse the direction then sorts the neighboring column.
 - **One horizontal column in every mode.** There are no modes and nothing
   moves. It spends that 115 px to 150 px in benchmark order too, against
-  68 px, on a table that already scrolls sideways in a 1500 px window. It
+  68 px, on a table that already scrolls sideways in a 1500 px window. The
+  Columns menu now lets a user drop columns they don't read, which eases
+  that for them and leaves the default view as wide as before. This option
   also gives up the benchmark-sheet layout the request asked for.
 - **Hide the group columns outside benchmark order.** This is the least
   code. A sorted table would then say nothing about groups, which is the
   view the maintainer's question was about. The filter box also couldn't
   match a category name while a sort is active, because the grid's quick
-  filter skips hidden columns.
+  filter skips hidden columns. A user who wants the columns gone can already
+  hide them through the Columns menu, in every mode.
 
 Material consequence: the swap moves the column headers on the first click
 of every sort. The single horizontal column spends 47 px to 82 px more in
 the default view and doesn't look like the benchmark's sheet. Hiding leaves
 a sorted table without the feature.
-
-### D2 — Where the grouping data comes from
-
-Status: open
-
-Neither the bundled benchmark files nor KovaaK's hold the grouping. Evxl
-does, and the repo already carries Evxl's data as the benchmark importer's
-input, `resources/evxl/benchmarks.json`. For each benchmark that snapshot
-lists the categories in order, each with its subcategories, their colors,
-and how many scenarios each holds. A bundled file keeps its scenarios in
-that same order, so slicing the scenario list by those counts gives each
-scenario its group. The decision is which side does the slicing.
-
-**Recommendation: the app joins the snapshot at startup, and the bundled
-files stay as they are.** The snapshot already travels in the release zip.
-The app would read it once, slice each bundled benchmark by the counts, and
-keep the result in memory beside the playlist store. A benchmark gets groups
-only when the counts add up to its scenario count. The benchmark files,
-their schema, the `Scenario` model, and the importer don't change, and
-removing the feature later means deleting the reader. A category that Evxl
-renames reaches the app with the next snapshot refresh, which every importer
-run already performs.
-
-Choosing differently:
-
-- **The importer writes each scenario's group into its bundled file.** The
-  app then reads the groups from the files it already loads and never parses
-  Evxl's format. The bundled files stay the app's only runtime data, as they
-  are for rank ladders and leaderboard IDs
-  ([2026-07-20](../decision_log.md#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus)),
-  and a snapshot refresh alone can't change what the app shows. The cost is
-  a change to every bundled file. The importer's `schema_version` rises to
-  3, which marks all 261 files stale, and a live importer run regenerates
-  them: one Evxl lookup each, plus a KovaaK's benchmark request for every
-  payload that isn't cached. That run rewrites thresholds from live data, so
-  whatever KovaaK's changed upstream since each file was generated arrives
-  in the same change. The importer's skip test would also need the category
-  layout added to it, or a group that Evxl renames would never regenerate
-  its file.
-
-Material consequence: writing the groups into the files turns this into two
-deliveries, with a corpus-wide data change and a schema bump first, and both
-are awkward to undo. The join makes the app depend at runtime on a file
-whose shape Evxl defines, and lets a snapshot refresh change the table with
-no benchmark file changing. Both paths draw the same table.
 
 ## Problem
 
@@ -130,8 +94,9 @@ beside the scenario names.
 The app shows none of it. Finding the Arm scenarios, or a scenario that the
 player remembers by its group, means reading names down the table. The
 filter box matches scenario names and the other cells, and no cell holds a
-group. Evxl answers the question at a glance, so this is another reason to
-leave the app for it.
+group. Evxl answers the question at a glance, and a benchmark's page now
+links to its Evxl page. That puts the grouped view one click away, and
+outside the app, away from this table's own columns.
 
 The question belongs to both moments in
 [product.md](../product.md#when-they-ask-them). Between sessions, the look
@@ -145,15 +110,22 @@ Everything the feature needs is local, and it makes no network call.
 ### Verified facts
 
 Surveyed against `main` at `fb2f679`, with the snapshot last refreshed on
-2026-09-26.
+2026-09-26. Neither the bundled files nor the snapshot has changed on `main`
+since, as of `89b7006`. The grid measurements and the prototype date from
+2026-10-04, before the Columns menu shipped.
 
 - **The bundled files carry no grouping.** A scenario has a name, a ladder,
   and a leaderboard ID. The importer walks KovaaK's categories in order and
   flattens them into that list.
-- **The snapshot does.** It has 266 difficulty entries. Each lists
-  categories in order, and each category lists subcategories with a name, a
-  color, and a scenario count. It holds no scenario names, so Evxl itself
-  can only place scenarios by position.
+- **The snapshot does.** `resources/evxl/benchmarks.json` has 266 difficulty
+  entries. Each lists categories in order, and each category lists
+  subcategories with a name, a color, and a scenario count. It holds no
+  scenario names, so Evxl itself can only place scenarios by position.
+- **The app already reads the snapshot.** The View on Evxl link takes each
+  benchmark's Evxl names from it, once per process, matched to the playlist
+  code without regard to case. The release contract names the file, so a
+  release can't ship without it
+  ([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 - **KovaaK's has one level and no colors.** Its benchmark payload groups
   scenarios under category keys with progress, a rank, and thresholds. In
   the five payloads cached in the maintainer's checkout on 2026-10-03, those
@@ -192,14 +164,15 @@ Surveyed against `main` at `fb2f679`, with the snapshot last refreshed on
 A prototype of the recommended design, and of D1's swap alternative, is on
 the local branch `claude/scenario-categories-prototype` in the maintainer's
 checkout. It stamps the groups into the bundled files with a one-off script,
-which is neither of D2's paths, and four fill-state tests fail on it. It is
-evidence, not a starting point to merge.
+which is not the data path proposed here, and four fill-state tests fail on
+it. It also predates the Columns menu and was not rebuilt on it, so nothing
+under "The Columns menu" below has been run. It is evidence for the grid
+mechanics, not a starting point to merge.
 
 ## Design
 
-The design below follows both recommendations. A different D1 ruling changes
-the "Two modes" section. A different D2 ruling changes only "Getting the
-groups" and the delivery plan.
+The design below follows D1's recommendation. A different ruling changes the
+"Two modes" section and what follows from it.
 
 ### What the table shows
 
@@ -247,52 +220,120 @@ that already carries a `?sort=` opens straight in the second mode.
 In the prototype the two lines measure 39 px inside the 41 px cell, and no
 column changes width between modes.
 
+### The Columns menu
+
+The table's Columns menu lists every column the table can work without, and
+keeps each choice in the browser
+([playlists.md](../specs/playlists.md#the-overview)). A row means the same
+without its group cells, so the group columns are listed: `Category` and
+`Subcategory`, first in the menu because they are first in the table, and
+shown by default. Each entry is rendered only on a table that has that
+level, the way Rank and Next rank are rendered only on a benchmark's table,
+so a table without groups leaves the stored choices alone.
+
+Hiding a group column removes that level from the table. The column goes,
+its names leave the filter box, which matches shown columns only, and the
+Scenario cell's second line names only the levels still shown. With both
+hidden the table reads as it does today.
+
+Two parts of the menu's mechanics need care:
+
+- The menu fits a column it has just shown to its content. A group column
+  has a fixed width, so it opts out of auto-sizing.
+- A stored choice is keyed by the column's ID. The two IDs are chosen once,
+  because renaming one later resets that choice.
+
+### How the modes meet the table's other state
+
+The mode is a new piece of grid state, so it is set against each piece the
+table already has, with that piece active:
+
+- **A sort.** Any sorted column puts the table in the second mode. The
+  Columns menu clears the sort of a column it hides, and a `?sort=` on a
+  hidden column is cleared on arrival
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  When that leaves no sort and no filter text, the table is back in
+  benchmark order and the labels return.
+- **Filter text.** Text in the filter box puts the table in the second mode,
+  whatever it matches. Showing or hiding a column re-runs the filter, and
+  the mode doesn't change.
+- **The position fill.** Its update transactions replace rows whole. The
+  rows carry their group fields, and a redrawn cell reads the current mode,
+  so a row that streams in during a sort draws its second line.
+- **The timestamp refresh.** Every 30 seconds it redraws the two timestamp
+  columns and nothing else.
+- **A stored column choice.** It applies as the page opens. The Scenario
+  cell reads which group columns are shown when it draws, and it is redrawn
+  when that changes.
+- **Navigation.** The second line sits inside the Scenario cell, so a click
+  on it opens the scenario, as a click anywhere else in that cell does.
+
 ### Getting the groups
 
-At startup, after the bundled benchmarks load, the app reads the snapshot
-once and builds each benchmark's groups:
+The groups come from the snapshot read the app already has. That read
+validates the file once per process, indexes its entries by sharecode
+without regard to case, and keeps the first listing of a sharecode that
+appears twice. It serves the View on Evxl link today. The proposal extends
+it and adds the join:
 
-1. Index the snapshot's entries by sharecode, ignoring case. Entries that
-   share a sharecode are used only when their layouts agree.
-2. For each bundled benchmark, look up its playlist code. Sum the entry's
-   scenario counts. If the sum differs from the benchmark's scenario count,
-   the benchmark gets no groups.
+1. The read also keeps each entry's layout: its categories in order, each
+   with its subcategories, their colors, and their scenario counts.
+2. For each bundled benchmark, sum the layout's scenario counts. If the sum
+   differs from the benchmark's scenario count, the benchmark gets no
+   groups.
 3. Otherwise walk the layout in order and hand each scenario its category
    and subcategory, with both colors. Names are trimmed.
 4. If no category in the layout is named, the subcategories become the
    categories, so a one-level benchmark always has categories.
 
-Only bundled benchmarks are looked up. A playlist the user imported has its
-own scenario order, which the counts don't describe.
+Only bundled benchmarks are joined. A playlist the user imported has its own
+scenario order, which the counts don't describe.
 
-The snapshot is a read-only bundled asset. If it is missing, unreadable, or
-in a shape the reader doesn't expect, no benchmark gets groups, the app logs
-one warning, and every table renders as it does today. No message reaches
-the screen, because nothing the user asked for failed.
+A snapshot that is missing, unreadable, or in an unexpected shape already
+costs every benchmark its Evxl link and logs one warning. It would cost the
+groups as well, and the warning would say so. Every table then renders as it
+does today, and no message reaches the screen, because nothing the user
+asked for failed.
 
-Three things follow from reading the file at runtime:
-
-- The release contract lists paths that a component opens by name. The
-  snapshot joins that list, so a release can't ship without it.
-- The importer rewrites the snapshot on every run. A refresh can therefore
-  change a benchmark's counts before its file is regenerated, and that
-  benchmark then loses its groups. A test over the committed corpus pins the
-  list of benchmarks that don't join, one today, so such a refresh fails in
-  the PR that commits it rather than passing silently.
-- The reader keeps its own minimal model of the snapshot. The importer's
-  models live under `scripts/`, outside the app package.
+One thing follows from joining by position. The importer rewrites the
+snapshot on every run. A refresh can therefore change a benchmark's counts
+before its file is regenerated, and that benchmark then loses its groups. A
+test over the committed corpus pins the list of benchmarks that don't join,
+one today, so such a refresh fails in the PR that commits it rather than
+passing silently.
 
 The app makes no new network call, so the user guide's
 [What it talks to](../user_guide.md#what-it-talks-to) section doesn't
 change.
 
+**Alternative rejected: the importer writes each scenario's group into its
+bundled file.** The link's decision weighed the same alternative for the
+Evxl names and rejected it. It raises the importer's `schema_version`, which
+marks all 261 files stale, and the live run that regenerates them carries
+whatever thresholds KovaaK's changed upstream into the same diff
+([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
+For groups it costs one thing more. The playlist model would gain fields,
+and the importer's drift check compares a shipped file with its rebuild by
+whole-model equality
+([2026-09-26](../decision_log.md#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
+A snapshot refresh that renamed a group would then report every affected
+file as drifted. What the alternative buys is bundled files that describe
+themselves. The app's runtime read of the snapshot exists either way.
+
 ### Where it lives
 
-- **The reader and the join** sit with playlist loading in
-  `source/kovaaks/data_service.py`, or in a small module beside it if that
-  file's size argues for one. The result is a per-code tuple aligned with
-  the benchmark's scenarios, behind one accessor. It stays out of
-  `PlaylistData`, which is also the schema of the user's playlist files.
+- **The snapshot read** is in `source/kovaaks/evxl_links.py`, with a minimal
+  model of the two names the link needs. The groups need the same file
+  through the same tolerant read, so it is shared, not done twice. Whether
+  that module grows the layout fields or the read moves to a small module
+  both features use is the implementer's call.
+- **The join** runs with playlist loading in
+  `source/kovaaks/data_service.py`, after the bundled files load. Its result
+  is a side table keyed by playlist code and aligned with each benchmark's
+  scenarios, rebuilt on every load, behind one accessor. It stays out of
+  `PlaylistData`, as the benchmark ID does, because the importer shares that
+  model
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
 - **The row builder** in `source/kovaaks/playlist_scenarios_service.py` adds
   each row's names, colors, and two run keys. A key numbers a run of
   neighbors that share a group, and it is the cell's value. The grid merges
@@ -305,20 +346,25 @@ change.
   ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
   The fill state captures the groups at registration, as it does the
   ladders, or an update would blank the group cells.
-- **The page** adds the column definitions for the levels present, turns on
-  `enableCellSpan`, and seeds the mode from `?sort=`. A clientside callback
-  on the grid's column state and the filter text flips the mode and redraws
-  the group and Scenario cells.
+- **The page** adds the column definitions and the menu entries for the
+  levels present, turns on `enableCellSpan` beside the Columns menu's grid
+  options, and seeds the mode from `?sort=`. A clientside callback on the
+  grid's column state and the filter text flips the mode and redraws the
+  group and Scenario cells. It only reads the column state. Writing that
+  prop from Dash also sets the column order, which is why the Columns menu
+  applies its own changes through the grid API.
 - **The renderers** go in `assets/dashAgGridComponentFunctions.js`, the
   fill function in `assets/dashAgGridFunctions.js` under a bare name
   ([2026-06-20](../decision_log.md#2026-06-20-reference-dash-ag-grid-grid-functions-by-bare-name)),
   and the styles in `assets/stylesheet.css`. The Scenario renderer keeps its
   anchor and click handling, and wraps the anchor only in the second mode.
 
-Cell spanning rules out a few grid features on the same grid: text
-selection across cells, click row selection, cell selection, and editing or
+Cell spanning rules out a few grid features on the same grid: the grid-wide
+text selection option, click row selection, cell selection, and editing or
 row dragging on a spanning column. The table uses none of them. The
-implementation records that as a constraint beside the grid option.
+Leaderboard ID cell's selectable text comes from a cell class, not from the
+grid-wide option, so the two don't conflict. The implementation records the
+constraint beside the grid option.
 
 ### Copy
 
@@ -329,7 +375,8 @@ stored, after trimming. Every string this design adds:
 |---|---|---|
 | First group column's header: accessible name and header tooltip, no visible text | `Category` | Title Case like every grid header. A 34 px header can't fit the word, so it stays in the name and the tooltip. |
 | Second group column's header, same treatment | `Subcategory` | As above. Absent on a one-level benchmark. |
-| Scenario cell, second line, outside benchmark order | `{category} · {subcategory}`, such as `Control Tracking · Arm`, or `{category}` alone | A readout, so the middle dot and no period (copy rule 2). |
+| Columns menu checkboxes | `Category`, `Subcategory` | Sentence case, as controls, which for one word is the header's own casing. `Subcategory` is absent on a one-level benchmark, and both are absent on a table with no groups. |
+| Scenario cell, second line, outside benchmark order | `{category} · {subcategory}`, such as `Control Tracking · Arm`, or one name when one level is shown | A readout, so the middle dot and no period (copy rule 2). |
 | Group cell tooltip, outside benchmark order | the group's name | The cell holds only a color there. No tooltip in benchmark order, where the label is on the cell. |
 
 The vertical labels are the names in uppercase. That is a presentation
@@ -380,34 +427,36 @@ spec has that section.
 
 ## Delivery plan
 
-One implementation PR, once D1 and D2 are ruled:
+One implementation PR, once D1 is ruled, with no dependencies:
 
-- The snapshot reader and the join, the row fields on all three row paths,
-  the gated column definitions, the mode flag and its callback, the two
-  renderers, the styles, the release-contract entry, and the tests below.
+- The shared snapshot read and the join, the row fields on all three row
+  paths, the gated column definitions and their menu entries, the mode flag
+  and its callback, the two renderers, the styles, and the tests below.
 - The shipping docs in the same PR:
   - a decision-log entry;
-  - the playlists spec, for the columns, the two modes, and the join;
+  - the playlists spec, for the columns, the two modes, the menu entries,
+    and the join;
   - the glossary, from the Terms block;
   - the user guide's Playlists and Benchmarks section;
   - the product inventory;
-  - `docs/architecture.md`, for the new startup read and the row fields;
-  - the importer readme, for the note that a snapshot refresh can change
-    groups;
+  - `docs/architecture.md`, for the join and the row fields;
+  - the importer readme, whose note on the app reading the snapshot names
+    only the link;
+  - the release contract's comment on the snapshot, for the same reason;
   - the README's Features line for the scenario table, amended in place;
   - the roadmap's Shipped list.
 
   The PR also deletes this proposal.
 
-If D2 is ruled the other way, an importer PR comes first: the group fields,
-the schema bump, the skip-test change, and the regenerated corpus. The app
-PR then reads the fields from the files and drops the snapshot reader and
-the release-contract entry.
+The prototype predates the Columns menu and the renamed row fields. The
+implementer builds on current `main` and takes the grid mechanics from the
+prototype, not its code.
 
-Recommended implementer: `claude-opus-5-5` at high. Once the two rows are
-ruled the spec is settled, and unit tests plus one live check verify it. The
-prototype branch shows the grid mechanics working, so little is left to
-discover.
+Recommended implementer: `claude-opus-5-5` at high. Once D1 is ruled the
+spec is settled, and unit tests plus one live check verify it. The prototype
+shows cell spanning and the mode flag working, so what is left to discover
+is how they sit beside the Columns menu, and the live check below covers
+that.
 
 ## Testing
 
@@ -416,11 +465,11 @@ discover.
     layout that names nothing;
   - counts that don't add up to the scenario count;
   - a code that differs from its sharecode only in case;
-  - a sharecode on two entries, with matching layouts and with different
-    ones;
+  - a sharecode on two entries, where the first listing is the one used;
   - padded names, a short-form color, and a color that is not a hex value;
   - a missing snapshot, one that is not valid JSON, and one in an unexpected
-    shape, each of which leaves every benchmark without groups.
+    shape, each of which leaves every benchmark without groups and without
+    its Evxl link.
 - **The corpus:** every bundled benchmark joins the committed snapshot,
   except a pinned list that holds PureG S1 - Worthless today.
 - **The row builder:** a grouped row carries its names, colors, and keys.
@@ -428,17 +477,27 @@ discover.
   carries none of the fields. A second-phase row and a cancelled fill's
   rebuilt row carry the same group fields as the first-phase row.
 - **The page:** a two-level benchmark gets both columns ahead of Scenario, a
-  one-level benchmark one, and a playlist none. A `?sort=` value opens the
-  table in the second mode, and no value opens it in benchmark order.
-- **The release contract:** a zip without the snapshot fails the check.
+  one-level benchmark one, and a playlist none. The Columns menu lists the
+  same levels first, shown by default. The group columns opt out of
+  auto-sizing. A `?sort=` value opens the table in the second mode, and no
+  value opens it in benchmark order.
 - **Gates:** the standard local validation in AGENTS.md, including the docs
   test for this file's placement and links.
-- **Live check**, on Viscose S2 Medium, Voltaic S5.5 Intermediate, a
-  one-level benchmark, and a playlist imported by code, in both themes:
+- **Live check**, in Edge and in Firefox, on Viscose S2 Medium, Voltaic S5.5
+  Intermediate, a one-level benchmark, and a playlist imported by code, in
+  both themes:
   - benchmark order shows the merged, labeled cells, matching Evxl's sheet;
   - sorting by Last Played drops the labels, adds the second line, and moves
     no column;
   - clearing the sort restores the labels;
   - typing "arm" in the filter box leaves the three Arm scenarios;
   - the position fill, with a username set, leaves the group cells intact
-    while rows stream in.
+    while rows stream in, in both modes;
+  - hiding Subcategory through the Columns menu removes the column and its
+    name from the second line, with a sort active and with filter text
+    typed, and showing it again leaves the column 34 px wide;
+  - a stored choice that hides a group column opens the table that way after
+    a reload;
+  - hiding a sorted column through the menu returns the table to benchmark
+    order and the labels;
+  - a click on the second line opens the scenario.
