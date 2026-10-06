@@ -338,6 +338,19 @@ are one view or two is a design choice for the feature that builds them.
   file. An ID is noise to a player who isn't calling that API, so it stays
   off until asked for, and the menu gives any later optional column the same
   place to start hidden.
+- **Categories and subcategories on benchmarks** (PR #352; design in #338).
+  A benchmark's scenario table draws the groups its author sorted the
+  scenarios into, as merged, colored cells ahead of the scenario names with
+  each group's name written up the side, the way the benchmark's own sheet
+  and Evxl draw them. Sorted or filtered, each row names its group under its
+  scenario instead, and the filter box matches group names either way. The
+  grouping ships with the app, so it appears with the table and works
+  offline. *Problem solved:* a benchmark holds up to 60 scenarios, and the
+  table listed them as one flat run, so finding the Arm scenarios, or a
+  scenario remembered by its group, meant reading names down the table or
+  leaving for Evxl. The look ahead between sessions is usually asked by
+  group, "which tracking scenarios are weak", and the quick pick just before
+  a session needs the structure at a glance.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I

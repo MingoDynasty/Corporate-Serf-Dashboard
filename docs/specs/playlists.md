@@ -5,8 +5,9 @@ it lists the playlists the user has chosen to see, with local aggregates. A
 benchmark is a playlist that also carries rank thresholds, and the bundled
 library ships with the app with only the popular ones visible. Clicking a row
 opens that playlist's scenario table, which paints local stats and a
-benchmark's ranks immediately and streams leaderboard positions in behind
-them, while a background worker keeps the overview's percentile columns warm.
+benchmark's ranks and categories immediately and streams leaderboard positions
+in behind them, while a background worker keeps the overview's percentile
+columns warm.
 Each table has a Columns menu that shows or hides its columns and remembers
 the choice in the browser, and one KovaaK's ID column that starts hidden.
 
@@ -174,7 +175,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   percentile, and Lowest percentile. The scenario table's lists Leaderboard
   ID, Last played, Runs, Position, Total players, Percentile, PB score, PB
   date, PB cm/360, and PB accuracy, with Rank and Next rank after PB score on
-  a benchmark's table only. The Playlist column, the Scenario column, and the
+  a benchmark's table only, and Category and Subcategory first on a table
+  that has those [groups](#categories-and-subcategories-on-a-benchmarks-table).
+  The Playlist column, the Scenario column, and the
   overview's action cells are never listed. A checked column is shown, a
   change applies at once, and the menu stays open until an outside click or
   Escape. Opening the menu moves keyboard focus to its first checkbox, and
@@ -281,7 +284,10 @@ and [product.md](../product.md). Leaderboard placement is worded
 - Columns: Scenario, Leaderboard ID (hidden until the Columns menu shows it),
   Last Played, Runs, Position, Total Players, Percentile, PB Score, then Rank
   and Next Rank on a benchmark's table only, then PB Date, PB cm/360, PB
-  Accuracy. Position reads a formatted rank, "Unranked",
+  Accuracy. A benchmark that has groups adds Category and Subcategory ahead
+  of Scenario
+  ([below](#categories-and-subcategories-on-a-benchmarks-table)). Position
+  reads a formatted rank, "Unranked",
   `N/A`, or, while pending, a blank cell with an animated ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
   Played keeps "Never"; the 30-second tick refreshes both timestamp columns
   ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)).
@@ -426,6 +432,103 @@ and [product.md](../product.md). Leaderboard placement is worded
   `minHeight` style. Neither declares initial `rowData`, so the loading
   overlay owns the gap
   ([2026-07-16](../decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
+
+## Categories and subcategories on a benchmark's table
+
+All of this section is set by the
+[2026-10-06 entry](../decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory),
+except where another entry is linked.
+
+- A bundled benchmark's table gains up to two columns ahead of Scenario,
+  Category and then Subcategory, one per level its groups name. A benchmark
+  with one level shows Category alone, whichever field Evxl stores that level
+  in. A table without groups is unchanged, with no group column and no
+  Category or Subcategory entry in its Columns menu: a playlist, a playlist
+  imported by code, a benchmark whose snapshot counts don't add up to its
+  scenario count, one whose layout names nothing, and one on the exclusion
+  list. As of 2026-10-06, 258 of the 261 bundled benchmarks have groups, 180
+  with two levels and 78 with one.
+- Each group column is 34 px wide and pinned to the table's left edge. Its
+  header shows no text. The header's accessible name and its tooltip are
+  "Category" or "Subcategory". The column can't be resized, sorted, or moved,
+  and it has no `?sort=` name
+  ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+- Its cells merge down each run of neighboring rows that share a group, over
+  the rows as displayed. Two groups that share a name across a category
+  boundary stay two cells. A merged cell is filled with its group's color,
+  with black or white text, whichever reads better on the fill. A snapshot
+  color in either hex form fills the cell, and any other value leaves it
+  unfilled. Hovering a group cell shows its group's name as a tooltip, in
+  both states. Clicking one does nothing.
+- The table is *grouped* while it is in playlist order and the filter box is
+  empty, which is how a fresh visit opens. Any sort, or any filter text that
+  is not only spaces, makes it *ungrouped*, and clearing both makes it
+  grouped again. It is one state for the whole table. A link that carries a
+  valid `?sort=` opens ungrouped.
+- Grouped, each merged cell carries its group's name as a vertical label,
+  reading bottom to top, in uppercase by the stylesheet. The label sits in
+  the middle of its cell. When that middle is scrolled out of view, the label
+  moves to the nearer edge of the part still showing, so a group taller than
+  the window stays named. A label longer than its cell is cut with an
+  ellipsis, and one longer than the part of its cell still showing is cut at
+  the window's edge.
+- Ungrouped, the cells keep their colors and show no label, and each Scenario
+  cell gains a second line under the scenario's name: "{category} ·
+  {subcategory}", such as "Control Tracking · Arm", or the one name when one
+  level is shown. Neighboring rows that still share a group keep merging. No
+  column changes width between the two states, and a row keeps its height.
+  The second line is part of the scenario's link, so a click on it opens the
+  scenario and a modified click opens it in a new tab, and the link's
+  accessible name then carries the group.
+- The filter box matches group names in both states, so "arm" on Viscose S2
+  Medium leaves its three Arm scenarios. It never matches the run number a
+  group cell holds as its value. Showing or hiding a column re-runs the
+  filter and does not change the state.
+- The Columns menu lists Category and Subcategory first, shown by default,
+  each only on a table that has that level, so a table without groups leaves
+  the two stored choices alone. Hiding one removes the column, its names from
+  the filter box, and that level from the Scenario cell's second line. With
+  both hidden the table reads as a table without groups does. Showing one
+  again leaves it 34 px wide. A stored choice applies as the page opens. The
+  stored choices are keyed by the column IDs `category` and `subcategory`.
+  Hiding a sorted column through the menu clears that sort
+  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)),
+  and when that leaves no sort and an empty filter box, the table is grouped
+  again.
+- The first paint, the fill's streamed rows, and a cancelled fill's rebuild
+  all carry a row's group, so an update transaction never blanks a group
+  cell, and a row that streams in while the table is ungrouped draws its
+  second line
+  ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+  The 30-second timestamp tick redraws the two timestamp columns and nothing
+  else.
+- The groups come from Evxl's benchmark snapshot
+  (`resources/evxl/benchmarks.json`), through the read the Evxl link uses.
+  The app requests nothing for them. A benchmark's playlist code is matched
+  to a snapshot sharecode without regard to case, and a sharecode listed
+  twice keeps its first listing. The entry's subcategory counts are then
+  walked down the benchmark's scenario list in order, handing each scenario
+  its category and subcategory with their colors. Names are trimmed. When no
+  category is named, the subcategories become the categories. A playlist the
+  user imported is never joined.
+- An entry whose layout is not in the expected shape gives that benchmark no
+  groups and keeps its Evxl link, with one warning that names it. A snapshot
+  that is missing or in another shape gives no benchmark groups or a link,
+  with one warning, and every table renders as a table without groups does.
+- Three things keep a positional join honest. The benchmark importer compares
+  the groups the app would draw with KovaaK's own categories wherever it
+  builds a benchmark: where a drawn group and a KovaaK's category meet, one
+  has to contain the other. A benchmark that fails is named, and gets no
+  groups through a hand-kept list of playlist codes, which holds IRIS Mixed
+  Benchmarks Easy. A normal importer run builds a benchmark again, and so
+  compares it again, when a snapshot refresh has changed its layout. A corpus
+  test pins the bundled benchmarks that get no groups. Where Evxl subdivides one of KovaaK's categories, nothing else
+  confirms where the subdivision falls.
+- After each update to the table's rows, the page hides and then shows the
+  group columns that are showing, through the grid API. It is a workaround
+  for a defect in the grid version the app bundles, which otherwise leaves
+  merged cells stale after two sort changes and then none. It changes no
+  column's width or position.
 
 ## Bundled corpus, user playlists, and the importer
 

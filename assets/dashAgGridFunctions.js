@@ -140,3 +140,24 @@ dagfuncs.absoluteTime = function (seconds, sentinel) {
     ampm
   );
 };
+
+// Fill a playlist scenario group cell with its group's color, with black or
+// white text, whichever reads better on the fill. `color` is six-digit hex
+// or null: the server normalizes the snapshot's value, and anything that is
+// not a hex color arrives as null and leaves the cell unfilled.
+dagfuncs.scenarioGroupCellStyle = function (color) {
+  if (typeof color !== "string" || !/^#[0-9a-f]{6}$/i.test(color)) {
+    return null;
+  }
+  const value = parseInt(color.slice(1), 16);
+  // Perceived brightness, 0 to 255, by the ITU-R BT.601 weights.
+  const brightness =
+    (((value >> 16) & 255) * 299 +
+      ((value >> 8) & 255) * 587 +
+      (value & 255) * 114) /
+    1000;
+  return {
+    backgroundColor: color,
+    color: brightness >= 140 ? "#000" : "#fff",
+  };
+};

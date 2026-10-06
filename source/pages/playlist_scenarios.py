@@ -2,8 +2,8 @@
 
 import copy
 import json
-from collections.abc import Collection
-from typing import Any
+from collections.abc import Collection, Sequence
+from typing import Any, NamedTuple
 from uuid import uuid4
 
 import dash
@@ -32,6 +32,7 @@ from source.config.settings_service import get_kovaaks_username, get_steam_id
 from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_display_label,
+    get_scenario_groups,
     is_benchmark_playlist,
 )
 from source.kovaaks.evxl_links import evxl_benchmark_url
@@ -271,6 +272,80 @@ BENCHMARK_COLUMN_DEFS = [
     },
 ]
 
+
+class GroupColumn(NamedTuple):
+    """One of the two group columns a benchmark's table can show.
+
+    ``column_id`` is chosen once. The Columns menu keeps a stored choice under
+    it, so renaming one resets that choice in every browser.
+    """
+
+    column_id: str
+    header: str
+    name_field: str
+    color_field: str
+    run_field: str
+
+
+CATEGORY_COLUMN = GroupColumn(
+    "category", "Category", "category_name", "category_color", "category_run"
+)
+SUBCATEGORY_COLUMN = GroupColumn(
+    "subcategory",
+    "Subcategory",
+    "subcategory_name",
+    "subcategory_color",
+    "subcategory_run",
+)
+GROUP_COLUMNS = (CATEGORY_COLUMN, SUBCATEGORY_COLUMN)
+GROUP_COLUMN_WIDTH = 34
+
+
+def _group_column_def(column: GroupColumn) -> dict:
+    """Build one group column: narrow, pinned, and merged down each group."""
+    name = f"params.data.{column.name_field}"
+    return {
+        "colId": column.column_id,
+        # The header shows no text, because 34 px can't fit the word. The
+        # name stays in the header for assistive technology, hidden by the
+        # header class, and the tooltip shows it on hover.
+        "headerName": column.header,
+        "headerTooltip": column.header,
+        "headerClass": "playlist-scenario-group-header",
+        # The cell's value is the row's run, never the group's name. The grid
+        # merges neighboring cells whose values are equal, and dash-ag-grid
+        # passes no ``spanRows`` function through, so equality is the only
+        # merge test. With the name as the value, two groups that share a name
+        # across a category boundary would merge into one.
+        "field": column.run_field,
+        "spanRows": True,
+        # Without this the filter box would match the run numbers, so typing
+        # a digit would keep rows for no reason a user could see.
+        "getQuickFilterText": {"function": name},
+        "tooltipValueGetter": {"function": f"{name} || null"},
+        "cellRenderer": "ScenarioGroupLabel",
+        "cellRendererParams": {"nameField": column.name_field},
+        "cellStyle": {
+            "function": f"scenarioGroupCellStyle(params.data.{column.color_field})"
+        },
+        "cellClass": "playlist-scenario-group-cell",
+        # Pinned so a group taller than the window keeps its label in view.
+        # The label is ``position: sticky``, and an unpinned cell's nearest
+        # scroll container is the one that scrolls the columns sideways, so
+        # there the label would scroll away with the cell's middle.
+        "pinned": "left",
+        "lockPinned": True,
+        "suppressMovable": True,
+        "sortable": False,
+        "resizable": False,
+        "width": GROUP_COLUMN_WIDTH,
+        "minWidth": GROUP_COLUMN_WIDTH,
+        "maxWidth": GROUP_COLUMN_WIDTH,
+        # The Columns menu fits a column it has just shown to its content.
+        "suppressAutoSize": True,
+    }
+
+
 COLUMNS_MENU_ID = "playlist-scenarios-columns"
 
 # The Columns menu's entries, in table order: every column the table can work
@@ -347,14 +422,33 @@ def _parse_sort(sort: object, column_ids: Collection[str]) -> list[tuple[str, st
     return list(directions_by_id.items())
 
 
-def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
+def _group_columns(playlist_code: str | None) -> tuple[GroupColumn, ...]:
+    """List the group columns a playlist's table shows, one per level it names.
+
+    Empty for a table without groups. A benchmark with one level of grouping
+    has categories only.
+    """
+    groups = get_scenario_groups(playlist_code) if playlist_code else None
+    if groups is None:
+        return ()
+    if any(group.subcategory for group in groups):
+        return GROUP_COLUMNS
+    return (CATEGORY_COLUMN,)
+
+
+def _column_defs(
+    sort: object,
+    *,
+    benchmark: bool,
+    group_columns: Sequence[GroupColumn] = (),
+) -> list[dict]:
     """Copy the column defs, seeding the grid's opening sort from ``?sort=``.
 
-    A benchmark's table adds Rank and Next Rank directly after PB Score. A
-    fresh copy per call, because the module's column defs are shared across
-    requests. The seed is ``initialSort``, never ``sort``: AG Grid reapplies
-    ``sort`` whenever column defs arrive again, overriding the user's header
-    clicks.
+    A benchmark's table adds Rank and Next Rank directly after PB Score, and
+    ``group_columns`` ahead of Scenario. A fresh copy per call, because the
+    module's column defs are shared across requests. The seed is
+    ``initialSort``, never ``sort``: AG Grid reapplies ``sort`` whenever
+    column defs arrive again, overriding the user's header clicks.
     """
     column_defs: list[dict] = copy.deepcopy(TABLE_COLUMN_DEFS)
     if benchmark:
@@ -369,17 +463,47 @@ def _column_defs(sort: object, *, benchmark: bool) -> list[dict]:
     ):
         columns_by_id[column_id]["initialSort"] = direction
         columns_by_id[column_id]["initialSortIndex"] = sort_index
+    if group_columns:
+        # The Scenario cell names the row's group under the scenario while
+        # the table is ungrouped, for the levels whose columns are shown.
+        columns_by_id["scenario"]["cellRendererParams"] = {
+            "groupLevels": [
+                {"columnId": column.column_id, "nameField": column.name_field}
+                for column in group_columns
+            ]
+        }
+        column_defs[0:0] = [_group_column_def(column) for column in group_columns]
     return column_defs
 
 
-def _menu_columns(*, benchmark: bool) -> list[MenuColumn]:
+def _opens_grouped(sort: object, *, benchmark: bool) -> bool:
+    """Tell whether the table opens in playlist order, which is grouped.
+
+    A link that carries a valid ``?sort=`` opens ungrouped. The filter box is
+    always empty as the page opens.
+    """
+    column_ids = [column["field"] for column in _column_defs(None, benchmark=benchmark)]
+    return not _parse_sort(sort, column_ids)
+
+
+def _menu_columns(
+    *,
+    benchmark: bool,
+    group_columns: Sequence[GroupColumn] = (),
+) -> list[MenuColumn]:
     """List the Columns menu's entries in the order the table shows them."""
     columns = list(MENU_COLUMNS)
     if benchmark:
         column_ids = [column.column_id for column in columns]
         after_pb_score = column_ids.index("pb_score_sort") + 1
         columns[after_pb_score:after_pb_score] = BENCHMARK_MENU_COLUMNS
-    return columns
+    # Rendered only for the levels the table has, as Rank and Next rank are
+    # only on a benchmark's table, so a table without groups leaves the stored
+    # choices alone. The labels are the headers' own words.
+    return [
+        *(MenuColumn(column.column_id, column.header) for column in group_columns),
+        *columns,
+    ]
 
 
 @callback(
@@ -616,6 +740,121 @@ clientside_callback(
 )
 
 
+# Keep the table's grouped or ungrouped state in step with its sort, the
+# filter box, and the group columns' visibility, and redraw the cells that
+# read it. The state lives on the grid's ``context`` object, which the group
+# and Scenario renderers read as they draw. It is one flag for the whole
+# table: grouped while the table is in playlist order with an empty filter
+# box.
+#
+# The column state is only this callback's trigger. Everything it reads comes
+# from the grid API after the wait, so a run that waited longer for the grid
+# still sees the grid as it is. It never writes the ``columnState`` prop,
+# which would also set the column order.
+#
+# The Columns menu redraws no cells, so a change to a group column's
+# visibility is redrawn here even when the state itself did not change: the
+# Scenario cell's second line names only the levels still shown.
+#
+# The callback also installs, once per grid, the repair for the grid's own
+# stale merged cells, which its source explains.
+clientside_callback(
+    """
+    (() => {
+        let latestRun = 0;
+        const repairedGrids = new WeakSet();
+
+        // A workaround for a defect in AG Grid 35.3.1, the version
+        // dash-ag-grid 35.3.0 bundles. The grid keeps a merged cell's control
+        // across row-model updates without refreshing it, so two sort changes
+        // and then none, the three header clicks that clear a sort, leave
+        // merged cells at a stale height and rows with no group cell at all.
+        // No refresh or redraw call repairs that. Hiding and showing the
+        // group columns does, because the grid then builds those cells again.
+        // AG Grid 36.1.0 fixed the defect (measured 2026-10-06). Remove this
+        // when dash-ag-grid bundles that version or a later one: the
+        // decision-log entry for the group columns has the evidence.
+        const repairSpansAfterModelUpdates = (gridApi) => {
+            if (repairedGrids.has(gridApi)) {
+                return;
+            }
+            repairedGrids.add(gridApi);
+            gridApi.addEventListener("modelUpdated", () => {
+                // The grid rebuilds its own record of the merges in answer
+                // to this same event, so the repair waits one task for it.
+                window.setTimeout(() => {
+                    if (gridApi.isDestroyed()) {
+                        return;
+                    }
+                    // Only the columns showing now: one the Columns menu
+                    // has hidden must stay hidden.
+                    const shown = GROUP_COLUMN_IDS.filter((colId) => {
+                        const column = gridApi.getColumn(colId);
+                        return column && column.isVisible();
+                    });
+                    gridApi.setColumnsVisible(shown, false);
+                    gridApi.setColumnsVisible(shown, true);
+                }, 0);
+            });
+        };
+
+        return async (_columnState, filterText) => {
+            const noUpdate = window.dash_clientside.no_update;
+            if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
+                return noUpdate;
+            }
+
+            latestRun += 1;
+            const run = latestRun;
+            try {
+                const gridApi = await window.dash_ag_grid.getApiAsync("playlist-scenarios-grid");
+                if (gridApi.getGridOption("enableCellSpan")) {
+                    repairSpansAfterModelUpdates(gridApi);
+                }
+                // The filter text is this run's own argument, so an older run
+                // that lands late would put an old state back.
+                if (run !== latestRun) {
+                    return noUpdate;
+                }
+                const groupColumnIds = GROUP_COLUMN_IDS.filter(
+                    (colId) => gridApi.getColumn(colId)
+                );
+                const context = gridApi.getGridOption("context");
+                if (groupColumnIds.length === 0 || !context) {
+                    return noUpdate;
+                }
+                const sorted = gridApi
+                    .getColumnState()
+                    .some((column) => column.sort === "asc" || column.sort === "desc");
+                const grouped = !sorted && !(filterText || "").trim();
+                const shown = groupColumnIds
+                    .filter((colId) => gridApi.getColumn(colId).isVisible())
+                    .join(",");
+                if (context.grouped === grouped && context.shownGroupColumns === shown) {
+                    return noUpdate;
+                }
+                context.grouped = grouped;
+                context.shownGroupColumns = shown;
+                gridApi.refreshCells({
+                    force: true,
+                    columns: [...groupColumnIds, "scenario"],
+                });
+            } catch (error) {
+                console.warn("Failed to set the playlist scenario table's grouped state.", error);
+            }
+            return noUpdate;
+        };
+    })()
+    """.replace(
+        "GROUP_COLUMN_IDS",
+        json.dumps([column.column_id for column in GROUP_COLUMNS]),
+    ),
+    Output("playlist-scenarios-group-sink", "data"),
+    Input("playlist-scenarios-grid", "columnState"),
+    Input("playlist-scenarios-quick-filter", "value"),
+)
+
+
 register_columns_menu(COLUMNS_MENU_ID, "playlist-scenarios-grid")
 
 
@@ -681,6 +920,18 @@ def layout(
     """
     playlist = get_playlist_by_code(playlist_code) if playlist_code else None
     benchmark = playlist is not None and is_benchmark_playlist(playlist)
+    group_columns = _group_columns(playlist_code)
+    grid_options: dict[str, Any] = {**COLUMNS_MENU_GRID_OPTIONS}
+    if group_columns:
+        # Cell spanning rules out some grid features on the same grid: the
+        # grid-wide ``enableCellTextSelection``, click row selection, cell
+        # selection, and editing or row dragging on a spanning column (read
+        # from the validation rules in the AG Grid 35.3.1 bundle). The table
+        # uses none of them, and the Leaderboard ID cell's selectable text
+        # comes from a cell class, not from the grid-wide option. It is an
+        # initial option, so it is set only on a table that has groups.
+        grid_options["enableCellSpan"] = True
+        grid_options["context"] = {"grouped": _opens_grouped(sort, benchmark=benchmark)}
     return dmc.Stack(
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
@@ -691,10 +942,11 @@ def layout(
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
             dcc.Store(id="playlist-scenarios-generation"),
             dcc.Store(id="playlist-scenarios-relative-time-refresh"),
-            # Dummy sinks for the client-side quick-filter, sort-URL, and
-            # Columns menu callbacks' outputs.
+            # Dummy sinks for the client-side quick-filter, sort-URL,
+            # grouped-state, and Columns menu callbacks' outputs.
             dcc.Store(id="playlist-scenarios-quick-filter-sink"),
             dcc.Store(id="playlist-scenarios-sort-sink"),
+            dcc.Store(id="playlist-scenarios-group-sink"),
             columns_menu_sink(COLUMNS_MENU_ID),
             dcc.Interval(
                 id="playlist-scenarios-relative-time-interval",
@@ -730,14 +982,19 @@ def layout(
                         gap="md",
                         align="center",
                     ),
-                    columns_menu(COLUMNS_MENU_ID, _menu_columns(benchmark=benchmark)),
+                    columns_menu(
+                        COLUMNS_MENU_ID,
+                        _menu_columns(benchmark=benchmark, group_columns=group_columns),
+                    ),
                 ],
                 justify="space-between",
             ),
             dag.AgGrid(
                 id="playlist-scenarios-grid",
                 className="ag-theme-quartz playlist-scenarios-grid",
-                columnDefs=_column_defs(sort, benchmark=benchmark),
+                columnDefs=_column_defs(
+                    sort, benchmark=benchmark, group_columns=group_columns
+                ),
                 defaultColDef={
                     "resizable": True,
                     "sortable": True,
@@ -748,7 +1005,7 @@ def layout(
                     "unSortIcon": True,
                 },
                 dashGridOptions={
-                    **COLUMNS_MENU_GRID_OPTIONS,
+                    **grid_options,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     "getRowId": {

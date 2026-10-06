@@ -411,6 +411,86 @@ a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 
+/* The Scenario cell while the table is ungrouped: the scenario's name over
+   its group's names. Both lines fit the row's own height, so no row grows.
+   The underline moves to the name, because an anchor's own underline would
+   run under the group line too. */
+a.playlist-scenario-link-cell.playlist-scenario-link-two-line {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    line-height: 1.25;
+    min-width: 0;
+    text-decoration-line: none;
+}
+
+.playlist-scenario-link-name,
+.playlist-scenario-link-group {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.playlist-scenario-link-name {
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+}
+
+.playlist-scenario-link-group {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-xs);
+}
+
+/* A group column's header keeps its name for assistive technology and shows
+   none of it: the column is 34 px wide, which can't fit the word. */
+.playlist-scenarios-grid .playlist-scenario-group-header {
+    padding: 0;
+}
+
+.playlist-scenarios-grid .playlist-scenario-group-header .ag-header-cell-text {
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* A group cell: one merged cell per group, filled with the group's color by
+   the column's cellStyle. Its overflow stays visible, which AG Grid would
+   otherwise hide: a clipping cell becomes the label's scroll container, and
+   the label could then never follow the table's scroll. */
+.playlist-scenarios-grid .ag-cell.playlist-scenario-group-cell {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+    padding: 0;
+}
+
+/* The group's name, bottom to top as on the benchmark's sheet. Sticky toward
+   both ends of the table's scrolling viewport: it sits in the middle of its
+   cell, and when that middle scrolls out of view it stops at the nearer edge
+   of the part still showing, so a group taller than the window stays named.
+   This needs the column pinned, and the cell's overflow visible. The
+   uppercase is this stylesheet's choice and changes no stored name. */
+.playlist-scenario-group-label {
+    bottom: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    max-height: 100%;
+    overflow: hidden;
+    position: sticky;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    top: 0;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+}
+
 /* The Evxl link in a benchmark's page header: Evxl's logo as an icon-only
    link. It is a plain anchor, because dmc.Anchor percent-decodes its href and
    would break a benchmark name holding an encoded slash. As a flex box it is

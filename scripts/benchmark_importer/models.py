@@ -1,24 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from pydantic import BaseModel, RootModel
+
+# The app's own model of a layout, so the importer's comparison walks exactly
+# the shape the app's join does.
+from source.kovaaks.evxl_snapshot import EvxlCategory
 
 
 @dataclass()
 class EvxlDatabaseItem:
     kovaaksBenchmarkId: int
     rankColors: dict[str, str]
-
-
-class EvxlSubcategory(BaseModel):
-    subcategoryName: str
-    color: str
-    scenarioCount: int
-
-
-class EvxlCategory(BaseModel):
-    categoryName: str
-    color: str
-    subcategories: list[EvxlSubcategory]
+    categories: list[EvxlCategory] = field(default_factory=list)
 
 
 class EvxlDifficulty(BaseModel):
@@ -64,6 +57,12 @@ class ManifestEntry(BaseModel):
     kovaaks_benchmark_id: int
     rank_colors: list[tuple[str, str]]
     generated_at: str
+    # The Evxl layout the benchmark's groups were last compared under and
+    # found to cross nothing. None means no clean comparison is on record,
+    # which no live item matches, so the benchmark is built and compared
+    # again: an entry written before this field existed, and one whose groups
+    # crossed KovaaK's categories when it was last built.
+    categories: list[EvxlCategory] | None = None
 
 
 class Manifest(RootModel[dict[str, ManifestEntry]]):

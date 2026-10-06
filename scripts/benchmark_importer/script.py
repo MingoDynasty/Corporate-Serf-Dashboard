@@ -9,7 +9,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, NamedTuple, Sequence
 
 import requests
 from pydantic import ValidationError
@@ -25,6 +25,11 @@ from source.kovaaks.api_service import (  # noqa: E402
     get_benchmark_json,
 )
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario  # noqa: E402
+from source.kovaaks.evxl_snapshot import EvxlCategory  # noqa: E402
+from source.kovaaks.scenario_groups import (  # noqa: E402
+    GROUP_EXCLUDED_PLAYLIST_CODES,
+    assign_scenario_groups,
+)
 from source.utilities.atomic_write import replace_with_retry  # noqa: E402
 
 from scripts.benchmark_importer.models import (  # noqa: E402
@@ -89,6 +94,30 @@ class DuplicateClaimant:
     rank_ladder: tuple[tuple[str, str], ...]
 
 
+@dataclass(frozen=True)
+class GroupCrossings:
+    """Where one benchmark's drawn groups cross KovaaK's categories.
+
+    ``excluded`` says the benchmark's playlist code is on the app's exclusion
+    list, so the app draws no groups for it and the crossing needs no action.
+    """
+
+    playlist_name: str
+    lines: tuple[str, ...]
+    excluded: bool
+
+
+class BuiltPlaylist(NamedTuple):
+    """One merged benchmark, and the group comparison made while building it."""
+
+    playlist: PlaylistData
+    group_crossings: GroupCrossings | None
+
+
+def _unhandled_group_crossings(group_crossings: dict[str, GroupCrossings]) -> bool:
+    return any(not crossings.excluded for crossings in group_crossings.values())
+
+
 @dataclass
 class RunSummary:
     generated: list[str] = field(default_factory=list)
@@ -96,12 +125,23 @@ class RunSummary:
     failed: dict[str, str] = field(default_factory=dict)
     known_bad: dict[str, str] = field(default_factory=dict)
     conflicts: dict[str, list[DuplicateClaimant]] = field(default_factory=dict)
+    # Generated benchmarks whose groups cross KovaaK's categories, by
+    # sharecode. Their files are written all the same: the groups are the
+    # app's to draw or leave out.
+    group_crossings: dict[str, GroupCrossings] = field(default_factory=dict)
 
     @property
     def exit_code(self) -> int:
         # Known-bad skips are informational: the failure was already reported by
-        # the run that recorded it.
-        return int(bool(self.failed or self.conflicts))
+        # the run that recorded it. A crossing on the app's exclusion list is
+        # informational for the same reason.
+        return int(
+            bool(
+                self.failed
+                or self.conflicts
+                or _unhandled_group_crossings(self.group_crossings)
+            )
+        )
 
 
 @dataclass
@@ -110,6 +150,10 @@ class CheckSummary:
     drifted: dict[str, list[str]] = field(default_factory=dict)
     failed: dict[str, str] = field(default_factory=dict)
     not_checked: list[str] = field(default_factory=list)
+    # Rebuilt benchmarks whose groups cross KovaaK's categories. Beside the
+    # buckets, never one of them: such a file can be identical or drifted, and
+    # regenerating it changes nothing about its groups.
+    group_crossings: dict[str, GroupCrossings] = field(default_factory=dict)
     # Bundled filename per key. A file with no usable sharecode is keyed by
     # its filename, and an unbundled --only code has no entry.
     filenames: dict[str, str] = field(default_factory=dict)
@@ -117,8 +161,16 @@ class CheckSummary:
     @property
     def exit_code(self) -> int:
         # Zero only when every visited file was rebuilt and matched, so a run
-        # the breaker cut short never reads as clean.
-        return int(bool(self.drifted or self.failed or self.not_checked))
+        # the breaker cut short never reads as clean. A crossing counts unless
+        # the app's exclusion list already holds the benchmark.
+        return int(
+            bool(
+                self.drifted
+                or self.failed
+                or self.not_checked
+                or _unhandled_group_crossings(self.group_crossings)
+            )
+        )
 
 
 def _ordered_rank_colors(item: EvxlDatabaseItem) -> list[tuple[str, str]]:
@@ -294,12 +346,22 @@ def should_skip_generation(
     *,
     force: bool = False,
 ) -> bool:
-    """Return whether manifest state and its output are current and intact."""
+    """Return whether manifest state and its output are current and intact.
+
+    The layout is part of that state although no generated file holds it. The
+    group comparison runs only where a benchmark is built, and the app draws
+    its groups from the snapshot this run may just have refreshed. Skipping a
+    benchmark whose layout changed would let a layout that now crosses
+    KovaaK's categories through with a clean exit. The manifest holds a layout
+    only after a clean comparison, so a benchmark whose groups crossed is
+    never current.
+    """
     if force or entry is None:
         return False
     return (
         entry.kovaaks_benchmark_id == item.kovaaksBenchmarkId
         and entry.rank_colors == _ordered_rank_colors(item)
+        and entry.categories == item.categories
         and _has_intact_generated_file(sharecode, entry, generated_dir)
     )
 
@@ -413,6 +475,7 @@ def load_evxl_data(
             database_item = EvxlDatabaseItem(
                 kovaaksBenchmarkId=difficulty.kovaaksBenchmarkId,
                 rankColors=difficulty.rankColors,
+                categories=difficulty.categories,
             )
             claimant = DuplicateClaimant(
                 benchmark=benchmark.benchmarkName,
@@ -605,16 +668,89 @@ def build_scenarios(
     return scenario_list
 
 
+def _span_label(start: int, end: int) -> str:
+    if end - start == 1:
+        return f"scenario {start + 1}"
+    return f"scenarios {start + 1}-{end}"
+
+
+def find_group_crossings(
+    benchmark_response: BenchmarksAPIResponse,
+    layout: Sequence[EvxlCategory],
+) -> list[str]:
+    """Describe each drawn group that partly overlaps one of KovaaK's categories.
+
+    The app assigns groups by position, from the snapshot's counts alone, and
+    a matching total doesn't show that each count cuts the scenario list where
+    the benchmark's author cut it. KovaaK's payload groups the same scenarios
+    by name, so it is the second source: wherever a drawn group and one of its
+    categories meet, one has to contain the other. Either side may subdivide
+    the other. Both drawn levels are checked, because a category can straddle
+    a boundary that each of its subcategories respects.
+
+    Empty when nothing crosses, and when the app would draw no groups at all.
+    Where Evxl subdivides a KovaaK's category, nothing here confirms where the
+    subdivision falls.
+    """
+    kovaaks_spans: list[tuple[str, int, int]] = []
+    scenario_names: list[str] = []
+    for category_name, category in benchmark_response.categories.items():
+        start = len(scenario_names)
+        scenario_names.extend(name.strip() for name in category.scenarios)
+        kovaaks_spans.append((category_name.strip(), start, len(scenario_names)))
+
+    groups = assign_scenario_groups(layout, len(scenario_names))
+    if groups is None:
+        return []
+    levels = [[(group.category_run, group.category) for group in groups]]
+    if any(group.subcategory for group in groups):
+        levels.append(
+            [
+                (group.subcategory_run, f"{group.category} / {group.subcategory}")
+                for group in groups
+            ]
+        )
+    drawn_spans: list[tuple[str, int, int]] = []
+    for level in levels:
+        start = 0
+        for index in range(1, len(level) + 1):
+            if index == len(level) or level[index][0] != level[start][0]:
+                drawn_spans.append((level[start][1], start, index))
+                start = index
+
+    lines: list[str] = []
+    for kovaaks_name, kovaaks_start, kovaaks_end in kovaaks_spans:
+        for group_name, group_start, group_end in drawn_spans:
+            start = max(kovaaks_start, group_start)
+            end = min(kovaaks_end, group_end)
+            if start >= end:
+                continue
+            if (start, end) in (
+                (kovaaks_start, kovaaks_end),
+                (group_start, group_end),
+            ):
+                continue
+            lines.append(
+                f"KovaaK's category {kovaaks_name!r} "
+                f"({_span_label(kovaaks_start, kovaaks_end)}) and the group "
+                f"{group_name!r} ({_span_label(group_start, group_end)}) share "
+                f"only {_quoted(scenario_names[start:end])}"
+            )
+    return lines
+
+
 def build_playlist(
     sharecode: str,
     evxl_database_item: EvxlDatabaseItem,
     *,
     use_cache: bool,
-) -> PlaylistData:
+) -> BuiltPlaylist:
     """Fetch and merge one benchmark playlist without writing it.
 
     Evxl is always queried live; ``use_cache`` governs only the KovaaK's
-    benchmark cache, which every live fetch rewrites.
+    benchmark cache, which every live fetch rewrites. The group comparison is
+    made here because this is where KovaaK's payload and the snapshot's layout
+    are both in hand.
     """
     playlist = get_evxl_playlist(sharecode)
     logger.debug("Resolved %s as playlist: %s", sharecode, playlist.playlist_name)
@@ -627,10 +763,21 @@ def build_playlist(
         backoff_seconds=RETRY_BACKOFF_SECONDS,
     )
     benchmark_response = BenchmarksAPIResponse.model_validate(response_json)
-    return PlaylistData(
+    playlist_data = PlaylistData(
         name=playlist.playlist_name.strip(),
         code=playlist.playlist_code.strip(),
         scenarios=build_scenarios(benchmark_response, evxl_database_item),
+    )
+    lines = find_group_crossings(benchmark_response, evxl_database_item.categories)
+    if not lines:
+        return BuiltPlaylist(playlist_data, None)
+    return BuiltPlaylist(
+        playlist_data,
+        GroupCrossings(
+            playlist_name=playlist_data.name,
+            lines=tuple(lines),
+            excluded=playlist_data.code in GROUP_EXCLUDED_PLAYLIST_CODES,
+        ),
     )
 
 
@@ -644,9 +791,21 @@ def generate_playlist(
     use_cache: bool = True,
     manifest: dict[str, ManifestEntry] | None = None,
     manifest_path: Path | None = None,
+    group_crossings: dict[str, GroupCrossings] | None = None,
 ) -> Path:
-    """Fetch, merge, and write one benchmark playlist."""
-    playlist_data = build_playlist(sharecode, evxl_database_item, use_cache=use_cache)
+    """Fetch, merge, and write one benchmark playlist.
+
+    A benchmark whose groups cross KovaaK's categories is written all the
+    same, and reported: logged here, and recorded in ``group_crossings`` under
+    its sharecode when the caller passes one.
+    """
+    playlist_data, crossings = build_playlist(
+        sharecode, evxl_database_item, use_cache=use_cache
+    )
+    if crossings is not None:
+        _log_group_crossings(f"{sharecode} ({crossings.playlist_name})", crossings)
+        if group_crossings is not None:
+            group_crossings[sharecode] = crossings
 
     generated_dir.mkdir(parents=True, exist_ok=True)
     generated_path = choose_generated_path(
@@ -692,6 +851,12 @@ def generate_playlist(
             kovaaks_benchmark_id=evxl_database_item.kovaaksBenchmarkId,
             rank_colors=rank_colors,
             generated_at=generated_at,
+            # Only a clean comparison makes the layout current. Recording a
+            # layout that crossed would let the next run skip the benchmark
+            # and exit clean with the crossing still there. That holds for an
+            # excluded benchmark too: its crossing has to block again on the
+            # first run after its code leaves the exclusion list.
+            categories=evxl_database_item.categories if crossings is None else None,
         )
         write_manifest(
             manifest,
@@ -831,6 +996,7 @@ def run_importer(
                 use_cache=not force and not retry_intent,
                 manifest=manifest,
                 manifest_path=manifest_path,
+                group_crossings=summary.group_crossings,
             )
         except (
             requests.RequestException,
@@ -874,15 +1040,48 @@ def run_importer(
     return summary
 
 
+def _log_group_crossings(label: str, crossings: GroupCrossings) -> None:
+    if crossings.excluded:
+        level = logging.INFO
+        logger.info(
+            "Groups cross KovaaK's categories, and the app's exclusion list "
+            "already leaves them out: %s",
+            label,
+        )
+    else:
+        level = logging.ERROR
+        logger.error("Groups cross KovaaK's categories: %s", label)
+    for line in crossings.lines:
+        logger.log(level, "  %s", line)
+
+
+def _log_group_crossings_summary(
+    group_crossings: dict[str, GroupCrossings],
+    labels: dict[str, str],
+) -> None:
+    for key, crossings in group_crossings.items():
+        _log_group_crossings(labels[key], crossings)
+    if _unhandled_group_crossings(group_crossings):
+        # Regenerating cannot fix these: the file is right, and the snapshot's
+        # counts disagree with KovaaK's about where a group falls.
+        logger.error(
+            "The app would mislabel rows of each benchmark above that is not "
+            "excluded. Add its playlist code to GROUP_EXCLUDED_PLAYLIST_CODES "
+            "in source/kovaaks/scenario_groups.py."
+        )
+
+
 def log_summary(summary: RunSummary) -> None:
     """Log end-of-run result buckets and conflict details."""
     logger.info(
-        "Run summary: generated=%d, skipped=%d, failed=%d, known_bad=%d, conflicts=%d",
+        "Run summary: generated=%d, skipped=%d, failed=%d, known_bad=%d, "
+        "conflicts=%d, group_crossings=%d",
         len(summary.generated),
         len(summary.skipped),
         len(summary.failed),
         len(summary.known_bad),
         len(summary.conflicts),
+        len(summary.group_crossings),
     )
     logger.info("Generated sharecodes: %s", summary.generated or "none")
     logger.info("Skipped sharecodes: %s", summary.skipped or "none")
@@ -901,6 +1100,13 @@ def log_summary(summary: RunSummary) -> None:
                 claimant.benchmark_id,
                 list(claimant.rank_ladder),
             )
+    _log_group_crossings_summary(
+        summary.group_crossings,
+        {
+            sharecode: f"{sharecode} ({crossings.playlist_name})"
+            for sharecode, crossings in summary.group_crossings.items()
+        },
+    )
 
 
 def _quoted(names: Sequence[str]) -> str:
@@ -1042,7 +1248,7 @@ def run_check(
             # Bypass the benchmark cache: it can hold the very payload the
             # bundled file was built from, and a rebuild from that matches the
             # file by construction.
-            rebuilt = build_playlist(key, database[key], use_cache=False)
+            rebuilt, crossings = build_playlist(key, database[key], use_cache=False)
         except (
             requests.RequestException,
             ValidationError,
@@ -1065,6 +1271,10 @@ def run_check(
             continue
 
         consecutive_failures = 0
+        # Compared on the rebuild, which is KovaaK's scenario list as it is
+        # now, and so the list a regenerated file would hold.
+        if crossings is not None:
+            summary.group_crossings[key] = crossings
         # Whole-model equality, not a field-by-field diff: a diff silently
         # passes any field added to the models later, and scenarios matched by
         # name collapse when a name repeats.
@@ -1088,11 +1298,13 @@ def _check_label(summary: CheckSummary, key: str) -> str:
 def log_check_summary(summary: CheckSummary) -> None:
     """Log the check's result buckets and, when files drifted, a paste line."""
     logger.info(
-        "Check summary: identical=%d, drifted=%d, failed=%d, not_checked=%d",
+        "Check summary: identical=%d, drifted=%d, failed=%d, not_checked=%d, "
+        "group_crossings=%d",
         len(summary.identical),
         len(summary.drifted),
         len(summary.failed),
         len(summary.not_checked),
+        len(summary.group_crossings),
     )
     for sharecode, lines in summary.drifted.items():
         logger.warning("Drifted: %s", _check_label(summary, sharecode))
@@ -1101,6 +1313,10 @@ def log_check_summary(summary: CheckSummary) -> None:
     for key, reason in summary.failed.items():
         logger.error("Failed: %s: %s", _check_label(summary, key), reason)
     logger.info("Not checked: %s", summary.not_checked or "none")
+    _log_group_crossings_summary(
+        summary.group_crossings,
+        {key: _check_label(summary, key) for key in summary.group_crossings},
+    )
     if summary.drifted:
         # Failures and unchecked files stay off this line: regenerating
         # cannot fix a file that does not build or was never compared.

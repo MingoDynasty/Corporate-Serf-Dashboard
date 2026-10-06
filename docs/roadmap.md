@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Categories and subcategories on benchmarks** — a benchmark's scenario
+  table now draws the groups its author sorted the scenarios into: two narrow
+  columns of merged, colored cells ahead of the scenario names, each labeled
+  with its category or subcategory the way the benchmark's own sheet and Evxl
+  do. A sorted or filtered table can't keep a group's rows together, so there
+  each row names its group under its scenario instead, and the filter box
+  matches group names either way. The grouping already shipped with the app,
+  so nothing new is fetched. (PR #352; design in #338) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Columns menu and KovaaK's ID columns** — the Playlists table and a
   playlist's scenario table each gain a Columns menu that shows or hides any
   column and remembers the choice in the browser. Each table also gains one
@@ -63,15 +72,6 @@ sequence.
   Evxl. Both columns come from the bundled thresholds and the local personal
   best, so they appear with the table and work offline. (PR #321; design in
   #320) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-- **Setup hints become notices** — the three plain-text lines that tell the
-  user the app needs something from them (the stats-folder hint on Scenario
-  Performance, its restart-pending twin, and the Settings page's restart
-  notice) now wear the same yellow panel, warning icon, and no title that
-  the first-run setup card already wore. The Settings notice leaves the
-  orange the app reserves for a partly-committed action. No wording changed,
-  and the Position field's inline hints stay value qualifiers. (PR #298;
-  design in #281) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 ---
 

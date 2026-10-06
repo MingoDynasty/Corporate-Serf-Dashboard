@@ -32,6 +32,7 @@ from source.kovaaks.data_models import (
     ScenarioStats,
 )
 from source.kovaaks.request_logging import request_exception_summary
+from source.kovaaks.scenario_groups import ScenarioGroup, join_scenario_groups
 from source.utilities.atomic_write import atomic_write_text
 from source.utilities.paths import package_root, state_dir
 from source.utilities.stopwatch import Stopwatch
@@ -119,6 +120,10 @@ _bundled_corpus_load_complete: bool = True
 # would report every bundled file as drifted. Reset on each load_playlists()
 # run.
 _bundled_benchmark_ids: dict[str, int] = {}
+# Each bundled benchmark's scenario groups by playlist code, aligned with its
+# scenarios, for the benchmarks that join the Evxl snapshot. A side table for
+# the reason the benchmark IDs are one. Reset on each load_playlists() run.
+_bundled_scenario_groups: dict[str, tuple[ScenarioGroup, ...]] = {}
 playlist_startup_warning_queue: deque[str] = deque()
 _PLAYLIST_IO_LOCK = threading.RLock()
 
@@ -940,6 +945,7 @@ def load_playlists() -> None:  # noqa: PLR0912
     _superseded_user_playlist_files.clear()
     _bundled_seed_pairs.clear()
     _bundled_benchmark_ids.clear()
+    _bundled_scenario_groups.clear()
     _bundled_corpus_load_complete = True
     playlist_sources: dict[str, Path] = {}
     bundled_parsed = 0
@@ -995,6 +1001,12 @@ def load_playlists() -> None:  # noqa: PLR0912
             # the ID of the file that won the code.
             if benchmark_id is not None:
                 _bundled_benchmark_ids[playlist_data.code] = benchmark_id
+            if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                scenario_groups = join_scenario_groups(
+                    playlist_data.code, len(playlist_data.scenarios)
+                )
+                if scenario_groups is not None:
+                    _bundled_scenario_groups[playlist_data.code] = scenario_groups
             if root == USER_PLAYLIST_DIRECTORY_PATH:
                 _user_root_playlist_codes.add(playlist_data.code)
                 _user_root_playlist_files.setdefault(playlist_data.code, []).append(
@@ -1026,6 +1038,16 @@ def get_bundled_benchmark_id(playlist_code: str) -> int | None:
     load_playlists().
     """
     return _bundled_benchmark_ids.get(playlist_code)
+
+
+def get_scenario_groups(playlist_code: str) -> tuple[ScenarioGroup, ...] | None:
+    """Return a bundled benchmark's scenario groups, one per scenario in order.
+
+    ``None`` for a playlist that has no groups: any playlist that is not a
+    bundled benchmark, and a bundled benchmark that doesn't join the Evxl
+    snapshot or is on the exclusion list. Call after load_playlists().
+    """
+    return _bundled_scenario_groups.get(playlist_code)
 
 
 def get_bundled_leaderboard_seed() -> tuple[dict[str, int], bool]:
