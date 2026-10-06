@@ -1,4 +1,4 @@
-# tooling-spec: python-v2
+# tooling-spec: python-v3
 name: CI
 
 on:
@@ -8,6 +8,13 @@ on:
 
 permissions:
     contents: read
+
+# A new push to a pull request cancels that pull request's superseded run.
+# A push to main gets a group of its own through the run id, so it is never
+# cancelled and never queued: a repository may hang a release off that run.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
     test:
@@ -21,6 +28,8 @@ jobs:
             UV_NO_SYNC: '1'
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
               with:
                   enable-cache: false
@@ -87,6 +96,7 @@ jobs:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   fetch-depth: 0
+                  persist-credentials: false
             - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
               with:
                   enable-cache: false
@@ -149,6 +159,8 @@ jobs:
         env:
             GH_TOKEN: ${{ github.token }}
         steps:
+            # No `persist-credentials: false` on this checkout: the tag push in
+            # this job authenticates with the token it leaves behind.
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   fetch-depth: 0
