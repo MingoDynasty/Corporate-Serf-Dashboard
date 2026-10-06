@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from source.kovaaks import evxl_links
+from source.kovaaks import evxl_snapshot
 from source.kovaaks.evxl_links import evxl_benchmark_url
 
 STEAM_ID = "76561198000000000"
@@ -72,9 +72,9 @@ SNAPSHOT = [
 @pytest.fixture(autouse=True)
 def fresh_snapshot_memo() -> Iterator[None]:
     """Keep one test's snapshot from answering for the next."""
-    evxl_links._evxl_names_by_code.cache_clear()
+    evxl_snapshot.evxl_entries_by_code.cache_clear()
     yield
-    evxl_links._evxl_names_by_code.cache_clear()
+    evxl_snapshot.evxl_entries_by_code.cache_clear()
 
 
 @pytest.fixture
@@ -82,7 +82,7 @@ def snapshot_path(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     """Point the lookup at a snapshot file holding ``SNAPSHOT``."""
     path = tmp_path / "benchmarks.json"
     path.write_text(json.dumps(SNAPSHOT), encoding="utf-8")
-    monkeypatch.setattr(evxl_links, "EVXL_BENCHMARKS_SNAPSHOT_PATH", path)
+    monkeypatch.setattr(evxl_snapshot, "EVXL_BENCHMARKS_SNAPSHOT_PATH", path)
     return path
 
 
@@ -175,14 +175,15 @@ def test_a_missing_snapshot_gives_no_links_and_says_so_once(
     monkeypatch, tmp_path, caplog
 ):
     path = tmp_path / "absent.json"
-    monkeypatch.setattr(evxl_links, "EVXL_BENCHMARKS_SNAPSHOT_PATH", path)
+    monkeypatch.setattr(evxl_snapshot, "EVXL_BENCHMARKS_SNAPSHOT_PATH", path)
 
-    with caplog.at_level(logging.WARNING, logger=evxl_links.__name__):
+    with caplog.at_level(logging.WARNING, logger=evxl_snapshot.__name__):
         assert evxl_benchmark_url("KovaaKsPeakingNarrowImpact", STEAM_ID) is None
         assert evxl_benchmark_url("KovaaKsPeakingNarrowImpact", None) is None
 
     (record,) = caplog.records
     assert f'Failed to read the Evxl benchmark snapshot "{path}"' in record.message
+    assert "no Evxl link and no categories" in record.message
 
 
 @pytest.mark.parametrize(
@@ -201,7 +202,7 @@ def test_a_snapshot_in_another_shape_gives_no_links_and_says_so(
 ):
     snapshot_path.write_text(content, encoding="utf-8")
 
-    with caplog.at_level(logging.WARNING, logger=evxl_links.__name__):
+    with caplog.at_level(logging.WARNING, logger=evxl_snapshot.__name__):
         assert evxl_benchmark_url("KovaaKsPeakingNarrowImpact", STEAM_ID) is None
 
     (record,) = caplog.records
@@ -209,11 +210,23 @@ def test_a_snapshot_in_another_shape_gives_no_links_and_says_so(
     assert record.exc_info is not None
 
 
-def test_the_committed_snapshot_loads_in_the_shape_the_lookup_reads():
-    names_by_code = evxl_links._evxl_names_by_code()
+def test_an_entry_with_an_unusable_layout_keeps_its_link(snapshot_path, caplog):
+    # ``SNAPSHOT`` holds no layouts at all, which is one unusable shape.
+    with caplog.at_level(logging.WARNING, logger=evxl_snapshot.__name__):
+        entry = evxl_snapshot.evxl_entries_by_code()["kovaaksparenscode"]
 
-    assert names_by_code
+    assert entry.layout is None
+    assert evxl_benchmark_url("KovaaKsParensCode", STEAM_ID) is not None
+    assert (
+        "categories for KovaaKsParensCode are not in the expected format" in caplog.text
+    )
+
+
+def test_the_committed_snapshot_loads_in_the_shape_the_lookup_reads():
+    entries_by_code = evxl_snapshot.evxl_entries_by_code()
+
+    assert entries_by_code
     assert all(
-        benchmark_name and difficulty_name
-        for benchmark_name, difficulty_name in names_by_code.values()
+        entry.benchmark_name and entry.difficulty_name and entry.layout is not None
+        for entry in entries_by_code.values()
     )

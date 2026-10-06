@@ -8,9 +8,14 @@ import pytest
 import requests
 from pydantic import ValidationError
 
-from source.kovaaks import data_service
+from source.kovaaks import data_service, evxl_snapshot
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
 from source.kovaaks.playlist_visibility_service import DEFAULT_VISIBLE_CODES
+from source.kovaaks.scenario_groups import (
+    GROUP_EXCLUDED_PLAYLIST_CODES,
+    ScenarioGroup,
+    join_scenario_groups,
+)
 from source.utilities import atomic_write
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -1052,6 +1057,84 @@ def test_default_visible_codes_are_all_bundled():
     }
 
     assert DEFAULT_VISIBLE_CODES - bundled_codes == set()
+
+
+# Bundled benchmarks whose scenario table shows no groups, by playlist code,
+# each with the reason. Every other bundled benchmark joins the committed Evxl
+# snapshot by count. This pins which benchmarks show groups. It does not show
+# where their groups fall, which the importer's comparison does.
+_BENCHMARKS_WITHOUT_GROUPS = {
+    # On the exclusion list: IRIS Mixed Benchmarks Easy.
+    "KovaaKsDeathballingFlyJump",
+    # Counts don't add up: PureG S1 - Worthless holds 14, and Evxl counts 12.
+    "KovaaKsCounterstrafingButteryExitfrag",
+    # Names nothing: kl2 - Reflex by dummy.
+    "KovaaKsFeedingKnockedFaq",
+}
+
+
+def test_committed_bundled_playlists_join_the_committed_snapshot_by_count():
+    # A snapshot refresh that changes a benchmark's counts before its file is
+    # regenerated stops that benchmark joining, and must not do so silently.
+    evxl_snapshot.evxl_entries_by_code.cache_clear()
+    playlists = [
+        PlaylistData.model_validate_json(path.read_text(encoding="utf-8"))
+        for path in _committed_bundled_playlist_paths()
+    ]
+
+    without_groups = {
+        playlist.code
+        for playlist in playlists
+        if join_scenario_groups(playlist.code, len(playlist.scenarios)) is None
+    }
+
+    assert without_groups == _BENCHMARKS_WITHOUT_GROUPS
+    assert GROUP_EXCLUDED_PLAYLIST_CODES <= {playlist.code for playlist in playlists}
+
+
+def test_a_bundled_benchmarks_groups_land_in_the_side_table(monkeypatch, tmp_path):
+    bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(data_service, "_bundled_scenario_groups", {})
+    groups = (ScenarioGroup("Clicking", "#111111", 0, "Static", "#aaaaaa", 0),)
+    asked = []
+
+    def fake_join(playlist_code, scenario_count):
+        asked.append((playlist_code, scenario_count))
+        return groups if playlist_code == "GroupedCode" else None
+
+    monkeypatch.setattr(data_service, "join_scenario_groups", fake_join)
+    _write_playlist(bundled_root / "grouped.json", _playlist("Grouped", "GroupedCode"))
+    _write_playlist(bundled_root / "plain.json", _playlist("Plain", "PlainCode"))
+    # A playlist the user imported has its own scenario order, so it is never
+    # joined, whatever its code.
+    _write_user_playlist(user_root / "user.json", _playlist("User", "UserCode"))
+
+    data_service.load_playlists()
+
+    assert asked == [("GroupedCode", 1), ("PlainCode", 1)]
+    assert data_service.get_scenario_groups("GroupedCode") == groups
+    assert data_service.get_scenario_groups("PlainCode") is None
+    assert data_service.get_scenario_groups("UserCode") is None
+    # The groups ride beside the model, never in it.
+    assert data_service.playlist_database["GroupedCode"] == _playlist(
+        "Grouped", "GroupedCode"
+    )
+
+
+def test_the_scenario_groups_table_is_rebuilt_on_every_load(monkeypatch, tmp_path):
+    bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(data_service, "_bundled_scenario_groups", {})
+    groups = (ScenarioGroup("Clicking", "#111111", 0, "", None, 0),)
+    monkeypatch.setattr(data_service, "join_scenario_groups", lambda *_args: groups)
+    path = bundled_root / "grouped.json"
+    _write_playlist(path, _playlist("Grouped", "GroupedCode"))
+    data_service.load_playlists()
+    assert data_service.get_scenario_groups("GroupedCode") == groups
+
+    path.unlink()
+    data_service.load_playlists()
+
+    assert data_service.get_scenario_groups("GroupedCode") is None
 
 
 # --- schema_version: user-root reads, and the import destination point-check ---
