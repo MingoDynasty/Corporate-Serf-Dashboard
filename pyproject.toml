@@ -133,13 +133,13 @@ patch = ["subprocess"]
 dev = [
     "datamodel-code-generator>=0.83.0",
     "markdown-it-py>=4.2.0",
-    "mypy>=2.3.1",
+    "mypy>=2.4.0",
     # Compatible-release pin rather than a floor: stubs describe a specific
     # pandas major/minor, so bump this in step with pandas itself.
     "pandas-stubs~=3.0.5",
     "pre-commit>=4.6.2",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
-    "ruff>=0.16.9",
+    "ruff>=0.16.10",
     "scipy-stubs>=1.18.1.1",
 ]
