@@ -49,7 +49,7 @@ Client identification:
 | `/user/scenario/total-play` | Metadata hydration/upsert for `scenarioName -> leaderboardId` | No | Can lag behind current score/rank. Returns `null` for unknown usernames. |
 | `/user/profile/by-username` | Identity detection: verify a local Steam persona against a KovaaK's profile | No | Unauthenticated. HTTP `409` is the confirmed "no such player" answer. Request parameters are never logged. |
 | `/scenario/popular` | Exact-name fallback for leaderboard ID resolution | No | Search can return many variants; require exact `scenarioName` match. |
-| `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires benchmark ID, so it does not cover all playlists. |
+| `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires a benchmark ID, sent as `benchmarkId`, so it does not cover all playlists. |
 | `/playlist/playlists` | Playlist discovery/metadata inspection | No | Does not include leaderboard IDs in observed responses. |
 | `/game-settings` | Provenance for the in-repo sensitivity-scale capture; not called at runtime | No | Per-scale conversion formulas. Captured to `resources/sensitivity converter/response.json`. |
 
@@ -66,6 +66,12 @@ Example total-ranked-players lookup:
 ```text
 GET /leaderboard/scores/global?leaderboardId=98330&page=0&max=1
 ```
+
+Where to find a `leaderboardId`: a playlist's scenario table shows it in the
+Leaderboard ID column, which starts hidden and is shown from the table's
+**Columns** menu. The number there is the one the app itself sends to this
+endpoint, from its permanent name-to-ID mapping. A scenario the app hasn't
+resolved reads `N/A`.
 
 Fields we rely on:
 
@@ -232,11 +238,22 @@ refusal.
 
 Existing app behavior uses this endpoint for benchmark progress.
 
+Example request, as `get_benchmark_json` sends it:
+
+```text
+GET /benchmarks/player-progress-rank-benchmark?benchmarkId=2336&steamId=00000000000000000
+```
+
 Important limitation:
 
-- Requires a benchmark ID.
+- Requires a benchmark ID, sent as the `benchmarkId` query parameter.
 - Works for benchmark playlists, but not every playlist is a benchmark.
 - Scenario rank display should not depend on this endpoint.
+
+Where to find a `benchmarkId`: the Playlists table shows a bundled
+benchmark's in the Benchmark ID column, which starts hidden and is shown from
+the table's **Columns** menu. The app reads it from the bundled file's
+`generated_from` stamp. A playlist imported by code has none and reads `N/A`.
 
 Leaderboard-ID facts (verified 2026-07-19; used by leaderboard-ID seeding —
 see the 2026-07-20 decision log entry):

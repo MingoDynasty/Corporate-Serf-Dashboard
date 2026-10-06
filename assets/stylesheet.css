@@ -509,6 +509,16 @@ a.playlist-scenarios-evxl-link {
     font-weight: bold;
 }
 
+/* Grid cells whose value gets copied out (a KovaaK's ID). AG Grid turns text
+   selection off on every cell; this turns it back on for one column without
+   the grid-wide enableCellTextSelection option. The text cursor also overrides
+   the pointer an overview row hands its cells. */
+.ag-cell.cell-selectable-text {
+    -webkit-user-select: text;
+    cursor: text;
+    user-select: text;
+}
+
 /* Overview rows are full-row navigation targets (routes decision 2026-07-03:
    visible click affordances). Hover tint comes from --ag-row-hover-color. */
 .playlist-overview-grid .ag-row {

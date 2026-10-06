@@ -13,6 +13,9 @@ import pytest
 
 from source.kovaaks import api_service, data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
+from source.kovaaks.playlist_scenarios_service import (
+    build_playlist_scenario_rank_rows,
+)
 
 
 def _mapping_path(cache_dir: Path) -> Path:
@@ -303,3 +306,37 @@ def test_seed_from_corpus_adds_ids_and_drops_conflicted_seed_row(
     assert mappings["Alpha"]["source"] == "seed"
     # Dup left the asserted set (conflict), so its seed-owned row is retracted.
     assert "Dup" not in mappings
+
+
+def test_a_name_the_seed_leaves_out_shows_no_leaderboard_id_until_one_is_learned(
+    monkeypatch, tmp_path, cache_dir
+):
+    # The scenario table shows the mapping's ID, never the copy embedded in the
+    # playlist file. So a name two bundled files disagree on reads N/A beside a
+    # file that embeds an ID for it.
+    bundled_root = _configure_bundled_root(monkeypatch, tmp_path)
+    _write_playlist(
+        bundled_root / "one.json",
+        "CodeOne",
+        [
+            Scenario(name="Alpha", leaderboard_id=184106),
+            Scenario(name="Dup", leaderboard_id=97841),
+        ],
+    )
+    _write_playlist(
+        bundled_root / "two.json",
+        "CodeTwo",
+        [Scenario(name="Dup", leaderboard_id=92603)],
+    )
+    data_service.load_playlists()
+    data_service.seed_leaderboard_ids_from_bundled_corpus()
+
+    def leaderboard_ids() -> dict:
+        rows = build_playlist_scenario_rank_rows("CodeOne", "generation-1")
+        return {row["scenario"]: row["leaderboard_id"] for row in rows}
+
+    assert leaderboard_ids() == {"Alpha": "184106", "Dup": "N/A"}
+
+    api_service.save_leaderboard_id("Dup", 92603, "search")
+
+    assert leaderboard_ids() == {"Alpha": "184106", "Dup": "92603"}

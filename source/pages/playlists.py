@@ -16,6 +16,13 @@ from dash import (
     no_update,
 )
 
+from source.components.columns_menu import (
+    COLUMNS_MENU_GRID_OPTIONS,
+    MenuColumn,
+    columns_menu,
+    columns_menu_sink,
+    register_columns_menu,
+)
 from source.components.control_name import control_name
 from source.components.local_icon import local_icon
 from source.config.settings_service import get_kovaaks_username
@@ -55,6 +62,9 @@ VISIBILITY_COLUMN_ID = "hidden"
 # The delete action cell's colId. Matches the ``deletable`` row flag so the
 # renderer can hide itself on bundled rows; excluded from row navigation.
 DELETE_COLUMN_ID = "deletable"
+# The Benchmark ID cell's colId. Excluded from row navigation, because a
+# double-click to select the number is two clicks on the cell.
+BENCHMARK_ID_COLUMN_ID = "benchmark_id"
 WARMUP_REFRESH_INTERVAL_MS = 1_000
 
 # Reused from the former Settings-modal import control, with the trailing
@@ -161,6 +171,7 @@ dash.register_page(
 
 AUTO_SIZE_COLUMN_KEYS = [
     "type_display",
+    BENCHMARK_ID_COLUMN_ID,
     "played_sort",
     "runs_sort",
     "last_played_sort",
@@ -255,6 +266,20 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 140,
     },
     {
+        "headerName": "Benchmark ID",
+        "field": BENCHMARK_ID_COLUMN_ID,
+        "headerTooltip": (
+            "The number KovaaK's uses to identify this benchmark in its API."
+        ),
+        "cellClass": "cell-selectable-text",
+        # Hidden until the Columns menu shows it. ``initialHide``, never
+        # ``hide``: AG Grid reapplies ``hide`` whenever column defs arrive
+        # again, which would override the user's choice.
+        "initialHide": True,
+        "sortable": False,
+        "minWidth": 90,
+    },
+    {
         "headerName": "Played",
         "field": "played_sort",
         "headerTooltip": "Scenarios played / total scenarios",
@@ -344,6 +369,23 @@ TABLE_COLUMN_DEFS = [
     },
 ]
 
+COLUMNS_MENU_ID = "playlists-overview-columns"
+
+# The Columns menu's entries, in table order: every column the table can work
+# without. A column the table's structure depends on is never listed. The row
+# means nothing without its name, and the action cells are the only way to hide
+# or delete a playlist. The labels are kept by hand, in sentence case as
+# controls, where the headers they name keep Title Case.
+MENU_COLUMNS = [
+    MenuColumn("type_display", "Type"),
+    MenuColumn(BENCHMARK_ID_COLUMN_ID, "Benchmark ID", shown_by_default=False),
+    MenuColumn("played_sort", "Played"),
+    MenuColumn("runs_sort", "Runs"),
+    MenuColumn("last_played_sort", "Last played"),
+    MenuColumn("median_percentile_sort", "Median percentile"),
+    MenuColumn("lowest_percentile_sort", "Lowest percentile"),
+]
+
 
 @callback(
     Output("playlists-location", "pathname"),
@@ -351,10 +393,17 @@ TABLE_COLUMN_DEFS = [
     prevent_initial_call=True,
 )
 def route_to_clicked_playlist(cell_clicked):
-    """Navigate to a playlist's scenario table from any cell in its row."""
+    """Navigate to a playlist's scenario table from a cell in its row.
+
+    The action cells and the Benchmark ID cell do not navigate.
+    """
     if not isinstance(cell_clicked, dict):
         return no_update
-    if cell_clicked.get("colId") in (VISIBILITY_COLUMN_ID, DELETE_COLUMN_ID):
+    if cell_clicked.get("colId") in (
+        VISIBILITY_COLUMN_ID,
+        DELETE_COLUMN_ID,
+        BENCHMARK_ID_COLUMN_ID,
+    ):
         return no_update
     playlist_code = cell_clicked.get("rowId")
     if not isinstance(playlist_code, str) or not playlist_code:
@@ -966,6 +1015,9 @@ clientside_callback(
 )
 
 
+register_columns_menu(COLUMNS_MENU_ID, "playlists-overview-grid")
+
+
 def layout(**kwargs):  # noqa: ARG001
     """Build the playlist-level overview page."""
     return dmc.Stack(
@@ -983,8 +1035,10 @@ def layout(**kwargs):  # noqa: ARG001
             # Holds the code the delete confirmation modal is targeting.
             dcc.Store(id="playlists-delete-target"),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
-            # Dummy sink for the client-side quick-filter callback's output.
+            # Dummy sinks for the client-side quick-filter and Columns menu
+            # callbacks' outputs.
             dcc.Store(id="playlists-overview-quick-filter-sink"),
+            columns_menu_sink(COLUMNS_MENU_ID),
             dcc.Interval(
                 id="playlists-overview-relative-time-interval",
                 interval=30_000,
@@ -1028,6 +1082,7 @@ def layout(**kwargs):  # noqa: ARG001
                                 persistence=True,
                                 size="sm",
                             ),
+                            columns_menu(COLUMNS_MENU_ID, MENU_COLUMNS),
                             dmc.Button(
                                 "Import",
                                 id="playlists-import-open-button",
@@ -1188,6 +1243,7 @@ def layout(**kwargs):  # noqa: ARG001
                     "unSortIcon": True,
                 },
                 dashGridOptions={
+                    **COLUMNS_MENU_GRID_OPTIONS,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     # Row ids carry the playlist code so any cell click can

@@ -240,6 +240,7 @@ flowchart LR
     subgraph SharedUI["Shared UI"]
         LocalIcon["components/<br/>local_icon.py"]
         ControlName["components/<br/>control_name.py"]
+        ColumnsMenu["components/<br/>columns_menu.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -279,6 +280,9 @@ flowchart LR
     Home --> ControlName
     Playlists --> ControlName
     SettingsPage --> ControlName
+    Playlists --> ColumnsMenu
+    PlaylistScenarios --> ColumnsMenu
+    ColumnsMenu --> LocalIcon
     Playlists --> OverviewService
     Playlists --> WarmupService
     WarmupService --> ApiService
@@ -441,6 +445,10 @@ flowchart LR
   superseded by bundled benchmarks, a notice above the grid offers a one-click
   cleanup (`delete_superseded_user_playlist_files`). It is a `dmc.Paper`
   rather than a `dmc.Alert` because it holds a button (see decision log).
+  The Columns menu sits between the "Show hidden" switch and Import, built by
+  `components/columns_menu.py` from this page's `MENU_COLUMNS`. The Benchmark
+  ID column starts hidden (`initialHide`), and a click on its cell does not
+  navigate, so a double-click can select the number.
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log). It paints
@@ -463,6 +471,10 @@ flowchart LR
   the column defs from a value valid for that page's columns, and a
   clientside callback on the grid's `columnState` rewrites the key with a raw
   `history.replaceState`, never through `dcc.Location` (see decision log).
+  The Columns menu ends the filter row, built by `components/columns_menu.py`
+  from this page's `MENU_COLUMNS` plus, on a benchmark,
+  `BENCHMARK_MENU_COLUMNS`. The Leaderboard ID column starts hidden
+  (`initialHide`) and is not sortable, so it has no `?sort=` name.
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
@@ -532,6 +544,21 @@ flowchart LR
   names one; chart annotations write `<b>…</b>` into the string instead. The
   copy rules it serves are in AGENTS.md's styling conventions and the
   [2026-09-14 app copy entry](decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+- `components/columns_menu.py` — the Columns menu both playlist tables share.
+  `columns_menu()` builds the button and a popover of one persisted checkbox
+  per hideable column, from a page's list of `MenuColumn` entries (column ID,
+  label, default). `register_columns_menu()` registers one clientside callback
+  per grid, the app's only pattern-matching callback, which applies the
+  checkboxes through the grid API as the page mounts and on every change: it
+  sets visibility, clears the sort of every hidden column, re-runs the quick
+  filter, and sizes the columns it just showed. Only the newest run applies
+  anything. A grid with a menu also takes `COLUMNS_MENU_GRID_OPTIONS`, which
+  turns column virtualization off, so the grid's own autosize can fit every
+  column a stored choice brings into the window. It never writes the grid's
+  `columnState` prop and
+  never resends column definitions. The choices live in the browser's local
+  storage, so the server never learns which columns are shown
+  ([decision_log.md](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -559,6 +586,12 @@ flowchart LR
   a bundled code already won; `delete_user_playlist` and
   `delete_superseded_user_playlist_files` are the write paths that unlink those
   files under the playlist I/O lock, keeping startup itself read-only.
+  `load_playlists` also reads each winning bundled file's KovaaK's benchmark
+  ID from its `generated_from` stamp into a table keyed by playlist code,
+  which `get_bundled_benchmark_id` serves. It is a side table and not a
+  `PlaylistData` field, because the benchmark importer's drift check compares
+  whole models
+  ([decision_log.md](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
   helpers (including `_get_with_retry`'s `sensitive` option, which keeps one
   request's parameters and query string out of every log line), JSON cache
@@ -587,7 +620,9 @@ flowchart LR
   scenario's ladder, its local PB, and an optional pace constant, computes on
   every path. The constant is `None` for the gap as a percentage of the PB,
   and `_build_row` supplies it, on a row with a ladder and a PB, when the
-  scenario is time-scored and the PB run is eligible.
+  scenario is time-scored and the PB run is eligible. Every row also carries
+  the scenario's leaderboard ID, read from the name-to-ID mapping on every
+  path.
 - `performance_file.py` — pure reader for a KovaaK's performance file and the
   countdown check (`read_performance_file`): bytes in, one of three answers
   out (`Scoring`: time-scored, not time-scored, can't answer), with the
@@ -611,7 +646,7 @@ flowchart LR
   `allow_network=False`), filtered by visibility unless the overview's "show
   hidden" mode asks for everything. Automated warmup-interval builds thread
   `record_activity=False` into those reads so polling does not postpone the
-  worker.
+  worker. Each row also carries the playlist's bundled benchmark ID, or `N/A`.
 - `playlist_visibility_service.py` — per-code show/hide visibility (plain
   show-list persisted at `data/playlist_visibility.json`, atomic writes under a
   module lock). A missing file yields the first-run seed (bundled defaults plus
@@ -796,6 +831,7 @@ flowchart LR
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
+| The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |
 | Shared UI icons or vendored icon files | `components/local_icon.py` + `assets/icons/` |

@@ -110,6 +110,17 @@ identity, because names aren't unique
 - Also called share code, KovaaK's own name for it.
 - In code: `code` on a playlist, and `playlist_code` elsewhere.
 
+### Benchmark ID
+
+KovaaK's numeric identifier for a benchmark. It is not the playlist code,
+which identifies the same benchmark as a playlist. Only a bundled benchmark
+carries one
+([2026-10-05](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+Where it is shown is in [playlists.md](specs/playlists.md#the-overview).
+
+- In code: `kovaaks_benchmark_id` in a bundled file, and `benchmark_id`
+  elsewhere.
+
 ### Stalest
 
 Of the scenarios in a playlist that the player has played, the one played
@@ -144,6 +155,16 @@ percentile.
 The share of a scenario's leaderboard the player places above, as a
 percentage, so higher is better. It comes from position and total players; how
 it is derived is in [scenario_rank.md](specs/scenario_rank.md#domain-model).
+
+### Leaderboard ID
+
+KovaaK's numeric identifier for a scenario's global leaderboard. Position,
+total players, and percentile all come from that leaderboard
+([2026-10-05](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+Where it is shown is in
+[playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
+
+- In code: `leaderboard_id`.
 
 ### From cache
 

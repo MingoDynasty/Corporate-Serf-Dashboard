@@ -108,6 +108,7 @@ def test_format_playlist_scenario_rank_row_ranked():
 
     assert row == {
         "scenario": "VT Pasu Intermediate S5",
+        "leaderboard_id": "N/A",
         "playlist_order": 3,
         "status": "RANKED",
         "position_display": "11,290",
@@ -127,6 +128,20 @@ def test_format_playlist_scenario_rank_row_ranked():
         "pb_accuracy_display": "76.15%",
         "pb_accuracy_sort": 76.15,
     }
+
+
+def test_format_playlist_scenario_rank_row_shows_the_leaderboard_id_as_bare_digits():
+    rank_info = ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN)
+
+    mapped = format_playlist_scenario_rank_row(
+        "Smoothsphere Viscose", 0, rank_info, leaderboard_id=184106
+    )
+    unmapped = format_playlist_scenario_rank_row("Unresolved", 0, rank_info)
+
+    # The number gets pasted into a request, so it takes no thousands
+    # separator, unlike every count beside it.
+    assert mapped["leaderboard_id"] == "184106"
+    assert unmapped["leaderboard_id"] == "N/A"
 
 
 def test_format_playlist_scenario_rank_row_unranked_with_total():
@@ -1428,11 +1443,19 @@ _PLAYLIST = PlaylistData(
     code="KovaaKsPlaylistCode",
     scenarios=[Scenario(name="Ranked"), Scenario(name="Unplayed")],
 )
+# The name-to-ID mapping the row paths read. "Unplayed" and "No Ladder" are
+# scenarios the app hasn't resolved.
+_LEADERBOARD_IDS = {"Ranked": 184106, "Top": 97841}
 
 
 @pytest.fixture
 def rank_row_sources(monkeypatch):
     """Serve both test playlists and the same local stats to every row path."""
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_cached_leaderboard_id",
+        _LEADERBOARD_IDS.get,
+    )
     monkeypatch.setattr(
         data_service,
         "playlist_database",
@@ -1566,6 +1589,94 @@ def test_cancelled_fill_rebuild_rows_equal_phase_one_rows(
         state = playlist_scenarios_service._FILL_REGISTRY["generation-1"]
         assert state.scenario_names == ()
         assert state.scenario_ladders == ()
+
+
+# --- every row path carries the scenario's leaderboard ID ---
+
+
+def _leaderboard_ids_by_scenario(rows) -> dict[str, str]:
+    return {row["scenario"]: row["leaderboard_id"] for row in rows}
+
+
+def test_every_row_path_carries_the_leaderboard_id(
+    monkeypatch,
+    rank_row_sources,
+    isolated_fill_registry,
+):
+    expected = {
+        "Ranked": "184106",
+        "Unplayed": "N/A",
+        "No Ladder": "N/A",
+        "Top": "97841",
+    }
+
+    phase_one = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    target, args = _register_fill(monkeypatch, _BENCHMARK.code, "generation-1")
+    target(*args)
+    streamed = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+    _register_fill(monkeypatch, _BENCHMARK.code, "generation-2")
+    # Opening any playlist in another tab cancels that fill before it fetches.
+    _register_fill(monkeypatch, _PLAYLIST.code, "generation-3")
+    rebuilt = playlist_scenarios_service.drain_playlist_scenario_fill("generation-2")
+
+    assert streamed is not None
+    assert streamed.terminal == "complete"
+    assert rebuilt is not None
+    assert rebuilt.terminal == "cancelled"
+    # The last two replace a row's data whole, so a path that dropped the field
+    # would blank the cell.
+    for rows in (phase_one, streamed.updates, rebuilt.updates):
+        assert _leaderboard_ids_by_scenario(rows) == expected
+
+
+def test_a_streamed_row_carries_the_leaderboard_id_its_lookup_learned(
+    monkeypatch,
+    rank_row_sources,
+    isolated_fill_registry,
+):
+    learned: dict[str, int] = {}
+    monkeypatch.setattr(
+        playlist_scenarios_service, "get_cached_leaderboard_id", learned.get
+    )
+
+    def lookup(scenario_name, *, allow_network):
+        # Only the fill may reach KovaaK's, which is where an ID is learned.
+        if allow_network:
+            learned[scenario_name] = 184106
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            total_players=100,
+            percentile=90.0,
+        )
+
+    monkeypatch.setattr(playlist_scenarios_service, "_lookup_rank_info", lookup)
+
+    phase_one = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+    target, args = _register_fill(monkeypatch, _PLAYLIST.code, "generation-1")
+    target(*args)
+    streamed = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert streamed is not None
+    assert set(_leaderboard_ids_by_scenario(phase_one).values()) == {"N/A"}
+    assert set(_leaderboard_ids_by_scenario(streamed.updates).values()) == {"184106"}
+
+
+def test_a_failed_mapping_read_still_builds_the_row(
+    monkeypatch, rank_row_sources, caplog
+):
+    def raise_on_read(_scenario_name):
+        raise ValueError("unreadable mapping")
+
+    monkeypatch.setattr(
+        playlist_scenarios_service, "get_cached_leaderboard_id", raise_on_read
+    )
+
+    with caplog.at_level(logging.WARNING, logger=playlist_scenarios_service.__name__):
+        rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+
+    assert _leaderboard_ids_by_scenario(rows) == {"Ranked": "N/A", "Unplayed": "N/A"}
+    assert 'Failed to read the leaderboard ID for "Ranked"' in caplog.messages
 
 
 # --- Time-scored rows on the three row paths --------------------------------

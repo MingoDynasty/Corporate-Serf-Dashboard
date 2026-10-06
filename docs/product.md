@@ -326,6 +326,18 @@ are one view or two is a design choice for the feature that builds them.
   leaving the app for Evxl or KovaaK's in-game view. A percentage compares
   scenarios whose scores run from single digits to millions, which raw points
   can't.
+- **Columns menu and KovaaK's ID columns** (PR #344; design in #334). The
+  Playlists table and a playlist's scenario table each have a Columns menu
+  that shows or hides any column and remembers the choice in the browser.
+  Each table also has one column that starts hidden: a benchmark's KovaaK's
+  ID on the Playlists table, and a scenario's leaderboard ID on the scenario
+  table. *Problem solved:* a benchmark's scenario table had grown to twelve
+  columns with no way to drop one a player never reads, and it keeps gaining
+  them. The IDs were a second gap: the app already knew both numbers, but
+  trying a KovaaK's API request by hand started with a text search of a
+  file. An ID is noise to a player who isn't calling that API, so it stays
+  off until asked for, and the menu gives any later optional column the same
+  place to start hidden.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I

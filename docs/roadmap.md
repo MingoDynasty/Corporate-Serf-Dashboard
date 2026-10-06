@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Columns menu and KovaaK's ID columns** — the Playlists table and a
+  playlist's scenario table each gain a Columns menu that shows or hides any
+  column and remembers the choice in the browser. Each table also gains one
+  column that starts hidden, the KovaaK's ID of the benchmark or of the
+  scenario's leaderboard, so trying an API request by hand no longer starts
+  with digging the number out of a file. Both pages look as they did until
+  the menu is used. (PR #344; design in #334) Design rationale distilled
+  into [`decision_log.md`](./decision_log.md).
 - **Time-scored scenarios measured by pace** — some scenarios score the time
   left on a countdown when the task is done, and on those a percentage of the
   score understates a real improvement several times over. The app now
@@ -64,14 +72,6 @@ sequence.
   orange the app reserves for a partly-committed action. No wording changed,
   and the Position field's inline hints stay value qualifiers. (PR #298;
   design in #281) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-- **App messaging consistency** — every string the app shows now follows one
-  short set of copy rules, so the same condition reads the same way on every
-  page: whole sentences with periods, one vocabulary, everyday contractions,
-  control names in bold, and no em dashes, which a test now keeps out of the
-  source. Some toasts that sounded like log lines now say what happened and
-  what to do. No new surface and no behavior change. (PR #291; design in
-  #247) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 ---
 
