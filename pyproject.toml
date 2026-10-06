@@ -37,32 +37,6 @@ build-backend = "uv_build"
 
 [tool.uv]
 required-version = "==0.12.23"
-# Keeps a hijacked package out of the lock, and so out of the next release:
-# one is usually caught and withdrawn within days of being published. It has
-# to be set here, not passed to the upgrade command. uv records it in
-# ``uv.lock``, and ``uv sync --locked``, which CI and the installer both run,
-# fails when the lock holds an option this file lacks.
-exclude-newer = "7 days"
-
-# A one-time exception, on the maintainer's word: the 2026-10-05 refresh took
-# the newest version of every package, whatever its age. These are the ones it
-# locked at under a week old. Without its entry here, a plain ``uv lock`` moves
-# that package back to an older version and exits 0. Remove the whole table at
-# the first refresh after 2026-10-12, when the youngest of them (filelock
-# 4.0.12) turns a week old.
-[tool.uv.exclude-newer-package]
-ast-serialize = false
-black = false
-charset-normalizer = false
-filelock = false
-markupsafe = false
-mypy = false
-optype = false
-platformdirs = false
-ruff = false
-tzdata = false
-virtualenv = false
-zipp = false
 
 [tool.uv.build-backend]
 module-root = ""

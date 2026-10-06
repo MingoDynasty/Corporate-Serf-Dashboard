@@ -10,24 +10,6 @@ resolution-markers = [
     "python_full_version < '3.15' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 
-[options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
-exclude-newer-span = "P7D"
-
-[options.exclude-newer-package]
-ast-serialize = false
-black = false
-charset-normalizer = false
-filelock = false
-markupsafe = false
-mypy = false
-optype = false
-platformdirs = false
-ruff = false
-tzdata = false
-virtualenv = false
-zipp = false
-
 [[package]]
 name = "annotated-types"
 version = "0.8.0"
