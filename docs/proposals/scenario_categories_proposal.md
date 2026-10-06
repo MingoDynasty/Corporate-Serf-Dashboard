@@ -17,12 +17,15 @@ nothing new is fetched.
 
 ## Decisions needed
 
-One ruling, and nothing is ratified. The maintainer asked for the feature in
-chat on 2026-10-03. On 2026-10-04 they asked whether one combined column
-would do, and whether Evxl's vertical labels are worth adopting, naming a
-table sorted by Last Played as the one worry. Those were questions, not
-leans. Everything else in this proposal, including the Copy and Terms
-blocks, is author-owned and open to challenge.
+One ruling. The maintainer ruled D1 on 2026-10-06, as its recommendation,
+after every reviewer had endorsed the row at its current text. The row keeps
+its recommendation and the alternatives it rejected, for the record.
+
+The maintainer asked for the feature in chat on 2026-10-03. On 2026-10-04
+they asked whether one combined column would do, and whether Evxl's vertical
+labels are worth adopting, naming a table sorted by Last Played as the one
+worry. Everything else in this proposal, including the Copy and Terms
+blocks, is author-owned, and the ruling on D1 does not ratify it.
 
 The data path was a second row when this proposal opened. A decision that
 shipped on 2026-10-04 took the same path for the View on Evxl link and
@@ -32,7 +35,14 @@ groups", with the alternative it rejects.
 
 ### D1 — What the group columns show when the table is sorted or filtered
 
-Status: open
+Status: Ruled (user), 2026-10-06: accept the recommendation below.
+
+The material consequence: the table has two states, and no column changes
+width between them. The default view spends 68 px on the groups. The
+implementation carries a state flag, the second line of the Scenario cell,
+and the checks that keep the two states in step with the sort, the filter
+box, and the Columns menu, none of which one always-horizontal column would
+need.
 
 A vertical label needs its group's whole height. Evxl's table can't be
 sorted, so its groups are always whole. This table sorts and filters, and
@@ -75,10 +85,10 @@ Choosing differently:
   filter skips hidden columns. A user who wants the columns gone can already
   hide them through the Columns menu, in either state.
 
-Material consequence: the swap moves the column headers on the first click
-of every sort. The single horizontal column spends 47 px to 82 px more in
-the default view and doesn't look like the benchmark's sheet. Hiding leaves
-a sorted table without the feature.
+Material consequence of choosing differently: the swap moves the column
+headers on the first click of every sort. The single horizontal column
+spends 47 px to 82 px more in the default view and doesn't look like the
+benchmark's sheet. Hiding leaves a sorted table without the feature.
 
 ## Problem
 
@@ -217,8 +227,7 @@ to merge.
 
 ## Design
 
-The design below follows D1's recommendation. A different ruling changes the
-"Grouped and ungrouped" section and what follows from it.
+The design below follows D1 as ruled.
 
 ### What the table shows
 
@@ -545,8 +554,9 @@ entry.
 
 ## Delivery plan
 
-One implementation PR, once D1 is ruled, with no dependencies. Its first
-step puts the comparison where it will keep running:
+One implementation PR, with no dependencies. D1 was ruled on 2026-10-06, so
+nothing holds it. Its first step puts the comparison where it will keep
+running:
 
 - The importer's group comparison, at generation and in the drift check,
   with its tests. Then one run of the drift check over the corpus, which goes
@@ -579,8 +589,8 @@ The prototype predates the Columns menu and the renamed row fields. The
 implementer builds on current `main` and takes the grid mechanics from the
 prototype, not its code.
 
-Recommended implementer: `claude-opus-5-5` at high. Once D1 is ruled the
-spec is settled, and unit tests plus one live check verify it. The prototype
+Recommended implementer: `claude-opus-5-5` at high. With D1 ruled the spec
+is settled, and unit tests plus one live check verify it. The prototype
 and the tall-group probe show cell spanning, the state flag, and the
 following label each working alone. What is left to discover is how they sit
 together beside the Columns menu, and the live check below covers that.
