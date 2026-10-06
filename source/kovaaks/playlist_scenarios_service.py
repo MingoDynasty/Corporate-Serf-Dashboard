@@ -193,7 +193,7 @@ def benchmark_rank_fields(
         gap = percent_faster(pace_constant, high_score, next_rank.threshold)
     if gap is not None:
         fields["next_tier_display"] = (
-            f"{_round_up(gap, 1):,.1f}% faster to {next_rank.name}"
+            f"+{_round_up(gap, 1):,.1f}% faster to {next_rank.name}"
         )
     elif high_score > 0:
         gap = points / high_score * 100

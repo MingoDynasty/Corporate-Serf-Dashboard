@@ -160,7 +160,7 @@ def test_a_recognized_scenario_reads_pace_on_the_table_and_the_chart(folders):
     folders.performance_file(SECOND)
     folders.start()
 
-    assert _next_rank() == "2.8% faster to Lavender"
+    assert _next_rank() == "+2.8% faster to Lavender"
     assert _threshold_line() == 890.74
 
 
@@ -216,7 +216,7 @@ def test_a_file_that_appears_after_startup_is_seen_by_every_surface_alike(
     message = _land(monkeypatch, folders.stats_file(THIRD, 883.02))
 
     assert message.pace_constant == 1000.0
-    assert _next_rank() == "2.8% faster to Lavender"
+    assert _next_rank() == "+2.8% faster to Lavender"
     assert _threshold_line() == 890.74
 
 
@@ -231,7 +231,7 @@ def test_a_first_run_of_a_scenario_carries_no_constant_and_lists_its_file(
 
     assert message.scenario_previous_best is None
     assert message.pace_constant is None
-    assert _next_rank() == "2.8% faster to Lavender"
+    assert _next_rank() == "+2.8% faster to Lavender"
 
 
 def test_a_previous_best_from_another_version_keeps_score_everywhere(
@@ -279,7 +279,7 @@ def test_a_current_version_run_that_beats_an_old_pb_turns_the_scenario_to_pace(
 
     # The run that beat it was judged against the old version's PB, by score.
     assert message.pace_constant is None
-    assert _next_rank() == "2.8% faster to Lavender"
+    assert _next_rank() == "+2.8% faster to Lavender"
     assert _threshold_line() == 890.74
 
 
@@ -295,7 +295,7 @@ def test_a_landed_file_on_another_schema_leaves_the_scenario_on_pace(
     message = _land(monkeypatch, folders.stats_file(THIRD, 883.02))
 
     assert message.pace_constant == 1000.0
-    assert _next_rank() == "2.8% faster to Lavender"
+    assert _next_rank() == "+2.8% faster to Lavender"
 
 
 def test_a_landed_file_that_shows_no_countdown_turns_the_scenario_back(
@@ -305,7 +305,7 @@ def test_a_landed_file_that_shows_no_countdown_turns_the_scenario_back(
     folders.stats_file(SECOND, 896.2)
     folders.performance_file(SECOND)
     folders.start()
-    assert _next_rank() == "2.8% faster to Lavender"
+    assert _next_rank() == "+2.8% faster to Lavender"
     folders.performance_file(THIRD, FIXED_LENGTH)
 
     message = _land(monkeypatch, folders.stats_file(THIRD, 883.02))

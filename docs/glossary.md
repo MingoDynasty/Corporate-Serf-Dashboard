@@ -208,8 +208,8 @@ How a PB is placed on the ladder is in
 
 How much a benchmark scenario's PB has to improve to reach its next rank: as
 a percentage of the PB, such as +4.8% to Gold, or of its pace where the app
-measures a time-scored scenario by pace, such as 2.8% faster to Lavender. With
-every rank reached, it reads Top rank
+measures a time-scored scenario by pace, such as +2.8% faster to Lavender.
+With every rank reached, it reads Top rank
 ([2026-09-27](decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one),
 [2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
 How the gap is computed and shown is in

@@ -41,7 +41,7 @@ sequence.
   score understates a real improvement several times over. The app now
   recognizes such a scenario from the performance files KovaaK's writes beside
   each run and measures it by pace, how fast a run finishes compared with the
-  personal best. Next Rank reads "2.8% faster to Lavender" there, the score
+  personal best. Next Rank reads "+2.8% faster to Lavender" there, the score
   threshold line and its verdict judge by pace, and a new personal best says
   how much faster it finished. A scenario the app can't recognize reads as it
   did before. (PR #343; design in #329) Design rationale distilled into
