@@ -135,11 +135,12 @@ CI needs no edit, because `setup-uv` reads the pin from `pyproject.toml`.
 ### GitHub Actions
 
 A refresh reports these pins and does not move them. They move through the
-[cross-repo tooling spec](decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec),
-which the maintainer keeps outside this repository. The `test` job is this
-repository's copy of the spec's workflow. The spec carries these exact SHAs,
-so moving them here alone makes this copy drift from the spec. A pin bump is a
-new version of the spec, which each repository then adopts.
+[cross-repo tooling spec](decision_log.md#2026-10-05-adopt-the-cross-repo-python-v3-tooling-spec),
+which the maintainer keeps outside this repository. The workflow's top-level
+settings and its `test` job are this repository's copy of the spec's workflow.
+The spec carries these exact SHAs, so moving them here alone makes this copy
+drift from the spec. A pin bump is a new version of the spec, which each
+repository then adopts.
 
 1. For each action in `.github/workflows/ci.yml`, find the latest release:
 
