@@ -1298,7 +1298,7 @@ def test_a_time_scored_rows_next_rank_gap_is_a_pace_gap():
     assert fields == {
         "tier_display": "Cerulean",
         "tier_sort": 1,
-        "next_tier_display": "2.8% faster to Lavender",
+        "next_tier_display": "+2.8% faster to Lavender",
         # The sort key is the unrounded pace gap, so a pace row and a score
         # row sort together in the one column.
         "next_tier_sort": pytest.approx(2.7723, abs=1e-4),
@@ -1320,9 +1320,9 @@ def test_the_same_row_without_a_constant_keeps_the_gap_as_a_share_of_the_pb():
     ("threshold", "pb", "next_tier_display"),
     [
         # 33.33% rounds up, so a gap that remains never reads as smaller.
-        pytest.param(999.25, 999, "33.4% faster to Iron", id="rounds-up"),
-        pytest.param(900, 899.9999, "0.1% faster to Iron", id="floor"),
-        pytest.param(999.9, 0, "999,900.0% faster to Iron", id="thousands"),
+        pytest.param(999.25, 999, "+33.4% faster to Iron", id="rounds-up"),
+        pytest.param(900, 899.9999, "+0.1% faster to Iron", id="floor"),
+        pytest.param(999.9, 0, "+999,900.0% faster to Iron", id="thousands"),
     ],
 )
 def test_a_pace_gap_formats_and_rounds_as_a_score_gap_does(
@@ -1719,7 +1719,7 @@ def _next_ranks(rows) -> list[tuple[str, str]]:
 
 # 105 against Bronze at 110, at a constant of 1,000: 895 s against 890 s.
 _PACE_NEXT_RANKS = [
-    ("Ranked", "0.6% faster to Bronze"),
+    ("Ranked", "+0.6% faster to Bronze"),
     ("Unplayed", "N/A"),
     ("No Ladder", "N/A"),
     ("Top", "Top rank"),

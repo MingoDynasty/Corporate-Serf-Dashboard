@@ -118,8 +118,8 @@ Some scenarios are scored by completion time: the score is the time left on a
 countdown when you finish the task, so a few points are a few seconds. On
 those, a percentage of the score makes a real improvement look many times
 smaller than it is, so the app measures by pace instead, which is how fast you
-finish compared with your personal best. **Next Rank** then reads "2.8% faster
-to Lavender": finish 2.8% faster than your personal best and you earn
+finish compared with your personal best. **Next Rank** then reads "+2.8%
+faster to Lavender": finish 2.8% faster than your personal best and you earn
 Lavender. On the Scenario Performance page, the **Score threshold percentage**
 becomes a percentage of your personal best's pace, so the threshold line and
 the run notification both judge by it, and the notification says "% of PB
