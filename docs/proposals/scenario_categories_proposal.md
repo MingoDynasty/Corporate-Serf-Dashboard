@@ -17,21 +17,28 @@ nothing new is fetched.
 
 ## Decisions needed
 
-One ruling. The maintainer ruled D1 on 2026-10-06, as its recommendation,
-after every reviewer had endorsed the row at its current text. The row keeps
-its recommendation and the alternatives it rejected, for the record.
+**The maintainer ratified this proposal as a whole on 2026-10-06,** after
+ruling D1 earlier the same day. Nothing in it is open:
+
+- **Ruled row.** D1, ruled as its recommendation once every reviewer had
+  endorsed that recommendation. The row keeps the recommendation and the
+  alternatives it rejected, for the record.
+- **Author-owned choices.** Everything else, including the data path and the
+  Copy and Terms blocks. The ratification settles them as written.
+
+Neither is a review target. A settled choice reopens only on material new
+evidence.
 
 The maintainer asked for the feature in chat on 2026-10-03. On 2026-10-04
 they asked whether one combined column would do, and whether Evxl's vertical
 labels are worth adopting, naming a table sorted by Last Played as the one
-worry. Everything else in this proposal, including the Copy and Terms
-blocks, is author-owned, and the ruling on D1 does not ratify it.
+worry.
 
 The data path was a second row when this proposal opened. A decision that
 shipped on 2026-10-04 took the same path for the View on Evxl link and
 rejected the alternative, for reasons that apply here unchanged. The choice
-is therefore author-owned now, and it sits in Design under "Getting the
-groups", with the alternative it rejects.
+is therefore author-owned, and it sits in Design under "Getting the groups",
+with the alternative it rejects.
 
 ### D1 — What the group columns show when the table is sorted or filtered
 
@@ -554,9 +561,9 @@ entry.
 
 ## Delivery plan
 
-One implementation PR, with no dependencies. D1 was ruled on 2026-10-06, so
-nothing holds it. Its first step puts the comparison where it will keep
-running:
+One implementation PR, with no dependencies. The proposal was ratified on
+2026-10-06, so nothing holds it. Its first step puts the comparison where it
+will keep running:
 
 - The importer's group comparison, at generation and in the drift check,
   with its tests. Then one run of the drift check over the corpus, which goes
@@ -589,11 +596,11 @@ The prototype predates the Columns menu and the renamed row fields. The
 implementer builds on current `main` and takes the grid mechanics from the
 prototype, not its code.
 
-Recommended implementer: `claude-opus-5-5` at high. With D1 ruled the spec
-is settled, and unit tests plus one live check verify it. The prototype
-and the tall-group probe show cell spanning, the state flag, and the
-following label each working alone. What is left to discover is how they sit
-together beside the Columns menu, and the live check below covers that.
+Recommended implementer: `claude-opus-5-5` at high. The spec is settled, and
+unit tests plus one live check verify it. The prototype and the tall-group
+probe show cell spanning, the state flag, and the following label each
+working alone. What is left to discover is how they sit together beside the
+Columns menu, and the live check below covers that.
 
 ## Testing
 
