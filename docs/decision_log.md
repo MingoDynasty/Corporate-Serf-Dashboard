@@ -520,6 +520,21 @@ per-scenario threshold. A per-bot breakdown. Anything else the performance
 file holds. A scenario whose score isn't the time left on its clock, and
 one with no performance file: both keep the score math.
 
+**Superseded in part (2026-10-05).** A pace row's Next Rank cell now leads
+with the sign a score row carries, at the maintainer's direction:
+"+{gap}% faster to {rank name}", such as "+2.8% faster to Lavender". Without
+it, one sorted column read "+1.4% to Cerulean" on one row and "1.4% faster to
+Cerulean" on the next, and the missing sign said nothing that "faster"
+doesn't. The sign went onto both rows instead of coming off both because a
+score row needs it: it marks growth still needed, where a bare "85.0% to
+Gold" can read as progress through the band, the measure D1 of the
+[2026-09-27 entry](#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)
+rejected, under which higher is closer. The accepted cost is that the sign
+and "faster" mark direction twice. "Faster" still names the measure, so the
+header tooltip holds as written, and the gap's formula, rounding, sort, and
+tooltip are unchanged. The string was author-owned copy, not a ruled row,
+and P1 and everything else here stand. Shipped in PR #348.
+
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.
 

@@ -104,7 +104,7 @@ are one view or two is a design choice for the feature that builds them.
 - **Time-scored scenarios are measured by pace** (PR #343; design in #329).
   Some scenarios score the time left on a countdown when you finish the task.
   On those, the app measures by pace, how fast a run finishes compared with
-  your personal best: the Next Rank column reads "2.8% faster to Lavender",
+  your personal best: the Next Rank column reads "+2.8% faster to Lavender",
   the score threshold line and its verdict judge a percentage of your
   personal best's pace, and a new personal best says how much faster you
   finished. The app recognizes such a scenario on its own, from the
