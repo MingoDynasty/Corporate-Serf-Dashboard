@@ -32,17 +32,11 @@ dependencies = [
 #test = "scripts.test:main"
 
 [build-system]
-requires = ["uv_build>=0.12.13,<0.13.0"]
+requires = ["uv_build>=0.12.23,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv]
-required-version = "==0.12.13"
-# Keeps a hijacked package out of the lock, and so out of the next release:
-# one is usually caught and withdrawn within days of being published. It has
-# to be set here, not passed to the upgrade command. uv records it in
-# ``uv.lock``, and ``uv sync --locked``, which CI and the installer both run,
-# fails when the lock holds an option this file lacks.
-exclude-newer = "7 days"
+required-version = "==0.12.23"
 
 [tool.uv.build-backend]
 module-root = ""
@@ -113,13 +107,13 @@ patch = ["subprocess"]
 dev = [
     "datamodel-code-generator>=0.83.0",
     "markdown-it-py>=4.2.0",
-    "mypy>=2.3.1",
+    "mypy>=2.4.0",
     # Compatible-release pin rather than a floor: stubs describe a specific
     # pandas major/minor, so bump this in step with pandas itself.
     "pandas-stubs~=3.0.5",
     "pre-commit>=4.6.2",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
-    "ruff>=0.16.9",
+    "ruff>=0.16.10",
     "scipy-stubs>=1.18.1.1",
 ]
