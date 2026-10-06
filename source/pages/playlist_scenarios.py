@@ -21,6 +21,7 @@ from dash import (
 )
 
 from source.components.columns_menu import (
+    COLUMNS_MENU_GRID_OPTIONS,
     MenuColumn,
     columns_menu,
     columns_menu_sink,
@@ -747,6 +748,7 @@ def layout(
                     "unSortIcon": True,
                 },
                 dashGridOptions={
+                    **COLUMNS_MENU_GRID_OPTIONS,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     "getRowId": {

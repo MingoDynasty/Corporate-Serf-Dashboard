@@ -3125,11 +3125,31 @@ def test_columns_menu_callback_lets_only_the_newest_run_apply(page_module):
 
 
 @pytest.mark.parametrize(
+    ("page_module", "grid_id"),
+    [
+        (playlists, "playlists-overview-grid"),
+        (playlist_scenarios, "playlist-scenarios-grid"),
+    ],
+    ids=["overview", "scenarios"],
+)
+def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
+    grid = _component_by_id(page_module.layout(), grid_id)
+
+    # With column virtualization on, a stored column choice opened the table
+    # with clipped headers on every load: the grid's own autosize left each
+    # column that the choice had just brought into the window at its minimum
+    # width. With every column rendered that does not happen.
+    assert grid.dashGridOptions["suppressColumnVirtualisation"] is True
+    # The option rides beside the grid's own, and replaces none of them.
+    assert grid.dashGridOptions["animateRows"] is False
+    assert "getRowId" in grid.dashGridOptions
+    assert grid.columnSize == "autoSize"
+
+
+@pytest.mark.parametrize(
     "page_module", [playlists, playlist_scenarios], ids=["overview", "scenarios"]
 )
-def test_columns_menu_callback_refits_every_shown_column_after_its_first_run(
-    page_module,
-):
+def test_columns_menu_callback_fits_only_the_columns_it_showed(page_module):
     _checkboxes, (spec,) = _columns_menu_specs(page_module.COLUMNS_MENU_ID)
     source = next(
         script
@@ -3137,21 +3157,12 @@ def test_columns_menu_callback_refits_every_shown_column_after_its_first_run(
         if spec["clientside_function"]["function_name"] in script
     )
 
-    # The grid's own autosize runs right after the callback's first run and
-    # leaves columns a visibility change just revealed at their minimum width,
-    # header clipped. The wider fit has to come after it, so it waits two
-    # frames, and a fit in the same task would not hold.
-    fit_added = source.index("gridApi.autoSizeColumns(added, false)")
-    gate = source.index("if (firstRun && changed) {")
-    fit_shown = source.index("gridApi.autoSizeColumns(shown, false)")
-    assert fit_added < gate < fit_shown
-    deferred = source[gate:fit_shown]
-    assert deferred.count("requestAnimationFrame(") == 2
-    # A grid that unmounted in those two frames is left alone.
-    assert "if (!gridApi.isDestroyed()) {" in deferred
-    # First run only, and only when it changed something: a later toggle must
-    # not undo a width set by hand, and an untouched table keeps the page's
-    # own sizing.
-    assert source.count("gridApi.autoSizeColumns(shown, false)") == 1
-    assert "const firstRun = !gridsFitted.has(gridApi);" in source
-    assert "gridsFitted.add(gridApi);" in source
+    # One fit, of the columns this run showed. A wider fit on any later run
+    # would undo a width the user set by hand.
+    assert source.count("autoSizeColumns(") == 1
+    assert "gridApi.autoSizeColumns(added, false)" in source
+    # Nothing is fitted after a wait. A fit timed by frames or by a delay ran
+    # before the headers existed in Firefox at some window widths, and clipped
+    # sets that were whole without it.
+    assert "requestAnimationFrame" not in source
+    assert "setTimeout" not in source

@@ -9,6 +9,16 @@ from dash import ALL, Input, Output, State, clientside_callback, dcc
 
 from source.components.local_icon import local_icon
 
+# Grid options every table with a Columns menu must set. With column
+# virtualization on, AG Grid renders only the columns inside the window. A
+# stored choice changes which columns those are as the page opens, and the
+# grid's own autosize then left each column that had just come into the window
+# at its minimum width, narrower than its header, on every load. Fitting those
+# columns again after a wait only moved the failure to other window widths and
+# to Firefox. With every column rendered it does not happen, and the tables
+# have few enough columns to afford it.
+COLUMNS_MENU_GRID_OPTIONS = {"suppressColumnVirtualisation": True}
+
 
 class MenuColumn(NamedTuple):
     """One column a table's Columns menu can show or hide.
@@ -29,13 +39,12 @@ class MenuColumn(NamedTuple):
 # column order, and resent definitions reapply every ``sort`` and ``hide`` they
 # declare over the user's own.
 #
-# The source is a function that returns the callback, so the two variables it
-# closes over last for the life of the page. Dash evaluates the source once,
-# and each grid registers its own copy.
+# The source is a function that returns the callback, so the counter it closes
+# over lasts for the life of the page. Dash evaluates the source once, and each
+# grid registers its own copy.
 _APPLY_COLUMNS = """
 (() => {
     let latestRun = 0;
-    const gridsFitted = new WeakSet();
 
     return async (checked, ids) => {
         const noUpdate = window.dash_clientside.no_update;
@@ -72,27 +81,14 @@ _APPLY_COLUMNS = """
             // they were until the filter text is next edited.
             gridApi.onFilterChanged();
             // setColumnsVisible does not size the column it shows, and one
-            // shown as the page opens comes up at its minimum width.
+            // shown as the page opens comes up at its minimum width. Only
+            // the columns this run showed are fitted, so a toggle never
+            // undoes a width the user set by hand. The other columns are
+            // the grid's own autosize to fit, which it can because the grid
+            // renders every column: see COLUMNS_MENU_GRID_OPTIONS.
             const added = shown.filter((colId) => !shownBefore.has(colId));
             if (added.length) {
                 gridApi.autoSizeColumns(added, false);
-            }
-            // The grid's own autosize runs right after this callback's first
-            // run, and it leaves columns that a visibility change has just
-            // brought into view at their minimum width, with the header
-            // clipped. Fitting them in this task does not hold: it has to
-            // come after that autosize. It is for the first run only, or
-            // every later toggle would undo widths the user set by hand.
-            const firstRun = !gridsFitted.has(gridApi);
-            gridsFitted.add(gridApi);
-            const changed = added.length > 0
-                || hidden.some((colId) => shownBefore.has(colId));
-            if (firstRun && changed) {
-                requestAnimationFrame(() => requestAnimationFrame(() => {
-                    if (!gridApi.isDestroyed()) {
-                        gridApi.autoSizeColumns(shown, false);
-                    }
-                }));
             }
         } catch (error) {
             console.warn("Failed to apply the Columns menu to the grid.", GRID_ID, error);
@@ -181,10 +177,10 @@ def register_columns_menu(menu_id: str, grid_id: str) -> None:
     It runs when the page mounts and on every change, and does four things in
     order: sets each column's visibility, clears the sort of every hidden
     column, re-runs the quick filter, and sizes the columns it just showed.
-    Its first run for a grid, when it changed any column's visibility, also
-    fits every shown column two frames later. Only the newest run applies
-    anything, so a run that waited longer for the grid cannot undo a later
-    one. Call once per menu, at import.
+    Only the newest run applies anything, so a run that waited longer for the
+    grid cannot undo a later one. The grid itself must be built with
+    ``COLUMNS_MENU_GRID_OPTIONS``, or a stored choice can open the table with
+    clipped headers. Call once per menu, at import.
     """
     clientside_callback(
         _APPLY_COLUMNS.replace("GRID_ID", json.dumps(grid_id)),

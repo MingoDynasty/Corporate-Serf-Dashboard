@@ -17,6 +17,7 @@ from dash import (
 )
 
 from source.components.columns_menu import (
+    COLUMNS_MENU_GRID_OPTIONS,
     MenuColumn,
     columns_menu,
     columns_menu_sink,
@@ -1242,6 +1243,7 @@ def layout(**kwargs):  # noqa: ARG001
                     "unSortIcon": True,
                 },
                 dashGridOptions={
+                    **COLUMNS_MENU_GRID_OPTIONS,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     # Row ids carry the playlist code so any cell click can

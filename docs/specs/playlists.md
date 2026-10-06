@@ -186,7 +186,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   one set per table, and the scenario table's set is shared by every
   playlist. A choice about Rank or Next Rank is left alone on a playlist's
   table. A browser with no stored choice shows the defaults. Column widths
-  and column order are not remembered.
+  and column order are not remembered. Both grids render every column,
+  whatever the window's width, so each column is sized to its header and its
+  content as the page opens, with a stored choice or without one.
 - Hiding a column is display only. Rows carry every field, no fetch stops,
   and each status line reads the same with its columns hidden. The quick
   filter matches visible columns only, so a hidden column's values find no

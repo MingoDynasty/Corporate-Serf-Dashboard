@@ -127,31 +127,41 @@ change, and does four things in order:
    and Leaderboard ID to 154 px after a toggle, a reload, and an in-app round
    trip alike (2026-10-05).
 
-Step 4 alone does not keep every header whole. The columns it shows are not
-the only ones at risk as the page opens. dash-ag-grid's own autosize runs
-right after the callback's first run, and it leaves any column that the
-visibility change has just brought into view at its minimum width, which is
-narrower than its header. With Position, Total Players, and Percentile
-stored as hidden, a benchmark's table in a 1920 px window opened with PB
-cm/360 and PB Accuracy clipped, on every load (found in review of PR #344,
-2026-10-05). Which stored sets clip depends on the window width and the
-data: of 26 sets on a benchmark, one clipped at 1920 px, eleven at 2400 px,
-and none at 2560 px. So the callback's first run for a grid, when it changed
-any column's visibility, also fits every shown column in the menu two
-animation frames later, after the grid's autosize. With that, none of the 26
-clipped at 1920 px or at 2400 px.
+Step 4 fits only the columns a run showed, so a toggle never undoes a width
+the user set by hand. Every other column is left to the grid's own autosize,
+and for that to work both grids turn column virtualization off
+(`suppressColumnVirtualisation`).
 
-- The second fit waits. In the review's probe, fitting every shown column in
-  the same task as the first run cleared the reported sets and clipped three
-  others.
-- The second fit is for the first run only. On a later run it would undo a
-  width the user set by hand.
+With virtualization on, AG Grid renders only the columns inside the window. A
+stored choice changes which columns those are as the page opens, and the
+grid's own autosize, which runs right after the callback's first run, then
+left each column that had just come into the window at its minimum width,
+narrower than its header. With Position, Total Players, and Percentile stored
+as hidden, a benchmark's table in a 1920 px window opened with PB cm/360 and
+PB Accuracy clipped, on every load (found in review of PR #344, 2026-10-05).
+Which stored sets clipped depended on the window width, the data, and the
+browser. Why AG Grid sizes such a column to its minimum was not traced.
 
-One limit remains, which the page's own autosize shares: AG Grid sizes only
-the columns it has rendered. In a window narrower than the table, a column
-scrolled out of view keeps AG Grid's 200 px default, whether the page or the
-menu showed it. With nothing stored, a benchmark's table shows that from 1680
-px down (measured 2026-10-05).
+Two fixes that fit the columns again were tried first and rejected:
+
+- *In the same task as the first run.* In the review's probe it cleared the
+  reported sets and clipped three others.
+- *Two animation frames later.* It cleared every reported case in Edge. In
+  Firefox it clipped sets that had been whole without it: 18 of 26 stored
+  sets on a benchmark at 2000 px. A fit timed by frames or by a delay has a
+  browser, a width, or a machine where it runs too early.
+
+With every column rendered there is nothing to time. None of the review's
+stored sets clipped a header: 26 sets on a benchmark, in Edge at window
+widths from 1366 px to 2400 px and in Firefox 157 from 1920 px to 2400 px, 22
+on a playlist, and 16 on the overview (measured 2026-10-05). The tables have
+at most 13 columns, so rendering them all costs nothing visible.
+
+Turning virtualization off also changes the default view in a narrow window.
+Before, a column scrolled out of view when the page opened kept AG Grid's 200
+px default, which a benchmark's table showed from 1680 px down. Now every
+column is sized to its header and its content, whether the page or the menu
+showed it.
 
 Only the newest run of the callback applies anything. Each run waits for the
 grid API on its own timer, so a run that started earlier can finish later,

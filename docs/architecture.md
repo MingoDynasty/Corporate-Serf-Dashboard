@@ -551,9 +551,10 @@ flowchart LR
   per grid, the app's only pattern-matching callback, which applies the
   checkboxes through the grid API as the page mounts and on every change: it
   sets visibility, clears the sort of every hidden column, re-runs the quick
-  filter, and sizes the columns it just showed. Its first run for a grid also
-  refits every shown column two frames later, after the grid's own autosize,
-  and only the newest run applies anything. It never writes the grid's
+  filter, and sizes the columns it just showed. Only the newest run applies
+  anything. A grid with a menu also takes `COLUMNS_MENU_GRID_OPTIONS`, which
+  turns column virtualization off, so the grid's own autosize can fit every
+  column a stored choice brings into the window. It never writes the grid's
   `columnState` prop and
   never resends column definitions. The choices live in the browser's local
   storage, so the server never learns which columns are shown
