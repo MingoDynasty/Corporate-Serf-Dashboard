@@ -121,6 +121,25 @@ Where it is shown is in [playlists.md](specs/playlists.md#the-overview).
 - In code: `kovaaks_benchmark_id` in a bundled file, and `benchmark_id`
   elsewhere.
 
+### Category
+
+One of the groups a benchmark's author sorts its scenarios into, such as
+Clicking or Tracking. Only a benchmark from the bundled library has
+categories
+([2026-10-06](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+How the table draws them is in
+[playlists.md](specs/playlists.md#categories-and-subcategories-on-a-benchmarks-table).
+
+- Not the `Category` of KovaaK's benchmark payload. KovaaK's has one level
+  of groups, which is this app's categories on some benchmarks and its
+  subcategories on others.
+
+### Subcategory
+
+A group within a category, such as Dynamic within Clicking. A benchmark
+with one level of grouping has categories and no subcategories
+([playlists.md](specs/playlists.md#categories-and-subcategories-on-a-benchmarks-table)).
+
 ### Stalest
 
 Of the scenarios in a playlist that the player has played, the one played

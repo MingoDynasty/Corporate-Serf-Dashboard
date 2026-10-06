@@ -207,6 +207,29 @@ and not documented
 ([2026-10-05 entry](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
 If the later run's time shows, stop and ask the maintainer.
 
+A dash-ag-grid bump needs two looks at a benchmark's scenario table, such as
+Viscose Benchmark S2 - Medium. Print the AG Grid version the package bundles
+first:
+
+```powershell
+uv run python -c "import json, pathlib, dash_ag_grid; print(json.loads((pathlib.Path(dash_ag_grid.__file__).parent / 'package-info.json').read_text())['dependencies']['ag-grid-community'])"
+```
+
+- **The merged-cell repair.** The table works around a defect in AG Grid
+  35.3.1, which AG Grid 36.1.0 fixed
+  ([2026-10-06 entry](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+  On 36.1.0 or later, remove the repair as its
+  [tech-debt entry](tech_debt.md#remove-the-merged-cell-repair-when-dash-ag-grid-bundles-ag-grid-3610)
+  says. Either way, click the Scenario header three times, then the Runs
+  header three times. Every row must still have its Category and Subcategory
+  cell, and each group must be one merged cell again.
+- **The following label.** On Hewchy's Smoothness - VAI Complete, scroll
+  through the table. Both group names must stay in view from the first row
+  to the last. AG Grid 36 lays its rows out in one scrolling container, with
+  no separate pinned section, and the label follows the scroll because of
+  how the pinned section is built in 35. If the names scroll away, stop and
+  ask the maintainer.
+
 A refresh changes versions, not behavior. If an upgrade adds or removes
 something a user can press, changes what a control does, or adds a new way for
 the app to reach an outside service, stop and ask the maintainer before

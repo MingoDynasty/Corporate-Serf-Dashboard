@@ -59,6 +59,18 @@ import it twice (observed in the 2026-08-12 soak).
 
 ## Code Smells
 
+### Remove the merged-cell repair when dash-ag-grid bundles AG Grid 36.1.0
+
+`source/pages/playlist_scenarios.py` (`repairSpansAfterModelUpdates`, in the
+grouped-state clientside callback) hides and shows a benchmark table's group
+columns after every row-model update. It works around a defect in AG Grid
+35.3.1, which dash-ag-grid 35.3.0 bundles: two sort changes and then none
+leave merged cells stale. AG Grid 36.1.0 fixed it, and no dash-ag-grid release
+bundles that yet (36.0.0rc0 pins 36.0.1). When one does, remove the listener
+and `test_playlist_scenarios_stale_merged_cells_are_rebuilt_after_each_model_update`,
+then run a sort cycle on a benchmark's table. Evidence and cost are in the
+[2026-10-06 entry](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory).
+
 ## Refactors
 
 ### Split Evxl out of the `kovaaks` package
@@ -74,8 +86,12 @@ backwards, or require extracting a neutral shared HTTP client first.
 Revisit when Evxl gains a **second** runtime endpoint — then extract
 `source/http_client.py` and `source/evxl/` together (and update the
 architecture.md module map). Not worth it for one fallback call. Note
-`scripts/benchmark_importer/models.py` has its own duplicate Evxl models; a
-split should decide whether they converge.
+`scripts/benchmark_importer/models.py` has its own duplicate Evxl models,
+apart from a layout's categories and subcategories, which it takes from
+`source/kovaaks/evxl_snapshot.py`; a split should decide whether the rest
+converge. The snapshot read and the modules built on it
+(`evxl_snapshot.py`, `evxl_links.py`, `scenario_groups.py`) would move with
+it.
 
 ## Tooling
 

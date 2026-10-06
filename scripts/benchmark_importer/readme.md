@@ -16,10 +16,13 @@ thresholds.
    [Evxl benchmarks data](https://evxl.app/data/benchmarks) and atomically
    refresh `resources/evxl/benchmarks.json`. A live candidate that removes any
    existing sharecode is rejected unless `--accept-removals` is set. The app
-   reads this snapshot too, for the benchmark and difficulty names behind a
-   benchmark page's "View on Evxl" link, so a committed refresh changes those
-   links
-   ([decision log](../../docs/decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
+   reads this snapshot too. It takes the benchmark and difficulty names behind
+   a benchmark page's "View on Evxl" link from it
+   ([decision log](../../docs/decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)),
+   and the categories and subcategories a benchmark's scenario table draws
+   ([decision log](../../docs/decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+   So a committed refresh changes those links, and can change which
+   benchmarks show groups and where a group falls.
 2. Resolve each playlist name and code through Evxl, fetch its rank thresholds
    from KovaaK's, and merge the data.
 3. Write benchmark JSON to `scripts/benchmark_importer/generated/`, with
@@ -156,7 +159,9 @@ Every visited file lands in one bucket:
 - **not checked**: files the circuit breaker left unvisited, so a run cut
   short never reads as clean.
 
-The exit code is 0 only when every file was rebuilt and matched. When
+The exit code is 0 only when every file was rebuilt and matched, and no
+benchmark's groups cross KovaaK's categories unless the app already excludes
+it ([Group comparison](#group-comparison)). When
 anything drifted, the summary ends with a ready-to-paste command that
 regenerates exactly the drifted sharecodes into `generated/`:
 
@@ -167,6 +172,47 @@ uv run python scripts/benchmark_importer/script.py --offline --force --only SHAR
 Failed and not-checked files never appear on that line, because regenerating
 can't fix a file that doesn't build or was never compared. The whole corpus
 takes about four minutes.
+
+## Group comparison
+
+The app draws each bundled benchmark's categories and subcategories from the
+snapshot's `categories`, which hold a scenario count per subcategory and no
+scenario names. It assigns the groups by position: it walks those counts down
+the bundled file's scenario list. A matching total doesn't show that each
+count cuts the list where the benchmark's author cut it, so wherever the
+importer builds a benchmark, in a normal run and under `--check`, it compares
+the groups the app would draw with the categories in KovaaK's payload, through
+the app's own join (`source/kovaaks/scenario_groups.py`).
+
+The rule: no drawn group and no KovaaK's category may partly overlap. Where
+the two meet, one has to contain the other. Evxl may subdivide a KovaaK's
+category, and KovaaK's may subdivide a drawn group. A group that straddles a
+boundary between two of KovaaK's categories fails. Both drawn levels are
+checked. A benchmark the app draws no groups for, because its counts don't add
+up or its layout names nothing, is not compared.
+
+A crossing is reported by benchmark, with the scenarios at issue:
+
+```text
+Groups cross KovaaK's categories: KovaaKsExample (Example Benchmark.json)
+  KovaaK's category 'Clicking' (scenarios 1-7) and the group 'Tracking / PRECISE' (scenarios 7-8) share only 'Example Scenario'
+```
+
+- The summary line carries a `group_crossings` count, beside the result
+  buckets and never as one of them. A file with a crossing still lands in
+  identical or drifted, a normal run still writes it, and it never appears on
+  the regenerate line, because regenerating changes nothing about its groups.
+- The fix is in the app, not here. Add the benchmark's playlist code to
+  `GROUP_EXCLUDED_PLAYLIST_CODES` in `source/kovaaks/scenario_groups.py`, with
+  a comment naming the benchmark and what disagrees. The app then draws no
+  groups for it. The list is kept by hand, because each crossing needs a look
+  and usually a report upstream. Add the same code to
+  `_BENCHMARKS_WITHOUT_GROUPS` in `tests/test_playlist_rekey.py`.
+- A crossing fails the exit code, of a normal run and of `--check`, until its
+  code is on that list. After that it is logged at INFO, as already handled,
+  and the exit code ignores it. IRIS Mixed Benchmarks Easy is on the list.
+- The comparison can't see one thing. Where Evxl subdivides one of KovaaK's
+  categories, nothing confirms where the subdivision falls.
 
 ## Refresh runbook
 
@@ -204,7 +250,8 @@ one PR. Run every command from the repository root with
    failures, and any files a circuit-breaker abort left not checked, with
    `--check --only`; after an early abort, a full rerun is simpler. A
    deterministic failure means the upstream data no longer builds, which
-   needs a look before anything replaces the bundled file.
+   needs a look before anything replaces the bundled file. A reported group
+   crossing is handled as [Group comparison](#group-comparison) says.
 4. **Generate the new sharecodes** with `--only`, one flag per code. Add
    `--offline` so the run uses the snapshot as reviewed in step 1 (or as
    committed, when the snapshot must stay out of the PR) instead of refreshing
@@ -228,7 +275,12 @@ one PR. Run every command from the repository root with
    [docs/specs/playlists.md](../../docs/specs/playlists.md), and stage new
    files intent-to-add (`git add -N resources/benchmarks`) so the
    committed-corpus tests, which list files through `git ls-files`, see them.
-   Run the gates. `--check --only` over the regenerated and new sharecodes
+   Run the gates. One of those tests pins the bundled benchmarks that get no
+   groups in the app (`_BENCHMARKS_WITHOUT_GROUPS` in
+   `tests/test_playlist_rekey.py`). When it fails, a refreshed snapshot count
+   no longer adds up to a file's scenario count, or a new benchmark has no
+   usable layout. Regenerate that file, or add its code to the pinned set with
+   the reason. `--check --only` over the regenerated and new sharecodes
    should now report them identical. Start the app once and confirm that
    `data/logs/debug.log` reports `Playlist startup load complete` with the new
    bundled count and `warnings=0`.

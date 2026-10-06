@@ -389,8 +389,13 @@ Observed behavior, measured 2026-10-04 by opening the addresses in a browser:
   bundled files found their names, and no two snapshot codes differed only by
   case.
 
-The app consumes only `benchmarkName`, `difficulties[].difficultyName`, and
-`difficulties[].sharecode` from the snapshot (see `evxl_links.py`).
+The app consumes `benchmarkName`, `difficulties[].difficultyName`,
+`difficulties[].sharecode`, and each difficulty's `categories` from the
+snapshot: per category its `categoryName` and `color`, and per subcategory
+its `subcategoryName`, `color`, and `scenarioCount` (see `evxl_snapshot.py`).
+The first three build the Evxl link, and the layout gives a benchmark's
+scenario table its categories and subcategories
+([playlists.md](specs/playlists.md#categories-and-subcategories-on-a-benchmarks-table)).
 
 ## `/game-settings`
 

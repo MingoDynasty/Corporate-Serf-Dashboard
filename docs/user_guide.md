@@ -139,6 +139,22 @@ on the Settings page, the link goes straight to your own sheet. Without one,
 it goes to a page where Evxl asks for your profile, and a few benchmarks that
 Evxl can't open that way show no link until a Steam ID is set.
 
+A benchmark's scenario table also shows how the benchmark's author grouped
+its scenarios. Two narrow colored columns at the table's left edge mark each
+category, such as Clicking or Tracking, and each subcategory within it, with
+the group's name written up the side, as on the benchmark's own sheet. A
+benchmark with one level of grouping has one column. Hover a colored cell to
+read its group's name. Type a group's name in the filter box to list its
+scenarios: "arm" on Viscose S2 Medium leaves its three Arm scenarios.
+
+When you sort the table or type in the filter box, a group's rows no longer
+sit together. The names up the side go, the colors stay, and each scenario
+names its group on a second line instead, such as "Control Tracking · Arm".
+Clear the sort and the filter box and the names come back. Both columns are
+in the **Columns** menu, as **Category** and **Subcategory**. A playlist you
+imported by share code has no groups, and neither do a few benchmarks whose
+grouping data doesn't line up with their scenario list.
+
 On the Scenario Performance page, the **Open scenario table** link under the
 **Playlist filter** opens the scenario table of the playlist selected there.
 

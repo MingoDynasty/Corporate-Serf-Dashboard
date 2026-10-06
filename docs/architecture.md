@@ -143,9 +143,9 @@ The sanctioned channels, each typed and single-purpose:
   generation-scoped rows and terminal tombstones, drained by the playlist
   scenarios page's interval callback into AG Grid transactions and a status
   line. Each generation's state holds its scenario names and, captured with
-  them, each scenario's rank ladder, which the cancelled-fill rebuild needs
-  so its rows keep Rank and Next Rank; both are released on terminal
-  consumption. It carries grid rows, not notifications: the fill emits no
+  them, each scenario's rank ladder and its group, which the cancelled-fill
+  rebuild needs so its rows keep Rank, Next Rank, Category, and Subcategory;
+  all three are released on terminal consumption. It carries grid rows, not notifications: the fill emits no
   toast at all
   ([2026-08-22](decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)).
 
@@ -254,6 +254,8 @@ flowchart LR
         PerfFile["kovaaks/<br/>performance_file.py"]
         Pace["kovaaks/<br/>pace.py"]
         EvxlLinks["kovaaks/<br/>evxl_links.py"]
+        EvxlSnapshot["kovaaks/<br/>evxl_snapshot.py"]
+        ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -291,6 +293,10 @@ flowchart LR
     PlaylistScenarios --> DataService
     PlaylistScenarios --> PlaylistService
     PlaylistScenarios --> EvxlLinks
+    EvxlLinks --> EvxlSnapshot
+    ScenarioGroups --> EvxlSnapshot
+    DataService --> ScenarioGroups
+    PlaylistService --> ScenarioGroups
     Journey --> DataService
     Journey --> PlotService
     SettingsPage --> WarmupService
@@ -474,7 +480,19 @@ flowchart LR
   The Columns menu ends the filter row, built by `components/columns_menu.py`
   from this page's `MENU_COLUMNS` plus, on a benchmark,
   `BENCHMARK_MENU_COLUMNS`. The Leaderboard ID column starts hidden
-  (`initialHide`) and is not sortable, so it has no `?sort=` name.
+  (`initialHide`) and is not sortable, so it has no `?sort=` name. A table
+  whose playlist has groups (`data_service.get_scenario_groups`) also gets
+  the group columns in `GROUP_COLUMNS`, Category and Subcategory, ahead of
+  Scenario and first in the Columns menu, with cell spanning turned on and
+  the grouped state seeded from `?sort=` into the grid's `context`. Each is
+  pinned left, 34 px wide, and merged down each group by the row's run
+  number. A clientside callback on the grid's `columnState` and the filter
+  box's value keeps that state current and redraws the group and Scenario
+  cells, reading the grid through its API and never writing `columnState`.
+  The same callback installs a listener that hides and shows the group
+  columns after each row-model update, a workaround for stale merged cells
+  in the bundled AG Grid
+  ([decision_log.md](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
@@ -592,6 +610,12 @@ flowchart LR
   `PlaylistData` field, because the benchmark importer's drift check compares
   whole models
   ([decision_log.md](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  A second side table, filled the same way and for the same reason, holds
+  each winning bundled benchmark's scenario groups, one per scenario in
+  order, from `scenario_groups.join_scenario_groups`.
+  `get_scenario_groups` serves it, and answers `None` for a user playlist and
+  for a benchmark that has no groups
+  ([decision_log.md](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
   helpers (including `_get_with_retry`'s `sensitive` option, which keeps one
   request's parameters and query string out of every log line), JSON cache
@@ -622,7 +646,10 @@ flowchart LR
   and `_build_row` supplies it, on a row with a ladder and a PB, when the
   scenario is time-scored and the PB run is eligible. Every row also carries
   the scenario's leaderboard ID, read from the name-to-ID mapping on every
-  path.
+  path. A row of a benchmark that has groups carries six more fields from
+  `scenario_group_fields`: the category's and the subcategory's name, color,
+  and run number. The fill state captures the groups at registration, beside
+  the ladders, so all three row paths carry them.
 - `performance_file.py` — pure reader for a KovaaK's performance file and the
   countdown check (`read_performance_file`): bytes in, one of three answers
   out (`Scoring`: time-scored, not time-scored, can't answer), with the
@@ -655,13 +682,29 @@ flowchart LR
   Playlists page renders it. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Scenario
   Performance filter, Journey picker, overview).
+- `evxl_snapshot.py` — the one read of `resources/evxl/benchmarks.json`,
+  the Evxl benchmark snapshot that ships with the code
+  (`evxl_entries_by_code`). Read once per process and keyed by case-folded
+  playlist code, a code listed twice keeping its first listing. Each entry
+  holds Evxl's benchmark and difficulty names and its layout of categories
+  and subcategories. A layout is validated per entry, so a bad one costs that
+  benchmark its groups and no benchmark its Evxl link. A snapshot that is
+  missing or in another shape yields no entries and one warning. No network.
 - `evxl_links.py` — builds the address of a benchmark's page on Evxl
   (`evxl_benchmark_url`): a player's sheet when a Steam ID is set, the
   profile-less page otherwise, `None` when Evxl has no page the app can link.
-  Evxl's benchmark and difficulty names come from
-  `resources/evxl/benchmarks.json`, read once per process and keyed by
-  case-folded playlist code. No network: the browser opens the address
+  Evxl's benchmark and difficulty names come from `evxl_snapshot.py`. No
+  network: the browser opens the address
   ([decision_log.md](decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
+- `scenario_groups.py` — sorts a bundled benchmark's scenarios into its
+  categories and subcategories. `assign_scenario_groups` is the pure walk:
+  it hands a layout's scenario counts down a scenario list and returns one
+  `ScenarioGroup` per scenario, with names, colors, and a run number per
+  level, or `None` when the counts don't add up or the layout names nothing.
+  `join_scenario_groups` adds the snapshot lookup and the hand-kept
+  `GROUP_EXCLUDED_PLAYLIST_CODES`. The benchmark importer calls the same walk
+  for its group comparison
+  ([decision_log.md](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -830,7 +873,8 @@ flowchart LR
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
-| The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
+| The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
+| A benchmark's categories and subcategories on that table | `kovaaks/evxl_snapshot.py` for the read of `resources/evxl/benchmarks.json`; `kovaaks/scenario_groups.py` for the join and the exclusion list; `kovaaks/data_service.py` (`get_scenario_groups`) for the side table; `pages/playlist_scenarios.py` for the columns, the grouped state, and the merged-cell workaround; `scripts/benchmark_importer/script.py` (`find_group_crossings`) for the comparison with KovaaK's categories; the rules are in `docs/specs/playlists.md` |
 | The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |
