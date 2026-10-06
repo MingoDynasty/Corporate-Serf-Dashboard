@@ -256,11 +256,12 @@ proposal's "the merges were checked through a sort" was one sort.
   menu has hidden is never touched.
 - **What it costs.** It leans on grid behavior the documentation does not
   promise. It fires two column-visibility events on every model update,
-  including each tick of the position fill. A group cell's open tooltip, and
-  keyboard focus inside a group cell, would be lost when the cells are
-  rebuilt, which is inferred and not measured. Measured: no column moves or
-  changes width, and the sort and the address are untouched. The two calls
-  run in one task, so the browser paints nothing between them.
+  including each tick of the position fill. Measured, in Edge and in
+  Firefox: no column moves or changes width, the sort and the address are
+  untouched, a focused group cell keeps keyboard focus through a rebuild, and
+  a tooltip on a group cell under a resting pointer still names its group
+  after one. The two calls run in one task, so the browser paints nothing
+  between them.
 - **The alternatives.** Park the feature until a dash-ag-grid release bundles
   AG Grid 36.1.0 or later, for which there is no date. Or draw the merged look
   without the grid's cell spanning, which replaces the mechanism the proposal
