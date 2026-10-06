@@ -39,7 +39,7 @@ differently:
 | Dependency floors | `dependencies` and the `dev` group in `pyproject.toml` | `uv tree --depth 1` prints the locked version of each |
 | `pandas-stubs` | the `dev` group, as a `~=` pin | follows pandas' major.minor line |
 | pre-commit ruff | `rev` in `.pre-commit-config.yaml` | must equal the locked ruff |
-| uv | `required-version` and the `uv_build` range in `pyproject.toml` | the newest release at least a week old; see [uv](#uv) |
+| uv | `required-version` and the `uv_build` range in `pyproject.toml` | the latest release; see [uv](#uv) |
 | GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
@@ -47,54 +47,13 @@ The Python version is not part of a refresh. Moving it touches
 `.python-version`, `requires-python`, and ruff's `target-version`, and is its
 own change.
 
-## Minimum package age
-
-`pyproject.toml` tells uv to ignore any package version published in the last
-seven days:
-
-```toml
-[tool.uv]
-exclude-newer = "7 days"
-```
-
-A hijacked package is usually caught and withdrawn within days. Without the
-setting, an upgrade takes versions that are hours old, and merging the lock
-ships them in the next release
-([2026-10-04 decision](decision_log.md#2026-10-04-upgrades-skip-package-versions-younger-than-a-week)).
-
-The setting lives in `pyproject.toml`, never only on the command line. uv
-records it in `uv.lock`, and `uv sync --locked`, which CI and the installer
-both run, fails when the lock and the project disagree. uv stores the value as
-a span, not a date, so the lock stays valid as time passes.
-
-A refresh starts by checking that the line is there. If it is missing, add it,
-run `uv lock`, and commit both files as
-`chore(deps): skip package versions younger than a week` before upgrading.
-`git diff uv.lock` must show no line starting `version = ` in that commit. It
-adds an `[options]` block, and uv may reorder the `resolution-markers` list,
-but no package moves.
-
-When a fix cannot wait a week, exempt that one package, with a comment naming
-why:
-
-```toml
-exclude-newer-package = { <name> = false }
-```
-
-Remove an exemption at the first refresh after the exempted version is a week
-old, never sooner. The `upload-time` beside that package in `uv.lock` is the
-date to count from. Removed too early, `uv lock` moves the package back to an
-older version and exits 0, and an upgrade does not bring the newer one back.
-After removing one, check that the package's `version` in `uv.lock` did not
-go down.
-
 ## Package pass
 
-1. Do the two checks under [Minimum package age](#minimum-package-age): the
-   setting is there, and any exemption is old enough to remove.
-
-2. See what would move. Read the release notes of anything crossing a major
-   version, and of every package that ships browser code (named under
+1. See what would move. An upgrade takes the newest version of every package,
+   however recently it was published
+   ([2026-10-05 decision](decision_log.md#2026-10-05-a-refresh-takes-the-newest-version-of-everything)).
+   Read the release notes of anything crossing a major version, and of every
+   package that ships browser code (named under
    [Verify by what moved](#verify-by-what-moved)). For plotly, read the
    plotly.js notes too, for every version between the two it bundles: plotly's
    own notes list only the notable changes.
@@ -103,14 +62,7 @@ go down.
    uv lock --upgrade --dry-run
    ```
 
-   The preview leaves out what the minimum package age is holding back. To see
-   that as well, lift the limit for one preview. It writes nothing:
-
-   ```powershell
-   uv lock --upgrade --dry-run --exclude-newer "0 days"
-   ```
-
-3. Upgrade the lock and the environment, and commit `uv.lock` alone as
+2. Upgrade the lock and the environment, and commit `uv.lock` alone as
    `chore(deps): upgrade locked dependencies`. The lock diff runs to hundreds
    of lines, so it stays apart from the hand edits that follow it.
 
@@ -118,11 +70,11 @@ go down.
    uv sync --upgrade
    ```
 
-4. If ruff moved, set `rev` in `.pre-commit-config.yaml` to the locked ruff
+3. If ruff moved, set `rev` in `.pre-commit-config.yaml` to the locked ruff
    version. Left behind, the hook formats and lints with a different ruff than
    CI does. Commit as `chore: sync pre-commit ruff rev with the locked ruff`.
 
-5. Raise each floor in `pyproject.toml` to the version now locked. The floors
+4. Raise each floor in `pyproject.toml` to the version now locked. The floors
    record what is tested, and a stale one lets a resolver hand back a version
    nobody ran. `pandas-stubs` keeps its `~=` pin, which moves only when pandas
    changes its minor version. Then re-lock:
@@ -134,26 +86,23 @@ go down.
 
    `git diff uv.lock` must show no line starting `version = `, because no
    package moves in this step. The `specifier` lines change, and uv may reorder
-   the `resolution-markers` list, as it may in the minimum-age commit. Commit as
+   the `resolution-markers` list. Commit as
    `chore(deps): refresh dependency floors to the locked, tested versions`.
 
-6. Check the vendored browser libraries, which no uv command sees. Compare
+5. Check the vendored browser libraries, which no uv command sees. Compare
    each row of [assets/vendor/README.md](../assets/vendor/README.md) with its
    upstream project's latest release. To update one, follow that README's
    steps, as its own commit.
 
-7. Verify by what moved, then open the PR.
+6. Verify by what moved, then open the PR.
 
 ## Toolchain pass
 
 ### uv
 
-1. Find the newest release that is at least a week old, and confirm that the
-   installer for it is being served. The
-   [minimum package age](#minimum-package-age) applies to this pin too, by
-   hand, because uv's own setting does not govern it. An installed copy
-   downloads exactly the pinned version from that address and runs it, so a
-   version it does not serve breaks installs
+1. Find the latest release, and confirm that the installer for it is being
+   served. An installed copy downloads exactly the pinned version from that
+   address and runs it, so a version it does not serve breaks installs
    ([Release and install](specs/release_and_install.md)).
 
    ```powershell
@@ -319,6 +268,4 @@ uv lock --upgrade-package <name>
 uv sync
 ```
 
-If the fixed version is under a week old, the
-[minimum package age](#minimum-package-age) hides it, so exempt the package
-first. Verify the fix by what moved, the same as a refresh.
+Verify the fix by what moved, the same as a refresh.

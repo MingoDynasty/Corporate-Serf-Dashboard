@@ -13,6 +13,53 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-10-05: A Refresh Takes The Newest Version Of Everything
+
+Status: Accepted
+
+A dependency refresh takes the newest version of every package and pins the
+latest uv release, however recently each was published. The one-week minimum
+age is removed, within a day of the first refresh switching it on. Nothing now
+keeps a version published hours earlier out of the lockfile, and the
+maintainer chose to handle a bad release if one arrives.
+
+**Direction.** The maintainer, 2026-10-05, in chat, on
+[#349](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/349): "I
+vote to simply remove the `exclude-newer = "7 days"` line. I'll deal with the
+issue if a broken package makes it way in." It supersedes the
+[2026-10-04 entry](#2026-10-04-upgrades-skip-package-versions-younger-than-a-week).
+
+**What changed.** `exclude-newer` is gone from `[tool.uv]` in `pyproject.toml`,
+and the `[options]` block it wrote is gone from `uv.lock`. Removing it moved no
+package version. The playbook lost its minimum-age section, the check that
+opened the package pass, and the exemption step for a security fix.
+
+**Why.** The maintainer wants each refresh to bring the newest versions. With
+the setting on, that took one `exclude-newer-package` entry per young package,
+kept in `pyproject.toml` until that version was a week old, because a plain
+`uv lock` moves an unexempted young version back and exits 0. On 2026-10-05,
+12 of the 13 packages with an update had a newest version under a week old.
+
+**What is given up.** The setting was there to keep a hijacked package out of
+the lock and out of the next release. That refresh locked a version published
+14 hours earlier (filelock 4.0.12, dev-only), and nothing would now delay one
+that ships to users. What still stands between a new version and an installed
+copy: updates are made by hand, about monthly, so nothing moves between
+refreshes
+([2026-10-04 entry](#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook));
+the playbook's release-note reading and its checks by what moved; and
+Dependabot alerts on the lockfile.
+
+**The uv pin.** The week no longer applies to it either. A refresh pins the
+latest uv release whose installer is being served. The maintainer's words
+above name only the setting. The 2026-10-04 entry tied the pin's week to the
+same reasoning, and earlier in the same chat the maintainer had this refresh
+pin 0.12.23 at three days old.
+
+**Bringing it back.** The 2026-10-04 entry records what uv requires: the
+setting has to live in `pyproject.toml`, and an exemption has to stay until its
+version is a week old.
+
 ## 2026-10-05: A Columns Menu Shows And Hides Table Columns, And KovaaK's IDs Are Optional Ones
 
 Status: Accepted
@@ -766,7 +813,10 @@ implementation in [#346](https://github.com/MingoDynasty/Corporate-Serf-Dashboar
 
 ## 2026-10-04: Upgrades Skip Package Versions Younger Than A Week
 
-Status: Accepted
+Status: Superseded by the
+[2026-10-05 newest-versions entry](#2026-10-05-a-refresh-takes-the-newest-version-of-everything):
+the setting is removed, and the week no longer applies to the uv pin. What
+this entry measured about how uv records the setting still holds.
 
 uv ignores any package version published in the last seven days. A hijacked
 package is usually caught and withdrawn within days, so the delay keeps one
