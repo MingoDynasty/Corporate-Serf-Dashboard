@@ -129,24 +129,44 @@ since, as of `bb71988`. The grid measurements and the prototype date from
   release can't ship without it
   ([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
 - **KovaaK's has one level and no colors.** Its benchmark payload groups
-  scenarios under category keys with progress, a rank, and thresholds. Their
-  names differ from Evxl's, such as "WideWall" against "Widewall", and one
-  payload pads a repeated name with a space. The category level and every
-  color exist only in Evxl's data.
+  scenarios under category keys with progress, a rank, and thresholds. That
+  level is Evxl's subcategory level on most benchmarks and Evxl's category
+  level on others, as the comparison in this list counts. Their names differ
+  from Evxl's, such as "WideWall" against "Widewall", and one payload pads a
+  repeated name with a space. A benchmark's second level and every color
+  exist only in Evxl's data.
 - **260 of the 261 bundled files join by count.** Matching a file's playlist
   code to a snapshot sharecode without regard to case finds an entry whose
   counts add up to the file's scenario count. One file matches only that
   way: Revosect Season 4 Easy's code differs from its sharecode in the case
   of one letter. PureG S1 - Worthless doesn't join: the file holds 14
   scenarios and Evxl counts 12.
-- **Where the groups fall is checked on 5 of the 260.** A matching total
-  doesn't show that each count cuts the list in the right place. In the five
-  KovaaK's payloads cached in the maintainer's checkout on 2026-10-03,
-  KovaaK's category sizes equal the snapshot's subcategory counts in order.
-  The maintainer's screenshot of Evxl's Viscose S2 Medium sheet, shared in
-  chat on 2026-10-04, shows all 39 scenarios in the bundled file's order,
-  under the groups the slice assigns. The other 255 need KovaaK's payloads,
-  which are not cached. "Getting the groups" says what checks them.
+- **Where the groups fall agrees with KovaaK's on 257 of 258 benchmarks.**
+  A matching total doesn't show that each count cuts the list in the right
+  place, so the drawn groups were compared with KovaaK's own categories, on
+  payloads fetched for every bundled benchmark on 2026-10-05:
+  - 221: KovaaK's categories begin exactly where the drawn groups do.
+  - 34: Evxl is finer. Every KovaaK's boundary is a drawn boundary, and the
+    drawn groups subdivide KovaaK's categories. In 31 of them KovaaK's
+    categories are exactly Evxl's categories, the Voltaic S5 benchmarks
+    among them.
+  - 2: KovaaK's is finer, on Control Track DOJO and Tosoku Aim FundamentalLVL
+    Benchmarks.
+  - 1 disagrees: IRIS Mixed Benchmarks Easy. KovaaK's holds IRIS Smoothbot
+    Easy in its Clicking category, and Evxl's counts put it under Tracking,
+    in PRECISE.
+
+  Three more can't be compared. PureG S1 - Worthless doesn't join, and kl2 -
+  Reflex by dummy names nothing. Coach Ben - VALORANT Strafe Aim Benchmark's
+  bundled file holds 8 scenarios where KovaaK's now serves 11, which is the
+  importer's drift check to report, not this proposal's.
+- **Evxl's finer level has no second source, and two sheets confirm it.**
+  Where Evxl subdivides one of KovaaK's categories, KovaaK's can't say where
+  the subdivision falls. The maintainer's screenshots of Evxl's own sheets,
+  shared in chat on 2026-10-04, match the slice row for row on both
+  benchmarks they show. Voltaic Intermediate S5 has 18 scenarios, in nine
+  subcategories of two where KovaaK's has three categories of six. Viscose
+  S2 Medium has 39.
 - **One or two levels.** Of the 260, 181 name both levels. 22 name
   categories only. 56 name one level that Evxl stores as subcategories under
   an unnamed category. 1 names nothing. No benchmark mixes named and unnamed
@@ -353,22 +373,28 @@ keep the total and mislabel rows. Three things hold the premise:
   snapshot.
 - **A new comparison in the importer looks at both.** The importer holds
   KovaaK's categories and the snapshot at once. For each benchmark it
-  compares where the table would draw a boundary between two groups with
-  where KovaaK's categories begin. Every boundary the table draws has to
-  fall on a boundary between two of KovaaK's categories. Evxl may gather
-  several of KovaaK's categories under one name, which passes. A boundary
-  inside one of KovaaK's categories fails. The comparison runs at generation
-  and in the drift check, and each reports a benchmark that fails by name.
+  compares the groups the table would draw with KovaaK's categories. No
+  group and no KovaaK's category may partly overlap: where the two meet, one
+  has to contain the other. Evxl may subdivide KovaaK's categories, as it
+  does on Voltaic S5, and KovaaK's may subdivide Evxl's. A group that
+  straddles a boundary between two of KovaaK's categories fails. The
+  comparison runs at generation and in the drift check, and each reports a
+  benchmark that fails by name.
 - **A benchmark that fails gets no groups.** Its playlist code goes on a
   short exclusion list beside the join, kept by hand, because each failure
-  needs a look and usually a report to Evxl. The corpus test below pins that
-  list together with the benchmarks whose counts don't add up.
+  needs a look and usually a report upstream. The list starts with IRIS
+  Mixed Benchmarks Easy. The corpus test below pins that list together with
+  the benchmarks whose counts don't add up.
 
-The comparison has not been run over the corpus. Five payloads are cached,
-and the other 255 need live requests to KovaaK's. The implementation PR runs
-it once as its first step, through the drift check, and records the result
-there and in the decision log. Whatever it finds changes how many benchmarks
-show groups, not this design.
+The comparison can't see one thing. Where Evxl subdivides one of KovaaK's
+categories, the subdivision rests on Evxl's counts alone, and a wrong count
+there moves a subcategory boundary without crossing anything. The table
+shows there what Evxl's own page shows, which is the layout the request
+asked for.
+
+A one-off script ran the comparison over the corpus, with the result in
+Verified facts. The implementation PR builds it into the importer, and its
+first run through the drift check should reproduce that result.
 
 The importer also rewrites the snapshot on every run. A refresh can
 therefore change a benchmark's counts before its file is regenerated, and
@@ -407,7 +433,7 @@ exists either way.
   model
   ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
   The exclusion list sits beside it.
-- **The boundary comparison** goes in `scripts/benchmark_importer/`, where
+- **The group comparison** goes in `scripts/benchmark_importer/`, where
   generation and the drift check already hold KovaaK's payload and the
   snapshot together.
 - **The row builder** in `source/kovaaks/playlist_scenarios_service.py` adds
@@ -480,8 +506,8 @@ Playlists:
 > categories.
 >
 > - Not the `Category` of KovaaK's benchmark payload. KovaaK's has one level
->   of groups. They are this app's subcategories on a benchmark with two
->   levels, and its categories on a benchmark with one.
+>   of groups, which is this app's categories on some benchmarks and its
+>   subcategories on others.
 >
 > ### Subcategory
 >
@@ -519,17 +545,19 @@ glossary entry.
 ## Delivery plan
 
 One implementation PR, once D1 is ruled, with no dependencies. Its first
-step settles which benchmarks show groups:
+step puts the comparison where it will keep running:
 
-- The importer's boundary comparison, at generation and in the drift check,
-  with its tests. Then one run of the drift check over the corpus, whose
-  result goes in the PR and seeds the exclusion list.
+- The importer's group comparison, at generation and in the drift check,
+  with its tests. Then one run of the drift check over the corpus, which
+  should name IRIS Mixed Benchmarks Easy and no other benchmark, and goes in
+  the PR.
 - The shared snapshot read and the join, the row fields on all three row
   paths, the gated and pinned column definitions and their menu entries, the
   state flag and its callback, the two renderers, the styles, and the tests
   below.
 - The shipping docs in the same PR:
-  - a decision-log entry, which records the comparison's result;
+  - a decision-log entry, which records the comparison's result and that
+    Evxl's finer level has no second source;
   - the playlists spec, for the columns, the two states, the menu entries,
     and the join;
   - the glossary, from the Terms block;
@@ -571,10 +599,11 @@ together beside the Columns menu, and the live check below covers that.
   - a missing snapshot, one that is not valid JSON, and one in an unexpected
     shape, each of which leaves every benchmark without groups and without
     its Evxl link.
-- **The importer's comparison:** equal sizes pass. Several of KovaaK's
-  categories under one group pass. A boundary inside one of KovaaK's
-  categories fails, at generation and in the drift check, and names the
-  benchmark.
+- **The importer's comparison:** groups that begin where KovaaK's
+  categories do pass. Groups that subdivide a KovaaK's category pass, and so
+  do KovaaK's categories that subdivide a group. A group that straddles a
+  boundary between two of KovaaK's categories fails, at generation and in
+  the drift check, and names the benchmark.
 - **The corpus:** a test pins which bundled benchmarks join the committed
   snapshot by count and are not excluded. It covers which benchmarks show
   groups. It does not show where their groups fall, which the importer's
