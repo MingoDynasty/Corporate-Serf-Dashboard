@@ -1206,7 +1206,7 @@ after.
 | L-X5 | Run toasts are built by this page, so they show only while it is open | **Run toasts, ratified (T1):** the app shell builds a plain toast, on every page. Until that lands the new page builds today's toasts |
 | L-X6b | A run that is neither judged nor placed gets no toast | **Run toasts, ratified (T1):** a new run gets the plain toast. A run the celebration announces keeps the celebration alone, and runs detected together share one toast |
 | L-X7 | A run is judged against the PB it was chasing, and the toast words the result | The rule stays and also decides the check and the card's badge. The toast stops wording it under T1, ratified |
-| L-X14 | The user guide names the page four times | The name changes. Its pace paragraph gains the check and the card |
+| L-X14 | The user guide names the page five times | The name changes in all five. One is the sentence about the Open scenario table link, which the list holds as X15, a keep row: its statement holds and only the page's name in it changes. The pace paragraph gains the check and the card |
 | L-X17 | The README's first screenshot is this page | Retaken |
 | L-X18 | The README's Features line names two chart modes | It gains Score vs Run. The run list may add one line, no more |
 | L-X19 | The README's install steps 3 and 4 name the page that shows the setup card | They name Home |
