@@ -290,7 +290,7 @@ without the line, by turning the overlay off.
 
 **If the maintainer chooses differently:** the switch stays and gates the
 check and the card's verdict in place of the toast's. The page hosts it,
-and this proposal removes nothing from the panel.
+and this proposal leaves the panel's Score Threshold group as it is.
 
 ## Problem
 
