@@ -36,9 +36,13 @@ the page proposal in three places, and none blocks review:
 - **A link to a scenario the Playlist filter does not list.** The page
   proposal's row R7 has such a link clear the filter.
 
-The page proposal is written separately. It replaces the text of
-[run_history_proposal.md](run_history_proposal.md) in place, and until it
-merges that file holds the older plan.
+The page proposal is
+[PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356).
+It replaces the text of [run_history_proposal.md](run_history_proposal.md)
+in place, and until it merges that file holds the older plan. The Sessions
+proposal is
+[PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355),
+and this proposal takes nothing from it.
 
 **Already decided, and binding here.** The proposal is held to these and
 does not reopen them:
