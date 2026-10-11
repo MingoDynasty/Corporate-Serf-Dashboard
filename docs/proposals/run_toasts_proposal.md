@@ -405,6 +405,13 @@ Checked on 2026-10-11 against `main` at `4272fbb`.
    poll's timing as random. A window the game only covers is not hidden, in
    the browsers checked on 2026-09-28
    ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+8. **A link to the address the page already holds does nothing.** On the
+   scratch app of fact 2, with the page open at `?scenario=` and a name, a
+   second toast's link to that same address left the page as it was. The
+   router saw no change and did not build the page again. With the run's id
+   added to the address, the second toast's link built the page again and
+   delivered the whole name, with no reload and the toast still up. A page
+   ignores a parameter its layout does not name, as every page does today.
 
 ## Design
 
@@ -527,12 +534,26 @@ With it, the page opens on the scenario just played. The page treats that
 as an ordinary choice and remembers it, as it does for a link from a
 playlist's table (2026-09-19).
 
+**It names the run too.** The address also carries `run=` and the run's id,
+which is its stats file's name. The page does not read it. It is there so
+that each run's toast links to an address the page is not already at,
+because a link to the address the page already holds does nothing (fact 8).
+Without it that case is an ordinary one. A toast opens scenario A. The
+player picks B by hand, with Follow off, and plays A again. The new toast's
+link would be the address still in the address bar, and B would stay on
+screen. With the run's id the new link is a new address, so the page opens
+on A, and R7's rule for the Playlist filter runs with it.
+
+One case is left. The same toast's link, used a second time after a choice
+made by hand, does nothing. It lasts the eight seconds that toast is up.
+
 **It is a `dcc.Link`,** by fact 2. It is the only one of the three that
 both keeps the encoded name and changes the page without reloading the app.
 
 **One function builds it.** Scenario links to the page are built in one
-place today (`scenario_home_href`), with the name encoded by `urlencode`.
-The toast's link comes from the same place, so the address is spelled once.
+place today (`scenario_home_href`), with each value encoded by
+`urlencode`. The toast's link comes from the same place, so the address is
+spelled once.
 
 **It carries no playlist.** The shell does not know what the page's
 Playlist filter holds. So the link relies on the page proposal's row R7:
@@ -540,8 +561,8 @@ a `?scenario=` link clears a filter that does not list the scenario. If R7
 goes the other way, a toast for a scenario outside the filtered playlist
 opens the page without selecting it.
 
-**The address keeps its parameter,** so a reload applies it again over a
-later choice. That is the accepted behavior of every such link
+**The address keeps its parameters,** so a reload applies the scenario
+again over a later choice. That is the accepted behavior of every such link
 (2026-09-19), and the navbar entry leads to the page with no parameter.
 
 **Reaching it without a mouse.** The link is reachable by keyboard while
@@ -739,6 +760,14 @@ is relied on and not changed.
   declined to rely on.
 - **A link with no scenario.** By fact 1 it opens the wrong scenario from
   any other page.
+- **Accepting a link that sometimes does nothing.** With Follow off, the
+  jump to the scenario just played is the one thing the toast adds on Run
+  History, and that is exactly where a link without the run's id fails.
+- **The page removing the parameter once it has applied it.** That is the
+  page proposal's to weigh, since it changes an accepted behavior of
+  2026-09-19. It is also not known to close the case: the router does not
+  see an address rewritten behind it, so a later link to the old address
+  may still read as no change. Not probed.
 - **The verdict and the link together.** It keeps the toast useful at a
   glance, and keeps the duplicate, the N, and the switch that T1 to T3
   remove. It is not what "barebones" asked for.
@@ -781,6 +810,9 @@ Until the page is public the verdict has nowhere else to live.
 - **Its address** (R2) and **its name** (R1), for the link.
 - **The `?scenario=` link** carried over, and row R7's rule for a scenario
   the filter does not list.
+- **A parameter it does not read, tolerated.** The link carries `run=`. The
+  old page's layout accepts parameters it does not name, and the new page's
+  has to as well.
 - **The check, the star, and the latest-run card** on screen, so the
   verdict is somewhere before the toast drops it.
 - **The judging functions** already moved to the page. This PR deletes only
@@ -841,7 +873,8 @@ For the implementation PR:
   The plain toast for a new PB when the celebration setting is off. The
   registry patch holds both keys when both toasts go out.
 - **The link.** It is a `dcc.Link`. Its address is the page's own plus the
-  encoded name, checked with a name that holds `&`, `%`, `+`, and `#`.
+  encoded name and the run's id, checked with a name that holds `&`, `%`,
+  `+`, and `#`. Two runs of one scenario give two different addresses.
 - **The setting.** The write is refused before the filling tick, with the
   tick's count at 0 and at none. An unknown stored value shows the toast.
 - **What is gone.** The tests for the verdict and placement toasts are
@@ -854,7 +887,9 @@ For the implementation PR:
   that holds `&` and `%`. Nothing shows with the switch off. A new PB shows
   the celebration alone. A second run inside the first toast's eight
   seconds replaces it with the entry animation, and one toast is left on
-  screen. In Edge and in Firefox.
+  screen. After a toast's link has opened scenario A, pick B by hand with
+  Follow off and land another run of A: the new toast's link opens A again,
+  with no reload. In Edge and in Firefox.
 - **The gates:** the five standard local checks in AGENTS.md.
 
 For this proposal PR: `uv run pytest tests/test_docs.py` and
