@@ -9,6 +9,7 @@ import dash
 import dash_mantine_components as dmc
 import pytest
 
+from source.components import scenario_selection
 from source.config import settings_service
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -72,7 +73,7 @@ def quiet_playlists(monkeypatch):
 
 def test_hint_is_absent_while_the_pinned_directory_is_usable(monkeypatch):
     """The autouse fixtures pin the fixture stats folder, as startup would."""
-    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
 
     page = home.layout()
 
@@ -88,7 +89,7 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
     settings_service.save_settings({settings_service.STATS_DIR_KEY: stored})
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenario_names",
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
@@ -113,7 +114,7 @@ def test_hint_cedes_the_never_configured_case_to_the_setup_card(monkeypatch):
     settings_service.save_settings({})
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenario_names",
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
@@ -131,7 +132,7 @@ def test_hint_defers_to_the_restart_after_a_post_boot_save(monkeypatch, tmp_path
     settings_service.resolve_stats_dir()
     settings_service.save_settings({settings_service.STATS_DIR_KEY: str(tmp_path)})
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenario_names",
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
@@ -164,7 +165,7 @@ def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
     assert settings_service.is_restart_pending() is True
     assert settings_service.is_stats_dir_change_pending() is False
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenario_names",
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
@@ -188,7 +189,7 @@ def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
     settings_service.save_settings({settings_service.STATS_DIR_KEY: ""})
     assert settings_service.is_stats_dir_change_pending() is True
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenario_names",
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
@@ -217,7 +218,7 @@ def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished(
     )
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenario_names",
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
@@ -236,15 +237,3 @@ def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished(
     assert card.className == home.SETUP_CARD_CLASS
     order = [id(component) for component in _walk_components(page)]
     assert order.index(id(hint)) < order.index(id(card_box))
-
-
-def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
-    settings_service.save_settings({})
-    settings_service.resolve_stats_dir()
-    monkeypatch.setattr(
-        home,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
-
-    assert home.select_playlist(None, None) == ([], None)

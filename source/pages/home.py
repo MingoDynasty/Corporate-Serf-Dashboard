@@ -2,8 +2,7 @@
 
 import logging
 from datetime import datetime
-from decimal import Decimal
-from typing import Any, NamedTuple, TypedDict
+from typing import Any, TypedDict
 
 import dash
 import dash_mantine_components as dmc
@@ -37,6 +36,23 @@ from source.components.chart_options import (
     settings_help_label,
 )
 from source.components.local_icon import local_icon
+from source.components.queued_notices import (
+    register_run_import_failure_flush,
+    register_startup_playlist_warning_flush,
+)
+from source.components.scenario_selection import (
+    ScenarioSelectionIds,
+    deep_link_selection,
+    initial_scenario_options,
+    register_scenario_selection,
+)
+from source.components.score_threshold import (
+    ThresholdVerdict,
+    normalize_score_threshold_percentage,
+    score_threshold_line,
+    shown_percentage,
+    threshold_verdict,
+)
 from source.config.config_service import get_config
 from source.config.settings_service import (
     KOVAAKS_USERNAME_KEY,
@@ -52,25 +68,17 @@ from source.config.settings_service import (
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch_warning
 from source.kovaaks.data_service import (
-    drain_startup_playlist_warnings,
     get_high_score,
     get_new_high_score_runs,
-    get_personal_best_run,
-    get_playlist_by_code,
     get_rank_data_from_playlist_code,
-    get_scenario_names,
     get_scenario_stats,
-    get_scenarios_from_playlist_code,
     get_sensitivities_vs_runs_filtered,
     get_time_vs_runs,
     is_scenario_in_database,
 )
-from source.kovaaks.pace import pace_goal_met, pace_percent, pace_threshold_score
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
-from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
-from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
 from source.pages.playlist_selector import (
     PLAYLIST_SELECTOR_PRESET,
@@ -111,17 +119,16 @@ RANK_REFRESH_TOOLTIP = (
 # constant would leave the ``@container`` queries with nothing to match and
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
-# This visit's ``?scenario=`` and ``?playlist_code=``, carried as layout-bound
-# state rather than read from the URL by a callback. Dash Pages rebuilds the
-# page on a route change and then this store triggers exactly one write, which
-# keeps the deep link out of the router's own callback graph.
-HOME_DEEP_LINK_STORE_ID = "home-deep-link"
-# The holder under the playlist filter for the link to that playlist's
-# scenario table. It is always in the layout so ``select_playlist`` has an
-# output to write to; the link itself comes and goes with the selection.
-PLAYLIST_TABLE_LINK_ID = "playlist-table-link"
-PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
+# The ids this page gives its playlist filter and scenario dropdown. The
+# browser stores each dropdown's value under its id, so changing one resets
+# that selection for every user.
+SCENARIO_SELECTION_IDS = ScenarioSelectionIds(
+    playlist_filter="playlist-dropdown-selection",
+    scenario_dropdown="scenario-dropdown-selection",
+    deep_link="home-deep-link",
+    playlist_table_link="playlist-table-link",
+)
 
 # The ids this page gives the Chart options block. The browser stores each
 # remembered control's value under its id, so changing one resets that setting
@@ -241,7 +248,6 @@ _RANK_REFRESH_PROBLEM_CHANNEL = "rank-refresh-problem"
 # repeat click reproduces byte-identical copy, which is the stacking the policy
 # forbids.
 _RANK_REFRESH_USERNAME_UNSET_CHANNEL = "rank-refresh-username-unset"
-_RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 # One run, one toast: every run verdict shares this channel key, so the newest
 # one replaces whatever is on screen instead of stacking. The celebration toast
 # is deliberately not in this lane -- it has its own id and stays until
@@ -379,46 +385,7 @@ def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
     return run_events, scenario_update
 
 
-def _build_run_import_failure_notification(
-    failures: list[str],
-) -> dict[str, object]:
-    """Fold a batch of failed run imports into one red toast.
-
-    Red is earned here: the user played those runs and nothing else tells them
-    the runs never landed.
-    """
-    message = (
-        failures[0]
-        if len(failures) == 1
-        else (
-            f"{len(failures)} new run files couldn't be processed. "
-            "See data/logs/debug.log."
-        )
-    )
-    return toast(
-        _RUN_IMPORT_FAILURE_NOTIFICATION_ID,
-        "Run not recorded",
-        message,
-        color="red",
-        icon=local_icon("material-symbols:warning-outline"),
-    )
-
-
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("interval-component", "n_intervals"),
-    prevent_initial_call=True,
-)
-def flush_run_import_failures(_n_intervals):
-    """Deliver run imports the watchdog thread could not complete.
-
-    Home-gated, like the delivery it replaces: a missing run is a Home-visible
-    fact, so the next poll tick is soon enough.
-    """
-    failures = drain_run_import_failures()
-    if not failures:
-        return no_update
-    return [_build_run_import_failure_notification(failures)]
+register_run_import_failure_flush("interval-component")
 
 
 @callback(
@@ -985,116 +952,6 @@ def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
     return any(trigger["prop_id"] == _RUN_EVENTS_PROP for trigger in triggered)
 
 
-def _normalize_score_threshold_percentage(
-    score_threshold_percentage: float | str | None,
-) -> float | None:
-    """Return a usable threshold percentage, or None while the input is empty."""
-    if not score_threshold_percentage:
-        return None
-
-    try:
-        return float(score_threshold_percentage)
-    except TypeError:
-        return None
-    except ValueError:
-        return None
-
-
-class _ThresholdVerdict(NamedTuple):
-    """How a run measured up against the score threshold it was judged on.
-
-    ``by_pace`` says which measure ``percentage`` is in: the run's pace as a
-    percentage of the previous best's, or its score as a percentage of it.
-    """
-
-    passed: bool
-    percentage: float
-    goal_percentage: float
-    by_pace: bool = False
-
-
-def _threshold_verdict(
-    latest: RunEventData,
-    score_threshold_percentage: float | str | None,
-    score_threshold_notification_switch: bool,
-) -> _ThresholdVerdict | None:
-    """Judge a run against the threshold, or return None when nothing judges it.
-
-    A run goes unjudged when the switch is off, the goal percentage is blank,
-    the run is the first at its sensitivity, or the scenario has no positive
-    previous best to be a percentage of -- there is no denominator, not a
-    failing one. The message carries the facts and this derives the gate; the
-    two used to be bundled into one nullable field that meant both.
-
-    A run whose message carries a pace constant is judged by pace wherever
-    pace is defined, which needs positive times and not a positive previous
-    best. Where it is undefined, the run is judged by score as any other.
-    """
-    goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
-    scenario_previous_best = latest["scenario_previous_best"]
-    if (
-        not score_threshold_notification_switch
-        or not goal_percentage
-        or latest["is_new_sensitivity"]
-        or scenario_previous_best is None
-    ):
-        return None
-    pace_constant = latest["pace_constant"]
-    if pace_constant is not None:
-        passed_by_pace = pace_goal_met(
-            pace_constant,
-            scenario_previous_best,
-            latest["score"],
-            goal_percentage,
-        )
-        percentage_of_pace = pace_percent(
-            pace_constant,
-            scenario_previous_best,
-            latest["score"],
-        )
-        if passed_by_pace is not None and percentage_of_pace is not None:
-            return _ThresholdVerdict(
-                passed=passed_by_pace,
-                percentage=percentage_of_pace,
-                goal_percentage=goal_percentage,
-                by_pace=True,
-            )
-    if scenario_previous_best <= 0:
-        return None
-    # Compared as decimals: in floats, 20.6 * 95 / 100 is 19.570000000000004,
-    # which fails a 19.57 run sitting exactly at 95% of a 20.60 PB. A float's
-    # str() is the decimal the stats CSV wrote.
-    passed = Decimal(str(latest["score"])) * 100 >= Decimal(
-        str(scenario_previous_best)
-    ) * Decimal(str(goal_percentage))
-    return _ThresholdVerdict(
-        passed=passed,
-        percentage=latest["score"] / scenario_previous_best * 100,
-        goal_percentage=goal_percentage,
-    )
-
-
-def _shown_percentage(verdict: _ThresholdVerdict) -> float:
-    """Return the percentage of PB to print, held below each line the run missed.
-
-    Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
-    95.0%)" and a run 0.03% short of the PB as "100.0% of PB". So a miss shows
-    at most one tenth below the goal as printed, and a run below the PB shows
-    at most 99.9% whether it passed or not. Flooring would not do: float error
-    prints 407 / 500 as 81.3%.
-    """
-    shown = verdict.percentage
-    if not verdict.passed:
-        shown = min(shown, round(verdict.goal_percentage, 1) - 0.1)
-    # Float division and multiplication both round monotonically, so the
-    # percentage is below 100 exactly when the score is below the PB. That
-    # holds for a percentage of pace too: a run's time is longer than the
-    # PB's exactly when its score is lower.
-    if verdict.percentage < 100:
-        shown = min(shown, 99.9)
-    return shown
-
-
 def _placement_phrase(nth_score: int) -> str:
     """Name a top-N placement: first place is "best", the rest are "Nth-best"."""
     return "best" if nth_score == 1 else f"{ordinal(nth_score)}-best"
@@ -1104,7 +961,7 @@ def _build_live_run_notification(
     latest: RunEventData,
     selected_scenario: str,
     top_n_scores: int,
-    verdict: _ThresholdVerdict | None,
+    verdict: ThresholdVerdict | None,
 ) -> dict[str, object] | None:
     """Build the one toast a just-played run earned, if it earned one.
 
@@ -1130,13 +987,13 @@ def _build_live_run_notification(
             icon=local_icon("fontisto:line-chart"),
         )
 
-    shown_percentage = _shown_percentage(verdict)
+    shown = shown_percentage(verdict)
     # The one word that tells the player which measure judged the run.
     measure = "PB pace" if verdict.by_pace else "PB"
     if verdict.passed:
         # A pass ends at the fact: a line saying what to do next would be
         # advice, and the app states verdicts only.
-        message = f"{score}, {shown_percentage:.1f}% of {measure}."
+        message = f"{score}, {shown:.1f}% of {measure}."
         if placed:
             message += f" Also {placement}."
         return toast(
@@ -1147,7 +1004,7 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {shown_percentage:.1f}% of {measure} "
+    shortfall = f"{score}, {shown:.1f}% of {measure} "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."
@@ -1190,7 +1047,7 @@ def _build_run_event_notification(  # noqa: PLR0913
     if not latest["is_live"]:
         return None
 
-    verdict = _threshold_verdict(
+    verdict = threshold_verdict(
         latest,
         score_threshold_percentage,
         score_threshold_notification_switch,
@@ -1201,28 +1058,6 @@ def _build_run_event_notification(  # noqa: PLR0913
         top_n_scores,
         verdict,
     )
-
-
-def _score_threshold_line(
-    selected_scenario: str,
-    high_score: float,
-    goal_percentage: float,
-) -> float:
-    """Return the score the threshold line is drawn at, from the current PB.
-
-    On a time-scored scenario whose PB can be measured by pace, the line sits
-    at the score that finishes at the goal percentage of the PB's pace. Every
-    other scenario keeps the goal as a percentage of the PB's score.
-    """
-    pace_constant = eligible_pace_constant(
-        get_pace_basis(selected_scenario),
-        get_personal_best_run(selected_scenario),
-    )
-    if pace_constant is not None:
-        pace_line = pace_threshold_score(pace_constant, high_score, goal_percentage)
-        if pace_line is not None:
-            return pace_line
-    return high_score * goal_percentage / 100
 
 
 def _empty_state_graph_response(
@@ -1432,11 +1267,11 @@ def generate_graph(  # noqa: PLR0913
         if high_score_overlay_switch:
             plot = add_high_score_overlay(plot, high_score)
 
-        score_threshold_goal_percentage = _normalize_score_threshold_percentage(
+        score_threshold_goal_percentage = normalize_score_threshold_percentage(
             score_threshold_percentage
         )
         if score_threshold_overlay_switch and score_threshold_goal_percentage:
-            score_threshold = _score_threshold_line(
+            score_threshold = score_threshold_line(
                 selected_scenario,
                 high_score,
                 score_threshold_goal_percentage,
@@ -1462,100 +1297,8 @@ def generate_graph(  # noqa: PLR0913
 
 
 register_chart_options(CHART_OPTIONS_IDS)
-
-
-def _build_startup_playlist_warning_notifications(
-    warnings: list[str],
-) -> list[dict[str, object]]:
-    """Report the playlists that did not survive the startup scan.
-
-    Persistent, not timed: these fire once per boot, seconds after the server
-    starts, which is exactly when nobody is guaranteed to be watching.
-    """
-    return [
-        toast(
-            f"startup-playlist-warning-{idx}",
-            "Playlist not loaded",
-            warning,
-            color="yellow",
-            icon=local_icon("material-symbols:warning-outline"),
-            auto_close=False,
-        )
-        for idx, warning in enumerate(warnings)
-    ]
-
-
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("startup-playlist-warning-interval", "n_intervals"),
-    prevent_initial_call=True,
-)
-def flush_startup_playlist_warnings(_):
-    """Deliver import-time playlist warnings after Dash has mounted."""
-    warnings = drain_startup_playlist_warnings()
-    if not warnings:
-        return no_update
-    return _build_startup_playlist_warning_notifications(warnings)
-
-
-def _local_scenario_options() -> list:
-    """List the scenarios with local runs, or none without a usable stats directory.
-
-    The directory check stays even though the names come from the store. The
-    pin is restart-scoped and the store is only ever filled behind a usable
-    pin, so today the check never trims a populated list; it makes "no usable
-    directory, no local list" a property of this function rather than of the
-    startup order.
-    """
-    return get_scenario_names() if get_usable_stats_dir() else []
-
-
-def _playlist_table_link(playlist_code: str) -> dmc.Text:
-    """Build the link from the playlist filter to that playlist's scenario table."""
-    return dmc.Text(
-        dmc.Anchor(
-            PLAYLIST_TABLE_LINK_LABEL,
-            # The bare path, with no ``?sort=``: the table opens in playlist
-            # order, as it does from the Playlists page.
-            href=f"/playlists/{playlist_code}",
-            inherit=True,
-            refresh=False,
-        ),
-        # The spacing rides on the link, not on a gap in the column, so the
-        # holder takes no room while it is empty.
-        mt="xs",
-        size="sm",
-    )
-
-
-@callback(
-    Output("scenario-dropdown-selection", "data"),
-    Output(PLAYLIST_TABLE_LINK_ID, "children"),
-    Input("playlist-dropdown-selection", "value"),
-    # Scheduling, not data: this Input looks removable and is not. The value
-    # above is an output of ``apply_deep_link``, and the renderer prunes a
-    # ready callback whose every Input is a declared output of a group member
-    # that already ran and whose none was actually written. On a visit with no
-    # ``?playlist_code=`` that callback returns ``no_update``, so without a
-    # second Input nothing writes these outputs: the scenario dropdown keeps
-    # the layout's full local set while the filter names a playlist, and that
-    # playlist's link never appears. Nothing writes this store, so the prune's
-    # "every Input covered" test fails and the initial call survives. See the
-    # 2026-09-19 decision-log entry.
-    Input(HOME_DEEP_LINK_STORE_ID, "data"),
-)
-def select_playlist(selected_playlist, _deep_link):
-    """List the selected playlist's scenarios and link to its scenario table.
-
-    With no playlist selected, or a remembered code that no longer resolves,
-    the list is every local scenario and there is no link.
-    """
-    if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return _local_scenario_options(), None
-    return (
-        get_scenarios_from_playlist_code(selected_playlist),
-        _playlist_table_link(selected_playlist),
-    )
+register_startup_playlist_warning_flush("startup-playlist-warning-interval")
+register_scenario_selection(SCENARIO_SELECTION_IDS)
 
 
 def _stats_dir_hint() -> list:
@@ -1835,80 +1578,6 @@ def skip_identity_setup(n_clicks, toast_channels):
     return [], no_update, no_update, no_update
 
 
-def _home_deep_link(
-    scenario: str | None,
-    playlist_code: str | None,
-) -> dict[str, str | None]:
-    """Resolve Home's query params into the selections this visit applies.
-
-    A key is present only for a parameter the URL actually carried, because
-    the two dropdowns are set independently: ``?scenario=`` alone must leave
-    the playlist filter on whatever the browser restored. An unknown playlist
-    code is present with no value, which clears the filter rather than leaving
-    a code the app cannot resolve standing.
-    """
-    selection: dict[str, str | None] = {}
-    if playlist_code is not None:
-        selection["playlist"] = (
-            playlist_code if get_playlist_by_code(playlist_code) is not None else None
-        )
-    if scenario is not None:
-        selection["scenario"] = scenario or None
-    return selection
-
-
-def _home_scenario_options(playlist_code: str | None) -> list[str]:
-    """List the scenarios the first paint shows, before any callback runs.
-
-    ``select_playlist`` owns this list from then on. Resolving the query
-    parameter here too means a deep-linked visit paints its playlist's
-    scenarios immediately instead of the whole local list.
-    """
-    selected_playlist = (
-        playlist_code
-        if playlist_code and get_playlist_by_code(playlist_code) is not None
-        else None
-    )
-    if selected_playlist:
-        return get_scenarios_from_playlist_code(selected_playlist)
-    return _local_scenario_options()
-
-
-@callback(
-    Output("playlist-dropdown-selection", "value"),
-    Output("scenario-dropdown-selection", "value", allow_duplicate=True),
-    Input(HOME_DEEP_LINK_STORE_ID, "data"),
-    # Not ``True``: applying the deep link *is* the mount's job, but Dash
-    # refuses an ``allow_duplicate`` output without one of the
-    # ``prevent_initial_call`` forms.
-    prevent_initial_call="initial_duplicate",
-)
-def apply_deep_link(selection):
-    """Set the two dropdowns from this visit's query parameters.
-
-    The values arrive by callback rather than as the layout's ``value`` so
-    that Dash persistence records them: a persisted control's layout default
-    has to be the same on every visit, or the stored edit is discarded instead
-    of restored. Writing them here makes a Playlists grid click an ordinary
-    selection, which the browser then remembers like any other.
-
-    Under DashProxy an ``allow_duplicate`` callback can fire once on load with
-    nothing triggering it. Re-emitting the same values is harmless -- Dash
-    skips a persistence write when the value is unchanged -- so this needs no
-    guard beyond the empty payload every non-deep-linked visit carries.
-
-    Returning ``no_update`` for a control the URL did not name leaves that
-    control's dependents unwritten, which is why ``select_playlist`` carries a
-    second Input.
-    """
-    if not selection:
-        return no_update, no_update
-    return (
-        selection.get("playlist", no_update),
-        selection.get("scenario", no_update),
-    )
-
-
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(
     scenario: str | None = None,
@@ -1918,15 +1587,15 @@ def layout(
     """Build the interactive home dashboard."""
     config = get_config()
     playlist_options = get_visible_playlist_selector_options()
-    scenario_options = _home_scenario_options(playlist_code)
+    scenario_options = initial_scenario_options(playlist_code)
 
     return dmc.Box(
         className="home-page",
         children=[
             dcc.Store(id="run-events"),
             dcc.Store(
-                id=HOME_DEEP_LINK_STORE_ID,
-                data=_home_deep_link(scenario, playlist_code),
+                id=SCENARIO_SELECTION_IDS.deep_link,
+                data=deep_link_selection(scenario, playlist_code),
             ),
             dcc.Store(
                 id="cached-plot",
@@ -1995,7 +1664,9 @@ def layout(
                                             # stored.
                                             value=None,
                                         ),
-                                        dmc.Box(id=PLAYLIST_TABLE_LINK_ID),
+                                        dmc.Box(
+                                            id=SCENARIO_SELECTION_IDS.playlist_table_link
+                                        ),
                                     ],
                                     className=PLAYLIST_FIELD_CLASS,
                                     # The column, not the Select inside it, is
