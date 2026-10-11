@@ -80,9 +80,11 @@ Two words are kept apart throughout. A **break** is time between runs. A
   ([2026-10-11][entry]).
 - A run longer than 30 minutes has no start, so its break is measured to its
   end, and it starts a new session ([2026-10-11][entry]).
-- Runs are ordered by their end before they are split, whatever order they
-  were handed over in. Runs that ended in the same second keep the order they
-  were handed over in ([2026-10-11][entry]).
+- Runs are ordered by their end before they are split, so the same runs
+  split the same way whatever order they were handed over in. Runs that ended
+  in the same second go by their start, earliest first, then by scenario
+  name, then by stats file name. A run with no start counts there as
+  beginning at its end ([2026-10-11][entry]).
 - A session starts at its first run's start, or at that run's end when the
   run has no start. It ends at its last run's end
   ([2026-10-11][entry]).

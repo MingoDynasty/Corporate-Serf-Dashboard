@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from itertools import permutations
 
 import pytest
 
@@ -20,6 +21,7 @@ def _run(
     paused: float = 0,
     scenario: str = "1w4ts",
     horizontal_sens: float = 40.0,
+    stats_file_name: str | None = None,
 ) -> RunData:
     """Build a run that ended at ``end``, as the parser would hold it.
 
@@ -38,6 +40,7 @@ def _run(
         horizontal_sens=horizontal_sens,
         scenario=scenario,
         accuracy=0.5,
+        stats_file_name=stats_file_name,
         run_start=run_start,
         run_length=run_length,
     )
@@ -204,12 +207,64 @@ def test_runs_handed_over_out_of_order_split_the_same_way() -> None:
     assert split_into_play_sessions(reversed(in_order)) == play_sessions
 
 
-def test_runs_that_ended_in_the_same_second_keep_the_order_they_came_in() -> None:
-    one = _run(TEN, scenario="one")
-    other = _run(TEN, scenario="other")
+def test_a_tie_on_the_end_second_cannot_move_a_session_boundary() -> None:
+    """Two runs that share an end second go in the order they began.
 
-    assert split_into_play_sessions([one, other])[0].runs == (one, other)
-    assert split_into_play_sessions([other, one])[0].runs == (other, one)
+    The end is in whole seconds, so the end alone leaves a tie in the
+    caller's order. Here that order decides a boundary: the long run began
+    exactly 30 minutes after the first run ended and joins its session, while
+    the short one began 59 minutes after it and, put first, would start a new
+    session that the long run then joins.
+    """
+    first = _run(TEN - timedelta(hours=1))
+    long_run = _run(TEN, seconds=1800)
+    short_run = _run(TEN)
+
+    for handed_over in permutations([first, long_run, short_run]):
+        (play_session,) = split_into_play_sessions(handed_over)
+
+        assert play_session.runs == (first, long_run, short_run)
+
+
+def test_runs_that_share_an_end_second_split_the_same_way_in_any_order() -> None:
+    """Sessions, their keys and lengths, and visits are the same in every order.
+
+    Five runs end in the same second. They go by start, a run with no start
+    counting as beginning at its end, then by scenario, then by file name.
+    """
+    before = _run(TEN - timedelta(hours=1), scenario="A")
+    began_first = _run(TEN, seconds=1800, scenario="B")
+    began_later = _run(TEN, scenario="A")
+    no_start_a1 = _run(TEN, seconds=None, scenario="A", stats_file_name="1.csv")
+    no_start_a2 = _run(TEN, seconds=None, scenario="A", stats_file_name="2.csv")
+    no_start_c = _run(TEN, seconds=None, scenario="C")
+    after = _run(TEN + timedelta(minutes=5), scenario="C")
+    in_split_order = (
+        before,
+        began_first,
+        began_later,
+        no_start_a1,
+        no_start_a2,
+        no_start_c,
+        after,
+    )
+
+    for handed_over in permutations(in_split_order):
+        (play_session,) = split_into_play_sessions(handed_over)
+
+        assert play_session.runs == in_split_order
+        # The key a view would use, and the session's length.
+        assert play_session.runs[0] is before
+        assert play_session.length == timedelta(minutes=66)
+        assert [
+            (visit.scenario, visit.runs)
+            for visit in split_into_scenario_visits(play_session)
+        ] == [
+            ("A", (before,)),
+            ("B", (began_first,)),
+            ("A", (began_later, no_start_a1, no_start_a2)),
+            ("C", (no_start_c, after)),
+        ]
 
 
 def test_no_runs_make_no_sessions() -> None:

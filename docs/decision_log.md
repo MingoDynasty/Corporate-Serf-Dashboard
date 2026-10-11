@@ -206,7 +206,12 @@ rule for two days of play five years ago.
 
 **How a session is built.** One pure function over the runs. It sorts them by
 end time itself, so its answer never depends on the order a caller hands
-them over in.
+them over in. The end is in whole seconds, so two runs can share one, after
+the clock goes back or when a stats file has a stray copy, and which comes
+first can move a boundary when their starts differ. Such runs go by their
+start, earliest first, a run with no start counting as beginning at its end,
+then by scenario name and stats file name. The maintainer's history has no
+two runs that share an end second.
 
 - The break between two runs is the next run's start minus this run's end.
   When the next run has no start, it is the next run's end minus this run's

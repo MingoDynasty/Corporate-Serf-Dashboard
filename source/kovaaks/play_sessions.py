@@ -31,6 +31,24 @@ def _start_or_end(run: RunData) -> datetime.datetime:
     return run.run_start if run.run_start is not None else run.datetime_object
 
 
+def _split_order(run: RunData) -> tuple[datetime.datetime, datetime.datetime, str, str]:
+    """Return the key that puts runs in the one order they are split in.
+
+    The end comes first. It is in whole seconds, so two runs can share one:
+    after the clock goes back, or when a stats file has a stray copy. Which
+    of them comes first can move a session boundary when their starts differ,
+    so the run that began first does, a run with no usable start counting as
+    beginning at its end. The scenario and the stats file's name settle what
+    is left, and a file name is unique within a stats folder.
+    """
+    return (
+        run.datetime_object,
+        _start_or_end(run),
+        run.scenario,
+        run.stats_file_name or "",
+    )
+
+
 @dataclass(frozen=True)
 class _ConsecutiveRuns:
     """One or more runs in the order they ended, and the time they span."""
@@ -81,12 +99,15 @@ def split_into_play_sessions(runs: Iterable[RunData]) -> list[PlaySession]:
     start it runs to this run's end, which overstates it by the run's length.
     A break of exactly the limit does not end a play session. Neither does a
     negative one, which a wrong start or a clock change can produce.
+
+    The same runs split the same way whatever order they are handed over in.
     """
     # Sorted here, never trusted from the caller: each run is compared with
     # the one before it, so the same runs handed over in another order would
-    # split at other places and nothing would show it. The sort is stable, so
-    # runs that ended in the same second keep the order they came in.
-    ordered = sorted(runs, key=attrgetter("datetime_object"))
+    # split at other places and nothing would show it. The key is total for
+    # runs read from one stats folder, so no pair is left in the caller's
+    # order.
+    ordered = sorted(runs, key=_split_order)
     groups: list[list[RunData]] = []
     for run in ordered:
         if (
