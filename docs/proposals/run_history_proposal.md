@@ -387,9 +387,11 @@ reaching such a scenario.
   drops the scenario, leaving nothing selected
   ([Identity](../specs/scenario_performance.md#identity)). Follow's callback
   writes the scenario without looking at the filter. What the dropdown then
-  does was not checked in the running app. No app code drops a linked
-  scenario, so the dropdown itself must, and it likely drops a followed one
-  the same way.
+  shows was not checked for Follow. On this app's playlist filter, the same
+  component kept the previous option's name on screen when a callback wrote
+  a value its list lacked (headless Edge, 2026-10-11). So Follow most likely
+  leaves the old scenario's name in the dropdown while the chart and
+  Scenario Stats show the new one.
 - **The list makes it more visible.** A run that lands is a new row and a
   new card. A page still filtered to a playlist that run isn't in would
   show a selection its own dropdown can't name.
@@ -1464,7 +1466,10 @@ maintainer's main checkout.
   filter that lists the scenario and one that doesn't, with Follow on and
   off. The structural test from the 2026-09-19 entry, which fails when a
   callback's inputs are all written only on some visits, is carried to the
-  new page.
+  new page. The browser check asserts the dropdown's visible text as well
+  as its value: the two can disagree for a round trip when the scenario
+  lands before the cleared filter's list does, and a test on the value
+  alone passes through that.
 - **Home:** the stats line with many runs, one run, and none, and its
   absence with no stats folder. The hint and the card in each state, by the
   tests that cover them today.
