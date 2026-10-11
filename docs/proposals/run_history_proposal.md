@@ -229,10 +229,12 @@ For A:
 
 - **One table library for the whole app.** It shares the playlist tables'
   theme variables, and the shared Columns menu already talks to its API.
-- **It does not care how many rows are loaded.** It keeps about 39 row
-  elements in the page whatever is open. C slows once thousands of rows are
-  open at once: 935 ms in Edge with all 12,129 rows of the whole history
-  open, against 46 ms for A.
+- **It does not care how many rows are loaded,** which no state of version
+  1 tests. It keeps about 39 row elements in the page whatever is open. C
+  slows once thousands of rows are open at once: 935 ms in Edge with all
+  12,129 rows of the whole history open, against 46 ms for A. Version 1
+  loads 30 sessions of one scenario at a time, 36 to 484 rows in the
+  trial, so this is a fact about scale and not a reason for version 1.
 - **NVDA can read it and work it.** The pass found nothing that makes A
   unusable where C works. A also reads every cell of a run row with its
   column heading, which C does not.
@@ -289,7 +291,10 @@ landed run, in Edge and in Firefox.
 function. Only the last step differs: about 370 lines of script for A and
 500 for C. NVDA did not show A unusable. If another screen reader does, or
 an AG Grid upgrade breaks the group rows, that step is rebuilt and nothing
-else moves.
+else moves. What it is rebuilt as is chosen then. Prototype C is one
+candidate, and NVDA reads it as a tree. The other is a plain table with
+disclosure buttons, which the library research found practitioners prefer
+and neither prototype builds.
 
 **If the maintainer chooses the treegrid:** the repository owns the
 rendering, the keyboard model, and a second table idiom with no library
