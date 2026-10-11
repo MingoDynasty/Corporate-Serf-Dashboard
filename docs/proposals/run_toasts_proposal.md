@@ -19,8 +19,9 @@ before the Run History page is public.
 judgment, T1 to T3. Each repeats what the maintainer said in chat on
 2026-10-10, which was a lean or an agreement and not a ruling. Each then
 gives the argument, the cost, and what changes if the maintainer chooses
-differently. Reviewers are invited to contest any row, and any author-owned
-choice in [Design](#design).
+differently. T1 also holds two judgments the outline did not ask about,
+each marked as one. Reviewers are invited to contest any row, and any
+author-owned choice in [Design](#design).
 
 **How this sits among the other Run History proposals.** Run History is
 planned as five pieces: groundwork with no proposal, Sessions, Run toasts
@@ -60,15 +61,17 @@ does not reopen them:
 - **The copy rules** in
   [AGENTS.md](../../AGENTS.md#styling-conventions).
 
-### T1. Every run gets one plain toast, on every page, with no verdict
+### T1. A plain toast when a new run is detected, on every page, with no verdict
 
 Status: Open. The maintainer's agreement of 2026-10-10, and of 2026-10-11
-for the clause on a new personal best.
+for the clause on a new personal best. The clause on runs detected together
+is the author's recommendation, and the maintainer has not been asked.
 
 **Recommendation: a blue toast titled "New run detected", holding the
 scenario's name and a link, "Open in Run History". The app shell builds it,
 so it shows on every page. A run that the personal best celebration
-announces keeps the celebration as its one toast.**
+announces keeps the celebration as its one toast. Runs detected together
+share one toast, which names the newest.**
 
 The maintainer's words, 2026-10-10:
 
@@ -89,7 +92,7 @@ set three things for run toasts that T1 undoes:
   landed.
 - A run that earns neither a verdict nor a placement "emits nothing,
   because the new point on the plot is the confirmation that it landed."
-  Every run now earns a toast.
+  A run now needs neither to earn a toast.
 - Its test for whether an event deserves a toast: "Is it already visible
   somewhere (plot point, Position field, empty-state canvas, warmup status
   strip)? → nothing." While Run History is open, the run is already visible
@@ -149,6 +152,38 @@ on 2026-10-11, which is an agreement and not a ruling.
 *If the maintainer chooses a plain toast on a celebrated run too:* a new PB
 puts two toasts on screen for one run, and that clause of the 2026-09-02
 decision is superseded as well.
+
+**A second judgment inside this row: runs detected together.** "Every run"
+is the maintainer's phrase, and in one case the recommendation does not
+meet it. The app looks for new runs once a second by default. Each look
+that finds any shows one toast, for the newest run it found. The older runs
+found in the same look get no toast of their own, which is today's rule for
+a batch.
+
+How often that happens, from the maintainer's 9,135 runs (fact 7 under
+[Verified facts](#verified-facts)):
+
+- **In normal play, never.** No two runs ended within a second of each
+  other, so each is found alone.
+- **With the tab hidden for more than five minutes,** Chromium slows the
+  look to about one a minute. About 1.3% of runs would then have been found
+  together with a newer one.
+- **When the app is opened** less than about two minutes after several
+  runs, they are found together.
+
+The reason to accept it: a run toast is one channel, and a newer one
+replaces the one on screen (2026-08-31, binding here). Toasts for three
+runs found in one look would replace each other in the same instant, and
+only the last would be seen. So only two other choices change what the
+player sees, and neither is recommended:
+
+- *If the maintainer chooses a count:* the title reads "3 new runs
+  detected" for a batch. That is a second string and a plural rule, and the
+  link still names one scenario.
+- *If the maintainer chooses one toast per run, side by side:* run toasts
+  leave the replace-in-place rule, which supersedes part of the 2026-08-03
+  and 2026-08-31 decisions. An app opened after a few runs then shows
+  several toasts at once.
 
 **If the maintainer chooses differently on the row:**
 
@@ -342,6 +377,16 @@ Checked on 2026-10-11 against `main` at `4272fbb`.
 6. **The drain already owns the outputs a toast needs.**
    `publish_run_events` writes the notification container and the registry
    of toasts on screen, for the celebration.
+7. **Runs are almost never detected together.** From the maintainer's stats
+   folder, 9,135 runs through 2026-10-10, by the end time in each file's
+   name. No two runs ended within one second of each other, so the default
+   one-second poll finds each run alone. 384 runs (4.2%) were followed by
+   another within a minute. With the poll slowed to one a minute, as
+   Chromium does to a tab hidden for more than five minutes, about 116
+   (1.3%) would have been found together with a newer run, taking the
+   poll's timing as random. A window the game only covers is not hidden, in
+   the browsers checked on 2026-09-28
+   ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
 
 ## Design
 
@@ -417,14 +462,15 @@ Each holds today for the run toast and still holds:
 
 ### A batch of several runs
 
-A drain usually finds one run. It finds several when the tab was in the
-background, where a browser slows the poll to about one a minute, or when
-the app is opened shortly after a few runs.
+A drain nearly always finds one run (fact 7). It finds several when the
+tab has been hidden long enough for Chromium to slow the poll to about one
+a minute, or when the app is opened shortly after a few runs.
 
 **One toast, for the batch's newest run.** The other runs earn none, as
 today, and their rows on the page are their record. The title does not
-count them. "3 new runs detected" would add a second string and a plural
-rule for a rare case, and the link can name only one scenario anyway.
+count them. This is a judgment for the maintainer, so it is argued in
+[T1](#t1-a-plain-toast-when-a-new-run-is-detected-on-every-page-with-no-verdict),
+with the two other choices and what each costs.
 
 ### A new personal best
 
