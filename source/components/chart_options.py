@@ -1,6 +1,13 @@
-"""Build the Chart options panel and its callbacks."""
+"""Build the Chart options panel and wire its callbacks to a page's ids.
+
+A page that hosts the panel fills in a ``ChartOptionsIds``, builds
+``chart_options_toggle`` and ``chart_options_panel`` from it in its layout,
+and calls ``register_chart_options`` with it once, at import. The callbacks
+are plain functions here and are registered once per page.
+"""
 
 import json
+from typing import NamedTuple
 
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
@@ -69,8 +76,6 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
 # with ``display: none`` takes the controls out of the tab order and the
 # accessibility tree while leaving them mounted, so their persisted values keep
 # feeding the graph callbacks either way.
-CHART_OPTIONS_PANEL_ID = "chart-options-panel"
-CHART_OPTIONS_TOGGLE_ID = "chart-options-toggle"
 CHART_OPTIONS_PANEL_CLASS = "chart-options-panel"
 CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
 # The Run Data Points group. Both controls persist in the browser like their
@@ -79,10 +84,6 @@ CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
 # value the browser already stored under its id.
 CHART_OPTIONS_FIELD_CLASS = "chart-options-field"
 CHART_OPTIONS_FIELD_LABEL_CLASS = "chart-options-field-label"
-POINT_SIZE_INPUT_ID = "point-size"
-POINT_SIZE_LABEL_ID = "point-size-label"
-POINT_COLOR_INPUT_ID = "point-color"
-POINT_COLOR_DEFAULT_ID = "point-color-default"
 POINT_COLOR_DEFAULT = ""
 # The empty field previews the generated point color. Mantine paints the
 # preview of an empty ColorInput white, so the stylesheet repaints it from
@@ -110,7 +111,38 @@ POINT_COLOR_SWATCHES = [
 ]
 
 
-def _settings_help_label(label: str, help_text: str | list) -> dmc.Group:
+class ChartOptionsIds(NamedTuple):
+    """The component ids one page gives its Chart options block.
+
+    Two pages need two sets: the callbacks are registered once per set, and
+    Dash allows one callback per output. The browser stores a remembered
+    control's value under its id, so changing an id a page already uses
+    resets that setting for every user.
+
+    ``graph`` and ``cached_plot`` are the page's own. The block reads the
+    unstyled figure from the store and writes the styled one to the graph,
+    and builds neither.
+    """
+
+    panel: str
+    toggle: str
+    rank_overlay: str
+    show_all_ranks: str
+    high_score_overlay: str
+    point_size: str
+    point_size_label: str
+    point_color: str
+    point_color_default: str
+    score_threshold_overlay: str
+    score_threshold_percentage: str
+    score_threshold_notification: str
+    run_notification: str
+    graph: str
+    cached_plot: str
+
+
+def settings_help_label(label: str, help_text: str | list) -> dmc.Group:
+    """Build a control's label with a help icon that shows the text on hover."""
     return dmc.Group(
         [
             # `inherit` so the label text takes the enclosing <label>'s font
@@ -141,19 +173,12 @@ def _settings_help_label(label: str, help_text: str | list) -> dmc.Group:
     )
 
 
-@callback(
-    Output("graph-content", "figure"),
-    Input("color-scheme-switch", "computedColorScheme"),
-    Input("cached-plot", "data"),
-    Input(POINT_SIZE_INPUT_ID, "value"),
-    Input(POINT_COLOR_INPUT_ID, "value"),
-)
 def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
     """
     Applies the theme and the Run Data Points preferences to the graph.
 
-    Everything here is presentation over the figure ``generate_graph`` already
-    built and cached, which is what keeps a size or color change from
+    Everything here is presentation over the figure the page's chart callback
+    already built and cached, which is what keeps a size or color change from
     rereading scenario data, rebuilding overlays, or firing notifications.
     :param color_scheme: active Mantine color scheme.
     :param plot_json: json object with plotted data.
@@ -167,11 +192,6 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
     return apply_point_appearance(figure, point_size, point_color)
 
 
-@callback(
-    Output(POINT_COLOR_INPUT_ID, "value"),
-    Input(POINT_COLOR_DEFAULT_ID, "n_clicks"),
-    prevent_initial_call=True,
-)
 def clear_point_color(n_clicks):
     """
     Returns the point color to Default.
@@ -190,13 +210,6 @@ def _chart_options_panel_class(opened: bool) -> str:
     return f"{CHART_OPTIONS_PANEL_CLASS} {CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
 
 
-@callback(
-    Output(CHART_OPTIONS_PANEL_ID, "className"),
-    Output(CHART_OPTIONS_TOGGLE_ID, "aria-expanded"),
-    Input(CHART_OPTIONS_TOGGLE_ID, "n_clicks"),
-    State(CHART_OPTIONS_PANEL_ID, "className"),
-    prevent_initial_call=True,
-)
 def toggle_chart_options(n_clicks, panel_class):
     """Open or collapse the chart options inspector.
 
@@ -220,19 +233,19 @@ def _chart_options_group(title: str, controls: list) -> dmc.Stack:
     )
 
 
-def _chart_options_panel() -> dmc.Box:
+def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
     """Build the collapsible inspector that sits beside the chart."""
     return dmc.Box(
-        id=CHART_OPTIONS_PANEL_ID,
+        id=ids.panel,
         className=_chart_options_panel_class(False),
         children=[
             _chart_options_group(
                 "Overlays",
                 [
                     dmc.Switch(
-                        id="rank-overlay-switch",
+                        id=ids.rank_overlay,
                         labelPosition="right",
-                        label=_settings_help_label(
+                        label=settings_help_label(
                             "Rank thresholds",
                             SETTINGS_HELP_TEXT["rank-overlay"],
                         ),
@@ -240,9 +253,9 @@ def _chart_options_panel() -> dmc.Box:
                         persistence=True,
                     ),
                     dmc.Switch(
-                        id="show-all-ranks-switch",
+                        id=ids.show_all_ranks,
                         labelPosition="right",
-                        label=_settings_help_label(
+                        label=settings_help_label(
                             "Show all ranks",
                             SETTINGS_HELP_TEXT["show-all-ranks"],
                         ),
@@ -250,9 +263,9 @@ def _chart_options_panel() -> dmc.Box:
                         persistence=True,
                     ),
                     dmc.Switch(
-                        id="high-score-overlay-switch",
+                        id=ids.high_score_overlay,
                         labelPosition="right",
-                        label=_settings_help_label(
+                        label=settings_help_label(
                             "PB score",
                             SETTINGS_HELP_TEXT["high-score-overlay"],
                         ),
@@ -273,18 +286,18 @@ def _chart_options_panel() -> dmc.Box:
                         children=[
                             dmc.Text(
                                 "Point size",
-                                id=POINT_SIZE_LABEL_ID,
+                                id=ids.point_size_label,
                                 className=CHART_OPTIONS_FIELD_LABEL_CLASS,
                             ),
                             dmc.SegmentedControl(
-                                id=POINT_SIZE_INPUT_ID,
+                                id=ids.point_size,
                                 data=list(POINT_SIZE_OPTIONS),
                                 value=POINT_SIZE_DEFAULT,
                                 fullWidth=True,
                                 persistence=True,
                                 radius="sm",
                                 size="sm",
-                                **{"aria-labelledby": POINT_SIZE_LABEL_ID},
+                                **{"aria-labelledby": ids.point_size_label},
                             ),
                         ],
                     ),
@@ -296,7 +309,7 @@ def _chart_options_panel() -> dmc.Box:
                         },
                         children=[
                             dmc.ColorInput(
-                                id=POINT_COLOR_INPUT_ID,
+                                id=ids.point_color,
                                 label="Point color",
                                 value=POINT_COLOR_DEFAULT,
                                 # An empty field is Default, and says so.
@@ -323,7 +336,7 @@ def _chart_options_panel() -> dmc.Box:
                             dmc.Group(
                                 dmc.Button(
                                     "Use default",
-                                    id=POINT_COLOR_DEFAULT_ID,
+                                    id=ids.point_color_default,
                                     variant="subtle",
                                     size="compact-xs",
                                 ),
@@ -337,9 +350,9 @@ def _chart_options_panel() -> dmc.Box:
                 "Score Threshold",
                 [
                     dmc.Switch(
-                        id="score-threshold-overlay-switch",
+                        id=ids.score_threshold_overlay,
                         labelPosition="right",
-                        label=_settings_help_label(
+                        label=settings_help_label(
                             "Score threshold overlay",
                             SETTINGS_HELP_TEXT["score-threshold-overlay"],
                         ),
@@ -347,8 +360,8 @@ def _chart_options_panel() -> dmc.Box:
                         persistence=True,
                     ),
                     dmc.NumberInput(
-                        id="score-threshold-percentage",
-                        label=_settings_help_label(
+                        id=ids.score_threshold_percentage,
+                        label=settings_help_label(
                             "Score threshold percentage",
                             SETTINGS_HELP_TEXT["score-threshold-percentage"],
                         ),
@@ -368,9 +381,9 @@ def _chart_options_panel() -> dmc.Box:
                     # against, even though the master switch it depends on
                     # lives in Notifications.
                     dmc.Switch(
-                        id="score-threshold-notification-switch",
+                        id=ids.score_threshold_notification,
                         labelPosition="right",
-                        label=_settings_help_label(
+                        label=settings_help_label(
                             "Score threshold verdict",
                             SETTINGS_HELP_TEXT["score-threshold-notification"],
                         ),
@@ -383,9 +396,9 @@ def _chart_options_panel() -> dmc.Box:
                 "Notifications",
                 [
                     dmc.Switch(
-                        id="run-notification-switch",
+                        id=ids.run_notification,
                         labelPosition="right",
-                        label=_settings_help_label(
+                        label=settings_help_label(
                             "Run notifications",
                             SETTINGS_HELP_TEXT["run-notification"],
                         ),
@@ -398,19 +411,46 @@ def _chart_options_panel() -> dmc.Box:
     )
 
 
-def _chart_options_toggle() -> dmc.Button:
+def chart_options_toggle(ids: ChartOptionsIds) -> dmc.Button:
     """Build the disclosure button that opens and collapses the inspector."""
     return dmc.Button(
         "Chart options",
-        id=CHART_OPTIONS_TOGGLE_ID,
+        id=ids.toggle,
         variant="default",
         rightSection=local_icon(
             "material-symbols:keyboard-arrow-down",
             className="chart-options-toggle-chevron",
             width=20,
         ),
-        **{"aria-controls": CHART_OPTIONS_PANEL_ID, "aria-expanded": "false"},
+        **{"aria-controls": ids.panel, "aria-expanded": "false"},
     )
+
+
+def register_chart_options(ids: ChartOptionsIds) -> None:
+    """Register the block's callbacks for one page's ids.
+
+    Call once per page, at import, with the ids its layout is built from. The
+    theme comes from the shell's color scheme switch, which every page shares.
+    """
+    callback(
+        Output(ids.graph, "figure"),
+        Input("color-scheme-switch", "computedColorScheme"),
+        Input(ids.cached_plot, "data"),
+        Input(ids.point_size, "value"),
+        Input(ids.point_color, "value"),
+    )(apply_graph_appearance)
+    callback(
+        Output(ids.point_color, "value"),
+        Input(ids.point_color_default, "n_clicks"),
+        prevent_initial_call=True,
+    )(clear_point_color)
+    callback(
+        Output(ids.panel, "className"),
+        Output(ids.toggle, "aria-expanded"),
+        Input(ids.toggle, "n_clicks"),
+        State(ids.panel, "className"),
+        prevent_initial_call=True,
+    )(toggle_chart_options)
 
 
 # Add Dash Mantine Component figure templates to Plotly's templates.

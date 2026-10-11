@@ -17,7 +17,6 @@ import pytest
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.components import chart_options  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.pages.playlist_selector import (  # noqa: E402
     PLAYLIST_SELECTOR_PRESET,
@@ -243,7 +242,7 @@ def test_chart_row_holds_the_graph_beside_the_options_inspector():
 
     assert [getattr(child, "id", None) for child in row.children] == [
         "graph-content",
-        chart_options.CHART_OPTIONS_PANEL_ID,
+        home.CHART_OPTIONS_IDS.panel,
     ]
 
 

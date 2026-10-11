@@ -588,7 +588,7 @@ def test_chart_options_inputs_keep_their_ids_and_defaults(monkeypatch):
 
 def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch):
     components = _layout_components(monkeypatch)
-    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
+    panel = components[home.CHART_OPTIONS_IDS.panel]
 
     labels = {
         component.id: _label_text(component)
@@ -614,7 +614,7 @@ def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
     that Notifications is the trailing group and holds the master switch.
     """
     components = _layout_components(monkeypatch)
-    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
+    panel = components[home.CHART_OPTIONS_IDS.panel]
 
     groups = [
         (
@@ -632,8 +632,8 @@ def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
 
 def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypatch):
     components = _layout_components(monkeypatch)
-    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
-    toggle = components[chart_options.CHART_OPTIONS_TOGGLE_ID].to_plotly_json()["props"]
+    panel = components[home.CHART_OPTIONS_IDS.panel]
+    toggle = components[home.CHART_OPTIONS_IDS.toggle].to_plotly_json()["props"]
 
     # Collapsed is a class, never conditional rendering: the inputs stay in the
     # layout tree feeding their callbacks with their persisted values.
@@ -643,7 +643,7 @@ def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypa
 
     assert toggle["children"] == "Chart options"
     assert toggle["aria-expanded"] == "false"
-    assert toggle["aria-controls"] == chart_options.CHART_OPTIONS_PANEL_ID
+    assert toggle["aria-controls"] == home.CHART_OPTIONS_IDS.panel
 
 
 def test_chart_options_toggle_flips_the_panel_class_and_aria_expanded():

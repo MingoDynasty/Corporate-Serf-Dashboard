@@ -35,8 +35,8 @@ from source.plot.plot_service import (  # noqa: E402
 )
 
 APPEARANCE_INPUT_IDS = {
-    chart_options.POINT_SIZE_INPUT_ID,
-    chart_options.POINT_COLOR_INPUT_ID,
+    home.CHART_OPTIONS_IDS.point_size,
+    home.CHART_OPTIONS_IDS.point_color,
 }
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
@@ -110,7 +110,7 @@ def _new_pb_trace(figure: go.Figure):
 
 
 def test_run_data_points_group_sits_between_overlays_and_score_threshold(components):
-    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
+    panel = components[home.CHART_OPTIONS_IDS.panel]
 
     titles = [
         component.children
@@ -130,8 +130,8 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
     # Dash persistence is keyed by component id, and changing a layout default
     # silently wipes every value the browser already stored under it. Default
     # and an empty color are also what "leave the figure alone" means.
-    size = components[chart_options.POINT_SIZE_INPUT_ID]
-    color = components[chart_options.POINT_COLOR_INPUT_ID]
+    size = components[home.CHART_OPTIONS_IDS.point_size]
+    color = components[home.CHART_OPTIONS_IDS.point_color]
 
     assert size.value == "Default"
     assert size.data == ["Small", "Default", "Large"]
@@ -143,7 +143,9 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
     assert color.placeholder == "Default"
     assert color.persistence is True
 
-    assert components[chart_options.POINT_COLOR_DEFAULT_ID].children == "Use default"
+    assert (
+        components[home.CHART_OPTIONS_IDS.point_color_default].children == "Use default"
+    )
 
 
 def test_empty_point_color_field_previews_the_generated_color(components):
@@ -154,13 +156,11 @@ def test_empty_point_color_field_previews_the_generated_color(components):
     # to the same names.
     field = next(
         component
-        for component in _walk_components(
-            components[chart_options.CHART_OPTIONS_PANEL_ID]
-        )
+        for component in _walk_components(components[home.CHART_OPTIONS_IDS.panel])
         if chart_options.POINT_COLOR_FIELD_CLASS in getattr(component, "className", "")
     )
 
-    assert chart_options.POINT_COLOR_INPUT_ID in [
+    assert home.CHART_OPTIONS_IDS.point_color in [
         getattr(child, "id", None) for child in field.children
     ]
     assert field.style == {
@@ -202,7 +202,7 @@ def test_generated_run_points_take_the_theme_template_colorway(cached_plot):
 
 
 def test_point_color_offers_the_curated_swatches_on_one_row(components):
-    color = components[chart_options.POINT_COLOR_INPUT_ID]
+    color = components[home.CHART_OPTIONS_IDS.point_color]
 
     assert color.swatches == [
         "#1c7ed6",
@@ -228,11 +228,11 @@ def test_point_color_offers_the_curated_swatches_on_one_row(components):
 def test_point_size_is_named_by_its_own_visible_label(components):
     # SegmentedControl has no Mantine label slot, so the visible text becomes
     # the control's accessible name by reference rather than by proximity.
-    size = components[chart_options.POINT_SIZE_INPUT_ID].to_plotly_json()["props"]
-    label = components[chart_options.POINT_SIZE_LABEL_ID]
+    size = components[home.CHART_OPTIONS_IDS.point_size].to_plotly_json()["props"]
+    label = components[home.CHART_OPTIONS_IDS.point_size_label]
 
     assert label.children == "Point size"
-    assert size["aria-labelledby"] == chart_options.POINT_SIZE_LABEL_ID
+    assert size["aria-labelledby"] == home.CHART_OPTIONS_IDS.point_size_label
 
 
 def test_default_size_and_empty_color_leave_the_cached_figure_untouched(

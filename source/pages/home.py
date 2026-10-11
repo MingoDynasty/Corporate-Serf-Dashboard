@@ -30,9 +30,11 @@ from source.components.chart_options import (
     SETTINGS_HELP_TEXT,
     SETTINGS_HELP_TOOLTIP_WIDTH,
     TOOLTIP_EVENTS,
-    _chart_options_panel,
-    _chart_options_toggle,
-    _settings_help_label,
+    ChartOptionsIds,
+    chart_options_panel,
+    chart_options_toggle,
+    register_chart_options,
+    settings_help_label,
 )
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
@@ -121,6 +123,26 @@ PLAYLIST_TABLE_LINK_ID = "playlist-table-link"
 PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
 
+# The ids this page gives the Chart options block. The browser stores each
+# remembered control's value under its id, so changing one resets that setting
+# for every user.
+CHART_OPTIONS_IDS = ChartOptionsIds(
+    panel="chart-options-panel",
+    toggle="chart-options-toggle",
+    rank_overlay="rank-overlay-switch",
+    show_all_ranks="show-all-ranks-switch",
+    high_score_overlay="high-score-overlay-switch",
+    point_size="point-size",
+    point_size_label="point-size-label",
+    point_color="point-color",
+    point_color_default="point-color-default",
+    score_threshold_overlay="score-threshold-overlay-switch",
+    score_threshold_percentage="score-threshold-percentage",
+    score_threshold_notification="score-threshold-notification-switch",
+    run_notification="run-notification-switch",
+    graph="graph-content",
+    cached_plot="cached-plot",
+)
 # Below this much room for the chart row, the inspector stacks above the chart
 # instead of sitting beside it (assets/stylesheet.css measures the row's own
 # width with an ``@container`` query, never the window's). ``md`` is where a
@@ -1439,6 +1461,9 @@ def generate_graph(  # noqa: PLR0913
     return plot.to_json(), notifications, hide_notifications, next_toast_channels
 
 
+register_chart_options(CHART_OPTIONS_IDS)
+
+
 def _build_startup_playlist_warning_notifications(
     warnings: list[str],
 ) -> list[dict[str, object]]:
@@ -2007,7 +2032,7 @@ def layout(
                                         dmc.Switch(
                                             id="automatically-change-scenario-switch",
                                             labelPosition="right",
-                                            label=_settings_help_label(
+                                            label=settings_help_label(
                                                 "Follow newly played scenario",
                                                 SETTINGS_HELP_TEXT[
                                                     "automatically-change-scenario"
@@ -2033,7 +2058,7 @@ def layout(
                                 dmc.Space(h="xl"),
                                 dmc.NumberInput(
                                     id="top_n_scores",
-                                    label=_settings_help_label(
+                                    label=settings_help_label(
                                         "Top N scores",
                                         SETTINGS_HELP_TEXT["top-n-scores"],
                                     ),
@@ -2192,7 +2217,7 @@ def layout(
                                     persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
-                                _chart_options_toggle(),
+                                chart_options_toggle(CHART_OPTIONS_IDS),
                             ],
                             gap="md",
                             justify="flex-end",
@@ -2225,7 +2250,7 @@ def layout(
                             # resizes, not just on window resize.
                             responsive=True,
                         ),
-                        _chart_options_panel(),
+                        chart_options_panel(CHART_OPTIONS_IDS),
                     ],
                 ),
             ),
