@@ -82,8 +82,9 @@ are converted, and which ones can't be, is in
 One stretch of play, including the breaks between runs, as
 [product.md](product.md#when-they-ask-them) defines it. A break of more than
 30 minutes between runs ends it, so a session can cross midnight and one day
-can hold several. It is in progress until 30 minutes have passed since its
-last run. How a break is measured is in [sessions.md](specs/sessions.md).
+can hold several. It is in progress while no more than 30 minutes have passed
+since its last run. How a break is measured is in
+[sessions.md](specs/sessions.md).
 
 - Not an app session, which the specs use for one run of the server process.
 - In code: `play_session`, because `session` already names an HTTP session
