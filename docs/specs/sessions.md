@@ -112,9 +112,11 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - The current time is handed in by the caller, as the app's own clock. It is
   never a browser's clock, because a browser on another device may be in
   another time zone ([2026-10-11][entry]).
-- A session that has ended can be in progress again. A run that began within
-  the 30 minutes and finished after them joins the session when it finishes
-  ([2026-10-11][entry]).
+- A session that has ended can be in progress again. A run with a usable
+  start that began within the 30 minutes and finished after them joins the
+  session when it finishes. A run with no usable start does not: a run that
+  began a minute after the last one ended and took 40 minutes to play starts
+  a new session ([2026-10-11][entry]).
 - Nothing happens when a session ends, so a view that shows the state has to
   re-check it on a timer. No such view exists yet
   ([2026-10-11][entry]).
