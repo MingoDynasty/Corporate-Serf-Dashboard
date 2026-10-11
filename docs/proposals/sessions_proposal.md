@@ -188,12 +188,12 @@ breakdown the maintainer agreed.
   indefinitely. This row sets the rule. The page proposal owns the timer.
 - **An ended session can reopen.** The app sees a run only when it
   finishes. A run begun inside the 30 minutes and finished after them joins
-  the session it was begun in. So a session can read as ended and then gain
-  a run. It reads as ended from the 30-minute mark until that run finishes.
-  That is usually under a minute. It is longer when the run was paused,
-  because a pause is part of the run and not a break. It happened twice in
-  seven years of the maintainer's history, for about half a minute each
-  time.
+  the session it was begun in, as long as its start is usable. So a session
+  can read as ended and then gain a run. It reads as ended from the
+  30-minute mark until that run finishes. That is usually under a minute.
+  It is longer when the run was paused, because a pause is part of the run
+  and not a break. It happened twice in seven years of the maintainer's
+  history, for about half a minute each time.
 
 **Where it gives a wrong answer.** The session reads as in progress for 30
 minutes after the player has left.
@@ -634,10 +634,12 @@ session in progress, or none.
   worked out from the browser's clock.
 - **A last run in the future counts as in progress.** It can happen after a
   clock change.
-- **A run that lands late reopens the session.** A run begun inside the 30
-  minutes joins the session when it finishes, however long it took. A run
-  paused for an hour reopens a session that has read as ended for most of
-  that hour, and the next run can do it again.
+- **A run that lands late reopens the session.** A run with a usable start
+  inside the 30 minutes joins the session when it finishes, even after a
+  long pause. A run paused for an hour reopens a session that has read as
+  ended for most of that hour, and the next run can do it again. A run
+  whose own playing time is over 30 minutes has no usable start, so it
+  starts a new session instead.
 - **The state changes with no event.** A view re-checks it on a timer. The
   page proposal owns that mechanism.
 
