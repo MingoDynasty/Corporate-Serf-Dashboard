@@ -20,8 +20,9 @@ judgment, T1 to T3. Each repeats what the maintainer said in chat on
 2026-10-10, which was a lean or an agreement and not a ruling. Each then
 gives the argument, the cost, and what changes if the maintainer chooses
 differently. T1 also holds two judgments the outline did not ask about,
-each marked as one. Reviewers are invited to contest any row, and any
-author-owned choice in [Design](#design).
+each marked as one. The maintainer agreed to both on 2026-10-11. Reviewers
+are invited to contest any row, and any author-owned choice in
+[Design](#design).
 
 **How this sits among the other Run History proposals.** Run History is
 planned as five pieces: groundwork with no proposal, Sessions, Run toasts
@@ -68,8 +69,8 @@ does not reopen them:
 ### T1. A plain toast when a new run is detected, on every page, with no verdict
 
 Status: Open. The maintainer's agreement of 2026-10-10, and of 2026-10-11
-for the clause on a new personal best. The clause on runs detected together
-is the author's recommendation, and the maintainer has not been asked.
+for the two clauses the outline did not ask about: a new personal best, and
+runs detected together.
 
 **Recommendation: a blue toast titled "New run detected", holding the
 scenario's name and a link, "Open in Run History". The app shell builds it,
@@ -188,6 +189,19 @@ player sees, and neither is recommended:
   leave the replace-in-place rule, which supersedes part of the 2026-08-03
   and 2026-08-31 decisions. An app opened after a few runs then shows
   several toasts at once.
+
+The maintainer agreed to one toast for the newest run on 2026-10-11, which
+is an agreement and not a ruling:
+
+> The toast itself carries no information besides "a run came in; please
+> look at the Run History page". Whether that's 1 run or 10 runs, doesn't
+> matter to the user. It's also an edge case because runs shouldn't be
+> piling up in the queue.
+
+They asked for one thing to hold with it: when a run's toast replaces the
+toast of the run before it, the new one still plays its entry animation, so
+the player sees that another run came in. It does, and
+[The rules it keeps](#the-rules-it-keeps) says why.
 
 **If the maintainer chooses differently on the row:**
 
@@ -456,6 +470,15 @@ Each holds today for the run toast and still holds:
   gets a full lifetime. This holds per browser and survives a change of
   page. The channel stays separate from `pb-celebration`, so a run toast
   lands beside a celebration and never replaces it.
+- **A replacement is seen to arrive.** When a run lands while the last
+  run's toast is still up, the new toast slides in as the old one fades
+  out. The player sees that another run came in, although the two toasts
+  may read the same. Every channel already behaves this way: it was
+  measured on 2026-08-29 as a slide of about 135 ms and a crossfade of
+  about 250 ms
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  The maintainer asked on 2026-10-11 that it hold for this toast. It holds
+  because the toast stays on that mechanism, and Testing checks it.
 - **The Run notifications switch turns it off.** Off means no plain toast,
   on any page. It still does not reach the celebration, the failed-import
   toast, or any other toast.
@@ -829,7 +852,9 @@ For the implementation PR:
   Playlists page is open shows the toast, and its link opens Run History on
   that scenario with the toast still up. The same with a scenario name
   that holds `&` and `%`. Nothing shows with the switch off. A new PB shows
-  the celebration alone. In Edge and in Firefox.
+  the celebration alone. A second run inside the first toast's eight
+  seconds replaces it with the entry animation, and one toast is left on
+  screen. In Edge and in Firefox.
 - **The gates:** the five standard local checks in AGENTS.md.
 
 For this proposal PR: `uv run pytest tests/test_docs.py` and
