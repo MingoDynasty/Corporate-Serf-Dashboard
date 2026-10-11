@@ -796,11 +796,13 @@ control on that page.
 - **Accepting a link that sometimes does nothing.** With Follow off, the
   jump to the scenario just played is the one thing the toast adds on Run
   History, and that is exactly where a link without the run's id fails.
-- **The page removing the parameter once it has applied it.** That is the
-  page proposal's to weigh, since it changes an accepted behavior of
-  2026-09-19. It is also not known to close the case: the router does not
-  see an address rewritten behind it, so a later link to the old address
-  may still read as no change. Not probed.
+- **The page removing the parameter once it has applied it.** It changes an
+  accepted behavior of 2026-09-19, which would be the page proposal's to
+  weigh, and it does not close the case. The router does not see an address
+  rewritten behind it, so it still holds the old query, and a later link to
+  that query does not build the page again. Probed on the scratch app of
+  fact 2, during review and again by the author: after the query was
+  stripped, a second toast's link to it left the page as it was.
 - **A verdict and the link, on every page.** This is the strongest
   alternative, and it does not need the rest of today's toast. The shell
   would send "Threshold passed" or "Below threshold" with the percentage
