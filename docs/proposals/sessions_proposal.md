@@ -100,9 +100,9 @@ choice matters. It just has no evidence-backed answer inside 20 to 60.
 
 **Where 30 gives a wrong answer.**
 
-- **A pause of 31 to 59 minutes ends the session.** There were nine in
-  2026, in eight sittings. The
-  [table](#where-30-splits-a-sitting) lists them.
+- **A break of 31 to 59 minutes ends the session, even when the player
+  came back to the same sitting.** There were nine in 2026, in eight
+  sittings. The [table](#where-30-splits-a-sitting) lists them.
 - **A break of 20 to 30 minutes followed by something unrelated does not
   end it.** There were seven in 2026, and five came back to a different
   scenario.
@@ -120,17 +120,18 @@ on the logged days. It would merge six of 2026's 117 boundaries. 10, 15,
 evidence chose 30 with 45 second. A consult with `claude-fable-5-1`, whose
 brief withheld that recommendation, chose the same. This author session
 re-ran the scripts and agrees, for one more reason: the two errors aren't
-equally visible. A session split at a 35-minute pause shows as two rows
+equally visible. A session split at a 35-minute break shows as two rows
 with their start times, so the player can see what happened. A 40-minute
 absence merged into one session is hidden inside its length, because
-version 1 draws nothing where a pause was. None of the three would fight
+version 1 draws nothing where a break was. None of the three would fight
 between 30 and 45.
 
 **What would move it to 45:**
 
 - game logs covering breaks of 30 to 60 minutes that show the game left
   open through most of them (no logged day has such a break);
-- other players' histories whose pauses run past 45 minutes;
+- other players' histories whose breaks within a sitting run past 45
+  minutes;
 - the eight sittings in the table reading as wrongly split on the real
   page.
 
@@ -158,9 +159,9 @@ The lean is recorded from 2026-10-07 without the maintainer's wording. The
 - **Fixed is the reversible choice.** A `config.toml` key can be added
   later without breaking anything. Removing a shipped setting would break
   whoever set it.
-- **One player's history is the weak point.** If other players' pauses run
-  longer, the answer is a different constant for everyone (S1), which stays
-  a one-line change.
+- **One player's history is the weak point.** If other players' breaks
+  within a sitting run longer, the answer is a different constant for
+  everyone (S1), which stays a one-line change.
 
 **If the maintainer chooses a setting:** this proposal gains a control and
 a Copy block, and two installs can split the same runs into different
@@ -513,6 +514,10 @@ the start or end of a stretch.
 
 No user sees this layer. The Run History page, and later features, read it.
 
+**Two words.** A break is time between runs. A pause is the game's own
+pause inside a run, which the stats file records as `Pause Duration:`. The
+rules below turn on the difference, so each word means one thing here.
+
 ### Run start and run length
 
 Author-owned. The run record gains a start and a length, both optional. The
@@ -689,7 +694,7 @@ rules above use it as written.
   and runs from the two passes through that hour sort among each other.
   [It happened once](#a-clock-change-in-the-history) in seven years.
 - **When the clock goes forward,** a break reads an hour longer than it
-  was. A five-minute pause across the change ends the session.
+  was. A five-minute break across the change ends the session.
 - **A manual clock change or a trip across time zones** does the same.
 
 This is accepted, and the spec will say so. A time in the repeated hour
@@ -708,7 +713,7 @@ The implementation PR moves them in. The spec they point to is
 Changed entry:
 
 - **[Session](../glossary.md#session).** One stretch of play, including the
-  pauses between runs, as [product.md](../product.md#when-they-ask-them)
+  breaks between runs, as [product.md](../product.md#when-they-ask-them)
   defines it. A break of more than 30 minutes between runs ends it, so a
   session can cross midnight and one day can hold several. It is in
   progress until 30 minutes have passed since its last run. How a break is
@@ -779,6 +784,9 @@ contract: a boundary that moves is noted in that PR's description.
 - `docs/specs/sessions.md`, a new spec: the rules in Design, and that no
   screen shows them yet;
 - the four glossary entries;
+- one word in `docs/product.md`, whose definition of a session says "the
+  pauses between runs". It becomes "breaks", so the glossary and the
+  sentence it cites use the same word;
 - "app session" in place of a bare "session" in the specs, where the line
   means one run of the server. On `main` today that is up to five lines of
   `docs/specs/playlists.md` and two of `docs/specs/notifications.md`. Each
@@ -817,9 +825,10 @@ their tests.
   session's start would miss most of it. Parked in
   `ignore/design-notes/session-gap.md` of the main checkout, under "Ideas
   for later".
-- **Four ideas from the gap discussion,** parked in the same place: a pause
-  divider inside a session, warm-up keyed on a pause, "in progress" on its
-  own shorter timer, and a session as one launch of the game. The
+- **Four ideas from the gap discussion,** parked in the same place: a
+  divider for a long break inside a session, warm-up keyed on a break, "in
+  progress" on its own shorter timer, and a session as one launch of the
+  game. The
   maintainer, 2026-10-10: good ideas, probably not for the first release.
 - **The gap as a setting.** S2. Nothing tracks it. A `config.toml` key
   could be added later without breaking anything.
