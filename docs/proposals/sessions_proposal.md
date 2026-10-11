@@ -185,11 +185,14 @@ breakdown the maintainer agreed.
   ([comment](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/351#discussion_r4191712545)):
   a list that redraws only when a run lands would read "in progress"
   indefinitely. This row sets the rule. The page proposal owns the timer.
-- **An ended session can reopen once.** The app sees a run only when it
+- **An ended session can reopen.** The app sees a run only when it
   finishes. A run begun inside the 30 minutes and finished after them joins
   the session it was begun in. So a session can read as ended and then gain
-  a run, for at most one run's length. It happened twice in seven years of
-  the maintainer's history.
+  a run. It reads as ended from the 30-minute mark until that run finishes.
+  That is usually under a minute. It is longer when the run was paused,
+  because a pause is part of the run and not a break. It happened twice in
+  seven years of the maintainer's history, for about half a minute each
+  time.
 
 **Where it gives a wrong answer.** The session reads as in progress for 30
 minutes after the player has left.
@@ -368,6 +371,9 @@ are 8,941. Two are negative. The rest, by length in minutes:
 - **Measuring to the next run's start or to its end** puts 2 of the 8,941
   breaks on different sides of 30 minutes. Both are from 2026: 29.5 and
   28.3 minutes of idle time, each 30.5 or more from end to end.
+- **Counting a run's paused time as part of the break** changes the
+  measure of 21 breaks, by 209 seconds at most, and puts none on the other
+  side of 30 minutes.
 
 ### What each limit does
 
@@ -583,6 +589,13 @@ Alternatives rejected:
 - **A threshold fitted to each player's own breaks.** The two published
   methods tried here disagree with each other and, for one of them, with
   itself between runs.
+- **Counting a run's paused time as part of the break before it.** A run
+  paused for an hour would then start a new session, and a session could
+  read as ended for one run's playing time at most. But the run's start
+  would then mean two things: when it began, for a session's length, and
+  when its playing began, for the break. No pause since 2024 is longer than
+  209 seconds, and the two rules agree on every session boundary in the
+  history.
 
 ### In progress
 
@@ -605,6 +618,10 @@ session in progress, or none.
   worked out from the browser's clock.
 - **A last run in the future counts as in progress.** It can happen after a
   clock change.
+- **A run that lands late reopens the session.** A run begun inside the 30
+  minutes joins the session when it finishes, however long it took. A run
+  paused for an hour reopens a session that has read as ended for most of
+  that hour, and the next run can do it again.
 - **The state changes with no event.** A view re-checks it on a timer. The
   page proposal owns that mechanism.
 
@@ -820,6 +837,7 @@ their tests.
   - a break of exactly 30 minutes, one second under, and one second over;
   - a session across midnight, and two sessions in one day;
   - a run with no start beside runs that have one;
+  - a paused run begun inside the 30 minutes and finished long after them;
   - a negative break;
   - no runs, and one run;
   - in progress at exactly 30 minutes after the last run, one second
