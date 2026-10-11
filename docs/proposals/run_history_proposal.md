@@ -446,7 +446,9 @@ release:
 
 Measured on the maintainer's stats folder unless a line says otherwise. It
 is one player's history: 8,937 runs over 866 scenarios, which make 321
-sessions at a 30-minute gap (2026-10-05).
+sessions at a 30-minute gap (2026-10-05). Nothing was measured again for
+this proposal. The folder grows daily, and the Sessions proposal counts a
+later snapshot: 322 sessions on 2026-10-08.
 
 - **A time axis bunches recent play.** On Smoothsphere Viscose at All time,
   half of the 61 runs sit in the right-hand 10% of a time axis. In run order
@@ -499,8 +501,12 @@ carries what a reviewer needs from them.
   on the same thread. The trial's chart was a stand-in.
 - **AG Grid 36.** Every workaround under A was checked on 35.3.1 only.
 - **The zoom script on a numeric axis.** Score vs Run is the first.
-- **Whether two registered pages can share a control id.** Read from how
-  Dash dispatches callbacks, not tried. Nothing here depends on it.
+- **Two pages sharing a control id, in this app.** A scratch Dash 4.4.1 app
+  on 2026-10-11 showed the rule is narrower than the list assumed. A page
+  may hold an id that is only an input of another page's callback. It breaks
+  when it holds a callback's output without all of that callback's inputs.
+  That was not tried under `DashProxy`, which the app uses. Nothing here
+  depends on it: the new page keeps its own ids either way.
 - **Other players' data.**
 
 ## Design
