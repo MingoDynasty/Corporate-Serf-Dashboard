@@ -508,7 +508,8 @@ the start or end of a stretch.
 - **A spring clock change.** None falls inside a session in this history.
   It is reasoned about in Design.
 - **Reset files,** which are out of scope.
-- **A scenario longer than ten minutes.** None is in the history.
+- **A long scenario.** The longest run in the history is 238 seconds, so
+  nothing here measures a run of ten minutes or more.
 
 ## Design
 
@@ -528,7 +529,7 @@ parser reads two more lines from a file it already reads.
   that crossed midnight.
 - **The length** is the end minus the start, minus `Pause Duration:` when
   the file has one.
-- **The length is unknown outside 1 to 600 seconds, and the start with
+- **The length is unknown outside 1 to 1,800 seconds, and the start with
   it.** A length out of that range means the start or the pause can't be
   trusted. The range covers:
   - the 46 negative lengths from 2021;
@@ -538,9 +539,18 @@ parser reads two more lines from a file it already reads.
 - **It doesn't catch a start that is wrong by less.** The repeated start
   from 2025-07-13 leaves a length in range. That run's break comes out
   negative, which the session rule counts as no break.
-- **600 leaves room above the longest run in the history,** 238 seconds. A
-  real run longer than ten minutes would lose its start and its length, and
-  its break would be measured to its end.
+- **The upper bound is the session limit.** It has to sit above any real
+  run and under an hour, so that a run across a clock change is still
+  caught. It also has to be no more than the session limit, for this
+  reason: a start left over from an earlier run makes the break before the
+  run read as nothing. With the bound at 30 minutes, such a start is
+  trusted only when the real break was under 30 minutes, which would not
+  have ended the session anyway. The spec states that as an invariant, so a
+  later edit keeps it.
+- **A run longer than 30 minutes loses its start and its length,** and its
+  break is measured to its end. The longest run in the history is 238
+  seconds, but a scenario sets its own timer and other players' runs may be
+  far longer.
 - **A file with no `Challenge Start:` has neither.** It still joins a
   session by its end.
 - **A malformed value reads as a missing one.** It costs the start and the
@@ -870,7 +880,8 @@ their tests.
   - a missing `Challenge Start:`, and a malformed one;
   - a missing `Pause Duration:`;
   - a start within a second of the end;
-  - a length over the limit.
+  - a 20-minute run, which keeps its start;
+  - a span of an hour plus a run, which loses it.
 - **The existing parser tests pass unchanged,** since both fields are
   optional.
 - **The docs test** holds this file's sections and its links.
