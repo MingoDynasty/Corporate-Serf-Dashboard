@@ -23,14 +23,14 @@ not a ruling: reviewers are invited to contest any row, and any author-owned
 choice in [Design](#design).
 
 This is piece 4 of 5 of the Run History work. The other pieces are the
-groundwork (three refactor PRs with no proposal), the Sessions proposal, the
-Run toasts proposal
+groundwork (three refactor PRs with no proposal), the Sessions proposal
+([PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355)),
+the Run toasts proposal
 ([PR #354](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/354)),
-and a later All scenarios proposal. The Sessions proposal had no PR when
-this was written. Two things cross between them. This page takes what a
-session is from the Sessions proposal. The Run toasts proposal takes this
-page's name and address, R7's rule for its link, and the fact that the page
-shows a run's verdict. Neither blocks review of this one.
+and a later All scenarios proposal. Two things cross between them. This page
+takes what a session is from the Sessions proposal. The Run toasts proposal
+takes this page's name and address, R7's rule for its link, and the fact
+that the page shows a run's verdict. Neither blocks review of this one.
 
 **Already decided, and binding here.** The proposal is held to these and
 doesn't reopen them:
@@ -610,8 +610,11 @@ updates on every batch of new runs.
 The percentage follows the toast's rules today: the same PB, the same pace
 rule, and the same two display caps
 ([Run notifications](../specs/notifications.md#run-notifications)). The
-badge follows [Marks](#marks-the-check-and-the-star). The run's number and
-the time on the scenario come from the Sessions proposal's functions.
+badge follows [Marks](#marks-the-check-and-the-star). The page works out the
+run's number and the time on the scenario from what the Sessions proposal
+defines: the session, and a stretch of one scenario inside it. The time is
+the sum of the scenario's stretches in the session, each from its first
+run's start to its last run's end.
 
 Not in version 1, both dashed in the mockup: "Better than 19 of your last
 20", and a percentage against the typical score.
@@ -723,8 +726,10 @@ switch between the two, are a later proposal.
   rule: a session is in progress until 30 minutes after its last run. The
   badge, and the card's "this session", change on the page's existing
   30-second tick, the one that keeps Last played current. No new polling is
-  added. This answers the connector's comment on PR #351 that a list
-  redrawn only by a new run could read "in progress" forever.
+  added. The app works the state out, never the browser's clock, as that
+  proposal requires. This answers the connector's
+  [comment on PR #351](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/351#discussion_r4191712545)
+  that a list redrawn only by a new run could read "in progress" forever.
 - **Columns don't sort.** A sort would scatter each session's rows.
 
 **How it is built (R4).**
@@ -1157,7 +1162,9 @@ This file replaces a proposal written when the feature was far off. That
 text described two views: (1) the current session across scenarios, and (2)
 one scenario's full history. Two of its durable decisions were already
 marked superseded. They stay marked here, with their text, which answers the
-connector's comment on PR #351 that a rewrite left them only in git history.
+connector's
+[comment on PR #351](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/351#discussion_r4191712535)
+that a rewrite left them only in git history.
 
 - **Raw timestamps first; sessions are a later quality-of-life layer.** With
   timestamps visible, the user can eyeball the session boundary. Sessions
