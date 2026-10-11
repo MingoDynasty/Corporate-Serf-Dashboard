@@ -10,7 +10,7 @@ import re
 import threading
 from collections import Counter, deque
 from collections.abc import Iterable
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -31,6 +31,7 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.kovaaks.play_sessions import PLAY_SESSION_BREAK_LIMIT
 from source.kovaaks.request_logging import request_exception_summary
 from source.kovaaks.scenario_groups import ScenarioGroup, join_scenario_groups
 from source.utilities.atomic_write import atomic_write_text
@@ -76,6 +77,18 @@ BASE_SCALE_YAW = 0.07
 # bucketing with hard edges, not a tolerance, so 40.849 and 40.851 still land
 # in different groups.
 CM360_DECIMAL_PLACES = 1
+
+# A run length outside this range means the stats file's start or pause can't
+# be trusted, so the run keeps neither a start nor a length.
+MIN_RUN_LENGTH = timedelta(seconds=1)
+# The upper bound may never exceed the play session limit. A start left over
+# from an earlier run makes the break before its run read as nothing. Under
+# this bound such a start is trusted only when the real break was within the
+# limit, which would not have ended the play session anyway. A larger bound
+# would let a wrong start hide a break that should have ended one. The hour
+# is the second ceiling: a run played while the clock went forward reads an
+# hour too long, and has to stay out of range whatever the limit becomes.
+MAX_RUN_LENGTH = min(PLAY_SESSION_BREAK_LIMIT, timedelta(hours=1))
 
 # Deliberately unsynchronized: after startup the watchdog thread is the only
 # writer, and raced reads self-heal on re-render (the home page's polling
@@ -712,6 +725,63 @@ def _parse_optional_positive(raw_value: str | None) -> float | None:
     return value
 
 
+def _parse_pause_duration(raw_value: str | None) -> timedelta | None:
+    """Read ``Pause Duration:`` as the time a run spent paused, or None.
+
+    ``raw_value`` is None when the file has no such line, which is no pause:
+    files from 2020 and 2021 carry a start and no pause lines. A line that is
+    there and can't be read (no value yet, not a number, negative, not
+    finite) is an unknown pause, and returns None.
+    """
+    if raw_value is None:
+        return timedelta(0)
+    try:
+        pause_seconds = float(raw_value)
+        # Zero is the common value and a real one, so this can't share the
+        # positive-only reader the conversion fields use.
+        if not math.isfinite(pause_seconds) or pause_seconds < 0:
+            return None
+        return timedelta(seconds=pause_seconds)
+    except ValueError, OverflowError:
+        return None
+
+
+def _run_start_and_length(
+    run_end: datetime,
+    raw_challenge_start: str | None,
+    raw_pause_duration: str | None,
+) -> tuple[datetime, timedelta] | tuple[None, None]:
+    """Work out when a run began and how long it took to play.
+
+    ``Challenge Start:`` is a local time of day with no date, so the start
+    takes the end's date and moves back a day when that lands after the end:
+    the run crossed midnight. The length is the end minus the start, minus
+    the paused time.
+
+    Returns ``(None, None)`` when the file gives no usable start: no
+    ``Challenge Start:``, a value that is not a time of day, an unreadable
+    pause, or a length outside ``MIN_RUN_LENGTH`` to ``MAX_RUN_LENGTH``. None
+    of these may raise: a bad value costs the start and the length only --
+    never the run, and never the startup scan that hit it.
+    """
+    paused = _parse_pause_duration(raw_pause_duration)
+    if not raw_challenge_start or paused is None:
+        return None, None
+    try:
+        time_of_day = datetime.strptime(raw_challenge_start, "%H:%M:%S.%f").time()
+        run_start = datetime.combine(run_end.date(), time_of_day)
+        if run_start > run_end:
+            run_start -= timedelta(days=1)
+        run_length = run_end - run_start - paused
+    except ValueError, OverflowError:
+        # OverflowError: the arithmetic left the range Python can hold, which
+        # takes a file dated the calendar's first day or an absurd pause.
+        return None, None
+    if not MIN_RUN_LENGTH <= run_length <= MAX_RUN_LENGTH:
+        return None, None
+    return run_start, run_length
+
+
 def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
     """
     Extracts data from a scenario CSV file.
@@ -727,6 +797,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     raw_sens_increment = None
     raw_dpi = None
     raw_scenario_hash = None
+    raw_challenge_start = None
+    raw_pause_duration = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -780,6 +852,13 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 scenario = line.split(",", 1)[1].strip()
             elif line.startswith("Hash:"):
                 raw_scenario_hash = _optional_field_value(line)
+            elif line.startswith("Challenge Start:"):
+                raw_challenge_start = _optional_field_value(line)
+            elif line.startswith("Pause Duration:"):
+                # ``or ""`` keeps a line with no value column yet apart from
+                # no line at all: the first is an unknown pause, the second
+                # is no pause.
+                raw_pause_duration = _optional_field_value(line) or ""
     except OSError, ValueError, IndexError:
         # OSError: the CSV can be locked by a still-running KovaaK's or vanish
         # between listing and open. IndexError: a mid-write line like "Score:"
@@ -832,6 +911,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         # 4.75 Overwatch into 4.8.
         horizontal_sens = round(horizontal_sens, CM360_DECIMAL_PLACES)
 
+    run_start, run_length = _run_start_and_length(
+        datetime_object, raw_challenge_start, raw_pause_duration
+    )
+
     return RunData(
         datetime_object=datetime_object,
         score=score,
@@ -845,6 +928,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         # scenario, so the run's score must never join a pace comparison.
         scenario_hash=raw_scenario_hash or None,
         stats_file_name=Path(full_file_path).name,
+        run_start=run_start,
+        run_length=run_length,
     )
 
 

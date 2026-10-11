@@ -152,7 +152,7 @@ toasts under, and it applies to every toast the app adds from here on
 - A **burst toast** is many same-type events where the aggregate is the message.
   It folds into one summary carrying a count and points at where the individual
   events are recorded. `run-import-failure` is the one instance.
-- Persistence (`auto_close=False`, process- or session-gated) is orthogonal to
+- Persistence (`auto_close=False`, process- or app-session-gated) is orthogonal to
   all three and stacks with any of them. The personal best celebration is a
   persistent channel: it replaces its own previous instance and never expires
   on its own

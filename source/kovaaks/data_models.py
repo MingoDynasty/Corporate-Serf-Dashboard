@@ -31,6 +31,13 @@ class RunData:
     of the scenario the run was played on, and is ``None`` when the file has
     none. ``stats_file_name`` is the stats file's own name, which is how the
     run's performance file is found.
+
+    ``datetime_object`` is when the run ended, in whole seconds. ``run_start``
+    is when it began and ``run_length`` is how long it took to play, with
+    paused time left out. Both are ``None`` together when the stats file
+    gives no usable start, and a run with neither is still a run: unknown is
+    never read as zero. Every time is local wall-clock time, as the game
+    wrote it.
     """
 
     datetime_object: datetime.datetime
@@ -43,6 +50,8 @@ class RunData:
     recorded_sensitivity: RecordedSensitivity | None = None
     scenario_hash: str | None = None
     stats_file_name: str | None = None
+    run_start: datetime.datetime | None = None
+    run_length: datetime.timedelta | None = None
 
 
 @dataclass()
