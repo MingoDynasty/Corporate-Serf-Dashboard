@@ -586,10 +586,17 @@ Alternatives rejected:
 
 ### In progress
 
-S3. One pure function of a session and the current time.
+S3. One pure function of the sessions and the current time. It returns the
+session in progress, or none.
 
-- **A session is in progress** when the current time is no more than 30
-  minutes after its last run's end. Only the newest session can be.
+- **Only the newest session can be in progress.** That is the last one in
+  the order the runs ended. It is in progress when the current time is no
+  more than 30 minutes after its last run's end. No earlier session is,
+  whatever its times.
+- **The question is asked of the whole list, never of one session.** After
+  a clock change two sessions can both pass the time test: one that ended
+  minutes ago, and a later-sorted one whose runs carry times still in the
+  future. Asked of the list, the answer is one session or none.
 - **The time is an argument,** so the function is testable and holds no
   clock of its own.
 - **The clock is the app's.** Run times are wall-clock times on the machine
@@ -817,6 +824,8 @@ their tests.
   - no runs, and one run;
   - in progress at exactly 30 minutes after the last run, one second
     later, and with a last run in the future;
+  - two sessions that both pass the time test, where only the newest is in
+    progress;
   - a return to a scenario later in the session;
   - a visit of one run;
   - a change of sensitivity inside a visit.
