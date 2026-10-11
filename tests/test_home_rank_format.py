@@ -9,6 +9,7 @@ import requests
 from dash import dcc, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
 
+from source.components import chart_options
 from source.config import settings_service
 from source.kovaaks import api_service, data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
@@ -128,7 +129,8 @@ CHART_OPTIONS_INPUT_DEFAULTS = {
     "run-notification-switch": ("checked", True),
 }
 COLLAPSED_PANEL_CLASS = (
-    f"{home.CHART_OPTIONS_PANEL_CLASS} {home.CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
+    f"{chart_options.CHART_OPTIONS_PANEL_CLASS} "
+    f"{chart_options.CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
 )
 
 
@@ -372,7 +374,7 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert getattr(last_played, "tabIndex", None) is None
     assert tooltip.disabled is True
     assert tooltip.label == ""
-    assert tooltip.events == home.TOOLTIP_EVENTS
+    assert tooltip.events == chart_options.TOOLTIP_EVENTS
 
 
 def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
@@ -517,8 +519,8 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         ]
 
         assert len(tooltips) == 1
-        assert tooltips[0].label == home.SETTINGS_HELP_TEXT[help_key]
-        assert tooltips[0].events == home.TOOLTIP_EVENTS
+        assert tooltips[0].label == chart_options.SETTINGS_HELP_TEXT[help_key]
+        assert tooltips[0].events == chart_options.TOOLTIP_EVENTS
         assert tooltips[0].withArrow is True
         assert tooltips[0].multiline is True
 
@@ -586,7 +588,7 @@ def test_chart_options_inputs_keep_their_ids_and_defaults(monkeypatch):
 
 def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch):
     components = _layout_components(monkeypatch)
-    panel = components[home.CHART_OPTIONS_PANEL_ID]
+    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
 
     labels = {
         component.id: _label_text(component)
@@ -612,7 +614,7 @@ def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
     that Notifications is the trailing group and holds the master switch.
     """
     components = _layout_components(monkeypatch)
-    panel = components[home.CHART_OPTIONS_PANEL_ID]
+    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
 
     groups = [
         (
@@ -630,8 +632,8 @@ def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
 
 def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypatch):
     components = _layout_components(monkeypatch)
-    panel = components[home.CHART_OPTIONS_PANEL_ID]
-    toggle = components[home.CHART_OPTIONS_TOGGLE_ID].to_plotly_json()["props"]
+    panel = components[chart_options.CHART_OPTIONS_PANEL_ID]
+    toggle = components[chart_options.CHART_OPTIONS_TOGGLE_ID].to_plotly_json()["props"]
 
     # Collapsed is a class, never conditional rendering: the inputs stay in the
     # layout tree feeding their callbacks with their persisted values.
@@ -641,15 +643,17 @@ def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypa
 
     assert toggle["children"] == "Chart options"
     assert toggle["aria-expanded"] == "false"
-    assert toggle["aria-controls"] == home.CHART_OPTIONS_PANEL_ID
+    assert toggle["aria-controls"] == chart_options.CHART_OPTIONS_PANEL_ID
 
 
 def test_chart_options_toggle_flips_the_panel_class_and_aria_expanded():
-    assert home.toggle_chart_options(1, COLLAPSED_PANEL_CLASS) == (
-        home.CHART_OPTIONS_PANEL_CLASS,
+    assert chart_options.toggle_chart_options(1, COLLAPSED_PANEL_CLASS) == (
+        chart_options.CHART_OPTIONS_PANEL_CLASS,
         "true",
     )
-    assert home.toggle_chart_options(2, home.CHART_OPTIONS_PANEL_CLASS) == (
+    assert chart_options.toggle_chart_options(
+        2, chart_options.CHART_OPTIONS_PANEL_CLASS
+    ) == (
         COLLAPSED_PANEL_CLASS,
         "false",
     )
@@ -659,7 +663,7 @@ def test_chart_options_toggle_ignores_a_fire_no_click_caused():
     # Under DashProxy a callback can fire once on page load with n_clicks=None.
     # The inspector starts closed on every visit, so that fire must change
     # neither the panel class nor the state the button announces.
-    assert home.toggle_chart_options(None, COLLAPSED_PANEL_CLASS) == (
+    assert chart_options.toggle_chart_options(None, COLLAPSED_PANEL_CLASS) == (
         no_update,
         no_update,
     )
@@ -702,7 +706,7 @@ def test_rank_refresh_button_has_tooltip(monkeypatch):
 
     assert len(tooltips) == 1
     assert tooltips[0].label == home.RANK_REFRESH_TOOLTIP
-    assert tooltips[0].events == home.TOOLTIP_EVENTS
+    assert tooltips[0].events == chart_options.TOOLTIP_EVENTS
     assert tooltips[0].withArrow is True
     assert tooltips[0].multiline is True
 
@@ -1920,7 +1924,7 @@ def test_position_hover_starts_disabled_around_the_value(monkeypatch):
     assert value.id == "scenario_rank"
     assert tooltip.disabled is True
     assert tooltip.label == ""
-    assert tooltip.events == home.TOOLTIP_EVENTS
+    assert tooltip.events == chart_options.TOOLTIP_EVENTS
     assert getattr(value, "className", None) is None
     assert getattr(value, "tabIndex", None) is None
     assert getattr(components["rank-updated-ts"], "data", None) is None

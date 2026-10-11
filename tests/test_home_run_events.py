@@ -17,6 +17,7 @@ from source.app_shell import (  # noqa: E402
     RunEventData,
     _run_event_data,
 )
+from source.components import chart_options  # noqa: E402
 from source.kovaaks import data_service  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.kovaaks.time_scored_service import PaceBasis  # noqa: E402
@@ -118,7 +119,7 @@ def test_home_layout_initial_graph_has_placeholder(monkeypatch):
 
 
 def test_graph_theme_callback_falls_back_to_initial_placeholder():
-    figure = home.apply_graph_appearance("light", None, "Default", "")
+    figure = chart_options.apply_graph_appearance("light", None, "Default", "")
 
     _assert_placeholder_figure(figure)
     assert figure.layout.template.layout.paper_bgcolor == "#ffffff"
@@ -771,7 +772,7 @@ def test_the_master_switch_guard_precedes_the_celebration_yield():
 def test_the_run_notifications_help_text_names_both_families():
     # The switch's own family, then the one it deliberately does not reach: the
     # celebration has its own setting, and the digest it once mentioned is gone.
-    assert home.SETTINGS_HELP_TEXT["run-notification"] == (
+    assert chart_options.SETTINGS_HELP_TEXT["run-notification"] == (
         "Controls threshold verdict and placement notifications for your runs. "
         "Personal best celebrations use their own setting."
     )
