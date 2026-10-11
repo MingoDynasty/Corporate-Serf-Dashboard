@@ -12,7 +12,7 @@ import dash
 import dash_mantine_components as dmc
 import pytest
 from dash import no_update
-from dash._callback import GLOBAL_CALLBACK_LIST
+from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 from source.components import scenario_selection
 from source.config import settings_service
@@ -291,3 +291,96 @@ def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
     )
 
     assert scenario_selection.select_playlist(None, None) == ([], None)
+
+
+# A second page's ids, none of which the Scenario Performance page uses.
+SECOND_PAGE_IDS = scenario_selection.ScenarioSelectionIds(
+    *(f"second-{field}" for field in scenario_selection.ScenarioSelectionIds._fields)
+)
+
+
+def _input_keys(registration: dict) -> set[str]:
+    """Read a registration's Inputs as ``id.prop``."""
+    return {f"{dep['id']}.{dep['property']}" for dep in registration["inputs"]}
+
+
+def _answering(registration: dict) -> str:
+    """Name the function a registration runs."""
+    return GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__
+
+
+@pytest.fixture
+def restored_callbacks():
+    """Take a test's registrations back out of Dash's process-wide registry."""
+    saved_list = list(GLOBAL_CALLBACK_LIST)
+    saved_map = dict(GLOBAL_CALLBACK_MAP)
+    yield
+    GLOBAL_CALLBACK_LIST[:] = saved_list
+    GLOBAL_CALLBACK_MAP.clear()
+    GLOBAL_CALLBACK_MAP.update(saved_map)
+
+
+def test_the_page_gives_the_block_the_ids_its_layout_builds(monkeypatch):
+    # The ids are data the page passes in, so a typo there resets every
+    # user's stored selection, or leaves a callback writing to nothing.
+    assert home.SCENARIO_SELECTION_IDS._asdict() == {
+        "playlist_filter": "playlist-dropdown-selection",
+        "scenario_dropdown": "scenario-dropdown-selection",
+        "deep_link": "home-deep-link",
+        "playlist_table_link": "playlist-table-link",
+    }
+
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
+    mounted = {
+        getattr(component, "id", None) for component in _walk_components(home.layout())
+    }
+    # The layout spells the two dropdowns' ids itself, so nothing but this
+    # ties them to the ids the callbacks were registered for.
+    assert set(home.SCENARIO_SELECTION_IDS) <= mounted
+
+
+def test_the_page_registers_the_block_for_its_own_ids():
+    """Registration is a call the page makes; without it both go quiet."""
+    registered = {
+        _answering(entry): _input_keys(entry)
+        for entry in GLOBAL_CALLBACK_LIST
+        if home.SCENARIO_SELECTION_IDS.deep_link
+        in {dep["id"] for dep in entry["inputs"]}
+    }
+
+    assert registered == {
+        "select_playlist": {"playlist-dropdown-selection.value", "home-deep-link.data"},
+        "apply_deep_link": {"home-deep-link.data"},
+    }
+
+
+def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
+    restored_callbacks,
+):
+    registered_before = list(GLOBAL_CALLBACK_LIST)
+
+    scenario_selection.register_scenario_selection(SECOND_PAGE_IDS)
+
+    assert GLOBAL_CALLBACK_LIST[: len(registered_before)] == registered_before
+    select_playlist, apply_deep_link = GLOBAL_CALLBACK_LIST[len(registered_before) :]
+    assert _answering(select_playlist) == "select_playlist"
+    assert _output_keys(select_playlist) == {
+        "second-scenario_dropdown.data",
+        "second-playlist_table_link.children",
+    }
+    assert _answering(apply_deep_link) == "apply_deep_link"
+    assert _output_keys(apply_deep_link) == {
+        "second-playlist_filter.value",
+        "second-scenario_dropdown.value",
+    }
+    assert _input_keys(apply_deep_link) == {"second-deep_link.data"}
+    assert select_playlist["state"] == apply_deep_link["state"] == []
+    # The second page gets the Input that keeps its scenario list from going
+    # unwritten too: without the store, every Input of ``select_playlist``
+    # would be something ``apply_deep_link`` conditionally writes.
+    assert _input_keys(select_playlist) == {
+        "second-playlist_filter.value",
+        "second-deep_link.data",
+    }
+    assert not _input_keys(select_playlist) <= _output_keys(apply_deep_link)
