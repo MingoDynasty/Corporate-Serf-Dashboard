@@ -869,8 +869,9 @@ that is also a new PB: at 110 percent C keeps its check and no other run has
 one.
 
 **Not judged:** a scenario's first run, and the first run at a new
-sensitivity, as today. Such a row has no check, and neither does a judged
-run that missed. The column shows both as blank, and the cell's hover and
+sensitivity, as today. That is about the threshold only. The first run at a
+new sensitivity can still be a new PB and carry a star. Such a row has no
+check, and neither does a judged run that missed. The column shows both as blank, and the cell's hover and
 accessible text say which: "Below threshold" or "Not judged". The glance
 answers "which runs passed", and the reason is one hover away. The card,
 which has room, words a miss and leaves an unjudged run without a badge.
@@ -1045,7 +1046,7 @@ chart's hover keeps its two decimals.
 | A check, hover and accessible name | `Threshold passed` | The verdict's own words. |
 | A star, hover and accessible name | `New PB` | The legend's entry. |
 | No check, a judged run, hover and accessible text | `Below threshold` | The verdict's own words. |
-| No check, an unjudged run, hover and accessible text | `Not judged. A scenario's first run, and the first run at a new sensitivity, aren't compared with your personal best.` | Unknown isn't a miss, and it says why. |
+| No check, an unjudged run, hover and accessible text | `Not judged. A scenario's first run, and the first run at a new sensitivity, aren't judged against the score threshold.` | Unknown isn't a miss, and it says why. It names the threshold and not the personal best, because such a run can still be a new PB and carry a star in the same cell. |
 | Button | `Show older sessions` | Loads 30 more. |
 | The grid, accessible name | `Runs of {scenario}, by session` | Plain. |
 | No scenario selected | `No scenario selected` | The chart's own empty-state title. |
