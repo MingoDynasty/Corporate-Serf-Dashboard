@@ -266,8 +266,9 @@ T1 is not agreed, T3 falls with it.
 options panel. Clearing Score threshold percentage is the one way to stop
 runs being judged.**
 
-The switch decides whether a run toast carries a pass or a miss. It never
-decided whether a toast shows
+The switch decides whether a run toast carries a pass or a miss. With it
+off, a run that did not place gets no toast. It was never the switch that
+turns run toasts off
 ([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
 
 The maintainer, 2026-10-10: "Yes, drop the Score Threshold verdict switch."
@@ -749,8 +750,11 @@ Each entry keeps its text and gains a dated note. None is erased.
 | [2026-10-05, Time-Scored Scenarios Are Measured By Pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | Where the third of its five surfaces lives: the threshold verdict's "% of PB pace" is on the page, not in a toast. Top N placement leaves its list of things that order scores. | Every formula, the detection, and the other four surfaces. |
 | [2026-08-09, The Graph Page Is Scenario Performance](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options) | Its list of the Score Threshold group's controls, which names the verdict switch. | The rest of the entry, as far as this proposal goes. The page proposal reverses its name ruling separately. |
 
-Three more entries mention strings or rules that go, and get a one-line
+Four more entries mention strings or rules that go, and get a one-line
 note: the
+[2026-07-06 coalescing entry](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)
+(that the chart callback creates the toast, and that a backlog yields one
+toast batch; its rule for the plot and for Follow is unchanged), the
 [2026-09-14 copy entry](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)
 (the run-toast strings it set), the
 [2026-09-22 README entry](../decision_log.md#2026-09-22-the-readme-stops-explaining-how-the-installer-works)
