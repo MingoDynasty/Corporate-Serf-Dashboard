@@ -681,9 +681,12 @@ Not in version 1, both dashed in the mockup: "Better than 19 of your last
   (R5).
 - **Ranges.** Score vs Run counts runs: the last 50, 100, or 200, or all of
   them. The other two modes count days: the last 7, 14, 30, or 90 days, the
-  last 12 months, or all time. A range in days starts at local midnight that
-  many days before today, so a point leaves the chart at midnight and not in
-  the middle of a day.
+  last 12 months, or all time.
+- **A range of N days is N calendar dates, counting today.** It starts at
+  local midnight N minus 1 days before today. On October 11 the last 7 days
+  are October 5 to 11. So the label and the chart agree, and a point leaves
+  the chart at midnight and not in the middle of a day. The last 12 months
+  are 365 days, counted the same way.
 - **The chart opens on the last 100 runs,** or the last 90 days in the other
   two modes. The maintainer: "I think those are reasonable defaults".
 - **The mode and the range are remembered** by the browser, with one
@@ -1143,7 +1146,7 @@ after.
 | L-C17 | The oldest date is remembered | The range is, one for runs and one for days |
 | L-C20 | The row measures the content area, and the dropdowns narrow from 400 px toward 200 px before it wraps | The row is rebuilt around the stats and the card. It still measures the content area. The widths are new |
 | L-G1 | Each kept run is a point | Every run in the range is. The legend entry is unchanged |
-| L-G4 | The date range includes the selected date | A range is a count of runs, or whole local days back |
+| L-G4 | The date range includes the selected date | A range is a count of runs, or a number of calendar dates that counts today |
 | L-G5 | The plot title reads `{scenario} (updated: {timestamp})` | `{scenario}` |
 | L-G8 | A new PB that Top N or the date leaves off the chart gets no star and still counts | Only the range can leave one off |
 | L-G19 | Runs at one position share one hover, and a new PB is ordered last where it shares a position with a same-day tie | The rule is kept, for a rarer case. In Score vs Time only runs that ended in the same second with the same score share a position, and a new PB is still ordered last among them. Score vs Run gives every run its own position. Score vs Sensitivity still shares positions and has no stars |
