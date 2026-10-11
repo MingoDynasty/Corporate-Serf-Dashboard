@@ -940,8 +940,8 @@ at a time.
 
 Kept as a panel beside the chart, with its controls, their defaults, and its
 closed-on-arrival rule. It opens between the chart and the list, as the
-mockup has it. The maintainer accepts the narrower chart "until it is
-reworked after shipping".
+mockup has it. The maintainer accepts the narrower chart until the panel is
+reworked after shipping.
 
 Two things change, both from R5: the Top N help text goes with its control,
 and the Score threshold percentage help text loses its claim that only
@@ -987,8 +987,8 @@ threshold and says so.
 
 There is no phone design. At phone width the list's seven columns need about
 480 px and scroll sideways. With Shots fired and Sensitivity hidden they
-need about 305 px and would fit. The maintainer asked for a phone layout
-"only if it is cheap".
+need about 305 px and would fit. The maintainer wanted a phone layout only
+if it is cheap, and agreed to one cheap stacking rule.
 
 ### Remembered controls
 
