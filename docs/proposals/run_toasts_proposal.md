@@ -15,14 +15,13 @@ before the Run History page is public.
 
 ## Decisions needed
 
-**Nothing in this proposal is ratified.** Three rows need the maintainer's
-judgment, T1 to T3. Each repeats what the maintainer said in chat on
-2026-10-10, which was a lean or an agreement and not a ruling. Each then
-gives the argument, the cost, and what changes if the maintainer chooses
-differently. T1 also holds two judgments the outline did not ask about,
-each marked as one. The maintainer agreed to both on 2026-10-11. Reviewers
-are invited to contest any row, and any author-owned choice in
-[Design](#design).
+Three rulings: T1 to T3. The maintainer ratified this proposal on
+2026-10-11, after every reviewer had endorsed all three rows. That settles
+each as its recommendation, the two clauses inside T1 included. Each row
+keeps what the maintainer said in chat on 2026-10-10, its argument, its
+cost, and what the alternatives would have changed, for the record.
+Everything else is author-owned, in [Design](#design), and the ratification
+covers it too.
 
 **How this sits among the other Run History proposals.** Run History is
 planned as five pieces: groundwork with no proposal, Sessions, Run toasts
@@ -68,9 +67,8 @@ does not reopen them:
 
 ### T1. A plain toast when a new run is detected, on every page, with no verdict
 
-Status: Open. The maintainer's agreement of 2026-10-10, and of 2026-10-11
-for the two clauses the outline did not ask about: a new personal best, and
-runs detected together.
+Status: Ratified (user), 2026-10-11: accept the recommendation below, with
+its two clauses, on a new personal best and on runs detected together.
 
 **Recommendation: a blue toast titled "New run detected", holding the
 scenario's name and a link, "Open in Run History". The app shell builds it,
@@ -152,7 +150,7 @@ personal best" toast and no plain one. A plain toast beside it would say
 less about the same run, at the moment the screen should be the
 celebration's. The cost is that a celebrated run's toast has no link,
 because the celebration is unchanged. The maintainer agreed to this clause
-on 2026-10-11, which is an agreement and not a ruling.
+on 2026-10-11, and it is ratified with the row.
 
 *If the maintainer chooses a plain toast on a celebrated run too:* a new PB
 puts two toasts on screen for one run, and that clause of the 2026-09-02
@@ -190,8 +188,8 @@ player sees, and neither is recommended:
   and 2026-08-31 decisions. An app opened after a few runs then shows
   several toasts at once.
 
-The maintainer agreed to one toast for the newest run on 2026-10-11, which
-is an agreement and not a ruling:
+The maintainer agreed to one toast for the newest run on 2026-10-11, and it
+is ratified with the row:
 
 > The toast itself carries no information besides "a run came in; please
 > look at the Run History page". Whether that's 1 run or 10 runs, doesn't
@@ -221,7 +219,7 @@ the player sees that another run came in. It does, and
 
 ### T2. Top N placement is retired
 
-Status: Open. The maintainer's lean of 2026-10-10.
+Status: Ratified (user), 2026-10-11: accept the recommendation below.
 
 **Recommendation: no surface says where a run placed. The run message loses
 `nth_score`, and the glossary loses the term.**
@@ -263,9 +261,9 @@ for it. Score vs Sensitivity still plots every run at each sensitivity.
 
 ### T3. The Score threshold verdict switch is dropped
 
-Status: Open. The maintainer's agreement of 2026-10-10. It rests on a
-toast with no verdict. If the toast keeps a verdict, T3 needs another look,
-though it could still stand.
+Status: Ratified (user), 2026-10-11: accept the recommendation below. It
+rests on a toast with no verdict. If the toast ever keeps a verdict again,
+T3 needs another look, though it could still stand.
 
 **Recommendation: remove the switch and its help text from the Chart
 options panel. Clearing Score threshold percentage is the one way to stop
@@ -421,7 +419,8 @@ Checked on 2026-10-11 against `main` at `4272fbb`.
 
 ## Design
 
-Every choice in this section is the author's, and open to challenge.
+Every choice in this section is the author's. The ratification of
+2026-10-11 covers them.
 
 ### The toast
 
@@ -674,8 +673,8 @@ move with the verdict, to the page.
 
 ### Copy
 
-Every string this design adds, edits, or removes. Reviewers are asked to
-endorse or redline this block.
+Every string this design adds, edits, or removes. The implementation
+receives this block as written.
 
 **Added**
 
@@ -818,8 +817,9 @@ control on that page.
 
 ### Beyond the outline, optional
 
-Neither of these is part of the proposal. Each is listed so the maintainer
-can take or leave it, and neither is needed for T1 to T3.
+Neither of these is part of the proposal, and the ratification does not
+cover them. Each is listed so the maintainer can take or leave it, and
+neither is needed for T1 to T3.
 
 - **Rename the channel** from `run-verdict` to `run-notification`. The toast
   holds no verdict, and the glossary would then give the code word its
@@ -837,6 +837,9 @@ the design.
 ## Delivery plan
 
 One implementation PR. This is intent, not a contract.
+
+**Ratified, and still waiting on the page.** T1 to T3 were ratified on
+2026-10-11, so nothing in this proposal is left to decide.
 
 **It lands in the page's going-public PR, or after it, never before.**
 Until the page is public the verdict has nowhere else to live.
