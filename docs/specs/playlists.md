@@ -545,7 +545,7 @@ except where another entry is linked.
   shadowed one is skipped with a startup warning buffered for the UI
   ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)).
   Those warnings drain only when the Scenario Performance page mounts, as
-  persistent yellow toasts titled "Playlist not loaded"; a session that
+  persistent yellow toasts titled "Playlist not loaded"; an app session that
   starts on `/playlists` sees them after its first visit there. Each body
   names the file by kind and ends with its path, such as "The playlist file
   isn't valid JSON. File: {path}", and a shadowed file reads "Skipped a
@@ -627,12 +627,12 @@ except where another entry is linked.
   quiet window, and backs off on outages, waking early on a real network
   success. Unhide and import prepend the playlist's played scenarios and wake
   it; hide and delete cancel nothing. Every dequeue rechecks cache freshness
-  and a session outcome map; that recheck runs with the worker's lock
+  and an app-session outcome map; that recheck runs with the worker's lock
   released, so a warm-cache drain (where every queued scenario is skipped)
   delays neither the status line nor an import or unhide
   ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
   UNRANKED is cached only after one positive
-  username validation per session. `percentile_warmup_enabled = false` or an
+  username validation per app session. `percentile_warmup_enabled = false` or an
   empty username skips the worker
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
   Within each playlist, scenarios lacking a displayable percentile queue
@@ -640,11 +640,11 @@ except where another entry is linked.
   window is five seconds; the backoff ladder runs 30 s to 30 min. Connection
   errors, 5xx, and post-retry 429 re-queue and trip the backoff; a read
   timeout and an exhausted third transient attempt are terminal for the
-  session and also trip it; other permanent failures are terminal without it.
+  app session and also trip it; other permanent failures are terminal without it.
   The three-attempt budget is per scenario name, with one shared budget for
   username validation. `percentile_warmup_enabled` defaults to true. A restart
   re-enqueues everything and skips fresh items at dequeue.
-- An unknown username stops the queue for the session, whether confirmed by
+- An unknown username stops the queue for the app session, whether confirmed by
   the API or by a fresh cached marker; the overview's status line and a
   WARNING log carry it, with no toast
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)

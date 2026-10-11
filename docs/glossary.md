@@ -41,6 +41,12 @@ folder. Play that writes no stats file isn't a run.
 
 - On screen, a run's stats file is a run file.
 
+### Run length
+
+How long a run took to play, with paused time left out. Some runs have none,
+because their stats files give no usable start. Which runs those are is in
+[sessions.md](specs/sessions.md#run-start-and-run-length).
+
 ### Stats folder
 
 The KovaaK's folder of stats files that the app reads runs from.
@@ -73,11 +79,33 @@ are converted, and which ones can't be, is in
 
 ### Session
 
-One stretch of play, including the pauses between runs, as
-[product.md](product.md#when-they-ask-them) defines it. The app has no rule
-yet for where one session ends; the first feature that needs one sets it.
+One stretch of play, including the breaks between runs, as
+[product.md](product.md#when-they-ask-them) defines it. A break of more than
+30 minutes between runs ends it, so a session can cross midnight and one day
+can hold several. It is in progress while no more than 30 minutes have passed
+since its last run. How a break is measured is in
+[sessions.md](specs/sessions.md).
 
 - Not an app session, which the specs use for one run of the server process.
+- In code: `play_session`, because `session` already names an HTTP session
+  and an app session.
+
+### Session length
+
+How long a session lasted, from the start of its first run to the end of its
+last. It includes the time between runs. How it is worked out is in
+[sessions.md](specs/sessions.md#sessions).
+
+### Visit
+
+Consecutive runs on one scenario within a session, with no other scenario
+between them. Switching to another scenario ends the visit, and coming back
+later in the session starts a new one. The rules are in
+[sessions.md](specs/sessions.md#visits).
+
+- Not a visit to a page, which the docs also say in the everyday sense.
+- In code: `scenario_visit`.
+- Not on screen yet.
 
 ### In session and between sessions
 

@@ -46,7 +46,7 @@ designed for a moment as well as for a question.
   should I work on next?*). Looking back often leads straight into looking
   ahead in one sitting.
 
-The session, one stretch of play including the pauses between runs, is what
+The session, one stretch of play including the breaks between runs, is what
 the two moments share: both read the same record. A session the user
 watched live stays reviewable once it ends. Between sessions the user may
 start from a recent session, a scenario's history over weeks, or their
