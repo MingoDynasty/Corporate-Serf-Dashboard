@@ -453,7 +453,7 @@ mostly from abstracts. This session re-read none of it.
 ### Stretches of one scenario
 
 A stretch is consecutive runs on one scenario inside a session, with no
-other scenario between them. The roadmap calls it a visit.
+other scenario between them. It is what the Terms block calls a visit.
 
 - **2,895 stretches** in the 322 sessions. In 2026 the median session has
   5, a third have more than 8, and the largest has 71.
@@ -644,16 +644,20 @@ per stretch.
 
 **The word.** The roadmap, the 2026-10-04 decision, and PR #351 call a
 stretch a visit. The recommendation is that the code and the docs keep
-"visit", as a working word with no glossary entry yet.
+"visit", and that the [Terms](#terms) block defines it.
 
 - **It fits.** A player visits a scenario, leaves, and may visit it again.
 - **It is already the word** in a ruled decision's text and in every note
-  of this work. That entry also says the proposal that ships the word "may
-  rename it".
+  of this work.
+- **It gets its glossary entry with the code that ships it.** That
+  decision calls visit a working word, and says the proposal that ships it
+  "names and defines it in its Terms block, and may rename it". The
+  implementation ships the word in code and in the spec, so this is that
+  proposal.
 - **No version 1 screen shows it.** The divider is worded in runs and
   scenarios. All scenarios is the first piece that could put the word on
-  screen, and its Terms block names it then. If it picks another word, the
-  code follows, as code names follow the glossary.
+  screen. If it picks another word, its Terms block changes the entry and
+  the code follows, as code names follow the glossary.
 - **One cost.** The docs and the code's comments already use "visit" as
   plain English for one load of a page, dozens of times. So the code
   qualifies the name, `scenario_visit`, the way it qualifies
@@ -720,11 +724,15 @@ New entries:
   first run to the end of its last. It includes the time between runs.
 - **Run length.** How long a run took to play, with paused time left out.
   Some runs have none, because their stats files give no usable start.
+- **Visit.** Consecutive runs on one scenario within a session, with no
+  other scenario between them. Switching to another scenario ends the
+  visit, and coming back later in the session starts a new one.
+  - Not a visit to a page, which the docs also say in the everyday sense.
+  - In code: `scenario_visit`.
+  - Not on screen yet.
 
-**Optional, and beyond the agreed outline: a fourth entry, Visit.** The
-code will use the word, and an entry would fix its meaning first. It would
-also write a glossary entry for a word no screen shows, ahead of the
-proposal that chooses the on-screen wording. Not recommended.
+The agreed outline for this proposal listed three terms. Visit is a fourth,
+added because the implementation ships the word.
 
 ### Copy
 
@@ -770,7 +778,7 @@ contract: a boundary that moves is noted in that PR's description.
   place;
 - `docs/specs/sessions.md`, a new spec: the rules in Design, and that no
   screen shows them yet;
-- the three glossary entries;
+- the four glossary entries;
 - "app session" in place of a bare "session" in the specs, where the line
   means one run of the server. On `main` today that is up to five lines of
   `docs/specs/playlists.md` and two of `docs/specs/notifications.md`. Each
