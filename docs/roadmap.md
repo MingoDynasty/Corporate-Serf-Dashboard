@@ -88,12 +88,13 @@ What we plan to do now or very soon, each with the reasons it comes next.
   1. **Groundwork** — moves the code the new page keeps out of the Scenario
      Performance page's module, with no change in behavior. It has no
      proposal.
-  2. **Sessions** — what a session is, and a start and a length for every
-     run, built with nothing on screen
-     ([proposal](./proposals/sessions_proposal.md), ratified 2026-10-11).
-     The app splits the runs into sessions at a break between runs, and
-     finds each visit, an unbroken stretch of runs on one scenario inside a
-     session.
+  2. **Sessions** — built, with nothing on screen (PR #359; design in #355):
+     what a session is, and a start and a length for every run. The app
+     splits the runs into sessions at a break of more than 30 minutes between
+     runs, and finds each visit, an unbroken stretch of runs on one scenario
+     inside a session. The rules are in
+     [`specs/sessions.md`](./specs/sessions.md), and their reasons in
+     [`decision_log.md`](./decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes).
   3. **The Run History page, version 1** — a page of its own with a chart
      that plots every run, the selected scenario's runs listed by session,
      and a card for the latest run. It's built hidden and made public when
@@ -111,7 +112,7 @@ What we plan to do now or very soon, each with the reasons it comes next.
   The pieces are built in that order. Sessions can be built beside the
   groundwork, and Run toasts and All scenarios don't wait for each other.
   Version 1 leaves out the typical run. Its definition moves to a proposal
-  of its own, which the Sessions proposal settles. Going public retires
+  of its own, which the sessions decision settled. Going public retires
   the interim per-run lines the watchdog writes to the debug log.
 
   Why it's next, and why sessions first:

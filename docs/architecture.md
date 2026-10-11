@@ -262,6 +262,7 @@ flowchart LR
         EvxlLinks["kovaaks/<br/>evxl_links.py"]
         EvxlSnapshot["kovaaks/<br/>evxl_snapshot.py"]
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
+        PlaySessions["kovaaks/<br/>play_sessions.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -314,6 +315,7 @@ flowchart LR
     EvxlLinks --> EvxlSnapshot
     ScenarioGroups --> EvxlSnapshot
     DataService --> ScenarioGroups
+    DataService --> PlaySessions
     PlaylistService --> ScenarioGroups
     Journey --> DataService
     Journey --> PlotService
@@ -670,7 +672,13 @@ flowchart LR
   Every run also carries `RunData.scenario_hash`, the stats file's `Hash:`,
   or `None` when the file has none, and `RunData.stats_file_name`, the file's
   own name. The hash names the scenario version a run was played on, and the
-  name is how its performance file is found. `get_runs_newest_first` hands
+  name is how its performance file is found. Every run may also carry
+  `RunData.run_start` and `RunData.run_length`, read from the file's
+  `Challenge Start:` and `Pause Duration:`, both `None` together when the
+  file gives no usable start. `MAX_RUN_LENGTH`, the longest length the parser
+  trusts, is derived from the play session limit so it can never exceed it
+  ([decision_log.md](decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes)).
+  `get_runs_newest_first` hands
   a scenario's runs to the time-scored lookup
   ([decision_log.md](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
   `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
@@ -783,6 +791,17 @@ flowchart LR
   `GROUP_EXCLUDED_PLAYLIST_CODES`. The benchmark importer calls the same walk
   for its group comparison
   ([decision_log.md](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+- `play_sessions.py` — groups runs into play sessions and scenario visits,
+  the code's words for a session and a visit. Three pure functions over a
+  list of runs, which never read the run store and hold no clock:
+  `split_into_play_sessions` sorts the runs and splits them at a break longer
+  than `PLAY_SESSION_BREAK_LIMIT`, `find_play_session_in_progress` takes
+  every play session and the current time, and `split_into_scenario_visits`
+  splits one play session. `PlaySession` and `ScenarioVisit` are frozen
+  tuples of runs with a start and an end, and nothing is stored. Nothing
+  calls the functions yet: the Run History page is the first planned caller.
+  Rules in [specs/sessions.md](specs/sessions.md)
+  ([decision_log.md](decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -945,6 +964,7 @@ flowchart LR
 | What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
 | The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
+| What a session or a visit is, or how a run's start and length are read | `kovaaks/play_sessions.py` for the session limit and the three pure functions; `kovaaks/data_service.py` (`_run_start_and_length`) for the two fields; the rules are in `docs/specs/sessions.md` |
 | How a time-scored scenario is recognized, or the pace math | `kovaaks/performance_file.py` for the file reader and the countdown check; `kovaaks/time_scored_service.py` for which file decides and which scores are eligible; `kovaaks/pace.py` for the formulas; the rules are in `docs/specs/scenario_performance.md` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
