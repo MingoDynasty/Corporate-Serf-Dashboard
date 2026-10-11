@@ -390,7 +390,7 @@ In 2026:
 |---|---|---|---|---|---|---|
 | Sessions | 158 | 134 | 125 | 118 | 112 | 109 |
 | Sessions under 5 runs | 29 | 18 | 14 | 11 | 8 | 8 |
-| Median session length, minutes | 32 | 38 | 44 | 49 | 59 | 60 |
+| Median session length, 2+ runs, minutes | 32 | 38 | 44 | 49 | 59 | 60 |
 | Runs in a different session than at 30 | 716 | 316 | 174 | 0 | 80 | 122 |
 | Hours away counted inside session lengths | 0.0 | 4.9 | 7.4 | 10.3 | 13.6 | 16.3 |
 | Sessions holding a break over 30 minutes | 0 | 0 | 0 | 0 | 6 | 8 |
@@ -757,7 +757,7 @@ None. This design adds no user-facing string, so it has no Copy block.
 
 ### Carried from PR #351
 
-PR #351 is an open draft whose design is superseded. This proposal takes
+PR #351 is a closed draft whose design is superseded. This proposal takes
 three things from it.
 
 - **Its Foundation section,** less the typical score, the readout's
