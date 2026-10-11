@@ -26,8 +26,6 @@ from source.app_shell import (
 )
 from source.components.chart_options import (
     SETTINGS_HELP_TEXT,
-    SETTINGS_HELP_TOOLTIP_WIDTH,
-    TOOLTIP_EVENTS,
     ChartOptionsIds,
     chart_options_panel,
     chart_options_toggle,
@@ -46,8 +44,10 @@ from source.components.scenario_selection import (
     register_scenario_selection,
 )
 from source.components.scenario_stats import (
-    RANK_REFRESH_TOOLTIP,
-    SCENARIO_RANK_LOADING_DELAY_MS,
+    ScenarioStatsIds,
+    register_scenario_stats,
+    scenario_stats_panel,
+    scenario_stats_stores,
 )
 from source.components.score_threshold import (
     ThresholdVerdict,
@@ -142,6 +142,24 @@ CHART_OPTIONS_IDS = ChartOptionsIds(
     run_notification="run-notification-switch",
     graph="graph-content",
     cached_plot="cached-plot",
+)
+# The ids this page gives the Scenario Stats block. The run-events store, the
+# scenario dropdown and the two intervals are built by this page's layout,
+# and the block only reads them.
+SCENARIO_STATS_IDS = ScenarioStatsIds(
+    last_played="scenario_datetime_last_played",
+    last_played_tooltip="last-played-tooltip",
+    num_runs="scenario_num_runs",
+    rank="scenario_rank",
+    rank_updated_tooltip="rank-updated-tooltip",
+    rank_refresh_button="rank-refresh-button",
+    last_played_ts="last-played-ts",
+    last_played_empty_value="last-played-empty-value",
+    rank_updated_ts="rank-updated-ts",
+    run_events="run-events",
+    scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    polling_interval="interval-component",
+    relative_time_interval="relative-time-interval",
 )
 # Below this much room for the chart row, the inspector stacks above the chart
 # instead of sitting beside it (assets/stylesheet.css measures the row's own
@@ -322,6 +340,7 @@ def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
 
 
 register_run_import_failure_flush("interval-component")
+register_scenario_stats(SCENARIO_STATS_IDS)
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
@@ -978,14 +997,7 @@ def layout(
                 id="cached-plot",
                 data=_placeholder_plot_json(),
             ),  # caches the plot for easy light/dark mode
-            dcc.Store(
-                id="last-played-ts"
-            ),  # raw epoch for the relative "Last played" text
-            dcc.Store(
-                id="last-played-empty-value",
-                data="",
-            ),
-            dcc.Store(id="rank-updated-ts"),  # raw epoch for the Position hover
+            *scenario_stats_stores(SCENARIO_STATS_IDS),
             dcc.Interval(
                 id="startup-playlist-warning-interval",
                 interval=250,
@@ -1130,111 +1142,7 @@ def layout(
                                         day=1,
                                     ).isoformat(),
                                 ),
-                                dmc.Box(
-                                    [
-                                        dmc.Title(
-                                            "Scenario Stats",
-                                            order=2,
-                                            size="h6",
-                                        ),
-                                        dmc.Group(
-                                            [
-                                                dmc.Text(
-                                                    "Last played:",
-                                                    fw=700,
-                                                    span=True,
-                                                    size="sm",
-                                                ),
-                                                dmc.Tooltip(
-                                                    dmc.Text(
-                                                        "",
-                                                        id="scenario_datetime_last_played",
-                                                        span=True,
-                                                        size="sm",
-                                                    ),
-                                                    disabled=True,
-                                                    events=TOOLTIP_EVENTS,
-                                                    id="last-played-tooltip",
-                                                    label="",
-                                                ),
-                                            ],
-                                            gap="0.25em",
-                                        ),
-                                        dmc.Text(
-                                            [
-                                                dmc.Text(
-                                                    "Number of runs: ",
-                                                    fw=700,
-                                                    span=True,
-                                                ),
-                                                dmc.Text(
-                                                    id="scenario_num_runs",
-                                                    span=True,
-                                                ),
-                                            ],
-                                            size="sm",
-                                        ),
-                                        dmc.Group(
-                                            [
-                                                dmc.Group(
-                                                    [
-                                                        dmc.Text(
-                                                            "Position:",
-                                                            fw=700,
-                                                            span=True,
-                                                            size="sm",
-                                                        ),
-                                                        # dcc.Loading renders
-                                                        # divs, which cannot
-                                                        # nest inside a Text's
-                                                        # default <p> root, so
-                                                        # it sits beside the
-                                                        # label in a Group
-                                                        # (like "Last played:"
-                                                        # above).
-                                                        dcc.Loading(
-                                                            dmc.Tooltip(
-                                                                dmc.Text(
-                                                                    id="scenario_rank",
-                                                                    span=True,
-                                                                    size="sm",
-                                                                ),
-                                                                disabled=True,
-                                                                events=TOOLTIP_EVENTS,
-                                                                id="rank-updated-tooltip",
-                                                                label="",
-                                                            ),
-                                                            delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
-                                                            show_initially=False,
-                                                        ),
-                                                    ],
-                                                    gap="0.25em",
-                                                ),
-                                                dmc.Tooltip(
-                                                    dmc.Button(
-                                                        "Refresh",
-                                                        id="rank-refresh-button",
-                                                        variant="subtle",
-                                                        size="compact-xs",
-                                                        leftSection=local_icon(
-                                                            "material-symbols:refresh-rounded",
-                                                            width=14,
-                                                        ),
-                                                    ),
-                                                    label=RANK_REFRESH_TOOLTIP,
-                                                    events=TOOLTIP_EVENTS,
-                                                    multiline=True,
-                                                    withArrow=True,
-                                                    w=SETTINGS_HELP_TOOLTIP_WIDTH,
-                                                ),
-                                            ],
-                                            gap="xs",
-                                            align="center",
-                                        ),
-                                    ],
-                                    w=300,
-                                    maw="100%",
-                                ),
+                                scenario_stats_panel(SCENARIO_STATS_IDS),
                             ],
                             gap="sm",
                             justify="flex-start",

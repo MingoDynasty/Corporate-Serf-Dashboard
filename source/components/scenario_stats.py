@@ -1,10 +1,37 @@
-"""Show a scenario's stats and leaderboard position."""
+"""Build the Scenario Stats block and wire its callbacks to a page's ids.
+
+The block is what sits under the Scenario Stats heading: Last played,
+Number of runs, and Position with its Refresh button. A page that hosts it
+fills in a ``ScenarioStatsIds``, puts ``scenario_stats_stores`` and
+``scenario_stats_panel`` in its layout, and calls
+``register_scenario_stats`` with the ids once, at import. The callbacks are
+plain functions here and are registered once per page.
+
+What the Position field remembers between calls is module-level state:
+``_session_notices_sent`` and ``_last_rank_hints``. Every page that
+registers the block reads and writes the same objects, so the Steam ID
+mismatch toast fires once per run of the server, whichever page is open.
+"""
 
 import logging
+from typing import NamedTuple
 
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, clientside_callback, ctx, no_update
+from dash import (
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    dcc,
+    no_update,
+)
 
+from source.components.chart_options import (
+    SETTINGS_HELP_TOOLTIP_WIDTH,
+    TOOLTIP_EVENTS,
+)
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity, get_kovaaks_username
@@ -24,7 +51,11 @@ RANK_REFRESH_TOOLTIP = (
     "Fetch your current position live from the KovaaK's leaderboard. The "
     "displayed value can come from a local cache and may lag the live board."
 )
-_INTERVAL_PROP = "interval-component.n_intervals"
+# How a trigger's ``prop_id`` ends when it is a tick of the polling interval.
+# The property, not one page's id: every page that registers the block has
+# an interval of its own, and the poll is the only ``n_intervals`` the
+# Position callback takes.
+_INTERVAL_TICK = ".n_intervals"
 _RANK_HINT_USERNAME_UNSET = "username_unset"
 _RANK_HINT_LOOKUP_FAILED = "lookup_failed"
 _RANK_HINT_SERVED_STALE = "served_stale"
@@ -59,6 +90,42 @@ _session_notices_sent: set[str] = set()
 _last_rank_hints: dict[str, tuple[str, str | None]] = {}
 
 
+class ScenarioStatsIds(NamedTuple):
+    """The component ids one page gives its Scenario Stats block.
+
+    Two pages need two sets: the callbacks are registered once per set, and
+    Dash allows one callback per output.
+
+    ``scenario_stats_stores`` builds the stores, whose ids here end in
+    ``_ts`` or ``_empty_value``, and ``scenario_stats_panel`` builds the
+    rest of the block. ``run_events``, ``scenario_dropdown``,
+    ``polling_interval`` and ``relative_time_interval`` are the page's own.
+    The block reads them and builds none of them:
+
+    - ``run_events`` is the store the page's run delivery writes when new
+      runs land on the scenario it shows.
+    - ``polling_interval`` is the ``dcc.Interval`` the page polls on. A
+      tick of it alone reads the Position from caches and never fetches.
+    - ``relative_time_interval`` is a ``dcc.Interval`` that ticks every 30
+      seconds, so the Last played text and the Position hover's age stay
+      current on a page left open.
+    """
+
+    last_played: str
+    last_played_tooltip: str
+    num_runs: str
+    rank: str
+    rank_updated_tooltip: str
+    rank_refresh_button: str
+    last_played_ts: str
+    last_played_empty_value: str
+    rank_updated_ts: str
+    run_events: str
+    scenario_dropdown: str
+    polling_interval: str
+    relative_time_interval: str
+
+
 # Rank display states deliberately map to distinct user-facing text.
 def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     """Format the compact Scenario Stats rank value shown after the fixed label."""
@@ -83,30 +150,16 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     return "N/A"
 
 
-@callback(
-    Output("scenario_num_runs", "children"),
-    Output("last-played-ts", "data"),
-    Output("last-played-empty-value", "data"),
-    Output("last-played-tooltip", "label"),
-    Output("scenario_datetime_last_played", "className"),
-    Output("scenario_datetime_last_played", "tabIndex"),
-    Output("last-played-tooltip", "disabled"),
-    Input("run-events", "data"),
-    Input("scenario-dropdown-selection", "value"),
-)
 def get_scenario_num_runs(
     _, selected_scenario
 ) -> tuple[int, float | None, str, str, str | None, int | None, bool]:
-    """
-    Updates the Scenario Stats on the UI.
+    """Fill in the run count and what the Last played text is built from.
 
     The relative "Last played" string is rendered client-side from the raw epoch
-    written to the ``last-played-ts`` store. This callback owns the empty-state
+    written to the ``last_played_ts`` store. This callback owns the empty-state
     value and tooltip affordance, while a clientside callback owns the visible
-    ``children``.
-    :param _: trigger from the interval component. Its actual value is not used.
-    :param selected_scenario: user-selected scenario name.
-    :return: Scenario Stats data
+    ``children``. The first argument is the page's run-events store, which
+    triggers the call and is not read.
     """
     if not selected_scenario:
         return 0, None, "—", "", None, None, True
@@ -129,24 +182,18 @@ def get_scenario_num_runs(
 
 # The visible "Last played" text is recomputed in the browser on each store
 # change and on every 30s interval tick, so the relative string stays current
-# without a reload. Home uses the full window.* path (dagfuncs is not a bare
+# without a reload. It uses the full window.* path (dagfuncs is not a bare
 # global here) and the server-selected empty-state sentinel.
-clientside_callback(
-    """
+_LAST_PLAYED_SCRIPT = """
     (seconds, emptyValue, _nIntervals) => {
         return window.dashAgGridFunctions.relativeTime(seconds, emptyValue);
     }
-    """,
-    Output("scenario_datetime_last_played", "children"),
-    Input("last-played-ts", "data"),
-    Input("last-played-empty-value", "data"),
-    Input("relative-time-interval", "n_intervals"),
-)
+    """
 
 
 def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
     """Allow network access unless the interval is the callback's only trigger."""
-    return any(trigger["prop_id"] != _INTERVAL_PROP for trigger in triggered)
+    return any(not trigger["prop_id"].endswith(_INTERVAL_TICK) for trigger in triggered)
 
 
 def _steam_mismatch_notifications(
@@ -329,18 +376,6 @@ def _render_scenario_rank(
     return display, updated_ts, notifications
 
 
-@callback(
-    Output("scenario_rank", "children"),
-    Output("rank-updated-ts", "data"),
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("run-events", "data"),
-    Input("scenario-dropdown-selection", "value"),
-    Input("interval-component", "n_intervals"),
-    # Not ``True``: this callback renders the initial Position value, so the
-    # page load must still run it -- but Dash refuses an ``allow_duplicate``
-    # output without one of the ``prevent_initial_call`` forms.
-    prevent_initial_call="initial_duplicate",
-)
 def get_scenario_rank(_, selected_scenario, _n_intervals):
     """Render scenario rank, keeping interval-only calls cache-only.
 
@@ -367,8 +402,7 @@ def get_scenario_rank(_, selected_scenario, _n_intervals):
 # The tooltip is a fixed part of the layout rather than part of the value's
 # children: the interval rewrites those every tick, and Dash remounts component
 # children on each write, which blinks an open tooltip.
-clientside_callback(
-    """
+_RANK_UPDATED_SCRIPT = """
     (seconds, _nIntervals) => {
         if (seconds === null || seconds === undefined) {
             return ["", true, null, null];
@@ -381,14 +415,7 @@ clientside_callback(
             dagfuncs.absoluteTime(seconds, "");
         return [label, false, "cell-tooltip-affordance", 0];
     }
-    """,
-    Output("rank-updated-tooltip", "label"),
-    Output("rank-updated-tooltip", "disabled"),
-    Output("scenario_rank", "className"),
-    Output("scenario_rank", "tabIndex"),
-    Input("rank-updated-ts", "data"),
-    Input("relative-time-interval", "n_intervals"),
-)
+    """
 
 
 def _rank_refresh_problem_notification(
@@ -508,21 +535,6 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
     )
 
 
-@callback(
-    Output("scenario_rank", "children", allow_duplicate=True),
-    Output("rank-updated-ts", "data", allow_duplicate=True),
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Output("notification-container", "hideNotifications", allow_duplicate=True),
-    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
-    Input("rank-refresh-button", "n_clicks"),
-    State("scenario-dropdown-selection", "value"),
-    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
-    # Show the button's spinner for the duration of the fetch. Mantine's
-    # loading state also swallows clicks, so the button cannot be spammed
-    # into repeat KovaaK's calls while one refresh is in flight.
-    running=[(Output("rank-refresh-button", "loading"), True, False)],
-    prevent_initial_call=True,
-)
 # One return per outcome the click can have. Collapsing any pair would only
 # hide which answer a reader is looking at.
 def refresh_rank(  # noqa: PLR0911
@@ -640,3 +652,182 @@ def refresh_rank(  # noqa: PLR0911
             _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
         ),
     )
+
+
+def scenario_stats_stores(ids: ScenarioStatsIds) -> list[dcc.Store]:
+    """Build the stores the block's callbacks pass their values through."""
+    return [
+        # raw epoch for the relative "Last played" text
+        dcc.Store(id=ids.last_played_ts),
+        dcc.Store(id=ids.last_played_empty_value, data=""),
+        # raw epoch for the Position hover
+        dcc.Store(id=ids.rank_updated_ts),
+    ]
+
+
+def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
+    """Build the Scenario Stats heading and the rows under it."""
+    return dmc.Box(
+        [
+            dmc.Title(
+                "Scenario Stats",
+                order=2,
+                size="h6",
+            ),
+            dmc.Group(
+                [
+                    dmc.Text(
+                        "Last played:",
+                        fw=700,
+                        span=True,
+                        size="sm",
+                    ),
+                    dmc.Tooltip(
+                        dmc.Text(
+                            "",
+                            id=ids.last_played,
+                            span=True,
+                            size="sm",
+                        ),
+                        disabled=True,
+                        events=TOOLTIP_EVENTS,
+                        id=ids.last_played_tooltip,
+                        label="",
+                    ),
+                ],
+                gap="0.25em",
+            ),
+            dmc.Text(
+                [
+                    dmc.Text(
+                        "Number of runs: ",
+                        fw=700,
+                        span=True,
+                    ),
+                    dmc.Text(
+                        id=ids.num_runs,
+                        span=True,
+                    ),
+                ],
+                size="sm",
+            ),
+            dmc.Group(
+                [
+                    dmc.Group(
+                        [
+                            dmc.Text(
+                                "Position:",
+                                fw=700,
+                                span=True,
+                                size="sm",
+                            ),
+                            # dcc.Loading renders divs, which cannot nest
+                            # inside a Text's default <p> root, so it sits
+                            # beside the label in a Group (like "Last played:"
+                            # above).
+                            dcc.Loading(
+                                dmc.Tooltip(
+                                    dmc.Text(
+                                        id=ids.rank,
+                                        span=True,
+                                        size="sm",
+                                    ),
+                                    disabled=True,
+                                    events=TOOLTIP_EVENTS,
+                                    id=ids.rank_updated_tooltip,
+                                    label="",
+                                ),
+                                delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
+                                show_initially=False,
+                            ),
+                        ],
+                        gap="0.25em",
+                    ),
+                    dmc.Tooltip(
+                        dmc.Button(
+                            "Refresh",
+                            id=ids.rank_refresh_button,
+                            variant="subtle",
+                            size="compact-xs",
+                            leftSection=local_icon(
+                                "material-symbols:refresh-rounded",
+                                width=14,
+                            ),
+                        ),
+                        label=RANK_REFRESH_TOOLTIP,
+                        events=TOOLTIP_EVENTS,
+                        multiline=True,
+                        withArrow=True,
+                        w=SETTINGS_HELP_TOOLTIP_WIDTH,
+                    ),
+                ],
+                gap="xs",
+                align="center",
+            ),
+        ],
+        w=300,
+        maw="100%",
+    )
+
+
+def register_scenario_stats(ids: ScenarioStatsIds) -> None:
+    """Register the block's callbacks for one page's ids.
+
+    Call once per page, at import, with the ids its layout is built from.
+    The toasts go to the shell's notification container and channel
+    registry, which every page shares.
+    """
+    callback(
+        Output(ids.num_runs, "children"),
+        Output(ids.last_played_ts, "data"),
+        Output(ids.last_played_empty_value, "data"),
+        Output(ids.last_played_tooltip, "label"),
+        Output(ids.last_played, "className"),
+        Output(ids.last_played, "tabIndex"),
+        Output(ids.last_played_tooltip, "disabled"),
+        Input(ids.run_events, "data"),
+        Input(ids.scenario_dropdown, "value"),
+    )(get_scenario_num_runs)
+    clientside_callback(
+        _LAST_PLAYED_SCRIPT,
+        Output(ids.last_played, "children"),
+        Input(ids.last_played_ts, "data"),
+        Input(ids.last_played_empty_value, "data"),
+        Input(ids.relative_time_interval, "n_intervals"),
+    )
+    callback(
+        Output(ids.rank, "children"),
+        Output(ids.rank_updated_ts, "data"),
+        Output("notification-container", "sendNotifications", allow_duplicate=True),
+        Input(ids.run_events, "data"),
+        Input(ids.scenario_dropdown, "value"),
+        Input(ids.polling_interval, "n_intervals"),
+        # Not ``True``: this callback renders the initial Position value, so the
+        # page load must still run it -- but Dash refuses an ``allow_duplicate``
+        # output without one of the ``prevent_initial_call`` forms.
+        prevent_initial_call="initial_duplicate",
+    )(get_scenario_rank)
+    clientside_callback(
+        _RANK_UPDATED_SCRIPT,
+        Output(ids.rank_updated_tooltip, "label"),
+        Output(ids.rank_updated_tooltip, "disabled"),
+        Output(ids.rank, "className"),
+        Output(ids.rank, "tabIndex"),
+        Input(ids.rank_updated_ts, "data"),
+        Input(ids.relative_time_interval, "n_intervals"),
+    )
+    callback(
+        Output(ids.rank, "children", allow_duplicate=True),
+        Output(ids.rank_updated_ts, "data", allow_duplicate=True),
+        Output("notification-container", "sendNotifications", allow_duplicate=True),
+        Output("notification-container", "hideNotifications", allow_duplicate=True),
+        Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
+        Input(ids.rank_refresh_button, "n_clicks"),
+        State(ids.scenario_dropdown, "value"),
+        State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
+        # Show the button's spinner for the duration of the fetch. Mantine's
+        # loading state also swallows clicks, so the button cannot be spammed
+        # into repeat KovaaK's calls while one refresh is in flight.
+        running=[(Output(ids.rank_refresh_button, "loading"), True, False)],
+        prevent_initial_call=True,
+    )(refresh_rank)
