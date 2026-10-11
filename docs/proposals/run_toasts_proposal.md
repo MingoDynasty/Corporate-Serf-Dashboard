@@ -205,10 +205,14 @@ the player sees that another run came in. It does, and
 
 **If the maintainer chooses differently on the row:**
 
-- **Keep the verdict in the toast.** The page then goes public with today's
-  toast, still built by the page and shown only there. That is the page
-  proposal's fallback, with N fixed at 5. T2 and T3 would need another
-  look, since both follow from a toast with no verdict.
+- **Keep the verdict in the toast.** There are two versions. The smaller
+  one keeps only the verdict: a toast on every page with the pass or miss,
+  the percentage, and the link, with no placement and no verdict switch. T2
+  and T3 could still stand. [Alternatives rejected](#alternatives-rejected)
+  says what it offers and why it is not recommended. The larger one keeps
+  today's toast as it is, built by the page and shown only there. That is
+  the page proposal's fallback, with N fixed at 5, and T2 and T3 would
+  wait.
 - **No run toast at all.** This is the quietest app, and it keeps the
   2026-08-03 test whole. It loses the link, and on any page but Run History
   it loses the only sign that the app saw the run.
@@ -259,8 +263,9 @@ for it. Score vs Sensitivity still plots every run at each sensitivity.
 
 ### T3. The Score threshold verdict switch is dropped
 
-Status: Open. The maintainer's agreement of 2026-10-10. It follows T1: if
-T1 is not agreed, T3 falls with it.
+Status: Open. The maintainer's agreement of 2026-10-10. It rests on a
+toast with no verdict. If the toast keeps a verdict, T3 needs another look,
+though it could still stand.
 
 **Recommendation: remove the switch and its help text from the Chart
 options panel. Clearing Score threshold percentage is the one way to stop
@@ -797,9 +802,17 @@ control on that page.
   2026-09-19. It is also not known to close the case: the router does not
   see an address rewritten behind it, so a later link to the old address
   may still read as no change. Not probed.
-- **The verdict and the link together.** It keeps the toast useful at a
-  glance, and keeps the duplicate, the N, and the switch that T1 to T3
-  remove. It is not what "barebones" asked for.
+- **A verdict and the link, on every page.** This is the strongest
+  alternative, and it does not need the rest of today's toast. The shell
+  would send "Threshold passed" or "Below threshold" with the percentage
+  and the link, and a plain toast for a run that can't be judged. It needs
+  no placement and no verdict switch, so T2 and T3 could stand beside it.
+  It serves a player who wants the result without leaving the page they
+  are on, and it keeps the answer readable from across the room. It is not
+  recommended because of what the toast is for under T1: it confirms that
+  the run arrived and offers the way to look, and the judgment has one home
+  that lasts. It is also not what "barebones" asked for. If a glance at the
+  result becomes the priority again, this is the version to reconsider.
 - **A count for a batch,** and **hiding the toast on Run History.** Both
   are above.
 
