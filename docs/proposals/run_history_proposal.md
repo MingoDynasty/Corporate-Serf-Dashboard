@@ -666,8 +666,17 @@ Not in version 1, both dashed in the mockup: "Better than 19 of your last
   they were played, evenly spaced. Its axis labels are dates, one at the
   first run of a day, thinned so they don't collide. It is the mode that
   shows every run of a session apart, which is why the page opens on it.
+  The order is the one the
+  [sessions spec](../specs/sessions.md#sessions) sets: by when a run ended,
+  with its rule for runs that ended in the same second. So the chart and
+  the list never disagree about which run came first.
 - **Score vs Time** plots each run at its own timestamp. The day no longer
   shares one position.
+- **Two runs can still share a position in Score vs Time.** A run's
+  timestamp is in whole seconds, so runs that ended in the same second
+  with the same score sit on one point. The chart keeps today's rule for
+  points at one position: a new PB comes last among them in the run trace,
+  so the hover shown under a star is the hover of the run that set the PB.
 - **Score vs Sensitivity** plots every run in the range at its sensitivity
   (R5).
 - **Ranges.** Score vs Run counts runs: the last 50, 100, or 200, or all of
@@ -1137,7 +1146,7 @@ after.
 | L-G4 | The date range includes the selected date | A range is a count of runs, or whole local days back |
 | L-G5 | The plot title reads `{scenario} (updated: {timestamp})` | `{scenario}` |
 | L-G8 | A new PB that Top N or the date leaves off the chart gets no star and still counts | Only the range can leave one off |
-| L-G19 | Runs at one position share one hover, and a new PB is ordered last where it shares a position with a same-day tie | Shared positions end in Score vs Time and never exist in Score vs Run. They remain in Score vs Sensitivity, which has no stars |
+| L-G19 | Runs at one position share one hover, and a new PB is ordered last where it shares a position with a same-day tie | The rule is kept, for a rarer case. In Score vs Time only runs that ended in the same second with the same score share a position, and a new PB is still ordered last among them. Score vs Run gives every run its own position. Score vs Sensitivity still shares positions and has no stars |
 | L-G24 | The rank lines lag a change of playlist until the next rebuild | They redraw at once |
 | L-G30 | "No runs in this date range" | Reworded for a range, and reachable only in the two day-based modes |
 | L-G31 | "Unsupported graph option" names two modes | It names three |
@@ -1164,7 +1173,7 @@ after.
 | L-C19 | Its help tooltip, the one place that says a top-N run earns a notification | Goes with L-C8. The maintainer: "I think this is probably fine." |
 | L-G2 | The "Average score" line | R5. No summary line in version 1 |
 | L-G3 | The top N scores are kept per sensitivity, or per day | R5 |
-| L-G9 | A later run the same day with the same score has no star | It can't arise. Each run sits at its own time and none is left out |
+| L-G9 | A later run the same day with the same score has no star | It can't arise. No run is left out, so a tie is never plotted without the new PB it tied |
 | L-G17 | The Average score hover | Goes with L-G2 |
 | L-G28 | The empty state "Graph settings incomplete" | Both controls it names are gone, and a range can't be empty |
 | L-G34 | The Average score line's fixed color | Goes with L-G2 |
@@ -1201,7 +1210,7 @@ entry. It erases nothing.
 |---|---|---|
 | [2026-08-09, the naming entry](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options) | The page's name (R1). "The route restructure is deferred" is resolved, with `/run-history` in place of `/scenario` (R2). "Run History composes into this column" is answered with a second column (R3) | Chart options' name, Settings' name, no exclusive tenancy, and the rule that copy is checked against the app's own words |
 | [2026-08-09, the panel entry](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph) | The 62em threshold. "Ids and defaults survive verbatim", set aside once | The panel beside the chart, the container query, the clipping row, `.home-graph` as the resize hook, and the toggle's guard |
-| [2026-10-05, the stars](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star) | "Only Score vs Time is marked" (R6). The clauses about Top N, the oldest date, the kept tie, the hover order at a shared position, and the Average score trace stop applying (R5) | What a new PB is, no stars on Score vs Sensitivity, the look, Point size, and no control |
+| [2026-10-05, the stars](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star) | "Only Score vs Time is marked" (R6). The clauses about Top N, the oldest date, the kept tie, and the Average score trace stop applying (R5). The hover order at a shared position narrows from a same-day tie to a same-second one | What a new PB is, no stars on Score vs Sensitivity, a new PB ordered last among points at one position, the look, Point size, and no control |
 | [2026-09-19, query parameters](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory) | "`?scenario=` alone leaves the playlist filter on the restored value" gains one exception (R7) | The invariant and its corollary, which bind the new page. An unknown playlist code still clears the filter, and the URL is still not rewritten |
 | [2026-07-11, timestamps](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format) | The plot title's `updated:` use ends. Session names and the card drop this year's year, and a run row shows a time of day alone | The format and its rules |
 | [2026-10-05, pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | The watchdog's session lines leave its list of surfaces. The check and the card join it | The pace rule |
@@ -1393,6 +1402,9 @@ maintainer's main checkout.
 - **The chart's queries and figures:** every run in each range, the range's
   midnight edge, stars in Score vs Run and Score vs Time and none in Score
   vs Sensitivity, no Average score trace, the title, and each empty state.
+  Also two runs that ended in the same second with the same score, one of
+  them a new PB, handed over in both orders: the new PB is last in the run
+  trace either way.
 - **The card,** in each state in the Copy block, with the toast's two caps.
 - **Deep links and R7:** each combination of the two parameters against a
   filter that lists the scenario and one that doesn't, with Follow on and
