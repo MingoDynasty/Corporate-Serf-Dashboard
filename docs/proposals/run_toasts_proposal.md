@@ -601,35 +601,50 @@ with.
 
 ### The Run notifications setting
 
-**The setting becomes a value the shell holds, and the switch becomes a
-view of it.** This is the shape the celebration setting has had since
+**The setting becomes a value the shell holds, and its switch moves to the
+Settings page.** The maintainer chose the Settings page on 2026-10-11. Both
+are what the celebration setting has had since
 [2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page):
 
 - **A browser-local store in the shell** holds one value, on or off, and
   starts on. Only the exact off value silences the toast. Anything else,
   including a store the browser has lost, shows it, which is the default.
-- **The switch stays where it is,** in the Chart options panel's
-  **Notifications** group. It no longer uses Dash's persistence. It takes
-  its value from the store when the page opens, and writes each change
-  back.
+- **The switch sits on the Settings page,** in a **Notifications** section
+  of its own, directly above **Celebrations**. Like that section it is
+  outside the Save form and takes effect at once. The switch takes its
+  value from the store when the page opens, and writes each change back.
+- **The Chart options panel loses its Notifications group.** With T3, the
+  panel then holds no notification control.
 - **The drain reads the store as state.**
+
+**Why Settings.** The 2026-09-02 decision put the celebration control there
+because "The behavior is app-wide, so the Chart options inspector on one
+page is the wrong home". Under T1 the run toast is app-wide too. It shows
+on Playlists and on Settings, and the control that silences it would
+otherwise sit in one page's chart options. It is also the smaller build.
+Settings already has the tick described below, so this switch is a second
+control that tick fills, and no second page takes on its hazard.
+
+**What it costs.** The switch leaves the page where most toasts are seen.
+The celebration setting accepted the same cost.
 
 The switch and the store can't simply feed each other: that is a cycle the
 renderer refuses, and a page-mounted control writes its layout default into
 the store on every visit. The 2026-09-02 decision records both hazards and
 the fix, a one-shot tick that fills the control and gates the write. This
-reuses that fix.
+reuses that fix, and the tick the Settings page already has.
 
 **It stays browser-local.** A key in `data/settings.json` was rejected for
 the celebration on cost, since it forces that file's first schema
 migration, and the reasoning holds here.
 
-**A stored "off" is lost once, in one ordering.** If the page has been
-public with a persisted switch before this lands, a browser that had turned
-it off starts on again, and shows toasts until the switch is turned off
-once more. If the two land in one release, nothing is lost, because the new
-page's controls start fresh then anyway. The page proposal can remove the
-case entirely by building its switch on the store from the start.
+**A stored "off" is lost once.** The old switch's value is kept by Dash's
+persistence under the old control, and the store does not read it. So a
+browser that had turned run toasts off starts on again when this lands, and
+shows them until the switch on Settings is turned off. If this lands in the
+release that makes the page public, that is part of the one-time reset of
+remembered controls the page proposal already describes. If it lands later,
+it is a second reset, for this one switch.
 
 ### What leaves
 
@@ -663,12 +678,13 @@ endorse or redline this block.
 | Toast title | `New run detected` | The maintainer's words. Sentence case. The Follow switch's help already says "when a new run is detected". |
 | Toast, first line | `{scenario}` | A readout, so no period. It says which run and where the link goes. |
 | Toast, link | `Open in Run History` | "Open", as **Open scenario table** and **Open Settings** say. "In", because it opens that scenario and not the page's last view. A page name keeps its capitals and takes no bold. |
+| Settings page, section heading | `Notifications` | The Chart options group's heading, moved with its switch. A section heading keeps Title Case, as **Celebrations** below it does. |
 
 **Edited**
 
 | Where | Now | Becomes | Why |
 |---|---|---|---|
-| **Run notifications** help text | `Controls threshold verdict and placement notifications for your runs. Personal best celebrations use their own setting.` | `Shows a notification on every page when a new run is detected. Personal best celebrations use their own setting.` | Neither named kind exists any more. "On every page" is the new fact. |
+| **Run notifications**, its explanation | A help tooltip in Chart options: `Controls threshold verdict and placement notifications for your runs. Personal best celebrations use their own setting.` | The description under the switch on Settings: `Shows a notification on every page when a new run is detected. Personal best celebrations use their own setting. Takes effect right away.` | Neither named kind exists any more. "On every page" is the new fact. The last sentence is the celebration description's own, for the same reason: this section applies at once, unlike the Save form above it. The label, `Run notifications`, is unchanged. |
 | **Score threshold percentage** help text, last sentence | `Notifications judge a run against the personal best you had before the run.` | `A run is judged against the personal best you had before the run.` | No notification judges a run. The sentence names no surface, so it is true before and after the page ships its check. |
 | README, Features | `**Run notifications**: a toast to compare your new run against your personal best.` | `**Run notifications**: a toast on every page when a new run is detected, with a link to its scenario on Run History.` | The comparison is on the page now. Still one line. |
 | User guide, pace paragraph | `so the threshold line and the run notification both judge by it, and the notification says "% of PB pace".` | `so the threshold line and the check beside a run's score both judge by it, and the latest-run card says "% of PB pace".` | The notification no longer judges. "Check" and "latest-run card" follow the page proposal's Copy block, whatever it settles on. |
@@ -684,6 +700,7 @@ endorse or redline this block.
 | `{scenario}: {score}, {pct}% of PB (need {goal}%).` and its `% of PB pace` twin | Toast message, miss |
 | `Also your {best or Nth-best} at {sensitivity}.`, `Still your {best or Nth-best} at {sensitivity}.` | Toast message, placement |
 | `{scenario}: {score} at {sensitivity}.` | Toast message, placed and not judged |
+| `Notifications` | Chart options group heading. It moves to the Settings page. |
 | `Score threshold verdict` | Switch label |
 | `Adds a pass or fail verdict to run notifications when the run can be judged against the score threshold. Needs **Run notifications** turned on.` | Its help text |
 
@@ -694,7 +711,7 @@ R5.
 
 Checked and left as it is: the Settings page's celebration description says
 the celebration "doesn't depend on **Run notifications**", which stays
-true.
+true. The switch it names is now the one above it.
 
 ### Terms
 
@@ -727,7 +744,7 @@ Each entry keeps its text and gains a dated note. None is erased.
 |---|---|---|
 | [2026-08-03, One Quiet Notification Layer](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy) | For run toasts: the title carries the verdict; a run that earns neither emits nothing; the threshold verdict headlines and the placement trails; a failing verdict names its target; sensitivity as a trailing qualifier. Its "already visible somewhere" test gains the run toast as a named exception. | The one delivery path. The routing policy for every other event. Background threads never driving the UI. The four behaviors of the run toast's channel. "The message leads with the scenario." |
 | [2026-07-08, Judge Against The Previous PB](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb) | The surface: no notification judges a run. | The rule and its exact comparison, now for the check and the card. |
-| [2026-08-21, Run Notifications Have A Master Switch](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed) | The verdict switch and its four combinations (T3). What the master switch gates: one plain toast. That it is stored by Dash persistence. Its deferral of app-wide run toasts. | What the master switch does not gate. That flipping it rebuilds nothing. That it is browser-local, with `settings.json` and `config.toml` rejected. |
+| [2026-08-21, Run Notifications Have A Master Switch](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed) | The verdict switch and its four combinations (T3). What the master switch gates: one plain toast. Where it lives: its Notifications group leaves Chart options for the Settings page. That it is stored by Dash persistence. Its deferral of app-wide run toasts. | What the master switch does not gate. That flipping it rebuilds nothing. That it is browser-local, with `settings.json` and `config.toml` rejected. |
 | [2026-09-02, A New Personal Best Celebrates On Every Page](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page) | "Run toasts remain page-built and page-scoped", and the deferred question of app-wide run toasts. The page's part in the coalescing rule: the shell now picks the batch's newest run, whatever its scenario. | The celebration in full. One notification per run at most. The two settings staying independent. |
 | [2026-10-05, Time-Scored Scenarios Are Measured By Pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | Where the third of its five surfaces lives: the threshold verdict's "% of PB pace" is on the page, not in a toast. Top N placement leaves its list of things that order scores. | Every formula, the detection, and the other four surfaces. |
 | [2026-08-09, The Graph Page Is Scenario Performance](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options) | Its list of the Score Threshold group's controls, which names the verdict switch. | The rest of the entry, as far as this proposal goes. The page proposal reverses its name ruling separately. |
@@ -741,15 +758,23 @@ note: the
 [2026-09-11 sensitivity entry](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)
 (placement within the normalized group).
 
-The
-[2026-08-31 toast identity decision](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
-is relied on and not changed.
+Two decisions are relied on and not changed. One is the
+[2026-08-31 toast identity decision](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry).
+The other is the
+[2026-09-02 celebration setting decision](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page),
+whose reason for the Settings page now covers a second control. It gains a
+note that the celebration select is no longer the only browser-local
+control on that page.
 
 ### Alternatives rejected
 
 - **A second shell callback that listens to the batch.** It leaves the
   drain untouched, but it must be shown never to fire twice for one batch.
   The drain needs no such proof, because it empties the queue.
+- **Keeping the switch in Chart options.** It stays where players have
+  found it, on the page where most toasts show. It also leaves an app-wide
+  setting in one page's chart panel, and puts a second copy of the store's
+  wiring and its hazard on that page.
 - **A mirror store beside a persisted switch.** The switch would keep
   Dash's persistence and copy its value into a shell store. Then two stored
   values can disagree: after an upgrade, a browser whose switch says off
@@ -776,19 +801,9 @@ is relied on and not changed.
 
 ### Beyond the outline, optional
 
-None of these is part of the proposal. Each is listed so the maintainer can
-take or leave it, and none is needed for T1 to T3.
+Neither of these is part of the proposal. Each is listed so the maintainer
+can take or leave it, and neither is needed for T1 to T3.
 
-- **Move the Run notifications switch to the Settings page,** beside
-  **Personal best celebration**. The 2026-09-02 decision put the
-  celebration control there because "The behavior is app-wide, so the Chart
-  options inspector on one page is the wrong home". Under T1 the run toast
-  is app-wide too, and a player who wants it off while on the Playlists
-  page would have to know to look in one page's chart options. The cost is
-  a visible move, a **Notifications** group that leaves the Chart options
-  panel, and no way to silence the toast from the page that shows most of
-  them. Because the setting is a store, the move is cheap whenever it is
-  wanted.
 - **Rename the channel** from `run-verdict` to `run-notification`. The toast
   holds no verdict, and the glossary would then give the code word its
   term's name. The cost is a rename across the helper, the spec's
@@ -797,6 +812,10 @@ take or leave it, and none is needed for T1 to T3.
   player most wants to open, and under T1 its toast is the one without a
   link. The cost is a change to a toast the maintainer said can stay as it
   is.
+
+A third item was here: moving the **Run notifications** switch to the
+Settings page. The maintainer chose it on 2026-10-11, and it is now part of
+the design.
 
 ## Delivery plan
 
@@ -820,12 +839,14 @@ Until the page is public the verdict has nowhere else to live.
 
 **What it holds:**
 
-- **The shell:** the toast in the drain, the setting's store, and the
-  switch as a view of it.
+- **The shell:** the toast in the drain, and the setting's store.
+- **The Settings page:** the Notifications section and its switch.
+- **The Chart options panel:** without its Notifications group.
 - **The removals** under [What leaves](#what-leaves).
 - **The docs:** the notifications spec's Run notifications section and its
   inventory row; the Chart options statements in the page's spec; the
-  glossary, from [Terms](#terms); one decision-log entry and the notes
+  settings spec, which gains the Notifications section; the glossary, from
+  [Terms](#terms); one decision-log entry and the notes
   under [Decisions this changes](#decisions-this-changes); the product
   inventory's Run notifications paragraph; the README line and the two
   user guide lines from [Copy](#copy); the architecture doc's lines on the
@@ -877,6 +898,8 @@ For the implementation PR:
   `+`, and `#`. Two runs of one scenario give two different addresses.
 - **The setting.** The write is refused before the filling tick, with the
   tick's count at 0 and at none. An unknown stored value shows the toast.
+  The Settings layout holds the switch, and the Chart options panel holds
+  no Notifications group.
 - **What is gone.** The tests for the verdict and placement toasts are
   removed. The tests for the judging functions move with those functions.
 - **The channel.** `tests/test_home_run_verdict_lifetime.py` stays as the
@@ -884,7 +907,8 @@ For the implementation PR:
 - **In a browser, with a scratch stats folder.** A run dropped while the
   Playlists page is open shows the toast, and its link opens Run History on
   that scenario with the toast still up. The same with a scenario name
-  that holds `&` and `%`. Nothing shows with the switch off. A new PB shows
+  that holds `&` and `%`. With **Run notifications** turned off on the
+  Settings page, the next run shows nothing, with no Save. A new PB shows
   the celebration alone. A second run inside the first toast's eight
   seconds replaces it with the entry animation, and one toast is left on
   screen. After a toast's link has opened scenario A, pick B by hand with
