@@ -691,9 +691,9 @@ something asks for them.
   batch can be missed.
 - **The functions take a list of runs** and never read the store
   themselves. The store already keeps one list of every run in the order
-  the runs ended, and that list is what a caller copies. The store is written by the watchdog thread and read without
-  a lock, and a caller that hands over a copy keeps that out of the session
-  code.
+  the runs ended, and that list is what a caller copies. The store is
+  written by the watchdog thread and read without a lock, and a caller that
+  hands over a copy keeps that out of the session code.
 - **Changing the constant re-splits the whole history,** with nothing to
   migrate.
 
@@ -840,8 +840,8 @@ their tests.
 - **Four ideas from the gap discussion,** parked in the same place: a
   divider for a long break inside a session, warm-up keyed on a break, "in
   progress" on its own shorter timer, and a session as one launch of the
-  game. The
-  maintainer, 2026-10-10: good ideas, probably not for the first release.
+  game. The maintainer, 2026-10-10: good ideas, probably not for the first
+  release.
 - **The gap as a setting.** S2. Nothing tracks it. A `config.toml` key
   could be added later without breaking anything.
 - **Time in runs as a figure.** No version 1 screen shows it. Run length
