@@ -91,8 +91,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
   2. **Sessions** — what a session is, and a start and a length for every
      run, built with nothing on screen
      ([proposal](./proposals/sessions_proposal.md)). The app splits the runs
-     into sessions at a break between runs, and finds each unbroken stretch
-     of runs on one scenario inside a session.
+     into sessions at a break between runs, and finds each visit, an
+     unbroken stretch of runs on one scenario inside a session.
   3. **The Run History page, version 1** — a page of its own with a chart
      that plots every run, the selected scenario's runs listed by session,
      and a card for the latest run. It's built hidden and made public when
