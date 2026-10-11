@@ -90,9 +90,10 @@ What we plan to do now or very soon, each with the reasons it comes next.
      proposal.
   2. **Sessions** — what a session is, and a start and a length for every
      run, built with nothing on screen
-     ([proposal](./proposals/sessions_proposal.md)). The app splits the runs
-     into sessions at a break between runs, and finds each visit, an
-     unbroken stretch of runs on one scenario inside a session.
+     ([proposal](./proposals/sessions_proposal.md), ratified 2026-10-11).
+     The app splits the runs into sessions at a break between runs, and
+     finds each visit, an unbroken stretch of runs on one scenario inside a
+     session.
   3. **The Run History page, version 1** — a page of its own with a chart
      that plots every run, the selected scenario's runs listed by session,
      and a card for the latest run. It's built hidden and made public when
@@ -109,8 +110,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
 
   The pieces are built in that order. Sessions can be built beside the
   groundwork, and Run toasts and All scenarios don't wait for each other.
-  Version 1 leaves out the typical run, and the Sessions proposal recommends
-  that its definition move to a proposal of its own. Going public retires
+  Version 1 leaves out the typical run. Its definition moves to a proposal
+  of its own, which the Sessions proposal settles. Going public retires
   the interim per-run lines the watchdog writes to the debug log.
 
   Why it's next, and why sessions first:

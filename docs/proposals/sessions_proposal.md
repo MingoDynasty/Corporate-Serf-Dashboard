@@ -15,13 +15,13 @@ History, to a proposal of its own.
 
 ## Decisions needed
 
-**Nothing in this proposal is ratified.** Four rows need the maintainer's
-judgment, S1 to S4. Each is the maintainer's lean or agreement in chat,
-quoted where words were recorded. Each states the argument, where the
-recommendation gives a wrong answer, and what changes if the maintainer
-chooses differently. Reviewers are invited to contest any row, and any
-author-owned choice in [Design](#design). The IDs start with S so they can't
-be confused with H1 to H6 of
+Four rulings: S1 to S4. The maintainer ratified this proposal on
+2026-10-11, after every reviewer had endorsed all four rows. That settles
+each as its recommendation. Each keeps its argument, where the
+recommendation gives a wrong answer, and what the alternatives would have
+changed, for the record. Everything else is author-owned, in
+[Design](#design), and the ratification covers it too. The IDs start with S
+so they can't be confused with H1 to H6 of
 [PR #351](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/351)
 or D1 to D5 of
 [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327).
@@ -60,15 +60,18 @@ rewrites that file from scratch, so the three continue here.
 
 ### S1. A session ends after a break of more than 30 minutes
 
-Status: Open. The maintainer's lean is 30.
+Status: Ratified (user), 2026-10-11: accept the recommendation below.
+
+The material consequence: the app splits a player's runs into sessions
+wherever more than 30 minutes pass between one run's end and the next run's
+start. A break of 31 to 59 minutes inside one sitting ends a session.
 
 **Recommendation: a run belongs to the session of the run before it unless
 more than 30 minutes pass between that run's end and this run's start.**
 
 The maintainer, 2026-10-10: "I accept 30." And later that day: "30 is an
 accepted lean. Let's take it to proposal review to get Codex's take before
-we ratify." So **the Codex seat is asked by name for its stance on this
-row.**
+we ratify." It went to review for that take and was ratified after it.
 
 The argument, in order. The numbers are in [Evidence](#evidence).
 
@@ -142,7 +145,11 @@ the 2026 history gains 16 sessions. At 45 it loses 6, and at 60 it loses 9.
 
 ### S2. The 30 is fixed, not a setting
 
-Status: Open. The maintainer's lean is a fixed value.
+Status: Ratified (user), 2026-10-11: accept the recommendation below.
+
+The material consequence: the app has no setting and no `config.toml` key
+for the limit, so every install splits the same runs the same way. Changing
+the value is a change to the code.
 
 **Recommendation: the limit is one named constant in the code. The app has
 no setting and no `config.toml` key for it.**
@@ -169,7 +176,11 @@ sessions.
 
 ### S3. A session is in progress until 30 minutes after its last run
 
-Status: Open. Agreed as part of the outline.
+Status: Ratified (user), 2026-10-11: accept the recommendation below.
+
+The material consequence: a session reads as in progress for 30 minutes
+after its last run, a view that shows the state re-checks it on a timer,
+and a session that has read as ended can reopen when a late run lands.
 
 **Recommendation: a session is in progress while no more than 30 minutes
 have passed since its last run ended. After that it has ended. The 30 is
@@ -205,7 +216,11 @@ second number to explain. That option is parked with three other ideas
 
 ### S4. The typical score's definition leaves Run History
 
-Status: Open. The maintainer agreed to leave it out of version 1.
+Status: Ratified (user), 2026-10-11: accept the recommendation below.
+
+The material consequence: Run History version 1 neither defines nor shows
+the typical score. Its definition waits for a proposal of its own, and the
+2026-10-04 entry gains a dated note saying so when this proposal ships.
 
 **Recommendation: Run History neither defines nor shows the typical score,
 which the roadmap calls the typical run. The definition goes to a later
@@ -813,7 +828,7 @@ contract: a boundary that moves is noted in that PR's description.
   sees a change;
 - this file deleted.
 
-**Needs:** S1, S2, and S3 ratified. S4 gates no code.
+**Unblocked:** S1 to S4 were ratified on 2026-10-11.
 
 **Order:** it depends on nothing and can run beside the groundwork PRs. The
 page's run list and its latest-run card wait for it.
