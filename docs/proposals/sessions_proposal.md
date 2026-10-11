@@ -27,8 +27,10 @@ or D1 to D5 of
 [PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327).
 
 **Where this sits.** Run History was one proposal and is now five pieces:
-groundwork with no proposal, Sessions, Run toasts, the Run History page
-(version 1), and All scenarios. The maintainer agreed the split on
+groundwork with no proposal, Sessions, Run toasts
+([PR #354](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/354)),
+the Run History page (version 1), and All scenarios. The maintainer agreed
+the split on
 2026-10-10: "Merged breakdown is a go." That agrees the outline and ratifies
 no row. This piece depends on none of the others. The page's run list and
 its latest-run card are built on it.
