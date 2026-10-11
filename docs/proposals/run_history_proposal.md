@@ -334,6 +334,12 @@ chart/feature", and "Score vs Sensitivity should not affect the launch. We
 can redesign it afterward." So version 1 ships that mode as every run per
 sensitivity, and its redesign is a later piece of work.
 
+What a player will see first there is overplotting. Every run at a
+sensitivity shares one position along the axis, so a well-played scenario
+draws a dense vertical strip per sensitivity, and the spread inside a
+strip can't be read. The maintainer's largest scenario had 463 runs on
+2026-10-04. That is the first thing the redesign has to answer.
+
 Also lost: a start date of the player's own choosing. The range becomes a
 choice from a list (see [The chart](#the-chart)).
 
