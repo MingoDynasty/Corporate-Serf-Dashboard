@@ -9,7 +9,7 @@ import requests
 from dash import dcc, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
 
-from source.components import chart_options, scenario_selection
+from source.components import chart_options, scenario_selection, scenario_stats
 from source.config import settings_service
 from source.kovaaks import api_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
@@ -18,28 +18,30 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import home  # noqa: E402
 
-format_scenario_rank = home.format_scenario_rank
+format_scenario_rank = scenario_stats.format_scenario_rank
 
 
 @pytest.fixture(autouse=True)
 def _forget_rank_hints():
     """Keep the cross-tick hint memo from leaking between tests."""
-    home._last_rank_hints.clear()
+    scenario_stats._last_rank_hints.clear()
     yield
-    home._last_rank_hints.clear()
+    scenario_stats._last_rank_hints.clear()
 
 
 @pytest.fixture(autouse=True)
 def _forget_session_notices():
     """Give each test a fresh app session's worth of once-per-session toasts."""
-    home._session_notices_sent.clear()
+    scenario_stats._session_notices_sent.clear()
     yield
-    home._session_notices_sent.clear()
+    scenario_stats._session_notices_sent.clear()
 
 
 def _rendered_rank(*args, **kwargs):
     """Render the Position value, discarding any toast the render earned."""
-    display, _updated_ts, _notifications = home._render_scenario_rank(*args, **kwargs)
+    display, _updated_ts, _notifications = scenario_stats._render_scenario_rank(
+        *args, **kwargs
+    )
     return display
 
 
@@ -54,7 +56,7 @@ class _RefreshClient:
     def click(self, scenario: str | None):
         """Return this click's (display, shown payloads, hidden ids)."""
         self.clicks += 1
-        display, self.updated_ts, shown, hidden, patch = home.refresh_rank(
+        display, self.updated_ts, shown, hidden, patch = scenario_stats.refresh_rank(
             self.clicks, scenario, self.toast_channels
         )
         self.toast_channels.update(_registry_writes(patch))
@@ -276,14 +278,14 @@ def test_rank_refresh_button_has_tooltip(monkeypatch):
     ]
 
     assert len(tooltips) == 1
-    assert tooltips[0].label == home.RANK_REFRESH_TOOLTIP
+    assert tooltips[0].label == scenario_stats.RANK_REFRESH_TOOLTIP
     assert tooltips[0].events == chart_options.TOOLTIP_EVENTS
     assert tooltips[0].withArrow is True
     assert tooltips[0].multiline is True
 
 
 def test_get_scenario_num_runs_without_selection():
-    assert home.get_scenario_num_runs(None, None) == (
+    assert scenario_stats.get_scenario_num_runs(None, None) == (
         0,
         None,
         "—",
@@ -295,9 +297,11 @@ def test_get_scenario_num_runs_without_selection():
 
 
 def test_get_scenario_num_runs_without_play_data(monkeypatch):
-    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
+    monkeypatch.setattr(
+        scenario_stats, "is_scenario_in_database", lambda _scenario: False
+    )
 
-    assert home.get_scenario_num_runs(None, "Unplayed Scenario") == (
+    assert scenario_stats.get_scenario_num_runs(None, "Unplayed Scenario") == (
         0,
         None,
         "Never",
@@ -310,14 +314,16 @@ def test_get_scenario_num_runs_without_play_data(monkeypatch):
 
 def test_get_scenario_num_runs_with_play_data(monkeypatch):
     last_played = datetime(2026, 6, 30, 9, 5, 4)
-    scenario_stats = SimpleNamespace(
+    played = SimpleNamespace(
         number_of_runs=12,
         date_last_played=last_played,
     )
-    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
-    monkeypatch.setattr(home, "get_scenario_stats", lambda _scenario: scenario_stats)
+    monkeypatch.setattr(
+        scenario_stats, "is_scenario_in_database", lambda _scenario: True
+    )
+    monkeypatch.setattr(scenario_stats, "get_scenario_stats", lambda _scenario: played)
 
-    assert home.get_scenario_num_runs(None, "Played Scenario") == (
+    assert scenario_stats.get_scenario_num_runs(None, "Played Scenario") == (
         12,
         last_played.timestamp(),
         "Never",
@@ -407,8 +413,12 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
             total_players=54702,
         )
 
-    monkeypatch.setattr(home, "is_scenario_in_database", fail_is_scenario_in_database)
-    monkeypatch.setattr(home, "get_scenario_rank_info", fake_get_scenario_rank_info)
+    monkeypatch.setattr(
+        scenario_stats, "is_scenario_in_database", fail_is_scenario_in_database
+    )
+    monkeypatch.setattr(
+        scenario_stats, "get_scenario_rank_info", fake_get_scenario_rank_info
+    )
 
     assert _rendered_rank("Unplayed Scenario", allow_network=True) == (
         "Unranked (54,702 players)"
@@ -419,11 +429,11 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
 def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads():
     interval = {"prop_id": "interval-component.n_intervals"}
 
-    assert home._rank_allows_network([{"prop_id": "."}]) is True
-    assert home._rank_allows_network([interval]) is False
-    assert home._rank_allows_network([{"prop_id": "run-events.data"}]) is True
+    assert scenario_stats._rank_allows_network([{"prop_id": "."}]) is True
+    assert scenario_stats._rank_allows_network([interval]) is False
+    assert scenario_stats._rank_allows_network([{"prop_id": "run-events.data"}]) is True
     assert (
-        home._rank_allows_network(
+        scenario_stats._rank_allows_network(
             [
                 interval,
                 {"prop_id": "scenario-dropdown-selection.value"},
@@ -599,7 +609,7 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
     # it toasts -- but once for the session, not once per scenario switch.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
 
-    display, _updated_ts, notifications = home._render_scenario_rank(
+    display, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -612,7 +622,7 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
     assert "different-steam-id" in notifications[0]["message"]
 
     for allow_network in (False, True):
-        assert home._render_scenario_rank(
+        assert scenario_stats._render_scenario_rank(
             scenario_name,
             allow_network=allow_network,
         ) == (display, None, [])
@@ -622,7 +632,7 @@ def test_steam_id_mismatch_toast_persists_until_dismissed(monkeypatch, tmp_path)
     # It can fire while nobody is looking at the page, so it must not expire.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
 
-    _display, _updated_ts, notifications = home._render_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -636,7 +646,7 @@ def test_matching_steam_id_never_toasts(monkeypatch, tmp_path):
         {"kovaaks_username": "MingoDynasty", "steam_id": "different-steam-id"}
     )
 
-    _display, _updated_ts, notifications = home._render_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -652,19 +662,21 @@ def test_a_rank_render_nobody_triggered_keeps_the_sessions_mismatch_toast(
     # with an empty trigger list. The value still renders, but the session's
     # one mismatch toast must survive for a render the user actually caused.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
-    monkeypatch.setattr(home, "ctx", SimpleNamespace(triggered=[]))
+    monkeypatch.setattr(scenario_stats, "ctx", SimpleNamespace(triggered=[]))
 
-    display, _updated_ts, notifications = home.get_scenario_rank(None, scenario_name, 0)
+    display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
+        None, scenario_name, 0
+    )
 
     assert display == "10 of 100 (90.50% percentile)"
     assert notifications is no_update
 
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "ctx",
         SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
     )
-    _display, _updated_ts, notifications = home.get_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
         None, scenario_name, 0
     )
 
@@ -677,12 +689,12 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "ctx",
         SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
     )
 
-    _display, _updated_ts, notifications = home.get_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
         None, scenario_name, 0
     )
 
@@ -691,7 +703,7 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
 
 def test_passive_rank_render_points_an_unset_username_at_settings():
     # The fixture store leaves identity unset -- the fresh-install default.
-    rendered, _updated_ts, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -710,7 +722,7 @@ def test_passive_rank_render_points_an_unset_username_at_settings():
 def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -718,7 +730,7 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
         ),
     )
 
-    rendered, _updated_ts, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -730,7 +742,7 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
 def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -741,7 +753,7 @@ def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
         ),
     )
 
-    rendered, _updated_ts, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -762,7 +774,7 @@ def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
             served_stale=True if kwargs["allow_network"] else None,
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", rank_for)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", rank_for)
 
     assert (
         _rank_text(_rendered_rank("Scenario", allow_network=True))
@@ -777,8 +789,8 @@ def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
 @pytest.mark.parametrize(
     ("hint", "stale_value"),
     [
-        (home._RANK_HINT_SERVED_STALE, "1,240"),
-        (home._RANK_HINT_LOOKUP_FAILED, "N/A"),
+        (scenario_stats._RANK_HINT_SERVED_STALE, "1,240"),
+        (scenario_stats._RANK_HINT_LOOKUP_FAILED, "N/A"),
     ],
 )
 def test_a_background_cache_write_retires_the_memoized_hint(
@@ -791,9 +803,9 @@ def test_a_background_cache_write_retires_the_memoized_hint(
     # network verdict was never about, that verdict must not keep claiming the
     # lookup failed over a position that has since arrived.
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    home._last_rank_hints["Scenario"] = (stale_value, hint)
+    scenario_stats._last_rank_hints["Scenario"] = (stale_value, hint)
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -802,14 +814,17 @@ def test_a_background_cache_write_retires_the_memoized_hint(
     )
 
     assert _rendered_rank("Scenario", allow_network=False) == "1,180"
-    assert "Scenario" not in home._last_rank_hints
+    assert "Scenario" not in scenario_stats._last_rank_hints
 
 
 def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    home._last_rank_hints["Scenario"] = ("1,240", home._RANK_HINT_SERVED_STALE)
+    scenario_stats._last_rank_hints["Scenario"] = (
+        "1,240",
+        scenario_stats._RANK_HINT_SERVED_STALE,
+    )
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -819,7 +834,7 @@ def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
 
     _RefreshClient().click("Scenario")
 
-    assert home._last_rank_hints["Scenario"] == ("1,240", None)
+    assert scenario_stats._last_rank_hints["Scenario"] == ("1,240", None)
     assert _rendered_rank("Scenario", allow_network=False) == "1,240"
 
 
@@ -1164,7 +1179,7 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
             error_message="Rank lookup failed.",
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", get_rank)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1186,7 +1201,7 @@ def test_manual_rank_refresh_crash_toasts_red_and_leaves_the_value_alone(monkeyp
     def explode(*_args, **_kwargs):
         raise RuntimeError("boom")
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", explode)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", explode)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1213,7 +1228,7 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
             "cached position for Scenario.",
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", get_rank)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1242,7 +1257,7 @@ def test_manual_rank_refresh_reports_a_steam_mismatch_as_a_clean_refresh(monkeyp
             warning_message="Configured Steam ID 'x' does not match.",
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", get_rank)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1255,7 +1270,7 @@ def test_back_to_back_manual_refreshes_each_render_their_result(monkeypatch):
     # each deliberate click shows a fresh instance and hides the one before it.
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -1283,7 +1298,7 @@ def test_manual_rank_refresh_without_a_username_names_the_condition(monkeypatch)
     # network, so the click is answered with the verdict rather than the
     # generic red failure -- and the field's own hint is left alone.
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "an unset username must not reach the rank service"
@@ -1304,7 +1319,7 @@ def test_back_to_back_unset_username_refreshes_each_answer(monkeypatch):
     # Same reason the green confirmation re-pops: a stable id would be
     # swallowed while the first toast is still on screen.
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "an unset username must not reach the rank service"
@@ -1345,7 +1360,7 @@ def test_the_two_refresh_problems_share_one_channel(monkeypatch):
         ),
     ]
     monkeypatch.setattr(
-        home, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
+        scenario_stats, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
     )
 
     client = _RefreshClient()
@@ -1354,8 +1369,10 @@ def test_the_two_refresh_problems_share_one_channel(monkeypatch):
 
     assert failed[0]["color"] == "red"
     assert stale[0]["color"] == "yellow"
-    assert failed[0]["id"].startswith(f"{home._RANK_REFRESH_PROBLEM_CHANNEL}-")
-    assert stale[0]["id"].startswith(f"{home._RANK_REFRESH_PROBLEM_CHANNEL}-")
+    assert failed[0]["id"].startswith(
+        f"{scenario_stats._RANK_REFRESH_PROBLEM_CHANNEL}-"
+    )
+    assert stale[0]["id"].startswith(f"{scenario_stats._RANK_REFRESH_PROBLEM_CHANNEL}-")
     assert failed_hidden == []
     assert stale_hidden == [failed[0]["id"]]
 
@@ -1364,7 +1381,7 @@ def test_refreshes_of_two_scenarios_keep_separate_success_channels(monkeypatch):
     """Different scenarios are different facts, so their confirmations stack."""
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda scenario, *_a, **_k: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -1398,7 +1415,7 @@ def test_a_successful_refresh_clears_the_problem_and_username_channels(monkeypat
         ),
     ]
     monkeypatch.setattr(
-        home, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
+        scenario_stats, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
     )
 
     # No username first: the blue notice stands, and nothing reached the
@@ -1411,22 +1428,25 @@ def test_a_successful_refresh_clears_the_problem_and_username_channels(monkeypat
 
     assert success[0]["color"] == "green"
     assert set(success_hidden) == {failed[0]["id"], unset[0]["id"]}
-    assert client.toast_channels[home._RANK_REFRESH_PROBLEM_CHANNEL] is None
-    assert client.toast_channels[home._RANK_REFRESH_USERNAME_UNSET_CHANNEL] is None
+    assert client.toast_channels[scenario_stats._RANK_REFRESH_PROBLEM_CHANNEL] is None
+    assert (
+        client.toast_channels[scenario_stats._RANK_REFRESH_USERNAME_UNSET_CHANNEL]
+        is None
+    )
 
 
 def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
     # Under DashProxy an allow_duplicate callback can fire once on page load
     # with n_clicks=None; that must not force a network refresh or toast.
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "an initial-load fire must not hit the network"
         ),
     )
 
-    assert home.refresh_rank(None, "Scenario", {}) == (
+    assert scenario_stats.refresh_rank(None, "Scenario", {}) == (
         no_update,
         no_update,
         no_update,
@@ -1437,14 +1457,14 @@ def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
 
 def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch):
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "a refresh without a scenario must not hit the network"
         ),
     )
 
-    assert home.refresh_rank(1, None, {}) == (
+    assert scenario_stats.refresh_rank(1, None, {}) == (
         "N/A",
         None,
         no_update,
@@ -1472,7 +1492,9 @@ def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     )
 
     assert rank_loading is not None
-    assert rank_loading.delay_show == home.SCENARIO_RANK_LOADING_DELAY_MS == 250
+    assert (
+        rank_loading.delay_show == scenario_stats.SCENARIO_RANK_LOADING_DELAY_MS == 250
+    )
     assert rank_loading.show_initially is False
 
     refresh_button = next(
@@ -1529,7 +1551,7 @@ def test_position_hover_starts_disabled_around_the_value(monkeypatch):
     ],
 )
 def test_rank_updated_ts_dates_only_a_displayed_position(rank_info, expected):
-    assert home._rank_updated_ts(rank_info) == expected
+    assert scenario_stats._rank_updated_ts(rank_info) == expected
 
 
 def _seed_dated_rank_cache(monkeypatch, tmp_path) -> str:
@@ -1570,7 +1592,7 @@ def test_both_render_paths_date_the_position_from_its_cache_entry(
     scenario_name = _seed_dated_rank_cache(monkeypatch, tmp_path)
 
     for allow_network in (True, False):
-        display, updated_ts, _notifications = home._render_scenario_rank(
+        display, updated_ts, _notifications = scenario_stats._render_scenario_rank(
             scenario_name,
             allow_network=allow_network,
         )
@@ -1582,7 +1604,7 @@ def test_both_render_paths_date_the_position_from_its_cache_entry(
 def test_a_render_with_no_position_dates_nothing(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -1590,14 +1612,18 @@ def test_a_render_with_no_position_dates_nothing(monkeypatch):
         ),
     )
 
-    rendered, updated_ts, _notifications = home._render_scenario_rank(
+    rendered, updated_ts, _notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
 
     assert _rank_text(rendered) == "N/A · lookup failed"
     assert updated_ts is None
-    assert home._render_scenario_rank(None, allow_network=True) == ("N/A", None, [])
+    assert scenario_stats._render_scenario_rank(None, allow_network=True) == (
+        "N/A",
+        None,
+        [],
+    )
 
 
 def test_a_refresh_restarts_the_stored_time(monkeypatch, tmp_path):
@@ -1650,7 +1676,7 @@ def test_a_failed_refresh_leaves_the_stored_time_alone(monkeypatch):
     """The value stays on screen untouched, and so does the time that dates it."""
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
