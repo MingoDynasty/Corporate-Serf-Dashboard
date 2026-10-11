@@ -23,16 +23,17 @@ not a ruling: reviewers are invited to contest any row, and any author-owned
 choice in [Design](#design).
 
 This is piece 4 of 5 of the Run History work. The groundwork, three refactor
-PRs with no proposal, has merged. The Sessions proposal
-([PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355))
-and the [Run toasts proposal](run_toasts_proposal.md) were both ratified and
-merged on 2026-10-11. All scenarios is a later proposal. Two things cross
-between them:
+PRs with no proposal, has merged. Sessions is ratified and built: its
+proposal was [PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355),
+and [PR #359](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/359)
+built it with nothing on screen. The
+[Run toasts proposal](run_toasts_proposal.md) is ratified and waits on this
+page. All scenarios is a later proposal. Two things cross between them:
 
-- **This page takes what a session is from the Sessions proposal:** when
-  one ends, when it is in progress, and a visit, its word for consecutive
-  runs on one scenario within a session. The Sessions proposal is linked by
-  its PR, because the PR that builds it deletes its file.
+- **This page takes what a session is from the
+  [sessions spec](../specs/sessions.md):** when one ends, when it is in
+  progress, and a visit, the consecutive runs on one scenario within a
+  session. The functions exist, and this page is their first caller.
 - **The Run toasts proposal takes this page's name and address, and R7's
   rule for its link.** Its three rows were ratified leaning on R1, R2, and
   R7 here, which are still open. If one of them goes another way, the
@@ -49,8 +50,9 @@ doesn't reopen them:
   player set or a record they hold. The page gives no advice.
 - **Sessions come before the history views** (row D4 of the same entry).
 - **What a session is, and when one is in progress:** rows S1 to S3 of the
-  Sessions proposal, ratified on 2026-10-11. Its row S4 takes the typical
-  score out of this milestone.
+  Sessions proposal, ratified on 2026-10-11
+  ([decision log](../decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes)).
+  Its row S4 takes the typical score out of this milestone.
 - **The run toast:** rows T1 to T3 of the
   [Run toasts proposal](run_toasts_proposal.md), ratified on 2026-10-11. A
   plain toast on every page, built by the app shell, replaces the verdict
@@ -466,7 +468,7 @@ release:
 Measured on the maintainer's stats folder unless a line says otherwise. It
 is one player's history: 8,937 runs over 866 scenarios, which make 321
 sessions at a 30-minute gap (2026-10-05). Nothing was measured again for
-this proposal. The folder grows daily, and the Sessions proposal counts a
+this proposal. The folder grows daily, and the Sessions proposal counted a
 later snapshot: 322 sessions on 2026-10-08.
 
 - **A time axis bunches recent play.** On Smoothsphere Viscose at All time,
@@ -642,10 +644,11 @@ The percentage follows the toast's rules today: the same PB, the same pace
 rule, and the same two display caps
 ([Run notifications](../specs/notifications.md#run-notifications)). The
 badge follows [Marks](#marks-the-check-and-the-star). The page works out the
-run's number and the time on the scenario from what the Sessions proposal
-defines: the session, and a visit, which is consecutive runs on one scenario
-within it. The time is the sum of the scenario's visits in the session, each
-from its first run's start to its last run's end.
+run's number and the time on the scenario from what the
+[sessions spec](../specs/sessions.md) defines: the session, and a visit,
+which is consecutive runs on one scenario within it. The time is the sum of
+the scenario's visits in the session, each from its first run's start to its
+last run's end.
 
 The card and the marks are worked out from the run store, never from the
 message a new run arrives in. So the card is right on a page load with no
@@ -758,18 +761,18 @@ switch between the two, are a later proposal.
   opens for it, once per run, so a row the player closed is not reopened by
   a later change of scenario. With Follow on, the list scrolls back to the
   top.
-- **"In progress" clears without a run.** The Sessions proposal sets the
-  rule: a session is in progress until 30 minutes after its last run. The
+- **"In progress" clears without a run.** The sessions spec has the rule:
+  a session is in progress until 30 minutes after its last run. The
   badge, and the card's "this session", change on the page's existing
   30-second tick, the one that keeps Last played current. No new polling is
   added. The app works the state out, never the browser's clock, as that
-  proposal requires. This answers the connector's
+  spec requires. This answers the connector's
   [comment on PR #351](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/351#discussion_r4191712545)
   that a list redrawn only by a new run could read "in progress" forever.
-- **A late run can reopen a session.** Under the Sessions proposal's rule a
-  run that began inside the 30 minutes joins its session when it finishes,
-  even after the session has read as ended. The list and the card follow,
-  because both rebuild when a run lands.
+- **A late run can reopen a session.** Under the sessions spec's rule a run
+  with a usable start that began inside the 30 minutes joins its session
+  when it finishes, even after the session has read as ended. The list and
+  the card follow, because both rebuild when a run lands.
 - **Columns don't sort.** A sort would scatter each session's rows.
 
 **How it is built (R4).**
@@ -1095,7 +1098,8 @@ Entries the same PR corrects, because the change makes them untrue:
 - **Sensitivity** says a scenario's runs are compared within one sensitivity
   on the Score vs Sensitivity chart and in top-N placement.
 
-The Sessions proposal changes the Session entry and adds Visit.
+The glossary already holds Session, Session length, Run length, and Visit,
+from the Sessions work.
 
 ### The contract for going public
 
@@ -1236,9 +1240,10 @@ that a rewrite left them only in git history.
     proposal's.
 
 The old file's three positions on sessions are not superseded: gap-based
-sessions, a fixed gap, and no SQLite migration. The Sessions proposal, now
-ratified, carries them forward. Its open question about the navigation
-surface is answered by R3.
+sessions, a fixed gap, and no SQLite migration. The sessions decision
+([2026-10-11](../decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes))
+carries them forward. Its open question about the navigation surface is
+answered by R3.
 
 ### Optional, beyond the outline
 
@@ -1288,13 +1293,13 @@ and nothing linking to it, so nothing moves when it goes public.
    Columns menu, Expand all, the pinned session, the divider, 30 sessions at
    a time, the marks, shots fired on the run record, the list's narrow rule,
    and the percentage field's change.
-   - Needs PR 1, and the Sessions implementation merged.
+   - Needs PR 1. The Sessions implementation it also needed has merged.
    - Reports the accessibility tree and a scripted keyboard walk, as the
      trial did.
    - Recommended: `claude-opus-5-5` at xhigh.
 3. **The latest-run card.** The card in every state, the ring on the latest
    point, and the row highlight.
-   - Needs PR 1, and the Sessions implementation merged. It can run beside
+   - Needs PR 1. The Sessions implementation has merged. It can run beside
      PR 2. The row highlight lands with whichever merges second.
    - Recommended: `claude-opus-5-5` at high.
 4. **Going public.** `home.py` shrinks into Home with its stats line. The
@@ -1310,10 +1315,10 @@ and nothing linking to it, so nothing moves when it goes public.
    - Needs PRs 1 to 3.
    - Recommended: `claude-opus-5-5` at high.
 
-PRs 2 and 3 each depend only on PR 1 and the Sessions implementation, which
-is [PR #359](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/359).
-The
-Run toasts PR lands with PR 4 or after it.
+PRs 2 and 3 each depend only on PR 1. Whichever of the two merges first also
+rewrites the "Not on screen yet" section of the
+[sessions spec](../specs/sessions.md), which goes untrue once a page draws a
+session. The Run toasts PR lands with PR 4 or after it.
 
 ### Fallbacks
 
@@ -1344,7 +1349,8 @@ maintainer's main checkout.
 - **The run toast,** and the **Run notifications** switch's move to the
   Settings page. The [Run toasts proposal](run_toasts_proposal.md), rows T1
   to T3, ratified.
-- **What a session is.** The Sessions proposal, rows S1 to S4, ratified.
+- **What a session is.** Ratified and built. The rules are in the
+  [sessions spec](../specs/sessions.md).
 - **The typical score, a median line, the card's two dashed readouts, and
   the trend verdict.** Later proposals. The roadmap's Future list holds the
   trend verdict.
