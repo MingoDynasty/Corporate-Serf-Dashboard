@@ -210,10 +210,10 @@ options take turns in it.
 
 ### R4. The run list is built on AG Grid Community, with hand-built group rows
 
-Status: Open, and **not checked with a screen reader.** The maintainer,
-2026-10-10, after trying both prototypes in Firefox and reading the library
-research: "let's go with AG Grid". Asked how to record that: "Take it as
-lean".
+Status: Open. **Both prototypes were checked with NVDA on 2026-10-11.** The
+maintainer, 2026-10-10, after trying both prototypes in Firefox and reading
+the library research: "let's go with AG Grid". Asked how to record that:
+"Take it as lean". That lean predates the NVDA result below.
 
 **Recommendation: build the list on the grid the app's other tables use,
 dash-ag-grid 35.3.0 in its free edition. A session row is a full-width row
@@ -233,30 +233,53 @@ For A:
   elements in the page whatever is open. C slows once thousands of rows are
   open at once: 935 ms in Edge with all 12,129 rows of the whole history
   open, against 46 ms for A.
-- **The screen-reader case for C is thinner than the trial implied.** ARIA
-  allows a row to state its depth and its open state only inside a treegrid,
-  which is what C is. But the newest measured evidence found that a screen
-  reader announces them is an NVDA change from 2020. Nothing was found for
-  Narrator. One named practitioner calls treegrid support poor, and the
-  advice found favours a plain table with disclosure buttons, which neither
-  prototype builds.
+- **NVDA can read it and work it.** The pass found nothing that makes A
+  unusable where C works. A also reads every cell of a run row with its
+  column heading, which C does not.
 - **No free library does more.** The research found none that pairs a free
   licence, a released treegrid, a pinned row, and row virtualization.
 
 Against A:
 
-- **It is a grid made to look like a tree,** through eight pieces of
+- **It is a grid made to look like a tree,** through nine pieces of
   grid-specific work, listed in [The run list](#the-run-list). Each is a
   place an AG Grid upgrade can break.
 - **That risk has a concrete case.** AG Grid 36.0.0 replaced its row
   containers, and 36.0.1 fixed regressions in two of the options A relies
   on. The Dash wrapper has only a release candidate for 36. Moving to 36
-  means checking all eight again.
-- **It tells a screen reader less.** Its root role is `grid`. The open state
-  sits on a button inside the row, a row's depth is not exposed, and Tab
-  stops at every cell, seven to a row. AG Grid sets the `treegrid` role only
-  through its paid features, at $999 a developer, under terms that read as
-  needing a further licence for an app handed to its users.
+  means checking all of them again.
+- **It tells a screen reader less, and NVDA bore that out.** Its root role
+  is `grid`, and a row's depth is never announced. The open state sits on a
+  button inside the row, so opening or closing a row with Enter, Left, or
+  Right says nothing, and only the button speaks. In Firefox the pinned row
+  and the first body row are both announced as "row 2", and NVDA counts 40
+  rows where there are 41. Tab stops at every cell, seven to a row. AG Grid
+  sets the `treegrid` role only through its paid features, at $999 a
+  developer, under terms that read as needing a further licence for an app
+  handed to its users.
+- **A landed run moves the keyboard user to another run.** The prototype
+  holds focus by grid position, so when the rows shift, the cell under it
+  becomes a different run's. C keeps focus on the same run. The list needs
+  a ninth piece of work to do the same, and that fix was not tried.
+
+**What NVDA says.** NVDA 2026.2 was run on both prototypes on 2026-10-11, in
+Firefox 157 and Edge 155: 633 recorded steps, read from NVDA's own log by a
+script. Both lists can be read and worked, and neither is clean.
+
+- **C does what the trial said it would.** NVDA announces each row's depth
+  and whether it is open, and says "collapsed" and "expanded" when a row
+  changes. That settles, for NVDA, a doubt the library research had raised:
+  the newest evidence it found of a screen reader announcing those was from
+  2020.
+- **C has failures of its own.** In Firefox its list is two tab stops when
+  it scrolls, and the first reads all 41 rows aloud. A fix for that was
+  measured. It also reads a run row as one string, with no column headings.
+- **Not covered:** Narrator, JAWS, and a person listening. No screen-reader
+  user tried either list.
+
+This is evidence for the row, not a verdict on it. It removes the worry
+that A can't be used with a screen reader, and it confirms that C says
+more.
 
 Speed does not separate them at the planned size. With 30 sessions loaded,
 neither takes more than 15 ms to open a session or more than 60 ms to show a
@@ -264,9 +287,9 @@ landed run, in Edge and in Firefox.
 
 **What being wrong costs.** Both prototypes share one row model, a Python
 function. Only the last step differs: about 370 lines of script for A and
-500 for C. If a screen reader shows A unusable where C works, that step is
-rebuilt and nothing else moves. A separate session is arranging a pass with
-NVDA on both prototypes. Its note did not exist when this was written.
+500 for C. NVDA did not show A unusable. If another screen reader does, or
+an AG Grid upgrade breaks the group rows, that step is rebuilt and nothing
+else moves.
 
 **If the maintainer chooses the treegrid:** the repository owns the
 rendering, the keyboard model, and a second table idiom with no library
@@ -484,6 +507,9 @@ later snapshot: 322 sessions on 2026-10-08.
   per component doubles each time the count doubles.
 - **Tree data and row grouping are paid features** in the installed AG Grid.
   A grid given `treeData` logs error #200 and shows the rows flat.
+- **NVDA reads both prototypes.** NVDA 2026.2, in Firefox 157.0.1 and Edge
+  155, on both views: 633 recorded steps on 2026-10-11. What it said is
+  under R4.
 - **The two working prototypes, 30 sessions loaded** (888 rows, medians in
   milliseconds). "Run lands" is from the batch reaching the browser to the
   new row painted.
@@ -514,7 +540,9 @@ carries what a reviewer needs from them.
 
 ### Not checked
 
-- **A screen reader,** on either prototype. R4 stands unchecked.
+- **Narrator and JAWS, and a person listening.** NVDA's output was read by
+  a script, on the two prototypes. No screen-reader user tried either list,
+  and the list this proposal builds does not exist yet.
 - **The layout in the real app.** Every size here is from the mockup or the
   trial's stand-in pages.
 - **A visible browser.** Both trial passes were headless. The maintainer
@@ -769,7 +797,9 @@ switch between the two, are a later proposal.
 - **Which rows are open is not remembered.** On arrival the first row is
   open and the rest are closed.
 - **A run that lands** shows as a new row with nothing lost: opened rows
-  stay open and keyboard focus stays where it was. The current session
+  stay open, and keyboard focus stays on the same run. The prototype did
+  not do the second: it held focus by grid position, so the focused cell
+  became another run's. Item 9 below is the fix. The current session
   opens for it, once per run, so a row the player closed is not reopened by
   a later change of scenario. With Follow on, the list scrolls back to the
   top.
@@ -801,7 +831,9 @@ switch between the two, are a later proposal.
   as Dash components.
 - **What is open never leaves the browser.**
 
-The eight pieces of grid-specific work, each checked on AG Grid 35.3.1:
+The nine pieces of grid-specific work. The first eight were built in the
+prototype and checked on AG Grid 35.3.1. The ninth comes from the NVDA
+pass and was not built:
 
 1. A session row is a full-width row with its own renderer. A full-width row
    has no cells, so its `gridcell` role is added by hand.
@@ -817,10 +849,21 @@ The eight pieces of grid-specific work, each checked on AG Grid 35.3.1:
    grid's own.
 7. Sorting is off on every column.
 8. The fixed column widths leave room for the scrollbar.
+9. After new rows are applied, focus goes back to the cell of the same row
+   id. The grid holds focus by position, so a landed run otherwise leaves a
+   keyboard user on a different run.
 
 One variation was not tried and could remove items 1, 4, and 6: ordinary
 rows whose first cell spans every column. The implementing PR may try it
 first. It would not change the `grid` role or the missing row levels.
+
+The NVDA pass found three more things on the prototype that the list's PR
+fixes, because each is cheap. The grid had no accessible name, and the Copy
+block gives it one. A session row's button repeated the row's visible name,
+so the name was read twice. And opening or closing a row from the keyboard
+was silent: the PR announces the change, a fix the pass inferred and did not
+try. Two things it found have no known fix in the free edition: a row's
+depth, and Firefox's numbering of the pinned row.
 
 ### Marks: the check and the star
 
@@ -1266,10 +1309,10 @@ maintainer may want, with what it would cost.
 - **Home forwards a `/?scenario=` or `/?playlist_code=` link to Run
   History.** Old bookmarks keep working. It is forwarding logic on Home,
   which the maintainer declined in general, though for a different reason.
-- **A screen-reader pass on the built list before the page goes public.**
-  It would check R4 on the real thing and not a prototype. It needs the
-  maintainer to approve installing NVDA and to give it the foreground
-  window.
+- **The NVDA walk repeated on the built list before the page goes public.**
+  It would check the real thing and not a prototype. The walk's scripts and
+  an unpacked NVDA are already on the maintainer's machine. It takes over
+  the foreground window while it runs.
 - **The Score threshold percentage stops at 100.** Above 100 every check
   sits on a run that is also a new PB. The spec allows a goal above 100
   today, so this would remove something a user may have set.
@@ -1302,7 +1345,7 @@ and nothing linking to it, so nothing moves when it goes public.
    - Recommended: `claude-opus-5-5` at xhigh. It carries the persistence
      rules of 2026-09-19 onto a new page and sets the layout every later PR
      sits in.
-2. **The run list.** The row model, the grid with its eight items, the
+2. **The run list.** The row model, the grid with its nine items, the
    Columns menu, Expand all, the pinned session, the divider, 30 sessions at
    a time, the marks, shots fired on the run record, the list's narrow rule,
    and the percentage field's change.
@@ -1347,9 +1390,10 @@ session. The Run toasts PR lands with PR 4 or after it.
 - **R4 stalls review.** The run list and the card split into a proposal of
   their own. It depends on this one and never the reverse, and this one then
   ships the chart, Home, and the kept parts.
-- **No screen-reader verdict by the first review.** R4 goes forward on the
-  lean, marked not checked. If it later proves wrong, the cost is the list's
-  last step, about 370 to 500 lines of script.
+- **The built list proves unusable with a screen reader.** NVDA was run on
+  the prototypes, and Narrator and JAWS were not run at all. If the built
+  list fails where the prototype passed, the cost is the list's last step,
+  about 370 to 500 lines of script.
 
 ## Out of scope
 
@@ -1430,8 +1474,9 @@ maintainer's main checkout.
   what survives a run landing.
   - PR 1: the measurements above, a run landing with no reload, and both
     pages open in turn.
-  - PR 2: the eight grid items, light and dark, the narrow layouts, and a
-    run landing with rows open.
+  - PR 2: the nine grid items, light and dark, the narrow layouts, and a
+    run landing with rows open and with focus in a run row, which must
+    stay on the same run.
   - PR 4: every link, a launch, and a browser that holds the old page's
     remembered values.
 - **The maintainer's own Firefox,** at the hidden address, before each
