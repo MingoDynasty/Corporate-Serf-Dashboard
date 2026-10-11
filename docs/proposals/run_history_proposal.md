@@ -22,15 +22,21 @@ judgment, R1 to R7. Each is the maintainer's lean or agreement in chat on
 not a ruling: reviewers are invited to contest any row, and any author-owned
 choice in [Design](#design).
 
-This is piece 4 of 5 of the Run History work. The other pieces are the
-groundwork (three refactor PRs with no proposal), the Sessions proposal
-([PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355)),
-the Run toasts proposal
-([PR #354](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/354)),
-and a later All scenarios proposal. Two things cross between them. This page
-takes what a session is from the Sessions proposal. The Run toasts proposal
-takes this page's name and address, R7's rule for its link, and the fact
-that the page shows a run's verdict. Neither blocks review of this one.
+This is piece 4 of 5 of the Run History work. The groundwork, three refactor
+PRs with no proposal, has merged. The Sessions proposal
+([PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355))
+and the [Run toasts proposal](run_toasts_proposal.md) were both ratified and
+merged on 2026-10-11. All scenarios is a later proposal. Two things cross
+between them:
+
+- **This page takes what a session is from the Sessions proposal:** when
+  one ends, when it is in progress, and a visit, its word for consecutive
+  runs on one scenario within a session. The Sessions proposal is linked by
+  its PR, because the PR that builds it deletes its file.
+- **The Run toasts proposal takes this page's name and address, and R7's
+  rule for its link.** Its three rows were ratified leaning on R1, R2, and
+  R7 here, which are still open. If one of them goes another way, the
+  toast's link follows.
 
 **Already decided, and binding here.** The proposal is held to these and
 doesn't reopen them:
@@ -42,6 +48,15 @@ doesn't reopen them:
   The check and the star this page draws are verdicts against a bar the
   player set or a record they hold. The page gives no advice.
 - **Sessions come before the history views** (row D4 of the same entry).
+- **What a session is, and when one is in progress:** rows S1 to S3 of the
+  Sessions proposal, ratified on 2026-10-11. Its row S4 takes the typical
+  score out of this milestone.
+- **The run toast:** rows T1 to T3 of the
+  [Run toasts proposal](run_toasts_proposal.md), ratified on 2026-10-11. A
+  plain toast on every page, built by the app shell, replaces the verdict
+  toast. Top N placement is retired, the **Score threshold verdict** switch
+  is dropped, and the **Run notifications** switch moves to the Settings
+  page.
 - **What a new PB is**
   ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
   R6 changes where stars are drawn, not which runs earn one.
@@ -70,8 +85,8 @@ column claims no exclusive tenancy.
   and a card for the latest one. "Scenario Performance" names the chart
   alone.
 - **It is the name the work already has.** The roadmap has called the
-  milestone Run history since it was planned, and the run toast's link will
-  send the player to a page by name.
+  milestone Run history since it was planned, and the ratified run toast's
+  link reads "Open in Run History".
 - **The reasoning of 2026-08-09 still holds.** That entry gave the page a
   product name apart from its address. Only the name moves.
 
@@ -87,8 +102,8 @@ files on `main` at `4272fbb`. 24 of those are in the decision log, where
 history keeps the old name.
 
 **If the maintainer keeps the old name:** nothing is renamed, the page's
-largest new part has no name pointing at it, and the run toast's link reads
-"Scenario Performance".
+largest new part has no name pointing at it, and the run toast's link, which
+was ratified as "Open in Run History", has to be worded again.
 
 ### R2. Run History gets its own address, and `/` becomes Home
 
@@ -276,9 +291,9 @@ draws a line through each group's average.
   the average of that day's best, which the 2026-10-05 stars entry already
   notes.
 - **A new summary line would be a second definition of the typical run.**
-  The typical score is leaving this milestone (row S4 of the Sessions
-  proposal). A median drawn now would have to agree with it later or be
-  replaced.
+  The typical score has left this milestone (row S4 of the Sessions
+  proposal, ratified). A median drawn now would have to agree with it later
+  or be replaced.
 
 What is lost, and where it hurts most: **Score vs Sensitivity loses both of
 its summaries.** Top N per sensitivity and the Average score line were how
@@ -355,6 +370,9 @@ reaching such a scenario.
   show a selection its own dropdown can't name.
 - **The same rule will cover a click in the All scenarios tree** (row A1 of
   that proposal), and it covers the scenario link on the latest-run card.
+- **The ratified run toast's link depends on it.** That link names the
+  scenario and carries no playlist, because the app shell doesn't know what
+  the page's filter holds.
 
 What it costs: clearing the filter takes away the rank lines and the Open
 scenario table link, and the cleared filter is what the browser then
@@ -368,7 +386,8 @@ the new page unchanged.
 
 **If the maintainer keeps today's link rule:** a link to a scenario outside
 the filtered playlist selects nothing, while Follow on the same scenario
-clears the filter. **If Follow should keep the filter too:** it has to stop
+clears the filter. A run toast for such a scenario then opens the page with
+nothing selected. **If Follow should keep the filter too:** it has to stop
 following such a run, or the dropdown has to show a scenario its playlist
 doesn't list, and the card then reports a run the rest of the page ignores.
 
@@ -478,9 +497,10 @@ later snapshot: 322 sessions on 2026-10-08.
 - **The row model the server sends** is 5 KB for 36 rows, 72 KB for 484, and
   142 KB for 888. Sending all of it on every landing was fast enough that
   neither prototype needed a smarter update.
-- **The old page is large.** `source/pages/home.py` is 2,630 lines and
-  `tests/test_home_*.py` total 5,657, at `4272fbb`. The groundwork PRs lift
-  the kept blocks out before this proposal's first PR.
+- **The old page was large.** `source/pages/home.py` was 2,630 lines and
+  `tests/test_home_*.py` totalled 5,657, at `4272fbb`. The three groundwork
+  PRs have since moved the kept blocks into modules both pages can import,
+  and `home.py` is 1,214 lines.
 - **Every hidden PR is a public release.** A push cuts one unless every
   changed path is documentation, tests, or repository tooling
   (`scripts/release_job.py`). The maintainer accepts releases that change
@@ -592,6 +612,11 @@ chart mode and the Chart options button move into the chart's header.
 address as they do today, by callback and never as a layout default, with
 R7's one change.
 
+The page's layout also accepts parameters it doesn't name, as the old page's
+does. The ratified run toast's link carries `run=` beside `?scenario=`. The
+page never reads it. It is there only so each toast's address is new,
+because a link to the address the page already holds does nothing.
+
 ### The latest-run card
 
 The card reports the last run played, whatever scenario is selected. It
@@ -618,9 +643,14 @@ rule, and the same two display caps
 ([Run notifications](../specs/notifications.md#run-notifications)). The
 badge follows [Marks](#marks-the-check-and-the-star). The page works out the
 run's number and the time on the scenario from what the Sessions proposal
-defines: the session, and a stretch of one scenario inside it. The time is
-the sum of the scenario's stretches in the session, each from its first
-run's start to its last run's end.
+defines: the session, and a visit, which is consecutive runs on one scenario
+within it. The time is the sum of the scenario's visits in the session, each
+from its first run's start to its last run's end.
+
+The card and the marks are worked out from the run store, never from the
+message a new run arrives in. So the card is right on a page load with no
+new run, and a past run's check needs nothing that was not kept. The Run
+toasts proposal left that choice to this one.
 
 Not in version 1, both dashed in the mockup: "Better than 19 of your last
 20", and a percentage against the typical score.
@@ -736,6 +766,10 @@ switch between the two, are a later proposal.
   proposal requires. This answers the connector's
   [comment on PR #351](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/351#discussion_r4191712545)
   that a list redrawn only by a new run could read "in progress" forever.
+- **A late run can reopen a session.** Under the Sessions proposal's rule a
+  run that began inside the 30 minutes joins its session when it finishes,
+  even after the session has read as ended. The list and the card follow,
+  because both rebuild when a run lands.
 - **Columns don't sort.** A sort would scatter each session's rows.
 
 **How it is built (R4).**
@@ -743,7 +777,8 @@ switch between the two, are a later proposal.
 - **One Python function builds the rows.** Its inputs are the run store, the
   selected scenario, and how many sessions to load. It returns a flat list
   of row records: session rows, run rows, and dividers. It also names the
-  newest run and the rows that run forces open.
+  newest run and the rows that run forces open. A session's row is keyed by
+  the session's first run, since a session has no stored identity.
 - **The list rebuilds from the run store, not from the batch.** The batch of
   new runs only triggers it. Two open tabs race for each batch, and a list
   built from batches would miss runs in one of them.
@@ -844,17 +879,21 @@ at a time.
 
 ### Chart options
 
-Kept as a panel beside the chart, with its four groups, its controls, their
-defaults, and its closed-on-arrival rule. It opens between the chart and the
-list, as the mockup has it. The maintainer accepts the narrower chart "until
-it is reworked after shipping".
+Kept as a panel beside the chart, with its controls, their defaults, and its
+closed-on-arrival rule. It opens between the chart and the list, as the
+mockup has it. The maintainer accepts the narrower chart "until it is
+reworked after shipping".
 
 Two things change, both from R5: the Top N help text goes with its control,
 and the Score threshold percentage help text loses its claim that only
 notifications judge a run (see [Copy](#copy)).
 
-The **Score threshold verdict** and **Run notifications** switches are
-carried as they are. Their fate is the Run toasts proposal's.
+The panel has four groups today, and two of its controls are notification
+switches. The ratified Run toasts proposal settles both: **Score threshold
+verdict** is dropped, and **Run notifications** moves to the Settings page
+with its group. This page carries both switches as they are until that
+change lands. After it the panel has three groups and no notification
+control.
 
 ### Narrow windows
 
@@ -904,8 +943,10 @@ need about 305 px and would fit. The maintainer asked for a phone layout
   feel like a new page anyways."
 - **That release's notes say so,** in one line.
 - **Remembered on the new page:** the Playlist filter, the Selected
-  scenario, Follow, the chart mode, the two ranges, the eight Chart options
-  controls, and the Columns menu's two checkboxes.
+  scenario, Follow, the chart mode, the two ranges, the Chart options
+  controls, and the Columns menu's two checkboxes. Chart options has nine
+  controls while both notification switches are carried, and seven once the
+  Run toasts change lands.
 - **Not remembered:** whether Chart options is open, as today, and which
   session rows are open.
 
@@ -1000,7 +1041,7 @@ chart's hover keeps its two decimals.
 | Where | String | Why |
 |---|---|---|
 | Follow newly played scenario, help | `Automatically selects the scenario you just played when a new run is detected. If the **Playlist filter** doesn't list that scenario, the filter is cleared.` | R7. The second sentence is new. It is the one place that explains a filter that emptied itself. |
-| Score threshold percentage, help, last sentence | `A run is judged against the personal best you had before the run.` | Was "Notifications judge a run against the personal best you had before the run." The check and the card judge too. The Run toasts proposal words the sentence the same way, and it is true whichever of the two lands first. |
+| Score threshold percentage, help, last sentence | `A run is judged against the personal best you had before the run.` | Was "Notifications judge a run against the personal best you had before the run." The check and the card judge too. The ratified Run toasts proposal words the sentence the same way, and it is true whichever change lands first. |
 
 **Kept as today, word for word**
 
@@ -1015,7 +1056,7 @@ chart's hover keeps its two decimals.
 - Chart options: its four group headings, every control label and
   placeholder, and every help text but the two above. That includes the
   **Score threshold verdict** and **Run notifications** switches and their
-  help, which the Run toasts proposal may change.
+  help, until the Run toasts change takes both out of the panel.
 - Home: the stats-folder hint's two sentences, and the setup card's three
   states with their buttons and fine print.
 
@@ -1054,7 +1095,7 @@ Entries the same PR corrects, because the change makes them untrue:
 - **Sensitivity** says a scenario's runs are compared within one sensitivity
   on the Score vs Sensitivity chart and in top-N placement.
 
-The Sessions proposal changes the Session entry.
+The Sessions proposal changes the Session entry and adds Visit.
 
 ### The contract for going public
 
@@ -1069,8 +1110,10 @@ change, 13 drop. The 45 changed and dropped rows are carried here in full,
 because the list is untracked. A row's id is the list's own with `L-` in
 front, so `L-R4` can't be read as decision row R4.
 
-Seven of the 45 are the Run toasts proposal's to decide and are marked so.
-Until it lands they stay as they are today.
+Seven of the 45 were the Run toasts proposal's to decide. It was ratified on
+2026-10-11, and those rows say what it settled. Each stays as it is today
+until that proposal's change lands, which is with this page going public or
+after.
 
 **The 32 changes**
 
@@ -1095,19 +1138,19 @@ Until it lands they stay as they are today.
 | L-G30 | "No runs in this date range" | Reworded for a range, and reachable only in the two day-based modes |
 | L-G31 | "Unsupported graph option" names two modes | It names three |
 | L-O4 | The panel stacks above the chart when the chart row is narrower than 62em | A new threshold, on the chart's own area (see Narrow windows) |
-| L-O5 | Four groups with their defaults, the verdict switch among them | Unchanged here. **Run toasts:** T3 drops the verdict switch |
+| L-O5 | Four groups with their defaults, the verdict switch among them | Unchanged here. **Run toasts, ratified:** the verdict switch is dropped (T3) and the Notifications group moves to the Settings page, which leaves three groups |
 | L-O8 | The percentage's help text says notifications judge a run | It says a run is judged (see Copy) |
-| L-O10 | The page hosts two notification switches | Unchanged here. **Run toasts:** T3 leaves one |
+| L-O10 | The page hosts two notification switches | Unchanged here. **Run toasts, ratified:** none stays on the page. The verdict switch is dropped (T3), and **Run notifications** moves to the Settings page |
 | L-R4 | The chart rebuilds on a Chart options control, a scenario change, and the date and mode controls | The mode, the two ranges, and the Playlist filter. Top N and the date are gone |
 | L-X4 | The navbar's first entry is "Scenario Performance", and it and the header title lead to `/` | Home, then Run History. The header title leads to Home |
-| L-X5 | Run toasts are built by this page, so they show only while it is open | **Run toasts:** T1. Until then the new page builds today's toasts |
-| L-X6b | A run that is neither judged nor placed gets no toast | **Run toasts:** T1 |
-| L-X7 | A run is judged against the PB it was chasing, and the toast words the result | The rule stays and also decides the check and the card's badge. Whether the toast still words it is T1 |
+| L-X5 | Run toasts are built by this page, so they show only while it is open | **Run toasts, ratified (T1):** the app shell builds a plain toast, on every page. Until that lands the new page builds today's toasts |
+| L-X6b | A run that is neither judged nor placed gets no toast | **Run toasts, ratified (T1):** a new run gets the plain toast. A run the celebration announces keeps the celebration alone, and runs detected together share one toast |
+| L-X7 | A run is judged against the PB it was chasing, and the toast words the result | The rule stays and also decides the check and the card's badge. The toast stops wording it under T1, ratified |
 | L-X14 | The user guide names the page four times | The name changes. Its pace paragraph gains the check and the card |
 | L-X17 | The README's first screenshot is this page | Retaken |
 | L-X18 | The README's Features line names two chart modes | It gains Score vs Run. The run list may add one line, no more |
 | L-X19 | The README's install steps 3 and 4 name the page that shows the setup card | They name Home |
-| L-X20 | The README says a toast compares a run with the personal best | **Run toasts.** True until it lands |
+| L-X20 | The README says a toast compares a run with the personal best | **Run toasts, ratified.** True until its change lands |
 
 **The 13 drops**
 
@@ -1123,8 +1166,8 @@ Until it lands they stay as they are today.
 | L-G34 | The Average score line's fixed color | Goes with L-G2 |
 | L-O7 | The Top N help's "or per day in Score vs Time" | Goes with L-C8 |
 | L-T2 | The watchdog's per-run lines in the debug log, judged at a fixed 95% | The run list is the record they stood in for. Dropped when the page goes public |
-| L-X6 | Top-N placement in a run toast | **Run toasts:** T2. Under the fallback, N is fixed at 5 |
-| L-X9b | The "Score threshold verdict" switch | **Run toasts:** T3 |
+| L-X6 | Top-N placement in a run toast | **Run toasts, ratified (T2):** retired. If this page goes public first, N is fixed at 5 until then |
+| L-X9b | The "Score threshold verdict" switch | **Run toasts, ratified (T3):** dropped |
 | L-X28 | What each browser remembers for the kept controls | A one-time reset, accepted (see Remembered controls) |
 
 **Rows the list marks keep that R2 and R7 change.** The list was answered
@@ -1193,8 +1236,8 @@ that a rewrite left them only in git history.
     proposal's.
 
 The old file's three positions on sessions are not superseded: gap-based
-sessions, a fixed gap, and no SQLite migration. The Sessions proposal
-carries them forward and argues them. Its open question about the navigation
+sessions, a fixed gap, and no SQLite migration. The Sessions proposal, now
+ratified, carries them forward. Its open question about the navigation
 surface is answered by R3.
 
 ### Optional, beyond the outline
@@ -1232,8 +1275,10 @@ and nothing linking to it, so nothing moves when it goes public.
    module and its address. The top row from the groundwork's shared modules,
    with the new page's ids. The chart: three modes, the two ranges, every
    run, stars on Score vs Run, the title, and rank lines that redraw at
-   once. Chart options. Deep links, and R7. The stats-folder hint.
-   - Needs the three groundwork PRs merged, and this proposal ratified.
+   once. Chart options. Deep links, R7, and a layout that accepts a
+   parameter it doesn't name. The stats-folder hint.
+   - Needs this proposal ratified. The three groundwork PRs it also needed
+     have merged.
    - Measures and reports: the chart's box at 1400, 1600, and 1920 px with
      Chart options open and closed, and the zoom fit on Score vs Run's axis.
    - Recommended: `claude-opus-5-5` at xhigh. It carries the persistence
@@ -1260,23 +1305,27 @@ and nothing linking to it, so nothing moves when it goes public.
    page's spec rewritten and renamed for the new page, a short spec for
    Home, the glossary, `AGENTS.md` copy rule 3, the README and its
    screenshot, the user guide, `architecture.md`, the roadmap, `product.md`,
-   and this file deleted with the five pointers to it fixed. One line in the
+   and this file deleted with every pointer to it fixed. One line in the
    release notes about the reset.
    - Needs PRs 1 to 3.
    - Recommended: `claude-opus-5-5` at high.
 
-PRs 2 and 3 each depend only on PR 1 and the Sessions implementation. The
+PRs 2 and 3 each depend only on PR 1 and the Sessions implementation, which
+is [PR #359](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/359).
+The
 Run toasts PR lands with PR 4 or after it.
 
 ### Fallbacks
 
-- **Run toasts is still open when PR 4 is ready.** The page goes public with
+- **The Run toasts change is not built when PR 4 is ready.** Its proposal is
+  ratified, so this is now only about build order. The page goes public with
   today's toast, built by Run History as the old page builds it, with N
-  fixed at 5 and no control. Nothing in this proposal waits on that one: the
-  marks are never gated by a switch, and both notification switches are
-  carried unchanged. The Run toasts proposal names the one cost of that
-  order: a browser that turned **Run notifications** off on the new page
-  starts on again when its change lands.
+  fixed at 5 and no control. Nothing in this proposal waits on that change:
+  the marks are never gated by a switch, and both notification switches are
+  carried unchanged. The Run toasts proposal names the cost. A browser's
+  stored "off" for **Run notifications** is lost once whenever its change
+  lands. Landing with PR 4, that is part of the one-time reset. Landing
+  later, it is a second reset, for that one switch.
 - **R4 stalls review.** The run list and the card split into a proposal of
   their own. It depends on this one and never the reverse, and this one then
   ships the chart, Home, and the kept parts.
@@ -1292,8 +1341,10 @@ maintainer's main checkout.
 - **All scenarios:** the view switch, the "7 of 47 runs" jump, **Show all
   runs**, and Median and best. Its own proposal, written once this one
   settles the list's library. Rows A1 to A3.
-- **The run toast.** The Run toasts proposal, rows T1 to T3.
-- **What a session is.** The Sessions proposal, rows S1 to S4.
+- **The run toast,** and the **Run notifications** switch's move to the
+  Settings page. The [Run toasts proposal](run_toasts_proposal.md), rows T1
+  to T3, ratified.
+- **What a session is.** The Sessions proposal, rows S1 to S4, ratified.
 - **The typical score, a median line, the card's two dashed readouts, and
   the trend verdict.** Later proposals. The roadmap's Future list holds the
   trend verdict.
