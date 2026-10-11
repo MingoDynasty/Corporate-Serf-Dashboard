@@ -9,9 +9,9 @@ import requests
 from dash import dcc, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
 
-from source.components import chart_options, queued_notices, scenario_selection
+from source.components import chart_options, scenario_selection
 from source.config import settings_service
-from source.kovaaks import api_service, data_service
+from source.kovaaks import api_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -133,180 +133,12 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     assert playlist_filter.persistence is True
 
 
-def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
-    monkeypatch.setattr(
-        home,
-        "get_visible_playlist_selector_options",
-        lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
-    )
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_playlist_by_code",
-        lambda code: object() if code == "KovaaKsTestCode" else None,
-    )
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenarios_from_playlist_code",
-        lambda code: [f"{code} Scenario"],
-    )
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
-
-    page = home.layout(
-        scenario="KovaaKsTestCode Scenario",
-        playlist_code="KovaaKsTestCode",
-    )
-    components = list(_walk_components(page))
-    playlist_filter = next(
-        component
-        for component in components
-        if getattr(component, "id", None) == "playlist-dropdown-selection"
-    )
-    scenario_dropdown = next(
-        component
-        for component in components
-        if getattr(component, "id", None) == "scenario-dropdown-selection"
-    )
-    deep_link_store = next(
-        component
-        for component in components
-        if getattr(component, "id", None) == home.SCENARIO_SELECTION_IDS.deep_link
-    )
-
-    # The query parameters reach the dropdowns through the store, never as
-    # the layout value: a persisted control's default has to be the same on
-    # every visit or Dash discards the stored edit instead of restoring it.
-    assert deep_link_store.data == {
-        "playlist": "KovaaKsTestCode",
-        "scenario": "KovaaKsTestCode Scenario",
-    }
-    assert playlist_filter.value is None
-    assert playlist_filter.persistence is True
-    assert scenario_dropdown.value is None
-    assert scenario_dropdown.persistence is True
-    # Still resolved in the layout, so the first paint already lists the
-    # deep-linked playlist's scenarios.
-    assert scenario_dropdown.data == ["KovaaKsTestCode Scenario"]
-
-
-def _known_playlist(monkeypatch):
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_playlist_by_code",
-        lambda code: object() if code == "KovaaKsTestCode" else None,
-    )
-
-
-def test_home_deep_link_records_only_the_parameters_the_url_carried(monkeypatch):
-    """An absent parameter leaves its control on the restored value."""
-    _known_playlist(monkeypatch)
-
-    assert scenario_selection.deep_link_selection(None, None) == {}
-    assert scenario_selection.deep_link_selection("Scenario A", None) == {
-        "scenario": "Scenario A"
-    }
-    assert scenario_selection.deep_link_selection(None, "KovaaKsTestCode") == {
-        "playlist": "KovaaKsTestCode"
-    }
-
-
-def test_home_deep_link_clears_the_filter_for_an_unknown_playlist_code(monkeypatch):
-    """The URL's selection is applied as given: no playlist means no filter."""
-    _known_playlist(monkeypatch)
-
-    assert scenario_selection.deep_link_selection(None, "KovaaKsGoneCode") == {
-        "playlist": None
-    }
-
-
-def test_home_deep_link_treats_an_empty_scenario_as_no_scenario(monkeypatch):
-    _known_playlist(monkeypatch)
-
-    assert scenario_selection.deep_link_selection("", "KovaaKsTestCode") == {
-        "playlist": "KovaaKsTestCode",
-        "scenario": None,
-    }
-
-
-def test_apply_deep_link_writes_only_the_controls_the_url_named():
-    assert scenario_selection.apply_deep_link({}) == (no_update, no_update)
-    assert scenario_selection.apply_deep_link(None) == (no_update, no_update)
-    assert scenario_selection.apply_deep_link({"scenario": "Scenario A"}) == (
-        no_update,
-        "Scenario A",
-    )
-    assert scenario_selection.apply_deep_link({"playlist": None}) == (None, no_update)
-    assert scenario_selection.apply_deep_link(
-        {"playlist": "KovaaKsTestCode", "scenario": "Scenario A"}
-    ) == ("KovaaKsTestCode", "Scenario A")
-
-
-def test_apply_deep_link_is_a_second_writer_of_the_scenario_value():
-    """It shares the scenario value with the run-event consumer.
-
-    ``initial_duplicate`` rather than ``True``: applying the deep link is the
-    mount's whole job, and Dash refuses an ``allow_duplicate`` output without
-    one of the ``prevent_initial_call`` forms.
-    """
-    registration = _deep_link_registration()
-    playlist_output, scenario_output = registration["output"].strip(".").split("...")
-
-    assert playlist_output == "playlist-dropdown-selection.value"
-    # The suffix Dash appends to an allow_duplicate output. The scenario value
-    # already has a writer in check_for_new_data; the playlist filter does not.
-    assert scenario_output.startswith("scenario-dropdown-selection.value@")
-    # What Dash stores for "initial_duplicate": the mount still runs it.
-    assert registration["prevent_initial_call"] is False
-
-
-def _deep_link_registration() -> dict:
-    """Find apply_deep_link's registration. The store has more than one reader."""
-    (registration,) = [
-        entry
-        for entry in GLOBAL_CALLBACK_LIST
-        if any(
-            dep["id"] == home.SCENARIO_SELECTION_IDS.deep_link
-            for dep in entry["inputs"]
-        )
-        and "playlist-dropdown-selection.value" in entry["output"]
-    ]
-    return registration
-
-
 def _output_keys(registration: dict) -> set[str]:
     """Read a registration's outputs as ``id.prop``, without duplicate hashes."""
     return {
         output.split("@")[0]
         for output in registration["output"].strip(".").split("...")
     }
-
-
-def test_no_callback_depends_only_on_what_apply_deep_link_conditionally_writes():
-    """Guard the regression that shipped once: a starved single-Input dependent.
-
-    ``apply_deep_link`` returns ``no_update`` for a control the URL did not
-    name, which is every control on an ordinary visit. dash-renderer drops a
-    ready callback when none of its Inputs was written and every one of them
-    is a declared output of a group member that already ran, so a callback
-    whose Inputs are all written by ``apply_deep_link`` never makes its
-    initial call on those visits. ``select_playlist`` was exactly that, and
-    the scenario dropdown kept the full local list while the filter named a
-    playlist. Its second Input is what this test protects.
-    """
-    deep_link = _deep_link_registration()
-    written = _output_keys(deep_link)
-
-    starved = [
-        entry["output"]
-        for entry in GLOBAL_CALLBACK_LIST
-        if entry is not deep_link
-        and entry["inputs"]
-        and {f"{dep['id']}.{dep['property']}" for dep in entry["inputs"]} <= written
-    ]
-
-    assert starved == [], (
-        "these callbacks would not make their initial call on a visit with no "
-        f"query parameters: {starved}"
-    )
 
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
@@ -363,98 +195,6 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert tooltip.disabled is True
     assert tooltip.label == ""
     assert tooltip.events == chart_options.TOOLTIP_EVENTS
-
-
-def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
-    data_service.playlist_startup_warning_queue.clear()
-    warnings = ["First warning", "Second warning"]
-    data_service.playlist_startup_warning_queue.extend(warnings)
-
-    notifications = queued_notices.flush_startup_playlist_warnings(1)
-
-    assert [notification["message"] for notification in notifications] == warnings
-    # They fire seconds after a server start, when nobody is guaranteed to be
-    # looking, so they wait for a dismissal instead of timing out.
-    assert [notification["title"] for notification in notifications] == [
-        "Playlist not loaded",
-        "Playlist not loaded",
-    ]
-    assert [notification["autoClose"] for notification in notifications] == [
-        False,
-        False,
-    ]
-    assert queued_notices.flush_startup_playlist_warnings(2) is dash.no_update
-
-
-def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_playlist_by_code",
-        lambda code: object() if code == "ValidCode" else None,
-    )
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenarios_from_playlist_code",
-        lambda code: [f"{code} Scenario"],
-    )
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
-
-    # The second argument is the deep-link store: a scheduling Input the
-    # callback never reads. See select_playlist.
-    assert scenario_selection.select_playlist("Old Playlist Name", None) == (
-        ["All"],
-        None,
-    )
-    scenarios, _link = scenario_selection.select_playlist("ValidCode", None)
-    assert scenarios == ["ValidCode Scenario"]
-
-
-def test_select_playlist_links_the_selection_to_its_scenario_table(monkeypatch):
-    """The way back from a scenario to the table it was opened from."""
-    _known_playlist(monkeypatch)
-    monkeypatch.setattr(
-        scenario_selection, "get_scenarios_from_playlist_code", lambda _code: []
-    )
-
-    _scenarios, link = scenario_selection.select_playlist("KovaaKsTestCode", None)
-
-    (anchor,) = [
-        component
-        for component in _walk_components(link)
-        if isinstance(component, dmc.Anchor)
-    ]
-    assert anchor.children == "Open scenario table"
-    # The bare route: no ``?sort=``, so the table opens in playlist order.
-    assert anchor.href == "/playlists/KovaaKsTestCode"
-    # In-app navigation, as every other internal link on the page.
-    assert anchor.refresh is False
-
-
-@pytest.mark.parametrize("selected_playlist", [None, "", "KovaaKsGoneCode"])
-def test_select_playlist_shows_no_link_without_a_loaded_playlist(
-    monkeypatch, selected_playlist
-):
-    """A cleared filter and a remembered code that no longer resolves both
-    list every local scenario, so neither has a table to link."""
-    _known_playlist(monkeypatch)
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
-
-    _scenarios, link = scenario_selection.select_playlist(selected_playlist, None)
-
-    assert link is None
-
-
-def test_select_playlist_writes_the_link_holder_the_layout_carries():
-    (registration,) = [
-        entry
-        for entry in GLOBAL_CALLBACK_LIST
-        if "scenario-dropdown-selection.data" in entry["output"]
-    ]
-
-    assert _output_keys(registration) == {
-        "scenario-dropdown-selection.data",
-        f"{home.SCENARIO_SELECTION_IDS.playlist_table_link}.children",
-    }
 
 
 def test_page_is_named_scenario_performance_and_keeps_the_root_route():

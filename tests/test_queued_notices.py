@@ -1,9 +1,15 @@
-"""A run that failed to import must still reach the user, from a plain thread."""
+"""Notices queued where no browser could be told must still reach the user.
+
+A run that failed to import is queued from a plain thread, and a playlist that
+did not load is queued while the app starts. Each has a flush in
+``source/components/queued_notices.py`` that drains its queue into toasts.
+"""
 
 import dash
 import pytest
 
 from source.components import queued_notices
+from source.kovaaks import data_service
 from source.my_watchdog import file_watchdog
 
 
@@ -53,3 +59,24 @@ def test_a_drained_failure_does_not_toast_again_on_the_next_tick():
     queued_notices.flush_run_import_failures(1)
 
     assert queued_notices.flush_run_import_failures(2) is dash.no_update
+
+
+def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
+    data_service.playlist_startup_warning_queue.clear()
+    warnings = ["First warning", "Second warning"]
+    data_service.playlist_startup_warning_queue.extend(warnings)
+
+    notifications = queued_notices.flush_startup_playlist_warnings(1)
+
+    assert [notification["message"] for notification in notifications] == warnings
+    # They fire seconds after a server start, when nobody is guaranteed to be
+    # looking, so they wait for a dismissal instead of timing out.
+    assert [notification["title"] for notification in notifications] == [
+        "Playlist not loaded",
+        "Playlist not loaded",
+    ]
+    assert [notification["autoClose"] for notification in notifications] == [
+        False,
+        False,
+    ]
+    assert queued_notices.flush_startup_playlist_warnings(2) is dash.no_update

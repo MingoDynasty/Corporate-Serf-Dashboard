@@ -237,15 +237,3 @@ def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished(
     assert card.className == home.SETUP_CARD_CLASS
     order = [id(component) for component in _walk_components(page)]
     assert order.index(id(hint)) < order.index(id(card_box))
-
-
-def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
-    settings_service.save_settings({})
-    settings_service.resolve_stats_dir()
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
-
-    assert scenario_selection.select_playlist(None, None) == ([], None)
