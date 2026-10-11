@@ -16,7 +16,11 @@ import dash_mantine_components as dmc
 import pytest
 import requests
 from dash import dcc, no_update
-from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
+from dash._callback import (
+    GLOBAL_CALLBACK_LIST,
+    GLOBAL_CALLBACK_MAP,
+    GLOBAL_INLINE_SCRIPTS,
+)
 
 from source.components import chart_options, scenario_selection, scenario_stats
 from source.config import settings_service
@@ -1633,3 +1637,231 @@ def test_position_hover_is_worded_in_the_browser_from_the_stored_time():
     assert "relativeTime(seconds" in source
     assert "absoluteTime(seconds" in source
     assert "cell-tooltip-affordance" in source
+
+
+# A second page's ids, none of which the Scenario Performance page uses.
+SECOND_PAGE_IDS = scenario_stats.ScenarioStatsIds(
+    *(f"second-{field}" for field in scenario_stats.ScenarioStatsIds._fields)
+)
+# The ids of what a page builds itself and the block only reads.
+PAGE_BUILT_FIELDS = (
+    "run_events",
+    "scenario_dropdown",
+    "polling_interval",
+    "relative_time_interval",
+)
+
+
+def _keys(dependencies: list[dict]) -> list[str]:
+    """Read a registration's Inputs or State as ``id.prop``, in their order."""
+    return [f"{dep['id']}.{dep['property']}" for dep in dependencies]
+
+
+def _answering(registration: dict):
+    """Return the function a registration runs, or None when the browser runs it."""
+    wrapper = GLOBAL_CALLBACK_MAP[registration["output"]].get("callback")
+    return getattr(wrapper, "__wrapped__", None)
+
+
+def _block_registrations(ids) -> list[tuple]:
+    """List what is registered to write a block's own components, in order."""
+    built = set(ids) - {getattr(ids, field) for field in PAGE_BUILT_FIELDS}
+    return [
+        (_answering(entry), _keys(entry["inputs"]), _keys(entry["state"]))
+        for entry in GLOBAL_CALLBACK_LIST
+        if {key.rpartition(".")[0] for key in _output_keys(entry)} & built
+    ]
+
+
+@pytest.fixture
+def restored_callbacks():
+    """Take a test's registrations back out of Dash's process-wide registries."""
+    saved_list = list(GLOBAL_CALLBACK_LIST)
+    saved_map = dict(GLOBAL_CALLBACK_MAP)
+    saved_scripts = list(GLOBAL_INLINE_SCRIPTS)
+    yield
+    GLOBAL_CALLBACK_LIST[:] = saved_list
+    GLOBAL_CALLBACK_MAP.clear()
+    GLOBAL_CALLBACK_MAP.update(saved_map)
+    GLOBAL_INLINE_SCRIPTS[:] = saved_scripts
+
+
+def test_the_page_gives_the_block_the_ids_it_has_always_had(monkeypatch):
+    # The block builds most of its components from this object, so a changed
+    # string here changes an id in the browser with nothing else to notice.
+    assert home.SCENARIO_STATS_IDS._asdict() == {
+        "last_played": "scenario_datetime_last_played",
+        "last_played_tooltip": "last-played-tooltip",
+        "num_runs": "scenario_num_runs",
+        "rank": "scenario_rank",
+        "rank_updated_tooltip": "rank-updated-tooltip",
+        "rank_refresh_button": "rank-refresh-button",
+        "last_played_ts": "last-played-ts",
+        "last_played_empty_value": "last-played-empty-value",
+        "rank_updated_ts": "rank-updated-ts",
+        "run_events": "run-events",
+        "scenario_dropdown": "scenario-dropdown-selection",
+        "polling_interval": "interval-component",
+        "relative_time_interval": "relative-time-interval",
+    }
+
+    # The layout builds the run-events store, the scenario dropdown and the
+    # two intervals itself and spells their ids there, so nothing but this
+    # ties them to the ids the callbacks were registered for.
+    assert set(home.SCENARIO_STATS_IDS) <= set(_layout_components(monkeypatch))
+
+
+def test_the_page_registers_the_block_for_its_own_ids():
+    """Registration is a call the page makes; without it the block shows nothing."""
+    assert _block_registrations(home.SCENARIO_STATS_IDS) == [
+        (
+            scenario_stats.get_scenario_num_runs,
+            ["run-events.data", "scenario-dropdown-selection.value"],
+            [],
+        ),
+        (
+            None,
+            [
+                "last-played-ts.data",
+                "last-played-empty-value.data",
+                "relative-time-interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            scenario_stats.get_scenario_rank,
+            [
+                "run-events.data",
+                "scenario-dropdown-selection.value",
+                "interval-component.n_intervals",
+            ],
+            [],
+        ),
+        (None, ["rank-updated-ts.data", "relative-time-interval.n_intervals"], []),
+        (
+            scenario_stats.refresh_rank,
+            ["rank-refresh-button.n_clicks"],
+            ["scenario-dropdown-selection.value", "toast-channel-registry.data"],
+        ),
+    ]
+
+
+def test_a_second_page_builds_a_block_that_shares_no_id_with_the_first(monkeypatch):
+    first_page_ids = set(_layout_components(monkeypatch)) - {None}
+
+    built = {
+        component.id
+        for tree in (
+            *scenario_stats.scenario_stats_stores(SECOND_PAGE_IDS),
+            scenario_stats.scenario_stats_panel(SECOND_PAGE_IDS),
+        )
+        for component in _walk_components(tree)
+        if getattr(component, "id", None) is not None
+    }
+
+    # Every id in the two trees came from the ids passed in, and every id
+    # passed in is there apart from the ones a page builds itself.
+    assert built == set(SECOND_PAGE_IDS) - {
+        getattr(SECOND_PAGE_IDS, field) for field in PAGE_BUILT_FIELDS
+    }
+    assert not built & first_page_ids
+
+
+def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
+    restored_callbacks,
+):
+    registered_before = list(GLOBAL_CALLBACK_LIST)
+    first_page = _block_registrations(home.SCENARIO_STATS_IDS)
+
+    scenario_stats.register_scenario_stats(SECOND_PAGE_IDS)
+
+    assert GLOBAL_CALLBACK_LIST[: len(registered_before)] == registered_before
+    added = GLOBAL_CALLBACK_LIST[len(registered_before) :]
+    # The same functions answer for both pages, so both read and write the
+    # module's one memory of what the Position field last concluded.
+    assert _block_registrations(SECOND_PAGE_IDS) == [
+        (
+            scenario_stats.get_scenario_num_runs,
+            ["second-run_events.data", "second-scenario_dropdown.value"],
+            [],
+        ),
+        (
+            None,
+            [
+                "second-last_played_ts.data",
+                "second-last_played_empty_value.data",
+                "second-relative_time_interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            scenario_stats.get_scenario_rank,
+            [
+                "second-run_events.data",
+                "second-scenario_dropdown.value",
+                "second-polling_interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            None,
+            [
+                "second-rank_updated_ts.data",
+                "second-relative_time_interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            scenario_stats.refresh_rank,
+            ["second-rank_refresh_button.n_clicks"],
+            ["second-scenario_dropdown.value", "toast-channel-registry.data"],
+        ),
+    ]
+    assert len(added) == len(first_page)
+    # Nothing it writes belongs to the first page. The notification container
+    # and the channel registry are the shell's, which both pages share.
+    assert {
+        key.rpartition(".")[0] for entry in added for key in _output_keys(entry)
+    } == {
+        "second-num_runs",
+        "second-last_played",
+        "second-last_played_tooltip",
+        "second-last_played_ts",
+        "second-last_played_empty_value",
+        "second-rank",
+        "second-rank_updated_tooltip",
+        "second-rank_updated_ts",
+        "notification-container",
+        "toast-channel-registry",
+    }
+    # The spinner that swallows repeat clicks is on the second page's button.
+    assert added[-1]["running"] == {
+        "running": {"second-rank_refresh_button.loading": True},
+        "runningOff": {"second-rank_refresh_button.loading": False},
+    }
+    assert _block_registrations(home.SCENARIO_STATS_IDS) == first_page
+
+
+def test_a_second_pages_polling_tick_alone_reads_caches_only(monkeypatch):
+    """Each page has an interval of its own, so the rule cannot name one id."""
+    tick = {"prop_id": f"{SECOND_PAGE_IDS.polling_interval}.n_intervals"}
+    chosen = {"prop_id": f"{SECOND_PAGE_IDS.scenario_dropdown}.value"}
+    new_runs = {"prop_id": f"{SECOND_PAGE_IDS.run_events}.data"}
+
+    assert scenario_stats._rank_allows_network([tick]) is False
+    assert scenario_stats._rank_allows_network([new_runs]) is True
+    assert scenario_stats._rank_allows_network([tick, chosen]) is True
+
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    allowed = []
+
+    def rank_for(*_args, **kwargs):
+        allowed.append(kwargs["allow_network"])
+        return ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED)
+
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", rank_for)
+    for triggered in ([tick], [tick, chosen]):
+        monkeypatch.setattr(scenario_stats, "ctx", SimpleNamespace(triggered=triggered))
+        scenario_stats.get_scenario_rank(None, "Scenario", 1)
+
+    assert allowed == [False, True]
