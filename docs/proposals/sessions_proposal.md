@@ -29,11 +29,12 @@ or D1 to D5 of
 **Where this sits.** Run History was one proposal and is now five pieces:
 groundwork with no proposal, Sessions, Run toasts
 ([PR #354](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/354)),
-the Run History page (version 1), and All scenarios. The maintainer agreed
-the split on
-2026-10-10: "Merged breakdown is a go." That agrees the outline and ratifies
-no row. This piece depends on none of the others. The page's run list and
-its latest-run card are built on it.
+the Run History page, version 1
+([PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356)),
+and All scenarios. The maintainer agreed the split on 2026-10-10: "Merged
+breakdown is a go." That agrees the outline and ratifies no row. This piece
+depends on none of the others. The page's run list and its latest-run card
+are built on it.
 
 **Already decided, and binding here.**
 
@@ -608,10 +609,14 @@ Author-owned. One pure function over one session's runs.
   scenario ends it. Coming back later in the session starts a new one.
 - **A scenario is its name,** as everywhere else in the app.
 - **A change of sensitivity doesn't end a stretch.**
+- **A stretch's start and end** follow the session's rule: its first run's
+  start, or that run's end when it has no start, to its last run's end.
 
-Version 1 of the page uses stretches for one thing: the divider in a
-scenario's run list where the scenario was left and returned to. The All
-scenarios view draws one row per stretch.
+Version 1 of the page uses stretches for two things. One is the divider in
+a scenario's run list where the scenario was left and returned to. The
+other is the latest-run card's time on a scenario, which adds up that
+scenario's stretches in the session. The All scenarios view draws one row
+per stretch.
 
 **The word.** The roadmap, the 2026-10-04 decision, and PR #351 call a
 stretch a visit. The recommendation is that the code and the docs keep
@@ -770,8 +775,9 @@ their tests.
 
 - **Everything on screen.** Session rows, the "in progress" state and its
   timer, the run number within a session, the divider, and the latest-run
-  card belong to the Run History page proposal, which will rewrite
-  [run_history_proposal.md](./run_history_proposal.md).
+  card belong to the Run History page proposal
+  ([PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356)),
+  which rewrites [run_history_proposal.md](./run_history_proposal.md).
 - **Marks on a run,** threshold passed and New PB. The page proposal.
 - **The typical score.** S4: a later proposal of its own.
 - **Warm-up runs,** in any form. The dip after a break grows gradually with
