@@ -1073,7 +1073,7 @@ chart's hover keeps its two decimals.
 
 | Where | String | Why |
 |---|---|---|
-| Heading line | `{scenario} · {n} runs` | Says what the list is filtered to. The list has no name of its own. |
+| Heading line | `{scenario} · {n} runs`, or `{scenario} · 1 run` | Says what the list is filtered to. The list has no name of its own. Singular where the count is one. |
 | Buttons | `Expand all`, `Collapse all` | Sentence case. One button, reading what a click would do. |
 | Button and menu | `Columns` | The shared menu's own label. |
 | Column headers | `#`, `Time`, `Score`, `Accuracy`, `Shots Fired`, `Sensitivity` | Title Case, as grid headers. The Columns menu's two checkboxes carry the headers they show. |
@@ -1081,7 +1081,7 @@ chart's hover keeps its two decimals.
 | A session row's name | `Oct 4, 9:45 PM`, or `Dec 30, 2025, 9:45 PM` in an earlier year | The session's start. |
 | Badge | `In progress` | A status, in sentence case. |
 | A session row, right side | `{n} of {m} runs`, such as `7 of 47 runs`, `1 of 1 run` | This scenario's runs out of the session's. |
-| The first row, right side | `{length} · {n} of {m} runs`, such as `1 hr 6 min · 7 of 47 runs` | The session being played is the one whose length matters at a glance. |
+| The first row, right side | `{length} · {n} of {m} runs`, such as `1 hr 6 min · 7 of 47 runs` | The session being played is the one whose length matters at a glance. When the selected scenario has no run in it, the row reads `1 hr 6 min · 0 of 47 runs`, on purpose: it gives the session's size and says none of it was on this scenario. |
 | The first row's length, hover | `The length runs from the first run to the last run. It doesn't count the time since your last run.` | Says why the figure stands still between runs. |
 | The first row, opened, scenario not played in it | `Not played in this session` | "This" is the row's session, in progress or ended. |
 | Divider | `{n} runs on {k} other scenarios`, or `1 run on 1 other scenario` | Says what happened between two rows. |
