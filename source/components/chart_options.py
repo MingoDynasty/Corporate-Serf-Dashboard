@@ -174,17 +174,13 @@ def settings_help_label(label: str, help_text: str | list) -> dmc.Group:
 
 
 def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
-    """
-    Applies the theme and the Run Data Points preferences to the graph.
+    """Apply the theme and the Run Data Points preferences to the graph.
 
     Everything here is presentation over the figure the page's chart callback
     already built and cached, which is what keeps a size or color change from
     rereading scenario data, rebuilding overlays, or firing notifications.
-    :param color_scheme: active Mantine color scheme.
-    :param plot_json: json object with plotted data.
-    :param point_size: selected point size preset.
-    :param point_color: explicit point color, or empty for Default.
-    :return: Figure with theme and point preferences applied.
+    ``plot_json`` is that cached figure, and ``point_color`` is an explicit
+    color or empty for Default.
     """
     if not plot_json:
         plot_json = generate_placeholder_plot().to_json()
