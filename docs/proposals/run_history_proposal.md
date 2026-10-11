@@ -615,10 +615,16 @@ What follows from R2.
   leads to `/`, which is now Home.
 - **The Playlists pages' scenario links** point at
   `/run-history?playlist_code=...&scenario=...`. One function builds them.
-- **Run History with no stats folder** shows the stats-folder hint above its
-  top row, both sentences as they are today. Its chart and list keep their
-  ordinary empty states. The setup card is Home's alone: it is the app's
-  first-run offer, and the hint is what explains an empty page.
+- **Run History with no runs to read** explains itself in place. It shows
+  what Home shows in that case, above its top row: the stats-folder hint,
+  and the setup card's two yellow states, "Your settings can't be read"
+  and "Finish setting up". Each is as it is today, and neither has Skip.
+  The hint alone would not cover it: it speaks only for a stats folder
+  that is set and can't be used, so with no folder set, or with a settings
+  file the app can't read, the page would be empty with no reason given.
+  Its chart and list keep their ordinary empty states. The card's blue
+  account offer is Home's alone: it is the app's first-run offer, and it
+  explains nothing about an empty page.
 - **Failed run imports and startup playlist warnings** reach the screen
   today only while the old page is open
   ([Run delivery](../specs/scenario_performance.md#run-delivery)). Home and
@@ -1242,7 +1248,7 @@ before Home was proposed.
 | L-R6, L-X10 | Failed run imports and startup playlist warnings reach the screen only on this page | On Home and on Run History (R2) |
 | L-X1 | A scenario name in a playlist's table links to `/?playlist_code=...&scenario=...` | To `/run-history?...` (R2) |
 | L-X13 | The settings spec says the setup card and the hint belong to this page's spec | To Home's (R2) |
-| L-H1 to L-H9 | The setup card and the stats-folder hint show above the controls row | Every statement holds on Home. The hint also shows on Run History (R2) |
+| L-H1 to L-H9 | The setup card and the stats-folder hint show above the controls row | Every statement holds on Home. The hint and the card's two yellow states also show on Run History. The account offer is Home's alone (R2) |
 
 The other 82 kept rows hold as the spec states them, read against the new
 layout.
