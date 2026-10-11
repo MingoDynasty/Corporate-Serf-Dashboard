@@ -79,7 +79,7 @@ flowchart TD
         ShellTick --> Drain
     end
 
-    subgraph Server["Server threads (Waitress or Flask, home.py callbacks)"]
+    subgraph Server["Server threads (Waitress or Flask, the callbacks home.py registers)"]
         Tick["dcc.Interval tick"]
         Check["check_for_new_data<br/>may auto-switch scenario"]
         Graph["generate_graph<br/>rebuilds the plot via plot_service"]
@@ -247,6 +247,7 @@ flowchart LR
         ScenarioSelection["components/<br/>scenario_selection.py"]
         QueuedNotices["components/<br/>queued_notices.py"]
         ScoreThreshold["components/<br/>score_threshold.py"]
+        ScenarioStats["components/<br/>scenario_stats.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -281,7 +282,6 @@ flowchart LR
     Shell --> Queue
     Shell --> Pace
     Home --> DataService
-    Home --> ApiService
     Home --> PlotService
     Home --> LocalIcon
     Home --> ChartOptions
@@ -299,6 +299,11 @@ flowchart LR
     ScoreThreshold --> DataService
     ScoreThreshold --> TimeScored
     ScoreThreshold --> Pace
+    Home --> ScenarioStats
+    ScenarioStats --> ChartOptions
+    ScenarioStats --> LocalIcon
+    ScenarioStats --> DataService
+    ScenarioStats --> ApiService
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -395,6 +400,14 @@ flowchart LR
   warnings on a one-shot interval. Its run toast builders and `generate_graph`
   call `components/score_threshold.py` for a run's threshold verdict and for
   the score the threshold line is drawn at.
+  The Scenario Stats block (Last played, Number of runs, and Position with
+  its Refresh button) is built by `components/scenario_stats.py` from this
+  page's `SCENARIO_STATS_IDS`, and `register_scenario_stats` wires that
+  module's callbacks to the same ids; `get_scenario_num_runs`,
+  `get_scenario_rank`, and `refresh_rank` are defined there. The page builds
+  what the block only reads: the `run-events` store, the scenario dropdown,
+  the polling interval, and the 30-second interval that keeps the relative
+  times current.
   As the landing page it also carries the first-run setup card
   (`_setup_card_children`), which is suppressed while a stats-directory change
   awaits a restart. It asks the store's read state before anything else: an
@@ -657,6 +670,31 @@ flowchart LR
   threshold line is drawn at, from the current personal best.
   `normalize_score_threshold_percentage()` reads the percentage input, which
   is empty while the user is clearing it.
+- `components/scenario_stats.py` — the Scenario Stats block: Last played,
+  Number of runs, and Position with its Refresh button. A page fills in a
+  `ScenarioStatsIds`: an id for each component the block builds, plus the
+  page's own run-events store, scenario dropdown, polling interval, and
+  30-second interval, which the block only reads. It puts
+  `scenario_stats_stores()` and `scenario_stats_panel()` in its layout and
+  calls `register_scenario_stats()` with the ids once, at import, which
+  registers `get_scenario_num_runs`, `get_scenario_rank`, `refresh_rank`,
+  and the clientside callbacks that word the Last played text and the age
+  in the Position hover. `get_scenario_rank` is the passive read. A tick of
+  the polling interval alone reads caches only, and the tick is told by its
+  `n_intervals` property and not by one id, so the rule holds for each
+  page's interval. `refresh_rank` is the click: a board-authoritative fetch
+  that answers every outcome with a channel toast.
+  The module holds what the Position field remembers between calls:
+  `_last_rank_hints`, what each scenario's last network read concluded, so
+  that a cache-only tick can repeat the hint, and `_session_notices_sent`,
+  which lets the Steam ID mismatch toast fire once per run of the server.
+  Every page that registers the block reads and writes the same objects.
+  That depends on the module being imported once, which is the reason given
+  under `components/chart_options.py` for living outside `source/pages/`.
+  It takes `TOOLTIP_EVENTS` and `SETTINGS_HELP_TOOLTIP_WIDTH` from
+  `components/chart_options.py`. What the block shows is specified in
+  [scenario_performance.md](specs/scenario_performance.md) and
+  [scenario_rank.md](specs/scenario_rank.md).
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -976,6 +1014,7 @@ flowchart LR
 | The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/home.py`) for the component ids |
 | What `?scenario=` and `?playlist_code=` select, the scenario dropdown's list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the two layout helpers; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/home.py`) for the component ids |
 | How a failed run import or a startup playlist warning reaches the screen | `components/queued_notices.py` for the two flushes; `my_watchdog/file_watchdog.py` and `kovaaks/data_service.py` for the queues; the hosting page for the interval each flush is registered on |
+| The Scenario Stats block, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the block and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/home.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
 | How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `pages/home.py` for the run toast builders and the chart callback that call it |
 | The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |

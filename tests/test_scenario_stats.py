@@ -1,3 +1,12 @@
+"""The Scenario Stats block on the Scenario Performance page.
+
+The callbacks live in ``source/components/scenario_stats.py`` and take their
+ids from the page that hosts them. These tests hold the run count and the Last
+played stores, the Position value with its hints and its hover, the Steam ID
+mismatch toast, and each answer a click on Refresh can give. The ones that
+read a layout or a registration read the page's own.
+"""
+
 import os
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -7,9 +16,13 @@ import dash_mantine_components as dmc
 import pytest
 import requests
 from dash import dcc, no_update
-from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
+from dash._callback import (
+    GLOBAL_CALLBACK_LIST,
+    GLOBAL_CALLBACK_MAP,
+    GLOBAL_INLINE_SCRIPTS,
+)
 
-from source.components import chart_options, scenario_selection
+from source.components import chart_options, scenario_selection, scenario_stats
 from source.config import settings_service
 from source.kovaaks import api_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
@@ -18,28 +31,30 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import home  # noqa: E402
 
-format_scenario_rank = home.format_scenario_rank
+format_scenario_rank = scenario_stats.format_scenario_rank
 
 
 @pytest.fixture(autouse=True)
 def _forget_rank_hints():
     """Keep the cross-tick hint memo from leaking between tests."""
-    home._last_rank_hints.clear()
+    scenario_stats._last_rank_hints.clear()
     yield
-    home._last_rank_hints.clear()
+    scenario_stats._last_rank_hints.clear()
 
 
 @pytest.fixture(autouse=True)
 def _forget_session_notices():
     """Give each test a fresh app session's worth of once-per-session toasts."""
-    home._session_notices_sent.clear()
+    scenario_stats._session_notices_sent.clear()
     yield
-    home._session_notices_sent.clear()
+    scenario_stats._session_notices_sent.clear()
 
 
 def _rendered_rank(*args, **kwargs):
     """Render the Position value, discarding any toast the render earned."""
-    display, _updated_ts, _notifications = home._render_scenario_rank(*args, **kwargs)
+    display, _updated_ts, _notifications = scenario_stats._render_scenario_rank(
+        *args, **kwargs
+    )
     return display
 
 
@@ -54,7 +69,7 @@ class _RefreshClient:
     def click(self, scenario: str | None):
         """Return this click's (display, shown payloads, hidden ids)."""
         self.clicks += 1
-        display, self.updated_ts, shown, hidden, patch = home.refresh_rank(
+        display, self.updated_ts, shown, hidden, patch = scenario_stats.refresh_rank(
             self.clicks, scenario, self.toast_channels
         )
         self.toast_channels.update(_registry_writes(patch))
@@ -106,64 +121,12 @@ def _layout_components(monkeypatch) -> dict:
     }
 
 
-def _label_text(component) -> str:
-    """Flatten a control's label into the text a reader would see."""
-    return "".join(
-        part for part in _walk_components(component.label) if isinstance(part, str)
-    )
-
-
-def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
-    monkeypatch.setattr(
-        home,
-        "get_visible_playlist_selector_options",
-        lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
-    )
-    monkeypatch.setattr(
-        scenario_selection, "get_scenario_names", lambda: ["1wall6targets"]
-    )
-
-    playlist_filter = next(
-        component
-        for component in _walk_components(home.layout())
-        if getattr(component, "id", None) == "playlist-dropdown-selection"
-    )
-
-    assert playlist_filter.scrollAreaProps == {"type": "always"}
-    assert playlist_filter.persistence is True
-
-
 def _output_keys(registration: dict) -> set[str]:
     """Read a registration's outputs as ``id.prop``, without duplicate hashes."""
     return {
         output.split("@")[0]
         for output in registration["output"].strip(".").split("...")
     }
-
-
-def test_home_top_n_input_uses_compact_width(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
-
-    page = home.layout()
-    top_n_scores = next(
-        component
-        for component in _walk_components(page)
-        if getattr(component, "id", None) == "top_n_scores"
-    )
-    controls_flex = next(
-        component
-        for component in _walk_components(page)
-        if isinstance(component, dmc.Flex)
-        and any(
-            getattr(child, "id", None) == "top_n_scores" for child in component.children
-        )
-    )
-
-    assert top_n_scores.w == "8rem"
-    assert getattr(top_n_scores, "placeholder", None) is None
-    assert controls_flex.gap == "sm"
-    assert controls_flex.wrap == "wrap"
 
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
@@ -197,70 +160,6 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert tooltip.events == chart_options.TOOLTIP_EVENTS
 
 
-def test_page_is_named_scenario_performance_and_keeps_the_root_route():
-    """The rename is labels-only: the product name moved, the route did not."""
-    page = dash.page_registry["source.pages.home"]
-
-    assert page["name"] == "Scenario Performance"
-    # Registered as a callable so the optional build-label prefix can be read
-    # per request; unprefixed here because the flag defaults off.
-    assert page["title"]() == "Scenario Performance"
-    assert page["path"] == "/"
-
-
-def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
-    monkeypatch,
-):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
-
-    titles = {
-        component.children: component
-        for component in _walk_components(home.layout())
-        if isinstance(component, dmc.Title)
-    }
-
-    assert titles["Scenario Stats"].order == 2
-    assert titles["Scenario Stats"].size == "h6"
-    # The inspector's groups sit under the page's h2 sections.
-    for group in ("Overlays", "Run Data Points", "Score Threshold", "Notifications"):
-        assert titles[group].order == 3
-        assert titles[group].size == "h6"
-
-
-def test_home_no_longer_builds_the_settings_modal(monkeypatch):
-    components = _layout_components(monkeypatch)
-
-    assert "settings-modal" not in components
-    assert "settings-modal-open-button" not in components
-    assert not [
-        component
-        for component in components.values()
-        if isinstance(component, dmc.Modal)
-    ]
-
-
-def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
-    """It is stacked with the selector, not spread across the controls row."""
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
-
-    scenario_field = next(
-        component
-        for component in _walk_components(home.layout())
-        if getattr(component, "className", None) == "home-scenario-field"
-    )
-    switch = scenario_field.children[1]
-
-    assert [getattr(child, "id", None) for child in scenario_field.children] == [
-        "scenario-dropdown-selection",
-        "automatically-change-scenario-switch",
-    ]
-    assert _label_text(switch) == "Follow newly played scenario"
-    assert switch.checked is True
-    assert switch.persistence is True
-
-
 def test_rank_refresh_button_has_tooltip(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
@@ -276,14 +175,14 @@ def test_rank_refresh_button_has_tooltip(monkeypatch):
     ]
 
     assert len(tooltips) == 1
-    assert tooltips[0].label == home.RANK_REFRESH_TOOLTIP
+    assert tooltips[0].label == scenario_stats.RANK_REFRESH_TOOLTIP
     assert tooltips[0].events == chart_options.TOOLTIP_EVENTS
     assert tooltips[0].withArrow is True
     assert tooltips[0].multiline is True
 
 
 def test_get_scenario_num_runs_without_selection():
-    assert home.get_scenario_num_runs(None, None) == (
+    assert scenario_stats.get_scenario_num_runs(None, None) == (
         0,
         None,
         "—",
@@ -295,9 +194,11 @@ def test_get_scenario_num_runs_without_selection():
 
 
 def test_get_scenario_num_runs_without_play_data(monkeypatch):
-    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
+    monkeypatch.setattr(
+        scenario_stats, "is_scenario_in_database", lambda _scenario: False
+    )
 
-    assert home.get_scenario_num_runs(None, "Unplayed Scenario") == (
+    assert scenario_stats.get_scenario_num_runs(None, "Unplayed Scenario") == (
         0,
         None,
         "Never",
@@ -310,14 +211,16 @@ def test_get_scenario_num_runs_without_play_data(monkeypatch):
 
 def test_get_scenario_num_runs_with_play_data(monkeypatch):
     last_played = datetime(2026, 6, 30, 9, 5, 4)
-    scenario_stats = SimpleNamespace(
+    played = SimpleNamespace(
         number_of_runs=12,
         date_last_played=last_played,
     )
-    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
-    monkeypatch.setattr(home, "get_scenario_stats", lambda _scenario: scenario_stats)
+    monkeypatch.setattr(
+        scenario_stats, "is_scenario_in_database", lambda _scenario: True
+    )
+    monkeypatch.setattr(scenario_stats, "get_scenario_stats", lambda _scenario: played)
 
-    assert home.get_scenario_num_runs(None, "Played Scenario") == (
+    assert scenario_stats.get_scenario_num_runs(None, "Played Scenario") == (
         12,
         last_played.timestamp(),
         "Never",
@@ -407,8 +310,12 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
             total_players=54702,
         )
 
-    monkeypatch.setattr(home, "is_scenario_in_database", fail_is_scenario_in_database)
-    monkeypatch.setattr(home, "get_scenario_rank_info", fake_get_scenario_rank_info)
+    monkeypatch.setattr(
+        scenario_stats, "is_scenario_in_database", fail_is_scenario_in_database
+    )
+    monkeypatch.setattr(
+        scenario_stats, "get_scenario_rank_info", fake_get_scenario_rank_info
+    )
 
     assert _rendered_rank("Unplayed Scenario", allow_network=True) == (
         "Unranked (54,702 players)"
@@ -419,11 +326,11 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
 def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads():
     interval = {"prop_id": "interval-component.n_intervals"}
 
-    assert home._rank_allows_network([{"prop_id": "."}]) is True
-    assert home._rank_allows_network([interval]) is False
-    assert home._rank_allows_network([{"prop_id": "run-events.data"}]) is True
+    assert scenario_stats._rank_allows_network([{"prop_id": "."}]) is True
+    assert scenario_stats._rank_allows_network([interval]) is False
+    assert scenario_stats._rank_allows_network([{"prop_id": "run-events.data"}]) is True
     assert (
-        home._rank_allows_network(
+        scenario_stats._rank_allows_network(
             [
                 interval,
                 {"prop_id": "scenario-dropdown-selection.value"},
@@ -599,7 +506,7 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
     # it toasts -- but once for the session, not once per scenario switch.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
 
-    display, _updated_ts, notifications = home._render_scenario_rank(
+    display, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -612,7 +519,7 @@ def test_passive_rank_render_reports_a_steam_id_mismatch_once_per_session(
     assert "different-steam-id" in notifications[0]["message"]
 
     for allow_network in (False, True):
-        assert home._render_scenario_rank(
+        assert scenario_stats._render_scenario_rank(
             scenario_name,
             allow_network=allow_network,
         ) == (display, None, [])
@@ -622,7 +529,7 @@ def test_steam_id_mismatch_toast_persists_until_dismissed(monkeypatch, tmp_path)
     # It can fire while nobody is looking at the page, so it must not expire.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
 
-    _display, _updated_ts, notifications = home._render_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -636,7 +543,7 @@ def test_matching_steam_id_never_toasts(monkeypatch, tmp_path):
         {"kovaaks_username": "MingoDynasty", "steam_id": "different-steam-id"}
     )
 
-    _display, _updated_ts, notifications = home._render_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         scenario_name,
         allow_network=True,
     )
@@ -652,19 +559,21 @@ def test_a_rank_render_nobody_triggered_keeps_the_sessions_mismatch_toast(
     # with an empty trigger list. The value still renders, but the session's
     # one mismatch toast must survive for a render the user actually caused.
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
-    monkeypatch.setattr(home, "ctx", SimpleNamespace(triggered=[]))
+    monkeypatch.setattr(scenario_stats, "ctx", SimpleNamespace(triggered=[]))
 
-    display, _updated_ts, notifications = home.get_scenario_rank(None, scenario_name, 0)
+    display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
+        None, scenario_name, 0
+    )
 
     assert display == "10 of 100 (90.50% percentile)"
     assert notifications is no_update
 
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "ctx",
         SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
     )
-    _display, _updated_ts, notifications = home.get_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
         None, scenario_name, 0
     )
 
@@ -677,12 +586,12 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
     scenario_name = _seed_mismatched_rank_cache(monkeypatch, tmp_path)
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "ctx",
         SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
     )
 
-    _display, _updated_ts, notifications = home.get_scenario_rank(
+    _display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
         None, scenario_name, 0
     )
 
@@ -691,7 +600,7 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
 
 def test_passive_rank_render_points_an_unset_username_at_settings():
     # The fixture store leaves identity unset -- the fresh-install default.
-    rendered, _updated_ts, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -710,7 +619,7 @@ def test_passive_rank_render_points_an_unset_username_at_settings():
 def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -718,7 +627,7 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
         ),
     )
 
-    rendered, _updated_ts, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -730,7 +639,7 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
 def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -741,7 +650,7 @@ def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
         ),
     )
 
-    rendered, _updated_ts, notifications = home._render_scenario_rank(
+    rendered, _updated_ts, notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
@@ -762,7 +671,7 @@ def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
             served_stale=True if kwargs["allow_network"] else None,
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", rank_for)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", rank_for)
 
     assert (
         _rank_text(_rendered_rank("Scenario", allow_network=True))
@@ -777,8 +686,8 @@ def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
 @pytest.mark.parametrize(
     ("hint", "stale_value"),
     [
-        (home._RANK_HINT_SERVED_STALE, "1,240"),
-        (home._RANK_HINT_LOOKUP_FAILED, "N/A"),
+        (scenario_stats._RANK_HINT_SERVED_STALE, "1,240"),
+        (scenario_stats._RANK_HINT_LOOKUP_FAILED, "N/A"),
     ],
 )
 def test_a_background_cache_write_retires_the_memoized_hint(
@@ -791,9 +700,9 @@ def test_a_background_cache_write_retires_the_memoized_hint(
     # network verdict was never about, that verdict must not keep claiming the
     # lookup failed over a position that has since arrived.
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    home._last_rank_hints["Scenario"] = (stale_value, hint)
+    scenario_stats._last_rank_hints["Scenario"] = (stale_value, hint)
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -802,14 +711,17 @@ def test_a_background_cache_write_retires_the_memoized_hint(
     )
 
     assert _rendered_rank("Scenario", allow_network=False) == "1,180"
-    assert "Scenario" not in home._last_rank_hints
+    assert "Scenario" not in scenario_stats._last_rank_hints
 
 
 def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    home._last_rank_hints["Scenario"] = ("1,240", home._RANK_HINT_SERVED_STALE)
+    scenario_stats._last_rank_hints["Scenario"] = (
+        "1,240",
+        scenario_stats._RANK_HINT_SERVED_STALE,
+    )
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -819,7 +731,7 @@ def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
 
     _RefreshClient().click("Scenario")
 
-    assert home._last_rank_hints["Scenario"] == ("1,240", None)
+    assert scenario_stats._last_rank_hints["Scenario"] == ("1,240", None)
     assert _rendered_rank("Scenario", allow_network=False) == "1,240"
 
 
@@ -1164,7 +1076,7 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
             error_message="Rank lookup failed.",
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", get_rank)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1186,7 +1098,7 @@ def test_manual_rank_refresh_crash_toasts_red_and_leaves_the_value_alone(monkeyp
     def explode(*_args, **_kwargs):
         raise RuntimeError("boom")
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", explode)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", explode)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1213,7 +1125,7 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
             "cached position for Scenario.",
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", get_rank)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1242,7 +1154,7 @@ def test_manual_rank_refresh_reports_a_steam_mismatch_as_a_clean_refresh(monkeyp
             warning_message="Configured Steam ID 'x' does not match.",
         )
 
-    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", get_rank)
 
     rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
@@ -1255,7 +1167,7 @@ def test_back_to_back_manual_refreshes_each_render_their_result(monkeypatch):
     # each deliberate click shows a fresh instance and hides the one before it.
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -1283,7 +1195,7 @@ def test_manual_rank_refresh_without_a_username_names_the_condition(monkeypatch)
     # network, so the click is answered with the verdict rather than the
     # generic red failure -- and the field's own hint is left alone.
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "an unset username must not reach the rank service"
@@ -1304,7 +1216,7 @@ def test_back_to_back_unset_username_refreshes_each_answer(monkeypatch):
     # Same reason the green confirmation re-pops: a stable id would be
     # swallowed while the first toast is still on screen.
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "an unset username must not reach the rank service"
@@ -1345,7 +1257,7 @@ def test_the_two_refresh_problems_share_one_channel(monkeypatch):
         ),
     ]
     monkeypatch.setattr(
-        home, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
+        scenario_stats, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
     )
 
     client = _RefreshClient()
@@ -1354,8 +1266,10 @@ def test_the_two_refresh_problems_share_one_channel(monkeypatch):
 
     assert failed[0]["color"] == "red"
     assert stale[0]["color"] == "yellow"
-    assert failed[0]["id"].startswith(f"{home._RANK_REFRESH_PROBLEM_CHANNEL}-")
-    assert stale[0]["id"].startswith(f"{home._RANK_REFRESH_PROBLEM_CHANNEL}-")
+    assert failed[0]["id"].startswith(
+        f"{scenario_stats._RANK_REFRESH_PROBLEM_CHANNEL}-"
+    )
+    assert stale[0]["id"].startswith(f"{scenario_stats._RANK_REFRESH_PROBLEM_CHANNEL}-")
     assert failed_hidden == []
     assert stale_hidden == [failed[0]["id"]]
 
@@ -1364,7 +1278,7 @@ def test_refreshes_of_two_scenarios_keep_separate_success_channels(monkeypatch):
     """Different scenarios are different facts, so their confirmations stack."""
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda scenario, *_a, **_k: ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -1398,7 +1312,7 @@ def test_a_successful_refresh_clears_the_problem_and_username_channels(monkeypat
         ),
     ]
     monkeypatch.setattr(
-        home, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
+        scenario_stats, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
     )
 
     # No username first: the blue notice stands, and nothing reached the
@@ -1411,22 +1325,25 @@ def test_a_successful_refresh_clears_the_problem_and_username_channels(monkeypat
 
     assert success[0]["color"] == "green"
     assert set(success_hidden) == {failed[0]["id"], unset[0]["id"]}
-    assert client.toast_channels[home._RANK_REFRESH_PROBLEM_CHANNEL] is None
-    assert client.toast_channels[home._RANK_REFRESH_USERNAME_UNSET_CHANNEL] is None
+    assert client.toast_channels[scenario_stats._RANK_REFRESH_PROBLEM_CHANNEL] is None
+    assert (
+        client.toast_channels[scenario_stats._RANK_REFRESH_USERNAME_UNSET_CHANNEL]
+        is None
+    )
 
 
 def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
     # Under DashProxy an allow_duplicate callback can fire once on page load
     # with n_clicks=None; that must not force a network refresh or toast.
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "an initial-load fire must not hit the network"
         ),
     )
 
-    assert home.refresh_rank(None, "Scenario", {}) == (
+    assert scenario_stats.refresh_rank(None, "Scenario", {}) == (
         no_update,
         no_update,
         no_update,
@@ -1437,14 +1354,14 @@ def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
 
 def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch):
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: pytest.fail(
             "a refresh without a scenario must not hit the network"
         ),
     )
 
-    assert home.refresh_rank(1, None, {}) == (
+    assert scenario_stats.refresh_rank(1, None, {}) == (
         "N/A",
         None,
         no_update,
@@ -1472,7 +1389,9 @@ def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     )
 
     assert rank_loading is not None
-    assert rank_loading.delay_show == home.SCENARIO_RANK_LOADING_DELAY_MS == 250
+    assert (
+        rank_loading.delay_show == scenario_stats.SCENARIO_RANK_LOADING_DELAY_MS == 250
+    )
     assert rank_loading.show_initially is False
 
     refresh_button = next(
@@ -1529,7 +1448,7 @@ def test_position_hover_starts_disabled_around_the_value(monkeypatch):
     ],
 )
 def test_rank_updated_ts_dates_only_a_displayed_position(rank_info, expected):
-    assert home._rank_updated_ts(rank_info) == expected
+    assert scenario_stats._rank_updated_ts(rank_info) == expected
 
 
 def _seed_dated_rank_cache(monkeypatch, tmp_path) -> str:
@@ -1570,7 +1489,7 @@ def test_both_render_paths_date_the_position_from_its_cache_entry(
     scenario_name = _seed_dated_rank_cache(monkeypatch, tmp_path)
 
     for allow_network in (True, False):
-        display, updated_ts, _notifications = home._render_scenario_rank(
+        display, updated_ts, _notifications = scenario_stats._render_scenario_rank(
             scenario_name,
             allow_network=allow_network,
         )
@@ -1582,7 +1501,7 @@ def test_both_render_paths_date_the_position_from_its_cache_entry(
 def test_a_render_with_no_position_dates_nothing(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -1590,14 +1509,18 @@ def test_a_render_with_no_position_dates_nothing(monkeypatch):
         ),
     )
 
-    rendered, updated_ts, _notifications = home._render_scenario_rank(
+    rendered, updated_ts, _notifications = scenario_stats._render_scenario_rank(
         "Scenario",
         allow_network=True,
     )
 
     assert _rank_text(rendered) == "N/A · lookup failed"
     assert updated_ts is None
-    assert home._render_scenario_rank(None, allow_network=True) == ("N/A", None, [])
+    assert scenario_stats._render_scenario_rank(None, allow_network=True) == (
+        "N/A",
+        None,
+        [],
+    )
 
 
 def test_a_refresh_restarts_the_stored_time(monkeypatch, tmp_path):
@@ -1650,7 +1573,7 @@ def test_a_failed_refresh_leaves_the_stored_time_alone(monkeypatch):
     """The value stays on screen untouched, and so does the time that dates it."""
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
-        home,
+        scenario_stats,
         "get_scenario_rank_info",
         lambda *_args, **_kwargs: ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -1714,3 +1637,231 @@ def test_position_hover_is_worded_in_the_browser_from_the_stored_time():
     assert "relativeTime(seconds" in source
     assert "absoluteTime(seconds" in source
     assert "cell-tooltip-affordance" in source
+
+
+# A second page's ids, none of which the Scenario Performance page uses.
+SECOND_PAGE_IDS = scenario_stats.ScenarioStatsIds(
+    *(f"second-{field}" for field in scenario_stats.ScenarioStatsIds._fields)
+)
+# The ids of what a page builds itself and the block only reads.
+PAGE_BUILT_FIELDS = (
+    "run_events",
+    "scenario_dropdown",
+    "polling_interval",
+    "relative_time_interval",
+)
+
+
+def _keys(dependencies: list[dict]) -> list[str]:
+    """Read a registration's Inputs or State as ``id.prop``, in their order."""
+    return [f"{dep['id']}.{dep['property']}" for dep in dependencies]
+
+
+def _answering(registration: dict):
+    """Return the function a registration runs, or None when the browser runs it."""
+    wrapper = GLOBAL_CALLBACK_MAP[registration["output"]].get("callback")
+    return getattr(wrapper, "__wrapped__", None)
+
+
+def _block_registrations(ids) -> list[tuple]:
+    """List what is registered to write a block's own components, in order."""
+    built = set(ids) - {getattr(ids, field) for field in PAGE_BUILT_FIELDS}
+    return [
+        (_answering(entry), _keys(entry["inputs"]), _keys(entry["state"]))
+        for entry in GLOBAL_CALLBACK_LIST
+        if {key.rpartition(".")[0] for key in _output_keys(entry)} & built
+    ]
+
+
+@pytest.fixture
+def restored_callbacks():
+    """Take a test's registrations back out of Dash's process-wide registries."""
+    saved_list = list(GLOBAL_CALLBACK_LIST)
+    saved_map = dict(GLOBAL_CALLBACK_MAP)
+    saved_scripts = list(GLOBAL_INLINE_SCRIPTS)
+    yield
+    GLOBAL_CALLBACK_LIST[:] = saved_list
+    GLOBAL_CALLBACK_MAP.clear()
+    GLOBAL_CALLBACK_MAP.update(saved_map)
+    GLOBAL_INLINE_SCRIPTS[:] = saved_scripts
+
+
+def test_the_page_gives_the_block_the_ids_it_has_always_had(monkeypatch):
+    # The block builds most of its components from this object, so a changed
+    # string here changes an id in the browser with nothing else to notice.
+    assert home.SCENARIO_STATS_IDS._asdict() == {
+        "last_played": "scenario_datetime_last_played",
+        "last_played_tooltip": "last-played-tooltip",
+        "num_runs": "scenario_num_runs",
+        "rank": "scenario_rank",
+        "rank_updated_tooltip": "rank-updated-tooltip",
+        "rank_refresh_button": "rank-refresh-button",
+        "last_played_ts": "last-played-ts",
+        "last_played_empty_value": "last-played-empty-value",
+        "rank_updated_ts": "rank-updated-ts",
+        "run_events": "run-events",
+        "scenario_dropdown": "scenario-dropdown-selection",
+        "polling_interval": "interval-component",
+        "relative_time_interval": "relative-time-interval",
+    }
+
+    # The layout builds the run-events store, the scenario dropdown and the
+    # two intervals itself and spells their ids there, so nothing but this
+    # ties them to the ids the callbacks were registered for.
+    assert set(home.SCENARIO_STATS_IDS) <= set(_layout_components(monkeypatch))
+
+
+def test_the_page_registers_the_block_for_its_own_ids():
+    """Registration is a call the page makes; without it the block shows nothing."""
+    assert _block_registrations(home.SCENARIO_STATS_IDS) == [
+        (
+            scenario_stats.get_scenario_num_runs,
+            ["run-events.data", "scenario-dropdown-selection.value"],
+            [],
+        ),
+        (
+            None,
+            [
+                "last-played-ts.data",
+                "last-played-empty-value.data",
+                "relative-time-interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            scenario_stats.get_scenario_rank,
+            [
+                "run-events.data",
+                "scenario-dropdown-selection.value",
+                "interval-component.n_intervals",
+            ],
+            [],
+        ),
+        (None, ["rank-updated-ts.data", "relative-time-interval.n_intervals"], []),
+        (
+            scenario_stats.refresh_rank,
+            ["rank-refresh-button.n_clicks"],
+            ["scenario-dropdown-selection.value", "toast-channel-registry.data"],
+        ),
+    ]
+
+
+def test_a_second_page_builds_a_block_that_shares_no_id_with_the_first(monkeypatch):
+    first_page_ids = set(_layout_components(monkeypatch)) - {None}
+
+    built = {
+        component.id
+        for tree in (
+            *scenario_stats.scenario_stats_stores(SECOND_PAGE_IDS),
+            scenario_stats.scenario_stats_panel(SECOND_PAGE_IDS),
+        )
+        for component in _walk_components(tree)
+        if getattr(component, "id", None) is not None
+    }
+
+    # Every id in the two trees came from the ids passed in, and every id
+    # passed in is there apart from the ones a page builds itself.
+    assert built == set(SECOND_PAGE_IDS) - {
+        getattr(SECOND_PAGE_IDS, field) for field in PAGE_BUILT_FIELDS
+    }
+    assert not built & first_page_ids
+
+
+def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
+    restored_callbacks,
+):
+    registered_before = list(GLOBAL_CALLBACK_LIST)
+    first_page = _block_registrations(home.SCENARIO_STATS_IDS)
+
+    scenario_stats.register_scenario_stats(SECOND_PAGE_IDS)
+
+    assert GLOBAL_CALLBACK_LIST[: len(registered_before)] == registered_before
+    added = GLOBAL_CALLBACK_LIST[len(registered_before) :]
+    # The same functions answer for both pages, so both read and write the
+    # module's one memory of what the Position field last concluded.
+    assert _block_registrations(SECOND_PAGE_IDS) == [
+        (
+            scenario_stats.get_scenario_num_runs,
+            ["second-run_events.data", "second-scenario_dropdown.value"],
+            [],
+        ),
+        (
+            None,
+            [
+                "second-last_played_ts.data",
+                "second-last_played_empty_value.data",
+                "second-relative_time_interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            scenario_stats.get_scenario_rank,
+            [
+                "second-run_events.data",
+                "second-scenario_dropdown.value",
+                "second-polling_interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            None,
+            [
+                "second-rank_updated_ts.data",
+                "second-relative_time_interval.n_intervals",
+            ],
+            [],
+        ),
+        (
+            scenario_stats.refresh_rank,
+            ["second-rank_refresh_button.n_clicks"],
+            ["second-scenario_dropdown.value", "toast-channel-registry.data"],
+        ),
+    ]
+    assert len(added) == len(first_page)
+    # Nothing it writes belongs to the first page. The notification container
+    # and the channel registry are the shell's, which both pages share.
+    assert {
+        key.rpartition(".")[0] for entry in added for key in _output_keys(entry)
+    } == {
+        "second-num_runs",
+        "second-last_played",
+        "second-last_played_tooltip",
+        "second-last_played_ts",
+        "second-last_played_empty_value",
+        "second-rank",
+        "second-rank_updated_tooltip",
+        "second-rank_updated_ts",
+        "notification-container",
+        "toast-channel-registry",
+    }
+    # The spinner that swallows repeat clicks is on the second page's button.
+    assert added[-1]["running"] == {
+        "running": {"second-rank_refresh_button.loading": True},
+        "runningOff": {"second-rank_refresh_button.loading": False},
+    }
+    assert _block_registrations(home.SCENARIO_STATS_IDS) == first_page
+
+
+def test_a_second_pages_polling_tick_alone_reads_caches_only(monkeypatch):
+    """Each page has an interval of its own, so the rule cannot name one id."""
+    tick = {"prop_id": f"{SECOND_PAGE_IDS.polling_interval}.n_intervals"}
+    chosen = {"prop_id": f"{SECOND_PAGE_IDS.scenario_dropdown}.value"}
+    new_runs = {"prop_id": f"{SECOND_PAGE_IDS.run_events}.data"}
+
+    assert scenario_stats._rank_allows_network([tick]) is False
+    assert scenario_stats._rank_allows_network([new_runs]) is True
+    assert scenario_stats._rank_allows_network([tick, chosen]) is True
+
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    allowed = []
+
+    def rank_for(*_args, **kwargs):
+        allowed.append(kwargs["allow_network"])
+        return ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED)
+
+    monkeypatch.setattr(scenario_stats, "get_scenario_rank_info", rank_for)
+    for triggered in ([tick], [tick, chosen]):
+        monkeypatch.setattr(scenario_stats, "ctx", SimpleNamespace(triggered=triggered))
+        scenario_stats.get_scenario_rank(None, "Scenario", 1)
+
+    assert allowed == [False, True]
