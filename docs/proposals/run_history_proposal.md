@@ -613,7 +613,8 @@ What follows from R2.
 - **`home.py` shrinks into Home.** The old page's controls, chart, and
   callbacks are deleted from it when the page goes public. The setup card
   and the stats-folder hint stay where they are, so nothing about them
-  moves. Its page name becomes "Home".
+  moves. Run History draws its own copies from the same builders. Its page
+  name becomes "Home".
 - **What Home shows,** top to bottom: the stats-folder hint and the setup
   card when they apply, exactly as the old page shows them
   ([Hosted setup surfaces](../specs/scenario_performance.md#hosted-setup-surfaces)),
@@ -1357,7 +1358,8 @@ and nothing linking to it, so nothing moves when it goes public.
    with the new page's ids. The chart: three modes, the two ranges, every
    run, stars on Score vs Run, the title, and rank lines that redraw at
    once. Chart options. Deep links, R7, and a layout that accepts a
-   parameter it doesn't name. The stats-folder hint.
+   parameter it doesn't name. The stats-folder hint and the setup card's two
+   yellow states.
    - Needs this proposal ratified. The three groundwork PRs it also needed
      have merged.
    - Measures and reports: the chart's box at 1400, 1600, and 1920 px with
@@ -1483,7 +1485,8 @@ maintainer's main checkout.
   lands before the cleared filter's list does, and a test on the value
   alone passes through that.
 - **Home:** the stats line with many runs, one run, and none, and its
-  absence with no stats folder. The hint and the card in each state, by the
+  absence with no stats folder. On Run History, the hint and the card's two
+  yellow states, and no account offer. The hint and the card in each state, by the
   tests that cover them today.
 - **Layout tests** in the style of the existing ones: the hidden page has no
   navbar entry, then Home and Run History have theirs.
