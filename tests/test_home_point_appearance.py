@@ -21,7 +21,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from dash._callback import GLOBAL_CALLBACK_MAP  # noqa: E402
 
-from source.components import chart_options  # noqa: E402
+from source.components import chart_options, scenario_selection  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.plot.plot_service import (  # noqa: E402
@@ -57,7 +57,7 @@ def _walk_components(component):
 def components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
         getattr(component, "id", None): component

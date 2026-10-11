@@ -18,6 +18,7 @@ from sortedcontainers import SortedList
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.app_shell import _run_event_data  # noqa: E402
+from source.components import score_threshold  # noqa: E402
 from source.kovaaks import data_service, playlist_scenarios_service  # noqa: E402
 from source.kovaaks.api_models import (  # noqa: E402
     ScenarioRankInfo,
@@ -148,7 +149,7 @@ def _next_rank() -> str:
 def _threshold_line() -> float:
     """Return the score the chart draws the 95% threshold line at."""
     return round(
-        home._score_threshold_line(
+        score_threshold._score_threshold_line(
             SCENARIO, data_service.get_high_score(SCENARIO), 95.0
         ),
         2,

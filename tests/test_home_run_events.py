@@ -17,7 +17,11 @@ from source.app_shell import (  # noqa: E402
     RunEventData,
     _run_event_data,
 )
-from source.components import chart_options  # noqa: E402
+from source.components import (  # noqa: E402
+    chart_options,
+    scenario_selection,
+    score_threshold,
+)
 from source.kovaaks import data_service  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.kovaaks.time_scored_service import PaceBasis  # noqa: E402
@@ -97,7 +101,7 @@ def _assert_placeholder_figure(figure) -> None:
 
 def test_home_layout_initial_graph_has_placeholder(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     page = home.layout()
     graph = next(
@@ -1098,8 +1102,10 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
     monkeypatch.setattr(home, "generate_time_plot", lambda *_args: go.Figure())
     monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
     monkeypatch.setattr(home, "get_high_score", lambda _scenario: 896.2)
-    monkeypatch.setattr(home, "get_personal_best_run", lambda _scenario: personal_best)
-    monkeypatch.setattr(home, "get_pace_basis", lambda _scenario: basis)
+    monkeypatch.setattr(
+        score_threshold, "get_personal_best_run", lambda _scenario: personal_best
+    )
+    monkeypatch.setattr(score_threshold, "get_pace_basis", lambda _scenario: basis)
     monkeypatch.setattr(
         home,
         "ctx",
@@ -1176,12 +1182,16 @@ def test_the_threshold_line_keeps_score_math_where_pace_is_undefined(monkeypatch
         accuracy=0.5,
         scenario_hash=_LINE_HASH,
     )
-    monkeypatch.setattr(home, "get_personal_best_run", lambda _scenario: personal_best)
     monkeypatch.setattr(
-        home, "get_pace_basis", lambda _scenario: PaceBasis(1000.0, _LINE_HASH)
+        score_threshold, "get_personal_best_run", lambda _scenario: personal_best
+    )
+    monkeypatch.setattr(
+        score_threshold,
+        "get_pace_basis",
+        lambda _scenario: PaceBasis(1000.0, _LINE_HASH),
     )
 
-    assert home._score_threshold_line("Scenario A", 1000.0, 95.0) == 950.0
+    assert score_threshold._score_threshold_line("Scenario A", 1000.0, 95.0) == 950.0
 
 
 # --- Normalized sensitivity groups, watchdog to toast ------------------------

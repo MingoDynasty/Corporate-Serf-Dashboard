@@ -12,7 +12,7 @@ import pytest
 from dash import no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
-from source.components import chart_options
+from source.components import chart_options, scenario_selection
 from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -35,7 +35,7 @@ def _walk_components(component):
 def _layout_components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
         getattr(component, "id", None): component

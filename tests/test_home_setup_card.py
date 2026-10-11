@@ -16,6 +16,7 @@ import pytest
 from dash import no_update
 from dash._callback import GLOBAL_CALLBACK_MAP
 
+from source.components import scenario_selection
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
 from source.utilities.store_schema import StoreState, UnsupportedSchemaError
@@ -88,7 +89,7 @@ def _icon_mask(component):
 def quiet_home(monkeypatch):
     """Keep the rest of the page out of the way of the card."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
 
 
 @pytest.fixture

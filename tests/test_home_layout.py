@@ -17,6 +17,7 @@ import pytest
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
+from source.components import scenario_selection  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.pages.playlist_selector import (  # noqa: E402
     PLAYLIST_SELECTOR_PRESET,
@@ -77,7 +78,7 @@ def _sizing_of(component):
 @pytest.fixture(autouse=True)
 def quiet_playlists(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
 
 @pytest.fixture
@@ -176,7 +177,7 @@ def test_playlist_link_holder_sits_under_the_filter_and_starts_empty():
 
     assert [getattr(child, "id", None) for child in field.children] == [
         PLAYLIST_SELECT_ID,
-        home.PLAYLIST_TABLE_LINK_ID,
+        scenario_selection.PLAYLIST_TABLE_LINK_ID,
     ]
     assert getattr(holder, "children", None) is None
     # A Stack's gap or a margin on the holder would be paid while there is no

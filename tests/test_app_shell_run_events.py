@@ -20,6 +20,7 @@ from source.app_shell import (  # noqa: E402
     CELEBRATION_STYLE_CONFETTI,
     CELEBRATION_STYLE_OFF,
 )
+from source.components import scenario_selection  # noqa: E402
 from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
@@ -406,7 +407,7 @@ def test_the_animation_is_driven_clientside_from_the_batch():
 def test_the_shell_hosts_the_drain_interval_and_the_batch_store(monkeypatch):
     ids = _component_ids(app_shell.layout())
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     assert app_shell.PB_CELEBRATION_INTERVAL_ID in ids
     assert app_shell.RUN_EVENTS_BATCH_STORE_ID in ids

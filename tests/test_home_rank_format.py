@@ -9,7 +9,7 @@ import requests
 from dash import dcc, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
 
-from source.components import chart_options
+from source.components import chart_options, queued_notices, scenario_selection
 from source.config import settings_service
 from source.kovaaks import api_service, data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
@@ -98,7 +98,7 @@ def _walk_components(component):
 def _layout_components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
         getattr(component, "id", None): component
@@ -119,7 +119,9 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
         "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
-    monkeypatch.setattr(home, "get_scenario_names", lambda: ["1wall6targets"])
+    monkeypatch.setattr(
+        scenario_selection, "get_scenario_names", lambda: ["1wall6targets"]
+    )
 
     playlist_filter = next(
         component
@@ -138,16 +140,16 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_playlist_by_code",
         lambda code: object() if code == "KovaaKsTestCode" else None,
     )
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenarios_from_playlist_code",
         lambda code: [f"{code} Scenario"],
     )
-    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
 
     page = home.layout(
         scenario="KovaaKsTestCode Scenario",
@@ -167,7 +169,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     deep_link_store = next(
         component
         for component in components
-        if getattr(component, "id", None) == home.HOME_DEEP_LINK_STORE_ID
+        if getattr(component, "id", None) == scenario_selection.HOME_DEEP_LINK_STORE_ID
     )
 
     # The query parameters reach the dropdowns through the store, never as
@@ -188,7 +190,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
 
 def _known_playlist(monkeypatch):
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_playlist_by_code",
         lambda code: object() if code == "KovaaKsTestCode" else None,
     )
@@ -198,9 +200,11 @@ def test_home_deep_link_records_only_the_parameters_the_url_carried(monkeypatch)
     """An absent parameter leaves its control on the restored value."""
     _known_playlist(monkeypatch)
 
-    assert home._home_deep_link(None, None) == {}
-    assert home._home_deep_link("Scenario A", None) == {"scenario": "Scenario A"}
-    assert home._home_deep_link(None, "KovaaKsTestCode") == {
+    assert scenario_selection._home_deep_link(None, None) == {}
+    assert scenario_selection._home_deep_link("Scenario A", None) == {
+        "scenario": "Scenario A"
+    }
+    assert scenario_selection._home_deep_link(None, "KovaaKsTestCode") == {
         "playlist": "KovaaKsTestCode"
     }
 
@@ -209,27 +213,29 @@ def test_home_deep_link_clears_the_filter_for_an_unknown_playlist_code(monkeypat
     """The URL's selection is applied as given: no playlist means no filter."""
     _known_playlist(monkeypatch)
 
-    assert home._home_deep_link(None, "KovaaKsGoneCode") == {"playlist": None}
+    assert scenario_selection._home_deep_link(None, "KovaaKsGoneCode") == {
+        "playlist": None
+    }
 
 
 def test_home_deep_link_treats_an_empty_scenario_as_no_scenario(monkeypatch):
     _known_playlist(monkeypatch)
 
-    assert home._home_deep_link("", "KovaaKsTestCode") == {
+    assert scenario_selection._home_deep_link("", "KovaaKsTestCode") == {
         "playlist": "KovaaKsTestCode",
         "scenario": None,
     }
 
 
 def test_apply_deep_link_writes_only_the_controls_the_url_named():
-    assert home.apply_deep_link({}) == (no_update, no_update)
-    assert home.apply_deep_link(None) == (no_update, no_update)
-    assert home.apply_deep_link({"scenario": "Scenario A"}) == (
+    assert scenario_selection.apply_deep_link({}) == (no_update, no_update)
+    assert scenario_selection.apply_deep_link(None) == (no_update, no_update)
+    assert scenario_selection.apply_deep_link({"scenario": "Scenario A"}) == (
         no_update,
         "Scenario A",
     )
-    assert home.apply_deep_link({"playlist": None}) == (None, no_update)
-    assert home.apply_deep_link(
+    assert scenario_selection.apply_deep_link({"playlist": None}) == (None, no_update)
+    assert scenario_selection.apply_deep_link(
         {"playlist": "KovaaKsTestCode", "scenario": "Scenario A"}
     ) == ("KovaaKsTestCode", "Scenario A")
 
@@ -257,7 +263,10 @@ def _deep_link_registration() -> dict:
     (registration,) = [
         entry
         for entry in GLOBAL_CALLBACK_LIST
-        if any(dep["id"] == home.HOME_DEEP_LINK_STORE_ID for dep in entry["inputs"])
+        if any(
+            dep["id"] == scenario_selection.HOME_DEEP_LINK_STORE_ID
+            for dep in entry["inputs"]
+        )
         and "playlist-dropdown-selection.value" in entry["output"]
     ]
     return registration
@@ -302,7 +311,7 @@ def test_no_callback_depends_only_on_what_apply_deep_link_conditionally_writes()
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     page = home.layout()
     top_n_scores = next(
@@ -327,7 +336,7 @@ def test_home_top_n_input_uses_compact_width(monkeypatch):
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     components = list(_walk_components(home.layout()))
     last_played = next(
@@ -361,7 +370,7 @@ def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
     warnings = ["First warning", "Second warning"]
     data_service.playlist_startup_warning_queue.extend(warnings)
 
-    notifications = home.flush_startup_playlist_warnings(1)
+    notifications = queued_notices.flush_startup_playlist_warnings(1)
 
     assert [notification["message"] for notification in notifications] == warnings
     # They fire seconds after a server start, when nobody is guaranteed to be
@@ -374,35 +383,40 @@ def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
         False,
         False,
     ]
-    assert home.flush_startup_playlist_warnings(2) is dash.no_update
+    assert queued_notices.flush_startup_playlist_warnings(2) is dash.no_update
 
 
 def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_playlist_by_code",
         lambda code: object() if code == "ValidCode" else None,
     )
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_scenarios_from_playlist_code",
         lambda code: [f"{code} Scenario"],
     )
-    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
 
     # The second argument is the deep-link store: a scheduling Input the
     # callback never reads. See select_playlist.
-    assert home.select_playlist("Old Playlist Name", None) == (["All"], None)
-    scenarios, _link = home.select_playlist("ValidCode", None)
+    assert scenario_selection.select_playlist("Old Playlist Name", None) == (
+        ["All"],
+        None,
+    )
+    scenarios, _link = scenario_selection.select_playlist("ValidCode", None)
     assert scenarios == ["ValidCode Scenario"]
 
 
 def test_select_playlist_links_the_selection_to_its_scenario_table(monkeypatch):
     """The way back from a scenario to the table it was opened from."""
     _known_playlist(monkeypatch)
-    monkeypatch.setattr(home, "get_scenarios_from_playlist_code", lambda _code: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_scenarios_from_playlist_code", lambda _code: []
+    )
 
-    _scenarios, link = home.select_playlist("KovaaKsTestCode", None)
+    _scenarios, link = scenario_selection.select_playlist("KovaaKsTestCode", None)
 
     (anchor,) = [
         component
@@ -423,9 +437,9 @@ def test_select_playlist_shows_no_link_without_a_loaded_playlist(
     """A cleared filter and a remembered code that no longer resolves both
     list every local scenario, so neither has a table to link."""
     _known_playlist(monkeypatch)
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
-    _scenarios, link = home.select_playlist(selected_playlist, None)
+    _scenarios, link = scenario_selection.select_playlist(selected_playlist, None)
 
     assert link is None
 
@@ -439,7 +453,7 @@ def test_select_playlist_writes_the_link_holder_the_layout_carries():
 
     assert _output_keys(registration) == {
         "scenario-dropdown-selection.data",
-        f"{home.PLAYLIST_TABLE_LINK_ID}.children",
+        f"{scenario_selection.PLAYLIST_TABLE_LINK_ID}.children",
     }
 
 
@@ -458,7 +472,7 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     titles = {
         component.children: component
@@ -489,7 +503,7 @@ def test_home_no_longer_builds_the_settings_modal(monkeypatch):
 def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
     """It is stacked with the selector, not spread across the controls row."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     scenario_field = next(
         component
@@ -509,7 +523,7 @@ def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
 
 def test_rank_refresh_button_has_tooltip(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     tooltips = [
         component
@@ -1701,7 +1715,7 @@ def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch)
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     page = home.layout()
     rank_loading = next(
