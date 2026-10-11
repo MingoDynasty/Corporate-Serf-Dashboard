@@ -177,7 +177,7 @@ def test_playlist_link_holder_sits_under_the_filter_and_starts_empty():
 
     assert [getattr(child, "id", None) for child in field.children] == [
         PLAYLIST_SELECT_ID,
-        scenario_selection.PLAYLIST_TABLE_LINK_ID,
+        home.SCENARIO_SELECTION_IDS.playlist_table_link,
     ]
     assert getattr(holder, "children", None) is None
     # A Stack's gap or a margin on the holder would be paid while there is no

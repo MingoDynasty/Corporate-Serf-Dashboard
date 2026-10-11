@@ -1191,7 +1191,7 @@ def test_the_threshold_line_keeps_score_math_where_pace_is_undefined(monkeypatch
         lambda _scenario: PaceBasis(1000.0, _LINE_HASH),
     )
 
-    assert score_threshold._score_threshold_line("Scenario A", 1000.0, 95.0) == 950.0
+    assert score_threshold.score_threshold_line("Scenario A", 1000.0, 95.0) == 950.0
 
 
 # --- Normalized sensitivity groups, watchdog to toast ------------------------

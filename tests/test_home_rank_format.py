@@ -169,7 +169,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     deep_link_store = next(
         component
         for component in components
-        if getattr(component, "id", None) == scenario_selection.HOME_DEEP_LINK_STORE_ID
+        if getattr(component, "id", None) == home.SCENARIO_SELECTION_IDS.deep_link
     )
 
     # The query parameters reach the dropdowns through the store, never as
@@ -200,11 +200,11 @@ def test_home_deep_link_records_only_the_parameters_the_url_carried(monkeypatch)
     """An absent parameter leaves its control on the restored value."""
     _known_playlist(monkeypatch)
 
-    assert scenario_selection._home_deep_link(None, None) == {}
-    assert scenario_selection._home_deep_link("Scenario A", None) == {
+    assert scenario_selection.deep_link_selection(None, None) == {}
+    assert scenario_selection.deep_link_selection("Scenario A", None) == {
         "scenario": "Scenario A"
     }
-    assert scenario_selection._home_deep_link(None, "KovaaKsTestCode") == {
+    assert scenario_selection.deep_link_selection(None, "KovaaKsTestCode") == {
         "playlist": "KovaaKsTestCode"
     }
 
@@ -213,7 +213,7 @@ def test_home_deep_link_clears_the_filter_for_an_unknown_playlist_code(monkeypat
     """The URL's selection is applied as given: no playlist means no filter."""
     _known_playlist(monkeypatch)
 
-    assert scenario_selection._home_deep_link(None, "KovaaKsGoneCode") == {
+    assert scenario_selection.deep_link_selection(None, "KovaaKsGoneCode") == {
         "playlist": None
     }
 
@@ -221,7 +221,7 @@ def test_home_deep_link_clears_the_filter_for_an_unknown_playlist_code(monkeypat
 def test_home_deep_link_treats_an_empty_scenario_as_no_scenario(monkeypatch):
     _known_playlist(monkeypatch)
 
-    assert scenario_selection._home_deep_link("", "KovaaKsTestCode") == {
+    assert scenario_selection.deep_link_selection("", "KovaaKsTestCode") == {
         "playlist": "KovaaKsTestCode",
         "scenario": None,
     }
@@ -264,7 +264,7 @@ def _deep_link_registration() -> dict:
         entry
         for entry in GLOBAL_CALLBACK_LIST
         if any(
-            dep["id"] == scenario_selection.HOME_DEEP_LINK_STORE_ID
+            dep["id"] == home.SCENARIO_SELECTION_IDS.deep_link
             for dep in entry["inputs"]
         )
         and "playlist-dropdown-selection.value" in entry["output"]
@@ -453,7 +453,7 @@ def test_select_playlist_writes_the_link_holder_the_layout_carries():
 
     assert _output_keys(registration) == {
         "scenario-dropdown-selection.data",
-        f"{scenario_selection.PLAYLIST_TABLE_LINK_ID}.children",
+        f"{home.SCENARIO_SELECTION_IDS.playlist_table_link}.children",
     }
 
 

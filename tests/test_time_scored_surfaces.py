@@ -149,7 +149,7 @@ def _next_rank() -> str:
 def _threshold_line() -> float:
     """Return the score the chart draws the 95% threshold line at."""
     return round(
-        score_threshold._score_threshold_line(
+        score_threshold.score_threshold_line(
             SCENARIO, data_service.get_high_score(SCENARIO), 95.0
         ),
         2,

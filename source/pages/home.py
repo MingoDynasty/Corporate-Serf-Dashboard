@@ -20,7 +20,6 @@ from dash import (
     no_update,
 )
 
-import source.components.queued_notices  # noqa: F401
 from source.app_shell import (
     RUN_EVENTS_BATCH_STORE_ID,
     RunEventBatch,
@@ -37,18 +36,22 @@ from source.components.chart_options import (
     settings_help_label,
 )
 from source.components.local_icon import local_icon
+from source.components.queued_notices import (
+    register_run_import_failure_flush,
+    register_startup_playlist_warning_flush,
+)
 from source.components.scenario_selection import (
-    HOME_DEEP_LINK_STORE_ID,
-    PLAYLIST_TABLE_LINK_ID,
-    _home_deep_link,
-    _home_scenario_options,
+    ScenarioSelectionIds,
+    deep_link_selection,
+    initial_scenario_options,
+    register_scenario_selection,
 )
 from source.components.score_threshold import (
-    _normalize_score_threshold_percentage,
-    _score_threshold_line,
-    _shown_percentage,
-    _threshold_verdict,
-    _ThresholdVerdict,
+    ThresholdVerdict,
+    normalize_score_threshold_percentage,
+    score_threshold_line,
+    shown_percentage,
+    threshold_verdict,
 )
 from source.config.config_service import get_config
 from source.config.settings_service import (
@@ -117,6 +120,15 @@ RANK_REFRESH_TOOLTIP = (
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
+# The ids this page gives its playlist filter and scenario dropdown. The
+# browser stores each dropdown's value under its id, so changing one resets
+# that selection for every user.
+SCENARIO_SELECTION_IDS = ScenarioSelectionIds(
+    playlist_filter="playlist-dropdown-selection",
+    scenario_dropdown="scenario-dropdown-selection",
+    deep_link="home-deep-link",
+    playlist_table_link="playlist-table-link",
+)
 
 # The ids this page gives the Chart options block. The browser stores each
 # remembered control's value under its id, so changing one resets that setting
@@ -371,6 +383,9 @@ def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
         target_scenario if target_scenario != selected_scenario else no_update
     )
     return run_events, scenario_update
+
+
+register_run_import_failure_flush("interval-component")
 
 
 @callback(
@@ -946,7 +961,7 @@ def _build_live_run_notification(
     latest: RunEventData,
     selected_scenario: str,
     top_n_scores: int,
-    verdict: _ThresholdVerdict | None,
+    verdict: ThresholdVerdict | None,
 ) -> dict[str, object] | None:
     """Build the one toast a just-played run earned, if it earned one.
 
@@ -972,13 +987,13 @@ def _build_live_run_notification(
             icon=local_icon("fontisto:line-chart"),
         )
 
-    shown_percentage = _shown_percentage(verdict)
+    shown = shown_percentage(verdict)
     # The one word that tells the player which measure judged the run.
     measure = "PB pace" if verdict.by_pace else "PB"
     if verdict.passed:
         # A pass ends at the fact: a line saying what to do next would be
         # advice, and the app states verdicts only.
-        message = f"{score}, {shown_percentage:.1f}% of {measure}."
+        message = f"{score}, {shown:.1f}% of {measure}."
         if placed:
             message += f" Also {placement}."
         return toast(
@@ -989,7 +1004,7 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {shown_percentage:.1f}% of {measure} "
+    shortfall = f"{score}, {shown:.1f}% of {measure} "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."
@@ -1032,7 +1047,7 @@ def _build_run_event_notification(  # noqa: PLR0913
     if not latest["is_live"]:
         return None
 
-    verdict = _threshold_verdict(
+    verdict = threshold_verdict(
         latest,
         score_threshold_percentage,
         score_threshold_notification_switch,
@@ -1252,11 +1267,11 @@ def generate_graph(  # noqa: PLR0913
         if high_score_overlay_switch:
             plot = add_high_score_overlay(plot, high_score)
 
-        score_threshold_goal_percentage = _normalize_score_threshold_percentage(
+        score_threshold_goal_percentage = normalize_score_threshold_percentage(
             score_threshold_percentage
         )
         if score_threshold_overlay_switch and score_threshold_goal_percentage:
-            score_threshold = _score_threshold_line(
+            score_threshold = score_threshold_line(
                 selected_scenario,
                 high_score,
                 score_threshold_goal_percentage,
@@ -1282,6 +1297,8 @@ def generate_graph(  # noqa: PLR0913
 
 
 register_chart_options(CHART_OPTIONS_IDS)
+register_startup_playlist_warning_flush("startup-playlist-warning-interval")
+register_scenario_selection(SCENARIO_SELECTION_IDS)
 
 
 def _stats_dir_hint() -> list:
@@ -1570,15 +1587,15 @@ def layout(
     """Build the interactive home dashboard."""
     config = get_config()
     playlist_options = get_visible_playlist_selector_options()
-    scenario_options = _home_scenario_options(playlist_code)
+    scenario_options = initial_scenario_options(playlist_code)
 
     return dmc.Box(
         className="home-page",
         children=[
             dcc.Store(id="run-events"),
             dcc.Store(
-                id=HOME_DEEP_LINK_STORE_ID,
-                data=_home_deep_link(scenario, playlist_code),
+                id=SCENARIO_SELECTION_IDS.deep_link,
+                data=deep_link_selection(scenario, playlist_code),
             ),
             dcc.Store(
                 id="cached-plot",
@@ -1647,7 +1664,9 @@ def layout(
                                             # stored.
                                             value=None,
                                         ),
-                                        dmc.Box(id=PLAYLIST_TABLE_LINK_ID),
+                                        dmc.Box(
+                                            id=SCENARIO_SELECTION_IDS.playlist_table_link
+                                        ),
                                     ],
                                     className=PLAYLIST_FIELD_CLASS,
                                     # The column, not the Select inside it, is

@@ -1,4 +1,11 @@
-"""Deliver the notices that were queued where no browser could be told."""
+"""Deliver the notices that were queued where no browser could be told.
+
+A failed run import is found on the watchdog thread, and a playlist that did
+not load is found while the app starts. Each waits in a queue on the server
+until an interval in a mounted page asks for it. A page registers each flush
+on an interval of its own, once, at import. Every page that does reads the
+same queue, so whichever one is open delivers what is in it.
+"""
 
 from dash import Input, Output, callback, no_update
 
@@ -35,11 +42,6 @@ def _build_run_import_failure_notification(
     )
 
 
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("interval-component", "n_intervals"),
-    prevent_initial_call=True,
-)
 def flush_run_import_failures(_n_intervals):
     """Deliver run imports the watchdog thread could not complete.
 
@@ -73,14 +75,37 @@ def _build_startup_playlist_warning_notifications(
     ]
 
 
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("startup-playlist-warning-interval", "n_intervals"),
-    prevent_initial_call=True,
-)
 def flush_startup_playlist_warnings(_):
     """Deliver import-time playlist warnings after Dash has mounted."""
     warnings = drain_startup_playlist_warnings()
     if not warnings:
         return no_update
     return _build_startup_playlist_warning_notifications(warnings)
+
+
+def register_run_import_failure_flush(interval_id: str) -> None:
+    """Register the run import failure flush on one page's polling interval.
+
+    Call once per page, at import, with the id of a ``dcc.Interval`` its
+    layout builds. The toast goes to the shell's notification container, which
+    every page shares.
+    """
+    callback(
+        Output("notification-container", "sendNotifications", allow_duplicate=True),
+        Input(interval_id, "n_intervals"),
+        prevent_initial_call=True,
+    )(flush_run_import_failures)
+
+
+def register_startup_playlist_warning_flush(interval_id: str) -> None:
+    """Register the startup playlist warning flush on one page's interval.
+
+    Call once per page, at import, with the id of a ``dcc.Interval`` its
+    layout builds to tick once, shortly after the page mounts. The toasts go
+    to the shell's notification container, which every page shares.
+    """
+    callback(
+        Output("notification-container", "sendNotifications", allow_duplicate=True),
+        Input(interval_id, "n_intervals"),
+        prevent_initial_call=True,
+    )(flush_startup_playlist_warnings)

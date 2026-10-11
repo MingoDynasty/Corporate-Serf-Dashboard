@@ -9,7 +9,7 @@ from source.kovaaks.pace import pace_goal_met, pace_percent, pace_threshold_scor
 from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
 
 
-def _normalize_score_threshold_percentage(
+def normalize_score_threshold_percentage(
     score_threshold_percentage: float | str | None,
 ) -> float | None:
     """Return a usable threshold percentage, or None while the input is empty."""
@@ -24,7 +24,7 @@ def _normalize_score_threshold_percentage(
         return None
 
 
-class _ThresholdVerdict(NamedTuple):
+class ThresholdVerdict(NamedTuple):
     """How a run measured up against the score threshold it was judged on.
 
     ``by_pace`` says which measure ``percentage`` is in: the run's pace as a
@@ -37,11 +37,11 @@ class _ThresholdVerdict(NamedTuple):
     by_pace: bool = False
 
 
-def _threshold_verdict(
+def threshold_verdict(
     latest: RunEventData,
     score_threshold_percentage: float | str | None,
     score_threshold_notification_switch: bool,
-) -> _ThresholdVerdict | None:
+) -> ThresholdVerdict | None:
     """Judge a run against the threshold, or return None when nothing judges it.
 
     A run goes unjudged when the switch is off, the goal percentage is blank,
@@ -54,7 +54,7 @@ def _threshold_verdict(
     pace is defined, which needs positive times and not a positive previous
     best. Where it is undefined, the run is judged by score as any other.
     """
-    goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
+    goal_percentage = normalize_score_threshold_percentage(score_threshold_percentage)
     scenario_previous_best = latest["scenario_previous_best"]
     if (
         not score_threshold_notification_switch
@@ -77,7 +77,7 @@ def _threshold_verdict(
             latest["score"],
         )
         if passed_by_pace is not None and percentage_of_pace is not None:
-            return _ThresholdVerdict(
+            return ThresholdVerdict(
                 passed=passed_by_pace,
                 percentage=percentage_of_pace,
                 goal_percentage=goal_percentage,
@@ -91,14 +91,14 @@ def _threshold_verdict(
     passed = Decimal(str(latest["score"])) * 100 >= Decimal(
         str(scenario_previous_best)
     ) * Decimal(str(goal_percentage))
-    return _ThresholdVerdict(
+    return ThresholdVerdict(
         passed=passed,
         percentage=latest["score"] / scenario_previous_best * 100,
         goal_percentage=goal_percentage,
     )
 
 
-def _shown_percentage(verdict: _ThresholdVerdict) -> float:
+def shown_percentage(verdict: ThresholdVerdict) -> float:
     """Return the percentage of PB to print, held below each line the run missed.
 
     Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
@@ -119,7 +119,7 @@ def _shown_percentage(verdict: _ThresholdVerdict) -> float:
     return shown
 
 
-def _score_threshold_line(
+def score_threshold_line(
     selected_scenario: str,
     high_score: float,
     goal_percentage: float,
