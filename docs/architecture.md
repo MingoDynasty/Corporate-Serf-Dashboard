@@ -241,6 +241,7 @@ flowchart LR
         LocalIcon["components/<br/>local_icon.py"]
         ControlName["components/<br/>control_name.py"]
         ColumnsMenu["components/<br/>columns_menu.py"]
+        ChartOptions["components/<br/>chart_options.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -279,7 +280,10 @@ flowchart LR
     Home --> TimeScored
     Home --> Pace
     Home --> LocalIcon
-    Home --> ControlName
+    Home --> ChartOptions
+    ChartOptions --> LocalIcon
+    ChartOptions --> ControlName
+    ChartOptions --> PlotService
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -379,7 +383,11 @@ flowchart LR
   the line between it and `_stats_dir_hint`, which explains a directory that
   is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
-  overlay, run-point, score-threshold, and run-notification preferences. The
+  overlay, run-point, score-threshold, and run-notification preferences. It
+  is built by `components/chart_options.py` from this page's
+  `CHART_OPTIONS_IDS`, and `register_chart_options` wires that module's
+  callbacks to the same ids; `toggle_chart_options` and
+  `apply_graph_appearance`, named here, are defined there. The
   panel itself starts closed on every visit and its open state is never
   persisted; `toggle_chart_options` writes that open state as a CSS class,
   which hides the controls without unmounting them. Each control's own value
@@ -577,6 +585,27 @@ flowchart LR
   never resends column definitions. The choices live in the browser's local
   storage, so the server never learns which columns are shown
   ([decision_log.md](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+- `components/chart_options.py` — the Chart options panel and its callbacks,
+  built from component ids the hosting page supplies, so more than one page
+  can host a panel. A page fills in a `ChartOptionsIds`: an id for each
+  component the block builds, plus the page's own graph and the store
+  holding its unstyled figure. It
+  builds `chart_options_toggle()` and `chart_options_panel()` from that in
+  its layout and calls `register_chart_options()` with it once, at import,
+  which registers `toggle_chart_options`, `clear_point_color`, and
+  `apply_graph_appearance` for those ids. The functions are module-level and
+  stay unregistered until a page asks, so tests call them directly. The
+  module also holds the controls' help text (`SETTINGS_HELP_TEXT`) and
+  `settings_help_label()`, the label with a help icon, which `home.py` also
+  uses for controls outside the panel. Importing it registers the Mantine
+  figure templates (`dmc.add_figure_templates()`), which
+  `plot_service.apply_light_dark_mode` and `generated_point_color` look up
+  by name.
+  It lives outside `source/pages/` so that it is imported once. Dash Pages
+  imports every file in that folder whose text contains `register_page`,
+  under the name `pages.<name>` (read in Dash 4.4.1's `_pages.py`), so a
+  module there that is also imported as `source.pages.<name>` exists twice,
+  each copy with its own module-level state.
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -875,6 +904,7 @@ flowchart LR
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | A benchmark's categories and subcategories on that table | `kovaaks/evxl_snapshot.py` for the read of `resources/evxl/benchmarks.json`; `kovaaks/scenario_groups.py` for the join and the exclusion list; `kovaaks/data_service.py` (`get_scenario_groups`) for the side table; `pages/playlist_scenarios.py` for the columns, the grouped state, and the merged-cell workaround; `scripts/benchmark_importer/script.py` (`find_group_crossings`) for the comparison with KovaaK's categories; the rules are in `docs/specs/playlists.md` |
+| The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/home.py`) for the component ids |
 | The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |

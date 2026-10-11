@@ -242,7 +242,7 @@ def test_chart_row_holds_the_graph_beside_the_options_inspector():
 
     assert [getattr(child, "id", None) for child in row.children] == [
         "graph-content",
-        home.CHART_OPTIONS_PANEL_ID,
+        home.CHART_OPTIONS_IDS.panel,
     ]
 
 

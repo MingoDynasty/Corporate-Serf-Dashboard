@@ -21,6 +21,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from dash._callback import GLOBAL_CALLBACK_MAP  # noqa: E402
 
+from source.components import chart_options  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.plot.plot_service import (  # noqa: E402
@@ -33,7 +34,10 @@ from source.plot.plot_service import (  # noqa: E402
     generated_point_color,
 )
 
-APPEARANCE_INPUT_IDS = {home.POINT_SIZE_INPUT_ID, home.POINT_COLOR_INPUT_ID}
+APPEARANCE_INPUT_IDS = {
+    home.CHART_OPTIONS_IDS.point_size,
+    home.CHART_OPTIONS_IDS.point_color,
+}
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
 
@@ -106,7 +110,7 @@ def _new_pb_trace(figure: go.Figure):
 
 
 def test_run_data_points_group_sits_between_overlays_and_score_threshold(components):
-    panel = components[home.CHART_OPTIONS_PANEL_ID]
+    panel = components[home.CHART_OPTIONS_IDS.panel]
 
     titles = [
         component.children
@@ -126,8 +130,8 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
     # Dash persistence is keyed by component id, and changing a layout default
     # silently wipes every value the browser already stored under it. Default
     # and an empty color are also what "leave the figure alone" means.
-    size = components[home.POINT_SIZE_INPUT_ID]
-    color = components[home.POINT_COLOR_INPUT_ID]
+    size = components[home.CHART_OPTIONS_IDS.point_size]
+    color = components[home.CHART_OPTIONS_IDS.point_color]
 
     assert size.value == "Default"
     assert size.data == ["Small", "Default", "Large"]
@@ -139,7 +143,9 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
     assert color.placeholder == "Default"
     assert color.persistence is True
 
-    assert components[home.POINT_COLOR_DEFAULT_ID].children == "Use default"
+    assert (
+        components[home.CHART_OPTIONS_IDS.point_color_default].children == "Use default"
+    )
 
 
 def test_empty_point_color_field_previews_the_generated_color(components):
@@ -150,11 +156,11 @@ def test_empty_point_color_field_previews_the_generated_color(components):
     # to the same names.
     field = next(
         component
-        for component in _walk_components(components[home.CHART_OPTIONS_PANEL_ID])
-        if home.POINT_COLOR_FIELD_CLASS in getattr(component, "className", "")
+        for component in _walk_components(components[home.CHART_OPTIONS_IDS.panel])
+        if chart_options.POINT_COLOR_FIELD_CLASS in getattr(component, "className", "")
     )
 
-    assert home.POINT_COLOR_INPUT_ID in [
+    assert home.CHART_OPTIONS_IDS.point_color in [
         getattr(child, "id", None) for child in field.children
     ]
     assert field.style == {
@@ -164,7 +170,7 @@ def test_empty_point_color_field_previews_the_generated_color(components):
 
     css = re.sub(r"\s+", " ", STYLESHEET.read_text(encoding="utf-8"))
     swatch = (
-        f".{home.POINT_COLOR_FIELD_CLASS}:has(input:placeholder-shown)"
+        f".{chart_options.POINT_COLOR_FIELD_CLASS}:has(input:placeholder-shown)"
         " .mantine-ColorInput-colorPreview .mantine-ColorSwatch-colorOverlay"
     )
     assert (
@@ -187,14 +193,16 @@ def test_generated_run_points_take_the_theme_template_colorway(cached_plot):
 
     expected = {"light": "#228be6", "dark": "#1971c2"}
     for color_scheme in ("light", "dark"):
-        themed = home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
+        themed = chart_options.apply_graph_appearance(
+            color_scheme, cached_plot, "Default", ""
+        )
         assert _run_trace(themed).marker.color is None
         assert themed.layout.template.layout.colorway[0] == expected[color_scheme]
         assert generated_point_color(color_scheme) == expected[color_scheme]
 
 
 def test_point_color_offers_the_curated_swatches_on_one_row(components):
-    color = components[home.POINT_COLOR_INPUT_ID]
+    color = components[home.CHART_OPTIONS_IDS.point_color]
 
     assert color.swatches == [
         "#1c7ed6",
@@ -220,17 +228,19 @@ def test_point_color_offers_the_curated_swatches_on_one_row(components):
 def test_point_size_is_named_by_its_own_visible_label(components):
     # SegmentedControl has no Mantine label slot, so the visible text becomes
     # the control's accessible name by reference rather than by proximity.
-    size = components[home.POINT_SIZE_INPUT_ID].to_plotly_json()["props"]
-    label = components[home.POINT_SIZE_LABEL_ID]
+    size = components[home.CHART_OPTIONS_IDS.point_size].to_plotly_json()["props"]
+    label = components[home.CHART_OPTIONS_IDS.point_size_label]
 
     assert label.children == "Point size"
-    assert size["aria-labelledby"] == home.POINT_SIZE_LABEL_ID
+    assert size["aria-labelledby"] == home.CHART_OPTIONS_IDS.point_size_label
 
 
 def test_default_size_and_empty_color_leave_the_cached_figure_untouched(
     cached_plot,
 ):
-    styled = home.apply_graph_appearance("light", cached_plot, "Default", "").to_json()
+    styled = chart_options.apply_graph_appearance(
+        "light", cached_plot, "Default", ""
+    ).to_json()
     themed_only = apply_light_dark_mode(
         go.Figure(json.loads(cached_plot)), "light"
     ).to_json()
@@ -239,7 +249,9 @@ def test_default_size_and_empty_color_leave_the_cached_figure_untouched(
 
 
 def test_size_and_color_reach_only_the_run_trace_in_both_graph_modes(cached_plot):
-    figure = home.apply_graph_appearance("dark", cached_plot, "Large", "#f03e3e")
+    figure = chart_options.apply_graph_appearance(
+        "dark", cached_plot, "Large", "#f03e3e"
+    )
 
     run_trace = _run_trace(figure)
     assert run_trace.marker.size == POINT_SIZE_PRESET_PX["Large"]
@@ -251,7 +263,7 @@ def test_size_and_color_reach_only_the_run_trace_in_both_graph_modes(cached_plot
 
     # Appearance is not analysis: the axes and the trace names the legend and
     # hover labels read from stay the ones generate_graph produced.
-    untouched = home.apply_graph_appearance("dark", cached_plot, "Default", "")
+    untouched = chart_options.apply_graph_appearance("dark", cached_plot, "Default", "")
     assert figure.layout.xaxis.title.text == untouched.layout.xaxis.title.text
     assert figure.layout.yaxis.title.text == untouched.layout.yaxis.title.text
     assert [trace.name for trace in figure.data] == [
@@ -264,7 +276,7 @@ def test_point_size_sizes_the_new_pb_stars_and_default_leaves_them_generated(
 ):
     sizes = {
         point_size: _new_pb_trace(
-            home.apply_graph_appearance("light", starred_plot, point_size, "")
+            chart_options.apply_graph_appearance("light", starred_plot, point_size, "")
         ).marker.size
         for point_size in ("Small", "Default", "Large")
     }
@@ -272,7 +284,9 @@ def test_point_size_sizes_the_new_pb_stars_and_default_leaves_them_generated(
     assert sizes == {"Small": 9, "Default": 12, "Large": 16}
 
     # Default writes nothing: the 12 is the size the figure was generated with.
-    styled = home.apply_graph_appearance("light", starred_plot, "Default", "").to_json()
+    styled = chart_options.apply_graph_appearance(
+        "light", starred_plot, "Default", ""
+    ).to_json()
     themed_only = apply_light_dark_mode(
         go.Figure(json.loads(starred_plot)), "light"
     ).to_json()
@@ -282,7 +296,7 @@ def test_point_size_sizes_the_new_pb_stars_and_default_leaves_them_generated(
 def test_point_color_changes_the_run_points_and_never_the_new_pb_stars(starred_plot):
     for color_scheme in ("light", "dark"):
         # The stars' own gold, which a player is free to give the run points.
-        figure = home.apply_graph_appearance(
+        figure = chart_options.apply_graph_appearance(
             color_scheme, starred_plot, "Large", "#fab005"
         )
 
@@ -296,7 +310,7 @@ def test_point_color_changes_the_run_points_and_never_the_new_pb_stars(starred_p
 
 
 def test_a_figure_with_no_new_pb_trace_passes_through_the_star_sizing(cached_plot):
-    figure = home.apply_graph_appearance("light", cached_plot, "Large", "")
+    figure = chart_options.apply_graph_appearance("light", cached_plot, "Large", "")
 
     assert [trace.name for trace in figure.data] == [
         RUN_DATA_POINT_TRACE_NAME,
@@ -306,11 +320,15 @@ def test_a_figure_with_no_new_pb_trace_passes_through_the_star_sizing(cached_plo
 
 
 def test_unusable_preferences_fall_back_to_the_generated_appearance(cached_plot):
-    base = home.apply_graph_appearance("light", cached_plot, "Default", "").to_json()
+    base = chart_options.apply_graph_appearance(
+        "light", cached_plot, "Default", ""
+    ).to_json()
 
     for size, color in (("Enormous", "not-a-color"), (None, None), ("", "#12")):
         assert (
-            home.apply_graph_appearance("light", cached_plot, size, color).to_json()
+            chart_options.apply_graph_appearance(
+                "light", cached_plot, size, color
+            ).to_json()
             == base
         )
 
@@ -321,7 +339,9 @@ def test_placeholder_and_empty_figures_tolerate_every_persisted_preference():
     for plot_json in (None, "", empty):
         for size in ("Small", "Default", "Large", "Enormous"):
             for color in ("", "#1c7ed6", "not-a-color"):
-                figure = home.apply_graph_appearance("dark", plot_json, size, color)
+                figure = chart_options.apply_graph_appearance(
+                    "dark", plot_json, size, color
+                )
 
                 assert isinstance(figure, go.Figure)
                 assert not any(
@@ -334,7 +354,9 @@ def test_theme_switches_keep_an_explicit_color_and_leave_default_generated(
 ):
     for color_scheme in ("light", "dark"):
         explicit = _run_trace(
-            home.apply_graph_appearance(color_scheme, cached_plot, "Small", "#099268")
+            chart_options.apply_graph_appearance(
+                color_scheme, cached_plot, "Small", "#099268"
+            )
         )
         assert explicit.marker.color == "#099268"
         assert explicit.marker.size == POINT_SIZE_PRESET_PX["Small"]
@@ -344,7 +366,9 @@ def test_theme_switches_keep_an_explicit_color_and_leave_default_generated(
     # figure does.
     default = [
         _run_trace(
-            home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
+            chart_options.apply_graph_appearance(
+                color_scheme, cached_plot, "Default", ""
+            )
         ).marker.color
         for color_scheme in ("light", "dark")
     ]
@@ -353,10 +377,10 @@ def test_theme_switches_keep_an_explicit_color_and_leave_default_generated(
 
 
 def test_use_default_clears_the_color_and_ignores_a_phantom_click():
-    assert home.clear_point_color(1) == ""
+    assert chart_options.clear_point_color(1) == ""
     # Under DashProxy a callback can fire once on page load with no click.
-    assert home.clear_point_color(None) is dash.no_update
-    assert home.clear_point_color(0) is dash.no_update
+    assert chart_options.clear_point_color(None) is dash.no_update
+    assert chart_options.clear_point_color(0) is dash.no_update
 
 
 def test_appearance_preferences_never_reach_the_expensive_graph_callback():
