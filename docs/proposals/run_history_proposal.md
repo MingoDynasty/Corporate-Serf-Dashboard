@@ -99,9 +99,9 @@ Considered and not recommended:
   already holds a Scenarios page for scenario-first navigation.
 - **Keeping "Scenario Performance".**
 
-The cost is a rename: "Scenario Performance" appears 75 times in 20 tracked
-files on `main` at `4272fbb`. 24 of those are in the decision log, where
-history keeps the old name.
+The cost is a rename: "Scenario Performance" appears on 75 lines in 20
+tracked files on `main` at `4272fbb`. 24 of those lines are in the decision
+log, where history keeps the old name.
 
 **If the maintainer keeps the old name:** nothing is renamed, the page's
 largest new part has no name pointing at it, and the run toast's link, which
@@ -239,7 +239,8 @@ For A:
   unusable where C works. A also reads every cell of a run row with its
   column heading, which C does not.
 - **No free library does more.** The research found none that pairs a free
-  licence, a released treegrid, a pinned row, and row virtualization.
+  licence, a released treegrid, a pinned row, row virtualization, and a
+  build that runs on the app's React 18.3 without a new toolchain.
 
 Against A:
 
