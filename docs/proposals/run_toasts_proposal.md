@@ -62,7 +62,8 @@ does not reopen them:
 
 ### T1. Every run gets one plain toast, on every page, with no verdict
 
-Status: Open. The maintainer's agreement of 2026-10-10.
+Status: Open. The maintainer's agreement of 2026-10-10, and of 2026-10-11
+for the clause on a new personal best.
 
 **Recommendation: a blue toast titled "New run detected", holding the
 scenario's name and a link, "Open in Run History". The app shell builds it,
@@ -142,7 +143,8 @@ and the celebrated run exactly one." So a celebrated run shows the "New
 personal best" toast and no plain one. A plain toast beside it would say
 less about the same run, at the moment the screen should be the
 celebration's. The cost is that a celebrated run's toast has no link,
-because the celebration is unchanged.
+because the celebration is unchanged. The maintainer agreed to this clause
+on 2026-10-11, which is an agreement and not a ruling.
 
 *If the maintainer chooses a plain toast on a celebrated run too:* a new PB
 puts two toasts on screen for one run, and that clause of the 2026-09-02
