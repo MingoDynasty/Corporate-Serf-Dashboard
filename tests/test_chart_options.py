@@ -8,7 +8,9 @@ layout default, along with the groups, the help text, and the toggle.
 
 import dash
 import dash_mantine_components as dmc
+import pytest
 from dash import no_update
+from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 from source.components import chart_options
 from tests.rendered_text import rendered_text
@@ -228,3 +230,110 @@ def test_chart_options_toggle_ignores_a_fire_no_click_caused():
         no_update,
         no_update,
     )
+
+
+# A second page's ids, none of which the Scenario Performance page uses.
+SECOND_PAGE_IDS = chart_options.ChartOptionsIds(
+    *(f"second-{field}" for field in chart_options.ChartOptionsIds._fields)
+)
+
+
+@pytest.fixture
+def restored_callbacks():
+    """Take a test's registrations back out of Dash's process-wide registry."""
+    saved_list = list(GLOBAL_CALLBACK_LIST)
+    saved_map = dict(GLOBAL_CALLBACK_MAP)
+    yield
+    GLOBAL_CALLBACK_LIST[:] = saved_list
+    GLOBAL_CALLBACK_MAP.clear()
+    GLOBAL_CALLBACK_MAP.update(saved_map)
+
+
+def test_the_page_gives_the_block_the_ids_browsers_store_values_under(monkeypatch):
+    # The ids are data the page passes in, so a typo there is a reset of every
+    # user's stored setting. The four the other tests reach only through this
+    # object are held to their strings here too.
+    assert home.CHART_OPTIONS_IDS._asdict() == {
+        "panel": "chart-options-panel",
+        "toggle": "chart-options-toggle",
+        "rank_overlay": "rank-overlay-switch",
+        "show_all_ranks": "show-all-ranks-switch",
+        "high_score_overlay": "high-score-overlay-switch",
+        "point_size": "point-size",
+        "point_size_label": "point-size-label",
+        "point_color": "point-color",
+        "point_color_default": "point-color-default",
+        "score_threshold_overlay": "score-threshold-overlay-switch",
+        "score_threshold_percentage": "score-threshold-percentage",
+        "score_threshold_notification": "score-threshold-notification-switch",
+        "run_notification": "run-notification-switch",
+        "graph": "graph-content",
+        "cached_plot": "cached-plot",
+    }
+
+    # The graph and the store are built by the page, not by the block, so
+    # nothing but this ties their ids in the layout to the ones passed in.
+    assert set(home.CHART_OPTIONS_IDS) <= set(_layout_components(monkeypatch))
+
+
+def test_the_page_registers_the_block_for_its_own_ids():
+    """Registration is a call the page makes; without it all three go quiet."""
+    assert {
+        "graph-content.figure",
+        "point-color.value",
+        "..chart-options-panel.className...chart-options-toggle.aria-expanded..",
+    } <= set(GLOBAL_CALLBACK_MAP)
+
+
+def test_a_second_page_builds_a_panel_that_shares_no_id_with_the_first(monkeypatch):
+    first_page_ids = set(_layout_components(monkeypatch)) - {None}
+
+    built = {
+        component.id
+        for tree in (
+            chart_options.chart_options_toggle(SECOND_PAGE_IDS),
+            chart_options.chart_options_panel(SECOND_PAGE_IDS),
+        )
+        for component in _walk_components(tree)
+        if getattr(component, "id", None) is not None
+    }
+
+    # Every id in the tree came from the ids passed in, apart from the graph
+    # and the store, which the page builds.
+    assert built == set(SECOND_PAGE_IDS) - {
+        SECOND_PAGE_IDS.graph,
+        SECOND_PAGE_IDS.cached_plot,
+    }
+    assert not built & first_page_ids
+
+
+def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
+    restored_callbacks,
+):
+    before = dict(GLOBAL_CALLBACK_MAP)
+
+    chart_options.register_chart_options(SECOND_PAGE_IDS)
+
+    added = {
+        key: spec for key, spec in GLOBAL_CALLBACK_MAP.items() if key not in before
+    }
+    assert set(added) == {
+        "second-graph.figure",
+        "second-point_color.value",
+        "..second-panel.className...second-toggle.aria-expanded..",
+    }
+    # The theme switch belongs to the shell, so both pages read the same one.
+    assert {
+        entry["id"]
+        for spec in added.values()
+        for entry in spec["inputs"] + spec["state"]
+    } == {
+        "color-scheme-switch",
+        "second-cached_plot",
+        "second-point_size",
+        "second-point_color",
+        "second-point_color_default",
+        "second-toggle",
+        "second-panel",
+    }
+    assert all(GLOBAL_CALLBACK_MAP[key] is spec for key, spec in before.items())
