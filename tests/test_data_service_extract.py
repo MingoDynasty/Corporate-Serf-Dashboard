@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -8,6 +8,7 @@ from sortedcontainers import SortedList
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import RecordedSensitivity, RunData, ScenarioStats
+from source.kovaaks.play_sessions import PLAY_SESSION_BREAK_LIMIT
 from source.my_watchdog import file_watchdog
 
 extract_data_from_file = data_service.extract_data_from_file
@@ -57,11 +58,16 @@ def _write_stats_file(
     file_path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def _extract_written_file(name: str, **fields) -> RunData | None:
-    """Write one synthetic stats file, parse it, and clean it up."""
+def _extract_written_file(
+    name: str, *, end_stamp: str = "2025.01.01-10.00.00", **fields
+) -> RunData | None:
+    """Write one synthetic stats file, parse it, and clean it up.
+
+    ``end_stamp`` is the time in the file's name, which is when the run ended.
+    """
     fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "generated"
     fixtures_dir.mkdir(parents=True, exist_ok=True)
-    file_path = fixtures_dir / f"{name} - Challenge - 2025.01.01-10.00.00 Stats.csv"
+    file_path = fixtures_dir / f"{name} - Challenge - {end_stamp} Stats.csv"
     try:
         _write_stats_file(file_path, DAMAGE_SUB_CSV_ROW, **fields)
         return extract_data_from_file(str(file_path))
@@ -174,6 +180,236 @@ def test_extract_data_from_file_loads_a_file_with_no_usable_hash(hash_line) -> N
     assert run is not None
     assert run.score == 123.45
     assert run.scenario_hash is None
+
+
+# --- Run start and run length ------------------------------------------------
+
+
+def _extract_timed_file(
+    *timing_lines: str, end_stamp: str = "2025.01.01-10.00.00"
+) -> RunData:
+    """Parse a synthetic stats file that carries the given timing lines.
+
+    The run ends at 10:00:00 on 2025-01-01 unless ``end_stamp`` says otherwise.
+    A timing line never costs the run, so the run is asserted here.
+    """
+    run = _extract_written_file(
+        "timed", end_stamp=end_stamp, extra_line="\n".join(timing_lines)
+    )
+    assert run is not None
+    assert run.score == 123.45
+    return run
+
+
+def test_a_run_reads_its_start_and_its_length() -> None:
+    # The three lines a file from 2024 on carries, in the game's own order.
+    run = _extract_timed_file(
+        "Challenge Start:,09:59:00.250", "Pause Count:,0", "Pause Duration:,0"
+    )
+
+    assert run.datetime_object == datetime(2025, 1, 1, 10, 0, 0)
+    assert run.run_start == datetime(2025, 1, 1, 9, 59, 0, 250000)
+    assert run.run_length == timedelta(seconds=59.75)
+
+
+def test_a_start_after_the_ends_time_of_day_is_the_day_before() -> None:
+    # ``Challenge Start:`` has no date, so a run that crossed midnight reads
+    # as starting later in the day than it ended.
+    run = _extract_timed_file(
+        "Challenge Start:,23:59:20.500",
+        "Pause Duration:,0",
+        end_stamp="2025.01.02-00.00.20",
+    )
+
+    assert run.run_start == datetime(2025, 1, 1, 23, 59, 20, 500000)
+    assert run.run_length == timedelta(seconds=59.5)
+
+
+@pytest.mark.parametrize(
+    ("challenge_start", "pause_duration", "expected_start"),
+    [
+        pytest.param("09:55:00.000", "240", datetime(2025, 1, 1, 9, 55), id="4 min"),
+        # The pause is left out of the length, never out of the span: this run
+        # would lose its start if the hour counted toward its length.
+        pytest.param("08:59:00.000", "3600", datetime(2025, 1, 1, 8, 59), id="1 hour"),
+        pytest.param(
+            "09:58:52.500",
+            "7.5",
+            datetime(2025, 1, 1, 9, 58, 52, 500000),
+            id="a fraction of a second",
+        ),
+    ],
+)
+def test_paused_time_is_left_out_of_the_length_and_not_out_of_the_start(
+    challenge_start, pause_duration, expected_start
+) -> None:
+    run = _extract_timed_file(
+        f"Challenge Start:,{challenge_start}", f"Pause Duration:,{pause_duration}"
+    )
+
+    assert run.run_start == expected_start
+    assert run.run_length == timedelta(seconds=60)
+
+
+def test_a_pause_larger_than_the_span_leaves_no_start_and_no_length() -> None:
+    # What the two days of 2021 files look like, where the game wrote the
+    # pause as a running total for the whole time it was open.
+    run = _extract_timed_file("Challenge Start:,09:59:00.000", "Pause Duration:,120")
+
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+@pytest.mark.parametrize(
+    "challenge_start_line",
+    [
+        pytest.param("", id="no Challenge Start line"),
+        pytest.param("Challenge Start:", id="no value column yet"),
+        pytest.param("Challenge Start:,", id="an empty value"),
+        pytest.param("Challenge Start:,soon", id="not a time"),
+        pytest.param("Challenge Start:,09:59", id="no seconds"),
+        pytest.param("Challenge Start:,25:00:00.000", id="hour out of range"),
+        pytest.param("Challenge Start:,09:75:00.000", id="minute out of range"),
+        pytest.param("Challenge Start:,09:59:00.000+01:00", id="a time zone"),
+        pytest.param("Challenge Start:,2025-01-01 09:59:00.000", id="a date"),
+    ],
+)
+def test_a_file_with_no_usable_challenge_start_has_no_start_and_no_length(
+    challenge_start_line,
+) -> None:
+    """A missing or malformed start costs the start and the length, never the run."""
+    run = _extract_timed_file(challenge_start_line, "Pause Duration:,0")
+
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+def test_a_missing_pause_duration_subtracts_nothing() -> None:
+    # Files from 2020 and 2021 carry a start and no pause lines.
+    run = _extract_timed_file("Challenge Start:,09:59:00.000")
+
+    assert run.run_start == datetime(2025, 1, 1, 9, 59)
+    assert run.run_length == timedelta(seconds=60)
+
+
+@pytest.mark.parametrize(
+    "pause_duration_line",
+    [
+        pytest.param("Pause Duration:", id="no value column yet"),
+        pytest.param("Pause Duration:,", id="an empty value"),
+        pytest.param("Pause Duration:,soon", id="not a number"),
+        pytest.param("Pause Duration:,-5", id="negative"),
+        pytest.param("Pause Duration:,nan", id="nan"),
+        pytest.param("Pause Duration:,inf", id="infinite"),
+        # Finite, and more seconds than a time span can hold.
+        pytest.param("Pause Duration:,1e300", id="overflowing"),
+    ],
+)
+def test_an_unreadable_pause_duration_costs_the_start_and_the_length_not_the_run(
+    pause_duration_line,
+) -> None:
+    """A pause line that is there and can't be read is an unknown pause.
+
+    Reading it as no pause would count the paused time as playing time, and
+    the length would be wrong instead of unknown.
+    """
+    run = _extract_timed_file("Challenge Start:,09:59:00.000", pause_duration_line)
+
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+@pytest.mark.parametrize(
+    "challenge_start",
+    [
+        # A reset-shaped file. The end is in whole seconds and the start has
+        # milliseconds, so the start can land a fraction of a second after the
+        # end, which reads as a run of almost a day.
+        pytest.param("09:59:59.500", id="half a second before the end"),
+        pytest.param("10:00:00.300", id="a fraction of a second after the end"),
+    ],
+)
+def test_a_start_within_a_second_of_the_end_is_not_trusted(challenge_start) -> None:
+    run = _extract_timed_file(f"Challenge Start:,{challenge_start}")
+
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+@pytest.mark.parametrize(
+    ("challenge_start", "expected_seconds"),
+    [
+        pytest.param("09:59:59.000", 1, id="one second"),
+        pytest.param("09:40:00.000", 1200, id="a 20-minute run"),
+        pytest.param("09:30:00.000", 1800, id="exactly the session limit"),
+    ],
+)
+def test_a_length_from_one_second_to_the_session_limit_keeps_its_start(
+    challenge_start, expected_seconds
+) -> None:
+    run = _extract_timed_file(f"Challenge Start:,{challenge_start}")
+
+    assert run.run_start is not None
+    assert run.run_length == timedelta(seconds=expected_seconds)
+    assert run.datetime_object - run.run_start == run.run_length
+
+
+@pytest.mark.parametrize(
+    "challenge_start",
+    [
+        pytest.param("09:29:59.999", id="a millisecond over the session limit"),
+        pytest.param("09:20:00.000", id="a 40-minute run"),
+        # What a run played while the clock went forward looks like.
+        pytest.param("08:59:00.000", id="a span of an hour plus a run"),
+    ],
+)
+def test_a_length_over_the_session_limit_loses_its_start(challenge_start) -> None:
+    run = _extract_timed_file(f"Challenge Start:,{challenge_start}")
+
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+@pytest.mark.parametrize(
+    ("end_stamp", "challenge_start", "pause_duration"),
+    [
+        # Moving the start back a day leaves the calendar.
+        pytest.param("0001.01.01-00.00.20", "23:59:20.500", "0", id="first day"),
+        # The largest whole number of seconds a time span holds.
+        pytest.param(
+            "2025.01.01-10.00.00", "09:59:00.000", "86399999999999", id="huge pause"
+        ),
+    ],
+)
+def test_timing_arithmetic_out_of_range_costs_the_start_and_the_length_not_the_run(
+    end_stamp, challenge_start, pause_duration
+) -> None:
+    """Nothing past the parser's own handler may raise.
+
+    ``initialize_kovaaks_data`` has no guard of its own around
+    ``extract_data_from_file``, so an exception here would end the startup
+    scan and lose every run after the file that raised it.
+    """
+    run = _extract_timed_file(
+        f"Challenge Start:,{challenge_start}",
+        f"Pause Duration:,{pause_duration}",
+        end_stamp=end_stamp,
+    )
+
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+def test_the_longest_trusted_run_never_exceeds_the_session_limit() -> None:
+    """The bound that trusts a start may not pass either of its two ceilings.
+
+    Above the session limit, a start left over from an earlier run could hide
+    a break that should have ended a session. Above an hour, a run played
+    while the clock went forward would be trusted.
+    """
+    assert data_service.MAX_RUN_LENGTH <= PLAY_SESSION_BREAK_LIMIT
+    assert data_service.MAX_RUN_LENGTH <= timedelta(hours=1)
+    assert data_service.MIN_RUN_LENGTH < data_service.MAX_RUN_LENGTH
 
 
 def test_extract_data_from_file_tolerates_missing_damage_columns() -> None:
