@@ -79,28 +79,52 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **Run history and sessions, sessions first** — a reviewable record of past
-  runs that the per-run toast can't provide: the session in progress, recent
-  sessions, and a scenario's history over weeks. The app will split the runs
-  into sessions at a gap between runs, and each session into visits, a visit
-  being an unbroken stretch of runs on one scenario. Sessions and visits are
-  built first, as the foundation the history views stand on, not as a later
-  layer.
-  The milestone retires the interim per-run lines the watchdog writes to the
-  debug log. Why it's next, and why sessions first:
-  - Nearly every planned feature needs sessions and visits: history grouped
-    by session, time spent in a session, the trend verdict built on session
-    medians, and the typical run.
+- **Run History, in five pieces, sessions first** — a reviewable record of
+  past runs that the per-run toast can't provide: the session in progress,
+  recent sessions, and a scenario's history over weeks. It was planned as one
+  proposal and is now five pieces, so that one can ship while another is
+  still being debated. Each piece's proposal carries its own open decisions,
+  and nothing below is ratified by being listed here.
+  1. **Groundwork** — moves the code the new page keeps out of the Scenario
+     Performance page's module, with no change in behavior. It has no
+     proposal.
+  2. **Sessions** — what a session is, and a start and a length for every
+     run, built with nothing on screen
+     ([proposal](./proposals/sessions_proposal.md)). The app splits the runs
+     into sessions at a break between runs, and finds each unbroken stretch
+     of runs on one scenario inside a session.
+  3. **The Run History page, version 1** — a page of its own with a chart
+     that plots every run, the selected scenario's runs listed by session,
+     and a card for the latest run. It's built hidden and made public when
+     it's complete. The
+     [current proposal](./proposals/run_history_proposal.md) predates this
+     plan: its "sessions later" decision and its view order are marked
+     superseded, and the page's proposal rewrites that file.
+  4. **Run toasts** — what a run's toast says once the page shows how the
+     run went. It lands when the page goes public, or after, and has a
+     proposal of its own.
+  5. **All scenarios** — a second view of the run list: each session's
+     scenarios in the order they were played. It follows the public page,
+     and has a proposal of its own.
+
+  The pieces are built in that order. Sessions can be built beside the
+  groundwork, and Run toasts and All scenarios don't wait for each other.
+  Version 1 leaves out the typical run, and the Sessions proposal recommends
+  that its definition move to a proposal of its own. Going public retires
+  the interim per-run lines the watchdog writes to the debug log.
+
+  Why it's next, and why sessions first:
+  - Nearly every planned feature needs sessions: history grouped by session,
+    time spent in a session, the trend verdict built on session medians, and
+    the typical run.
   - They're cheap: one pure pass over the runs the app already holds in time
-    order, with no new data to capture.
+    order, with no new data to capture beyond two lines of each stats file.
   - It's what gets used most in session: a scenario's history and the
     session so far are what the player checks between runs.
   - All three seats that reviewed the in-session and between-sessions framing
     (#317) recommended building the session review first.
 
-  The [current proposal](./proposals/run_history_proposal.md) predates this
-  order. Its "sessions later" decision and its view order are marked
-  superseded, and a rewritten proposal will replace it. Baseline in
+  Baseline in
   [`specs/scenario_performance.md`](./specs/scenario_performance.md).
 ---
 
