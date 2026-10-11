@@ -79,7 +79,7 @@ flowchart TD
         ShellTick --> Drain
     end
 
-    subgraph Server["Server threads (Waitress or Flask, home.py callbacks)"]
+    subgraph Server["Server threads (Waitress or Flask, the callbacks home.py registers)"]
         Tick["dcc.Interval tick"]
         Check["check_for_new_data<br/>may auto-switch scenario"]
         Graph["generate_graph<br/>rebuilds the plot via plot_service"]
@@ -136,7 +136,9 @@ The sanctioned channels, each typed and single-purpose:
   drained by a dedicated Scenario Performance interval callback.
 - `file_watchdog.run_import_failure_queue` — run files the watchdog thread
   could not import, drained by a Scenario Performance interval callback into
-  one red toast.
+  one red toast. The callbacks that drain these two queues are defined in
+  `components/queued_notices.py`, and the page registers each on one of its
+  intervals.
 - The JSON caches under `data/cache/` — the rank pipeline: refresh Timers
   write, cache-only interval reads pick the value up on the next tick.
 - `playlist_scenarios_service._FILL_REGISTRY` — the progressive fill's
@@ -241,6 +243,11 @@ flowchart LR
         LocalIcon["components/<br/>local_icon.py"]
         ControlName["components/<br/>control_name.py"]
         ColumnsMenu["components/<br/>columns_menu.py"]
+        ChartOptions["components/<br/>chart_options.py"]
+        ScenarioSelection["components/<br/>scenario_selection.py"]
+        QueuedNotices["components/<br/>queued_notices.py"]
+        ScoreThreshold["components/<br/>score_threshold.py"]
+        ScenarioStats["components/<br/>scenario_stats.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -274,12 +281,28 @@ flowchart LR
     Shell --> Queue
     Shell --> Pace
     Home --> DataService
-    Home --> ApiService
     Home --> PlotService
-    Home --> TimeScored
-    Home --> Pace
     Home --> LocalIcon
-    Home --> ControlName
+    Home --> ChartOptions
+    ChartOptions --> LocalIcon
+    ChartOptions --> ControlName
+    ChartOptions --> PlotService
+    Home --> ScenarioSelection
+    ScenarioSelection --> DataService
+    Home --> QueuedNotices
+    QueuedNotices --> LocalIcon
+    QueuedNotices --> DataService
+    QueuedNotices --> FileWatchdog
+    Home --> ScoreThreshold
+    ScoreThreshold --> Shell
+    ScoreThreshold --> DataService
+    ScoreThreshold --> TimeScored
+    ScoreThreshold --> Pace
+    Home --> ScenarioStats
+    ScenarioStats --> ChartOptions
+    ScenarioStats --> LocalIcon
+    ScenarioStats --> DataService
+    ScenarioStats --> ApiService
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -366,7 +389,23 @@ flowchart LR
   layout-bound `home-deep-link` store and the `apply_deep_link` callback, never
   as their layout `value`: both are browser-persisted, and Dash discards a
   stored edit when a later visit renders a different default, so the per-visit
-  value has to arrive by callback to be remembered.
+  value has to arrive by callback to be remembered. `apply_deep_link` and
+  `select_playlist` are defined in `components/scenario_selection.py`, and
+  `register_scenario_selection` wires them to this page's
+  `SCENARIO_SELECTION_IDS`.
+  The page also registers the two flushes of `components/queued_notices.py`,
+  failed run imports on its polling interval and the startup playlist
+  warnings on a one-shot interval. Its run toast builders and `generate_graph`
+  call `components/score_threshold.py` for a run's threshold verdict and for
+  the score the threshold line is drawn at.
+  The Scenario Stats block (Last played, Number of runs, and Position with
+  its Refresh button) is built by `components/scenario_stats.py` from this
+  page's `SCENARIO_STATS_IDS`, and `register_scenario_stats` wires that
+  module's callbacks to the same ids; `get_scenario_num_runs`,
+  `get_scenario_rank`, and `refresh_rank` are defined there. The page builds
+  what the block only reads: the `run-events` store, the scenario dropdown,
+  the polling interval, and the 30-second interval that keeps the relative
+  times current.
   As the landing page it also carries the first-run setup card
   (`_setup_card_children`), which is suppressed while a stats-directory change
   awaits a restart. It asks the store's read state before anything else: an
@@ -379,7 +418,11 @@ flowchart LR
   the line between it and `_stats_dir_hint`, which explains a directory that
   is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
-  overlay, run-point, score-threshold, and run-notification preferences. The
+  overlay, run-point, score-threshold, and run-notification preferences. It
+  is built by `components/chart_options.py` from this page's
+  `CHART_OPTIONS_IDS`, and `register_chart_options` wires that module's
+  callbacks to the same ids; `toggle_chart_options` and
+  `apply_graph_appearance`, named here, are defined there. The
   panel itself starts closed on every visit and its open state is never
   persisted; `toggle_chart_options` writes that open state as a CSS class,
   which hides the controls without unmounting them. Each control's own value
@@ -577,6 +620,79 @@ flowchart LR
   never resends column definitions. The choices live in the browser's local
   storage, so the server never learns which columns are shown
   ([decision_log.md](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+- `components/chart_options.py` — the Chart options panel and its callbacks,
+  built from component ids the hosting page supplies, so more than one page
+  can host a panel. A page fills in a `ChartOptionsIds`: an id for each
+  component the block builds, plus the page's own graph and the store
+  holding its unstyled figure. It
+  builds `chart_options_toggle()` and `chart_options_panel()` from that in
+  its layout and calls `register_chart_options()` with it once, at import,
+  which registers `toggle_chart_options`, `clear_point_color`, and
+  `apply_graph_appearance` for those ids. The functions are module-level and
+  stay unregistered until a page asks, so tests call them directly. The
+  module also holds the controls' help text (`SETTINGS_HELP_TEXT`) and
+  `settings_help_label()`, the label with a help icon, which `home.py` also
+  uses for controls outside the panel. Importing it registers the Mantine
+  figure templates (`dmc.add_figure_templates()`), which
+  `plot_service.apply_light_dark_mode` and `generated_point_color` look up
+  by name.
+  It lives outside `source/pages/` so that it is imported once. Dash Pages
+  imports every file in that folder whose text contains `register_page`,
+  under the name `pages.<name>` (read in Dash 4.4.1's `_pages.py`), so a
+  module there that is also imported as `source.pages.<name>` exists twice,
+  each copy with its own module-level state.
+- `components/scenario_selection.py` — what a page's playlist filter and
+  scenario dropdown select and list. The page builds the components and
+  fills in a `ScenarioSelectionIds`: the two dropdowns, the store holding
+  this visit's query parameters, and the holder for the link to the
+  playlist's scenario table. `register_scenario_selection()` registers
+  `select_playlist` and `apply_deep_link` for those ids, once per page, at
+  import. A layout calls `deep_link_selection()` for the store's data and
+  `initial_scenario_options()` for the scenario list its first paint shows.
+  `select_playlist` takes the store as a second `Input` so that the renderer
+  cannot drop its first call
+  ([decision_log.md](decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
+- `components/queued_notices.py` — the two flushes that bring a queued
+  notice to the screen: `flush_run_import_failures` and
+  `flush_startup_playlist_warnings`. Each drains one queue on the server
+  into toasts for the shell's notification container.
+  `register_run_import_failure_flush()` and
+  `register_startup_playlist_warning_flush()` each take the id of one
+  `dcc.Interval` in a page's layout. Every page that registers a flush reads
+  the same queue, so whichever one is open delivers what is in it.
+- `components/score_threshold.py` — the score threshold's rules, as functions
+  with no component ids. `threshold_verdict()` judges one run of the shell's
+  `RunEventData` against the personal best it was chasing: by pace when the
+  run carries a pace constant and pace is defined, and by score otherwise.
+  `shown_percentage()` is the figure to print for that verdict. `score_threshold_line()` is the score the chart's
+  threshold line is drawn at, from the current personal best.
+  `normalize_score_threshold_percentage()` reads the percentage input, which
+  is empty while the user is clearing it.
+- `components/scenario_stats.py` — the Scenario Stats block: Last played,
+  Number of runs, and Position with its Refresh button. A page fills in a
+  `ScenarioStatsIds`: an id for each component the block builds, plus the
+  page's own run-events store, scenario dropdown, polling interval, and
+  30-second interval, which the block only reads. It puts
+  `scenario_stats_stores()` and `scenario_stats_panel()` in its layout and
+  calls `register_scenario_stats()` with the ids once, at import, which
+  registers `get_scenario_num_runs`, `get_scenario_rank`, `refresh_rank`,
+  and the clientside callbacks that word the Last played text and the age
+  in the Position hover. `get_scenario_rank` is the passive read. A tick of
+  the polling interval alone reads caches only, and the tick is told by its
+  `n_intervals` property and not by one id, so the rule holds for each
+  page's interval. `refresh_rank` is the click: a board-authoritative fetch
+  that answers every outcome with a channel toast.
+  The module holds what the Position field remembers between calls:
+  `_last_rank_hints`, what each scenario's last network read concluded, so
+  that a cache-only tick can repeat the hint, and `_session_notices_sent`,
+  which lets the Steam ID mismatch toast fire once per run of the server.
+  Every page that registers the block reads and writes the same objects.
+  That depends on the module being imported once, which is the reason given
+  under `components/chart_options.py` for living outside `source/pages/`.
+  It takes `TOOLTIP_EVENTS` and `SETTINGS_HELP_TOOLTIP_WIDTH` from
+  `components/chart_options.py`. What the block shows is specified in
+  [scenario_performance.md](specs/scenario_performance.md) and
+  [scenario_rank.md](specs/scenario_rank.md).
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -875,6 +991,11 @@ flowchart LR
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | A benchmark's categories and subcategories on that table | `kovaaks/evxl_snapshot.py` for the read of `resources/evxl/benchmarks.json`; `kovaaks/scenario_groups.py` for the join and the exclusion list; `kovaaks/data_service.py` (`get_scenario_groups`) for the side table; `pages/playlist_scenarios.py` for the columns, the grouped state, and the merged-cell workaround; `scripts/benchmark_importer/script.py` (`find_group_crossings`) for the comparison with KovaaK's categories; the rules are in `docs/specs/playlists.md` |
+| The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/home.py`) for the component ids |
+| What `?scenario=` and `?playlist_code=` select, the scenario dropdown's list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the two layout helpers; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/home.py`) for the component ids |
+| How a failed run import or a startup playlist warning reaches the screen | `components/queued_notices.py` for the two flushes; `my_watchdog/file_watchdog.py` and `kovaaks/data_service.py` for the queues; the hosting page for the interval each flush is registered on |
+| The Scenario Stats block, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the block and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/home.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
+| How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `pages/home.py` for the run toast builders and the chart callback that call it |
 | The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |

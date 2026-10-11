@@ -18,7 +18,7 @@ EM_DASH = "—"
 # (module, enclosing function, whole string). The one ratified em dash is the
 # empty value under Last played when no scenario is selected.
 ALLOWED_EM_DASHES = {
-    ("source/pages/home.py", "get_scenario_num_runs", EM_DASH),
+    ("source/components/scenario_stats.py", "get_scenario_num_runs", EM_DASH),
 }
 
 

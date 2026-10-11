@@ -1,10 +1,8 @@
 """Build the dashboard home page and its interactive callbacks."""
 
-import json
 import logging
 from datetime import datetime
-from decimal import Decimal
-from typing import Any, NamedTuple, TypedDict
+from typing import Any, TypedDict
 
 import dash
 import dash_mantine_components as dmc
@@ -16,7 +14,6 @@ from dash import (
     Patch,
     State,
     callback,
-    clientside_callback,
     ctx,
     dcc,
     no_update,
@@ -27,59 +24,71 @@ from source.app_shell import (
     RunEventBatch,
     RunEventData,
 )
-from source.components.control_name import control_name
+from source.components.chart_options import (
+    SETTINGS_HELP_TEXT,
+    ChartOptionsIds,
+    chart_options_panel,
+    chart_options_toggle,
+    register_chart_options,
+    settings_help_label,
+)
 from source.components.local_icon import local_icon
+from source.components.queued_notices import (
+    register_run_import_failure_flush,
+    register_startup_playlist_warning_flush,
+)
+from source.components.scenario_selection import (
+    ScenarioSelectionIds,
+    deep_link_selection,
+    initial_scenario_options,
+    register_scenario_selection,
+)
+from source.components.scenario_stats import (
+    ScenarioStatsIds,
+    register_scenario_stats,
+    scenario_stats_panel,
+    scenario_stats_stores,
+)
+from source.components.score_threshold import (
+    ThresholdVerdict,
+    normalize_score_threshold_percentage,
+    score_threshold_line,
+    shown_percentage,
+    threshold_verdict,
+)
 from source.config.config_service import get_config
 from source.config.settings_service import (
     KOVAAKS_USERNAME_KEY,
     STATS_DIR_KEY,
     decline_identity,
-    get_identity,
-    get_kovaaks_username,
     get_settings,
     get_settings_store_state,
     get_usable_stats_dir,
     is_stats_dir_change_pending,
 )
-from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
-from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch_warning
 from source.kovaaks.data_service import (
-    drain_startup_playlist_warnings,
     get_high_score,
     get_new_high_score_runs,
-    get_personal_best_run,
-    get_playlist_by_code,
     get_rank_data_from_playlist_code,
-    get_scenario_names,
-    get_scenario_stats,
-    get_scenarios_from_playlist_code,
     get_sensitivities_vs_runs_filtered,
     get_time_vs_runs,
     is_scenario_in_database,
 )
-from source.kovaaks.pace import pace_goal_met, pace_percent, pace_threshold_score
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
-from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
-from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
 from source.pages.playlist_selector import (
     PLAYLIST_SELECTOR_PRESET,
     PLAYLIST_SELECTOR_SIZING,
 )
 from source.plot.plot_service import (
-    POINT_SIZE_DEFAULT,
-    POINT_SIZE_OPTIONS,
     add_high_score_overlay,
     add_score_threshold_overlay,
-    apply_light_dark_mode,
-    apply_point_appearance,
     generate_empty_plot,
     generate_placeholder_plot,
     generate_sensitivity_plot,
     generate_time_plot,
-    generated_point_color,
 )
 from source.utilities.notifications import (
     TOAST_CHANNEL_REGISTRY_STORE_ID,
@@ -87,62 +96,9 @@ from source.utilities.notifications import (
     toast,
 )
 from source.utilities.store_schema import StoreState, UnsupportedSchemaError
-from source.utilities.utilities import format_absolute_timestamp, ordinal
+from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
-SCENARIO_RANK_LOADING_DELAY_MS = 250
-TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
-SETTINGS_HELP_TOOLTIP_WIDTH = 280
-SETTINGS_HELP_TEXT: dict[str, str | list] = {
-    "automatically-change-scenario": (
-        "Automatically selects the scenario you just played when a new run is detected."
-    ),
-    "rank-overlay": (
-        "Shows the selected playlist's rank threshold lines on the graph when "
-        "rank data is available."
-    ),
-    "show-all-ranks": [
-        "Draws every rank in the playlist's ladder instead of only the ones "
-        "around your plotted scores. Needs ",
-        control_name("Rank thresholds"),
-        " turned on.",
-    ],
-    "high-score-overlay": (
-        "Shows your current personal best score as a reference line on the graph."
-    ),
-    "score-threshold-overlay": (
-        "Shows a score goal line based on the selected percentage of your "
-        "current personal best."
-    ),
-    "score-threshold-percentage": (
-        "Sets the score goal as a percentage of your personal best. On a "
-        "scenario scored by completion time, it's a percentage of your "
-        "personal best's pace instead, when the app can measure pace "
-        "reliably. Otherwise, it stays a percentage of your score. The "
-        "overlay line tracks your current personal best. Notifications judge "
-        "a run against the personal best you had before the run."
-    ),
-    "score-threshold-notification": [
-        "Adds a pass or fail verdict to run notifications when the run can be "
-        "judged against the score threshold. Needs ",
-        control_name("Run notifications"),
-        " turned on.",
-    ],
-    "run-notification": (
-        "Controls threshold verdict and placement notifications for your runs. "
-        "Personal best celebrations use their own setting."
-    ),
-    "top-n-scores": [
-        "How many of your best scores to plot per sensitivity within the "
-        "selected date range, or per day in ",
-        control_name("Score vs Time"),
-        ". A new run that lands in the top N also triggers a notification.",
-    ],
-}
-RANK_REFRESH_TOOLTIP = (
-    "Fetch your current position live from the KovaaK's leaderboard. The "
-    "displayed value can come from a local cache and may lag the live board."
-)
 # The controls grid measures these against its own width rather than the
 # window's (``type="container"``). The AppShell navbar is fixed-position and
 # 225px wide, so a media query splits the columns on space the content area
@@ -156,66 +112,60 @@ RANK_REFRESH_TOOLTIP = (
 # constant would leave the ``@container`` queries with nothing to match and
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
-# This visit's ``?scenario=`` and ``?playlist_code=``, carried as layout-bound
-# state rather than read from the URL by a callback. Dash Pages rebuilds the
-# page on a route change and then this store triggers exactly one write, which
-# keeps the deep link out of the router's own callback graph.
-HOME_DEEP_LINK_STORE_ID = "home-deep-link"
-# The holder under the playlist filter for the link to that playlist's
-# scenario table. It is always in the layout so ``select_playlist`` has an
-# output to write to; the link itself comes and goes with the selection.
-PLAYLIST_TABLE_LINK_ID = "playlist-table-link"
-PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
+# The ids this page gives its playlist filter and scenario dropdown. The
+# browser stores each dropdown's value under its id, so changing one resets
+# that selection for every user.
+SCENARIO_SELECTION_IDS = ScenarioSelectionIds(
+    playlist_filter="playlist-dropdown-selection",
+    scenario_dropdown="scenario-dropdown-selection",
+    deep_link="home-deep-link",
+    playlist_table_link="playlist-table-link",
+)
 
-# The chart options inspector. Its collapsed class is the open state: hiding
-# with ``display: none`` takes the controls out of the tab order and the
-# accessibility tree while leaving them mounted, so their persisted values keep
-# feeding the graph callbacks either way.
-CHART_OPTIONS_PANEL_ID = "chart-options-panel"
-CHART_OPTIONS_TOGGLE_ID = "chart-options-toggle"
-CHART_OPTIONS_PANEL_CLASS = "chart-options-panel"
-CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
+# The ids this page gives the Chart options block. The browser stores each
+# remembered control's value under its id, so changing one resets that setting
+# for every user.
+CHART_OPTIONS_IDS = ChartOptionsIds(
+    panel="chart-options-panel",
+    toggle="chart-options-toggle",
+    rank_overlay="rank-overlay-switch",
+    show_all_ranks="show-all-ranks-switch",
+    high_score_overlay="high-score-overlay-switch",
+    point_size="point-size",
+    point_size_label="point-size-label",
+    point_color="point-color",
+    point_color_default="point-color-default",
+    score_threshold_overlay="score-threshold-overlay-switch",
+    score_threshold_percentage="score-threshold-percentage",
+    score_threshold_notification="score-threshold-notification-switch",
+    run_notification="run-notification-switch",
+    graph="graph-content",
+    cached_plot="cached-plot",
+)
+# The ids this page gives the Scenario Stats block. The run-events store, the
+# scenario dropdown and the two intervals are built by this page's layout,
+# and the block only reads them.
+SCENARIO_STATS_IDS = ScenarioStatsIds(
+    last_played="scenario_datetime_last_played",
+    last_played_tooltip="last-played-tooltip",
+    num_runs="scenario_num_runs",
+    rank="scenario_rank",
+    rank_updated_tooltip="rank-updated-tooltip",
+    rank_refresh_button="rank-refresh-button",
+    last_played_ts="last-played-ts",
+    last_played_empty_value="last-played-empty-value",
+    rank_updated_ts="rank-updated-ts",
+    run_events="run-events",
+    scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    polling_interval="interval-component",
+    relative_time_interval="relative-time-interval",
+)
 # Below this much room for the chart row, the inspector stacks above the chart
 # instead of sitting beside it (assets/stylesheet.css measures the row's own
 # width with an ``@container`` query, never the window's). ``md`` is where a
 # 20rem rail stops leaving a chart worth reading.
 CHART_OPTIONS_REFLOW_BREAKPOINT = HOME_GRID_BREAKPOINTS["md"]
-# The Run Data Points group. Both controls persist in the browser like their
-# siblings, so their layout defaults -- Default and an empty color -- must not
-# move: changing a persisted control's layout default silently discards every
-# value the browser already stored under its id.
-CHART_OPTIONS_FIELD_CLASS = "chart-options-field"
-CHART_OPTIONS_FIELD_LABEL_CLASS = "chart-options-field-label"
-POINT_SIZE_INPUT_ID = "point-size"
-POINT_SIZE_LABEL_ID = "point-size-label"
-POINT_COLOR_INPUT_ID = "point-color"
-POINT_COLOR_DEFAULT_ID = "point-color-default"
-POINT_COLOR_DEFAULT = ""
-# The empty field previews the generated point color. Mantine paints the
-# preview of an empty ColorInput white, so the stylesheet repaints it from
-# these custom properties while the placeholder shows, one per color scheme
-# because the graph's templates differ; the values come from plot_service so
-# the swatch and the graph cannot disagree.
-POINT_COLOR_FIELD_CLASS = "point-color-field"
-POINT_COLOR_DEFAULT_CSS_VARIABLES = {
-    "light": "--point-color-default-light",
-    "dark": "--point-color-default-dark",
-}
-# Eight color families, one shade each, chosen per family against both real
-# plot backgrounds (#ffffff light, #242424 dark) rather than by taking one
-# Mantine shade index across the board. Yellow, lime, gray, and dark are
-# omitted; docs/decision_log.md carries the reasoning and the contrast table.
-POINT_COLOR_SWATCHES = [
-    "#1c7ed6",  # blue-7
-    "#0c8599",  # cyan-8
-    "#099268",  # teal-8
-    "#2b8a3e",  # green-9
-    "#d9480f",  # orange-9
-    "#f03e3e",  # red-7
-    "#be4bdb",  # grape-6
-    "#e64980",  # pink-6
-]
 # The first-run setup card. Its container is always in the layout so the Skip
 # callback has an output to write to; the card itself is what comes and goes.
 SETUP_CARD_ID = "setup-card"
@@ -278,7 +228,6 @@ SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
 # one leaves every plot on the page empty, the same reason the card's
 # stats-folder state is yellow.
 STATS_DIR_HINT_CLASS = "alert-panel alert-panel-caution stats-dir-hint"
-_INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
 _SELECT_SCENARIO_PLOT_MESSAGE = "Select a scenario to see your score history."
@@ -296,44 +245,11 @@ _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
 _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = (
     "Choose <b>Score vs Sensitivity</b> or <b>Score vs Time</b>."
 )
-_RANK_HINT_USERNAME_UNSET = "username_unset"
-_RANK_HINT_LOOKUP_FAILED = "lookup_failed"
-_RANK_HINT_SERVED_STALE = "served_stale"
-_STEAM_MISMATCH_NOTIFICATION_ID = "steam-id-mismatch"
-# One channel for the whole refresh problem lane. The hard failure and the
-# served-stale serve are mutually exclusive verdicts on the same attempt, so
-# under separate ids a stale retry after a hard failure would leave both on
-# screen contradicting each other about the latest click.
-_RANK_REFRESH_PROBLEM_CHANNEL = "rank-refresh-problem"
-# The standing condition a Refresh click can report, and its own channel: a
-# repeat click reproduces byte-identical copy, which is the stacking the policy
-# forbids.
-_RANK_REFRESH_USERNAME_UNSET_CHANNEL = "rank-refresh-username-unset"
-_RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 # One run, one toast: every run verdict shares this channel key, so the newest
 # one replaces whatever is on screen instead of stacking. The celebration toast
 # is deliberately not in this lane -- it has its own id and stays until
 # dismissed.
 _RUN_VERDICT_CHANNEL = "run-verdict"
-_RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
-_RANK_REFRESH_STALE_TITLE = "Refresh failed · data from cache"
-_RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh. The position shown is unchanged."
-_RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh. The position shown is from cache."
-_RANK_REFRESH_STALE_WITH_TOTAL_MESSAGE = (
-    "Couldn't refresh. The position and total shown are from cache."
-)
-_RANK_REFRESH_TOTAL_STALE_TITLE = "Position refreshed but total from cache"
-_RANK_REFRESH_TOTAL_MISSING_TITLE = "Position refreshed but no total"
-# Notices that fire once per app session rather than once per trigger, by id.
-# A set, so the check-and-set needs no ``global`` rebinding; sound under
-# Waitress's single-process thread pool, and a lost race is benign because the
-# stable id makes the loser's duplicate payload a no-op at the container.
-_session_notices_sent: set[str] = set()
-# What each scenario's last network-backed render concluded, as
-# (displayed value, hint), so the cache-only interval path can repeat the hint
-# instead of recomputing it from a read that cannot see the failure -- and can
-# tell when a background writer has moved the cache on. See _rank_hint.
-_last_rank_hints: dict[str, tuple[str, str | None]] = {}
 dash.register_page(
     __name__,
     path="/",
@@ -358,61 +274,6 @@ class RunEventsPayload(TypedDict):
 
     latest: RunEventData
     celebrated_run_id: str | None
-
-
-def _settings_help_label(label: str, help_text: str | list) -> dmc.Group:
-    return dmc.Group(
-        [
-            # `inherit` so the label text takes the enclosing <label>'s font
-            # instead of dmc.Text's own defaults (md/400). Without it these
-            # labels render 16px/400 beside the 14px/700 of every label
-            # passed as a plain string.
-            dmc.Text(label, span=True, inherit=True),
-            dmc.Tooltip(
-                dmc.ActionIcon(
-                    local_icon("material-symbols:info-outline", width=16),
-                    className="settings-help-icon",
-                    color="gray",
-                    radius="xl",
-                    size="sm",
-                    variant="subtle",
-                    **{"aria-label": f"{label} help"},
-                ),
-                label=help_text,
-                events=TOOLTIP_EVENTS,
-                multiline=True,
-                withArrow=True,
-                w=SETTINGS_HELP_TOOLTIP_WIDTH,
-            ),
-        ],
-        align="center",
-        gap="xs",
-        wrap="nowrap",
-    )
-
-
-# Rank display states deliberately map to distinct user-facing text.
-def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
-    """Format the compact Scenario Stats rank value shown after the fixed label."""
-    match rank_info.status:
-        case ScenarioRankStatus.RANKED:
-            if rank_info.rank is None:
-                return "N/A"
-            if rank_info.total_players is not None:
-                if rank_info.percentile is not None:
-                    return (
-                        f"{rank_info.rank:,} of {rank_info.total_players:,} "
-                        f"({rank_info.percentile:.2f}% percentile)"
-                    )
-                return f"{rank_info.rank:,} of {rank_info.total_players:,}"
-            return f"{rank_info.rank:,}"
-        case ScenarioRankStatus.UNRANKED:
-            if rank_info.total_players is not None:
-                return f"Unranked ({rank_info.total_players:,} players)"
-            return "Unranked"
-        case ScenarioRankStatus.UNKNOWN:
-            return "N/A"
-    return "N/A"
 
 
 def _summarize_run_events(
@@ -478,720 +339,13 @@ def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
     return run_events, scenario_update
 
 
-def _build_run_import_failure_notification(
-    failures: list[str],
-) -> dict[str, object]:
-    """Fold a batch of failed run imports into one red toast.
-
-    Red is earned here: the user played those runs and nothing else tells them
-    the runs never landed.
-    """
-    message = (
-        failures[0]
-        if len(failures) == 1
-        else (
-            f"{len(failures)} new run files couldn't be processed. "
-            "See data/logs/debug.log."
-        )
-    )
-    return toast(
-        _RUN_IMPORT_FAILURE_NOTIFICATION_ID,
-        "Run not recorded",
-        message,
-        color="red",
-        icon=local_icon("material-symbols:warning-outline"),
-    )
-
-
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("interval-component", "n_intervals"),
-    prevent_initial_call=True,
-)
-def flush_run_import_failures(_n_intervals):
-    """Deliver run imports the watchdog thread could not complete.
-
-    Home-gated, like the delivery it replaces: a missing run is a Home-visible
-    fact, so the next poll tick is soon enough.
-    """
-    failures = drain_run_import_failures()
-    if not failures:
-        return no_update
-    return [_build_run_import_failure_notification(failures)]
-
-
-@callback(
-    Output("scenario_num_runs", "children"),
-    Output("last-played-ts", "data"),
-    Output("last-played-empty-value", "data"),
-    Output("last-played-tooltip", "label"),
-    Output("scenario_datetime_last_played", "className"),
-    Output("scenario_datetime_last_played", "tabIndex"),
-    Output("last-played-tooltip", "disabled"),
-    Input("run-events", "data"),
-    Input("scenario-dropdown-selection", "value"),
-)
-def get_scenario_num_runs(
-    _, selected_scenario
-) -> tuple[int, float | None, str, str, str | None, int | None, bool]:
-    """
-    Updates the Scenario Stats on the UI.
-
-    The relative "Last played" string is rendered client-side from the raw epoch
-    written to the ``last-played-ts`` store. This callback owns the empty-state
-    value and tooltip affordance, while a clientside callback owns the visible
-    ``children``.
-    :param _: trigger from the interval component. Its actual value is not used.
-    :param selected_scenario: user-selected scenario name.
-    :return: Scenario Stats data
-    """
-    if not selected_scenario:
-        return 0, None, "—", "", None, None, True
-
-    if not is_scenario_in_database(selected_scenario):
-        return 0, None, "Never", "", None, None, True
-
-    scenario_stats = get_scenario_stats(selected_scenario)
-
-    return (
-        scenario_stats.number_of_runs,
-        scenario_stats.date_last_played.timestamp(),
-        "Never",  # Defensive fallback; unused for a valid timestamp.
-        format_absolute_timestamp(scenario_stats.date_last_played),
-        "cell-tooltip-affordance",
-        0,
-        False,
-    )
-
-
-# The visible "Last played" text is recomputed in the browser on each store
-# change and on every 30s interval tick, so the relative string stays current
-# without a reload. Home uses the full window.* path (dagfuncs is not a bare
-# global here) and the server-selected empty-state sentinel.
-clientside_callback(
-    """
-    (seconds, emptyValue, _nIntervals) => {
-        return window.dashAgGridFunctions.relativeTime(seconds, emptyValue);
-    }
-    """,
-    Output("scenario_datetime_last_played", "children"),
-    Input("last-played-ts", "data"),
-    Input("last-played-empty-value", "data"),
-    Input("relative-time-interval", "n_intervals"),
-)
-
-
-def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
-    """Allow network access unless the interval is the callback's only trigger."""
-    return any(trigger["prop_id"] != _INTERVAL_PROP for trigger in triggered)
-
-
-def _steam_mismatch_notifications(
-    rank_info: ScenarioRankInfo,
-    username: str | None,
-    steam_id: str | None,
-) -> list[dict[str, object]]:
-    """Announce a Steam-ID mismatch once per app session, persistently.
-
-    The mismatch is a persistent condition with no in-place home, so it is the
-    one passive-path toast: one per session rather than one per scenario
-    switch, and it stays up until dismissed because it can fire while nobody
-    is looking at the page.
-    """
-    if not username or _STEAM_MISMATCH_NOTIFICATION_ID in _session_notices_sent:
-        return []
-
-    warning = steam_id_mismatch_warning(username, steam_id, rank_info.matched_steam_id)
-    if warning is None:
-        return []
-
-    _session_notices_sent.add(_STEAM_MISMATCH_NOTIFICATION_ID)
-    logger.warning(warning)
-    return [
-        toast(
-            _STEAM_MISMATCH_NOTIFICATION_ID,
-            "Steam ID mismatch",
-            warning,
-            color="yellow",
-            icon=local_icon("material-symbols:warning-outline"),
-            auto_close=False,
-        )
-    ]
-
-
-def _rank_hint_children(hint: str) -> list:
-    """Render one inline Position hint, including its repair affordance."""
-    if hint == _RANK_HINT_USERNAME_UNSET:
-        return [
-            " · set your KovaaK's username in ",
-            dmc.Anchor("Settings", href="/settings", refresh=False),
-        ]
-    if hint == _RANK_HINT_LOOKUP_FAILED:
-        return [" · lookup failed"]
-    return [" · from cache"]
-
-
-def _rank_display(value: str, hint: str | None) -> str | list:
-    """Pair the formatted Position value with the hint that explains it."""
-    if hint is None:
-        return value
-    return [
-        value,
-        dmc.Text(
-            _rank_hint_children(hint),
-            className="scenario-rank-hint",
-            span=True,
-        ),
-    ]
-
-
-def _rank_updated_ts(rank_info: ScenarioRankInfo) -> float | None:
-    """Return when the displayed position was stored, as epoch seconds.
-
-    ``None`` when no position is displayed, and for a cache entry written
-    without a time: the hover then has nothing to date.
-    """
-    displayed = rank_info.status == ScenarioRankStatus.UNRANKED or (
-        rank_info.status == ScenarioRankStatus.RANKED and rank_info.rank is not None
-    )
-    if not displayed or rank_info.fetched_at is None:
-        return None
-    return rank_info.fetched_at.timestamp()
-
-
-def _derive_rank_hint(rank_info: ScenarioRankInfo) -> str | None:
-    """Classify a rank result into the inline hint its value should carry."""
-    if rank_info.served_stale:
-        return _RANK_HINT_SERVED_STALE
-    if rank_info.error_message:
-        return _RANK_HINT_LOOKUP_FAILED
-    return None
-
-
-def _rank_hint(
-    rank_info: ScenarioRankInfo,
-    username: str | None,
-    selected_scenario: str,
-    allow_network: bool,
-    value: str,
-) -> str | None:
-    """Resolve the hint for a render, keeping it stable across interval ticks.
-
-    Only the network path can tell a degraded read from a healthy one: a
-    served-stale result is an ordinary cache hit by the time the cache-only
-    interval re-reads it a second later. Remembering the last network verdict
-    per scenario keeps the affordance on screen instead of blinking off on the
-    next tick.
-
-    The memo is tied to the value it explained, because the warmup worker and
-    the score-aware refresh Timer both write the rank cache from background
-    threads. When the interval reads a value the verdict was never about, the
-    cache has moved on: the memo is retired rather than left claiming the
-    lookup failed over a position that has since arrived.
-
-    An unset username is visible on both paths, so it is derived rather than
-    remembered and clears the moment Settings gains a name.
-    """
-    if not username:
-        return _RANK_HINT_USERNAME_UNSET
-    if allow_network:
-        hint = _derive_rank_hint(rank_info)
-        _last_rank_hints[selected_scenario] = (value, hint)
-        return hint
-    remembered = _last_rank_hints.get(selected_scenario)
-    if remembered is not None:
-        if remembered[0] == value:
-            return remembered[1]
-        # pop, not del: concurrent interval ticks for the same scenario (two
-        # Home tabs on Waitress's thread pool) can pass the same read, and the
-        # loser's KeyError would land outside the caller's try/except.
-        _last_rank_hints.pop(selected_scenario, None)
-    return _derive_rank_hint(rank_info)
-
-
-def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
-    """Return the shared rank-service arguments sourced from app configuration."""
-    rank_config = get_config()
-    username, steam_id = get_identity()
-    return (
-        username,
-        steam_id,
-        rank_config.scenario_metadata_cache_ttl_hours,
-        rank_config.scenario_rank_cache_ttl_hours,
-        rank_config.leaderboard_total_cache_ttl_hours,
-    )
-
-
-def _render_scenario_rank(
-    selected_scenario: str | None,
-    allow_network: bool,
-    allow_notifications: bool = True,
-) -> tuple[str | list, float | None, list[dict[str, object]]]:
-    """Render rank through either the normal lookup or the cache-only interval path.
-
-    Returns the Position value, when that position was stored, and any toast
-    the render earned. Passive renders do not toast their own state: an
-    unconfigured username, a failed lookup, and a value served from a stale
-    cache are persistent conditions, so the field says so itself. The Steam-ID
-    mismatch has no such in-place home and is the single exception.
-
-    ``allow_notifications=False`` renders the value without spending the
-    session's one mismatch toast -- for the render nobody triggered.
-    """
-    if not selected_scenario:
-        return "N/A", None, []
-
-    lookup_config = _rank_lookup_config()
-    username, steam_id = lookup_config[0], lookup_config[1]
-    try:
-        rank_info = get_scenario_rank_info(
-            selected_scenario,
-            *lookup_config,
-            allow_network=allow_network,
-            record_activity=allow_network,
-        )
-    except Exception:  # noqa: BLE001
-        logger.exception('Failed to fetch scenario rank for "%s"', selected_scenario)
-        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), None, []
-
-    value = format_scenario_rank(rank_info)
-    display = _rank_display(
-        value,
-        _rank_hint(rank_info, username, selected_scenario, allow_network, value),
-    )
-    updated_ts = _rank_updated_ts(rank_info)
-    if not allow_notifications:
-        return display, updated_ts, []
-    notifications = _steam_mismatch_notifications(rank_info, username, steam_id)
-    return display, updated_ts, notifications
-
-
-@callback(
-    Output("scenario_rank", "children"),
-    Output("rank-updated-ts", "data"),
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("run-events", "data"),
-    Input("scenario-dropdown-selection", "value"),
-    Input("interval-component", "n_intervals"),
-    # Not ``True``: this callback renders the initial Position value, so the
-    # page load must still run it -- but Dash refuses an ``allow_duplicate``
-    # output without one of the ``prevent_initial_call`` forms.
-    prevent_initial_call="initial_duplicate",
-)
-def get_scenario_rank(_, selected_scenario, _n_intervals):
-    """Render scenario rank, keeping interval-only calls cache-only.
-
-    Under DashProxy an ``allow_duplicate`` callback can still fire once on page
-    load with nothing triggering it. The value has to render either way, but a
-    fire nobody caused must not spend the session's one mismatch toast on a
-    moment the user may not be looking at.
-    """
-    triggered = ctx.triggered
-    display, updated_ts, notifications = _render_scenario_rank(
-        selected_scenario,
-        _rank_allows_network(triggered),
-        allow_notifications=bool(triggered),
-    )
-    return display, updated_ts, notifications or no_update
-
-
-# The hover's age is worded in the browser, on each store change and every 30s
-# tick, so it stays current while a cached position sits untouched. "Last
-# updated", not "checked": a fetch that fails, and an automatic read whose
-# result the cache refuses, both leave the stored position and its time alone,
-# so the label stays true of the data while the app goes on trying.
-#
-# The tooltip is a fixed part of the layout rather than part of the value's
-# children: the interval rewrites those every tick, and Dash remounts component
-# children on each write, which blinks an open tooltip.
-clientside_callback(
-    """
-    (seconds, _nIntervals) => {
-        if (seconds === null || seconds === undefined) {
-            return ["", true, null, null];
-        }
-        const dagfuncs = window.dashAgGridFunctions;
-        const label =
-            "Last updated " +
-            dagfuncs.relativeTime(seconds, "") +
-            " · " +
-            dagfuncs.absoluteTime(seconds, "");
-        return [label, false, "cell-tooltip-affordance", 0];
-    }
-    """,
-    Output("rank-updated-tooltip", "label"),
-    Output("rank-updated-tooltip", "disabled"),
-    Output("scenario_rank", "className"),
-    Output("scenario_rank", "tabIndex"),
-    Input("rank-updated-ts", "data"),
-    Input("relative-time-interval", "n_intervals"),
-)
-
-
-def _rank_refresh_problem_notification(
-    *,
-    served_stale: bool,
-    has_total: bool = False,
-) -> dict[str, object]:
-    """Report what went wrong with the latest manual refresh.
-
-    One channel, two flavors: the hard failure came back with nothing usable,
-    the served-stale one re-served the cached position. They are the mutually
-    exclusive verdicts on one attempt, so they replace each other rather than
-    stacking two contradictory claims about the same click.
-
-    ``has_total`` applies to the served-stale flavor only. A failed position
-    request asks for no total, so a total beside the cached position is cached
-    too, and naming only the position would read as though the total had
-    refreshed. With no total on screen, naming it would claim one that isn't
-    there. The hard failure keeps one message because it never sees what the
-    field is showing.
-    """
-    if served_stale:
-        return toast(
-            _RANK_REFRESH_PROBLEM_CHANNEL,
-            _RANK_REFRESH_STALE_TITLE,
-            _RANK_REFRESH_STALE_WITH_TOTAL_MESSAGE
-            if has_total
-            else _RANK_REFRESH_STALE_MESSAGE,
-            color="yellow",
-            icon=local_icon("material-symbols:refresh-rounded"),
-        )
-    return toast(
-        _RANK_REFRESH_PROBLEM_CHANNEL,
-        _RANK_REFRESH_FAILED_TITLE,
-        _RANK_REFRESH_FAILED_MESSAGE,
-        color="red",
-        icon=local_icon("material-symbols:refresh-rounded"),
-    )
-
-
-def _rank_refresh_success_channel(selected_scenario: str) -> str:
-    """Name the success channel for one scenario.
-
-    The scenario name goes in verbatim. Toast ids are internal -- never parsed
-    back apart, never rendered -- so the identity function is the stable,
-    collision-free derivation the policy asks for, and a hash would only add a
-    collision it cannot have.
-    """
-    return f"rank-refresh-success-{selected_scenario}"
-
-
-def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, object]:
-    """Confirm a genuinely fresh manual refresh.
-
-    A channel per scenario: repeat refreshes of one scenario carry identical
-    copy and replace each other, while refreshes of different scenarios are
-    distinct facts and stack.
-    """
-    return toast(
-        _rank_refresh_success_channel(selected_scenario),
-        "Position refreshed",
-        f"Refreshed position for {selected_scenario}.",
-        color="green",
-        icon=local_icon("material-symbols:refresh-rounded"),
-    )
-
-
-def _rank_refresh_total_failed_notification(
-    selected_scenario: str,
-    has_total: bool,
-) -> dict[str, object]:
-    """Report a refresh whose position landed but whose total did not.
-
-    Orange is the partial-success rung: the position the click asked for is
-    live, the count beside it is not. Green would assert a freshness the
-    readout does not have, and the served-stale yellow would claim the position
-    came from cache when it is the one part that did refresh. It shares the
-    success channel because a re-click is the recovery, so the green it earns
-    must replace this rather than stack under a contradicting verdict.
-
-    The consequence names the total, which is what failed, rather than the
-    percentile, which is recomputed from it and usually moves under the user's
-    eyes as the position refreshes. Naming the failed thing also stays true for
-    an unranked readout, which shows a count and never a percentile.
-    """
-    if has_total:
-        return toast(
-            _rank_refresh_success_channel(selected_scenario),
-            _RANK_REFRESH_TOTAL_STALE_TITLE,
-            f"Refreshed position for {selected_scenario}. Couldn't refresh the "
-            f"total, so the total shown is from cache.",
-            color="orange",
-            icon=local_icon("material-symbols:refresh-rounded"),
-        )
-    return toast(
-        _rank_refresh_success_channel(selected_scenario),
-        _RANK_REFRESH_TOTAL_MISSING_TITLE,
-        f"Refreshed position for {selected_scenario}. Couldn't fetch the "
-        f"total, so no total is shown.",
-        color="orange",
-        icon=local_icon("material-symbols:refresh-rounded"),
-    )
-
-
-def _rank_refresh_username_unset_notification() -> dict[str, object]:
-    """Answer a Refresh click that has no identity to look anything up with.
-
-    Blue, not red: nothing failed and no data is degraded -- the username is
-    simply not configured yet, and the title carries that verdict.
-    """
-    return toast(
-        _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
-        "KovaaK's username not set",
-        "Set your KovaaK's username in Settings to see your leaderboard position.",
-        color="blue",
-        icon=local_icon("material-symbols:refresh-rounded"),
-    )
-
-
-@callback(
-    Output("scenario_rank", "children", allow_duplicate=True),
-    Output("rank-updated-ts", "data", allow_duplicate=True),
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Output("notification-container", "hideNotifications", allow_duplicate=True),
-    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
-    Input("rank-refresh-button", "n_clicks"),
-    State("scenario-dropdown-selection", "value"),
-    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
-    # Show the button's spinner for the duration of the fetch. Mantine's
-    # loading state also swallows clicks, so the button cannot be spammed
-    # into repeat KovaaK's calls while one refresh is in flight.
-    running=[(Output("rank-refresh-button", "loading"), True, False)],
-    prevent_initial_call=True,
-)
-# One return per outcome the click can have. Collapsing any pair would only
-# hide which answer a reader is looking at.
-def refresh_rank(  # noqa: PLR0911
-    n_clicks,
-    selected_scenario: str | None,
-    toast_channels,
-):
-    """Fetch and display authoritative board truth after an explicit user request.
-
-    The user asked, so every outcome answers on this callback's own
-    notification output: red when the refresh failed outright, yellow when it
-    failed but a cached position was served in its place, orange when the
-    position refreshed but the leaderboard total behind the percentile did not,
-    green only on a genuinely fresh result, and blue when there is no username
-    to look anything up with.
-
-    The unset-username case is caught before the lookup, on the direct settings
-    read rather than the service's error copy. The passive field already
-    explains the condition in place, but it was explaining it before the click
-    too, so it cannot answer the click itself -- and a user clicking Refresh
-    beside that hint plausibly clicked because they had not read it.
-
-    A failed refresh returns ``no_update`` for the value rather than ``N/A``,
-    so whatever was on screen stays put -- usually the cached position -- and
-    the red toast's "The position shown is unchanged." is true either way.
-
-    Every verdict is a channel emission, so a repeat click always re-pops its
-    answer instead of being swallowed by ``show``'s dedupe. A fresh position
-    also clears the two claims it falsifies: the problem channel, whose latest
-    attempt just succeeded, and the unset-username channel, since a lookup that
-    returned cannot have run without a username.
-
-    Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
-    fire once on initial page load despite ``prevent_initial_call``, and a
-    page load must not force a network refresh or pop a stray toast.
-    """
-    if not n_clicks:
-        return no_update, no_update, no_update, no_update, no_update
-    if not selected_scenario:
-        return "N/A", None, no_update, no_update, no_update
-    # The value and the time it was stored: every outcome moves both or neither.
-    unchanged = (no_update, no_update)
-    if not get_kovaaks_username():
-        # ``no_update``: the field already reads "N/A · set your KovaaK's
-        # username in Settings", so only the toast is new.
-        return *unchanged, *channel_toast(
-            _rank_refresh_username_unset_notification(), toast_channels
-        )
-
-    try:
-        rank_info = get_scenario_rank_info(
-            selected_scenario,
-            *_rank_lookup_config(),
-            force_refresh=True,
-        )
-    except Exception:  # noqa: BLE001
-        logger.exception('Manual rank refresh failed for "%s"', selected_scenario)
-        return *unchanged, *channel_toast(
-            _rank_refresh_problem_notification(served_stale=False), toast_channels
-        )
-
-    if rank_info.error_message:
-        # The console/file record the log bridge used to keep, kept here now.
-        logger.error(
-            'Manual rank refresh for "%s" failed: %s',
-            selected_scenario,
-            rank_info.error_message,
-        )
-        return *unchanged, *channel_toast(
-            _rank_refresh_problem_notification(served_stale=False), toast_channels
-        )
-
-    # A manual refresh is a network verdict too, so the interval path must not
-    # go on repeating what the last passive render concluded.
-    rank_text = format_scenario_rank(rank_info)
-    hint = _derive_rank_hint(rank_info)
-    _last_rank_hints[selected_scenario] = (rank_text, hint)
-    shown = (_rank_display(rank_text, hint), _rank_updated_ts(rank_info))
-    if rank_info.served_stale:
-        logger.warning(
-            'Manual rank refresh for "%s" served a cached position: %s',
-            selected_scenario,
-            rank_info.warning_message,
-        )
-        return *shown, *channel_toast(
-            _rank_refresh_problem_notification(
-                served_stale=True,
-                has_total=rank_info.total_players is not None,
-            ),
-            toast_channels,
-        )
-    # Same clears as the green below: the position did refresh, which falsifies
-    # both the unchanged-position claim and the no-username one.
-    if rank_info.total_refresh_failed:
-        logger.warning(
-            'Manual rank refresh for "%s" could not re-read the leaderboard total.',
-            selected_scenario,
-        )
-        return *shown, *channel_toast(
-            _rank_refresh_total_failed_notification(
-                selected_scenario,
-                has_total=rank_info.total_players is not None,
-            ),
-            toast_channels,
-            clears=(
-                _RANK_REFRESH_PROBLEM_CHANNEL,
-                _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
-            ),
-        )
-    return *shown, *channel_toast(
-        _rank_refresh_success_notification(selected_scenario),
-        toast_channels,
-        clears=(
-            _RANK_REFRESH_PROBLEM_CHANNEL,
-            _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
-        ),
-    )
+register_run_import_failure_flush("interval-component")
+register_scenario_stats(SCENARIO_STATS_IDS)
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
     """Return whether a callback invocation was caused by new run events."""
     return any(trigger["prop_id"] == _RUN_EVENTS_PROP for trigger in triggered)
-
-
-def _normalize_score_threshold_percentage(
-    score_threshold_percentage: float | str | None,
-) -> float | None:
-    """Return a usable threshold percentage, or None while the input is empty."""
-    if not score_threshold_percentage:
-        return None
-
-    try:
-        return float(score_threshold_percentage)
-    except TypeError:
-        return None
-    except ValueError:
-        return None
-
-
-class _ThresholdVerdict(NamedTuple):
-    """How a run measured up against the score threshold it was judged on.
-
-    ``by_pace`` says which measure ``percentage`` is in: the run's pace as a
-    percentage of the previous best's, or its score as a percentage of it.
-    """
-
-    passed: bool
-    percentage: float
-    goal_percentage: float
-    by_pace: bool = False
-
-
-def _threshold_verdict(
-    latest: RunEventData,
-    score_threshold_percentage: float | str | None,
-    score_threshold_notification_switch: bool,
-) -> _ThresholdVerdict | None:
-    """Judge a run against the threshold, or return None when nothing judges it.
-
-    A run goes unjudged when the switch is off, the goal percentage is blank,
-    the run is the first at its sensitivity, or the scenario has no positive
-    previous best to be a percentage of -- there is no denominator, not a
-    failing one. The message carries the facts and this derives the gate; the
-    two used to be bundled into one nullable field that meant both.
-
-    A run whose message carries a pace constant is judged by pace wherever
-    pace is defined, which needs positive times and not a positive previous
-    best. Where it is undefined, the run is judged by score as any other.
-    """
-    goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
-    scenario_previous_best = latest["scenario_previous_best"]
-    if (
-        not score_threshold_notification_switch
-        or not goal_percentage
-        or latest["is_new_sensitivity"]
-        or scenario_previous_best is None
-    ):
-        return None
-    pace_constant = latest["pace_constant"]
-    if pace_constant is not None:
-        passed_by_pace = pace_goal_met(
-            pace_constant,
-            scenario_previous_best,
-            latest["score"],
-            goal_percentage,
-        )
-        percentage_of_pace = pace_percent(
-            pace_constant,
-            scenario_previous_best,
-            latest["score"],
-        )
-        if passed_by_pace is not None and percentage_of_pace is not None:
-            return _ThresholdVerdict(
-                passed=passed_by_pace,
-                percentage=percentage_of_pace,
-                goal_percentage=goal_percentage,
-                by_pace=True,
-            )
-    if scenario_previous_best <= 0:
-        return None
-    # Compared as decimals: in floats, 20.6 * 95 / 100 is 19.570000000000004,
-    # which fails a 19.57 run sitting exactly at 95% of a 20.60 PB. A float's
-    # str() is the decimal the stats CSV wrote.
-    passed = Decimal(str(latest["score"])) * 100 >= Decimal(
-        str(scenario_previous_best)
-    ) * Decimal(str(goal_percentage))
-    return _ThresholdVerdict(
-        passed=passed,
-        percentage=latest["score"] / scenario_previous_best * 100,
-        goal_percentage=goal_percentage,
-    )
-
-
-def _shown_percentage(verdict: _ThresholdVerdict) -> float:
-    """Return the percentage of PB to print, held below each line the run missed.
-
-    Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
-    95.0%)" and a run 0.03% short of the PB as "100.0% of PB". So a miss shows
-    at most one tenth below the goal as printed, and a run below the PB shows
-    at most 99.9% whether it passed or not. Flooring would not do: float error
-    prints 407 / 500 as 81.3%.
-    """
-    shown = verdict.percentage
-    if not verdict.passed:
-        shown = min(shown, round(verdict.goal_percentage, 1) - 0.1)
-    # Float division and multiplication both round monotonically, so the
-    # percentage is below 100 exactly when the score is below the PB. That
-    # holds for a percentage of pace too: a run's time is longer than the
-    # PB's exactly when its score is lower.
-    if verdict.percentage < 100:
-        shown = min(shown, 99.9)
-    return shown
 
 
 def _placement_phrase(nth_score: int) -> str:
@@ -1203,7 +357,7 @@ def _build_live_run_notification(
     latest: RunEventData,
     selected_scenario: str,
     top_n_scores: int,
-    verdict: _ThresholdVerdict | None,
+    verdict: ThresholdVerdict | None,
 ) -> dict[str, object] | None:
     """Build the one toast a just-played run earned, if it earned one.
 
@@ -1229,13 +383,13 @@ def _build_live_run_notification(
             icon=local_icon("fontisto:line-chart"),
         )
 
-    shown_percentage = _shown_percentage(verdict)
+    shown = shown_percentage(verdict)
     # The one word that tells the player which measure judged the run.
     measure = "PB pace" if verdict.by_pace else "PB"
     if verdict.passed:
         # A pass ends at the fact: a line saying what to do next would be
         # advice, and the app states verdicts only.
-        message = f"{score}, {shown_percentage:.1f}% of {measure}."
+        message = f"{score}, {shown:.1f}% of {measure}."
         if placed:
             message += f" Also {placement}."
         return toast(
@@ -1246,7 +400,7 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {shown_percentage:.1f}% of {measure} "
+    shortfall = f"{score}, {shown:.1f}% of {measure} "
     shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."
@@ -1289,7 +443,7 @@ def _build_run_event_notification(  # noqa: PLR0913
     if not latest["is_live"]:
         return None
 
-    verdict = _threshold_verdict(
+    verdict = threshold_verdict(
         latest,
         score_threshold_percentage,
         score_threshold_notification_switch,
@@ -1300,28 +454,6 @@ def _build_run_event_notification(  # noqa: PLR0913
         top_n_scores,
         verdict,
     )
-
-
-def _score_threshold_line(
-    selected_scenario: str,
-    high_score: float,
-    goal_percentage: float,
-) -> float:
-    """Return the score the threshold line is drawn at, from the current PB.
-
-    On a time-scored scenario whose PB can be measured by pace, the line sits
-    at the score that finishes at the goal percentage of the PB's pace. Every
-    other scenario keeps the goal as a percentage of the PB's score.
-    """
-    pace_constant = eligible_pace_constant(
-        get_pace_basis(selected_scenario),
-        get_personal_best_run(selected_scenario),
-    )
-    if pace_constant is not None:
-        pace_line = pace_threshold_score(pace_constant, high_score, goal_percentage)
-        if pace_line is not None:
-            return pace_line
-    return high_score * goal_percentage / 100
 
 
 def _empty_state_graph_response(
@@ -1531,11 +663,11 @@ def generate_graph(  # noqa: PLR0913
         if high_score_overlay_switch:
             plot = add_high_score_overlay(plot, high_score)
 
-        score_threshold_goal_percentage = _normalize_score_threshold_percentage(
+        score_threshold_goal_percentage = normalize_score_threshold_percentage(
             score_threshold_percentage
         )
         if score_threshold_overlay_switch and score_threshold_goal_percentage:
-            score_threshold = _score_threshold_line(
+            score_threshold = score_threshold_line(
                 selected_scenario,
                 high_score,
                 score_threshold_goal_percentage,
@@ -1560,169 +692,9 @@ def generate_graph(  # noqa: PLR0913
     return plot.to_json(), notifications, hide_notifications, next_toast_channels
 
 
-@callback(
-    Output("graph-content", "figure"),
-    Input("color-scheme-switch", "computedColorScheme"),
-    Input("cached-plot", "data"),
-    Input(POINT_SIZE_INPUT_ID, "value"),
-    Input(POINT_COLOR_INPUT_ID, "value"),
-)
-def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
-    """
-    Applies the theme and the Run Data Points preferences to the graph.
-
-    Everything here is presentation over the figure ``generate_graph`` already
-    built and cached, which is what keeps a size or color change from
-    rereading scenario data, rebuilding overlays, or firing notifications.
-    :param color_scheme: active Mantine color scheme.
-    :param plot_json: json object with plotted data.
-    :param point_size: selected point size preset.
-    :param point_color: explicit point color, or empty for Default.
-    :return: Figure with theme and point preferences applied.
-    """
-    if not plot_json:
-        plot_json = _placeholder_plot_json()
-    figure = apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
-    return apply_point_appearance(figure, point_size, point_color)
-
-
-@callback(
-    Output(POINT_COLOR_INPUT_ID, "value"),
-    Input(POINT_COLOR_DEFAULT_ID, "n_clicks"),
-    prevent_initial_call=True,
-)
-def clear_point_color(n_clicks):
-    """
-    Returns the point color to Default.
-    :param n_clicks: clicks on the Use default action.
-    :return: the empty value that means Default.
-    """
-    if not n_clicks:
-        return no_update
-    return POINT_COLOR_DEFAULT
-
-
-def _build_startup_playlist_warning_notifications(
-    warnings: list[str],
-) -> list[dict[str, object]]:
-    """Report the playlists that did not survive the startup scan.
-
-    Persistent, not timed: these fire once per boot, seconds after the server
-    starts, which is exactly when nobody is guaranteed to be watching.
-    """
-    return [
-        toast(
-            f"startup-playlist-warning-{idx}",
-            "Playlist not loaded",
-            warning,
-            color="yellow",
-            icon=local_icon("material-symbols:warning-outline"),
-            auto_close=False,
-        )
-        for idx, warning in enumerate(warnings)
-    ]
-
-
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("startup-playlist-warning-interval", "n_intervals"),
-    prevent_initial_call=True,
-)
-def flush_startup_playlist_warnings(_):
-    """Deliver import-time playlist warnings after Dash has mounted."""
-    warnings = drain_startup_playlist_warnings()
-    if not warnings:
-        return no_update
-    return _build_startup_playlist_warning_notifications(warnings)
-
-
-def _chart_options_panel_class(opened: bool) -> str:
-    """Return the inspector's class list for the open or collapsed state."""
-    if opened:
-        return CHART_OPTIONS_PANEL_CLASS
-    return f"{CHART_OPTIONS_PANEL_CLASS} {CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
-
-
-@callback(
-    Output(CHART_OPTIONS_PANEL_ID, "className"),
-    Output(CHART_OPTIONS_TOGGLE_ID, "aria-expanded"),
-    Input(CHART_OPTIONS_TOGGLE_ID, "n_clicks"),
-    State(CHART_OPTIONS_PANEL_ID, "className"),
-    prevent_initial_call=True,
-)
-def toggle_chart_options(n_clicks, panel_class):
-    """Open or collapse the chart options inspector.
-
-    The panel's class is the open state and ``aria-expanded`` rides with it, so
-    the ``n_clicks`` guard is unconditional: the inspector starts closed on
-    every visit, and under DashProxy a callback can fire once on page load with
-    nothing triggering it, which would spring the panel open on arrival.
-    """
-    if not n_clicks:
-        return no_update, no_update
-
-    will_open = CHART_OPTIONS_PANEL_HIDDEN_CLASS in (panel_class or "")
-    return _chart_options_panel_class(will_open), "true" if will_open else "false"
-
-
-def _local_scenario_options() -> list:
-    """List the scenarios with local runs, or none without a usable stats directory.
-
-    The directory check stays even though the names come from the store. The
-    pin is restart-scoped and the store is only ever filled behind a usable
-    pin, so today the check never trims a populated list; it makes "no usable
-    directory, no local list" a property of this function rather than of the
-    startup order.
-    """
-    return get_scenario_names() if get_usable_stats_dir() else []
-
-
-def _playlist_table_link(playlist_code: str) -> dmc.Text:
-    """Build the link from the playlist filter to that playlist's scenario table."""
-    return dmc.Text(
-        dmc.Anchor(
-            PLAYLIST_TABLE_LINK_LABEL,
-            # The bare path, with no ``?sort=``: the table opens in playlist
-            # order, as it does from the Playlists page.
-            href=f"/playlists/{playlist_code}",
-            inherit=True,
-            refresh=False,
-        ),
-        # The spacing rides on the link, not on a gap in the column, so the
-        # holder takes no room while it is empty.
-        mt="xs",
-        size="sm",
-    )
-
-
-@callback(
-    Output("scenario-dropdown-selection", "data"),
-    Output(PLAYLIST_TABLE_LINK_ID, "children"),
-    Input("playlist-dropdown-selection", "value"),
-    # Scheduling, not data: this Input looks removable and is not. The value
-    # above is an output of ``apply_deep_link``, and the renderer prunes a
-    # ready callback whose every Input is a declared output of a group member
-    # that already ran and whose none was actually written. On a visit with no
-    # ``?playlist_code=`` that callback returns ``no_update``, so without a
-    # second Input nothing writes these outputs: the scenario dropdown keeps
-    # the layout's full local set while the filter names a playlist, and that
-    # playlist's link never appears. Nothing writes this store, so the prune's
-    # "every Input covered" test fails and the initial call survives. See the
-    # 2026-09-19 decision-log entry.
-    Input(HOME_DEEP_LINK_STORE_ID, "data"),
-)
-def select_playlist(selected_playlist, _deep_link):
-    """List the selected playlist's scenarios and link to its scenario table.
-
-    With no playlist selected, or a remembered code that no longer resolves,
-    the list is every local scenario and there is no link.
-    """
-    if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return _local_scenario_options(), None
-    return (
-        get_scenarios_from_playlist_code(selected_playlist),
-        _playlist_table_link(selected_playlist),
-    )
+register_chart_options(CHART_OPTIONS_IDS)
+register_startup_playlist_warning_flush("startup-playlist-warning-interval")
+register_scenario_selection(SCENARIO_SELECTION_IDS)
 
 
 def _stats_dir_hint() -> list:
@@ -2002,285 +974,6 @@ def skip_identity_setup(n_clicks, toast_channels):
     return [], no_update, no_update, no_update
 
 
-def _home_deep_link(
-    scenario: str | None,
-    playlist_code: str | None,
-) -> dict[str, str | None]:
-    """Resolve Home's query params into the selections this visit applies.
-
-    A key is present only for a parameter the URL actually carried, because
-    the two dropdowns are set independently: ``?scenario=`` alone must leave
-    the playlist filter on whatever the browser restored. An unknown playlist
-    code is present with no value, which clears the filter rather than leaving
-    a code the app cannot resolve standing.
-    """
-    selection: dict[str, str | None] = {}
-    if playlist_code is not None:
-        selection["playlist"] = (
-            playlist_code if get_playlist_by_code(playlist_code) is not None else None
-        )
-    if scenario is not None:
-        selection["scenario"] = scenario or None
-    return selection
-
-
-def _home_scenario_options(playlist_code: str | None) -> list[str]:
-    """List the scenarios the first paint shows, before any callback runs.
-
-    ``select_playlist`` owns this list from then on. Resolving the query
-    parameter here too means a deep-linked visit paints its playlist's
-    scenarios immediately instead of the whole local list.
-    """
-    selected_playlist = (
-        playlist_code
-        if playlist_code and get_playlist_by_code(playlist_code) is not None
-        else None
-    )
-    if selected_playlist:
-        return get_scenarios_from_playlist_code(selected_playlist)
-    return _local_scenario_options()
-
-
-@callback(
-    Output("playlist-dropdown-selection", "value"),
-    Output("scenario-dropdown-selection", "value", allow_duplicate=True),
-    Input(HOME_DEEP_LINK_STORE_ID, "data"),
-    # Not ``True``: applying the deep link *is* the mount's job, but Dash
-    # refuses an ``allow_duplicate`` output without one of the
-    # ``prevent_initial_call`` forms.
-    prevent_initial_call="initial_duplicate",
-)
-def apply_deep_link(selection):
-    """Set the two dropdowns from this visit's query parameters.
-
-    The values arrive by callback rather than as the layout's ``value`` so
-    that Dash persistence records them: a persisted control's layout default
-    has to be the same on every visit, or the stored edit is discarded instead
-    of restored. Writing them here makes a Playlists grid click an ordinary
-    selection, which the browser then remembers like any other.
-
-    Under DashProxy an ``allow_duplicate`` callback can fire once on load with
-    nothing triggering it. Re-emitting the same values is harmless -- Dash
-    skips a persistence write when the value is unchanged -- so this needs no
-    guard beyond the empty payload every non-deep-linked visit carries.
-
-    Returning ``no_update`` for a control the URL did not name leaves that
-    control's dependents unwritten, which is why ``select_playlist`` carries a
-    second Input.
-    """
-    if not selection:
-        return no_update, no_update
-    return (
-        selection.get("playlist", no_update),
-        selection.get("scenario", no_update),
-    )
-
-
-def _chart_options_group(title: str, controls: list) -> dmc.Stack:
-    """Group the inspector's controls under the concept they share."""
-    return dmc.Stack(
-        [dmc.Title(title, order=3, size="h6"), *controls],
-        gap="xs",
-    )
-
-
-def _chart_options_panel() -> dmc.Box:
-    """Build the collapsible inspector that sits beside the chart."""
-    return dmc.Box(
-        id=CHART_OPTIONS_PANEL_ID,
-        className=_chart_options_panel_class(False),
-        children=[
-            _chart_options_group(
-                "Overlays",
-                [
-                    dmc.Switch(
-                        id="rank-overlay-switch",
-                        labelPosition="right",
-                        label=_settings_help_label(
-                            "Rank thresholds",
-                            SETTINGS_HELP_TEXT["rank-overlay"],
-                        ),
-                        checked=True,
-                        persistence=True,
-                    ),
-                    dmc.Switch(
-                        id="show-all-ranks-switch",
-                        labelPosition="right",
-                        label=_settings_help_label(
-                            "Show all ranks",
-                            SETTINGS_HELP_TEXT["show-all-ranks"],
-                        ),
-                        checked=False,
-                        persistence=True,
-                    ),
-                    dmc.Switch(
-                        id="high-score-overlay-switch",
-                        labelPosition="right",
-                        label=_settings_help_label(
-                            "PB score",
-                            SETTINGS_HELP_TEXT["high-score-overlay"],
-                        ),
-                        checked=True,
-                        persistence=True,
-                    ),
-                ],
-            ),
-            _chart_options_group(
-                "Run Data Points",
-                [
-                    # SegmentedControl has no Mantine label slot, so the field
-                    # carries its own and points the control at it -- the
-                    # visible text is then the control's accessible name
-                    # rather than a second one announced beside it.
-                    dmc.Box(
-                        className=CHART_OPTIONS_FIELD_CLASS,
-                        children=[
-                            dmc.Text(
-                                "Point size",
-                                id=POINT_SIZE_LABEL_ID,
-                                className=CHART_OPTIONS_FIELD_LABEL_CLASS,
-                            ),
-                            dmc.SegmentedControl(
-                                id=POINT_SIZE_INPUT_ID,
-                                data=list(POINT_SIZE_OPTIONS),
-                                value=POINT_SIZE_DEFAULT,
-                                fullWidth=True,
-                                persistence=True,
-                                radius="sm",
-                                size="sm",
-                                **{"aria-labelledby": POINT_SIZE_LABEL_ID},
-                            ),
-                        ],
-                    ),
-                    dmc.Box(
-                        className=f"{CHART_OPTIONS_FIELD_CLASS} {POINT_COLOR_FIELD_CLASS}",
-                        style={
-                            variable: generated_point_color(scheme)
-                            for scheme, variable in POINT_COLOR_DEFAULT_CSS_VARIABLES.items()
-                        },
-                        children=[
-                            dmc.ColorInput(
-                                id=POINT_COLOR_INPUT_ID,
-                                label="Point color",
-                                value=POINT_COLOR_DEFAULT,
-                                # An empty field is Default, and says so.
-                                placeholder="Default",
-                                format="hex",
-                                swatches=POINT_COLOR_SWATCHES,
-                                # The component defaults to seven per row,
-                                # which would wrap the eighth onto a row of
-                                # its own.
-                                swatchesPerRow=len(POINT_COLOR_SWATCHES),
-                                withEyeDropper=False,
-                                # Picking a swatch is a finished choice, and
-                                # the dropdown covers Use default while it
-                                # is open.
-                                closeOnColorSwatchClick=True,
-                                persistence=True,
-                                radius="sm",
-                                size="sm",
-                                w="100%",
-                            ),
-                            # The only way back to Default: the field has no
-                            # clear affordance of its own, and re-typing an
-                            # empty hex value is not one.
-                            dmc.Group(
-                                dmc.Button(
-                                    "Use default",
-                                    id=POINT_COLOR_DEFAULT_ID,
-                                    variant="subtle",
-                                    size="compact-xs",
-                                ),
-                                gap="xs",
-                            ),
-                        ],
-                    ),
-                ],
-            ),
-            _chart_options_group(
-                "Score Threshold",
-                [
-                    dmc.Switch(
-                        id="score-threshold-overlay-switch",
-                        labelPosition="right",
-                        label=_settings_help_label(
-                            "Score threshold overlay",
-                            SETTINGS_HELP_TEXT["score-threshold-overlay"],
-                        ),
-                        checked=True,
-                        persistence=True,
-                    ),
-                    dmc.NumberInput(
-                        id="score-threshold-percentage",
-                        label=_settings_help_label(
-                            "Score threshold percentage",
-                            SETTINGS_HELP_TEXT["score-threshold-percentage"],
-                        ),
-                        min=1,
-                        persistence=True,
-                        placeholder="Percentage",
-                        radius="sm",
-                        size="sm",
-                        variant="default",
-                        value=95,
-                        # Fills the rail. A Mantine label is only as wide as
-                        # its input, so the modal's 12em box would wrap this
-                        # label and strand its help icon on the line above.
-                        w="100%",
-                    ),
-                    # Stays in this group, beside the percentage it judges
-                    # against, even though the master switch it depends on
-                    # lives in Notifications.
-                    dmc.Switch(
-                        id="score-threshold-notification-switch",
-                        labelPosition="right",
-                        label=_settings_help_label(
-                            "Score threshold verdict",
-                            SETTINGS_HELP_TEXT["score-threshold-notification"],
-                        ),
-                        checked=True,
-                        persistence=True,
-                    ),
-                ],
-            ),
-            _chart_options_group(
-                "Notifications",
-                [
-                    dmc.Switch(
-                        id="run-notification-switch",
-                        labelPosition="right",
-                        label=_settings_help_label(
-                            "Run notifications",
-                            SETTINGS_HELP_TEXT["run-notification"],
-                        ),
-                        checked=True,
-                        persistence=True,
-                    ),
-                ],
-            ),
-        ],
-    )
-
-
-def _chart_options_toggle() -> dmc.Button:
-    """Build the disclosure button that opens and collapses the inspector."""
-    return dmc.Button(
-        "Chart options",
-        id=CHART_OPTIONS_TOGGLE_ID,
-        variant="default",
-        rightSection=local_icon(
-            "material-symbols:keyboard-arrow-down",
-            className="chart-options-toggle-chevron",
-            width=20,
-        ),
-        **{"aria-controls": CHART_OPTIONS_PANEL_ID, "aria-expanded": "false"},
-    )
-
-
-# Add Dash Mantine Component figure templates to Plotly's templates.
-dmc.add_figure_templates()
-
-
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(
     scenario: str | None = None,
@@ -2290,28 +983,21 @@ def layout(
     """Build the interactive home dashboard."""
     config = get_config()
     playlist_options = get_visible_playlist_selector_options()
-    scenario_options = _home_scenario_options(playlist_code)
+    scenario_options = initial_scenario_options(playlist_code)
 
     return dmc.Box(
         className="home-page",
         children=[
             dcc.Store(id="run-events"),
             dcc.Store(
-                id=HOME_DEEP_LINK_STORE_ID,
-                data=_home_deep_link(scenario, playlist_code),
+                id=SCENARIO_SELECTION_IDS.deep_link,
+                data=deep_link_selection(scenario, playlist_code),
             ),
             dcc.Store(
                 id="cached-plot",
                 data=_placeholder_plot_json(),
             ),  # caches the plot for easy light/dark mode
-            dcc.Store(
-                id="last-played-ts"
-            ),  # raw epoch for the relative "Last played" text
-            dcc.Store(
-                id="last-played-empty-value",
-                data="",
-            ),
-            dcc.Store(id="rank-updated-ts"),  # raw epoch for the Position hover
+            *scenario_stats_stores(SCENARIO_STATS_IDS),
             dcc.Interval(
                 id="startup-playlist-warning-interval",
                 interval=250,
@@ -2367,7 +1053,9 @@ def layout(
                                             # stored.
                                             value=None,
                                         ),
-                                        dmc.Box(id=PLAYLIST_TABLE_LINK_ID),
+                                        dmc.Box(
+                                            id=SCENARIO_SELECTION_IDS.playlist_table_link
+                                        ),
                                     ],
                                     className=PLAYLIST_FIELD_CLASS,
                                     # The column, not the Select inside it, is
@@ -2404,7 +1092,7 @@ def layout(
                                         dmc.Switch(
                                             id="automatically-change-scenario-switch",
                                             labelPosition="right",
-                                            label=_settings_help_label(
+                                            label=settings_help_label(
                                                 "Follow newly played scenario",
                                                 SETTINGS_HELP_TEXT[
                                                     "automatically-change-scenario"
@@ -2430,7 +1118,7 @@ def layout(
                                 dmc.Space(h="xl"),
                                 dmc.NumberInput(
                                     id="top_n_scores",
-                                    label=_settings_help_label(
+                                    label=settings_help_label(
                                         "Top N scores",
                                         SETTINGS_HELP_TEXT["top-n-scores"],
                                     ),
@@ -2454,111 +1142,7 @@ def layout(
                                         day=1,
                                     ).isoformat(),
                                 ),
-                                dmc.Box(
-                                    [
-                                        dmc.Title(
-                                            "Scenario Stats",
-                                            order=2,
-                                            size="h6",
-                                        ),
-                                        dmc.Group(
-                                            [
-                                                dmc.Text(
-                                                    "Last played:",
-                                                    fw=700,
-                                                    span=True,
-                                                    size="sm",
-                                                ),
-                                                dmc.Tooltip(
-                                                    dmc.Text(
-                                                        "",
-                                                        id="scenario_datetime_last_played",
-                                                        span=True,
-                                                        size="sm",
-                                                    ),
-                                                    disabled=True,
-                                                    events=TOOLTIP_EVENTS,
-                                                    id="last-played-tooltip",
-                                                    label="",
-                                                ),
-                                            ],
-                                            gap="0.25em",
-                                        ),
-                                        dmc.Text(
-                                            [
-                                                dmc.Text(
-                                                    "Number of runs: ",
-                                                    fw=700,
-                                                    span=True,
-                                                ),
-                                                dmc.Text(
-                                                    id="scenario_num_runs",
-                                                    span=True,
-                                                ),
-                                            ],
-                                            size="sm",
-                                        ),
-                                        dmc.Group(
-                                            [
-                                                dmc.Group(
-                                                    [
-                                                        dmc.Text(
-                                                            "Position:",
-                                                            fw=700,
-                                                            span=True,
-                                                            size="sm",
-                                                        ),
-                                                        # dcc.Loading renders
-                                                        # divs, which cannot
-                                                        # nest inside a Text's
-                                                        # default <p> root, so
-                                                        # it sits beside the
-                                                        # label in a Group
-                                                        # (like "Last played:"
-                                                        # above).
-                                                        dcc.Loading(
-                                                            dmc.Tooltip(
-                                                                dmc.Text(
-                                                                    id="scenario_rank",
-                                                                    span=True,
-                                                                    size="sm",
-                                                                ),
-                                                                disabled=True,
-                                                                events=TOOLTIP_EVENTS,
-                                                                id="rank-updated-tooltip",
-                                                                label="",
-                                                            ),
-                                                            delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
-                                                            show_initially=False,
-                                                        ),
-                                                    ],
-                                                    gap="0.25em",
-                                                ),
-                                                dmc.Tooltip(
-                                                    dmc.Button(
-                                                        "Refresh",
-                                                        id="rank-refresh-button",
-                                                        variant="subtle",
-                                                        size="compact-xs",
-                                                        leftSection=local_icon(
-                                                            "material-symbols:refresh-rounded",
-                                                            width=14,
-                                                        ),
-                                                    ),
-                                                    label=RANK_REFRESH_TOOLTIP,
-                                                    events=TOOLTIP_EVENTS,
-                                                    multiline=True,
-                                                    withArrow=True,
-                                                    w=SETTINGS_HELP_TOOLTIP_WIDTH,
-                                                ),
-                                            ],
-                                            gap="xs",
-                                            align="center",
-                                        ),
-                                    ],
-                                    w=300,
-                                    maw="100%",
-                                ),
+                                scenario_stats_panel(SCENARIO_STATS_IDS),
                             ],
                             gap="sm",
                             justify="flex-start",
@@ -2589,7 +1173,7 @@ def layout(
                                     persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
-                                _chart_options_toggle(),
+                                chart_options_toggle(CHART_OPTIONS_IDS),
                             ],
                             gap="md",
                             justify="flex-end",
@@ -2622,7 +1206,7 @@ def layout(
                             # resizes, not just on window resize.
                             responsive=True,
                         ),
-                        _chart_options_panel(),
+                        chart_options_panel(CHART_OPTIONS_IDS),
                     ],
                 ),
             ),

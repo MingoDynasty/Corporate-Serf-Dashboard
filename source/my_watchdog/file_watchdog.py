@@ -194,7 +194,8 @@ def _log_run_against_high_score(
             # stored runs all scored 0 divides by zero here and drops the run
             # before it is ever loaded. There is no usable denominator, not a
             # zero-percent one, so log the raw figures instead -- the same
-            # judgment _threshold_verdict makes in source/pages/home.py.
+            # judgment ``threshold_verdict`` makes in
+            # source/components/score_threshold.py.
             logger.debug(
                 "Current score (%g) has no percentage from high score (%g) "
                 "with score threshold (%.2f)",
