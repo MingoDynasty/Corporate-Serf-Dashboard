@@ -569,7 +569,8 @@ second rule for two days of play five years ago.
 
 ### Sessions
 
-S1. One pure function over the runs in the order they ended.
+S1. One pure function over the runs. It sorts them by end time itself, so
+its answer never depends on the order a caller hands them over in.
 
 - **The break between two runs** is the next run's start minus this run's
   end. When the next run has no start, it is the next run's end minus this
@@ -689,7 +690,8 @@ something asks for them.
   never builds them up from the batches of new runs it was sent, because a
   batch can be missed.
 - **The functions take a list of runs** and never read the store
-  themselves. The store is written by the watchdog thread and read without
+  themselves. The store already keeps one list of every run in the order
+  the runs ended, and that list is what a caller copies. The store is written by the watchdog thread and read without
   a lock, and a caller that hands over a copy keeps that out of the session
   code.
 - **Changing the constant re-splits the whole history,** with nothing to
@@ -866,6 +868,7 @@ their tests.
   - a run with no start beside runs that have one;
   - a paused run begun inside the 30 minutes and finished long after them;
   - a negative break;
+  - runs handed over out of order;
   - no runs, and one run;
   - in progress at exactly 30 minutes after the last run, one second
     later, and with a last run in the future;
