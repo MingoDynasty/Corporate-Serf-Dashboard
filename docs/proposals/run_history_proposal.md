@@ -1008,6 +1008,22 @@ The card has room, so it words a miss. Its badge is New PB whenever the run
 is one, judged or not. Otherwise a judged run shows its verdict, and an
 unjudged run shows no badge.
 
+Every state together. The last column is the card's percentage of the PB
+the run was chasing.
+
+| The run | Check | Star | Card badge | Card percentage |
+|---|---|---|---|---|
+| Judged, and passed | check | if a new PB | New PB if one, else Threshold passed | shown |
+| Judged, and missed | none, "Below threshold" | if a new PB | New PB if one, else Below threshold | shown |
+| Any run while the percentage is empty | none, no percentage is set | if a new PB | New PB if one, else none | shown where one exists |
+| A scenario's first run | none, a first run | never | none | none |
+| The first run at a new sensitivity | none, a first run | if a new PB | New PB if one, else none | shown |
+| Compared by score, with a PB before it of zero or less | none, no percentage to judge by | if a new PB | New PB if one, else none | none. A new PB names the previous best |
+
+A judged miss can be a new PB only with the percentage above 100. A
+comparison by pace needs only positive times, so a time-scored PB of zero or
+less is still judged, as today.
+
 **The percentage field.** It sends every keystroke today, so typing 90 over
 95 passes through 9, and every check on the page would flicker through it.
 The list's PR sets the field to send on Enter or on leaving it. That option
