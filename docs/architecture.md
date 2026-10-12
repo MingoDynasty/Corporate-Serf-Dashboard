@@ -545,7 +545,8 @@ flowchart LR
   On both grids one stylesheet rule makes cell text selectable, the name
   cell carries the `cell-navigates` class for its pointer, and
   `assets/gridSelectionGuard.js` keeps a drag that selects text from
-  counting as a click
+  counting as a click, and a modified click beside a name from navigating
+  the current tab
   ([decision_log.md](decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
@@ -961,9 +962,13 @@ flowchart LR
 - `assets/gridSelectionGuard.js` — keeps a text selection made by dragging
   inside either playlist grid from also counting as a click. One capture
   listener on the document swallows a click when the pointer moved during
-  the press and left text selected. It finds a grid by its class, so the
-  two grid classes it names must match the layouts'. A click with no
-  movement, a modified click, and a keyboard click pass through.
+  the press and left text selected. It also swallows a modified click in a
+  name cell beside the name's link, which the grid would open in the current
+  tab, and with Ctrl or Meta opens the link's address in a new tab. It finds
+  a grid by its class and a name cell by the `cell-navigates` class, so
+  those names must match the layouts and the two name columns. A click with
+  no movement, a modified click on a link or in any other cell, and a
+  keyboard click pass through.
 - `assets/dashMantineFunctions.js` — repo-owned client-side functions for
   dash-mantine-components function props, looked up by name in
   `window.dashMantineFunctions` when a prop is passed as

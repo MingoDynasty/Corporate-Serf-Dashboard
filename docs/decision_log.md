@@ -22,6 +22,7 @@ on a playlist's scenario table only the scenario's name did anything, and on
 both tables almost no text could be selected. Now one cell in each row
 navigates on both tables, the name, and the text of every other cell can be
 selected and copied. Dragging across a name to select it does not open it.
+A Ctrl+click anywhere in a name's cell opens it in a new tab.
 
 **Ruling.** By the maintainer, in chat on 2026-10-12: "Agreed on R1,R2,R3."
 R1 was name-only clicks on both tables, and R3 was selectable text in every
@@ -41,8 +42,12 @@ asked for. R2, the browser search, is
 - The name cell shows the pointer cursor across its whole width, because the
   whole cell is the target. A row no longer does. The hover tint stays on
   both tables.
-- A modified click on a name still opens a new tab, and Enter on a focused
-  name still opens it.
+- A modified click on a name's text is still the browser's own, as on any
+  link: a new tab on Ctrl, a new window on Shift. Enter on a focused name
+  still opens it.
+- A modified click in a name cell beside the text never navigates the
+  current tab. With Ctrl or Meta it opens the name in a new tab, and with
+  Shift or Alt alone it opens nothing.
 
 **Why the row stopped being the target.**
 
@@ -80,11 +85,14 @@ selected. It lets three kinds of click through:
 
 - A click with no movement. A selection made earlier and still on screen
   therefore never blocks a plain click on a name or a header.
-- A click with a modifier key, which keeps opening a new tab or window.
+- A modified click on a name's link, which keeps opening a new tab or
+  window, and a modified click in a cell that does not navigate.
 - A click from the keyboard.
 
-It finds a grid by its class, so a test ties the two class names in the
-script to the layouts.
+The same listener handles a modified click in a name cell beside the link,
+as the section on that click says. It finds a grid by its class and a name
+cell by its column's class, so tests tie those class names in the script to
+the layouts and the column definitions.
 
 **Verified on the built branch,** in headless Edge and Firefox, 26 checks in
 each, on the Playlists table and on a grouped scenario table:
@@ -116,17 +124,70 @@ working:
 - A click on any other cell does nothing, and a click on a name or in the
   empty part of its cell opens it.
 
-**A defect the hand test found.** A Ctrl+click on a name's text opens a new
-tab, and a Ctrl+click in the same cell beside the text navigates the current
-tab. The link is only as wide as its text, and a click beside it reaches the
-grid's own route, which cannot see modifier keys. It predates this change,
-which leaves the link and the scenario route as they were, and before it the
-Playlists table's whole row behaved this way. It ships as it is, a minor
-defect with a fix to come
-([tech debt](tech_debt.md#a-modified-click-beside-a-name-on-the-playlist-tables-navigates-the-current-tab)).
+**A modified click beside a name.** The hand test found a defect. A
+Ctrl+click on a name's text opened a new tab, and a Ctrl+click in the same
+cell beside the text navigated the current tab. The link is only as wide as
+its text, and a click beside it reached the grid's own route, which runs on
+the server and cannot see modifier keys. It predated this change: the link
+and the scenario route were as they had been, and before it the Playlists
+table's whole row behaved this way. It was first recorded as a minor defect,
+and a second change the same day fixed it, at the maintainer's request.
+
+The fix is in the guard script alone. The link, the stylesheet and both
+routes are as they were, so nothing moves and every plain click and drag
+behaves as the hand test found it. The capture listener now also swallows a
+modified click that lands in a name cell outside the link, so the grid never
+sees it:
+
+- With Ctrl or Meta it opens the link's address in a new tab, through
+  `window.open`. Both browsers open that tab the way the held key asks. In
+  Firefox it opened in the background, as the tab from a Ctrl+click on the
+  name's text does.
+- With Shift or Alt alone it opens nothing. A Shift+click there still
+  extends a text selection, which is the browser's own use of that click.
+- A modified click that ends a drag that selected text opens nothing, as a
+  plain one navigates nowhere. Before the fix a Ctrl+drag across a name
+  navigated the current tab.
+
+On the name's own text a modified click stays the browser's, as it is on
+any link, and the fix does not touch it. Measured there: Ctrl opens a new
+tab and Shift a new window in both browsers, Alt downloads the page in Edge
+and does nothing in Firefox, and Meta alone does nothing in Firefox. Edge on
+Windows reads a click with Meta alone as a plain click, so on the name's
+text it navigates the current tab, as it does on every link.
+
+**Verified for the modified click,** in headless Edge 155 and Firefox 157,
+126 checks in each, on the Playlists table and on a scenario table with
+one-line and with two-line names:
+
+- A Ctrl+click beside a name opens one new tab at the name's address and
+  leaves the page. The points tried were the gap right of the text, each
+  side padding, and the strip above the text. A two-line name's link fills
+  its cell but for the side padding, so there the padding was the test.
+- In Firefox that tab opens in the background with no opener, as the tab
+  from the name's text does. Edge reports it as a tab of the same window,
+  as it does the tab from the name's text.
+- Shift, Alt and Meta at those points leave the page. Shift and Alt open
+  nothing, and Meta opens one new tab.
+- A plain click at every point still opens the name in the current tab.
+- A Ctrl+drag and a Shift+drag across a name from the padding stay on the
+  page and open nothing. With a selection already on screen, a Ctrl+click
+  beside a name still opens its tab.
+- Every name, link and cell sits where it did and is styled as it was, on
+  all 110 rows at two window widths, and a clipped name still ends in an
+  ellipsis.
+- The 26 checks of the first verification pass again in both browsers.
+- With the guard script put back as it was before the fix, on the same
+  build, the same run failed 59 checks in each browser. Every one of them
+  was a modified click or drag beside a name, and no other check changed.
 
 **Not verified.**
 
+- The modified click by hand. Every check of it was scripted, in a headless
+  browser.
+- Whether Edge opens the tab from a Ctrl+click beside a name behind the
+  current one. Headless Edge reports every page as visible.
+- Cmd on a Mac.
 - A drag across several cells and rows in Firefox. The hand test reported
   no problem with one, without saying what it selected.
 - A drag down several rows after a sort. In Edge it picked up text from 14
@@ -135,15 +196,29 @@ defect with a fix to come
   for the reason the browser-search entry gives.
 - One console line. The first of four Firefox runs logged a bare "Error"
   with every check passing. The three runs after it were clean, and it was
-  not traced.
+  not traced. One Firefox run of the modified-click checks logged it too, on
+  the Scenario Performance page after a plain click on a name had opened
+  it, and 40 scripted repeats of that step did not bring it back.
 
 **Rejected.**
 
 - Full-row clicks on both tables. The first click of a double-click
   navigates, so a value could never be selected that way.
 - Leaving the two tables different, with the reason written down.
-- A link that navigates only from its text. It needs no guard, but it
-  shrinks the target the scenario table has always had.
+- A link that navigates only from its text. It needs no guard, and no
+  modified click could miss it, but it shrinks the target the scenario table
+  has always had.
+- For the modified click, a link that fills its cell. A block link with
+  link dragging switched off fixed the Ctrl+click in both browsers. In Edge
+  it broke the drag that selects a name: a press in the link's empty part
+  started no selection, and the click that ended the drag opened the name.
+- For the modified click, handing the click on to the link as a scripted
+  click with the same keys held. Both browsers treated it as a click on the
+  link, which was right for Ctrl. It also repeated beside the name
+  everything a browser does with a link. In Edge a click with Meta alone
+  navigated the current tab and an Alt+click downloaded the page, and in
+  both browsers a Shift+click opened the name as well, on the click that
+  extends a selection.
 
 **Unchanged.** The routes, the two icon cells, sorting, the filter boxes, and
 the Columns menu. A click that closes the Columns menu still acts on what it
@@ -152,6 +227,8 @@ lands on, which now matters only on a name cell.
 **Provenance.** Requested by the maintainer on 2026-10-12, with no proposal.
 Shipped in
 [PR #364](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/364).
+The fix for the modified click beside a name followed in
+[PR #365](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/365).
 
 ## 2026-10-12: Both Playlist Tables Draw Every Row, So A Browser Search Reaches Them
 
