@@ -13,10 +13,11 @@ length is not what is being fixed, and no entry is shortened or removed.
 
 ## Decisions needed
 
-Three rulings: L1 to L3. Nothing here is ratified, and the maintainer has
-stated no lean on any row. Each row carries a recommendation, its cost, and
-what choosing differently changes. Everything in [Design](#design) is
-author-owned and open to challenge.
+Three rulings: L1 to L3. The maintainer ruled on all three on 2026-10-12,
+after review had endorsed each row: accept the recommendation. That settles
+each row as its recommendation. Each row keeps its argument, its cost, and
+what the alternatives would have changed, for the record. Everything in
+[Design](#design) is author-owned.
 
 The question came from the maintainer on 2026-10-12: is the log's growth a
 problem, and if so, what should be done about it? An advisory consult with
@@ -25,7 +26,7 @@ answer and reached the same shape. Where it differed, the row says so.
 
 ### L1. Each decision gets its own file
 
-Status: open
+Status: Ratified (user), 2026-10-12: accept the recommendation below.
 
 **Recommendation: split the log into one file per decision, each entry's
 text unchanged, in one mechanical PR.**
@@ -48,7 +49,7 @@ The cost:
   PR descriptions and one in a review comment point at a heading of the log
   on `main`.
 
-Choosing differently:
+The alternatives, not chosen:
 
 - **Leave the file as it is.** The collisions continue wherever two shipping
   PRs are in review together. The question returns on its own between
@@ -59,7 +60,7 @@ Choosing differently:
 
 ### L2. A folder per year, and the folder keeps the log's name
 
-Status: open
+Status: Ratified (user), 2026-10-12: accept the recommendation below.
 
 **Recommendation: `docs/decision_log/<year>/<date>-<title>.md`, for example
 `docs/decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md`.**
@@ -81,7 +82,7 @@ Status: open
   with no table: `decision_log.md#<anchor>` becomes
   `decision_log/2026/<anchor>.md`.
 
-Choosing differently:
+The alternatives, not chosen:
 
 - **One flat folder.** Simpler to browse today, and a second link rewrite
   when it fills.
@@ -91,7 +92,7 @@ Choosing differently:
 
 ### L3. The split PR corrects the code comments, and so publishes one release
 
-Status: open
+Status: Ratified (user), 2026-10-12: accept the recommendation below.
 
 **Recommendation: the split PR corrects the eleven comment and docstring
 lines under `source/` and `assets/` that name `docs/decision_log.md`. That
@@ -115,7 +116,7 @@ The recommendation is to publish:
 
 A published release cannot be withdrawn, which is why this is a row.
 
-Choosing differently:
+The alternatives, not chosen:
 
 - **Leave the lines for a later PR.** The split PR then publishes nothing.
   Until a later PR corrects them, eleven lines on `main` name a file that
@@ -407,13 +408,13 @@ No user-facing string changes, and no term is added or redefined.
 Stated intent, not a contract.
 
 1. **This proposal.** Docs only.
-2. **The split**, after L1 to L3 are ruled. One PR, in this commit order:
+2. **The split.** One PR, in this commit order:
    - the split itself, each entry cut word for word into its file, with the
      README;
    - the link rewrite and the six references;
    - the test changes;
    - `AGENTS.md` and the other prose;
-   - the eleven comment and docstring lines, if L3 is ruled as recommended;
+   - the eleven comment and docstring lines;
    - the decision-log entry for this change, written as the first entry born
      as a file, and the deletion of this proposal.
 
