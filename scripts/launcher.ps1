@@ -368,7 +368,11 @@ function Show-AppFailure([string]$Context) {
     Write-Host "WARNING: $Context" -ForegroundColor Yellow
     $errLog = Join-Path $InstallRoot 'data\logs\launcher-app-stderr.log'
     if (Test-Path -LiteralPath $errLog) {
-        $tail = Get-Content -LiteralPath $errLog -Tail 15 -ErrorAction SilentlyContinue
+        # The app's Python writes this log as UTF-8, its default text encoding
+        # since 3.15. With no -Encoding, Windows PowerShell 5.1 reads the file
+        # in the ANSI code page and shows every non-ASCII character as two or
+        # three wrong ones.
+        $tail = Get-Content -LiteralPath $errLog -Tail 15 -Encoding UTF8 -ErrorAction SilentlyContinue
         if ($tail) {
             Write-Host '--- app error output ---'
             $tail | ForEach-Object { Write-Host $_ }

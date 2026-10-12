@@ -216,8 +216,18 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
     if link.returncode != 0:
         pytest.skip(f"cannot create a directory junction: {link.stderr.strip()}")
 
-    driver = tmp_path / "driver.ps1"
-    driver.write_text(_DRIVER, encoding="utf-8")
+    output = _run_under_windows_powershell(tmp_path, _DRIVER, root)
+    return output.strip().splitlines()[-1].strip()
+
+
+def _run_under_windows_powershell(tmp_path: Path, driver: str, root: Path) -> str:
+    """Run a driver script under Windows PowerShell 5.1 and return its stdout.
+
+    The driver receives the install root and the path of ``launcher.ps1`` as
+    its two arguments.
+    """
+    driver_path = tmp_path / "driver.ps1"
+    driver_path.write_text(driver, encoding="utf-8")
     result = subprocess.run(
         [
             str(WINDOWS_POWERSHELL),
@@ -225,7 +235,7 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
             "-ExecutionPolicy",
             "Bypass",
             "-File",
-            str(driver),
+            str(driver_path),
             str(root),
             str(REPO_ROOT / "scripts" / "launcher.ps1"),
         ],
@@ -235,7 +245,7 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
         timeout=120,
     )
     assert result.returncode == 0, result.stderr
-    return result.stdout.strip().splitlines()[-1].strip()
+    return result.stdout
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
@@ -280,3 +290,73 @@ def test_get_configured_endpoint_under_windows_powershell(
         pytest.skip(f"{WINDOWS_POWERSHELL} not found")
 
     assert _windows_powershell_endpoint(tmp_path, config_body) == expected, case
+
+
+# Dot-sources the real Show-AppFailure out of launcher.ps1 and prints each line
+# it sends to the host as code points. The text itself cannot cross the pipe:
+# 5.1 encodes piped output in the console's code page (437, measured on
+# 2026-10-12), which turned a CJK character into a question mark.
+_FAILURE_TAIL_DRIVER = """
+$ErrorActionPreference = 'Stop'
+$InstallRoot = $args[0]
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($args[1], [ref]$null, [ref]$null)
+$function = $ast.FindAll({
+    param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $n.Name -eq 'Show-AppFailure' }, $true)[0]
+Invoke-Expression $function.Extent.Text
+Show-AppFailure 'the dashboard failed to start (exited).' 6>&1 | ForEach-Object {
+    (([string]$_).ToCharArray() | ForEach-Object { '{0:X4}' -f [int]$_ }) -join ' '
+}
+"""
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_show_app_failure_reads_the_log_as_the_app_writes_it(tmp_path: Path) -> None:
+    """Hold the launcher's reader to the encoding the app's Python writes.
+
+    The launcher redirects the app's stderr to a file and prints its last 15
+    lines when a start fails. Python 3.15 made UTF-8 the default text
+    encoding, so that file stopped being written in the Windows code page,
+    which is what ``Get-Content`` assumes under 5.1 when no encoding is named:
+    an accented letter in a path came out as two wrong characters. The log is
+    written here by this interpreter with its stderr redirected to a file, as
+    the launcher redirects the app's, so a change on either side fails here.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+
+    root = tmp_path / "install-root"
+    log = root / "data" / "logs" / "launcher-app-stderr.log"
+    log.parent.mkdir(parents=True)
+    lines = [
+        f"line {number}: File: C:/Users/Zoë/config.toml 次" for number in range(20)
+    ]
+    # The launcher sets neither variable, and either one would pick the
+    # encoding in place of the interpreter's default.
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if name not in {"PYTHONIOENCODING", "PYTHONUTF8"}
+    }
+    with log.open("wb") as stderr_file:
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import sys; sys.stderr.write(sys.argv[1])",
+                "\n".join(lines) + "\n",
+            ],
+            stderr=stderr_file,
+            env=environment,
+            check=True,
+            timeout=60,
+        )
+
+    output = _run_under_windows_powershell(tmp_path, _FAILURE_TAIL_DRIVER, root)
+    shown = [
+        "".join(chr(int(code, 16)) for code in line.split())
+        for line in output.splitlines()
+    ]
+
+    assert shown[0] == "WARNING: the dashboard failed to start (exited)."
+    assert shown[2:-1] == lines[-15:]

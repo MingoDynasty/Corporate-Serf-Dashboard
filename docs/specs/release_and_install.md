@@ -253,6 +253,9 @@ console lines quoted here are plain console output, not app notifications.
   config.toml in <root> and the app error output above.", the reinstall
   one-liner, and "Press Enter to close"
   ([2026-08-21](../decision_log.md#2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling)).
+- The app's Python writes both redirected logs as UTF-8, its default text
+  encoding, and `Show-AppFailure` reads the stderr log as UTF-8. Windows
+  PowerShell 5.1 would otherwise read it in the ANSI code page.
 - After ready, the browser opens at `http://<browser>:<port>/` when
   `open_browser_on_launch` is on, old versions are pruned, the bootstrap is
   updated, and "Dashboard running at http://<browser>:<port>/ -- close this
