@@ -89,30 +89,38 @@ Choosing differently:
   Every sentence that says "the decision log" then points at a folder called
   something else.
 
-### L3. The split PR publishes no release
+### L3. The split PR corrects the code comments, and so publishes one release
 
 Status: open
 
-**Recommendation: the split PR changes no file under `source/` or
-`assets/`, so the release job publishes nothing. The 11 code comments that
-name `docs/decision_log.md` are corrected by the first later PR that
-publishes a release anyway, and `docs/tech_debt.md` lists them until then.**
+**Recommendation: the split PR corrects the eleven comment and docstring
+lines under `source/` and `assets/` that name `docs/decision_log.md`. That
+makes it publish one release whose only change is comments.**
 
 The release job publishes a new version when any changed path can affect an
 installed copy. Markdown files, `docs/`, and `tests/` cannot. A Python file
 under `source/` and a JavaScript file under `assets/` can, even when only a
-comment changed. Eleven comments in nine such files name the old path. The
-other eleven comment lines name the log or one of its entries with no path,
-and stay true.
+comment changed. Eleven lines in nine such files name the old path. So the
+split PR either leaves those lines naming a file that no longer exists, or
+it publishes a release.
 
-Until they are corrected, each of the 11 names a file that no longer exists,
-beside a folder of the same name.
+The recommendation is to publish:
+
+- **A release is routine here.** The job has published 126 since July, 44
+  of them in September.
+- **Leaving the lines for later has no owner.** Some later PR would have to
+  edit nine files it has no other reason to touch.
+- **The lines are published either way.** Deferring changes when they go
+  out, not whether.
+
+A published release cannot be withdrawn, which is why this is a row.
 
 Choosing differently:
 
-- **Correct the comments in the split PR.** No stale path is left behind, and
-  a release goes out whose only change is comments. A published release
-  cannot be withdrawn.
+- **Leave the lines for a later PR.** The split PR then publishes nothing.
+  Until a later PR corrects them, eleven lines on `main` name a file that
+  does not exist, beside a folder of the same name, and `docs/tech_debt.md`
+  lists them so the work has a record.
 
 ## Problem
 
@@ -307,6 +315,12 @@ All in `tests/test_docs.py`:
   index anyone maintains.
 - **`docs/architecture.md`, the importer's readme, and the merge-sweep skill**
   name the path in prose and take the new one.
+- **Eleven comment and docstring lines** in nine files under `source/` and
+  `assets/` name the path, as L3 covers. Each takes the folder's path,
+  `docs/decision_log/`, and keeps the words that say which entry it means.
+  Two of them name no entry today and gain the entry's date, because a
+  folder is too wide a pointer on its own. Eleven other lines name the log
+  or one of its entries with no path, and are not touched.
 
 ### History
 
@@ -394,6 +408,7 @@ Stated intent, not a contract.
    - the link rewrite and the six references;
    - the test changes;
    - `AGENTS.md` and the other prose;
+   - the eleven comment and docstring lines, if L3 is ruled as recommended;
    - the decision-log entry for this change, written as the first entry born
      as a file, and the deletion of this proposal.
 
@@ -401,7 +416,6 @@ Stated intent, not a contract.
    lists every PR open at that time.
 3. **After the split merges:** each PR that was open syncs and converts its
    links, and the one live kickoff prompt is refreshed.
-4. **The 11 code comments,** as L3 rules.
 
 Step 2 is mechanical and fully specified here, so it suits an implementation
 session working from a kickoff prompt.
@@ -430,12 +444,13 @@ session working from a kickoff prompt.
   Markdown file under `docs/`, the README, or `AGENTS.md` holds a dangling
   link.
 - **A search for the old path** over tracked files finds only the entries'
-  own prose and the 11 comments L3 defers.
+  own prose.
 - **The new and changed tests** each have a case that fails: a doc with a
   `Status:` line outside the three exempt folders, an entry whose summary
   has five sentences, and an entry file whose name and heading disagree on
   the date.
 - **On GitHub, on the PR's branch:** the folder page shows the README, one
   entry renders, and a link in a spec opens its entry.
-- **No release:** `is_release_worthy` returns false for every path the PR
-  changes.
+- **One release, with only comments in it:** the nine files under `source/`
+  and `assets/` are the only paths in the PR for which `is_release_worthy`
+  returns true, and their diff touches comment and docstring lines only.
