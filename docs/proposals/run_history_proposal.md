@@ -152,6 +152,19 @@ What it costs:
 
 What follows from this row is in [Home](#home).
 
+Considered and not taken: **forwarding an old `/?scenario=` or
+`/?playlist_code=` link to Run History,** while a plain `/` still opens
+Home. Old bookmarks would keep working. It is not the forwarding declined
+above, because the Overview would not remove it, and that is its cost: it is
+compatibility code with no date on which it could go. The maintainer,
+2026-10-12: "Long term, I don't think we should be supporting
+`/?playlist_code=X&scenario=Y`. And if we do, it would probably be for
+something else more specific to the Overview page, and not for a redirect to
+the Run History page; so it would be confusing for the user to be navigated
+to a location that they should not expect." So Home ignores both parameters,
+and the address stays free for the Overview to give them a meaning of its
+own.
+
 **If Run History stays at `/`:** there is no Home, the setup card stays on
 Run History, and the address moves when the Overview arrives, taking the
 toast's link, the Playlists links, and bookmarks with it then. **If Home
@@ -648,8 +661,8 @@ What follows from R2.
   the page the launcher opens. Whichever page is open empties the queue.
 - **The launcher is unchanged.** It opens `/`.
 
-Not proposed: a `/?scenario=` link forwarding from Home to Run History. It
-is listed under [Optional, beyond the outline](#optional-beyond-the-outline).
+Home forwards nowhere, an old `/?scenario=` or `/?playlist_code=` link
+included. R2 has the alternative and why it is not taken.
 
 ### The top row
 
@@ -1415,9 +1428,6 @@ answered by R3.
 None of these is proposed. Each is a small addition a reviewer or the
 maintainer may want, with what it would cost.
 
-- **Home forwards a `/?scenario=` or `/?playlist_code=` link to Run
-  History.** Old bookmarks keep working. It is forwarding logic on Home,
-  which the maintainer declined in general, though for a different reason.
 - **The NVDA walk repeated on the built list before the page goes public.**
   It would check the real thing and not a prototype. The walk's scripts and
   an unpacked NVDA are already on the maintainer's machine. It takes over
