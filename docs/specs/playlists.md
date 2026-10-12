@@ -9,7 +9,8 @@ benchmark's ranks and categories immediately and streams leaderboard positions
 in behind them, while a background worker keeps the overview's percentile
 columns warm.
 Each table has a Columns menu that shows or hides its columns and remembers
-the choice in the browser, and one KovaaK's ID column that starts hidden.
+the choice in the browser, with one KovaaK's ID column that starts hidden,
+and each draws every row, so the browser's own text search finds any of them.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
