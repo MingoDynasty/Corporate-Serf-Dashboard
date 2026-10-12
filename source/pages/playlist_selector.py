@@ -10,7 +10,7 @@ splats them and adds its own role-specific props.
 
 # Splatted into both playlist dropdowns. Only props valid on both
 # ``dmc.Select`` and ``dmc.MultiSelect`` belong here; Select-only refinements
-# (clearSearchOnFocus, allowDeselect, autoSelectOnBlur) and role-specific props
+# (allowDeselect, autoSelectOnBlur) and role-specific props
 # (clearable, persistence, value) stay at the call sites.
 PLAYLIST_SELECTOR_PRESET = {
     "checkIconPosition": "right",
