@@ -1,6 +1,9 @@
 # 2026-08-22: The Capability Spec Layer Is Written In One Pass
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-10-12](2026-10-12-each-decision-is-its-own-file-in-a-folder-per-year.md):
+a spec links the entry that governs a statement by its file, because an
+entry is now a file and no longer a heading of one log)
 
 Every shipped capability with a durable behavior contract must have a spec
 that states what the app does today, and the four still missing are being
