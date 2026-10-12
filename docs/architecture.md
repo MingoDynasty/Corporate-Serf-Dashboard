@@ -326,7 +326,7 @@ flowchart LR
     Journey --> PlotService
     SettingsPage --> WarmupService
 
-    Home --> Visibility
+    ScenarioSelection --> Visibility
     Journey --> Visibility
     Playlists --> Visibility
 
@@ -653,8 +653,14 @@ flowchart LR
   this visit's query parameters, and the holder for the link to the
   playlist's scenario table. `register_scenario_selection()` registers
   `select_playlist` and `apply_deep_link` for those ids, once per page, at
-  import. A layout calls `deep_link_selection()` for the store's data and
+  import. A layout calls `deep_link_selection()` for the store's data,
+  `playlist_filter_options()` for the playlist filter's list, and
   `initial_scenario_options()` for the scenario list its first paint shows.
+  `playlist_filter_options()` is the visible playlists plus the playlist the
+  filter holds when that one is hidden; `select_playlist` writes the same list
+  for the filter's value, which the layout cannot see when the browser
+  restored it
+  ([decision_log.md](decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
   `select_playlist` takes the store as a second `Input` so that the renderer
   cannot drop its first call
   ([decision_log.md](decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
@@ -809,7 +815,9 @@ flowchart LR
   `get_visibility_store_message()` is what tells those two apart, and the
   Playlists page renders it. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Scenario
-  Performance filter, Journey picker, overview).
+  Performance filter, Journey picker, overview). The Scenario Performance
+  filter adds one playlist to that list, the hidden one it holds, in
+  `components/scenario_selection.py`.
 - `evxl_snapshot.py` — the one read of `resources/evxl/benchmarks.json`,
   the Evxl benchmark snapshot that ships with the code
   (`evxl_entries_by_code`). Read once per process and keyed by case-folded
@@ -1021,11 +1029,11 @@ flowchart LR
 | Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
-| Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
+| Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`); `playlist_filter_options()` in `components/scenario_selection.py` for the hidden playlist the Scenario Performance filter holds |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | A benchmark's categories and subcategories on that table | `kovaaks/evxl_snapshot.py` for the read of `resources/evxl/benchmarks.json`; `kovaaks/scenario_groups.py` for the join and the exclusion list; `kovaaks/data_service.py` (`get_scenario_groups`) for the side table; `pages/playlist_scenarios.py` for the columns, the grouped state, and the merged-cell workaround; `scripts/benchmark_importer/script.py` (`find_group_crossings`) for the comparison with KovaaK's categories; the rules are in `docs/specs/playlists.md` |
 | The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/home.py`) for the component ids |
-| What `?scenario=` and `?playlist_code=` select, the scenario dropdown's list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the two layout helpers; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/home.py`) for the component ids |
+| What `?scenario=` and `?playlist_code=` select, what the two dropdowns list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the layout helpers; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/home.py`) for the component ids |
 | How a failed run import or a startup playlist warning reaches the screen | `components/queued_notices.py` for the two flushes; `my_watchdog/file_watchdog.py` and `kovaaks/data_service.py` for the queues; the hosting page for the interval each flush is registered on |
 | The Scenario Stats block, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the block and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/home.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
 | How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `pages/home.py` for the run toast builders and the chart callback that call it |

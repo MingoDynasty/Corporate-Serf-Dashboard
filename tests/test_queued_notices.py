@@ -146,7 +146,9 @@ def test_the_page_registers_each_flush_on_an_interval_its_layout_builds(
     # Registered to answer the interval's tick, not the mount.
     assert registration["prevent_initial_call"] is True
 
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
     mounted = {
         getattr(component, "id", None) for component in _walk_components(home.layout())

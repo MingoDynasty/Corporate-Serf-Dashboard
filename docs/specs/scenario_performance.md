@@ -53,6 +53,9 @@ of scope here, apart from its chart toolbar, noted under The graph.
   arriving from a Playlists grid scenario link and then returning to the page
   shows that playlist and scenario, not an earlier one
   ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
+  That holds for a hidden playlist too: `?playlist_code=` selects any loaded
+  playlist, and the filter names it
+  ([2026-10-12](../decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
   A parameter the URL omits leaves its control on the remembered value, so
   `?scenario=` alone keeps the playlist filter — and a scenario that filter
   does not list is then dropped, leaving no scenario selected and nothing
@@ -88,15 +91,30 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation
   ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
+- The playlist filter lists the visible playlists
+  ([playlists.md](playlists.md#the-overview)), plus the playlist it
+  holds when that one is hidden. A hidden playlist becomes the selection
+  through a `?playlist_code=` link, which every row of its scenario table
+  carries, or by being hidden while it is selected. It is listed only while
+  it is held: picking another playlist or clearing the filter takes it out of
+  the list, and it can't be picked again until it is shown. Nothing in the
+  list marks it as hidden. A playlist the URL names is in the list when the
+  page paints; one the browser restored is added by the callback that lists
+  the playlist's scenarios, so its name appears just after the page paints
+  ([2026-10-12](../decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
 - While the playlist filter holds a loaded playlist, the "Open scenario
   table" link under it leads to that playlist's scenario table at
   `/playlists/{code}`, which opens in playlist order
   ([playlists.md](playlists.md#routes-and-navigation)). There is no link, and
-  no room held for one, while the filter is empty or holds a remembered code
-  that no longer resolves. The callback that lists the playlist's scenarios
-  writes the link, so it arrives with that list just after the page paints,
-  whether the selection was remembered, made by hand, or named by
-  `?playlist_code=`.
+  no room held for one, while the filter is empty. The callback that lists the
+  playlist's scenarios writes the link, so it arrives with that list just
+  after the page paints, whether the selection was remembered, made by hand,
+  or named by `?playlist_code=`.
+- A remembered code that no playlist has does not stay in the filter. When
+  the page loads, the filter drops it and is empty, with no clear button, and
+  nothing is remembered: the list the filter is given has no such playlist,
+  and the Select drops a value its new options lack
+  ([2026-10-12](../decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
 - The row's responsive rules measure the content area rather than the
   window, and the two wide dropdowns narrow from their 400px target toward a
   200px floor before the row wraps
