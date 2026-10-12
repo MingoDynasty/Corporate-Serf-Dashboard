@@ -896,9 +896,8 @@ a switch.
   the toast judges it today: against the PB the run was chasing, which is
   the scenario's best score before it at any sensitivity
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
-  It is judged by pace where the app measures pace, under that rule's own
-  conditions for which runs are eligible
-  ([Time-scored scenarios](../specs/scenario_performance.md#time-scored-scenarios)).
+  It is judged by pace where the app measures pace on the run's own
+  version of the scenario. See [A past run's pace basis](#a-past-runs-pace-basis).
 - **New PB,** a star: the rule the chart's stars use. A run can carry both.
 
 Three consequences, which the maintainer worked through on 2026-10-10:
@@ -931,6 +930,43 @@ with 100, not 120. The field has no maximum. Above 100 percent a run has to
 beat the PB it was chasing by that margin, so every check then sits on a run
 that is also a new PB: at 110 percent C keeps its check and no other run has
 one.
+
+#### A past run's pace basis
+
+The pace rule
+([Time-scored scenarios](../specs/scenario_performance.md#time-scored-scenarios))
+lets a scenario's newest run name the version that every comparison is
+judged under. That fits a toast, which only ever judges the newest run.
+Applied as it stands to an old run, it would let a later run on another
+version change the old run's check. An old run that missed by pace would
+stop counting as a pace comparison, be judged by score, and pass, with no
+change to the run, to the PB it was chasing, or to the percentage. So a
+past run is judged under its own version:
+
+- **The version is the run's own:** the one its stats file names in
+  `Hash:`.
+- **Whether that version is time-scored, and its constant, is decided once
+  for the version,** from the newest performance file of that version that
+  can answer. For the scenario's current version that is today's rule
+  unchanged.
+- **The comparison is by pace** only when the PB the run was chasing was set
+  on the same version and both times are positive. Otherwise it is by
+  score.
+- **A run is judged by score** when its file names no version, or when no
+  performance file of its version can answer.
+
+So a run on a later version changes no earlier check. One thing can still
+move an old check, once: the first performance file of a version that can
+answer turns that version's earlier runs to pace. The app's other pace
+surfaces move at that same moment, and the spec already says of it that
+"its numbers move then". That is a correction toward the right measure,
+not a verdict taken back. The latest run is judged exactly as its toast
+was, because the newest run has always named its own version.
+
+Judging each run by what the app knew on the day it was played was
+considered and not taken. It would keep score verdicts on runs the app now
+knows were time-scored, beside pace verdicts on later runs of the same
+version, and it would parse one performance file per listed run.
 
 **Not judged:** a scenario's first run, and the first run at a new
 sensitivity, as today. That is about the threshold only. The first run at a
@@ -1281,7 +1317,7 @@ entry. It erases nothing.
 | [2026-10-05, the stars](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star) | "Only Score vs Time is marked" (R6). The clauses about Top N, the oldest date, the kept tie, and the Average score trace stop applying (R5). The hover order at a shared position narrows from a same-day tie to a same-second one | What a new PB is, no stars on Score vs Sensitivity, a new PB ordered last among points at one position, the look, Point size, and no control |
 | [2026-09-19, query parameters](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory) | "`?scenario=` alone leaves the playlist filter on the restored value" gains one exception (R7) | The invariant and its corollary, which bind the new page. An unknown playlist code still clears the filter, and the URL is still not rewritten |
 | [2026-07-11, timestamps](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format) | The plot title's `updated:` use ends. Session names and the card drop this year's year, and a run row shows a time of day alone | The format and its rules |
-| [2026-10-05, pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | The watchdog's session lines leave its list of surfaces. The check and the card join it | The pace rule |
+| [2026-10-05, pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | The watchdog's session lines leave its list of surfaces. The check and the card join it, and a past run is judged under its own version, not the newest run's | The pace rule |
 | [2026-09-12, Share chart](../decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button) | The figure shared holds every run in the range and no Average score line | The button stays |
 
 The Run toasts proposal carries the entries its own rows change.
@@ -1467,8 +1503,12 @@ maintainer's main checkout.
 - **The marks,** on the maintainer's example: runs A to E at 90, 99, and 110
   percent, an empty percentage, a scenario's first run, the first run at a
   new sensitivity, a time-scored scenario judged by pace, and a run on an
-  older version of a scenario. Each mark agrees with today's toast verdict
-  and the chart's stars on the same runs.
+  older version of a scenario. The mark on a scenario's newest run agrees
+  with the toast's verdict on it, and every star agrees with the chart's.
+  A replay on real stats and performance files: an old run that missed by
+  pace keeps that verdict after a run on a newer version lands, and a run
+  played before its version could be recognized turns to pace once, when
+  a file of that version first answers.
 - **The chart's queries and figures:** every run in each range, the range's
   midnight edge, stars in Score vs Run and Score vs Time and none in Score
   vs Sensitivity, no Average score trace, the title, and each empty state.
