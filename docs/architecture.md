@@ -3,7 +3,7 @@
 A map of the codebase: what each module owns and how data moves at runtime.
 This is the "where does X live" index so you don't have to re-read the tree.
 
-For the *why* behind specific choices, see `docs/decision_log.md`; for KovaaK's
+For the *why* behind specific choices, see `docs/decision_log/`; for KovaaK's
 endpoint behavior see `docs/kovaaks_api_notes.md`; for workflow/conventions see
 `AGENTS.md`. This file intentionally does not restate those.
 
@@ -185,7 +185,7 @@ state, not a field grafted onto someone else's schema.
   persist as JSON under `data/cache/` (not committed), written atomically and
   read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
-  per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
+  per-scenario rank files. TTLs and rationale live in `docs/decision_log/`.
 - **User settings** — `data/settings.json` (not committed) holds the app-owned
   user settings (`config/settings_service.py`): the stats directory and the
   KovaaK's identity. Written atomically and whole, read once and cached
@@ -216,7 +216,7 @@ state, not a field grafted onto someone else's schema.
   exempt (it ships with its reader), and `data/cache/` is deliberately
   unstamped. `scripts/stamp_schema_version.py` is the one-time conversion for
   installs created before the stamp; rationale and the run ordering are in
-  `docs/decision_log.md`.
+  `docs/decision_log/`.
 
 ## Module map
 
@@ -443,7 +443,7 @@ flowchart LR
   a new PB, over its whole history, and passes them to `generate_time_plot`
   with the filtered runs it plots. The plot stars the ones it holds, matched
   by run, in a third trace
-  ([decision_log.md](decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
+  ([decision log](decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
   The two notification controls draw nothing at all, and they differ in what
   flipping them costs. *Score threshold verdict* is an `Input` on
   `generate_graph`, so it re-runs the whole callback and rebuilds a figure
@@ -501,7 +501,7 @@ flowchart LR
   `components/columns_menu.py` from this page's `MENU_COLUMNS`. The Benchmark
   ID column starts hidden (`initialHide`). The grid draws every
   row, in view or not, so the browser's own text search reaches each one
-  ([decision_log.md](decision_log/2026/2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md)).
+  ([decision log](decision_log/2026/2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md)).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log). It paints
@@ -539,15 +539,15 @@ flowchart LR
   The same callback installs a listener that hides and shows the group
   columns after each row-model update, a workaround for stale merged cells
   in the bundled AG Grid
-  ([decision_log.md](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
+  ([decision log](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
   This grid draws every row too, for the same text search
-  ([decision_log.md](decision_log/2026/2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md)).
+  ([decision log](decision_log/2026/2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md)).
   On both grids one stylesheet rule makes cell text selectable, the name
   cell carries the `cell-navigates` class for its pointer, and
   `assets/gridSelectionGuard.js` keeps a drag that selects text from
   counting as a click, and a modified click beside a name from navigating
   the current tab
-  ([decision_log.md](decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
+  ([decision log](decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
@@ -631,7 +631,7 @@ flowchart LR
   `columnState` prop and
   never resends column definitions. The choices live in the browser's local
   storage, so the server never learns which columns are shown
-  ([decision_log.md](decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
+  ([decision log](decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
 - `components/chart_options.py` — the Chart options panel and its callbacks,
   built from component ids the hosting page supplies, so more than one page
   can host a panel. A page fills in a `ChartOptionsIds`: an id for each
@@ -666,10 +666,10 @@ flowchart LR
   filter holds when that one is hidden; `select_playlist` writes the same list
   for the filter's value, which the layout cannot see when the browser
   restored it
-  ([decision_log.md](decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
+  ([decision log](decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
   `select_playlist` takes the store as a second `Input` so that the renderer
   cannot drop its first call
-  ([decision_log.md](decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
+  ([decision log](decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
 - `components/queued_notices.py` — the two flushes that bring a queued
   notice to the screen: `flush_run_import_failures` and
   `flush_startup_playlist_warnings`. Each drains one queue on the server
@@ -719,10 +719,10 @@ flowchart LR
   `extract_data_from_file` normalizes a run's sensitivity to cm/360 when the
   file carries `Sens Increment` and `DPI`, so every downstream consumer of
   `RunData.horizontal_sens` / `RunData.sens_scale` reads one scale
-  ([decision_log.md](decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)).
+  ([decision log](decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)).
   A converted run also carries `RunData.recorded_sensitivity`, the unrounded
   value, scale, and DPI its file recorded, which only the chart hover reads
-  ([decision_log.md](decision_log/2026/2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md)).
+  ([decision log](decision_log/2026/2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md)).
   Every run also carries `RunData.scenario_hash`, the stats file's `Hash:`,
   or `None` when the file has none, and `RunData.stats_file_name`, the file's
   own name. The hash names the scenario version a run was played on, and the
@@ -731,14 +731,14 @@ flowchart LR
   `Challenge Start:` and `Pause Duration:`, both `None` together when the
   file gives no usable start. `MAX_RUN_LENGTH`, the longest length the parser
   trusts, is derived from the play session limit so it can never exceed it
-  ([decision_log.md](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
+  ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
   `get_runs_newest_first` hands
   a scenario's runs to the time-scored lookup
-  ([decision_log.md](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
+  ([decision log](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
   runs in time order, and `get_new_high_score_runs` applies it to everything
   the scenario holds, never to a filtered view
-  ([decision_log.md](decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
+  ([decision log](decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
   `load_playlists` records each winning user-root code's actual file path
   (so deletion targets the real file, not a reconstructed name) and the user files it skips because
   a bundled code already won; `delete_user_playlist` and
@@ -749,13 +749,13 @@ flowchart LR
   which `get_bundled_benchmark_id` serves. It is a side table and not a
   `PlaylistData` field, because the benchmark importer's drift check compares
   whole models
-  ([decision_log.md](decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
+  ([decision log](decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
   A second side table, filled the same way and for the same reason, holds
   each winning bundled benchmark's scenario groups, one per scenario in
   order, from `scenario_groups.join_scenario_groups`.
   `get_scenario_groups` serves it, and answers `None` for a user playlist and
   for a benchmark that has no groups
-  ([decision_log.md](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
+  ([decision log](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
   helpers (including `_get_with_retry`'s `sensitive` option, which keeps one
   request's parameters and query string out of every log line), JSON cache
@@ -837,7 +837,7 @@ flowchart LR
   profile-less page otherwise, `None` when Evxl has no page the app can link.
   Evxl's benchmark and difficulty names come from `evxl_snapshot.py`. No
   network: the browser opens the address
-  ([decision_log.md](decision_log/2026/2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page.md)).
+  ([decision log](decision_log/2026/2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page.md)).
 - `scenario_groups.py` — sorts a bundled benchmark's scenarios into its
   categories and subcategories. `assign_scenario_groups` is the pure walk:
   it hands a layout's scenario counts down a scenario list and returns one
@@ -846,7 +846,7 @@ flowchart LR
   `join_scenario_groups` adds the snapshot lookup and the hand-kept
   `GROUP_EXCLUDED_PLAYLIST_CODES`. The benchmark importer calls the same walk
   for its group comparison
-  ([decision_log.md](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
+  ([decision log](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
 - `play_sessions.py` — groups runs into play sessions and scenario visits,
   the code's words for a session and a visit. Three pure functions over a
   list of runs, which never read the run store and hold no clock:
@@ -857,7 +857,7 @@ flowchart LR
   tuples of runs with a start and an end, and nothing is stored. Nothing
   calls the functions yet: the Run History page is the first planned caller.
   Rules in [specs/sessions.md](specs/sessions.md)
-  ([decision_log.md](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
+  ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -1021,7 +1021,7 @@ flowchart LR
   listeners catch the focus, the press, the edit, and the arrow key that open
   a list, since Mantine reports none of them to Dash, and Mantine's
   `data-expanded` attribute tells an open list from a closed one
-  ([decision_log.md](decision_log/2026/2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name.md)).
+  ([decision log](decision_log/2026/2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name.md)).
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored icon files consumed by `components/local_icon.py`:

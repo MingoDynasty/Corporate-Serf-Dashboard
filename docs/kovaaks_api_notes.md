@@ -417,8 +417,8 @@ GET https://kovaaks.com/webapp-backend/game-settings
   `SliderMax` bounds.
 - The stats file's `Sens Increment` equals the scale's `IncrementFormula`
   value divided by 0.07, the yaw of KovaaK's UE4 base scale. That relation is
-  what the parser converts with; the field semantics are specified in
-  [decision_log.md](decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md).
+  what the parser converts with; the field semantics are specified in the
+  [decision log](decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md).
 
 ## Derived Data
 
