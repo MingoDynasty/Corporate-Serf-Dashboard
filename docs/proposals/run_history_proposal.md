@@ -1498,8 +1498,12 @@ session. The Run toasts PR lands with PR 4 or after it.
   lands. Landing with PR 4, that is part of the one-time reset. Landing
   later, it is a second reset, for that one switch.
 - **R4 stalls review.** The run list and the card split into a proposal of
-  their own. It depends on this one and never the reverse, and this one then
-  ships the chart, Home, and the kept parts.
+  their own, which depends on this one and never the reverse. That lets the
+  rest be ratified and its first PR start. It changes nothing about what
+  goes public: the old page stays public until the list and the card have
+  shipped too. Going public with the chart alone would drop the surfaces
+  that hold a run's verdict, which the ratified Run toasts proposal depends
+  on. That would need a direction decision of its own.
 - **The built list proves unusable with a screen reader.** NVDA was run on
   the prototypes, and Narrator and JAWS were not run at all. If the built
   list fails where the prototype passed, the cost is the list's last step,
