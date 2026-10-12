@@ -43,9 +43,11 @@ differently:
 | GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
-The Python version is not part of a refresh. Moving it touches
-`.python-version`, `requires-python`, and ruff's `target-version`, and is its
-own change.
+The Python version is not part of a refresh. Moving it is its own change. It
+touches `.python-version`, `requires-python`, ruff's `target-version`, and the
+version [AGENTS.md](../AGENTS.md) names, and it re-locks `uv.lock`. It needs a
+uv pin whose release knows the new interpreter, so a toolchain pass comes
+first.
 
 ## Package pass
 

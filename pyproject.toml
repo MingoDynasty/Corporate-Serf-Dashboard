@@ -3,7 +3,7 @@ name = "Corporate-Serf-Dashboard"
 version = "1.0.0"
 description = "Dash web app that monitors your KovaaK's stats directory and turns your runs into training insight."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.15"
 authors = [{ name = "MingoDynasty" }]
 license = "AGPL-3.0-or-later"
 # Lower bounds track the versions actually locked and tested (uv.lock is the
@@ -44,7 +44,7 @@ module-name = "source"
 
 [tool.ruff]
 line-length = 88
-target-version = "py314"
+target-version = "py315"
 # pre-commit passes filenames explicitly; without this, exclusions
 # (PR-2's lint.exclude for scripts/) are ignored for explicit paths.
 force-exclude = true
