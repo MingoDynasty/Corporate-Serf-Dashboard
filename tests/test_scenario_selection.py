@@ -2,7 +2,7 @@
 
 The callbacks live in ``source/components/scenario_selection.py`` and take
 their ids from the page that hosts them. These tests hold what a deep link
-selects, what the scenario dropdown lists, and the link from the filter to its
+selects, what the two dropdowns list, and the link from the filter to its
 scenario table. Two of them read the page's real registrations, for the rule
 that keeps the scenario list from going unwritten on a visit with no query
 parameters.
@@ -34,9 +34,131 @@ def _walk_components(component):
     yield from _walk_components(children)
 
 
+ALPHA = {"label": "Alpha", "value": "KovaaKsAlpha"}
+BETA = {"label": "Beta", "value": "KovaaKsBeta"}
+DELTA = {"label": "Delta", "value": "KovaaKsDelta"}
+GAMMA = {"label": "Gamma", "value": "KovaaKsGamma"}
+VISIBLE_PLAYLISTS = [ALPHA, GAMMA]
+
+
+@pytest.fixture
+def playlist_lists(monkeypatch):
+    """Load four playlists, two of them hidden, without touching the stores.
+
+    The hidden two sort between the visible two, so a held one that is merely
+    appended to the visible list shows up as a wrong order.
+    """
+    monkeypatch.setattr(
+        scenario_selection,
+        "get_visible_playlist_selector_options",
+        lambda: list(VISIBLE_PLAYLISTS),
+    )
+    monkeypatch.setattr(
+        scenario_selection,
+        "get_playlist_selector_options",
+        lambda: [ALPHA, BETA, DELTA, GAMMA],
+    )
+    monkeypatch.setattr(
+        scenario_selection,
+        "get_playlist_by_code",
+        lambda code: object() if code in {"KovaaKsAlpha", "KovaaKsBeta"} else None,
+    )
+    monkeypatch.setattr(
+        scenario_selection,
+        "get_scenarios_from_playlist_code",
+        lambda code: [f"{code} Scenario"],
+    )
+    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
+
+
+def _playlist_filter(page):
+    return next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlist-dropdown-selection"
+    )
+
+
+@pytest.mark.parametrize("held_playlist", [None, "", "KovaaKsAlpha"])
+def test_the_filter_lists_the_visible_playlists(playlist_lists, held_playlist):
+    """Nothing held, or a visible playlist held: the visible list as it is."""
+    assert (
+        scenario_selection.playlist_filter_options(held_playlist) == VISIBLE_PLAYLISTS
+    )
+
+
+def test_the_filter_lists_the_hidden_playlist_it_holds(playlist_lists):
+    """A hidden playlist still loads and its scenario table links here.
+
+    Without an option for it the filter shows no name, or the previous
+    playlist's, while the rest of the page follows the hidden one. Only the
+    held playlist joins the list: the other hidden one stays out.
+    """
+    assert scenario_selection.playlist_filter_options("KovaaKsBeta") == [
+        ALPHA,
+        BETA,
+        GAMMA,
+    ]
+
+
+def test_the_filter_lists_nothing_for_a_code_no_playlist_has(playlist_lists):
+    assert (
+        scenario_selection.playlist_filter_options("KovaaKsGoneCode")
+        == VISIBLE_PLAYLISTS
+    )
+
+
+def test_select_playlist_keeps_a_hidden_selection_and_lists_it(playlist_lists):
+    """The list written to the filter has to hold what the filter holds.
+
+    The Select drops a value its new options lack, so writing the visible
+    list alone would clear a hidden selection.
+    """
+    scenarios, link, options = scenario_selection.select_playlist("KovaaKsBeta", None)
+
+    assert scenarios == ["KovaaKsBeta Scenario"]
+    (anchor,) = [
+        component
+        for component in _walk_components(link)
+        if isinstance(component, dmc.Anchor)
+    ]
+    assert anchor.href == "/playlists/KovaaKsBeta"
+    assert options == [ALPHA, BETA, GAMMA]
+
+
+@pytest.mark.parametrize("selected_playlist", [None, "KovaaKsAlpha", "KovaaKsGoneCode"])
+def test_select_playlist_writes_only_the_visible_list_otherwise(
+    playlist_lists, selected_playlist
+):
+    """A code no playlist has gets no option, which is what empties the filter."""
+    _scenarios, _link, options = scenario_selection.select_playlist(
+        selected_playlist, None
+    )
+
+    assert options == VISIBLE_PLAYLISTS
+
+
+def test_home_layout_lists_a_hidden_playlist_the_url_names(playlist_lists):
+    """The first paint can already name a linked playlist, with no round trip."""
+    playlist_filter = _playlist_filter(home.layout(playlist_code="KovaaKsBeta"))
+
+    assert playlist_filter.data == [ALPHA, BETA, GAMMA]
+    # Still never the query parameter: see the comment on the Select.
+    assert playlist_filter.value is None
+
+
+@pytest.mark.parametrize("playlist_code", [None, "KovaaKsAlpha", "KovaaKsGoneCode"])
+def test_home_layout_lists_the_visible_playlists_otherwise(
+    playlist_lists, playlist_code
+):
+    playlist_filter = _playlist_filter(home.layout(playlist_code=playlist_code))
+
+    assert playlist_filter.data == VISIBLE_PLAYLISTS
+
+
 def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
@@ -210,37 +332,25 @@ def test_no_callback_depends_only_on_what_apply_deep_link_conditionally_writes()
     )
 
 
-def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_playlist_by_code",
-        lambda code: object() if code == "ValidCode" else None,
-    )
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenarios_from_playlist_code",
-        lambda code: [f"{code} Scenario"],
-    )
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
-
+def test_home_select_playlist_ignores_stale_persisted_names(playlist_lists):
     # The second argument is the deep-link store: a scheduling Input the
     # callback never reads. See select_playlist.
     assert scenario_selection.select_playlist("Old Playlist Name", None) == (
         ["All"],
         None,
+        VISIBLE_PLAYLISTS,
     )
-    scenarios, _link = scenario_selection.select_playlist("ValidCode", None)
-    assert scenarios == ["ValidCode Scenario"]
+    scenarios, _link, _options = scenario_selection.select_playlist(
+        "KovaaKsAlpha", None
+    )
+    assert scenarios == ["KovaaKsAlpha Scenario"]
 
 
-def test_select_playlist_links_the_selection_to_its_scenario_table(monkeypatch):
+def test_select_playlist_links_the_selection_to_its_scenario_table(playlist_lists):
     """The way back from a scenario to the table it was opened from."""
-    _known_playlist(monkeypatch)
-    monkeypatch.setattr(
-        scenario_selection, "get_scenarios_from_playlist_code", lambda _code: []
+    _scenarios, link, _options = scenario_selection.select_playlist(
+        "KovaaKsAlpha", None
     )
-
-    _scenarios, link = scenario_selection.select_playlist("KovaaKsTestCode", None)
 
     (anchor,) = [
         component
@@ -249,22 +359,22 @@ def test_select_playlist_links_the_selection_to_its_scenario_table(monkeypatch):
     ]
     assert anchor.children == "Open scenario table"
     # The bare route: no ``?sort=``, so the table opens in playlist order.
-    assert anchor.href == "/playlists/KovaaKsTestCode"
+    assert anchor.href == "/playlists/KovaaKsAlpha"
     # In-app navigation, as every other internal link on the page.
     assert anchor.refresh is False
 
 
 @pytest.mark.parametrize("selected_playlist", [None, "", "KovaaKsGoneCode"])
 def test_select_playlist_shows_no_link_without_a_loaded_playlist(
-    monkeypatch, selected_playlist
+    playlist_lists, selected_playlist
 ):
     """A cleared filter and a remembered code that no longer resolves both
     list every local scenario, so neither has a table to link."""
-    _known_playlist(monkeypatch)
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
+    scenarios, link, _options = scenario_selection.select_playlist(
+        selected_playlist, None
+    )
 
-    _scenarios, link = scenario_selection.select_playlist(selected_playlist, None)
-
+    assert scenarios == ["All"]
     assert link is None
 
 
@@ -278,10 +388,13 @@ def test_select_playlist_writes_the_link_holder_the_layout_carries():
     assert _output_keys(registration) == {
         "scenario-dropdown-selection.data",
         f"{home.SCENARIO_SELECTION_IDS.playlist_table_link}.children",
+        "playlist-dropdown-selection.data",
     }
 
 
-def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
+def test_select_playlist_lists_nothing_without_a_usable_directory(
+    monkeypatch, playlist_lists
+):
     settings_service.save_settings({})
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
@@ -290,7 +403,9 @@ def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
         lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
-    assert scenario_selection.select_playlist(None, None) == ([], None)
+    scenarios, link, _options = scenario_selection.select_playlist(None, None)
+
+    assert (scenarios, link) == ([], None)
 
 
 # A second page's ids, none of which the Scenario Performance page uses.
@@ -330,7 +445,9 @@ def test_the_page_gives_the_block_the_ids_its_layout_builds(monkeypatch):
         "playlist_table_link": "playlist-table-link",
     }
 
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
     mounted = {
         getattr(component, "id", None) for component in _walk_components(home.layout())
@@ -368,6 +485,7 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
     assert _output_keys(select_playlist) == {
         "second-scenario_dropdown.data",
         "second-playlist_table_link.children",
+        "second-playlist_filter.data",
     }
     assert _answering(apply_deep_link) == "apply_deep_link"
     assert _output_keys(apply_deep_link) == {

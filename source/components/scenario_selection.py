@@ -3,9 +3,10 @@
 A page that hosts the two dropdowns fills in a ``ScenarioSelectionIds``,
 builds the four components in its layout, and calls
 ``register_scenario_selection`` with the ids once, at import. Its layout takes
-the deep-link store's data from ``deep_link_selection`` and the scenario
-dropdown's first list from ``initial_scenario_options``. The callbacks are
-plain functions here and are registered once per page.
+the deep-link store's data from ``deep_link_selection``, the playlist filter's
+first list from ``playlist_filter_options``, and the scenario dropdown's first
+list from ``initial_scenario_options``. The callbacks are plain functions here
+and are registered once per page.
 """
 
 from typing import NamedTuple
@@ -16,8 +17,12 @@ from dash import Input, Output, callback, no_update
 from source.config.settings_service import get_usable_stats_dir
 from source.kovaaks.data_service import (
     get_playlist_by_code,
+    get_playlist_selector_options,
     get_scenario_names,
     get_scenarios_from_playlist_code,
+)
+from source.kovaaks.playlist_visibility_service import (
+    get_visible_playlist_selector_options,
 )
 
 PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
@@ -80,17 +85,52 @@ def _playlist_table_link(playlist_code: str) -> dmc.Text:
     )
 
 
+def playlist_filter_options(held_playlist: str | None) -> list[dict[str, str]]:
+    """List the playlist filter's options: the visible playlists, plus the one it holds.
+
+    A hidden playlist still loads, and a scenario link from its table selects
+    it here, so the filter can hold a playlist the visible list lacks. A Select
+    shows no name for a value its options lack, and goes on showing the
+    previous name when a callback writes such a value. Listing the held
+    playlist is what lets the filter name it.
+
+    The held playlist is listed only while it is held: the next pick or clear
+    builds the list without it, so a hidden playlist still cannot be picked
+    from the dropdown. A code no loaded playlist has adds nothing.
+
+    The layout calls this with ``?playlist_code=`` and ``select_playlist``
+    with the filter's value.
+    """
+    options = get_visible_playlist_selector_options()
+    if not held_playlist or any(option["value"] == held_playlist for option in options):
+        return options
+    listed = {option["value"] for option in options} | {held_playlist}
+    # Filtered from the full list rather than appended, so the held playlist
+    # sits where the list's own order puts it.
+    return [
+        option
+        for option in get_playlist_selector_options()
+        if option["value"] in listed
+    ]
+
+
 def select_playlist(selected_playlist, _deep_link):
-    """List the selected playlist's scenarios and link to its scenario table.
+    """List the selected playlist's scenarios, link to its table, and list the filter.
 
     With no playlist selected, or a remembered code that no longer resolves,
-    the list is every local scenario and there is no link.
+    the scenario list is every local scenario and there is no link.
+
+    The filter's own options are written here because only this callback sees
+    the value on every mount and every change. The layout sees a value the URL
+    names and never one the browser restored.
     """
+    options = playlist_filter_options(selected_playlist)
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return _local_scenario_options(), None
+        return _local_scenario_options(), None, options
     return (
         get_scenarios_from_playlist_code(selected_playlist),
         _playlist_table_link(selected_playlist),
+        options,
     )
 
 
@@ -167,6 +207,12 @@ def register_scenario_selection(ids: ScenarioSelectionIds) -> None:
     callback(
         Output(ids.scenario_dropdown, "data"),
         Output(ids.playlist_table_link, "children"),
+        # The Select drops a value its new options lack, and the browser then
+        # stores the empty filter. So the list written here has to hold the
+        # playlist the filter holds: the visible list alone would clear a
+        # hidden selection for good. That drop is also what empties the filter
+        # of a remembered code no playlist has.
+        Output(ids.playlist_filter, "data"),
         Input(ids.playlist_filter, "value"),
         # Scheduling, not data: this Input looks removable and is not. The value
         # above is an output of ``apply_deep_link``, and the renderer prunes a
