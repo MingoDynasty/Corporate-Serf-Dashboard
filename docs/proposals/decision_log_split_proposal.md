@@ -342,9 +342,14 @@ The split conflicts with any branch that predates it, in one of two ways:
 
 So the rule for the window is: **a PR opened before the split merges only
 after it has synced with `main` and passed the gates again.** The rewrite
-rules in the Links table convert its links. On 2026-10-12 one PR is open,
-[#356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356). It
-does not edit the log, and it adds 20 links in the old form.
+rules in the Links table convert its links.
+
+On 2026-10-12 two other PRs are open, one of each kind:
+
+- [#360](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/360)
+  adds an entry to the log, and links to it in the old form.
+- [#356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356)
+  does not edit the log, and adds 20 links in the old form.
 
 The maintainer picks the moment. The fewer PRs open, the shorter the window.
 
