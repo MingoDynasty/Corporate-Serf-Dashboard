@@ -862,13 +862,19 @@ switch between the two, are a later proposal.
   only.
 - **A divider** marks where the scenario was left and returned to, such as
   "10 runs on 3 other scenarios".
-- **A date header** names each calendar date in a session that crosses
-  midnight. A run row shows a time of day alone, and the session's name
-  gives only the date it started on. So where a session's runs of the
-  scenario fall on more than one date, each date's runs sit under a header
-  that names it. A session on one date has none. Where a header and a
-  divider fall between the same two runs, the divider comes first, and the
-  header sits directly above the runs it names.
+- **A date header** names the date of any listed run that is not on the
+  date its session started. A run row shows a time of day alone, and the
+  session's name gives only the date it started on. A run's date is the
+  date it ended on, the time its row shows. So where any of a session's
+  runs of the scenario has another date than the session's start, each
+  date among those runs gets a header that names it, the start date
+  included, and each date's runs sit under theirs. Two cases have only one
+  date among the listed runs and still get its header: a scenario played
+  only after midnight in a session that started before it, and a single
+  run that started before midnight and ended after it. Where every listed
+  run is on the session's start date, there is no header. Where a header
+  and a divider fall between the same two runs, the divider comes first,
+  and the header sits directly above the runs it names.
 - **Shots fired is shown on every scenario.** The run record gains the
   field. The parser already reads it.
 
@@ -1262,8 +1268,8 @@ chart's hover keeps its two decimals.
 | The first row's length, hover | `The length runs from the first run to the last run. It doesn't count the time since your last run.` | Says why the figure stands still between runs. |
 | The first row, opened, scenario not played in it | `Not played in this session` | "This" is the row's session, in progress or ended. |
 | Divider | `{n} runs on {k} other scenarios`, or `1 run on 1 other scenario` | Says what happened between two rows. |
-| Date header | `Oct 12`, or `Jan 1, 2027` in another year than this one | Names the date of the runs under it, only in a session that crosses midnight. The year follows the session name's rule. |
-| A run's time | `10:50 PM` | The session's name carries the date, or a date header does where the session crosses midnight. No seconds: the chart's hover stays the one place that keeps them. |
+| Date header | `Oct 12`, or `Jan 1, 2027` in another year than this one | Names the date of the runs under it, wherever a listed run is not on the date its session started. The year follows the session name's rule. |
+| A run's time | `10:50 PM` | The session's name carries the date, or a date header does where the run is on another date. No seconds: the chart's hover stays the one place that keeps them. |
 | A check, hover and accessible name | `Threshold passed` | The verdict's own words. |
 | A star, hover and accessible name | `New PB` | The legend's entry. |
 | No check, a judged run, hover and accessible text | `Below threshold` | The verdict's own words. |
@@ -1638,7 +1644,11 @@ maintainer's main checkout.
   scenario, per-session run numbers, a divider's two counts, 30 sessions and
   the next 30, and which rows a new run forces open. Also a session that
   crosses midnight and one that crosses a year, each with a header per
-  date, and a header and a divider between the same two runs.
+  date, and a header and a divider between the same two runs. And the two
+  cases with one date among the listed runs that is not the session's
+  start date: a scenario played only after midnight in a session that
+  started before it, and one run that started before midnight and ended
+  after it. Each shows its header.
 - **The marks,** on the maintainer's example: runs A to E at 90, 99, and 110
   percent, an empty percentage, the percentage cleared and then restored,
   a scenario's first run, the first run at a new sensitivity, a new PB at
