@@ -30,7 +30,9 @@ with option 1, if the user selects a different playlist, then tries to select
 "negative benchmarks" again from the dropdown, that item no longer exists. So
 it still manages to keep in the spirit of the "Hide playlists" feature, which
 hides playlists from dropdown menus to help keep dropdown menus tidier."
-Option 1 is the rule below. Option 2 is under "The option set aside".
+Option 1 is the rule below. Option 2 is under "The option set aside". The
+build is
+[PR #363](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/363).
 
 **The defect.** The filter's options were the visible playlists, while a
 selection was accepted for any loaded playlist. A `?playlist_code=` link
@@ -104,11 +106,12 @@ imported again, or a file that failed to load once.
 - The Journey picker has the same exposure and is left alone, since its page
   is shelved.
 - A restored hidden selection shows an empty filter for one round trip: 151
-  to 236 ms in the four returns measured. A link arrival shows the previous
-  playlist's name for one round trip, 46 and 47 ms in the two measured, which
-  is the cost
+  to 236 ms in the four returns measured in Edge, and 228 to 288 ms in
+  Firefox. A link arrival shows the previous playlist's name for one round
+  trip, 46 and 47 ms in the two measured in Edge and 112 and 125 ms in
+  Firefox, which is the cost
   [2026-09-19](#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)
-  already accepts.
+  already accepts. The Firefox runs shared the machine with a test run.
 - The rule leans on two behaviors of the installed Select that no unit test
   can hold: a value its options have is named, and a value its new options
   lack is dropped. An upgrade of dash-mantine-components should repeat the
