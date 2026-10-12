@@ -612,9 +612,10 @@ What follows from R2.
 
 - **`home.py` shrinks into Home.** The old page's controls, chart, and
   callbacks are deleted from it when the page goes public. The setup card
-  and the stats-folder hint stay where they are, so nothing about them
-  moves. Run History draws its own copies from the same builders. Its page
-  name becomes "Home".
+  and the stats-folder hint keep their place on the page. Their builders
+  move to a shared module, as the groundwork moved the other kept blocks,
+  so Run History draws its own copies without importing the Home page's
+  module. Its page name becomes "Home".
 - **What Home shows,** top to bottom: the stats-folder hint and the setup
   card when they apply, exactly as the old page shows them
   ([Hosted setup surfaces](../specs/scenario_performance.md#hosted-setup-surfaces)),
