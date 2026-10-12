@@ -24,7 +24,7 @@ after they ship and leave this file — lives in
 The five most recently shipped milestones, newest first — older entries
 leave this file entirely. Their user-facing rationale lives in
 [`product.md`](./product.md), design rationale in
-[`decision_log.md`](./decision_log.md), runtime structure in
+[`decision_log/`](./decision_log/README.md), runtime structure in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
@@ -36,7 +36,7 @@ sequence.
   each row names its group under its scenario instead, and the filter box
   matches group names either way. The grouping already shipped with the app,
   so nothing new is fetched. (PR #352; design in #338) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
+  distilled into [`decision_log/`](./decision_log/README.md).
 - **Columns menu and KovaaK's ID columns** — the Playlists table and a
   playlist's scenario table each gain a Columns menu that shows or hides any
   column and remembers the choice in the browser. Each table also gains one
@@ -44,7 +44,7 @@ sequence.
   scenario's leaderboard, so trying an API request by hand no longer starts
   with digging the number out of a file. Both pages look as they did until
   the menu is used. (PR #344; design in #334) Design rationale distilled
-  into [`decision_log.md`](./decision_log.md).
+  into [`decision_log/`](./decision_log/README.md).
 - **Time-scored scenarios measured by pace** — some scenarios score the time
   left on a countdown when the task is done, and on those a percentage of the
   score understates a real improvement several times over. The app now
@@ -54,7 +54,7 @@ sequence.
   threshold line and its verdict judge by pace, and a new personal best says
   how much faster it finished. A scenario the app can't recognize reads as it
   did before. (PR #343; design in #329) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
+  [`decision_log/`](./decision_log/README.md).
 - **New PB stars on the Score vs Time chart** — the chart now draws a gold
   star on each plotted run that beat the scenario's personal best when it was
   played, so it shows when each best was reached, including the ones a later
@@ -63,7 +63,7 @@ sequence.
   setting: the stars follow Point size, and the Score vs Sensitivity chart is
   unchanged. The stars record achievements, and whether the player is
   improving stays the trend verdict's question. (PR #346; design in #337)
-  Design rationale distilled into [`decision_log.md`](./decision_log.md).
+  Design rationale distilled into [`decision_log/`](./decision_log/README.md).
 - **Rank and next-rank gap on benchmarks** — a benchmark's scenario table now
   shows the rank each personal best has reached and how much it has to grow
   to reach the next one, such as "+4.8% to Gold", with the threshold and the
@@ -72,7 +72,7 @@ sequence.
   Evxl. Both columns come from the bundled thresholds and the local personal
   best, so they appear with the table and work offline. (PR #321; design in
   #320) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
+  [`decision_log/`](./decision_log/README.md).
 ---
 
 ## Upcoming milestones
@@ -94,7 +94,7 @@ What we plan to do now or very soon, each with the reasons it comes next.
      runs, and finds each visit, an unbroken stretch of runs on one scenario
      inside a session. The rules are in
      [`specs/sessions.md`](./specs/sessions.md), and their reasons in
-     [`decision_log.md`](./decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes).
+     [`decision_log/`](./decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md).
   3. **The Run History page, version 1** — a page of its own with a chart
      that plots every run, the selected scenario's runs listed by session,
      and a card for the latest run. It's built hidden and made public when
@@ -224,4 +224,4 @@ next.
 
 The typical-run, uncertainty, and verdict principles are recorded with their
 evidence, its limits, and the options set aside in the
-[decision log](./decision_log.md#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice).
+[decision log](./decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md).

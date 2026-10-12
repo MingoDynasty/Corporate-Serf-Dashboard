@@ -18,9 +18,9 @@ thresholds.
    existing sharecode is rejected unless `--accept-removals` is set. The app
    reads this snapshot too. It takes the benchmark and difficulty names behind
    a benchmark page's "View on Evxl" link from it
-   ([decision log](../../docs/decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)),
+   ([decision log](../../docs/decision_log/2026/2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page.md)),
    and the categories and subcategories a benchmark's scenario table draws
-   ([decision log](../../docs/decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+   ([decision log](../../docs/decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
    So a committed refresh changes those links, and can change which
    benchmarks show groups and where a group falls.
 2. Resolve each playlist name and code through Evxl, fetch its rank thresholds
@@ -33,7 +33,7 @@ thresholds.
    app's Playlists page ("Show hidden" reveals new arrivals). Which
    sharecodes belong there is a maintainer rule the script does not enforce:
    Evxl's listed, non-hidden benchmarks, with delisted files removed
-   ([decision log](../../docs/decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)).
+   ([decision log](../../docs/decision_log/2026/2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks.md)).
 
 Run from the repository root:
 
@@ -255,7 +255,7 @@ one PR. Run every command from the repository root with
    `sharecode` under an unchanged `kovaaksBenchmarkId`, and is a real removal.
    A refresh that should carry no snapshot change skips this step.
 2. **Apply the membership rule**
-   ([decision log](../../docs/decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)):
+   ([decision log](../../docs/decision_log/2026/2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks.md)):
    import the listed, non-hidden sharecodes that aren't bundled yet, delete
    the files of delisted ones, and leave hidden ones out. The snapshot diff
    shows all three; `git grep -l SHARECODE resources/benchmarks` finds a

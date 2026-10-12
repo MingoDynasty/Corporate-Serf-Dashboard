@@ -49,17 +49,17 @@ does not reopen them:
 
 - **How a repeatable toast behaves.** A toast whose fact can recur is a
   channel: a newer one replaces the one on screen and gets a full lifetime
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   The run toast stays one channel.
 - **The personal best celebration.** Its toast, its animation, its own
   channel, and its own setting are as ruled on
-  [2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page).
+  [2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md).
   The maintainer, 2026-10-10: "PB celebration toast can stay as is."
 - **What a run is judged against.** A run is judged against the PB it was
   chasing, the best score before it
-  ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)),
+  ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md)),
   by pace on a time-scored scenario
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   The rule survives. It becomes the rule for the check beside a score, which
   the page proposal owns.
 - **The copy rules** in
@@ -88,7 +88,7 @@ one sentence: "I agree to reverse this ratified decision. 'the title carries
 no verdict, and runs that earn no toast today get one.' is exactly correct."
 
 **What it reverses.** The
-[2026-08-03 decision](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+[2026-08-03 decision](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
 set three things for run toasts that T1 undoes:
 
 - "The title carries the verdict." The new title says only that a run
@@ -125,7 +125,7 @@ The rest of that decision stands, for run toasts and for every other toast.
   records it under H5). On 2026-09-22 they chose the README's Run
   notifications wording "intending every run to notify, which has not fully
   shipped"
-  ([decision log](../decision_log.md#2026-09-22-the-readme-stops-explaining-how-the-installer-works)).
+  ([decision log](../decision_log/2026/2026-09-22-the-readme-stops-explaining-how-the-installer-works.md)).
 
 **What it costs.**
 
@@ -272,7 +272,7 @@ runs being judged.**
 The switch decides whether a run toast carries a pass or a miss. With it
 off, a run that did not place gets no toast. It was never the switch that
 turns run toasts off
-([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
+([2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
 
 The maintainer, 2026-10-10: "Yes, drop the Score Threshold verdict switch."
 And: "It can be entirely replaced with the 'green checkmark' idea in the
@@ -368,7 +368,7 @@ Checked on 2026-10-11 against `main` at `4272fbb`.
 1. **Follow does not act when the page is opened.** The callback that
    follows a new run (`check_for_new_data`) is set never to run on mount,
    on purpose: a remount must not replay a batch it already handled
-   ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
+   ([2026-09-19](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
    So a player who arrives from another page sees the scenario the browser
    remembers, which need not be the one just played.
 2. **A toast can hold a working link, and the element matters.** No toast in
@@ -408,7 +408,7 @@ Checked on 2026-10-11 against `main` at `4272fbb`.
    (1.3%) would have been found together with a newer run, taking the
    poll's timing as random. A window the game only covers is not hidden, in
    the browsers checked on 2026-09-28
-   ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+   ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
 8. **A link to the address the page already holds does nothing.** On the
    scratch app of fact 2, with the page open at `?scenario=` and a name, a
    second toast's link to that same address left the page as it was. The
@@ -488,7 +488,7 @@ Each holds today for the run toast and still holds:
   may read the same. Every channel already behaves this way: it was
   measured on 2026-08-29 as a slide of about 135 ms and a crossfade of
   about 250 ms
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   The maintainer asked on 2026-10-11 that it hold for this toast. It holds
   because the toast stays on that mechanism, and Testing checks it.
 - **The Run notifications switch turns it off.** Off means no plain toast,
@@ -574,7 +574,7 @@ again over a later choice. That is the accepted behavior of every such link
 the toast is up (fact 4). The app's rule for a notice printed into a page
 is that one holding a control is not an alert, because the alert role is
 meant for text
-([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md)).
 A toast can't follow that rule: Mantine gives every toast the alert role.
 This would be the first toast to hold a control. A screen reader should
 read it as one alert, link text included, and none was run. The cost is
@@ -609,7 +609,7 @@ with.
 **The setting becomes a value the shell holds, and its switch moves to the
 Settings page.** The maintainer chose the Settings page on 2026-10-11. Both
 are what the celebration setting has had since
-[2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page):
+[2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md):
 
 - **A browser-local store in the shell** holds one value, on or off, and
   starts on. Only the exact off value silences the toast. Anything else,
@@ -747,29 +747,29 @@ Each entry keeps its text and gains a dated note. None is erased.
 
 | Entry | What this supersedes | What stands |
 |---|---|---|
-| [2026-08-03, One Quiet Notification Layer](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy) | For run toasts: the title carries the verdict; a run that earns neither emits nothing; the threshold verdict headlines and the placement trails; a failing verdict names its target; sensitivity as a trailing qualifier. Its "already visible somewhere" test gains the run toast as a named exception. | The one delivery path. The routing policy for every other event. Background threads never driving the UI. The four behaviors of the run toast's channel. "The message leads with the scenario." |
-| [2026-07-08, Judge Against The Previous PB](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb) | The surface: no notification judges a run. | The rule and its exact comparison, now for the check and the card. |
-| [2026-08-21, Run Notifications Have A Master Switch](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed) | The verdict switch and its four combinations (T3). What the master switch gates: one plain toast. Where it lives: its Notifications group leaves Chart options for the Settings page. That it is stored by Dash persistence. Its deferral of app-wide run toasts. | What the master switch does not gate. That flipping it rebuilds nothing. That it is browser-local, with `settings.json` and `config.toml` rejected. |
-| [2026-09-02, A New Personal Best Celebrates On Every Page](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page) | "Run toasts remain page-built and page-scoped", and the deferred question of app-wide run toasts. The page's part in the coalescing rule: the shell now picks the batch's newest run, whatever its scenario. | The celebration in full. One notification per run at most. The two settings staying independent. |
-| [2026-10-05, Time-Scored Scenarios Are Measured By Pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | Where the third of its five surfaces lives: the threshold verdict's "% of PB pace" is on the page, not in a toast. Top N placement leaves its list of things that order scores. | Every formula, the detection, and the other four surfaces. |
-| [2026-08-09, The Graph Page Is Scenario Performance](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options) | Its list of the Score Threshold group's controls, which names the verdict switch. | The rest of the entry, as far as this proposal goes. The page proposal reverses its name ruling separately. |
+| [2026-08-03, One Quiet Notification Layer](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md) | For run toasts: the title carries the verdict; a run that earns neither emits nothing; the threshold verdict headlines and the placement trails; a failing verdict names its target; sensitivity as a trailing qualifier. Its "already visible somewhere" test gains the run toast as a named exception. | The one delivery path. The routing policy for every other event. Background threads never driving the UI. The four behaviors of the run toast's channel. "The message leads with the scenario." |
+| [2026-07-08, Judge Against The Previous PB](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md) | The surface: no notification judges a run. | The rule and its exact comparison, now for the check and the card. |
+| [2026-08-21, Run Notifications Have A Master Switch](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md) | The verdict switch and its four combinations (T3). What the master switch gates: one plain toast. Where it lives: its Notifications group leaves Chart options for the Settings page. That it is stored by Dash persistence. Its deferral of app-wide run toasts. | What the master switch does not gate. That flipping it rebuilds nothing. That it is browser-local, with `settings.json` and `config.toml` rejected. |
+| [2026-09-02, A New Personal Best Celebrates On Every Page](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md) | "Run toasts remain page-built and page-scoped", and the deferred question of app-wide run toasts. The page's part in the coalescing rule: the shell now picks the batch's newest run, whatever its scenario. | The celebration in full. One notification per run at most. The two settings staying independent. |
+| [2026-10-05, Time-Scored Scenarios Are Measured By Pace](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md) | Where the third of its five surfaces lives: the threshold verdict's "% of PB pace" is on the page, not in a toast. Top N placement leaves its list of things that order scores. | Every formula, the detection, and the other four surfaces. |
+| [2026-08-09, The Graph Page Is Scenario Performance](../decision_log/2026/2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md) | Its list of the Score Threshold group's controls, which names the verdict switch. | The rest of the entry, as far as this proposal goes. The page proposal reverses its name ruling separately. |
 
 Four more entries mention strings or rules that go, and get a one-line
 note: the
-[2026-07-06 coalescing entry](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)
+[2026-07-06 coalescing entry](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)
 (that the chart callback creates the toast, and that a backlog yields one
 toast batch; its rule for the plot and for Follow is unchanged), the
-[2026-09-14 copy entry](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)
+[2026-09-14 copy entry](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)
 (the run-toast strings it set), the
-[2026-09-22 README entry](../decision_log.md#2026-09-22-the-readme-stops-explaining-how-the-installer-works)
+[2026-09-22 README entry](../decision_log/2026/2026-09-22-the-readme-stops-explaining-how-the-installer-works.md)
 (the Run notifications line, and that every run now notifies), and the
-[2026-09-11 sensitivity entry](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)
+[2026-09-11 sensitivity entry](../decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)
 (placement within the normalized group).
 
 Two decisions are relied on and not changed. One is the
-[2026-08-31 toast identity decision](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry).
+[2026-08-31 toast identity decision](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md).
 The other is the
-[2026-09-02 celebration setting decision](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page),
+[2026-09-02 celebration setting decision](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md),
 whose reason for the Settings page now covers a second control. It gains a
 note that the celebration select is no longer the only browser-local
 control on that page.

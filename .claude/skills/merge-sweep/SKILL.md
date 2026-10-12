@@ -56,7 +56,7 @@ judgment, not string equality — e.g.
 For PRs merged since the last sweep (default: the last 7 days), where the PR
 shipped or finished shipping a proposal, verify the "Shipping a proposal"
 definition of done in AGENTS.md actually happened: proposal file deleted,
-`docs/decision_log.md` entry added, `docs/roadmap.md` milestone moved to
+`docs/decision_log/` entry added, `docs/roadmap.md` milestone moved to
 Shipped, `docs/product.md` inventory updated, fixed `docs/tech_debt.md`
 entries removed, and no stale references to the deleted proposal file remain
 (`rg` the filename across the repo — CI's `test_docs.py` only catches

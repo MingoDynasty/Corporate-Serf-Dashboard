@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # Unsynchronized on the same terms as the run stores: after startup the
 # watchdog thread is the only writer of the listing, and a raced read
 # self-heals on the next look. See the 2026-07-09 "Unsynchronized In-Memory
-# Stores" entry in docs/decision_log.md.
+# Stores" entry in docs/decision_log/.
 _performance_dir: Path | None = None
 _performance_file_names: set[str] = set()
 _readings: dict[str, PerformanceReading] = {}

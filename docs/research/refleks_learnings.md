@@ -11,7 +11,7 @@ That is a bookkeeping choice, not a license conflict: this project is
 AGPL-3.0, whose section 13 permits combining with GPL-3.0 work, but any file
 taken from refleks would stay GPL-3.0 and need recording like the vendored
 assets (see the
-[AGPL decision](../decision_log.md#2026-08-10-the-project-is-agpl-30-and-contributors-sign-nothing)),
+[AGPL decision](../decision_log/2026/2026-08-10-the-project-is-agpl-30-and-contributors-sign-nothing.md)),
 and this tree keeps its own code under one license. Everything below is
 described at the idea/format level for that reason.
 

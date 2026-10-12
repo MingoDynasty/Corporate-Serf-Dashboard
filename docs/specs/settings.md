@@ -13,7 +13,7 @@ setting the running app cannot pick up live is frozen at startup, and the
 page says when a restart is needed.
 
 Statements below describe what the app does today and link the
-[decision log](../decision_log.md) entries that set them — rationale lives
+[decision log](../decision_log/README.md) entries that set them — rationale lives
 in those entries, not here. A statement with no link is an implementation
 fact that no decision-log entry governs. Runtime structure, including the two
 filesystem roots and the in-memory stores, is mapped in
@@ -31,7 +31,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   install or by hand from `example.toml` in a checkout, and is human-owned and
   app-read-only from then on: the app never writes it, and an update never
   touches it
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
   `ConfigData` holds `port` (required, no default, `1` to `65535`), `host`
   (`"127.0.0.1"`), `open_browser_on_launch` (`True`), `polling_interval`
   (`1000` ms, `1` to `2147483647`), `debug` (`False`),
@@ -41,25 +41,25 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   (`True`), `kovaaks_api_timeout_seconds` (`30`, must be above `0`), and
   `show_version_in_title` (`False`). The port and poll-interval bounds are set
   by
-  [2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load);
+  [2026-09-01](../decision_log/2026/2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load.md);
   a configured `0` port is refused even though `bind_server_socket(0)` still
   asks the OS for a free port, and the poll interval's upper bound is the
   largest delay `window.setInterval` can hold rather than a product cap on how
   slow a poll may be. `example.toml` states both ranges beside the settings.
 - The app owns no default port. `example.toml` ships `port = 8050`, and an
   existing install keeps whatever its file says
-  ([2026-07-19](../decision_log.md#2026-07-19-default-port-is-8050-not-8080)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-default-port-is-8050-not-8080.md)).
   The installer's generated file carries `port` only
-  ([2026-07-19](../decision_log.md#2026-07-19-the-installer-brings-its-own-toolchain-app-locally),
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md),
   its 2026-08-02 addendum).
 - The two `168` TTLs are set by
-  [2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)
+  [2026-04-29](../decision_log/2026/2026-04-29-cache-leaderboard-totals-for-one-week.md)
   and the `30` s timeout by
-  [2026-07-13](../decision_log.md#2026-07-13-kovaaks-timeout-is-30s-configurable-read-timeouts-are-not-retried);
+  [2026-07-13](../decision_log/2026/2026-07-13-kovaaks-timeout-is-30s-configurable-read-timeouts-are-not-retried.md);
   what they govern is specified in
   [scenario_rank.md](scenario_rank.md#caching). `percentile_warmup_enabled`
   disables only the warmup worker
-  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
+  ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)).
   `show_version_in_title` is read per request and prefixes every page title
   with the release label; the surfaces are listed in
   [release_and_install.md](release_and_install.md#build-identity).
@@ -68,25 +68,25 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   `port` and `host`, and a source checkout opens no browser whatever the key
   says. What the launcher does with it is specified in
   [release_and_install.md](release_and_install.md#starting)
-  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+  ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
 - The file is loaded lazily and cached through `get_config()`; `main()` owns
   the first load and turns a missing, undecodable, unparseable, or invalid
   file into one stderr line, "Configuration error: could not load
   `<path>` -- copy example.toml to config.toml.", and exit code 1, before
   playlists load or any service starts
-  ([2026-07-09](../decision_log.md#2026-07-09-load-configuration-lazily-at-application-startup)).
+  ([2026-07-09](../decision_log/2026/2026-07-09-load-configuration-lazily-at-application-startup.md)).
   An out-of-range `port` or `polling_interval` takes that same exit rather than
   reaching the bind; `host` is not part of that check and fails later, at the
   bind, with its own message
-  ([2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load)).
+  ([2026-09-01](../decision_log/2026/2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load.md)).
   The same line is written to the log files.
 - Unknown keys are named once in a warning,
   `Ignoring unknown key(s) in "<path>": ['<key>', ...]. Remove them when convenient.`,
   and ignored; a file carrying keys a release has retired or does not have
   yet loads on both sides of an update
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
   The path is quoted and the keys are shown as typed, in Python's list form
-  ([2026-09-26](../decision_log.md#2026-09-26-log-lines-delimit-their-values-by-kind)).
+  ([2026-09-26](../decision_log/2026/2026-09-26-log-lines-delimit-their-values-by-kind.md)).
 - `host` must be an IP literal. A name, `localhost` and the empty string
   included, exits before any bind with a message naming the setting; the
   address family comes from the literal, so `::` binds as IPv6. On the
@@ -94,7 +94,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   other host is bound alone, and under `0.0.0.0` nothing answers on `::1`.
   The app has no authentication, so every device that can reach the chosen
   address can read the run data and change the settings
-  ([2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
+  ([2026-08-14](../decision_log/2026/2026-08-14-the-listen-address-is-configurable-loopback-by-default.md)).
 - Every socket is bound by the app itself with `SO_EXCLUSIVEADDRUSE` and
   handed to waitress bound but not listening. A port taken on either face
   exits 1 with "Startup error: port `<port>` is already in use -- most likely
@@ -103,15 +103,15 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   addresses, 127.0.0.1 and [::1]. Close that program, or set a different port
   in `<path>`." (the "on `<host>`" form under a non-default host). IPv6
   genuinely absent serves IPv4 alone after one info line
-  ([2026-07-19](../decision_log.md#2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken.md)).
   A well-formed literal no local interface holds fails as a host error, not a
   port error
-  ([2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
+  ([2026-08-14](../decision_log/2026/2026-08-14-the-listen-address-is-configurable-loopback-by-default.md)).
 - `debug = true` serves through Flask's development server on the same host
   and port, validates `host` the same way, and warns at startup, when `host`
   is not the default, that the debugger is reachable from that network; the
   combination is not refused
-  ([2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
+  ([2026-08-14](../decision_log/2026/2026-08-14-the-listen-address-is-configurable-loopback-by-default.md)).
 
 ## The settings store
 
@@ -120,31 +120,31 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   the disk at most once per cache life, and a temp-file-plus-atomic-replace
   write. A hand edit made while the app runs is not picked up; one made while
   it is stopped is
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
 - The schema is flat: `stats_dir`, `kovaaks_username`, and `steam_id`, each a
   string, under a top-level `schema_version` stamp written first with the rest
   sorted. A missing key, an empty value, and any unusable file all read as
   *not configured*. Reads return the three keys only; the stamp never reaches
   domain code
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)
   as amended by
-  [2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  [2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
   The file is read `utf-8-sig` and written plain UTF-8.
 - Key absence and key emptiness are distinct facts to the startup bootstrap,
   which writes `stats_dir` only when the key is absent
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)),
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)),
   and to the setup card, the landing page's hint, and `decline_identity`,
   which key on whether a key exists
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   Every other consumer collapses both to unset.
 - `save_settings` replaces the file whole with exactly the mapping it is
   given; the Settings page always passes all three keys, empty strings
   included
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
   `decline_identity` re-reads the store under the lock, writes it back with
   `kovaaks_username` set to `""` and every other key untouched, and does
   nothing when the username key already exists
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   Both take the write guard in the schema contract below.
 
 ## Restart scope and pinning
@@ -154,7 +154,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   directory is decided as part of that pin; every consumer reads the pin
   (`get_usable_stats_dir`), so a directory appearing or vanishing mid-run
   changes nothing until a restart. A pin never resolved reads as unset
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)).
 - The app also reads the `performances` folder beside the pinned stats
   directory, the sibling of that name under the same parent, where KovaaK's
   writes one performance file per run. There is no setting for it: it
@@ -162,7 +162,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   and the app only ever reads it. A stats directory with no such folder
   beside it, as when the setting points at a copy of the stats files, lists
   nothing, and no scenario is then recognized as time-scored
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   What the files are read for is specified in
   [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
 - Identity is a pair. Reads stay live until the first `get_identity` (or
@@ -170,18 +170,18 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   values for the life of the process; a Steam ID without a username freezes
   nothing. A first-time identity set therefore applies without a restart, and
   any later change is restart-scoped
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)).
 - `is_restart_pending()` is derived, never stored: true when the stored
   `stats_dir` differs from the pinned one (an empty and an absent value
   compare equal), or when an identity pin exists and the stored pair differs
   from it. An unfrozen identity pin is never a difference
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)).
   `is_stats_dir_change_pending()` answers the directory half alone.
 - The app starts and serves with no usable stats directory. Unset and
   set-but-missing behave the same: the initial scan and the file watchdog are
   skipped, one warning names what was configured, and only `port` is needed to
   serve. The app never restarts itself and re-initializes nothing live
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)).
   What the landing page shows in that state is split between the hint and the
   setup card, below.
 
@@ -196,13 +196,13 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   whatever is stored. A miss writes nothing and retries next start; a present
   value, `""` included, is never overridden; an unreadable vdf is skipped with
   a warning
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)).
   The bootstrap is the app's only silent writer and declines with a warning
   when the store is in the error or future state
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 - The same walk, returning every hit in the same order, feeds the Settings
   page's stats-directory suggestions, recomputed on every render of the page
-  ([2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified.md)).
 - Identity detection runs only behind the Detect button. It reads
   `config/loginusers.vdf` from every Steam root, merges accounts by SteamID64
   keeping the newest `Timestamp`, probes each distinct persona against
@@ -212,7 +212,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   newest `lastAccess` first, an unchecked count (transport failure, unexpected
   status, or an unusable payload), and whether account discovery was complete.
   Personas never reach the log; nothing is written
-  ([2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified.md)).
 
 ## The Settings page
 
@@ -220,8 +220,8 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   is on disk. Three fields: "Stats folder" (an Autocomplete over the
   suggestions with filtering off), "KovaaK's username", and "Steam ID", all
   free text. Opening the page never calls KovaaK's
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page),
-  [2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md),
+  [2026-08-03](../decision_log/2026/2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified.md)).
   The stats-directory field shows a chevron and the sentence "Click the field
   to pick from the folders found on this machine." only when there are
   suggestions.
@@ -233,23 +233,23 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   "Settings saved.", and, when a username is present and
   `percentile_warmup_enabled` is on, starts the warmup worker if none is
   running
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
 - Save outcomes are in-place statuses, never toasts: an I/O failure says
   "Couldn't save settings, so nothing was written. See data/logs/debug.log."
   and a refused write over a newer file says "Nothing was saved. The settings
   file was written by a newer version of this app. Update the app to change
   settings."
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp));
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md));
   the routing rule lives in
   [notifications.md](notifications.md#routing-policy).
 - While `is_restart_pending()` holds, the page shows "Restart the app to
   apply. This app is still running on the settings it started with.", on
   every visit and immediately after the save that caused it
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)).
   It is a yellow panel under the Save row, with the warning icon beside the
   sentence and no title, capped at the form fields' width; every state it has
   is that one color
-  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+  ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md)).
 - "Detect my accounts" fills inputs only. Exactly one candidate with nothing
   unchecked and discovery complete fills both fields ("Found `<username>`.
   **Save** to apply it."); any other result with at least one candidate goes
@@ -266,35 +266,35 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   have been missed. See data/logs/debug.log." and the unchecked caveat
   "`<n>` Steam accounts couldn't be checked. Press the **Detect my accounts**
   button again to retry."
-  ([2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified.md)).
   The status line is built from parts so that every control name in it is
   bold, including a line that names both Save and Detect my accounts
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   Before any detection the button sits beside the hint "Checks the Steam
   accounts on this machine against KovaaK's.", which a detection's report
   replaces.
-- A yellow alert with a warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices))
+- A yellow alert with a warning icon ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md))
   titled "Your saved settings aren't being used" carries the
   store's message in the error and future states and is re-derived after a
   save that repairs the file
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 - The version section is static text from `BuildInfo`: "Version `<release
   label>`" then "Commit `<short sha>` (`<commit date>`)", the Commit prefix
   attributing a date that can lag the tag's by a day
-  ([2026-08-02](../decision_log.md#2026-08-02-the-settings-page-owns-version-display)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-the-settings-page-owns-version-display.md)).
   Beneath it, "Report a bug" opens the GitHub bug form with `version`
   pre-filled from the same label, and "Logs `<log directory>`" names where
   `debug.log` is
-  ([2026-08-10](../decision_log.md#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)).
+  ([2026-08-10](../decision_log/2026/2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed.md)).
 - Every callback that writes `data/settings.json` or spends a KovaaK's call
   guards on its trigger: Save and Detect on `n_clicks` and the triggering id,
   the picker on a chosen value and the triggering id
-  ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
   The Celebrations select below is the one state-writing callback that does
   neither, and deliberately: its write is browser-local, and the spurious call
   it has to survive arrives *with* the select as the triggering id, so it gates
   on the initialization tick instead
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 
 ## Celebrations
 
@@ -303,48 +303,48 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   "Plays a short animation and shows a toast when a run beats your personal
   best in any scenario. Works on every page, and doesn't depend on **Run
   notifications**. Takes effect right away.", with a "Preview" button beside
-  it; the control name renders bold ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  it; the control name renders bold ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   Nothing here goes through Save, and nothing here touches the restart notice
   or the store alert, which speak for the form's three keys
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - The select offers five options in this order: "Off", "Confetti",
   "Fireworks", "Cannons", "Stars", carrying the values `"off"`, `"confetti"`,
   `"fireworks"`, `"cannons"`, `"stars"`. Deselecting is disabled, so the
   control always holds one of them; Off is a value like any other rather than
   a second control. The four style names have to name entries in the animation
   registry, which a test asserts
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - The setting is the shell-hosted `dcc.Store(id="pb-celebration-style",
   storage_type="local")`, not the control: one browser-local string, `"off"`
   or a style name, defaulting to `"confetti"`. The select initializes from it
   and writes its value straight back to it, and carries no Dash persistence of
   its own. What the setting governs is in
   [notifications.md](notifications.md#run-notifications)
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - The value is per browser, is cleared with site data, and is never written to
   `data/settings.json`; a browser that has never visited the page celebrates.
   Anything but the exact `"off"` reads as on, so a value this build does not
   know still celebrates rather than silently disabling the family
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - A one-shot `dcc.Interval` initializes the select from the store, which reads
   as `State` there; the store-as-`Input` pair would be a dependency cycle. The
   same tick gates the write direction, because mounting the page fires that
   callback with the select's layout default despite `prevent_initial_call` and
   with the select as the triggering id, which would otherwise write that
   default over a stored choice on every visit
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - A stored value that is none of the five options — a cleared store, or a
   style a later version wrote — leaves the select on its layout default, which
   is Confetti. That mirrors the animation's own fallback, and the stored value
   is not rewritten: showing the default changes nothing, so nothing travels
   back to the store
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - Preview plays the currently selected style through the same clientside path
   a real celebration takes, so it obeys the reduced-motion guard, and it shows
   no toast. It is `disabled` while Off is selected. Both rules read the
   select's value rather than the store, so the button is enabled exactly when
   clicking it plays what the select shows
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 
 ## The setup card
 
@@ -354,7 +354,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   they would report a fresh install for a store that is configured on disk.
   One card covers both, because the Settings page's store alert is where they
   are told apart and where the remedy lives
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
   Copy and treatment belong to the Scenario Performance spec.
 - The landing page's card is keyed to key absence in the stored view: an
   absent `stats_dir` shows "Finish setting up" with no Skip and wins when both
@@ -363,42 +363,42 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   that exists with any value retires its item for good, so a configured
   install never sees the card. Nothing renders while
   `is_stats_dir_change_pending()` holds
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   Placement and copy belong to the Scenario Performance spec.
 - Skip calls `decline_identity`: the username becomes `""`, nothing else
   changes, no worker starts, nothing pins, and the card never returns
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   Two things stop the write and neither takes the card away, because nothing
   was recorded: a future-state store refuses it
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)),
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)),
   and an unwritable `data/` fails it. Both report on the red toast "Skip
   wasn't saved", the refusal with "The settings file was written by a newer
   version of this app. Update the app to change settings." and the failure
   with "Nothing was written. Try again. See data/logs/debug.log."
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)); the failure is logged. They share one channel, so a
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)); the failure is logged. They share one channel, so a
   second Skip
   click re-pops the current answer instead of clicking into silence, and a
   retry that fails differently replaces the first explanation rather than
   sitting beside it
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - The landing page's in-place hint "No stats folder configured. Set it in
   Settings." speaks only for a `stats_dir` key that exists and is unusable;
   while a set directory awaits a restart it reads "Restart the app to apply
   your saved settings." instead
-  ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)
+  ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)
   as amended by
-  [2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  [2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   Both branches wear the card's yellow panel treatment, and the hint can
   render above the card
-  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy));
+  ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md));
   the treatment is specified in
   [scenario_performance.md](scenario_performance.md#hosted-setup-surfaces).
 - An empty username keeps the app fully offline; the short-circuit is
   specified in [scenario_rank.md](scenario_rank.md#data-sources-and-identity)
-  ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)),
+  ([2026-08-01](../decision_log/2026/2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected.md)),
   and how the position surfaces state it is in
   [notifications.md](notifications.md#routing-policy)
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)).
 
 ## Durable-store schema contract
 
@@ -406,13 +406,13 @@ This section governs every JSON store the app writes under `data/`:
 `settings.json`, `playlist_visibility.json`, and each user playlist under
 `data/playlists/`. Cache files under `data/cache/` and the bundled corpus are
 exempt
-([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 
 - Every store carries a top-level `"schema_version"` whose value must be
   exactly an `int` (a JSON `true` is rejected) in the supported set `{1}`.
   There is no grandfather rule: a well-formed file without the stamp is an
   error
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 - `store_schema.read_store_document` classifies each file into one of four
   states and never mutates it: *missing* (no file) reads as the first-run
   default; *error* (unreadable, not JSON, not an object, unstamped, a
@@ -421,7 +421,7 @@ exempt
   first-run default, and logs an actionable message; *supported* reads the
   validated payload; *future* (a stamp above `1`) reads nothing and refuses
   every write with `UnsupportedSchemaError`
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 - Automatic writers never touch an error- or future-state store. A
   user-initiated write owns an error-state file: the incumbent is copied, never
   moved, to `<name>.corrupt-<n>.bak` before the replace. The bytes are made
@@ -432,23 +432,23 @@ exempt
   states the error and future states in its own register: the Settings page
   alert and statuses, the Playlists page for visibility, the startup warning
   queue for playlist files
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
   Every store message names the file by kind ("settings file", "playlist
   visibility file", "playlist file"), states the problem as whole sentences,
   and closes with the full path as a `File: {path}` readout, such as "The
   settings file isn't valid JSON. File: {path}"; a malformed stamp is quoted
   as the file holds it, in JSON
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - Settings v1 is a subset of the three keys with string values, unknown keys
   invalid; visibility v1 is exactly `shown_playlists` as a list of strings;
   playlist v1 is `PlaylistData`, extras ignored. The same validators serve the
   runtime readers and the conversion script
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 - The app has no migration code. `scripts/stamp_schema_version.py` stamps an
   unstamped valid-v1 file, leaves stamp 1 alone, and preserves and reports
   everything else; how it ships and resolves its root is in
   [release_and_install.md](release_and_install.md#schema-migration-shipping)
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 
 ## State root
 
@@ -458,10 +458,10 @@ exempt
   the current working directory; bundled read-only assets under
   `resources/benchmarks/` resolve from the package root instead. The app only
   reads the variable
-  ([2026-07-19](../decision_log.md#2026-07-19-all-mutable-state-lives-under-an-explicit-state-root)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-all-mutable-state-lives-under-an-explicit-state-root.md)).
   An empty value reads as unset. Who sets it is specified in
   [release_and_install.md](release_and_install.md#state-root).
 - Runtime data groups under `data/`, logs under `data/logs/`
-  ([2026-06-22](../decision_log.md#2026-06-22-keep-user-runtime-data-under-data)),
+  ([2026-06-22](../decision_log/2026/2026-06-22-keep-user-runtime-data-under-data.md)),
   and the API cache under `data/cache/`
-  ([2026-07-11](../decision_log.md#2026-07-11-move-the-api-cache-under-datacache)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-move-the-api-cache-under-datacache.md)).

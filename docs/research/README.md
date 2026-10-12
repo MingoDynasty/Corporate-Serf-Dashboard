@@ -33,7 +33,7 @@ surveys of one app.
   `ignore/design-notes/`, following the [scratch routing rules](../../ignore/README.md).
 - Develop a concrete design under `docs/proposals/`, following the
   [proposal guidance](../../AGENTS.md#documentation-habits).
-- Record adopted decisions in [the decision log](../decision_log.md) and
+- Record adopted decisions in [the decision log](../decision_log/README.md) and
   shipped behavior in `docs/specs/`.
 
 Surveys describe the projects as inspected on their recorded dates. Statements

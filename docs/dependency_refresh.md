@@ -10,7 +10,7 @@ release.
 Run a refresh about monthly, at a point when little other work is open. There
 is no reminder and no bot, because a refresh always finds something: a timer
 would say nothing the calendar does not. The reasons are in the
-[2026-10-04 decision](decision_log.md#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook).
+[2026-10-04 decision](decision_log/2026/2026-10-04-dependency-updates-stay-manual-run-from-a-playbook.md).
 
 List the open work first:
 
@@ -51,7 +51,7 @@ own change.
 
 1. See what would move. An upgrade takes the newest version of every package,
    however recently it was published
-   ([2026-10-05 decision](decision_log.md#2026-10-05-a-refresh-takes-the-newest-version-of-everything)).
+   ([2026-10-05 decision](decision_log/2026/2026-10-05-a-refresh-takes-the-newest-version-of-everything.md)).
    Read the release notes of anything crossing a major version, and of every
    package that ships browser code (named under
    [Verify by what moved](#verify-by-what-moved)). For plotly, read the
@@ -135,7 +135,7 @@ CI needs no edit, because `setup-uv` reads the pin from `pyproject.toml`.
 ### GitHub Actions
 
 A refresh reports these pins and does not move them. They move through the
-[cross-repo tooling spec](decision_log.md#2026-10-05-adopt-the-cross-repo-python-v3-tooling-spec),
+[cross-repo tooling spec](decision_log/2026/2026-10-05-adopt-the-cross-repo-python-v3-tooling-spec.md),
 which the maintainer keeps outside this repository. The workflow's top-level
 settings and its `test` job are this repository's copy of the spec's workflow.
 The spec carries these exact SHAs, so moving them here alone makes this copy
@@ -204,7 +204,7 @@ same day. The hover must give the time of the run that set the PB, the earlier
 of the two. The app only places that run last in the trace. That plotly.js
 answers a shared point with its last point is observed, on 4.0.0 and 4.1.1,
 and not documented
-([2026-10-05 entry](decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+([2026-10-05 entry](decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
 If the later run's time shows, stop and ask the maintainer.
 
 A dash-ag-grid bump needs two looks at a benchmark's scenario table, such as
@@ -217,7 +217,7 @@ uv run python -c "import json, pathlib, dash_ag_grid; print(json.loads((pathlib.
 
 - **The merged-cell repair.** The table works around a defect in AG Grid
   35.3.1, which AG Grid 36.1.0 fixed
-  ([2026-10-06 entry](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+  ([2026-10-06 entry](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
   On 36.1.0 or later, remove the repair as its
   [tech-debt entry](tech_debt.md#remove-the-merged-cell-repair-when-dash-ag-grid-bundles-ag-grid-3610)
   says. Either way, click the Scenario header three times, then the Runs
@@ -236,7 +236,7 @@ playlist while it holds one, and that rests on how the Select treats a value
 against its options: it names a value its options have, and drops a value its
 new options lack. Both were read in 2.8.0's bundle and seen in a browser, and
 neither is documented
-([2026-10-12 entry](decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
+([2026-10-12 entry](decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
 
 - **A held hidden playlist is named.** On Playlists, turn on Show hidden,
   open a hidden playlist's table, and click a scenario. The playlist filter
@@ -258,7 +258,7 @@ the app to reach an outside service, stop and ask the maintainer before
 shipping it or hiding it. A difference in appearance alone is named in the PR
 body. plotly 7 added a control and an outside service at once: it put a Share
 chart button on the charts by default
-([2026-09-12 entry](decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)).
+([2026-09-12 entry](decision_log/2026/2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md)).
 What the maintainer accepts goes into
 [What it talks to](user_guide.md#what-it-talks-to) and the capability spec in
 the same PR.
@@ -306,7 +306,7 @@ the PR body. Lift the cap in a later refresh, once the breakage is gone.
 GitHub's Dependabot alerts watch `uv.lock` and raise an alert when a locked
 package has a known vulnerability. Its automatic fix PRs are off, because they
 cannot run against this repository's exact uv pin
-([2026-10-04 decision](decision_log.md#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook)).
+([2026-10-04 decision](decision_log/2026/2026-10-04-dependency-updates-stay-manual-run-from-a-playbook.md)).
 So the fix is made by hand, as its own PR:
 
 ```powershell
