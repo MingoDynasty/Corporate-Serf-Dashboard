@@ -58,12 +58,13 @@ from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
 
+# The Playlist name cell's colId. A click in this cell, and in no other,
+# opens the playlist.
+PLAYLIST_COLUMN_ID = "name"
 VISIBILITY_COLUMN_ID = "hidden"
 # The delete action cell's colId. Matches the ``deletable`` row flag so the
-# renderer can hide itself on bundled rows; excluded from row navigation.
+# renderer can hide itself on bundled rows.
 DELETE_COLUMN_ID = "deletable"
-# The Benchmark ID cell's colId. Excluded from row navigation, because a
-# double-click to select the number is two clicks on the cell.
 BENCHMARK_ID_COLUMN_ID = "benchmark_id"
 WARMUP_REFRESH_INTERVAL_MS = 1_000
 
@@ -241,11 +242,14 @@ DELETE_TOOLTIP = "params.data.deletable ? 'Delete this playlist' : null"
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Playlist",
-        "field": "name",
+        "field": PLAYLIST_COLUMN_ID,
         # Real anchor to /playlists/<code> (built client-side from the row's
-        # share code). Whole-row click nav still works; the anchor adds
-        # new-tab / copy-link affordances a server-callback nav can't.
+        # share code). A plain click anywhere in this cell navigates through
+        # the cellClicked callback; the anchor adds the new-tab and copy-link
+        # affordances a server-callback nav can't.
         "cellRenderer": "PlaylistNameLink",
+        # The pointer cursor, over the whole cell and not the link alone.
+        "cellClass": "cell-navigates",
         "sortable": True,
         "flex": 1,
         "minWidth": 280,
@@ -271,7 +275,6 @@ TABLE_COLUMN_DEFS = [
         "headerTooltip": (
             "The number KovaaK's uses to identify this benchmark in its API."
         ),
-        "cellClass": "cell-selectable-text",
         # Hidden until the Columns menu shows it. ``initialHide``, never
         # ``hide``: AG Grid reapplies ``hide`` whenever column defs arrive
         # again, which would override the user's choice.
@@ -343,8 +346,8 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 160,
     },
     {
-        # Hide/unhide action cell. Its colId is excluded from row navigation,
-        # and the row-load callback treats clicks on it as visibility toggles.
+        # Hide/unhide action cell. The row-load callback treats clicks on it
+        # as visibility toggles.
         "headerName": "",
         "field": VISIBILITY_COLUMN_ID,
         "cellRenderer": "VisibilityAction",
@@ -356,8 +359,7 @@ TABLE_COLUMN_DEFS = [
     },
     {
         # Delete action cell (user playlists only; the renderer draws nothing
-        # on bundled rows). Its colId is excluded from row navigation, and a
-        # click opens the delete confirmation modal.
+        # on bundled rows). A click opens the delete confirmation modal.
         "headerName": "",
         "field": DELETE_COLUMN_ID,
         "cellRenderer": "DeleteAction",
@@ -393,17 +395,14 @@ MENU_COLUMNS = [
     prevent_initial_call=True,
 )
 def route_to_clicked_playlist(cell_clicked):
-    """Navigate to a playlist's scenario table from a cell in its row.
+    """Navigate to a playlist's scenario table from a click in its name cell.
 
-    The action cells and the Benchmark ID cell do not navigate.
+    No other cell navigates, so a click or a double-click there can select
+    its text.
     """
     if not isinstance(cell_clicked, dict):
         return no_update
-    if cell_clicked.get("colId") in (
-        VISIBILITY_COLUMN_ID,
-        DELETE_COLUMN_ID,
-        BENCHMARK_ID_COLUMN_ID,
-    ):
+    if cell_clicked.get("colId") != PLAYLIST_COLUMN_ID:
         return no_update
     playlist_code = cell_clicked.get("rowId")
     if not isinstance(playlist_code, str) or not playlist_code:
@@ -1254,8 +1253,8 @@ def layout(**kwargs):  # noqa: ARG001
                     # even when scrolled to.
                     "suppressRowVirtualisation": True,
                     "suppressMaxRenderedRowRestriction": True,
-                    # Row ids carry the playlist code so any cell click can
-                    # navigate to /playlists/{code}.
+                    # Row ids carry the playlist code, which is how a click in
+                    # the name cell knows where to navigate.
                     "getRowId": {"function": "params.data.code"},
                 },
                 columnSize="autoSize",

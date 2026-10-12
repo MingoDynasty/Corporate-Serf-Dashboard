@@ -460,13 +460,18 @@ a.playlist-scenario-link-cell.playlist-scenario-link-two-line {
 /* A group cell: one merged cell per group, filled with the group's color by
    the column's cellStyle. Its overflow stays visible, which AG Grid would
    otherwise hide: a clipping cell becomes the label's scroll container, and
-   the label could then never follow the table's scroll. */
+   the label could then never follow the table's scroll. Its text stays
+   unselectable, as AG Grid leaves it: the merged cell is where the grid's
+   own ban on selectable text sits, and its label is decoration that the
+   tooltip repeats. */
 .playlist-scenarios-grid .ag-cell.playlist-scenario-group-cell {
+    -webkit-user-select: none;
     align-items: center;
     display: flex;
     justify-content: center;
     overflow: visible;
     padding: 0;
+    user-select: none;
 }
 
 /* The group's name, bottom to top as on the benchmark's sheet. Sticky toward
@@ -589,19 +594,20 @@ a.playlist-scenarios-evxl-link {
     font-weight: bold;
 }
 
-/* Grid cells whose value gets copied out (a KovaaK's ID). AG Grid turns text
-   selection off on every cell; this turns it back on for one column without
-   the grid-wide enableCellTextSelection option. The text cursor also overrides
-   the pointer an overview row hands its cells. */
-.ag-cell.cell-selectable-text {
+/* Cell text on both playlist tables can be selected. AG Grid turns text
+   selection off on every cell, and its own switch for turning it back on,
+   enableCellTextSelection, is refused on a table with merged cells, which a
+   benchmark's scenario table has. */
+.playlist-overview-grid .ag-cell,
+.playlist-scenarios-grid .ag-cell {
     -webkit-user-select: text;
-    cursor: text;
     user-select: text;
 }
 
-/* Overview rows are full-row navigation targets (routes decision 2026-07-03:
-   visible click affordances). Hover tint comes from --ag-row-hover-color. */
-.playlist-overview-grid .ag-row {
+/* The one cell in a row that a click navigates from: the Playlist name and
+   the Scenario name. The pointer covers the whole cell because a click
+   anywhere in it navigates, not only a click on the link's text. */
+.ag-cell.cell-navigates {
     cursor: pointer;
 }
 

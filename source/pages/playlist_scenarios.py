@@ -95,6 +95,8 @@ TABLE_COLUMN_DEFS = [
         # itself, so new-tab / copy-link work; the cellClicked callback still
         # handles the fast in-app left-click nav.
         "cellRenderer": "ScenarioLink",
+        # The pointer cursor, over the whole cell and not the link alone.
+        "cellClass": "cell-navigates",
         "sortable": True,
         "flex": 1,
         "minWidth": 280,
@@ -107,7 +109,6 @@ TABLE_COLUMN_DEFS = [
             "The number KovaaK's uses to identify this scenario's leaderboard "
             "in its API."
         ),
-        "cellClass": "cell-selectable-text",
         # Hidden until the Columns menu shows it. ``initialHide``, never
         # ``hide``: AG Grid reapplies ``hide`` whenever column defs arrive
         # again, which would override the user's choice.
@@ -927,9 +928,9 @@ def layout(
         # grid-wide ``enableCellTextSelection``, click row selection, cell
         # selection, and editing or row dragging on a spanning column (read
         # from the validation rules in the AG Grid 35.3.1 bundle). The table
-        # uses none of them, and the Leaderboard ID cell's selectable text
-        # comes from a cell class, not from the grid-wide option. It is an
-        # initial option, so it is set only on a table that has groups.
+        # uses none of them, and its selectable cell text comes from a
+        # stylesheet rule, not from the grid-wide option. It is an initial
+        # option, so it is set only on a table that has groups.
         grid_options["enableCellSpan"] = True
         grid_options["context"] = {"grouped": _opens_grouped(sort, benchmark=benchmark)}
     return dmc.Stack(
