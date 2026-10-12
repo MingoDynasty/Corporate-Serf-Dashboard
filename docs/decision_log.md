@@ -83,7 +83,9 @@ change.
 real page, 36 of 36 checks each: click, copy, drag, a second click, typing,
 mouse and keyboard picks, an arrow key, Tab, the label, a keyboard pick after
 a right-click, and the highlight outlasting the page's one-second updates.
-Double-click word selection was checked in Edge only.
+The automation cannot double-click in Firefox, so double-click word selection
+was automated in Edge only. The maintainer tried the page by hand in Firefox
+the same day and confirmed it works.
 
 ## 2026-10-11: A Session Ends After A Break Of More Than 30 Minutes
 
