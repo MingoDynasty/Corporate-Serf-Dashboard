@@ -601,8 +601,8 @@ open to challenge.
 └───────────────────────────────────────────┴───────────────────────────────┘
 ```
 
-The page's subject is one scenario, and it follows the scenario being
-played. The session is context around it. The page fills the window's
+The page's subject is one scenario, and with Follow on it follows the
+scenario being played. The session is context around it. The page fills the window's
 height as the old one does: the chart and the list take the room under the
 top row, and the list scrolls inside its own box.
 
@@ -1241,7 +1241,7 @@ New entries:
 
 - **Run History.** The page that shows one scenario's runs: a chart of its
   scores, a list of its runs grouped by session, and the latest run played.
-  It follows the scenario being played.
+  With Follow on, it follows the scenario being played.
   - In code: `run_history`.
   - Not Home, the page the app opens on.
 - **Score vs Run.** The chart mode that plots a scenario's runs in the order
