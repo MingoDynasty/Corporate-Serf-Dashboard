@@ -298,7 +298,8 @@ one PR. Run every command from the repository root with
    `tests/test_playlist_rekey.py`). When it fails, a refreshed snapshot count
    no longer adds up to a file's scenario count, or a new benchmark has no
    usable layout. Regenerate that file, or add its code to the pinned set with
-   the reason. `--check --only` over the regenerated and new sharecodes
+   the reason. The spec's count of benchmarks with groups is the file count
+   less that set. `--check --only` over the regenerated and new sharecodes
    should now report them identical. Start the app once and confirm that
    `data/logs/debug.log` reports `Playlist startup load complete` with the new
    bundled count and `warnings=0`.
