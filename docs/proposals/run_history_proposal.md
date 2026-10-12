@@ -677,12 +677,17 @@ updates on every batch of new runs.
   another scenario is selected, the scenario's name is a link that selects
   it, under R7's rule. The time is a time of day for a run played today and
   carries the date otherwise.
-- **The score,** large, with one badge beside it: New PB, or Threshold
-  passed, or Below threshold. A run that was not judged has no badge. The
+- **The score,** large, with one badge beside it. A new PB shows New PB,
+  whether or not the run was judged. Otherwise a judged run shows Threshold
+  passed or Below threshold, and an unjudged run shows no badge. The
   maintainer agreed the card keeps a worded "Below threshold": "Yes."
 - **Second line:** the run's percentage of the PB it was chasing, and its
-  accuracy. A new PB says how far it beat the previous best instead. A
-  scenario's first run has no percentage.
+  accuracy. A new PB says how far it beat the previous best instead. The
+  percentage is a fact about the run, so it shows whether or not the run
+  was judged, and an empty threshold doesn't hide it. Two kinds of run
+  have none, and show the accuracy alone: a scenario's first run, and a
+  run that is not a new PB and is compared by score with a PB of zero or
+  less.
 - **Third line:** which run of the scenario this is in its session, and the
   clock time spent on the scenario in that session. Once the session has
   ended the line says "last session".
@@ -968,13 +973,23 @@ considered and not taken. It would keep score verdicts on runs the app now
 knows were time-scored, beside pace verdicts on later runs of the same
 version, and it would parse one performance file per listed run.
 
-**Not judged:** a scenario's first run, and the first run at a new
-sensitivity, as today. That is about the threshold only. The first run at a
-new sensitivity can still be a new PB and carry a star. Such a row has no
-check, and neither does a judged run that missed. The column shows both as blank, and the cell's hover and
-accessible text say which: "Below threshold" or "Not judged". The glance
-answers "which runs passed", and the reason is one hover away. The card,
-which has room, words a miss and leaves an unjudged run without a badge.
+**Not judged.** Three kinds of run get no verdict, as today:
+
+- every run, while the Score threshold percentage is empty;
+- a scenario's first run, and the first run at a new sensitivity;
+- a run compared by score whose PB before it was zero or less, which leaves
+  no percentage to judge by.
+
+That is about the threshold only. A star never depends on it: the first run
+at a new sensitivity can be a new PB and carry one. A row with no verdict
+has no check, and neither does a judged run that missed. The column shows
+both as blank, and the cell's hover and accessible text give the one reason
+that applies, taking the first that fits in the order above. The glance
+answers "which runs passed", and the reason is one hover away.
+
+The card has room, so it words a miss. Its badge is New PB whenever the run
+is one, judged or not. Otherwise a judged run shows its verdict, and an
+unjudged run shows no badge.
 
 **The percentage field.** It sends every keystroke today, so typing 90 over
 95 passes through 9, and every check on the page would flicker through it.
@@ -1104,7 +1119,7 @@ Durations use the app's existing form: `<1 min`, `9 min`, `1 hr 6 min`.
 | Second line, a new PB | `Up {pct}% on your previous best of {previous} · Accuracy {accuracy}%` | The celebration toast's sentence, as a readout fragment. |
 | Second line, a new PB by pace | `{pct}% faster than your previous best of {previous} · Accuracy {accuracy}%` | The same toast's pace wording. |
 | Second line, a new PB over a previous best of zero or less | `Your previous best was {previous} · Accuracy {accuracy}%` | No percentage exists. The toast's own fallback. |
-| Second line, a scenario's first run | `Accuracy {accuracy}%` | Nothing to compare with. |
+| Second line, no percentage | `Accuracy {accuracy}%` | For a scenario's first run, which has nothing to compare with, and for a run that is not a new PB and is compared by score with a previous best of zero or less. |
 | Third line, session in progress | `Run {n} this session · {duration} on this scenario` | Matches the list's number column. |
 | Third line, session ended | `Run {n} last session · {duration} on this scenario` | "This session" would be untrue. The latest run's session is always the last one. |
 | No run in the store | `No runs yet`, over `Play a scenario in KovaaK's and your latest run will show here.` | A title and one sentence, as the chart's empty states. |
@@ -1146,7 +1161,9 @@ chart's hover keeps its two decimals.
 | A check, hover and accessible name | `Threshold passed` | The verdict's own words. |
 | A star, hover and accessible name | `New PB` | The legend's entry. |
 | No check, a judged run, hover and accessible text | `Below threshold` | The verdict's own words. |
-| No check, an unjudged run, hover and accessible text | `Not judged. A scenario's first run, and the first run at a new sensitivity, aren't judged against the score threshold.` | Unknown isn't a miss, and it says why. It names the threshold and not the personal best, because such a run can still be a new PB and carry a star in the same cell. |
+| No check, the percentage is empty, hover and accessible text | `Not judged. No score threshold percentage is set.` | Says the checks are off, and why. It is the reason given when more than one applies. |
+| No check, a first run, hover and accessible text | `Not judged. A scenario's first run, and the first run at a new sensitivity, aren't judged against the score threshold.` | Unknown isn't a miss, and it says why. It names the threshold and not the personal best, because such a run can still be a new PB and carry a star in the same cell. |
+| No check, a previous best of zero or less, hover and accessible text | `Not judged. Your personal best before this run was zero or less, so there is no percentage to judge by.` | Rare, and unexplained otherwise. It applies only where the comparison is by score. |
 | Button | `Show older sessions` | Loads 30 more. |
 | The grid, accessible name | `Runs of {scenario}, by session` | Plain. |
 | No scenario selected | `No scenario selected` | The chart's own empty-state title. |
@@ -1501,8 +1518,11 @@ maintainer's main checkout.
   scenario, per-session run numbers, a divider's two counts, 30 sessions and
   the next 30, and which rows a new run forces open.
 - **The marks,** on the maintainer's example: runs A to E at 90, 99, and 110
-  percent, an empty percentage, a scenario's first run, the first run at a
-  new sensitivity, a time-scored scenario judged by pace, and a run on an
+  percent, an empty percentage, the percentage cleared and then restored,
+  a scenario's first run, the first run at a new sensitivity, a new PB at
+  a new sensitivity, which has its star and no check, a run that is not a
+  new PB against a previous best of zero, with the reason each blank cell
+  gives, a time-scored scenario judged by pace, and a run on an
   older version of a scenario. The mark on a scenario's newest run agrees
   with the toast's verdict on it, and every star agrees with the chart's.
   A replay on real stats and performance files: an old run that missed by
