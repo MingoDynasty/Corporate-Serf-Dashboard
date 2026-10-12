@@ -74,6 +74,14 @@ of scope here, apart from its chart toolbar, noted under The graph.
   the "Chart options" button. Every control in the row persists in the
   browser, the two dropdowns included. The follow switch and the Top N
   input carry help tooltips; the other row controls have plain labels.
+- Opening either dropdown's list keeps the selected name in the field and
+  highlights it, so it can be copied, and the first keystroke replaces it
+  with a search. The list shows every option until then. A drag highlights
+  only the part dragged over, and a second click while the list is open
+  places a cursor. After a pick or Escape, focus stays in the field with the
+  list closed; an edit or an arrow key there highlights the name first, so
+  typing still starts a fresh search
+  ([2026-10-12](../decision_log.md#2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name)).
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation
   ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
