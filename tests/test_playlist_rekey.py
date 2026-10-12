@@ -1070,6 +1070,8 @@ _BENCHMARKS_WITHOUT_GROUPS = {
     "KovaaKsCounterstrafingButteryExitfrag",
     # Names nothing: kl2 - Reflex by dummy.
     "KovaaKsFeedingKnockedFaq",
+    # Names nothing: The Good Benchmark - Fundamentals.
+    "KovaaKsGlidingCopperAutomatic",
 }
 
 

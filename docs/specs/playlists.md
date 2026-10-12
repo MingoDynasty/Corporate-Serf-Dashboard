@@ -559,7 +559,7 @@ except where another entry is linked.
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
   ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md));
-  261 files as of 2026-09-26. It holds Evxl's listed, non-hidden benchmarks:
+  265 files as of 2026-10-12. It holds Evxl's listed, non-hidden benchmarks:
   a benchmark Evxl delists is removed even if KovaaK's still serves it, and
   a hidden one waits until Evxl unhides it
   ([2026-09-15](../decision_log/2026/2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks.md)).
