@@ -108,7 +108,8 @@ not repeat that.
 was already off on both grids.
 
 **Provenance.** Requested by the maintainer on 2026-10-12, with no proposal.
-Shipped in PR #PENDING.
+Shipped in
+[PR #362](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/362).
 
 ## 2026-10-11: A Session Ends After A Break Of More Than 30 Minutes
 
