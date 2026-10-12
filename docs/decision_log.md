@@ -97,7 +97,12 @@ It looked empty but had a clear button, and the code stayed stored. Writing
 the filter's options makes the Select drop a value they lack, so the filter
 is now empty and nothing is remembered. The cost is that a playlist missing
 on one visit does not come back as the selection later: a deleted playlist
-imported again, or a file that failed to load once.
+imported again, or a file that failed to load once. This rides on the fix and
+changes a state the spec described, so the maintainer was asked whether to
+keep it or guard against it, with keeping it recommended. The answer,
+2026-10-12: "let's go with your recommendation." The guard set aside was to
+write no options for a code that does not resolve, which would have left that
+state as it was.
 
 **Costs accepted.**
 
