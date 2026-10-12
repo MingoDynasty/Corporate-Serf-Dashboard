@@ -216,11 +216,18 @@ after a reload. In Firefox the grid scrolled to the match, with its header
 where it was and the page itself not scrolled. Merged category cells looked
 the same as before, at the top of the table and at the bottom.
 
+**Checked by hand.** The browser's find bar cannot be scripted, so
+`window.find` stood in for it above. The maintainer tried the real one in
+Firefox on 2026-10-12, on a build that held this change. With **Show hidden**
+on and the Playlists table unscrolled, Ctrl+F found rows at the bottom and
+scrolled the table to them with the header in view. On the 60-row scenario
+table it scrolled to the last row.
+
 **Not verified.**
 
-- The browser's real find bar. It cannot be scripted, so `window.find` stood
-  in for it. In Edge that stand-in found the row and did not scroll the grid
-  to it, so whether Chromium's find bar scrolls is still open.
+- The find bar in a Chromium browser. In Edge the stand-in found the row and
+  did not scroll the grid to it, so whether Chromium's find bar scrolls is
+  still open.
 - The cost with a KovaaK's username set, when the position fill rewrites rows
   once a second. Every check ran with no username. The full-table rewrite
   above is the nearest measurement.
