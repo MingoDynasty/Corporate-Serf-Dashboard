@@ -181,10 +181,16 @@ one-line and with two-line names:
   build, the same run failed 59 checks in each browser. Every one of them
   was a modified click or drag beside a name, and no other check changed.
 
+**The modified click, checked by hand.** Every check above was scripted, in
+a headless browser. The maintainer then tried the fix by hand in Firefox on
+2026-10-12. A Ctrl+click in the empty space beside a name opened a new tab
+and left the page, on the Playlists table and on a scenario table, so the
+browser's pop-up blocker did not stop it. A Shift+click there opened
+nothing. A plain click there still opened the name, and a drag across a
+name from the empty space still selected it without opening it.
+
 **Not verified.**
 
-- The modified click by hand. Every check of it was scripted, in a headless
-  browser.
 - Whether Edge opens the tab from a Ctrl+click beside a name behind the
   current one. Headless Edge reports every page as visible.
 - Cmd on a Mac.
