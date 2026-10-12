@@ -119,8 +119,8 @@ state as it was.
   already accepts. The Firefox runs shared the machine with a test run.
 - The rule leans on two behaviors of the installed Select that no unit test
   can hold: a value its options have is named, and a value its new options
-  lack is dropped. An upgrade of dash-mantine-components should repeat the
-  browser check.
+  lack is dropped. An upgrade of dash-mantine-components repeats the browser
+  check, as a step in [dependency_refresh.md](dependency_refresh.md#packages-that-ship-browser-code).
 
 **What it keeps.** The filter's layout `value` is `None` on every visit, and
 `data` is not a prop the browser stores, so the 2026-09-19 rule about a
