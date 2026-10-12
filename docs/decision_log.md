@@ -13,6 +13,120 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-10-12: On Both Playlist Tables Only The Name Navigates, And Cell Text Can Be Selected
+
+Status: Accepted
+
+A click anywhere in a row of the Playlists table opened that playlist, while
+on a playlist's scenario table only the scenario's name did anything, and on
+both tables almost no text could be selected. Now one cell in each row
+navigates on both tables, the name, and the text of every other cell can be
+selected and copied. Dragging across a name to select it does not open it.
+
+**Ruling.** By the maintainer, in chat on 2026-10-12: "Agreed on R1,R2,R3."
+R1 was name-only clicks on both tables, and R3 was selectable text in every
+cell but the merged ones, with a guard against a drag counting as a click.
+The investigating session and a second-opinion consult had each recommended
+both. There was no proposal. R1 reverses the full-row click target that the
+[2026-07-03 entry](#2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional)
+asked for. R2, the browser search, is
+[its own entry](#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them).
+
+**What a click does now.**
+
+- A click anywhere in the Playlist name cell opens that playlist's scenario
+  table. A click anywhere in a table's Scenario cell opens that scenario on
+  the Scenario Performance page. That was already so on the scenario table.
+- No other cell navigates. The eye and delete icons act as before.
+- The name cell shows the pointer cursor across its whole width, because the
+  whole cell is the target. A row no longer does. The hover tint stays on
+  both tables.
+- A modified click on a name still opens a new tab, and Enter on a focused
+  name still opens it.
+
+**Why the row stopped being the target.**
+
+- Selecting text and clicking a row cannot share a cell. Measured with
+  selection switched on: a drag inside one cell of the Playlists table opened
+  that playlist, in Edge and in Firefox, and so did a double-click.
+- The full-row target already carried three exceptions, the Benchmark ID cell
+  and the two icon cells, and a click that missed an icon opened a playlist.
+- The 2026-07-03 entry asked for a full-row target when a row click was the
+  only way into a playlist. The name became a real link ten days later, on
+  2026-07-13, so the row was no longer the only affordance.
+- The two tables are consecutive steps of one drill-down, and they now answer
+  a click the same way.
+
+**Selectable text.** One stylesheet rule makes every cell's text selectable on
+both grids. It replaces the class that did it for the two ID columns alone.
+AG Grid's own switch, `enableCellTextSelection`, stays unused: the grid
+refuses it on a table with merged cells, which a benchmark's scenario table
+has. The merged Category and Subcategory cells stay unselectable, as the grid
+leaves them. Cells keep the grid's arrow cursor. The text cursor the ID cells
+had was there to override the pointer a row handed them, and that pointer is
+gone.
+
+**The guard.** `assets/gridSelectionGuard.js` is one capture listener on the
+document. A browser sends a click when a drag ends on the element it began
+on, and a name cell navigates on a click anywhere in it, so dragging across a
+name to select it would open it. The listener swallows a click inside either
+grid when the pointer moved more than 3 px during the press and text is
+selected. It lets three kinds of click through:
+
+- A click with no movement. A selection made earlier and still on screen
+  therefore never blocks a plain click on a name or a header.
+- A click with a modifier key, which keeps opening a new tab or window.
+- A click from the keyboard.
+
+It finds a grid by its class, so a test ties the two class names in the
+script to the layouts.
+
+**Verified on the built branch,** in headless Edge and Firefox, 26 checks in
+each, on the Playlists table and on a grouped scenario table:
+
+- A plain click, a double-click, and a drag inside another cell all stay on
+  the page. In Edge the double-click selected text in the cell.
+- A plain click on a name opens it, on the link's text and in the cell's
+  empty part, and also with a selection already on screen.
+- A drag across a name from the cell's empty part stays on the page, and in
+  Edge it selects the name. With the guard script blocked, that same drag
+  opened the page on both tables, and no other behavior check changed.
+- Ctrl+click opens a new tab and leaves the page. Enter on a focused name
+  opens it. With a selection on screen, a header click still sorts. The eye
+  icon still hides a row.
+- The name cell has the pointer, and the row and the cell checked beside it
+  do not. Cell text computes as selectable, and the merged cells as not.
+
+**Not verified.**
+
+- Double-click selection in Firefox. The automation delivers a double-click
+  there as two single clicks, so it was checked in Edge only.
+- Dragging with a real mouse in Firefox. Under the automation a Firefox drag
+  selected text from other cells and rows, on the old build as on the new
+  one, so nothing here says what a hand-held drag selects there.
+- A drag down several rows after a sort. In Edge it picked up text from 14
+  rows for 4 dragged over, because the grid leaves rows in the page in their
+  old order. `ensureDomOrder` fixes that and is left for a change of its own,
+  for the reason the browser-search entry gives.
+- One console line. The first of four Firefox runs logged a bare "Error"
+  with every check passing. The three runs after it were clean, and it was
+  not traced.
+
+**Rejected.**
+
+- Full-row clicks on both tables. The first click of a double-click
+  navigates, so a value could never be selected that way.
+- Leaving the two tables different, with the reason written down.
+- A link that navigates only from its text. It needs no guard, but it
+  shrinks the target the scenario table has always had.
+
+**Unchanged.** The routes, the two icon cells, sorting, the filter boxes, and
+the Columns menu. A click that closes the Columns menu still acts on what it
+lands on, which now matters only on a name cell.
+
+**Provenance.** Requested by the maintainer on 2026-10-12, with no proposal.
+Shipped in PR #PENDING.
+
 ## 2026-10-12: Both Playlist Tables Draw Every Row, So A Browser Search Reaches Them
 
 Status: Accepted
@@ -637,7 +751,9 @@ Community build includes.
   dragging on a spanning column. The list is read from the validation rules in
   the AG Grid 35.3.1 bundle, not from its documentation. The table uses none
   of them, and the Leaderboard ID cell's selectable text comes from a cell
-  class.
+  class. Superseded in part (2026-10-12): selectable text now comes from
+  one stylesheet rule for every cell, and the merged cells are left out
+  ([2026-10-12](#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 - It is an initial grid option, set only on a table that has groups, so every
   other table's grid is configured as before.
 
@@ -1099,6 +1215,11 @@ grid-wide `enableCellTextSelection` option is not used. On the overview every
 other cell opens the playlist on a click, so the Benchmark ID cell is left
 out of that navigation, as the action cells are: a double-click is two
 clicks. Each header carries a tooltip saying what the number is.
+
+**Superseded in part (2026-10-12).** The cell class is gone. One stylesheet
+rule now makes every cell's text selectable on both tables, and only the
+Playlist name cell navigates, so the Benchmark ID cell needs no exception
+([2026-10-12](#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 
 **Unchanged.** Column widths and column order are still not remembered. The
 quick filter keeps matching visible columns only, which is AG Grid's default,
@@ -8965,6 +9086,12 @@ clean delete, not a refactor. Post-overview, switching playlists means
 navigating back to `/playlists` and clicking a row, so the overview needs
 visible row-click affordances (cursor, hover tint, full-row target). Do not
 bake the selector into the per-playlist page in a way that blocks removal.
+
+**Superseded in part (2026-10-12).** The overview's rows are no longer
+full-row click targets. A click in the Playlist name cell opens the playlist
+and no other cell does, so that cell text can be selected. The routes and the
+hover tint stand
+([2026-10-12](#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 
 ## 2026-06-20: Reference dash-ag-grid Grid Functions By Bare Name
 

@@ -163,6 +163,12 @@ browser's Back button, but opening the playlist fresh, from the Playlists page
 or from that link, starts it in playlist order; to clear a sort, click a sorted
 column's header until the table returns to that order.
 
+On both tables, click a name to open it. A playlist's name opens its scenario
+table, and a scenario's name opens that scenario on the Scenario Performance
+page. Everything else in a row is text you can select and copy: double-click a
+value, or drag across it. Your browser's own search, Ctrl+F, finds any row of
+either table and scrolls to it.
+
 The Playlists table and a playlist's scenario table each have a **Columns**
 button. It opens a menu with one checkbox per column. Clear a checkbox to hide
 that column, and check it to show the column again. The menu stays open while
