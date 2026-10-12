@@ -984,6 +984,10 @@ Three consequences, which the maintainer worked through on 2026-10-10:
 - **No switch gates a mark.** An empty percentage is the one way to turn
   checks off.
 
+One more thing re-marks runs, and it is not from that discussion: new
+evidence about whether a run's version of the scenario is time-scored. See
+[A past run's pace basis](#a-past-runs-pace-basis).
+
 The maintainer's worked example. The PB is 100. Runs A to E are played in
 order at one sensitivity.
 
@@ -1016,23 +1020,41 @@ past run is judged under its own version:
 
 - **The version is the run's own:** the one its stats file names in
   `Hash:`.
-- **Whether that version is time-scored, and its constant, is decided once
-  for the version,** from the newest performance file of that version that
-  can answer. For the scenario's current version that is today's rule
-  unchanged.
+- **Whether that version is time-scored, and its constant, is one answer
+  for the whole version,** taken from the newest performance file of that
+  version that can answer. For the scenario's current version that is
+  today's rule unchanged. The answer is not fixed: a later run of the same
+  version can bring a file that answers differently.
 - **The comparison is by pace** only when the PB the run was chasing was set
   on the same version and both times are positive. Otherwise it is by
   score.
 - **A run is judged by score** when its file names no version, or when no
   performance file of its version can answer.
 
-So a run on a later version changes no earlier check. One thing can still
-move an old check, once: the first performance file of a version that can
-answer turns that version's earlier runs to pace. The app's other pace
-surfaces move at that same moment, and the spec already says of it that
-"its numbers move then". That is a correction toward the right measure,
-not a verdict taken back. The latest run is judged exactly as its toast
-was, because the newest run has always named its own version.
+So a run on a later version changes no earlier check. What can still move
+an old check is new evidence about its own version, in either direction:
+
+- **The first performance file of a version that can answer** turns that
+  version's earlier runs to pace. The spec already says of that moment that
+  "its numbers move then".
+- **A later file of the same version that answers differently** judges
+  every run of that version again. A file that shows no countdown turns
+  them back to score, as it turns the app's other pace surfaces back today.
+  So an old run that missed by pace can come to pass by score, and the
+  reverse, with no change to the run, the PB it was chasing, or the
+  percentage.
+
+The app's other pace surfaces move at the same moments, because they read
+the same answer. So a check holds to the PB the run was chasing when it was
+played, and to the measure the app now uses for the run's version. The
+latest run is judged as its toast was when it landed, because the newest
+run names its own version and its own file is tried first. A later file of
+that version can then move its check, as it can any other.
+
+Keeping a version's first answer for good was considered and not taken. An
+old check would then disagree with the toast and the threshold line on a
+later run of the same version, and the proposal would have to say when
+that first answer is set and when it is rebuilt.
 
 Judging each run by what the app knew on the day it was played was
 considered and not taken. It would keep score verdicts on runs the app now
@@ -1625,10 +1647,12 @@ maintainer's main checkout.
   gives, a time-scored scenario judged by pace, and a run on an
   older version of a scenario. The mark on a scenario's newest run agrees
   with the toast's verdict on it, and every star agrees with the chart's.
-  A replay on real stats and performance files: an old run that missed by
-  pace keeps that verdict after a run on a newer version lands, and a run
-  played before its version could be recognized turns to pace once, when
-  a file of that version first answers.
+  A replay on real stats and performance files, in three parts. An old run
+  that missed by pace keeps that verdict after a run on a newer version
+  lands. A run played before its version could be recognized turns to pace
+  when a file of that version first answers. And an old run that missed by
+  pace is judged by score, and passes, after a later run of the same
+  version brings a file that shows no countdown.
 - **The chart's queries and figures:** every run in each range, the range's
   midnight edge, stars in Score vs Run and Score vs Time and none in Score
   vs Sensitivity, no Average score trace, the title, and each empty state.
