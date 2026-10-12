@@ -113,6 +113,12 @@ logger = logging.getLogger(__name__)
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
+# Marks a dropdown's input for ``assets/selectHighlightOnOpen.js``, which
+# highlights the selected name when the list opens. dmc's
+# ``clearSearchOnFocus`` buys the same click-and-type search by emptying the
+# field instead, which leaves no name on screen to copy; setting it beside
+# this class empties the field before the script can highlight anything.
+SELECT_HIGHLIGHT_ON_OPEN_CLASS = "select-highlight-on-open"
 # The ids this page gives its playlist filter and scenario dropdown. The
 # browser stores each dropdown's value under its id, so changing one resets
 # that selection for every user.
@@ -1030,7 +1036,9 @@ def layout(
                                             **PLAYLIST_SELECTOR_PRESET,
                                             allowDeselect=False,
                                             autoSelectOnBlur=True,
-                                            clearSearchOnFocus=True,
+                                            classNames={
+                                                "input": SELECT_HIGHLIGHT_ON_OPEN_CLASS
+                                            },
                                             clearable=True,
                                             data=playlist_options,
                                             id="playlist-dropdown-selection",
@@ -1068,7 +1076,9 @@ def layout(
                                             allowDeselect=False,
                                             autoSelectOnBlur=True,
                                             checkIconPosition="right",
-                                            clearSearchOnFocus=True,
+                                            classNames={
+                                                "input": SELECT_HIGHLIGHT_ON_OPEN_CLASS
+                                            },
                                             data=scenario_options,
                                             id="scenario-dropdown-selection",
                                             label="Selected scenario",

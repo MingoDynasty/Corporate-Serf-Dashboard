@@ -1000,6 +1000,15 @@ flowchart LR
   any new play — `confetti.reset()` clears particles but does not stop a loop.
   It resolves `window.confetti` at call time, so asset load order is not
   load-bearing.
+- `assets/selectHighlightOnOpen.js` — keeps the selected name on screen when
+  a searchable dropdown opens, highlighted so it can be copied, where dmc's
+  `clearSearchOnFocus` would empty the field. It acts on any input carrying
+  the `select-highlight-on-open` class (`SELECT_HIGHLIGHT_ON_OPEN_CLASS` in
+  `pages/home.py`, on both Scenario Performance dropdowns). Document-level
+  listeners catch the focus, the press, the edit, and the arrow key that open
+  a list, since Mantine reports none of them to Dash, and Mantine's
+  `data-expanded` attribute tells an open list from a closed one
+  ([decision_log.md](decision_log.md#2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name)).
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored icon files consumed by `components/local_icon.py`:

@@ -98,10 +98,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
   3. **The Run History page, version 1** — a page of its own with a chart
      that plots every run, the selected scenario's runs listed by session,
      and a card for the latest run. It's built hidden and made public when
-     it's complete. The
-     [current proposal](./proposals/run_history_proposal.md) predates this
-     plan: its "sessions later" decision and its view order are marked
-     superseded, and the page's proposal rewrites that file.
+     it's complete. The design is in its
+     [proposal](./proposals/run_history_proposal.md), ratified on
+     2026-10-12.
   4. **Run toasts** — what a run's toast says once the page shows how the
      run went. It lands when the page goes public, or after, and has a
      proposal of its own.
