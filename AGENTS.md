@@ -151,7 +151,8 @@ Codex <codex@local>
   when upgrading dependencies or toolchain pins: the lockfile, the dependency
   floors, uv, the pinned GitHub Actions, and the vendored browser libraries.
   Updates are made by hand from it. A refresh that finds a step wrong or
-  missing fixes the playbook in the same PR.
+  missing fixes the playbook in the same PR. Its last section has the steps
+  for moving the Python version, which is never part of a refresh.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
   samples) goes under `ignore/` in a categorized subdirectory, never loose at
   the top level — routing table in [ignore/README.md](ignore/README.md).
