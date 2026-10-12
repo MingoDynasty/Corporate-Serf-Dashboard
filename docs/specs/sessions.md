@@ -24,8 +24,12 @@ Two words are kept apart throughout. A **break** is time between runs. A
   run's length. Nothing outside the parser and the session module reads them
   ([2026-10-11][entry]). The watchdog's interim per-run lines in the debug
   log are older than these rules and don't use them.
-- The session functions are called by nothing yet. The Run History page is
-  the first planned caller ([roadmap](../roadmap.md#upcoming-milestones)).
+- The functions that split runs into sessions and visits are called by
+  nothing yet. The Run History page is their first planned caller
+  ([roadmap](../roadmap.md#upcoming-milestones)). The order runs are split in
+  (see [Sessions](#sessions)) has one use outside the session module: the
+  chart of that page, which is built and not yet public, plots a scenario's
+  runs in it.
 
 ## Run start and run length
 
