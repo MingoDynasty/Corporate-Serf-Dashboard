@@ -180,27 +180,6 @@ keep the grid out of sight until the first run has applied. Nobody has
 verified one, and it has to leave the loading overlay in view
 ([2026-07-16](decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
 
-### A modified click beside a name on the playlist tables navigates the current tab
-
-On the Playlists table and a playlist's scenario table, a Ctrl+click on a
-name's text opens it in a new tab, and a Ctrl+click in the same cell beside
-the text opens it in the current tab. The name is a real link only as wide as
-its text. A click beside it misses the link and reaches the grid's
-`cellClicked` route, which cannot see modifier keys
-(`route_to_clicked_playlist` in `source/pages/playlists.py`,
-`route_to_scenario_home` in `source/pages/playlist_scenarios.py`). The
-maintainer found it in the hand test of PR #364 on 2026-10-12. It predates
-that PR: the link and the scenario route are unchanged by it, and before it
-the Playlists table's whole row behaved this way.
-
-A potential fix is to make the link fill its cell, so that every click on the
-cell is a click on the link. One attempt did that with a block link and link
-dragging switched off. It fixed the Ctrl+click in Edge and in Firefox. In
-Edge it also broke a drag that works today: a drag that began in the link's
-empty part selected nothing, and the click that ended it opened the name. A
-drag that began on the name's text still selected it. The attempt is
-unfinished and was not merged.
-
 ## Performance
 
 ### One global lock serializes every cache file operation

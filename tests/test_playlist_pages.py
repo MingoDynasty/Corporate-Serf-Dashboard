@@ -3099,6 +3099,23 @@ def test_selection_guard_covers_both_playlist_grids():
         assert f".{marker}" in guard
 
 
+def test_selection_guard_finds_a_name_cell_by_its_column_class():
+    guard = (STYLESHEET.parent / "gridSelectionGuard.js").read_text(encoding="utf-8")
+
+    # The guard tells a name cell from every other cell by the class its
+    # column gives it. Under a renamed class no cell would match, and a
+    # Ctrl+click beside a name would reach the grid again and open the name
+    # in the current tab, with no error.
+    for column_defs, name_column in (
+        (playlists.TABLE_COLUMN_DEFS, playlists.PLAYLIST_COLUMN_ID),
+        (playlist_scenarios.TABLE_COLUMN_DEFS, "scenario"),
+    ):
+        name_def = next(
+            column for column in column_defs if column["field"] == name_column
+        )
+        assert f'var NAME_CELL = ".{name_def["cellClass"]}";' in guard
+
+
 def test_playlists_overview_benchmark_id_cell_click_does_not_navigate():
     # A double-click to select the number is two clicks on the cell.
     assert (

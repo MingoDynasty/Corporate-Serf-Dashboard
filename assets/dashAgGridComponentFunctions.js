@@ -66,7 +66,9 @@ dagcomponentfuncs.DeleteAction = function (props) {
 //     the click bubble to cellClicked, which does the fast in-app nav.
 //   - Modified click (Ctrl/Cmd/Shift/Alt): keep the native anchor default (open
 //     a new tab) but stopPropagation() so cellClicked does NOT also navigate
-//     the current tab.
+//     the current tab. A modified click that misses the anchor, in the rest
+//     of its cell, never reaches this handler: gridSelectionGuard.js keeps
+//     that one from cellClicked.
 // Middle-click arrives as auxclick, not click, so it never reaches this handler
 // or cellClicked and stays native with no handling. The listener reads only the
 // event's modifier flags, so it never goes stale as row data changes; the

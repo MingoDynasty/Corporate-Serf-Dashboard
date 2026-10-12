@@ -64,12 +64,13 @@ and [product.md](../product.md). Leaderboard placement is worded
   pointer cursor over its whole width. No other cell navigates, and a row
   keeps its hover tint
   ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
-  Both names are real anchors: a modified click (Ctrl/Cmd/Shift/Alt) keeps
-  the native anchor and stops the grid's `cellClicked` navigation; a plain
-  click does the opposite. The anchor is only as wide as the name's text, so
-  a modified click in the cell beside the text navigates the current tab, a
-  known defect
-  ([tech debt](../tech_debt.md#a-modified-click-beside-a-name-on-the-playlist-tables-navigates-the-current-tab)).
+  Both names are real anchors: a modified click (Ctrl/Cmd/Shift/Alt) on a
+  name keeps the native anchor and stops the grid's `cellClicked`
+  navigation; a plain click does the opposite. The anchor is only as wide as
+  the name's text. A modified click in the rest of the name cell never
+  reaches `cellClicked` either: with Ctrl or Cmd it opens the name in a new
+  tab, and with Shift or Alt alone it opens nothing
+  ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 - The Scenario Performance page links back to the table: while its Playlist
   filter holds a loaded playlist, the "Open scenario table" link under the
   filter leads to `/playlists/{code}`. The link carries no `?sort=`, so the
