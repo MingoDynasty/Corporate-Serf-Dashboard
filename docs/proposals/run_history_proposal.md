@@ -226,12 +226,15 @@ options take turns in it.
 Status: Open. **Both prototypes were checked with NVDA on 2026-10-11.** The
 maintainer, 2026-10-10, after trying both prototypes in Firefox and reading
 the library research: "let's go with AG Grid". Asked how to record that:
-"Take it as lean". That lean predates the NVDA result below.
+"Take it as lean". That lean predates the NVDA result below. On 2026-10-12,
+with that result read, the maintainer agreed to the check on the built list
+that this row now carries.
 
 **Recommendation: build the list on the grid the app's other tables use,
 dash-ag-grid 35.3.0 in its free edition. A session row is a full-width row
 drawn by the app's own script, and opening a session is a filter over the
-rows.**
+rows. Before the page goes public, NVDA is run on the built list and what it
+says is recorded.**
 
 A technical trial on 2026-10-10 built the list six ways against `main`. Two
 worked: this one, called A below, and a list the app's own script draws as
@@ -297,18 +300,48 @@ This is evidence for the row, not a verdict on it. It removes the worry
 that A can't be used with a screen reader, and it confirms that C says
 more.
 
+**The check on the built list.** NVDA was run on prototypes. Two of the
+fixes that pass led to were never tried: keeping focus on the same run when
+a run lands, and announcing a row that is opened or closed from the
+keyboard. A scripted keyboard walk shows where focus is, and can't show what
+NVDA says. So NVDA is run again on the list as built, in Firefox, Chrome,
+and Edge, before the page goes public, and what it said is recorded. Chrome
+is new to the walk. It shares Edge's engine and most likely says the same,
+which the walk checks and does not assume. The walk covers five tasks:
+
+- finding a session, and hearing whether it is open;
+- reading a session's runs: each value with its column heading, and which
+  session the run is in;
+- reaching a row beyond the ones on screen;
+- telling a check, a star, and a run with neither apart;
+- staying on the same run when a new run lands.
+
+The record lists what still doesn't work, and says of each thing whether it
+stops one of the five tasks. A row's depth and Firefox's numbering of the
+pinned row have no known fix, so both are on that list from the start.
+
+**A failed task goes to the maintainer, and does not by itself hold the
+release.** They decide then: repair it first, go public with the failure
+recorded, or rebuild the list's last step. The app's accessibility work is
+best effort. The maintainer, 2026-10-12: "The app has never promised
+screen-reader usability", and "Perhaps we can cross that bridge when we get
+there." Making a repair a condition of going public was considered and not
+taken. In the worst case it would hold the release on a promise the app has
+not made.
+
 Speed does not separate them at the planned size. With 30 sessions loaded,
 neither takes more than 15 ms to open a session or more than 60 ms to show a
 landed run, in Edge and in Firefox.
 
 **What being wrong costs.** Both prototypes share one row model, a Python
 function. Only the last step differs: about 370 lines of script for A and
-500 for C. NVDA did not show A unusable. If another screen reader does, or
-an AG Grid upgrade breaks the group rows, that step is rebuilt and nothing
-else moves. What it is rebuilt as is chosen then. Prototype C is one
-candidate, and NVDA reads it as a tree. The other is a plain table with
-disclosure buttons, which the library research found practitioners prefer
-and neither prototype builds.
+500 for C. NVDA did not show A unusable. If the walk on the built list
+does, the maintainer decides what follows. If that step is rebuilt, for that
+reason, for another screen reader, or because an AG Grid upgrade breaks the
+group rows, nothing else moves. What it is rebuilt as is chosen then.
+Prototype C is one candidate, and NVDA reads it as a tree. The other is a
+plain table with disclosure buttons, which the library research found
+practitioners prefer and neither prototype builds.
 
 **If the maintainer chooses the treegrid:** the repository owns the
 rendering, the keyboard model, and a second table idiom with no library
@@ -569,7 +602,8 @@ carries what a reviewer needs from them.
 
 - **Narrator and JAWS, and a person listening.** NVDA's output was read by
   a script, on the two prototypes. No screen-reader user tried either list,
-  and the list this proposal builds does not exist yet.
+  and the list this proposal builds does not exist yet. NVDA is run on it
+  before the page goes public (R4).
 - **The layout in the real app.** Every size here is from the mockup or the
   trial's stand-in pages.
 - **A visible browser.** Both trial passes were headless. The maintainer
@@ -919,7 +953,9 @@ block gives it one. A session row's button repeated the row's visible name,
 so the name was read twice. And opening or closing a row from the keyboard
 was silent: the PR announces the change, a fix the pass inferred and did not
 try. Two things it found have no known fix in the free edition: a row's
-depth, and Firefox's numbering of the pinned row.
+depth, and Firefox's numbering of the pinned row. The walk on the built list
+(R4) is the check of that announcement and of item 9, and it records whether
+either unfixed thing stops a task.
 
 ### Marks: the check and the star
 
@@ -1285,6 +1321,14 @@ The new page replaces the old one when this holds: **every statement in
 [docs/specs/scenario_performance.md](../specs/scenario_performance.md) on
 `main` at `4272fbb` is true of the new page, except the rows below.**
 
+One more condition comes from R4, and not from that spec: **NVDA has been
+run on the built list, and what it said is recorded.** The record has to
+describe the list that goes public. So if a later PR changes what a screen
+reader is told about a row, which key does what, or where focus goes, the
+walk is run again first. A change to how the list looks does not repeat it.
+A task the walk shows failing is the maintainer's to decide, and is not by
+itself a reason the page can't go public.
+
 The rows come from a keep, change, or drop list the maintainer answered on
 2026-10-10. It has one row per statement in that spec, 121 of them, and 23
 more for what other pages and the user-facing docs rely on: 99 keep, 32
@@ -1428,10 +1472,6 @@ answered by R3.
 None of these is proposed. Each is a small addition a reviewer or the
 maintainer may want, with what it would cost.
 
-- **The NVDA walk repeated on the built list before the page goes public.**
-  It would check the real thing and not a prototype. The walk's scripts and
-  an unpacked NVDA are already on the maintainer's machine. It takes over
-  the foreground window while it runs.
 - **The Score threshold percentage stops at 100.** Above 100 every check
   sits on a run that is also a new PB. The spec allows a goal above 100
   today, so this would remove something a user may have set.
@@ -1472,6 +1512,13 @@ and nothing linking to it, so nothing moves when it goes public.
    - Needs PR 1. The Sessions implementation it also needed has merged.
    - Reports the accessibility tree and a scripted keyboard walk, as the
      trial did.
+   - Runs NVDA on the built list, in Firefox, Chrome, and Edge, and reports
+     what it said against R4's five tasks. The walk's scripts and an
+     unpacked NVDA are already on the maintainer's machine, and the scripts
+     gain Chrome. It takes over the keyboard and the foreground window for
+     some minutes, so it runs on the maintainer's word. The PR's session
+     hands the walk to a subagent, so NVDA's output stays out of the session
+     that builds the list. A failed task goes to the maintainer.
    - Recommended: `claude-opus-5-5` at xhigh.
 3. **The latest-run card.** The card in every state, the ring on the latest
    point, and the row highlight.
@@ -1488,7 +1535,8 @@ and nothing linking to it, so nothing moves when it goes public.
    screenshot, the user guide, `architecture.md`, the roadmap, `product.md`,
    and this file deleted with every pointer to it fixed. One line in the
    release notes about the reset.
-   - Needs PRs 1 to 3.
+   - Needs PRs 1 to 3, and the NVDA walk recorded for the list as it goes
+     public (R4).
    - Recommended: `claude-opus-5-5` at high.
 
 PRs 2 and 3 each depend only on PR 1. Whichever of the two merges first also
@@ -1514,10 +1562,11 @@ session. The Run toasts PR lands with PR 4 or after it.
   shipped too. Going public with the chart alone would drop the surfaces
   that hold a run's verdict, which the ratified Run toasts proposal depends
   on. That would need a direction decision of its own.
-- **The built list proves unusable with a screen reader.** NVDA was run on
-  the prototypes, and Narrator and JAWS were not run at all. If the built
-  list fails where the prototype passed, the cost is the list's last step,
-  about 370 to 500 lines of script.
+- **The walk on the built list finds a task NVDA can't do.** The walk is
+  required and a repair is not (R4). The maintainer decides then: repair it
+  before going public, go public with the failure recorded, or rebuild the
+  list's last step, about 370 to 500 lines of script. Narrator and JAWS are
+  still not run at all.
 
 ## Out of scope
 
@@ -1615,7 +1664,8 @@ maintainer's main checkout.
     pages open in turn.
   - PR 2: the nine grid items, light and dark, the narrow layouts, and a
     run landing with rows open and with focus in a run row, which must
-    stay on the same run.
+    stay on the same run. Then NVDA on the built list, in Firefox, Chrome,
+    and Edge, through R4's five tasks.
   - PR 4: every link, a launch, and a browser that holds the old page's
     remembered values.
 - **The maintainer's own Firefox,** at the hidden address, before each
