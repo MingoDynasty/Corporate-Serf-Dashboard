@@ -167,12 +167,12 @@
         {
           "name": "Amethyst",
           "color": "#9966CC",
-          "threshold": 900.0
+          "threshold": 898.0
         },
         {
           "name": "Obsidian",
           "color": "#4D004D",
-          "threshold": 905.0
+          "threshold": 903.0
         },
         {
           "name": "Zenith",
@@ -553,27 +553,27 @@
         {
           "name": "Ruby",
           "color": "#E0115F",
-          "threshold": 2500.0
+          "threshold": 2400.0
         },
         {
           "name": "Sapphire",
           "color": "#0F52BA",
-          "threshold": 2700.0
+          "threshold": 2600.0
         },
         {
           "name": "Amethyst",
           "color": "#9966CC",
-          "threshold": 3000.0
+          "threshold": 2900.0
         },
         {
           "name": "Obsidian",
           "color": "#4D004D",
-          "threshold": 3300.0
+          "threshold": 3200.0
         },
         {
           "name": "Zenith",
           "color": "#47B7BE",
-          "threshold": 3600.0
+          "threshold": 3500.0
         }
       ],
       "leaderboard_id": 128400
@@ -680,7 +680,7 @@
         "#47B7BE"
       ]
     ],
-    "generated_at": "2026-07-20T22:07:34.550333+00:00",
+    "generated_at": "2026-10-12T21:52:08.367273+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }
