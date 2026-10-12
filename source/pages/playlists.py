@@ -249,6 +249,8 @@ TABLE_COLUMN_DEFS = [
         # affordances a server-callback nav can't.
         "cellRenderer": "PlaylistNameLink",
         # The pointer cursor, over the whole cell and not the link alone.
+        # ``assets/gridSelectionGuard.js`` finds a name cell by this class
+        # too, to keep a modified click beside the link out of the callback.
         "cellClass": "cell-navigates",
         "sortable": True,
         "flex": 1,
