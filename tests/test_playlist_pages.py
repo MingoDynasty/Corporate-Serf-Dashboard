@@ -3154,6 +3154,28 @@ def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
 
 
 @pytest.mark.parametrize(
+    ("page_module", "grid_id"),
+    [
+        (playlists, "playlists-overview-grid"),
+        (playlist_scenarios, "playlist-scenarios-grid"),
+    ],
+    ids=["overview", "scenarios"],
+)
+def test_playlist_grids_draw_every_row(page_module, grid_id):
+    grid = _component_by_id(page_module.layout(), grid_id)
+
+    # The browser's own text search finds only rows that are in the page. With
+    # row virtualization on, the grid drew about 30 rows whatever the table's
+    # length, so Ctrl+F missed every row beyond them.
+    assert grid.dashGridOptions["suppressRowVirtualisation"] is True
+    # With the cap left on, a table of 600 rows drew 501 and never the rest,
+    # even when scrolled to its end.
+    assert grid.dashGridOptions["suppressMaxRenderedRowRestriction"] is True
+    # The grid still scrolls inside itself, which keeps its header in view.
+    assert "domLayout" not in grid.dashGridOptions
+
+
+@pytest.mark.parametrize(
     "page_module", [playlists, playlist_scenarios], ids=["overview", "scenarios"]
 )
 def test_columns_menu_callback_fits_only_the_columns_it_showed(page_module):

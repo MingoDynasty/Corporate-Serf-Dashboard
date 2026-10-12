@@ -9,7 +9,8 @@ benchmark's ranks and categories immediately and streams leaderboard positions
 in behind them, while a background worker keeps the overview's percentile
 columns warm.
 Each table has a Columns menu that shows or hides its columns and remembers
-the choice in the browser, and one KovaaK's ID column that starts hidden.
+the choice in the browser, with one KovaaK's ID column that starts hidden,
+and each draws every row, so the browser's own text search finds any of them.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -435,6 +436,11 @@ and [product.md](../product.md). Leaderboard placement is worded
   `minHeight` style. Neither declares initial `rowData`, so the loading
   overlay owns the gap
   ([2026-07-16](../decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
+- Both grids draw every row, in view or not, so the browser's own text
+  search (Ctrl+F) finds any row and scrolls the grid to it, with the header
+  still in view. A search steps through its matches in the order the rows
+  sit in the page, which after a sort is not their order on screen
+  ([2026-10-12](../decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
 
 ## Categories and subcategories on a benchmark's table
 

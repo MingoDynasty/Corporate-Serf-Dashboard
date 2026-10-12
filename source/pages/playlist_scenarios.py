@@ -1008,6 +1008,14 @@ def layout(
                     **grid_options,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
+                    # Every row is drawn, in view or not. The browser's own
+                    # text search finds only what is in the page, and the
+                    # grid otherwise draws just the rows in view, so Ctrl+F
+                    # missed the rest. The second option lifts the grid's cap
+                    # of about 500 drawn rows: rows past it are never drawn,
+                    # even when scrolled to.
+                    "suppressRowVirtualisation": True,
+                    "suppressMaxRenderedRowRestriction": True,
                     "getRowId": {
                         "function": (
                             "params.data.generation_token + ':' + "
