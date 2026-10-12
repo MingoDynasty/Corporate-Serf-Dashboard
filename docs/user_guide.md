@@ -166,9 +166,10 @@ column's header until the table returns to that order.
 On both tables, click a name to open it. A playlist's name opens its scenario
 table, and a scenario's name opens that scenario on the Scenario Performance
 page. Everything else in a row is text you can select and copy: double-click a
-value, or drag across it. A name is a link, so to copy one, start the drag
-beside its text and drag across it. Your browser's own search, Ctrl+F, finds
-any row of either table and scrolls to it.
+value, or drag across it. The exception is a benchmark's colored Category and
+Subcategory cells, whose labels can't be selected. A name is a link, so to copy
+one, start the drag beside its text and drag across it. Your browser's own
+search, Ctrl+F, finds any row of either table and scrolls to it.
 
 The Playlists table and a playlist's scenario table each have a **Columns**
 button. It opens a menu with one checkbox per column. Clear a checkbox to hide

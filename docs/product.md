@@ -282,7 +282,9 @@ are one view or two is a design choice for the feature that builds them.
   overview, a "Show hidden" toggle for managing hidden ones, and hiding
   filters every playlist dropdown (Scenario Performance filter, Journey
   picker). Hidden playlists stay loaded — routes and rank overlays keep
-  working. *Problem
+  working. The Scenario Performance filter still lists a hidden playlist
+  while it is the one selected, so arriving from a hidden playlist's scenario
+  table shows its name; it leaves the list when another is picked. *Problem
   solved:* focus — dropdowns and the overview show only the playlists you
   care about, which is what makes shipping the full benchmark library
   tolerable.

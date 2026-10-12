@@ -149,6 +149,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   plus every user-root code) without writing; a usable file is
   authoritative, even empty. Hidden playlists still load, route, and draw rank overlays
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
+  A hidden playlist is left out of the Scenario Performance filter and the
+  Journey picker, except that the filter lists the hidden playlist it holds
+  ([scenario_performance.md](scenario_performance.md#the-controls-row)).
   The browser-persisted "Show hidden" switch reveals them muted, and the eye
   cell toggles one code with no confirm step. The file is
   `schema_version`-stamped: an unusable or newer-build file yields the seed

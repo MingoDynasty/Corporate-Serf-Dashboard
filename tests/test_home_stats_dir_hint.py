@@ -68,7 +68,9 @@ def _hint_sentence(hint):
 
 @pytest.fixture(autouse=True)
 def quiet_playlists(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
 
 
 def test_hint_is_absent_while_the_pinned_directory_is_usable(monkeypatch):
