@@ -112,7 +112,9 @@ def _walk_components(component):
 
 def _layout_components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
@@ -130,7 +132,9 @@ def _output_keys(registration: dict) -> set[str]:
 
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     components = list(_walk_components(home.layout()))
@@ -161,7 +165,9 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
 
 
 def test_rank_refresh_button_has_tooltip(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     tooltips = [
@@ -1371,7 +1377,9 @@ def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch)
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     page = home.layout()

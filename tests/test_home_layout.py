@@ -77,7 +77,9 @@ def _sizing_of(component):
 
 @pytest.fixture(autouse=True)
 def quiet_playlists(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
 

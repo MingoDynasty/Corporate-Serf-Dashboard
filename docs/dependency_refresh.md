@@ -230,6 +230,28 @@ uv run python -c "import json, pathlib, dash_ag_grid; print(json.loads((pathlib.
   how the pinned section is built in 35. If the names scroll away, stop and
   ask the maintainer.
 
+A dash-mantine-components bump needs two looks at the playlist filter on
+Scenario Performance, which no test can take. The filter lists a hidden
+playlist while it holds one, and that rests on how the Select treats a value
+against its options: it names a value its options have, and drops a value its
+new options lack. Both were read in 2.8.0's bundle and seen in a browser, and
+neither is documented
+([2026-10-12 entry](decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
+
+- **A held hidden playlist is named.** On Playlists, turn on Show hidden,
+  open a hidden playlist's table, and click a scenario. The playlist filter
+  must show that playlist's name, and still show it after a reload and after
+  leaving the page and coming back.
+- **A playlist that is gone is dropped.** Give the filter a code no playlist
+  has: run the line below in the browser console on Scenario Performance,
+  then reload. The filter must come back empty, with no clear button.
+
+  ```js
+  localStorage.setItem("_dash_persistence.playlist-dropdown-selection.value.true", '["KovaaKsNoSuchCode",null]')
+  ```
+
+If either look fails, stop and ask the maintainer.
+
 A refresh changes versions, not behavior. If an upgrade adds or removes
 something a user can press, changes what a control does, or adds a new way for
 the app to reach an outside service, stop and ask the maintainer before

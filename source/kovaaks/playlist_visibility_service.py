@@ -3,6 +3,8 @@
 Visibility is a display preference, not file state: hidden playlists stay
 loaded, their routes keep resolving, and rank overlays keep drawing — hiding
 only removes them from selector option lists and (by default) the overview.
+A playlist filter that holds a hidden playlist adds that one back to its own
+list, in ``source/components/scenario_selection.py``.
 The store is a plain show-list: a playlist is visible iff its code is in the
 persisted ``shown_playlists`` list (see the 2026-07-11 playlist-overview entry
 in ``docs/decision_log.md``).

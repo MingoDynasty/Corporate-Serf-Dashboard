@@ -29,7 +29,9 @@ def _walk_components(component):
 
 def _layout_components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
@@ -40,7 +42,7 @@ def _layout_components(monkeypatch) -> dict:
 
 def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     monkeypatch.setattr(
-        home,
+        scenario_selection,
         "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
@@ -59,7 +61,9 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
 
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     page = home.layout()
@@ -97,7 +101,9 @@ def test_page_is_named_scenario_performance_and_keeps_the_root_route():
 def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     titles = {
@@ -135,7 +141,9 @@ def _label_text(component) -> str:
 
 def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
     """It is stacked with the selector, not spread across the controls row."""
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     scenario_field = next(
