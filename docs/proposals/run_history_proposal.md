@@ -691,7 +691,8 @@ updates on every batch of new runs.
   less.
 - **Third line:** which run of the scenario this is in its session, and the
   clock time spent on the scenario in that session. Once the session has
-  ended the line says "last session".
+  ended the line says "last session". Where that time can't be known, the
+  line says so and keeps the run's number.
 - **One height through every state,** so the page doesn't jump.
 - **With no run in the store** it says so, at the same height.
 
@@ -703,7 +704,14 @@ run's number and the time on the scenario from what the
 [sessions spec](../specs/sessions.md) defines: the session, and a visit,
 which is consecutive runs on one scenario within it. The time is the sum of
 the scenario's visits in the session, each from its first run's start to its
-last run's end.
+last run's end, so it includes the breaks between a visit's runs.
+
+The time is unknown when the first run of any of those visits has no usable
+start. The sessions spec then counts that visit from the run's end, so a
+visit of one long run would add nothing and the card would read `<1 min`.
+The card never shows a number in that case. When a run has no usable start
+is in the
+[sessions spec](../specs/sessions.md#run-start-and-run-length).
 
 The card and the marks are worked out from the run store, never from the
 message a new run arrives in. So the card is right on a page load with no
@@ -1131,6 +1139,7 @@ Durations use the app's existing form: `<1 min`, `9 min`, `1 hr 6 min`.
 | Second line, no percentage | `Accuracy {accuracy}%` | For a scenario's first run, which has nothing to compare with, and for a run that is not a new PB and is compared by score with a previous best of zero or less. |
 | Third line, session in progress | `Run {n} this session · {duration} on this scenario` | Matches the list's number column. |
 | Third line, session ended | `Run {n} last session · {duration} on this scenario` | "This session" would be untrue. The latest run's session is always the last one. |
+| Third line, the time is unknown | `Run {n} this session · Time on this scenario unknown`, or the same after `Run {n} last session` | For a visit whose first run has no usable start. A number there could turn a long run into `<1 min`. The run's number stays. |
 | No run in the store | `No runs yet`, over `Play a scenario in KovaaK's and your latest run will show here.` | A title and one sentence, as the chart's empty states. |
 
 Accuracy is shown to the whole percent on the card and in the list. The
@@ -1548,6 +1557,8 @@ maintainer's main checkout.
   them a new PB, handed over in both orders: the new PB is last in the run
   trace either way.
 - **The card,** in each state in the Copy block, with the toast's two caps.
+  Also a visit whose first run has no usable start, which reads as time
+  unknown and never as a number.
 - **Deep links and R7:** each combination of the two parameters against a
   filter that lists the scenario and one that doesn't, with Follow on and
   off. The structural test from the 2026-09-19 entry, which fails when a
