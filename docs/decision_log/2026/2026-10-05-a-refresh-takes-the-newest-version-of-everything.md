@@ -13,7 +13,7 @@ maintainer chose to handle a bad release if one arrives.
 vote to simply remove the `exclude-newer = "7 days"` line. I'll deal with the
 issue if a broken package makes it way in." Asked whether that was a ruling,
 the maintainer answered "Yes, ruling." It supersedes the
-[2026-10-04 entry](#2026-10-04-upgrades-skip-package-versions-younger-than-a-week).
+[2026-10-04 entry](2026-10-04-upgrades-skip-package-versions-younger-than-a-week.md).
 
 **What changed.** `exclude-newer` is gone from `[tool.uv]` in `pyproject.toml`,
 and the `[options]` block it wrote is gone from `uv.lock`. Removing it moved no
@@ -32,7 +32,7 @@ the lock and out of the next release. That refresh locked a version published
 that ships to users. What still stands between a new version and an installed
 copy: updates are made by hand, about monthly, so nothing moves between
 refreshes
-([2026-10-04 entry](#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook));
+([2026-10-04 entry](2026-10-04-dependency-updates-stay-manual-run-from-a-playbook.md));
 the playbook's release-note reading and its checks by what moved; and
 Dependabot alerts on the lockfile.
 

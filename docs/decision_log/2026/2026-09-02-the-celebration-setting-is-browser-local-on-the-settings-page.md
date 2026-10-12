@@ -24,8 +24,8 @@ setting must not replay a batch already delivered.
 **Why the Settings page.** The behavior is app-wide, so the Chart options
 inspector on one page is the wrong home — undiscoverable, and a control there
 describes itself as a chart option. This departs from the placement rule the
-[point customization](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
-and [master switch](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)
+[point customization](2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)
+and [master switch](2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)
 entries both state, that the inspector owns browser-persisted presentation
 preferences. The departure is deliberate and narrow: that rule governs
 preferences about the chart, and this one is about the app. It is also the
@@ -41,7 +41,7 @@ validator, a version bump, the stamp script becoming a real migration under
 the documented ordering contract, the launcher's trial-run window to be solved
 for the first migrating release, and an older build refusing the v2 file on
 rollback
-([2026-08-11](#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+([2026-08-11](2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 A cosmetic preference should not be what forces that. When a setting that
 deserves v2 arrives, this one joins it; only the store's backing would change.
 
@@ -68,7 +68,7 @@ nothing is stored yet and otherwise takes the stored value, so changing the
 default later resets nobody's setting. That is the opposite of Dash
 `persistence`, which keys the stored value on the layout default and drops it
 when that default moves (the
-[2026-08-20 point-customization entry](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+[2026-08-20 point-customization entry](2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)
 records the controls that pay it), and the distinction matters when the
 follow-up changes the default style. One more, inherited rather
 than introduced: `message_queue` is process-wide and each drain's payload

@@ -1,7 +1,7 @@
 # 2026-09-14: App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out
 
 Status: Superseded in part by the
-[2026-10-04 skill-judgment entry](#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice):
+[2026-10-04 skill-judgment entry](2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md):
 D4 keeping "Ready to move on." on a passed run that did not place no longer
 holds, and that toast now ends at the fact. D4 dropping "Keep grinding..."
 from the below-threshold toast stands. Everything else here stands.
@@ -19,7 +19,7 @@ startup playlist warnings, store messages, warmup stop reasons), chart
 annotations and legend entries, and accessible names, which a screen reader
 announces. Text a bundled library draws itself is not copy: plotly.js's
 toolbar and its `Share chart...` dialog, kept by the
-[2026-09-12 entry](#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button),
+[2026-09-12 entry](2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md),
 AG Grid's overlays, and Mantine's built-in text. The app passes no override for
 any of it (no plotly `config`, no grid `localeText`); should it ever supply
 such text, that text becomes copy. Console, launcher, and installer output,
@@ -41,10 +41,10 @@ numbering is the proposal's.
 2. *No em dashes.* Prose splits into sentences; a readout chains fragments
    with ` · ` (space, middle dot, space). The one exception is the `—` empty
    value under Last played when no scenario is selected
-   ([2026-06-30](#2026-06-30-model-home-last-played-empty-states-explicitly)).
+   ([2026-06-30](2026-06-30-model-home-last-played-empty-states-explicitly.md)).
    The run-toast scenario/score separator became a colon, the separator the
    celebration toast already used. Why: the no-em-dash ruling of the
-   [2026-08-11 setup-card entry](#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence),
+   [2026-08-11 setup-card entry](2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md),
    which deferred this sweep; Material calls em dashes best avoided in UX
    writing and Atlassian prefers two sentences. No guide prescribes a fragment
    separator; the middle dot is the web's metadata separator and the grid
@@ -81,10 +81,10 @@ numbering is the proposal's.
    control, double quotes for what the user typed, nothing for a token.
 7. *Vocabulary.* The software is *this app* or *the app*, never *the
    dashboard* (the
-   [2026-08-21 launcher entry](#2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling)).
+   [2026-08-21 launcher entry](2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling.md)).
    The run source is the *stats folder*. A cached position is *from cache*.
    *Position*, *Rank*, and *PB* keep the
-   [2026-07-06 meanings](#2026-07-06-one-word-per-concept-in-leaderboard-verbiage),
+   [2026-07-06 meanings](2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md),
    so a leaderboard lookup is a *position lookup*. A playlist's identifier is
    its *playlist code*; the import help introduces KovaaK's own name, *share
    code*, once. Instructions say *turn on* and *turn off*, states say *on* and
@@ -102,7 +102,7 @@ numbering is the proposal's.
    otherwise the message names the file by kind, finishes its sentences, and
    closes with the labeled readout `File: {path}`. The toast title carries the
    verdict, unchanged from the
-   [2026-08-03 policy](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy);
+   [2026-08-03 policy](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md);
    the "… failed" titles stay, since Atlassian endorses the form and only the
    legacy Windows guide bans "failed to".
 
@@ -206,7 +206,7 @@ numbering is the proposal's.
   show, so those log lines follow the new copy. A user-root playlist file the
   loader skipped was logged twice with identical text (store layer and
   loader) until the
-  [2026-09-26 logging conventions](#2026-09-26-log-lines-delimit-their-values-by-kind)
+  [2026-09-26 logging conventions](2026-09-26-log-lines-delimit-their-values-by-kind.md)
   shipped; the loader now only queues the message for the UI. That entry is
   also the audit of how log lines delimit their values.
 - `tests/test_em_dash_guard.py` walks every module under `source/`, visits
@@ -220,8 +220,8 @@ numbering is the proposal's.
 
 **Deliberately not changed.** Softening the red refresh-failure toast, whose
 title question this sweep answered and whose color question stays open in
-[tech_debt.md](./tech_debt.md) *(resolved 2026-09-27: it stays red, see
-[The Manual-Refresh Hard Failure Stays Red](#2026-09-27-the-manual-refresh-hard-failure-stays-red))*;
+[tech_debt.md](../../tech_debt.md) *(resolved 2026-09-27: it stays red, see
+[The Manual-Refresh Hard Failure Stays Red](2026-09-27-the-manual-refresh-hard-failure-stays-red.md))*;
 the configured-but-wrong username; the Steam ID
 mismatch toast's structure; the two `plot_service.py` empty-state messages the
 page callbacks never reach; the Aim Training Journey page beyond its banner
@@ -230,16 +230,16 @@ style.
 
 **Supersedes in part, for copy only.** Each entry keeps its decision and gains
 a note where its quoted strings changed:
-[2026-08-03 notification layer](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy),
-[2026-08-09 unset username](#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure),
-[2026-08-09 Scenario Performance naming](#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options),
-[2026-08-11 setup card](#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence),
-[2026-08-20 run points](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there),
-[2026-08-21 empty point color](#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme),
-[2026-08-21 master switch](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed),
-[2026-08-22 playlist fill](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only),
+[2026-08-03 notification layer](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md),
+[2026-08-09 unset username](2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md),
+[2026-08-09 Scenario Performance naming](2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md),
+[2026-08-11 setup card](2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md),
+[2026-08-20 run points](2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md),
+[2026-08-21 empty point color](2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme.md),
+[2026-08-21 master switch](2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md),
+[2026-08-22 playlist fill](2026-08-22-the-playlist-fill-reports-degradation-in-place-only.md),
 and
-[2026-09-02 celebration](#2026-09-02-a-new-personal-best-celebrates-on-every-page).
+[2026-09-02 celebration](2026-09-02-a-new-personal-best-celebrates-on-every-page.md).
 
 **Sources**, read 2026-09-04 unless noted:
 [Microsoft capitalization](https://learn.microsoft.com/en-us/style-guide/capitalization),

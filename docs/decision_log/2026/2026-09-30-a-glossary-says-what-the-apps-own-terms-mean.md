@@ -39,9 +39,9 @@ its shipping PR still updates the glossary under D4's same-PR duty.
 **D3, relation to the existing definitions.** The glossary holds meanings, and
 AGENTS.md copy rule 7 keeps its on-screen wording rules; each links to the
 other. The
-[2026-07-03 importer entry](#2026-07-03-import-benchmarks-from-evxl-and-kovaaks)
+[2026-07-03 importer entry](2026-07-03-import-benchmarks-from-evxl-and-kovaaks.md)
 (playlist and benchmark) and the
-[2026-07-06 verbiage entry](#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)
+[2026-07-06 verbiage entry](2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)
 (Rank, Position, and PB) keep their definitions as history, unedited, and the
 glossary links them. Folding rule 7's vocabulary line into the glossary was
 rejected: it would take a wording rule out of the copy rules that copy review
@@ -61,5 +61,5 @@ surfaces it to anyone who searches for the old name. The shipping step is
 step 3, between the spec update and the deletion of the proposal file,
 because the block has to move before the file goes. The steps after it move
 down one, so the "Steps 4 and 5" of the
-[2026-09-22 README entry](#2026-09-22-the-readme-is-a-front-door-and-user-reference-lives-in-a-user-guide)
+[2026-09-22 README entry](2026-09-22-the-readme-is-a-front-door-and-user-reference-lives-in-a-user-guide.md)
 are now steps 5 and 6.

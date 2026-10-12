@@ -28,7 +28,7 @@ positions, and ranks each belong to one scenario.
 A scenario scored by the time left on its clock when the task is done, so a
 faster finish scores higher. On one, the app measures by pace instead of
 score wherever it can measure pace reliably
-([2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 How it recognizes one, and when it can't measure pace, is in
 [scenario_performance.md](specs/scenario_performance.md#time-scored-scenarios).
 
@@ -58,7 +58,7 @@ The KovaaK's folder of stats files that the app reads runs from.
 The file KovaaK's writes beside a run's stats file, recording the run's
 events second by second. The app reads it only to tell whether a scenario is
 time-scored
-([2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 
 - Not a run on its own: an abandoned attempt can leave a performance file and
   no stats file.
@@ -122,18 +122,18 @@ they're doing and ahead to what to train, usually with more attention to give.
 A named, ordered list of scenarios, identified by its playlist code. The word
 covers benchmarks too. Where the two must be told apart, a playlist is the
 kind without rank data
-([2026-07-03](decision_log.md#2026-07-03-import-benchmarks-from-evxl-and-kovaaks)).
+([2026-07-03](decision_log/2026/2026-07-03-import-benchmarks-from-evxl-and-kovaaks.md)).
 
 ### Benchmark
 
 A playlist whose scenarios carry rank ladders, so a scenario's PB earns a Rank
-([2026-07-03](decision_log.md#2026-07-03-import-benchmarks-from-evxl-and-kovaaks)).
+([2026-07-03](decision_log/2026/2026-07-03-import-benchmarks-from-evxl-and-kovaaks.md)).
 
 ### Playlist code
 
 KovaaK's identifier for a playlist, which the app also uses as the playlist's
 identity, because names aren't unique
-([2026-07-07](decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)).
+([2026-07-07](decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)).
 
 - Also called share code, KovaaK's own name for it.
 - In code: `code` on a playlist, and `playlist_code` elsewhere.
@@ -143,7 +143,7 @@ identity, because names aren't unique
 KovaaK's numeric identifier for a benchmark. It is not the playlist code,
 which identifies the same benchmark as a playlist. Only a bundled benchmark
 carries one
-([2026-10-05](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+([2026-10-05](decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
 Where it is shown is in [playlists.md](specs/playlists.md#the-overview).
 
 - In code: `kovaaks_benchmark_id` in a bundled file, and `benchmark_id`
@@ -154,7 +154,7 @@ Where it is shown is in [playlists.md](specs/playlists.md#the-overview).
 One of the groups a benchmark's author sorts its scenarios into, such as
 Clicking or Tracking. Only a benchmark from the bundled library has
 categories
-([2026-10-06](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+([2026-10-06](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
 How the table draws them is in
 [playlists.md](specs/playlists.md#categories-and-subcategories-on-a-benchmarks-table).
 
@@ -182,7 +182,7 @@ longest ago ([playlists.md](specs/playlists.md#the-overview)).
 The player's placement on a scenario's global KovaaK's leaderboard, such as
 11,290 of 63,892. A player with no leaderboard entry is Unranked, KovaaK's own
 word
-([2026-07-06](decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
+([2026-07-06](decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 How it is fetched and cached is in [scenario_rank.md](specs/scenario_rank.md).
 
 - In code: `rank`, except in the scenario table's row fields, which say
@@ -207,7 +207,7 @@ it is derived is in [scenario_rank.md](specs/scenario_rank.md#domain-model).
 
 KovaaK's numeric identifier for a scenario's global leaderboard. Position,
 total players, and percentile all come from that leaderboard
-([2026-10-05](decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+([2026-10-05](decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
 Where it is shown is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
@@ -227,7 +227,7 @@ from the cache routinely carries no mark
 
 When the app last stored a read of the player's position from KovaaK's
 leaderboard
-([2026-10-04](decision_log.md#2026-10-04-the-position-value-says-when-it-was-last-updated)).
+([2026-10-04](decision_log/2026/2026-10-04-the-position-value-says-when-it-was-last-updated.md)).
 Where it appears is in [scenario_rank.md](specs/scenario_rank.md#caching).
 
 - In code: `fetched_at`.
@@ -242,7 +242,7 @@ Where it appears is in [scenario_rank.md](specs/scenario_rank.md#caching).
 The benchmark tier a scenario's PB has reached, such as Gold. Each benchmark
 scenario has a ladder of ranks, each with a name, a color, and a score
 threshold, and a PB below the first one has No rank
-([2026-07-06](decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
+([2026-07-06](decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 How a PB is placed on the ladder is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
@@ -257,8 +257,8 @@ How much a benchmark scenario's PB has to improve to reach its next rank: as
 a percentage of the PB, such as +4.8% to Gold, or of its pace where the app
 measures a time-scored scenario by pace, such as +2.8% faster to Lavender.
 With every rank reached, it reads Top rank
-([2026-09-27](decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one),
-[2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+([2026-09-27](decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md),
+[2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 How the gap is computed and shown is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
@@ -278,7 +278,7 @@ The chart's lines for a scenario's rank thresholds
 
 Personal best: the highest score among a scenario's runs, whatever their
 sensitivity. It's the player's own record, not their leaderboard score
-([2026-07-06](decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
+([2026-07-06](decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 
 - On screen: PB, also as the prefix of the PB run's stats, as in PB Score.
   Prose says personal best.
@@ -311,7 +311,7 @@ records it, so one run can show two different accuracies
 How fast a run finishes a time-scored scenario, set against another run: the
 other run's time divided by this one's. A run at 95% of PB pace takes the PB's
 time divided by 0.95
-([2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 
 - On screen: PB pace in a verdict, and faster in the Next Rank column and the
   New personal best toast.
@@ -320,8 +320,8 @@ time divided by 0.95
 
 A score goal set as a percentage of the PB, or of the PB's pace where the app
 measures a time-scored scenario by pace
-([2026-07-08](decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb),
-[2026-10-05](decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+([2026-07-08](decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md),
+[2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 How a run is judged against it is in
 [notifications.md](specs/notifications.md#run-notifications).
 
@@ -344,7 +344,7 @@ bounds what the chart plots
 
 The one toast a run can earn, carrying a score threshold verdict, a top-N
 placement, or both
-([2026-08-03](decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+([2026-08-03](decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
 When a run earns one is in
 [notifications.md](specs/notifications.md#run-notifications).
 
@@ -356,7 +356,7 @@ When a run earns one is in
 The response to a run that beats its scenario's previous PB: a short
 animation and a New personal best toast that stays until dismissed, on
 whatever page is open
-([2026-09-02](decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+([2026-09-02](decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
 Not every such run gets one: which run in a batch celebrates, and how recent
 it must be, is in [notifications.md](specs/notifications.md#run-notifications).
 

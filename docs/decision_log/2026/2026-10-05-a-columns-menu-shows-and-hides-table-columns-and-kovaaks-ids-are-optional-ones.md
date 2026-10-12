@@ -27,7 +27,7 @@ after two review waves in which every reviewer endorsed both rows.
   switch is, and the scenario table's set is shared by every playlist. A
   browser that has never opened the app shows the defaults, which fails toward
   the IDs being hidden; the celebration setting accepted the same costs
-  ([2026-09-02](#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
   Rejected: the URL, as the sort uses, because which columns a user reads is a
   standing preference and not part of one visit; one set per playlist, which
   multiplies the stored state for no stated need; the settings file, which
@@ -51,7 +51,7 @@ until an outside click or Escape, so several columns can be set in one visit.
 Every column is shown by default except the two ID columns. The checkbox
 labels are sentence case, as controls, while the headers they name keep Title
 Case
-([2026-09-14](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+([2026-09-14](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 They are two lists kept by hand; the labels are not derived from the headers.
 
 **One persisted checkbox per column, never one checkbox group.** Dash stores a
@@ -162,7 +162,7 @@ or Percentile stops none of their fetches.
 
 **Sort: hiding a sorted column clears its sort.** This amends the ruled sort
 contract
-([2026-09-27](#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)),
+([2026-09-27](2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url.md)),
 and D1's ratification covers the amendment. That entry has Back and Forward
 restore an entry's sort, and a reload or a copied link keep it. For a sort on
 a hidden column neither holds any more. The server cannot know which columns
@@ -196,7 +196,7 @@ raw text into a table keyed by playlist code, rebuilt on every load, as it
 already collects the seed's name and ID pairs. `PlaylistData` gains no field,
 because the benchmark importer shares the model: its drift check compares a
 shipped file with a stamp-free rebuild by whole-model equality
-([2026-09-26](#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)),
+([2026-09-26](2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed.md)),
 so a field would report all 261 bundled files as drifted, and the importer
 would start writing it into every file it regenerates.
 
@@ -216,7 +216,7 @@ would start writing it into every file it regenerates.
 app itself sends to KovaaK's, not the copy embedded in the playlist file. The
 two differ when a learned entry has replaced the seeded one, or when the seed
 left the name out because two bundled files embed different IDs for it
-([2026-07-20](#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus)).
+([2026-07-20](2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus.md)).
 One name is in that state today: CB SmoothTrack, which one file gives as
 97841 and two give as 92603. The mapping is the right source in both cases,
 because it names the leaderboard the Position beside the cell came from. A
@@ -241,7 +241,7 @@ clicks. Each header carries a tooltip saying what the number is.
 **Superseded in part (2026-10-12).** The cell class is gone. One stylesheet
 rule now makes every cell's text selectable on both tables, and only the
 Playlist name cell navigates, so the Benchmark ID cell needs no exception
-([2026-10-12](#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+([2026-10-12](2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 
 **Unchanged.** Column widths and column order are still not remembered. The
 quick filter keeps matching visible columns only, which is AG Grid's default,

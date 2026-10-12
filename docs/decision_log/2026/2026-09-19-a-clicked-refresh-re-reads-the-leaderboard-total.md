@@ -1,7 +1,7 @@
 # 2026-09-19: A Clicked Refresh Re-Reads The Leaderboard Total
 
 Status: Accepted (amended by
-[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile):
+[2026-09-20](2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md):
 the `rank > total` guard it deferred has landed)
 
 The Refresh button beside the Position field used to fetch a live position and
@@ -19,14 +19,14 @@ board-authoritative, not just the rank: `get_scenario_rank_info` passes it
 through to `_with_leaderboard_total`, which bypasses
 `leaderboard_total_cache_ttl_hours` for that call. The flag already bypassed
 the rank cache and already permitted a regressing write
-([2026-07-01](#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes));
+([2026-07-01](2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md));
 the denominator was the part it did not cover. The PB-triggered freshness chain
 had been forcing the total since 59b2d1d by passing a zero TTL, never recorded
 as a decision — an unlogged precedent that this entry adopts and states, and
 that call now names the flag instead of the zero.
 
 **Why the one-week TTL still stands elsewhere.**
-[2026-04-29](#2026-04-29-cache-leaderboard-totals-for-one-week) priced the
+[2026-04-29](2026-04-29-cache-leaderboard-totals-for-one-week.md) priced the
 trade against bursty cold-cache total fetches across every playlist scenario,
 and named "a targeted refresh flow" as the remedy if stale totals ever
 misled. The Refresh button is that flow: one leaderboard, one extra
@@ -51,12 +51,12 @@ whose own total fetch fails now shows the last cached count at any age where
 it used to show none. On Home that is the count the next interval tick would
 have supplied a second later anyway; in the playlist scenarios fill it is the
 one the first paint had already shown. It also supersedes the Consequences line of
-[2026-04-27](#2026-04-27-make-leaderboard-total-enrichment-best-effort), which
+[2026-04-27](2026-04-27-make-leaderboard-total-enrichment-best-effort.md), which
 described returning the original `ScenarioRankInfo` untouched.
 
 **Orange when the position lands and the count does not.** A clicked refresh
 whose total fetch failed answers orange — the partial-success rung
-([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)),
+([2026-08-30](2026-08-30-one-severity-color-language-for-inline-notices.md)),
 **extended here** from "a follow-up write did not" to any follow-up step, since
 what failed is a read. `docs/specs/notifications.md` carries the widened
 sentence.
@@ -66,7 +66,7 @@ part that did refresh. It shares the per-scenario success channel, so the
 green a re-click earns replaces it rather than stacking under a contradicting
 verdict. Rejected: dropping the count entirely, which shows less than the app
 knows and contradicts
-[2026-07-12](#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank);
+[2026-07-12](2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank.md);
 a silent green over the cached count, which is the smallest diff but leaves
 the button's promise unverifiable; a new inline hint, since the affordance is
 already beside the value and the same host is failing seconds apart. No total
@@ -76,7 +76,7 @@ request is made at all when the rank fetch itself failed.
 `rank > total`, so an automatic path, or a click whose total re-read failed
 and fell back to the cached count, could still print a negative percentile
 from a fresh rank over an older smaller count. The guard shipped separately in
-[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile),
+[2026-09-20](2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md),
 and that pairing now withholds the percentile instead. The click's orange
 verdict is unchanged by it: the verdict keys on the failed re-read, not on the
 percentile.

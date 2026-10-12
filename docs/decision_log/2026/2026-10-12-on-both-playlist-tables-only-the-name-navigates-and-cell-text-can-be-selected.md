@@ -14,9 +14,9 @@ R1 was name-only clicks on both tables, and R3 was selectable text in every
 cell but the merged ones, with a guard against a drag counting as a click.
 The investigating session and a second-opinion consult had each recommended
 both. There was no proposal. R1 reverses the full-row click target that the
-[2026-07-03 entry](#2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional)
+[2026-07-03 entry](2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional.md)
 asked for. R2, the browser search, is
-[its own entry](#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them).
+[its own entry](2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md).
 
 **What a click does now.**
 

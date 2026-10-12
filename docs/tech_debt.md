@@ -69,7 +69,7 @@ leave merged cells stale. AG Grid 36.1.0 fixed it, and no dash-ag-grid release
 bundles that yet (36.0.0rc0 pins 36.0.1). When one does, remove the listener
 and `test_playlist_scenarios_stale_merged_cells_are_rebuilt_after_each_model_update`,
 then run a sort cycle on a benchmark's table. Evidence and cost are in the
-[2026-10-06 entry](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory).
+[2026-10-06 entry](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md).
 
 ## Refactors
 
@@ -178,7 +178,7 @@ Deferred from PR #344 with the reviewer's agreement
 Waiting for the grid faster does not help. The direction that can hold is to
 keep the grid out of sight until the first run has applied. Nobody has
 verified one, and it has to leave the loading overlay in view
-([2026-07-16](decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
+([2026-07-16](decision_log/2026/2026-07-16-keep-pre-hydration-states-honest.md)).
 
 ## Performance
 

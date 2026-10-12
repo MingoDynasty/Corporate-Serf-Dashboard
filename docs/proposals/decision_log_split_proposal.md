@@ -142,12 +142,12 @@ entry:
   heading, and reads that entry. 463 links in 18 files point at a heading of
   the log, and they reach 115 of the 129 entries. The seven spec files hold
   382 of them. This is the design the log's own rules set: the
-  [2026-08-22 entry](../decision_log.md#2026-08-22-the-capability-spec-layer-is-written-in-one-pass)
+  [2026-08-22 entry](../decision_log/2026/2026-08-22-the-capability-spec-layer-is-written-in-one-pass.md)
   makes the specs the way a reader finds the decision behind a behavior.
 - **The maintainer** reads the 2 to 4 sentence summary that opens an entry,
   in the PR that adds it. The dense text under it is written for agents, as
   the
-  [2026-08-01 entry](../decision_log.md#2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index)
+  [2026-08-01 entry](../decision_log/2026/2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index.md)
   says.
 
 So the length costs neither reader. A lookup costs the same at any size, and

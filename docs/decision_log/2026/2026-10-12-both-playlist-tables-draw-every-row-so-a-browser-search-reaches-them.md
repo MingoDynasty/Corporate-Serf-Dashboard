@@ -30,7 +30,7 @@ Firefox:
 **The change.** Both grids set `suppressRowVirtualisation`. Nothing else about
 the layout moves: the grid is still bounded to the window, still owns its
 scrollbar, and still keeps its headers in view, which is what the
-[2026-07-06 entry](#2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling)
+[2026-07-06 entry](2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling.md)
 was for. That entry's remark that a bounded grid "restores row
 virtualization" is the one part this supersedes.
 

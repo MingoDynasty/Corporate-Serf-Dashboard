@@ -29,4 +29,4 @@ bake the selector into the per-playlist page in a way that blocks removal.
 full-row click targets. A click in the Playlist name cell opens the playlist
 and no other cell does, so that cell text can be selected. The routes and the
 hover tint stand
-([2026-10-12](#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+([2026-10-12](2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).

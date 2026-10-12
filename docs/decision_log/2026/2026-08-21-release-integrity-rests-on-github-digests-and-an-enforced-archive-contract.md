@@ -17,7 +17,7 @@ Decision: no custom `SHA256SUMS.txt`, no hash duplicated into the release
 notes, and no launcher-side hash verification at launch. Integrity rests on
 GitHub's per-asset digests plus immutable releases, which this repo already has
 enabled — see
-[Releases And Their Assets Are Immutable](#2026-07-19-releases-and-their-assets-are-immutable),
+[Releases And Their Assets Are Immutable](2026-07-19-releases-and-their-assets-are-immutable.md),
 which this entry extends rather than restates. Alongside that: the release page
 gets a curated header, `.gitattributes` prunes development-only trees from the
 archive, and `validate_release` enforces an archive contents contract before
@@ -103,4 +103,4 @@ Consequences and constraints:
   `_BLOCKED_DIRECTORIES` in `scripts/release_job.py` decides whether a push cuts
   a release; `.gitattributes` decides what the zip carries. `docs/` is on the
   first and not the second — see
-  [PyCharm Config Stays Tracked And Its Upgrade Churn Is Committed Once](#2026-08-08-pycharm-config-stays-tracked-and-its-upgrade-churn-is-committed-once).
+  [PyCharm Config Stays Tracked And Its Upgrade Churn Is Committed Once](2026-08-08-pycharm-config-stays-tracked-and-its-upgrade-churn-is-committed-once.md).

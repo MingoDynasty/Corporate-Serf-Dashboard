@@ -1,7 +1,7 @@
 # 2026-04-29: Cache Leaderboard Totals For One Week
 
 Status: Accepted (amended by
-[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): the
+[2026-09-19](2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md): the
 TTL governs automatic paths only, and both board-authoritative callers — a
 user-clicked Refresh and the PB-triggered freshness chain — bypass it)
 

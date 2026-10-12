@@ -18,7 +18,7 @@ status copy is unchanged, and `tests/test_playlist_pages.py` guards the
 callback's declared outputs so the toast cannot return unnoticed.
 
 Why: the toast was non-conformant against the
-[2026-08-03 routing policy](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy).
+[2026-08-03 routing policy](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md).
 A degraded fill is an automatic failure during passive navigation, which that
 entry routes to in-place state with no toast, and its second litmus — already
 visible somewhere? then nothing — is answered by the status line, which
@@ -35,7 +35,7 @@ it is not. Ratifying it would also have made "the policy names it" the test
 for conformance rather than the litmus tests themselves.
 
 Supersedes, in part, the
-[2026-07-15 progressive-fill entry](#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill):
+[2026-07-15 progressive-fill entry](2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill.md):
 its completion-toast clauses only — the first terminal tick no longer "emits
 any aggregate completion toast", and "Completion uses the existing
 red/yellow/silent failure tiers" no longer describes a notification. The two
@@ -44,7 +44,7 @@ tombstone retention and eviction order, the pending-flag rules, the outcome
 counting, and the status settling are all unchanged and remain Accepted.
 
 Discharges, for the playlist page only, one half of what the
-[2026-08-09 unset-username entry](#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)
+[2026-08-09 unset-username entry](2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)
 left open. That entry deferred the configured-but-wrong-username case,
 noting it "still produces both generic red toasts today". A wrong username
 resolves every position to `UNKNOWN`, so the aggregate toast was the
@@ -61,7 +61,7 @@ typed reason on `ScenarioRankInfo` is still where it should be
 reconsidered.
 
 Consequences: the app has one fewer toast id, and the notifications
-inventory in [specs/notifications.md](specs/notifications.md#inventory)
+inventory in [specs/notifications.md](../../specs/notifications.md#inventory)
 loses its `playlist-progressive-fill-{generation}` row. The fill's
 background-thread channel is untouched — it still streams rows into the
 registry an interval callback drains, which was never a notification path.
@@ -69,4 +69,4 @@ registry an interval callback drains, which was never a notification path.
 **Superseded in part, for copy (2026-09-14).** The status line quoted above
 chains its fragments with middle dots only: "1 of 3 positions unavailable · 1
 from cache · KovaaK's unreachable", and "{m} of {total} positions from cache ·
-KovaaK's unreachable". The in-place-only decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+KovaaK's unreachable". The in-place-only decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).

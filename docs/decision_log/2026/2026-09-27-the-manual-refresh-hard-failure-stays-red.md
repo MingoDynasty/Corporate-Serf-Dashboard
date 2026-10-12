@@ -19,7 +19,7 @@ channel.
 
 **Why red.** The severity scale makes red an operation that failed and yellow
 caution without anything having failed
-([2026-08-30](#2026-08-30-one-severity-color-language-for-inline-notices)).
+([2026-08-30](2026-08-30-one-severity-color-language-for-inline-notices.md)).
 The routing policy gives a user-initiated failure, manual Refresh named among
 them, an error toast, and its peers are red: "Playlist import failed",
 "Cleanup failed", "Skip wasn't saved". For this pair the scale reads as

@@ -32,6 +32,6 @@ cell sharing one sentinel). Maintainer-ratified copy call.
 
 Consequences: Shipped in PR #216. Narrows the sentinel rule and extends
 the single-column `refreshCells` call of the
-[2026-06-21 relative timestamp entry](#2026-06-21-relative-humanized-last-played-timestamps),
+[2026-06-21 relative timestamp entry](2026-06-21-relative-humanized-last-played-timestamps.md),
 whose Status line points here. Future timestamp columns choose their null
 sentinel by column family, not by renderer.

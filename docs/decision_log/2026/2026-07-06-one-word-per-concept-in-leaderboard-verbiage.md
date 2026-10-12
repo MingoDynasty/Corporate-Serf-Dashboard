@@ -20,4 +20,4 @@ leaderboard placement.
 old names: the playlist scenario table's Position and PB Score fields now say
 `position` and `pb_score`. Every other internal identifier still keeps its
 old name
-([2026-10-04](#2026-10-04-the-scenario-tables-row-fields-use-the-words-on-screen)).
+([2026-10-04](2026-10-04-the-scenario-tables-row-fields-use-the-words-on-screen.md)).

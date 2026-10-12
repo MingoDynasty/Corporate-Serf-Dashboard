@@ -1,7 +1,7 @@
 # 2026-04-27: Make Leaderboard Total Enrichment Best-Effort
 
 Status: Accepted (amended by
-[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total): a
+[2026-09-19](2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md): a
 failed total lookup now falls back to the last cached count for every caller
 rather than returning the result untouched)
 

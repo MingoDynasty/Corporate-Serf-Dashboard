@@ -2,7 +2,7 @@
 
 Status: Superseded in part, for the spec version, the action pins, and the
 cancelling of superseded runs, by the
-[2026-10-05 python-v3 decision](#2026-10-05-adopt-the-cross-repo-python-v3-tooling-spec)
+[2026-10-05 python-v3 decision](2026-10-05-adopt-the-cross-repo-python-v3-tooling-spec.md)
 
 Supersedes: The workflow shape, command set, tool and runtime pin placement,
 and concurrency behavior in the 2026-07-03 CI decision. Windows execution,

@@ -32,7 +32,7 @@ derives the Settings page's notice by comparing the store against both pins,
 so the notice describes reality for every consumer and stands until the
 restart actually happens. It is derived, never stored. Its look, unruled here
 and shipped as orange text, is set by the
-[2026-09-15 setup-hints entry](#2026-09-15-setup-hints-wear-the-notice-anatomy);
+[2026-09-15 setup-hints entry](2026-09-15-setup-hints-wear-the-notice-anatomy.md);
 its trigger and its derivation are unchanged. The app never restarts
 itself, and there is no live re-initialization of the watchdog, the warmup
 singleton, or the in-memory data — that machinery is the riskiest code this
@@ -47,8 +47,9 @@ hint linking to the settings page. The `SystemExit` that used to guard this is
 gone.
 
 **`stats_dir` bootstraps app-side**, replacing the detection deleted from the
-installer (see the 2026-08-02 addendum on the 2026-07-19 installer entry
-below, which this supersedes for stats-directory detection). On startup with
+installer (see the 2026-08-02 addendum on the
+[2026-07-19 installer entry](2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md),
+which this supersedes for stats-directory detection). On startup with
 the key **absent** — a missing file counts — the app collects Steam's install
 roots from the registry (`HKCU` `SteamPath`, then both `HKLM` `InstallPath`
 views, every hit kept), treats those roots as libraries, adds every `"path"`
@@ -80,5 +81,6 @@ logged and skipped, never fatal. The bootstrap runs only from the real server
 startup path, never at import, and the registry read is isolated in one
 function so no test ever touches the real registry.
 
-Provenance: same proposal and delivery arc as the entry above (PR #171;
-PRs #181, #182, #183, #184).
+Provenance: same proposal and delivery arc as
+[the settings-store entry](2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)
+(PR #171; PRs #181, #182, #183, #184).

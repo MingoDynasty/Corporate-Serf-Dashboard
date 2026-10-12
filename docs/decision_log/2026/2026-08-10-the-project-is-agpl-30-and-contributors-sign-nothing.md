@@ -50,7 +50,7 @@ for any of it, and this entry does not settle whether one should be.
 `assets/icons/evxl-logo.png` is Evxl's logo. It ships with its owner's
 permission, recorded in `assets/icons/README.md`, and neither the AGPL nor
 any icon collection's license covers it. The detail is in
-[the 2026-10-04 Evxl entry](#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page).
+[the 2026-10-04 Evxl entry](2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page.md).
 
 **Why this license.** The priority is that derivatives stay free and open
 source. AGPL binds anyone who conveys a modified version, or offers one to

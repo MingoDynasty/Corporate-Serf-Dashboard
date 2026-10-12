@@ -22,9 +22,9 @@ runs, accepts any constant, and falls back whenever it is unsure
 (2026-09-28); and it adds no run length to the run record (2026-10-04).
 
 **Supersedes in part**, for time-scored scenarios only, D1 of the
-[2026-09-27 entry](#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)
+[2026-09-27 entry](2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md)
 and the verdict formula of the
-[2026-07-08 entry](#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb).
+[2026-07-08 entry](2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md).
 Each keeps its text and gains a note. Every other scenario keeps both
 unchanged.
 
@@ -191,7 +191,7 @@ is not remembered, so the next look tries again. Reading one costs about
 0.6 ms in plain Python for a median file of 4.7 KB. Nothing is written to
 disk. A missing, unreadable, or malformed performance file costs only the
 detection, never the run. The stores are read on the terms of the
-[2026-07-09 entry](#2026-07-09-accept-unsynchronized-in-memory-stores-single-writer).
+[2026-07-09 entry](2026-07-09-accept-unsynchronized-in-memory-stores-single-writer.md).
 
 **Five surfaces.** Next Rank reads "{gap}% faster to {rank name}" and sorts
 by the unrounded pace gap, on all three row paths. The Score threshold line
@@ -260,7 +260,7 @@ Cerulean" on the next, and the missing sign said nothing that "faster"
 doesn't. The sign went onto both rows instead of coming off both because a
 score row needs it: it marks growth still needed, where a bare "85.0% to
 Gold" can read as progress through the band, the measure D1 of the
-[2026-09-27 entry](#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)
+[2026-09-27 entry](2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md)
 rejected, under which higher is closer. The accepted cost is that the sign
 and "faster" mark direction twice. "Faster" still names the measure, so the
 header tooltip holds as written, and the gap's formula, rounding, sort, and

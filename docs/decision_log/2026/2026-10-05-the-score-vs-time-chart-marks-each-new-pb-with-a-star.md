@@ -20,7 +20,7 @@ and term, and with them one exception to an earlier entry, named under
 **The rule.** A new PB is a run whose score is strictly above every earlier
 run of its scenario. It is the rule the personal best celebration applies to
 one new run
-([2026-09-02](#2026-09-02-a-new-personal-best-celebrates-on-every-page)), so a
+([2026-09-02](2026-09-02-a-new-personal-best-celebrates-on-every-page.md)), so a
 star and a celebration judge a run the same way.
 
 - One pass over the scenario's runs from oldest to newest, at every
@@ -110,7 +110,7 @@ where it could change.
 - **An outline, because gold alone fails on white.** Gold has 1.86:1 against
   the light plot background and 8.34:1 against the dark one. The outline has
   9.75:1 against white and 5.24:1 against the gold. The
-  [2026-08-20 entry](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+  [2026-08-20 entry](2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)
   dropped yellow from the swatches for the same contrast reason.
 - **A shape as well as a color.** Point color accepts any hex value, so a
   player can set the run points to this exact gold. The star and its outline
@@ -145,7 +145,7 @@ that it is drawn on top.
 
 **Point size sizes the stars, an exception to the 2026-08-20 entry.** That
 entry
-([Run Points Get A Size Preset And A Color, And The Chart Stops There](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there))
+([Run Points Get A Size Preset And A Color, And The Chart Stops There](2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md))
 says "Nothing else on the chart became customizable", and its point
 preferences restyle only the run trace. Point size now sizes the New PB trace
 too: 9 on Small, 16 on Large, and the generated 12 on Default. Point color
@@ -192,7 +192,7 @@ Rejected:
   at the run points' size and color, and nothing here needs it moved.
 
 **Achievements, not a trend.** The
-[2026-10-04 direction entry](#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice)
+[2026-10-04 direction entry](2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
 moves judgments about skill toward the typical run and keeps the personal best
 as the achievement. The stars sit on the achievement side of that line.
 

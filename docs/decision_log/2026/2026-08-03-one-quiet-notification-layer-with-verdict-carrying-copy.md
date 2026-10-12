@@ -1,7 +1,7 @@
 # 2026-08-03: One Quiet Notification Layer With Verdict-Carrying Copy
 
 Status: Accepted; three clauses are superseded by the 2026-08-31
-["Repeatable Toasts Replace In Place With A Visible Re-Entry"](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+["Repeatable Toasts Replace In Place With A Visible Re-Entry"](2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)
 entry -- the per-click-id exception to the stable-id rule, the distinct-ids
 rationale for the two refresh-failure toasts, and the absolute reading of "at
 most one run-verdict toast is visible at a time". Each is marked in place below.
@@ -16,7 +16,7 @@ toast, its title states the verdict, and a newer run replaces the one on
 screen rather than stacking beside it.
 
 Predecessor: the
-[2026-08-03 background-diagnostics entry](#2026-08-03-background-rank-diagnostics-are-console-only)
+[2026-08-03 background-diagnostics entry](2026-08-03-background-rank-diagnostics-are-console-only.md)
 deleted four toasts under this policy before the policy itself was recorded;
 that entry stands unchanged and this one supersedes nothing. Shipped in
 PRs #194, #196, #198, and #200; design in #82 and #195.
@@ -65,7 +65,7 @@ user sees. The deleted level-driven queue is the anti-pattern the rule exists
 to prevent. The one background toast that survived the routing verdicts — the
 run-import failure — got its own typed deque rather than a field grafted onto
 the run-event queue. The sanctioned channels are enumerated in
-[architecture.md](./architecture.md).
+[architecture.md](../../architecture.md).
 
 **One run, one toast.** Every run verdict and the catch-up digest share the
 stable id `run-verdict`. When a run both places top-N and earns a threshold
@@ -132,10 +132,10 @@ are now one `rank-refresh-problem` channel — under distinct ids a hard failure
 followed by a served-stale retry left both on screen contradicting each other
 about the same attempt.)* Softening the red to yellow is coupled to giving the
 served-stale toast a title of its own — without that, only the color separates
-them — and is left open in [tech_debt.md](./tech_debt.md). *(Superseded in
+them — and is left open in [tech_debt.md](../../tech_debt.md). *(Superseded in
 part, for copy, 2026-09-14: the served-stale toast now has that title of its
 own, "Refresh failed · position from cache", while the red hard failure keeps
-"Position refresh failed"; the color question stays open. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).)*
+"Position refresh failed"; the color question stays open. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).)*
 *(Superseded again, for copy, 2026-09-22: the served-stale title is now
 "Refresh failed · data from cache", chosen by the maintainer over "Refresh
 failed · from cache", and when the cached readout includes a total its
@@ -145,9 +145,9 @@ the click too, and once a partial refresh began reporting the total on its
 own, naming only the position read as though the total had refreshed. With no
 total on screen the message still names only the position, and the red hard
 failure keeps its message because it never sees what the field shows. See
-[scenario_rank.md](specs/scenario_rank.md#failure-handling).)*
+[scenario_rank.md](../../specs/scenario_rank.md#failure-handling).)*
 *(Resolved 2026-09-27: the hard failure stays red. See
-[The Manual-Refresh Hard Failure Stays Red](#2026-09-27-the-manual-refresh-hard-failure-stays-red).)*
+[The Manual-Refresh Hard Failure Stays Red](2026-09-27-the-manual-refresh-hard-failure-stays-red.md).)*
 
 **Deliberately left open: do background rank events deserve a real toast?**
 "Your rank updated after that PB" and "Position update timed out" are

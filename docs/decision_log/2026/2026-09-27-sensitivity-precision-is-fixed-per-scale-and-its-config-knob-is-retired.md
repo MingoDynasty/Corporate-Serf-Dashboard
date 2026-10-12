@@ -14,7 +14,7 @@ file only logs a warning.
 second opinions from `claude-fable-5-1` and `gpt-6-astra`, both of which
 endorsed this shape. `sens_round_decimal_places` dates from play on Valorant
 sensitivity. Since the
-[2026-09-11 conversion](#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)
+[2026-09-11 conversion](2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)
 nearly every run is cm/360 at parse time, and the knob did two contradictory
 jobs with one number. On cm/360 it merges formula output into groups, which
 wants one decimal. On a legacy run that keeps its game scale it should
@@ -58,15 +58,15 @@ negligible one day after launch. No cache persists sensitivities and the run
 store rebuilds from the stats folder at every start, so nothing migrates.
 Rolling back to a release that still requires the key needs the literal line
 `sens_round_decimal_places = 1`, which the user guide's rollback instructions
-under [Manual install](user_guide.md#manual-install) give.
+under [Manual install](../../user_guide.md#manual-install) give.
 
 Supersedes, in part, the
-[2026-09-11 sensitivity-normalization entry](#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi):
+[2026-09-11 sensitivity-normalization entry](2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md):
 its "The rounding fix does not reach legacy runs" paragraph only. Everything
 else there stands; where it names `sens_round_decimal_places` or the
 configured precision for a conversion, the precision is now this fixed one
 decimal place, the value the knob shipped with. This also closes the case the
-[2026-09-27 PB-format entry](#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)
+[2026-09-27 PB-format entry](2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)
 left open: every stored cm/360 value carries one decimal, so the PB cm/360
 column's two decimals are always exact.
 

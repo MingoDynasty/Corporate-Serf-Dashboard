@@ -1,10 +1,10 @@
 # 2026-07-16: Warm Playlist Percentiles With One Polite Background Worker
 
 Status: Superseded in part by the
-[2026-08-03 quiet-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy):
+[2026-08-03 quiet-layer entry](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md):
 the fatal-state toast for an unknown username was removed in PR #196; the
 overview's status line and a WARNING log carry it. Amended by
-[2026-09-20](#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile):
+[2026-09-20](2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md):
 the display rule is no longer weaker and monotonic, because a RANKED scenario
 whose rank sits above its cached total is worker-fresh yet display-unresolved,
 and a resolved row returns to the placeholder when a rewritten rank lands above

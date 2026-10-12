@@ -23,7 +23,8 @@ Why:
   opens would fetch totals and still end in red "positions unavailable"
   messaging unless both grew new semantics.
 
-What survives: the leaderboard-ID seeding (PR #169, previous entry) stands on
+What survives: the leaderboard-ID seeding (PR #169,
+[its entry](2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus.md)) stands on
 its own merits. The worthwhile kernel — treating "leaderboard features off"
 as a normal quiet state rather than a red error, skipping the futile
 progressive position fill, and pointing at how to enable the features — is

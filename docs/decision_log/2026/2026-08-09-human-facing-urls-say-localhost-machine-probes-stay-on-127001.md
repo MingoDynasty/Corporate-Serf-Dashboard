@@ -30,7 +30,7 @@ toggle state. Unifying on the name the docs and the development run already
 use collapses that to one origin.
 
 Why this is safe despite the shadowing history: the
-[2026-07-19 exclusive-bind entry](#2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken)
+[2026-07-19 exclusive-bind entry](2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken.md)
 and its 2026-07-20 addendum bind **both** loopback faces (`127.0.0.1` and
 `::1`) with `SO_EXCLUSIVEADDRUSE`, and the addendum's failure semantics are
 two-bucket: a port free on only one face is refused outright rather than

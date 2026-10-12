@@ -2,7 +2,7 @@
 
 Status: Accepted; the single-runtime-writer clause is narrowed by the
 2026-08-11
-["A Fresh Install Is Asked Once, On A Card Keyed To Key Absence"](#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)
+["A Fresh Install Is Asked Once, On A Card Keyed To Key Absence"](2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)
 entry — Save is still the only runtime writer of settings *values*, but a
 locked service operation may record a declined identity as `""`. Everything
 else here stands.

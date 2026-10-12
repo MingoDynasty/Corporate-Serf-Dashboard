@@ -110,18 +110,18 @@ Plotly-property editor.
 Design in [#238](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/238),
 implementation in [#241](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/241).
 The panel this group joined is the
-[2026-08-09 chart options entry](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph).
+[2026-08-09 chart options entry](2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md).
 The Automatic wording, the generated color, and the empty field's white
 preview swatch were revised the next day; see the
-[2026-08-21 entry](#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme).
+[2026-08-21 entry](2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme.md).
 
 **Superseded in part, for copy (2026-09-14).** The chart's legend entries are
 "Run data point" and "Average score", so `RUN_DATA_POINT_TRACE_NAME`, the
 handle this entry selects the run trace by, now holds "Run data point". The
-point preferences are unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+point preferences are unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
 **Superseded in part (2026-10-05).** Point size now sizes the New PB stars on
 the Score vs Time chart as well as the run points, so "Nothing else on the
 chart became customizable" has one exception. The set of controls is
 unchanged, Point color still restyles only the run trace, and the rest of this
-entry stands. See [The Score vs Time Chart Marks Each New PB With A Star](#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star).
+entry stands. See [The Score vs Time Chart Marks Each New PB With A Star](2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md).

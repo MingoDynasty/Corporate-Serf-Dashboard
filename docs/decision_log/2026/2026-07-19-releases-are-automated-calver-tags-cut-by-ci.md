@@ -47,7 +47,14 @@ baseline even for daily-or-faster shippers, and found no comparable project
 shipping *unidentified* builds from a branch tip — tags are load-bearing for
 rollback and support.
 
-Provenance: this entry and the six below distill the release, versioning, and
+Provenance: this entry and six others
+([immutable releases](2026-07-19-releases-and-their-assets-are-immutable.md),
+[build identity](2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md),
+[the state root](2026-07-19-all-mutable-state-lives-under-an-explicit-state-root.md),
+[the installer](2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md),
+[PowerShell output](2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths.md),
+and [updates](2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md))
+distill the release, versioning, and
 distribution proposal added in PR #150 and deleted once shipped (git history
 holds the full text). It went through four external design-review rounds plus
 the market-research run summarized above, and was implemented in PRs #154,

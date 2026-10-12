@@ -2,7 +2,7 @@
 
 Status: Superseded in part, for the passive red/yellow toasts of the
 three-tier toast model in Constraints below, by the
-[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+[2026-08-03 notification-layer entry](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
 (passive renders state the condition in place; manual Refresh keeps all
 three tiers). The fallback semantics are unchanged and remain Accepted.
 

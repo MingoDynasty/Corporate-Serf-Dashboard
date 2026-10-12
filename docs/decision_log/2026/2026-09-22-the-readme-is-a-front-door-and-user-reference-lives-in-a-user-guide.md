@@ -1,11 +1,11 @@
 # 2026-09-22: The README Is A Front Door, And User Reference Lives In A User Guide
 
 Status: Accepted (amended by
-[2026-09-22](#2026-09-22-the-readme-stops-explaining-how-the-installer-works):
+[2026-09-22](2026-09-22-the-readme-stops-explaining-how-the-installer-works.md):
 Install no longer carries the installer-touches or release-integrity
 paragraphs, and Development links `docs/` rather than `architecture.md`; and
 by the
-[2026-09-30 sentence-count entry](#2026-09-30-the-docs-test-counts-summary-sentences-and-its-count-is-the-definition):
+[2026-09-30 sentence-count entry](2026-09-30-the-docs-test-counts-summary-sentences-and-its-count-is-the-definition.md):
 the docs test now counts summary sentences, so "that test gates structure,
 never prose" holds for everything but that count, and the README word-count
 gate stays rejected)

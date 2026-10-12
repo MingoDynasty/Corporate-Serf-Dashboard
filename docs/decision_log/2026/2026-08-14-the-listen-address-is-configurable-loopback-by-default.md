@@ -38,7 +38,7 @@ read-only exposure. Defaulting to the LAN would hand that to every device on
 whatever network the machine joins next, including untrusted ones.
 
 Why a non-default host is bound alone: the `::1` companion in the
-[2026-07-19 exclusive-bind entry](#2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken)
+[2026-07-19 exclusive-bind entry](2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken.md)
 and its 2026-07-20 addendum exists to stop `localhost` resolving to a face the
 app does not hold. A user naming one address outright has no such ambiguity to
 close, and binding a speculative second address is not something a config
@@ -55,7 +55,7 @@ a perfectly healthy server. `scripts/launcher.ps1` therefore reads `host`
 alongside `port` — through the same "ask the app's own loader" contract, so
 there is still no second TOML parser — and maps it to two destinations. The
 `/health` probe stays resolver-free per the
-[2026-08-09 entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001):
+[2026-08-09 entry](2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001.md):
 `0.0.0.0` probes `127.0.0.1`, `::` probes `[::1]` (Windows sets
 `IPV6_V6ONLY`, so the IPv6 wildcard serves no IPv4 face), and any other host
 is probed at the literal address it names. The browser URL says `localhost`
@@ -79,7 +79,7 @@ Relationship to prior entries: nothing is superseded. The exclusive-bind
 decision stands unchanged — the app still creates and binds its own sockets,
 still sets `SO_EXCLUSIVEADDRUSE`, and still exits rather than half-serving a
 port. What changes is only which address it claims. The
-[2026-08-09 human-facing-URL entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001)
+[2026-08-09 human-facing-URL entry](2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001.md)
 reasoning that "whichever face the resolver hands `localhost` is ours" is
 narrowed to the default host, and holds there.
 

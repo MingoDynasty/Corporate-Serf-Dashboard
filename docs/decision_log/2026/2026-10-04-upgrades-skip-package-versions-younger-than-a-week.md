@@ -1,7 +1,7 @@
 # 2026-10-04: Upgrades Skip Package Versions Younger Than A Week
 
 Status: Superseded by the
-[2026-10-05 newest-versions entry](#2026-10-05-a-refresh-takes-the-newest-version-of-everything):
+[2026-10-05 newest-versions entry](2026-10-05-a-refresh-takes-the-newest-version-of-everything.md):
 the setting is removed, and the week no longer applies to the uv pin. What
 this entry measured about how uv records the setting still holds.
 
@@ -17,7 +17,7 @@ with the first refresh after this entry, not with the entry: adding it changes
 `uv.lock`, and a change to `uv.lock` cuts a release.
 
 **Why.** Updates here are made by hand
-([2026-10-04 entry](#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook)),
+([2026-10-04 entry](2026-10-04-dependency-updates-stay-manual-run-from-a-playbook.md)),
 and a plain `uv lock --upgrade` takes the newest version of everything. On
 2026-10-04, 13 of the 25 pending updates would have resolved to a version
 under seven days old. Merging a lock cuts a release, so those versions reach

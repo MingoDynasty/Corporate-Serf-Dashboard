@@ -45,7 +45,7 @@ names the sharecodes, printing a ready-to-paste
   can't fix them.
 
 **Evidence.** The limit was recorded from the start: the
-[2026-07-03 entry](#2026-07-03-import-benchmarks-from-evxl-and-kovaaks)'s last
+[2026-07-03 entry](2026-07-03-import-benchmarks-from-evxl-and-kovaaks.md)'s last
 consequence says threshold changes under an unchanged benchmark ID need an
 explicit forced refresh. Iron Pipe #1 (benchmark 2757) drifted that way and
 was caught in PR #289 only because Evxl's `scenarioCount` happened to change.

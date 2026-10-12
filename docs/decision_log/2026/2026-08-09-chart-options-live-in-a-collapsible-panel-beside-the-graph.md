@@ -49,7 +49,7 @@ Consequences and constraints:
   box. The fixed 250px navbar shrinks the content area without touching the
   viewport, so a viewport threshold would keep the panel beside a chart it had
   already crushed — the same trap as
-  [2026-08-03](#2026-08-03-homes-controls-row-measures-the-content-area-not-the-window).
+  [2026-08-03](2026-08-03-homes-controls-row-measures-the-content-area-not-the-window.md).
   62em is Mantine's `md` step, off the scale the controls grid already uses. A
   container query cannot match on the element that declares the container, so
   `.home-chart-area` declares it and `.home-chart-row` carries the layout.
@@ -75,5 +75,5 @@ Consequences and constraints:
   both are unchanged before a real click.
 
 Shipped in PRs #209 and #215; design discussion in #206. This entry and
-[the naming entry](#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)
+[the naming entry](2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md)
 distil `docs/chart_options_inspector_proposal.md`, now deleted.

@@ -21,7 +21,7 @@ ship the workaround under "A workaround for the grid's stale merged cells"
 below, over parking the feature and over replacing the mechanism.
 
 **Supersedes in part** the
-[2026-10-04 entry](#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page):
+[2026-10-04 entry](2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page.md):
 the snapshot read moved out of `source/kovaaks/evxl_links.py` into
 `source/kovaaks/evxl_snapshot.py`, which both features use, and its two
 warnings now say that benchmarks get no Evxl link and no categories. The
@@ -99,7 +99,7 @@ hold the premise.
 - **The file's order is KovaaK's.** The importer writes scenarios in KovaaK's
   category order, and its drift check reports a file whose scenario list no
   longer matches KovaaK's
-  ([2026-09-26 entry](#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
+  ([2026-09-26 entry](2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed.md)).
   That check compares KovaaK's with KovaaK's and never looks at the snapshot.
 - **A comparison in the importer looks at both.** Wherever a benchmark is
   built, at generation and in the drift check, the importer compares the
@@ -197,7 +197,7 @@ Community build includes.
   of them, and the Leaderboard ID cell's selectable text comes from a cell
   class. Superseded in part (2026-10-12): selectable text now comes from
   one stylesheet rule for every cell, and the merged cells are left out
-  ([2026-10-12](#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+  ([2026-10-12](2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 - It is an initial grid option, set only on a table that has groups, so every
   other table's grid is configured as before.
 
@@ -255,9 +255,9 @@ proposal's "the merges were checked through a sort" was one sort.
   ratified with one upstream has since fixed.
 - **When it goes.** When dash-ag-grid bundles AG Grid 36.1.0 or later. Remove
   the listener, its test, and the
-  [tech-debt entry](tech_debt.md#remove-the-merged-cell-repair-when-dash-ag-grid-bundles-ag-grid-3610),
+  [tech-debt entry](../../tech_debt.md#remove-the-merged-cell-repair-when-dash-ag-grid-bundles-ag-grid-3610),
   and run a sort cycle on a benchmark's table. The
-  [dependency refresh playbook](dependency_refresh.md#packages-that-ship-browser-code)
+  [dependency refresh playbook](../../dependency_refresh.md#packages-that-ship-browser-code)
   carries the check. AG Grid 36 also lays its rows out in one scrolling
   container, with no separate pinned section, so the following label needs
   checking again on that upgrade.
@@ -279,7 +279,7 @@ outcome.
 join and the exclusion list are `source/kovaaks/scenario_groups.py`, and
 `data_service.load_playlists` fills a side table from them, behind
 `get_scenario_groups`, beside the benchmark IDs and for the same reason
-([2026-10-05 entry](#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+([2026-10-05 entry](2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
 `playlist_scenarios_service.py` puts the group fields on all three row paths,
 and its fill state captures the groups at registration, as it does the
 ladders. `pages/playlist_scenarios.py` holds the column definitions, the menu

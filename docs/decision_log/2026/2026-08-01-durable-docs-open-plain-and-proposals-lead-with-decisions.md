@@ -1,7 +1,8 @@
 # 2026-08-01: Durable Docs Open Plain And Proposals Lead With Decisions
 
-Status: Superseded — replaced by the follow-up entry above (section
-rename; all other rules carried forward there in full)
+Status: Superseded — replaced by
+[the follow-up entry](2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index.md)
+(section rename; all other rules carried forward there in full)
 
 Docs now serve their two readers in layers instead of forcing one register
 on both. Every new decision-log entry opens with a short plain-language

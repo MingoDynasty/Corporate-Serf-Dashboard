@@ -52,14 +52,14 @@ stale and silently retire every toast liveness gates. The consequence, stated
 rather than hidden: a deliberately slow poll widens no-tab replay by exactly
 the period it chose. Validating the interval with a product cap instead stays
 rejected, for the reasons in
-[2026-09-01](#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load).
+[2026-09-01](2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load.md).
 
 **The toast.** Green, a trophy icon, titled "New personal best", and sent with
 `auto_close=False` so it is still there on alt-tab. Its channel key is
 `pb-celebration`, deliberately not `run-verdict`: an ordinary run toast lands
 beside it rather than replacing it, and only a later celebration replaces a
 celebration. It is a persistent channel in the sense the
-[2026-08-31 toast-identity entry](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+[2026-08-31 toast-identity entry](2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)
 defines, and that entry owns the mechanism.
 
 **The celebration takes the headline.** When celebrations are on, the
@@ -68,7 +68,7 @@ yields. The score threshold goal has no upper bound, so a goal above 100% let
 a personal best read "Below threshold" while confetti fell, and even under a
 goal it passes, "Threshold passed" says the less interesting thing. This
 amends the priority rule in
-[2026-08-03](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+[2026-08-03](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
 for the celebrations-on state only: with the setting off, the verdict
 headlines and a personal best has no toast of its own, exactly as before. A
 personal best the drain did not celebrate — an older qualifying run coalesced
@@ -145,23 +145,23 @@ deserves its own longer or unbounded window is a follow-up question, carried
 on the roadmap.
 
 **What this supersedes.** The
-[2026-07-06 coalescing entry](#2026-07-06-coalesce-pending-home-run-events)
+[2026-07-06 coalescing entry](2026-07-06-coalesce-pending-home-run-events.md)
 loses its "sole consumer" clause — the shell's drain is the consumer now and
 the page listens to a store — and its digest. Its coalescing rule survives,
 applied to the batch: the page still considers only the latest matching run.
-The [2026-08-21 master-switch entry](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)
+The [2026-08-21 master-switch entry](2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)
 loses the digest from the set of shapes its gate covers, and its deferral of
 the queue-to-UI redesign for the drain alone; the product question that
 deferral protected, app-wide verdict toasts, stays deferred, and run toasts
 remain page-built and page-scoped. The
-[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+[2026-08-03 notification-layer entry](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
 loses its rule that a personal best earns nothing beyond the run verdict, and
 the "backlog digest included" clause of its replacement rule.
 
 **Superseded in part, for copy (2026-09-14).** The master switch this entry
 calls Run Notifications is labelled "Run notifications", and the celebration
 description names it in bold: "…and doesn't depend on **Run notifications**."
-The decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+The decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
 Shipped in PRs #261 and #268; proposal and rulings in #248, toast mechanism
 reconciled in #263. Distilled from the personal best celebration proposal, now

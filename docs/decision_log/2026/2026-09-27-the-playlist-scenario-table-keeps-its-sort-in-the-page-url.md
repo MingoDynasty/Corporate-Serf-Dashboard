@@ -1,7 +1,7 @@
 # 2026-09-27: The Playlist Scenario Table Keeps Its Sort In The Page URL
 
 Status: Accepted (amended by
-[2026-10-05](#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones):
+[2026-10-05](2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md):
 a sort on a column the Columns menu has hidden is cleared, on arrival too, so
 Back, Forward, a reload, and a copied link no longer restore or keep that one
 sort)
@@ -98,4 +98,4 @@ process on 2026-09-27. Three models reviewed the design and agreed on it:
 `rank_sort`, is now `position_sort`, and the PB Score column's ID is now
 `pb_score_sort`. The names in the address did not change, so a link saved
 before the rename still sorts the table
-([2026-10-04](#2026-10-04-the-scenario-tables-row-fields-use-the-words-on-screen)).
+([2026-10-04](2026-10-04-the-scenario-tables-row-fields-use-the-words-on-screen.md)).

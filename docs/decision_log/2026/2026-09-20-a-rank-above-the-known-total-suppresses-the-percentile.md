@@ -21,12 +21,12 @@ playlists overview re-derives it per played scenario: one line in the log
 means one condition, not one occurrence.
 The guard is strictly `>`: `rank == total_players` is a real last place on the
 board and keeps its
-[midpoint value](#2026-04-27-use-the-midpoint-percentile-formula).
+[midpoint value](2026-04-27-use-the-midpoint-percentile-formula.md).
 
 Why: rank comes from `/leaderboard/scores/global` with `usernameSearch`, whose
 `total` counts search matches rather than the board, so the population is a
 second unfiltered request cached under `leaderboard_total_cache_ttl_hours`
-([one week by default](#2026-04-29-cache-leaderboard-totals-for-one-week)).
+([one week by default](2026-04-29-cache-leaderboard-totals-for-one-week.md)).
 Boards are expected to grow, so a cached total is normally a lower bound on the
 live one, and `((total - rank + 0.5) / total) * 100` crosses zero as soon as
 the rank passes it: a board cached at 500 that grew to 1,200 renders a 900th
@@ -35,7 +35,7 @@ ages are independent can reach it — the percentile warmup worker, the playlist
 scenarios fill, the overview's cache-only reads, a TTL-expired foreground
 lookup, the stale-rank fallback, and a clicked Refresh whose total re-read
 failed and fell back to the cached count
-([2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+([2026-09-19](2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
 
 Consequences: a suppressed percentile leaves that scenario unresolved for the
 playlists overview, so the whole playlist shows the
@@ -46,10 +46,10 @@ refreshes. The placeholder's tooltip suggests opening the playlist, which
 doesn't clear it while the total is TTL-fresh, because the playlist's fill
 honors that TTL. A clicked Refresh on that scenario does, since it re-reads the
 total
-([2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total));
+([2026-09-19](2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md));
 otherwise the row waits out `leaderboard_total_cache_ttl_hours`, a week by
 default. The suppression also breaks two properties
-[2026-07-16](#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)
+[2026-07-16](2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)
 stated for that placeholder, whose display rule it called weaker than the
 warmup worker's freshness test and monotonic: a scenario the worker counts as
 fresh can still hold a row on the placeholder, and a row that was showing
@@ -60,7 +60,7 @@ invents a number from data already known to be inconsistent, and the invented
 floor still feeds the median as though it had been measured. Also rejected:
 dropping the total along with the percentile, which discards a count the app
 legitimately has and contradicts the principle that a degraded read
-[shows no less than the app already knows](#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank).
+[shows no less than the app already knows](2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank.md).
 
 Not done: refreshing the total when the guard trips. A rank above the total is
 good evidence the total is stale. The self-heal would not live in

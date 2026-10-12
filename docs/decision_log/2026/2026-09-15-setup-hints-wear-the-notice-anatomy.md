@@ -66,9 +66,9 @@ width. The restart branch has no such case, because the card stands aside
 while a stats-folder change is pending.
 
 Amends the
-[2026-08-30 color-language entry](#2026-08-30-one-severity-color-language-for-inline-notices),
+[2026-08-30 color-language entry](2026-08-30-one-severity-color-language-for-inline-notices.md),
 whose enumeration of five inline surfaces becomes seven, and the
-[2026-08-02 pinning entry](#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself),
+[2026-08-02 pinning entry](2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md),
 which created the Settings notice without ruling its look. Out of scope, so
 that the next sweep does not re-find them: the Settings save-status line,
 which stays a red status line beside the button it answers, and the pale

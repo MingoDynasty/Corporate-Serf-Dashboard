@@ -6,9 +6,10 @@ Decision: The AG Grid console warning `invalid gridOptions property
 'columnSizeOptions'`, emitted once per grid mount on the Playlists and
 per-playlist scenario pages, is benign upstream noise from the dash-ag-grid
 wrapper. We accept it, keep passing `columnSizeOptions`, and do not work
-around it. It is distinct from the first-request pages race above: that noise
-appears only on the first load after a server start, while this warning
-appears on every mount of either grid.
+around it. It is distinct from the
+[first-request pages race](2026-07-18-accept-dashs-first-request-pages-race-instead-of-warming-the-app.md):
+that noise appears only on the first load after a server start, while this
+warning appears on every mount of either grid.
 
 Why: dash-ag-grid folds its remaining props into AG Grid's `gridOptions`
 after stripping its own Dash-side props via a hardcoded list
@@ -37,8 +38,9 @@ Alternatives rejected:
   invalid-property warning for a deprecation warning while also disabling
   the check that catches real typos in our own gridOptions and colDefs.
 - Re-implementing autosizing through a clientside grid-API call just to avoid
-  the prop is a workaround for someone else's cosmetic bug — the same bar the
-  pages-race entry above declines to meet.
+  the prop is a workaround for someone else's cosmetic bug — the same bar
+  [the pages-race entry](2026-07-18-accept-dashs-first-request-pages-race-instead-of-warming-the-app.md)
+  declines to meet.
 
 Consequences: treat the warning as expected baseline noise during browser
 checks. Not filed upstream as of 2026-07-18, so do not assume a version bump

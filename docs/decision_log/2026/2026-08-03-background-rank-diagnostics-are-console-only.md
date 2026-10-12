@@ -3,7 +3,7 @@
 Status: Accepted
 
 Supersedes: the "asks the user to click Refresh" consequence of the
-[2026-07-01 score-aware refresh entry](#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes).
+[2026-07-01 score-aware refresh entry](2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md).
 The rest of that decision — the timer schedule, the two-decimal catch-up floor,
 the monotonic writer, the cache-only interval poll, and the board-authoritative
 manual Refresh — is unchanged.
@@ -67,6 +67,6 @@ Scope: this entry decides these four call sites only. The broader notification
 redesign — which subsystem owns toasts, the routing policy that produced this
 verdict, and the fate of every other toast in the app — was still under debate
 in PR #82 when this shipped, and is now recorded in the
-[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
-above. The deletion was split out (PR #194) because it stands alone: nothing
+[2026-08-03 notification-layer entry](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md).
+The deletion was split out (PR #194) because it stands alone: nothing
 else reads the removed calls, and the retained logging is untouched.

@@ -11,7 +11,7 @@ that an outdated run on their pull request stops early.
 
 **Rulings.** All by the maintainer, in chat. 2026-10-04: action pins move
 through the spec, never in this repository alone
-([2026-10-04 entry](#2026-10-04-dependency-updates-stay-manual-run-from-a-playbook)),
+([2026-10-04 entry](2026-10-04-dependency-updates-stay-manual-run-from-a-playbook.md)),
 so a pin bump is a new version of the spec. 2026-10-05: version 3 carries
 three changes to the spec's workflow (the pin bump,
 `persist-credentials: false` on checkout, and a concurrency cancel for pull
@@ -20,7 +20,7 @@ out of CI, where Dependabot alerts on the lockfile carry that signal. The go
 to cut the version came the same day.
 
 **Supersedes in part** the
-[2026-07-06 entry](#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec):
+[2026-07-06 entry](2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec.md):
 the stamp is now `tooling-spec: python-v3`, the action pins moved, and the
 workflow again cancels superseded runs, for pull requests only. The job shape,
 the four checks, and where the uv, pytest, and mypy settings live are
@@ -49,7 +49,7 @@ group it only keeps the running member alive: the next push would still wait,
 and a third push would replace the one waiting, which drops its release. So
 the run-ID fallback has to stay, even though the event check looks as if it
 already covers `main`. The `release` job's own `release` group is separate and
-unchanged ([2026-07-19 entry](#2026-07-19-releases-are-automated-calver-tags-cut-by-ci)).
+unchanged ([2026-07-19 entry](2026-07-19-releases-are-automated-calver-tags-cut-by-ci.md)).
 
 **Why the block sits on the workflow.** On the `test` job, every leg of the OS
 matrix would share one group, so in a repository that runs two operating

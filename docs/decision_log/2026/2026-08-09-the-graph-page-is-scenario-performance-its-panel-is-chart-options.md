@@ -26,7 +26,7 @@ semantics; the panel edits instant-apply browser preferences that only the chart
 can give feedback on. Naming the panel after what it configures also follows the
 repo's precedent that controls live on the surface owning their effect —
 playlist management left this same modal for `/playlists`
-([2026-07-11](#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
+([2026-07-11](2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md)).
 "Scenario Performance" is the page's product identity, distinct from its route
 position as the default landing page, which is why the rename is labels-only.
 
@@ -51,7 +51,7 @@ Consequences and constraints:
   `source/pages/home.py` records it. The help tooltip is accurate as written and
   is unchanged. That copy pass has since happened: the control is now "Score
   Threshold Verdict"
-  ([2026-08-21](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
+  ([2026-08-21](2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
 - **The route restructure is deferred, not dropped.** Reserving `/` for a future
   Overview page and giving this page a durable `/scenario` route waits until an
   Overview has concrete plans.
@@ -65,8 +65,8 @@ annotations quoted above are sentence case: "Rank thresholds", "PB score",
 "Score threshold overlay", "Score threshold percentage", "Score threshold
 verdict", and the annotations "PB score" and "Score threshold". The group
 headings keep their capitals as section headings. The vocabulary rule this
-entry carries is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+entry carries is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
 Shipped in PRs #209 and #215; design discussion in #206. Distilled with
-[the inspector entry](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)
+[the inspector entry](2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md)
 from `docs/chart_options_inspector_proposal.md`, now deleted.

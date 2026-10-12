@@ -20,7 +20,7 @@ that exists.
 
 **What this protects, and what it does not.** Every stale tab is a live
 hazard, not just clutter: the supported model is one active tab
-([specs/notifications.md](specs/notifications.md)), because `message_queue` is
+([specs/notifications.md](../../specs/notifications.md)), because `message_queue` is
 process-wide and each drain's payload reaches one client, so with two tabs
 open a run toast or a PB celebration lands in whichever drain runs first. The
 knob lets a user stop accumulating tabs, but it only helps the user who finds
@@ -84,7 +84,7 @@ uses `print` with commas instead of an f-string, and quotes the attribute
 name with Python's single quotes, which survive both shells unchanged.
 
 One consequence worth recording against
-[2026-08-14](#2026-08-14-the-listen-address-is-configurable-loopback-by-default):
+[2026-08-14](2026-08-14-the-listen-address-is-configurable-loopback-by-default.md):
 that entry's launcher half, deriving the probe and browser addresses from the
 configured `host`, was inert in every installed launcher over that window,
 because the fallback always reported `127.0.0.1`.

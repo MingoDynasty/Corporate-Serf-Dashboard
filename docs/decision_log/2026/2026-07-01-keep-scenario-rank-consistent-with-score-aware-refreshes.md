@@ -2,7 +2,7 @@
 
 Status: Superseded in part, for the exhausted-loop notification ("asks the user
 to click Refresh" in Consequences below), by the
-[2026-08-03 console-only background diagnostics decision](#2026-08-03-background-rank-diagnostics-are-console-only).
+[2026-08-03 console-only background diagnostics decision](2026-08-03-background-rank-diagnostics-are-console-only.md).
 Every other part of this entry remains Accepted.
 
 Supersedes: The `ThreadPoolExecutor(max_workers=2)` high-score refresh and the

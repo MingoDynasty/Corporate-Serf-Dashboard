@@ -50,7 +50,7 @@ The held playlist leaves the list on the next pick or clear, because the list
 is built again for the new value.
 
 **What this changes in the 2026-07-11 entry.** One sentence of
-[The Playlist Overview Is The Playlist Management Surface](#2026-07-11-the-playlist-overview-is-the-playlist-management-surface):
+[The Playlist Overview Is The Playlist Management Surface](2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md):
 "`get_visible_playlist_selector_options()` is the single visibility filter
 every option list consumes (Home filter, Journey picker, overview), so they
 cannot disagree." The function is still the only place that decides what is
@@ -100,12 +100,12 @@ state as it was.
   Firefox. A link arrival shows the previous playlist's name for one round
   trip, 46 and 47 ms in the two measured in Edge and 112 and 125 ms in
   Firefox, which is the cost
-  [2026-09-19](#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)
+  [2026-09-19](2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)
   already accepts. The Firefox runs shared the machine with a test run.
 - The rule leans on two behaviors of the installed Select that no unit test
   can hold: a value its options have is named, and a value its new options
   lack is dropped. An upgrade of dash-mantine-components repeats the browser
-  check, as a step in [dependency_refresh.md](dependency_refresh.md#packages-that-ship-browser-code).
+  check, as a step in [dependency_refresh.md](../../dependency_refresh.md#packages-that-ship-browser-code).
 
 **What it keeps.** The filter's layout `value` is `None` on every visit, and
 `data` is not a prop the browser stores, so the 2026-09-19 rule about a

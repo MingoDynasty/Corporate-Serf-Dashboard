@@ -27,5 +27,5 @@ passes when it is at least the goal percentage as fast as the previous PB.
 The reasons above stand there too: the verdict still judges against the
 previous PB, and still compares exactly rather than through the ratio it
 displays. Every other scenario keeps the formula as written. The
-[2026-10-05 entry](#2026-10-05-time-scored-scenarios-are-measured-by-pace)
+[2026-10-05 entry](2026-10-05-time-scored-scenarios-are-measured-by-pace.md)
 holds the pace formula.

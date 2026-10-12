@@ -2,7 +2,7 @@
 
 What the app does and *why* — the user problem behind each feature. This is
 the durable companion to [`roadmap.md`](./roadmap.md) (which sequences what's
-next and trims itself as work ships) and [`decision_log.md`](./decision_log.md)
+next and trims itself as work ships) and [`decision_log.md`](./decision_log/README.md)
 (which records *technical* decisions). When a feature ships, its user-facing
 rationale lands here so it survives the deletion of the proposal that designed
 it (see AGENTS.md "Shipping a proposal").

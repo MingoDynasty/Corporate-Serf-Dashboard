@@ -2,7 +2,7 @@
 
 Status: Superseded in part, for the aggregate completion toast alone, by
 the
-[2026-08-22 in-place-only entry](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)
+[2026-08-22 in-place-only entry](2026-08-22-the-playlist-fill-reports-degradation-in-place-only.md)
 (the fill states degradation in the page's status line and emits no
 notification). The fill mechanism, generation scoping, tombstones, and
 status settling are unchanged and remain Accepted.

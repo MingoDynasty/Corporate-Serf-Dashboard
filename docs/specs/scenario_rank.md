@@ -13,14 +13,14 @@ clicked, and a Steam ID that disagrees with the account KovaaK's found, said
 once per app session because the field has nowhere to put it.
 
 Statements below describe what the app does today and link the
-[decision log](../decision_log.md) entries that set them — rationale lives
+[decision log](../decision_log/README.md) entries that set them — rationale lives
 in those entries, not here. A statement with no link is an implementation
 fact that no decision-log entry governs. Runtime structure is mapped in
 [architecture.md](../architecture.md); endpoint behavior and quirks in
 [kovaaks_api_notes.md](../kovaaks_api_notes.md). In user-facing text,
 leaderboard placement is worded "Position", never "Rank" (which means
 benchmark tier) — see the
-[2026-07-06 verbiage entry](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage).
+[2026-07-06 verbiage entry](../decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md).
 
 ## Data sources and identity
 
@@ -28,13 +28,13 @@ benchmark tier) — see the
   `/user/scenario/total-play` is metadata/upsert only — it hydrates
   `scenarioName -> leaderboardId` mappings for played scenarios and is never
   trusted for score or rank
-  ([2026-04-27](../decision_log.md#2026-04-27-treat-total-play-as-metadata-only)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-treat-total-play-as-metadata-only.md)).
 - `scenarioName -> leaderboardId` resolution reads the permanent mapping
   cache, which is seeded at startup from the leaderboard IDs embedded in the
   bundled benchmark corpus
-  ([2026-07-20](../decision_log.md#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus))
+  ([2026-07-20](../decision_log/2026/2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus.md))
   and served through an mtime-revalidated in-memory mirror
-  ([2026-07-18](../decision_log.md#2026-07-18-leaderboard-mapping-reads-through-an-mtime-revalidated-in-memory-mirror)).
+  ([2026-07-18](../decision_log/2026/2026-07-18-leaderboard-mapping-reads-through-an-mtime-revalidated-in-memory-mirror.md)).
   `/scenario/popular` is the exact-name fallback for names the cache and
   `total-play` hydration cannot resolve.
 - A mapping upsert writes nothing when the stored row already carries both the
@@ -44,24 +44,24 @@ benchmark tier) — see the
   seed-owned row the live API confirms is still rewritten, taking live
   ownership so a later corpus release that stops asserting the name cannot
   remove it
-  ([2026-09-04](../decision_log.md#2026-09-04-re-asserting-an-unchanged-leaderboard-id-writes-nothing)).
+  ([2026-09-04](../decision_log/2026/2026-09-04-re-asserting-an-unchanged-leaderboard-id-writes-nothing.md)).
 - When `steam_id` is configured it is preferred for leaderboard identity
   matching; if Steam ID matching fails but exact username matching succeeds,
   the rank result is kept and a transient (never cached) warning is attached
-  ([2026-04-27](../decision_log.md#2026-04-27-prefer-steam-id-matching-when-configured)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-prefer-steam-id-matching-when-configured.md)).
   A mismatch is a persistent condition with no in-place home, so it gets one
   toast per app session — fired by the first passive render that observes it
   (scenario switch, new run, interval tick), titled "Steam ID mismatch", and
   persistent until dismissed, one of the two named exceptions to the
   quiet-by-default routing policy
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)). Later renders carry it silently, and a manual
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)). Later renders carry it silently, and a manual
   Refresh that merely re-observes the mismatch still reports a clean refresh:
   the fetch succeeded. A render nothing triggered — the duplicate-output fire
   Dash can make on page load — renders the value without spending the
   session's one toast.
 - An empty `kovaaks_username` keeps the app fully offline: the rank service
   short-circuits before any network call
-  ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)).
+  ([2026-08-01](../decision_log/2026/2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected.md)).
   Two paths reach it: never configuring a username, and declining the offer.
   The landing page's setup card writes the key empty through
   `settings_service.decline_identity`, so the fully-offline state is one a
@@ -69,52 +69,52 @@ benchmark tier) — see the
   page at all. While the key is absent that card is also what says the rank
   features exist — it offers the account, and the in-place statements below
   take over once the emptiness is on screen
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   Every surface that depends on the username treats an empty one as
   persistent configuration state rather than a failure. The playlist
   scenarios page skips its progressive position
   fill entirely and says so in place — "Positions unavailable. Set your
   KovaaK's username in Settings.", with Settings linked and the period outside
   the link — so no lookup runs over a pass that would fetch nothing
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure);
-  copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md);
+  copy as amended by [2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   The playlists overview, whose percentile columns empty for the same reason,
   states it in its own status line as well: "Percentiles unavailable. Set your
   KovaaK's username in Settings.", again with Settings linked, and only when
   the grid has rows to explain
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   A username that is configured but wrong is a separate, still-open case: it
   is knowable only per result and still produces the generic failure reporting.
 
 ## Domain model
 
 - UI code consumes `ScenarioRankInfo` and avoids endpoint-specific logic
-  ([2026-04-27](../decision_log.md#2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo.md)).
 - `ScenarioRankStatus` uses `StrEnum` with stable JSON values (`RANKED`,
   `UNRANKED`, `UNKNOWN`).
 - Percentile is display-only metadata, derived with the midpoint formula from
   rank plus leaderboard total when rank info is returned; it is not stored in
   the rank cache
-  ([2026-04-27](../decision_log.md#2026-04-27-use-the-midpoint-percentile-formula)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-use-the-midpoint-percentile-formula.md)).
   A rank above the known total suppresses the percentile instead of deriving a
   negative one: the rank and the total are still shown, the condition is
   logged at WARNING, and the playlists overview counts that scenario
   unresolved until the total refreshes. `rank == total_players` still derives
-  ([2026-09-20](../decision_log.md#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile)).
+  ([2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)).
 
 ## Caching
 
 - Rank, leaderboard-total, and name-to-ID caches are JSON files under
   `data/cache/`
-  ([2026-04-27](../decision_log.md#2026-04-27-use-json-files-for-runtime-api-caches),
+  ([2026-04-27](../decision_log/2026/2026-04-27-use-json-files-for-runtime-api-caches.md),
   root relocated by
-  [2026-07-11](../decision_log.md#2026-07-11-move-the-api-cache-under-datacache)),
+  [2026-07-11](../decision_log/2026/2026-07-11-move-the-api-cache-under-datacache.md)),
   subject to the cache conventions in [AGENTS.md](../../AGENTS.md). They
   carry no schema stamp; the durable-store contract that exempts them lives in
   [settings.md](settings.md#durable-store-schema-contract).
 - `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
   both default to `168`
-  ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
+  ([2026-04-29](../decision_log/2026/2026-04-29-cache-leaderboard-totals-for-one-week.md)).
 - Both TTLs govern automatic paths that fetch. A cache-only read
   (`allow_network=False`, used by the playlists overview, the Home interval
   tick and the playlist scenarios first paint) serves the rank and total
@@ -122,12 +122,12 @@ benchmark tier) — see the
   marks a lookup board-authoritative for the whole readout and bypasses the
   rank cache and the leaderboard-total TTL alike, so a live position meets a
   week-old count only when the total re-read fails, which the result marks
-  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
 - Every automatic rank-cache write routes through one process-locked
   monotonic writer, so a lower score or transient `UNRANKED` result never
   replaces a known better value; only a user-clicked Refresh is
   board-authoritative and may write a lower score or `UNRANKED`
-  ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+  ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
 - The Scenario Performance Position value says when its position was stored:
   hovering or focusing it shows `Last updated {age} · {timestamp}`, from the
   rank cache entry's `fetched_at`, and the value takes the dotted underline
@@ -137,22 +137,22 @@ benchmark tier) — see the
   beside it is cached separately with its own time. `N/A` has no hover, and
   neither does a cache entry written without a time. The age is worded in the
   browser and re-worded every 30 seconds. The playlist pages show no such time
-  ([2026-10-04](../decision_log.md#2026-10-04-the-position-value-says-when-it-was-last-updated)).
+  ([2026-10-04](../decision_log/2026/2026-10-04-the-position-value-says-when-it-was-last-updated.md)).
 
 ## HTTP behavior
 
 - `kovaaks_api_timeout_seconds` defaults to `30`, one shared timeout for all
   KovaaK's requests
-  ([2026-07-13](../decision_log.md#2026-07-13-kovaaks-timeout-is-30s-configurable-read-timeouts-are-not-retried)).
+  ([2026-07-13](../decision_log/2026/2026-07-13-kovaaks-timeout-is-30s-configurable-read-timeouts-are-not-retried.md)).
 - Read timeouts fail immediately and are never retried; connection errors and
   HTTP 429 (honoring a capped `Retry-After`) retry once
-  ([2026-04-28](../decision_log.md#2026-04-28-retry-kovaaks-get-transient-failures-once)
+  ([2026-04-28](../decision_log/2026/2026-04-28-retry-kovaaks-get-transient-failures-once.md)
   as amended by
-  [2026-07-13](../decision_log.md#2026-07-13-kovaaks-timeout-is-30s-configurable-read-timeouts-are-not-retried)).
+  [2026-07-13](../decision_log/2026/2026-07-13-kovaaks-timeout-is-30s-configurable-read-timeouts-are-not-retried.md)).
 - Requests reuse thread-local `requests.Session` objects
-  ([2026-04-29](../decision_log.md#2026-04-29-use-thread-local-sessions-for-kovaaks-get-requests))
+  ([2026-04-29](../decision_log/2026/2026-04-29-use-thread-local-sessions-for-kovaaks-get-requests.md))
   and go through the hand-rolled retry helper, not urllib3 `Retry`
-  ([2026-06-21](../decision_log.md#2026-06-21-keep-the-hand-rolled-get-retry-defer-urllib3-retry-migration)).
+  ([2026-06-21](../decision_log/2026/2026-06-21-keep-the-hand-rolled-get-retry-defer-urllib3-retry-migration.md)).
 
 ## Refresh behavior
 
@@ -160,12 +160,12 @@ benchmark tier) — see the
   through a daemon `threading.Timer` chain (2/4/8/16/32 s), which accepts the
   leaderboard as caught up only when its score reaches the two-decimal floor
   of the local score; an exhausted chain leaves the previous cache untouched
-  ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+  ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
   A chain that does catch up writes a board-authoritative rank, so it re-reads
-  the leaderboard total too, TTL bypassed ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  the leaderboard total too, TTL bypassed ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
 - The Scenario Performance rank widget passively re-reads the rank and total
   caches on its existing interval — TTL ignored, no network calls
-  ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+  ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
 - Background refresh failures are recorded in the console/file logs only;
   they produce no UI notification. The chain degrades silently — the widget
   keeps serving the cached value it already shows, and an exhausted chain is
@@ -173,23 +173,23 @@ benchmark tier) — see the
   or a foreground fetch after the rank-cache TTL expires). An invalid username
   stops the chain outright, but is still reported by the foreground lookup the
   same run event triggers, not by the chain
-  ([2026-08-03](../decision_log.md#2026-08-03-background-rank-diagnostics-are-console-only)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-background-rank-diagnostics-are-console-only.md)).
 
 ## Failure handling
 
 - Expected KovaaK's API/domain failures in the service layer become
   `ScenarioRankInfo(status=UNKNOWN, error_message=...)`
-  ([2026-04-27](../decision_log.md#2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo.md)).
 - Exception: a rank-fetch failure with a resolved leaderboard — unreachable
   endpoint or schema-invalid response — falls back to the last cached rank
   (TTL ignored, read-only) tagged with a `warning_message` and
   `served_stale=True`, so the value survives the failure; it becomes
   `UNKNOWN` only when nothing is cached. `force_refresh=True` inherits the
   same fallback
-  ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)).
+  ([2026-07-12](../decision_log/2026/2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank.md)).
 - Passive renders never toast — the routing policy sends persistent conditions
   to in-place UI
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   The Scenario Performance Position field carries its own
   explanation instead: `N/A` plus " · set your KovaaK's username in Settings",
   with Settings linked, when no username is configured, `N/A` plus
@@ -197,7 +197,7 @@ benchmark tier) — see the
   cached value plus " · from cache" when a failed fetch was served from cache.
   Each hint is a middle-dot readout with no instruction half, because the
   Refresh button beside the value is the affordance
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). The
   hint the last network-backed render concluded is reused by the cache-only
   interval path, which cannot see a failure that already happened, so the
   affordance does not blink off between ticks. That hint is tied to the value
@@ -218,44 +218,44 @@ benchmark tier) — see the
   from cache." when the cached readout includes a total and "Couldn't
   refresh. The position shown is from cache." when it does not, and its value
   carries the same " · from cache" hint a passive render would give it
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   The hard failure's red, not yellow, follows the severity scale: nothing
   usable came back
-  ([2026-09-27](../decision_log.md#2026-09-27-the-manual-refresh-hard-failure-stays-red)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-the-manual-refresh-hard-failure-stays-red.md)).
   The two share one
   `rank-refresh-problem` channel: they are
   mutually exclusive verdicts on one attempt, so a stale retry after a hard
   failure replaces it instead of leaving both on screen contradicting each
   other
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)). A click with
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)). A click with
   no username configured never reaches the service at all: it is caught on the
   direct settings read after the `n_clicks` and selected-scenario guards, and
   answered blue, titled "KovaaK's username not set", leaving the value alone
   because the field's own hint already explains it
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)).
   Only a genuinely fresh result gets the green confirmation, titled "Position
   refreshed". Every outcome is a channel emission, so a repeat click always
   re-pops its answer instead of being swallowed while the previous toast is
   still up
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
   as amended by
-  [2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  [2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   The green confirmation is keyed by scenario, so re-refreshing one scenario
   replaces its own toast while refreshes of different scenarios stack; the blue
   notice is a single channel. A successful refresh also clears the problem
   channel and the unset-username channel, since a lookup that returned proves
   neither claim still stands
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
-  ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-make-leaderboard-total-enrichment-best-effort.md)).
   The failure substitutes the last cached total whatever its age, so the
   percentile survives it unless the fresh position sits above that older count
-  ([2026-09-20](../decision_log.md#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile)),
+  ([2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)),
   and only a leaderboard with no total ever cached degrades to a bare position.
   Either way the result carries `total_refresh_failed`, a transient marker
   excluded from serialization so it can never reach a rank cache file
-  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
 - A Refresh whose position landed but whose total did not is orange. Its
   consequence names the total, which is what failed, rather than the
   percentile, which is recomputed from it: "Position refreshed but total from
@@ -268,8 +268,8 @@ benchmark tier) — see the
   two channels the green does, so a re-click's green replaces the partial
   verdict instead of stacking under it. The value carries no extra inline
   hint; the Refresh button beside it is the affordance. A rank fetch that
-  failed asks for no total at all ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  failed asks for no total at all ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
 - Unexpected application bugs may still raise and are handled by
   UI/background safety nets — the expected/unexpected boundary is set by
   the same entry that reserves `UNKNOWN` for expected failures
-  ([2026-04-27](../decision_log.md#2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo)).
+  ([2026-04-27](../decision_log/2026/2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo.md)).

@@ -11,7 +11,7 @@ The README also shows the playlist pages, and its screenshots live in their
 own folder.
 
 **What this reverses.** The
-[front-door entry](#2026-09-22-the-readme-is-a-front-door-and-user-reference-lives-in-a-user-guide)
+[front-door entry](2026-09-22-the-readme-is-a-front-door-and-user-reference-lives-in-a-user-guide.md)
 kept Install's paragraph on what the installer touches, the
 release-integrity paragraph, Updates, and Uninstall unchanged, "because those
 are what make pasting a one-line installer acceptable". The maintainer
@@ -22,14 +22,14 @@ fact already has a home:
 - The installer-touches paragraph (one root under `%LOCALAPPDATA%`, its own uv
   and Python, no registry, `PATH`, or machine-wide toolchain) lives in
   `docs/specs/release_and_install.md` and the
-  [installer entry](#2026-07-19-the-installer-brings-its-own-toolchain-app-locally).
+  [installer entry](2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md).
   Its "nothing else is touched" also overstated: the desktop shortcut and
   `get.ps1`'s `%TEMP%` copy sit outside the root.
 - The release-integrity paragraph: the digest check, `Get-FileHash` included,
   moved into the user guide's Manual install step, which already listed the
   digest; immutability and the archive contract live in the release spec and
-  the [immutability](#2026-07-19-releases-and-their-assets-are-immutable) and
-  [archive-contract](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)
+  the [immutability](2026-07-19-releases-and-their-assets-are-immutable.md) and
+  [archive-contract](2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)
   entries.
 - Updates' promotion-after-a-healthy-start and untouched-`config.toml`-and-`data`
   sentences live in the release spec and the user guide's Configuration
@@ -55,7 +55,7 @@ the tech-stack sentence beside the architecture link, "which keeps the
 sentence now points at the `docs/` folder, and with the `product.md` pointer
 also gone, neither file is a target of the README or the user guide. Those two
 shipped entry points are what the contract's documentation rows cover, per the
-[archive-contract entry](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)
+[archive-contract entry](2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)
 and the two tests that hold their targets in `REQUIRED_ARCHIVE_ENTRIES`, so
 both rows left it. `docs/roadmap.md`, itself a row, still links both, as it
 links `decision_log.md`, a spec, and a proposal that never had rows: targets

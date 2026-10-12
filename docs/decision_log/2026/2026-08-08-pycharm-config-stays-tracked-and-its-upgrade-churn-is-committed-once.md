@@ -51,11 +51,11 @@ Consequences and constraints:
 - **black is a transitive dependency, not an absent one.** It is not in
   `pyproject.toml` and not a configured project tool, but it stays in the lock
   under `datamodel-code-generator` and is installed in `.venv` — see
-  [Consolidate Formatting And Linting On Ruff](#2026-07-03-consolidate-formatting-and-linting-on-ruff).
+  [Consolidate Formatting And Linting On Ruff](2026-07-03-consolidate-formatting-and-linting-on-ruff.md).
 - **Blocking is about triggering, not shipping.** The two lists are separate:
   `_BLOCKED_DIRECTORIES` decides whether a push cuts a release, while
   `.gitattributes` decides what the release zip carries. `.idea/` is now on
   both — it neither triggers a release nor ships in one, per
-  [Release Integrity Rests On GitHub Digests And An Enforced Archive Contract](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract).
+  [Release Integrity Rests On GitHub Digests And An Enforced Archive Contract](2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md).
   `docs/` still shows the split as it was: blocked from triggering, but
   shipped, because the zip's own README links into it.

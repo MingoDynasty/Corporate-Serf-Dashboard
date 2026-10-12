@@ -27,7 +27,7 @@ callback.* Dash pins a persisted edit to the layout value it was made against
 and discards the edit when a later visit renders a different one, so a default
 that varies per visit retires persistence for that control instead of
 overriding it. This is the per-visit twin of the keyed-by-id rule in
-[2026-08-09](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph),
+[2026-08-09](2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md),
 and it binds any future `?param=` preselect on any page.
 
 **Its corollary, learned the hard way in review.** *A callback that writes a
@@ -57,7 +57,7 @@ becomes an ordinary remembered selection. Details that are load-bearing:
 - **A layout-bound store, not the URL.** Dash Pages rebuilds the page on a
   route change and the store then triggers exactly one write, keeping the deep
   link out of the router's callback graph — the same reason
-  [2026-04-29](#2026-04-29-drive-playlist-table-loads-from-mounted-route-state)
+  [2026-04-29](2026-04-29-drive-playlist-table-loads-from-mounted-route-state.md)
   drives the playlist scenario table from mounted route state.
 - **`allow_duplicate` plus `prevent_initial_call="initial_duplicate"`.**
   `check_for_new_data` already writes the scenario value, and applying the

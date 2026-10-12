@@ -19,7 +19,7 @@ any page existed that could own the display, and information behind a hover
 on a repo link is found by accident rather than on purpose. A separate About
 page was considered and rejected in the same call: a nav destination for three
 lines of static text is not worth the space, and the settings page
-([entry](#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page))
+([entry](2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md))
 is already the "about this install" home.
 
 The section is static text built with the page layout from
@@ -28,7 +28,7 @@ The section is static text built with the page layout from
 re-derives no part of the identity, owns no callback, and makes no request.
 Identity resolution is unchanged: the stage-time `release.json` copy and the
 full precedence live in
-[Build Identity Comes From The Manifest](#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp),
+[Build Identity Comes From The Manifest](2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md),
 whose surfaces list this entry rewrites.
 
 Clock semantics (PR #225): the CalVer tag date is the release date in UTC —

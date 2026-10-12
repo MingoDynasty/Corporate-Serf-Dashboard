@@ -16,7 +16,7 @@ rows S1 to S4 ratified as recommended, after both review seats and a
 flagship read had endorsed all four. The ratification covers the
 author-owned rules below as well. The build is
 [PR #359](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/359).
-The rules as the app applies them are in [sessions.md](specs/sessions.md).
+The rules as the app applies them are in [sessions.md](../../specs/sessions.md).
 This entry holds what the spec doesn't: the reasons, the evidence and its
 limits, and the options set aside.
 
@@ -123,7 +123,7 @@ join it.
 neither defines nor shows the typical score, which the roadmap calls the
 typical run. Its definition goes to a later proposal of its own, written
 before the first feature that judges by it. This changes one sentence of the
-[2026-10-04 entry](#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice),
+[2026-10-04 entry](2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md),
 which said the definition was the Run History proposal's to set. That entry
 carries a dated note beside the sentence. Its row D1 is unchanged: skill is
 still judged by the typical run, and only where the definition gets written

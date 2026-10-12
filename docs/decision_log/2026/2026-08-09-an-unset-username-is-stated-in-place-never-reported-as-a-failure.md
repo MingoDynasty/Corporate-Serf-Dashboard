@@ -2,13 +2,13 @@
 
 Status: Accepted, except that the per-click-id mechanism described below is
 superseded by the 2026-08-31
-["Repeatable Toasts Replace In Place With A Visible Re-Entry"](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+["Repeatable Toasts Replace In Place With A Visible Re-Entry"](2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)
 entry: the blue notice is now a single-identity channel that re-pops by showing
 a fresh instance id. The ruling — an unset username is configuration state
 answered blue, never a red failure — is untouched. The
 configured-but-wrong-username case the Scope note below defers is now half
 settled by the 2026-08-22
-["The Playlist Fill Reports Degradation In Place Only"](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)
+["The Playlist Fill Reports Degradation In Place Only"](2026-08-22-the-playlist-fill-reports-degradation-in-place-only.md)
 entry, which deleted the playlist fill's aggregate toast — and with it
 `_fill_summary_notification`, described below as untouched. Only the Refresh
 half of "both generic red toasts" still fires. Everything else here stands.
@@ -42,7 +42,7 @@ is.
   in Settings".
 
 Why in place on the playlist page and a toast on Refresh: the
-[2026-08-03 routing policy](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+[2026-08-03 routing policy](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
 sends persistent conditions to in-place UI, and the playlist grid has such a
 home. Refresh collides with the same policy's user-initiated branch, and that
 branch wins for this event: the in-place hint was already on screen before the
@@ -75,7 +75,7 @@ toasts today. That case is deliberately deferred and remains open; a typed
 reason on `ScenarioRankInfo` is where it should be reconsidered.
 
 Consequences: nothing is superseded. This discharges the kernel the
-[2026-08-01 fully-offline entry](#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)
+[2026-08-01 fully-offline entry](2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected.md)
 deferred until a settings page existed to point at — quiet state instead of a
 red error, no futile fill, and a pointer to how to turn the features on.
 Position cells still render N/A throughout: the service's guard fires before
@@ -84,7 +84,7 @@ any cache read, so no cached position can contradict the status line.
 **Superseded in part, for copy (2026-09-14).** The two strings quoted above
 now read "Positions unavailable. Set your KovaaK's username in Settings.",
 with the period outside the link, and "N/A · set your KovaaK's username in
-Settings". The ruling is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+Settings". The ruling is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
 Provenance: distilled from `docs/unset_username_position_feedback_proposal.md`
 (four decisions ratified 2026-08-09), committed and then deleted in the

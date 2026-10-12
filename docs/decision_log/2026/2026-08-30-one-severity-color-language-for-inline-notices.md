@@ -1,7 +1,7 @@
 # 2026-08-30: One Severity Color Language For Inline Notices
 
 Status: Accepted (the orange rung widened by
-[2026-09-19](#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total) from
+[2026-09-19](2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md) from
 a failed follow-up write to any failed follow-up step)
 
 The app's inline notices each picked their own look, so the surfaces that most
@@ -60,7 +60,7 @@ defines the `-light` tokens per color scheme, so dark mode needs no separate
 rules.
 
 Superseded in part by the
-[2026-09-15 setup-hints entry](#2026-09-15-setup-hints-wear-the-notice-anatomy):
+[2026-09-15 setup-hints entry](2026-09-15-setup-hints-wear-the-notice-anatomy.md):
 that sweep enumerated the notices by component and so never saw the three
 plain-text messages about setup, which now wear the same anatomy. The
 enumeration above is the five as shipped that day; there are seven, and the
@@ -82,12 +82,12 @@ cost, accepted knowingly: it tracks Mantine's `Alert` look by hand across
 upgrades.
 
 Extends the toast layer specified by the
-[2026-08-03 notification entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy),
+[2026-08-03 notification entry](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md),
 which stays authoritative for toasts, including their white-card-with-icon
 anatomy: an icon suppresses Mantine's colored side bar, so a toast's color is a
 circle rather than a stripe, and nothing here changes that. Orange keeps the
 meaning the
-[2026-08-02 committed-side-effect entry](#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)
+[2026-08-02 committed-side-effect entry](2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails.md)
 gave it and stays a distinct severity rather than folding into yellow.
 
 Deferred: strengthening the pale yellow tint with a scoped CSS override. The

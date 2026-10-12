@@ -45,7 +45,7 @@ aim-training-hours checkpoint labels.
 its destination, and completes in a Plotly Cloud tab the user can see, which
 makes it an export in the same class as saving the PNG. That is what
 separates it from crash telemetry, which the
-[2026-08-10 bug-reports entry](#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)
+[2026-08-10 bug-reports entry](2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed.md)
 rejects as privacy-hostile for a local tool. The user guide's
 outside-services table carries a Plotly row as the disclosure.
 

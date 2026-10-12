@@ -54,4 +54,4 @@ colorway change here.
 
 **Superseded in part, for copy (2026-09-14).** The line this entry calls
 Average Score is labelled "Average score" in the legend and its hover label.
-The color decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+The color decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).

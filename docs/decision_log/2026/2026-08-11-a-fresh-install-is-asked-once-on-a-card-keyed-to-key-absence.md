@@ -66,7 +66,7 @@ and clicked after another tab saved a real username would otherwise erase it,
 and a refusal to answer is never grounds for discarding an answer somebody
 gave (found in PR #236's review). This deliberately narrows the single-runtime-writer
 clause of the 2026-08-03
-["Settings Detection Suggests, And Identity Is Offered Only Once Verified"](#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)
+["Settings Detection Suggests, And Identity Is Offered Only Once Verified"](2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified.md)
 entry rather than contradicting it: Save remains the only runtime writer of
 *values*, and the decline can only ever record "asked and declined" — never
 something a user typed. `pages/settings.py`'s module docstring carries the
@@ -79,7 +79,7 @@ restart notice appears either. Recovery from a decline is the settings page
 plus the point-of-impact hints; the card itself never returns. The callback
 guards on `n_clicks` and `ctx.triggered_id` against the DashProxy
 initial-call hazard (see the 2026-08-02
-["A Committed Side Effect Reports Its Outcome Even When A Later Write Fails"](#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)
+["A Committed Side Effect Reports Its Outcome Even When A Later Write Fails"](2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails.md)
 entry's hazard note), which matters here because this callback writes to disk.
 
 **New user-facing copy avoids em dashes.** A rule that emerged with this arc
@@ -103,7 +103,7 @@ Settings.", and State B's body reads "No KovaaK's stats folder was found, so
 this app can't read your runs yet. Set it in Settings." The deferral in the
 em-dash paragraph above is discharged: the sweep of all app messaging shipped,
 and the em-dash rule is now one of nine copy rules, gated by a test. Triggers,
-states, and Skip are unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+states, and Skip are unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
 Provenance: distilled from `docs/initial_setup_proposal.md` (proposed in PR
 #231), shipped in PRs #235 (the companion playlists-overview status line,

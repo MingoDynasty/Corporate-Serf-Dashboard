@@ -52,7 +52,7 @@ override stands, and the escape hatch is still a one-time edit of the
 affected files.
 
 Supersedes, in part, the
-[2026-09-11 sensitivity-normalization entry](#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi):
+[2026-09-11 sensitivity-normalization entry](2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md):
 its "`RunData`'s shape is unchanged, so the original scale value is not
 retained" clause only. The conversion, its inputs and guards, the trust in
 recorded DPI, the legacy-label rule, the notification semantics, and the

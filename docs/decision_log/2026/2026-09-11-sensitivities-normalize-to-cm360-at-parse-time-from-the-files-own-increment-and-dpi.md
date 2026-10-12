@@ -127,14 +127,14 @@ directory on 2026-09-05: 8,064 parseable files, of which 7,494 carry both
 fields and 570 carry neither, with no file carrying only one.
 
 Superseded in part by the
-[2026-09-26 recorded-setting entry](#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only):
+[2026-09-26 recorded-setting entry](2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md):
 the clause "`RunData`'s shape is unchanged, so the original scale value is
 not retained" no longer holds. A converted run keeps its recorded value,
 scale, and DPI, for the chart hover only. Everything else here stands,
 recorded DPI trusted as-is included.
 
 Superseded in part by the
-[2026-09-27 per-scale precision entry](#2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired):
+[2026-09-27 per-scale precision entry](2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired.md):
 the paragraph "The rounding fix does not reach legacy runs" no longer holds. A
 legacy run keeps the sensitivity its file recorded, unrounded, so the 95
 `0.32 Valorant` runs read `0.32 Valorant`. cm/360 values still round to one

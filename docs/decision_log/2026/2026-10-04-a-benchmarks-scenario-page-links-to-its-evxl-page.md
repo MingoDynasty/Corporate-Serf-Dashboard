@@ -22,7 +22,7 @@ percent-encoded as one path segment, so a `/` inside a name travels as `%2F`.
 Neither address carries a query: Evxl appends `?tab=` from the visitor's
 remembered tab, and a link that set one would override that choice. The
 measurements are in
-[kovaaks_api_notes.md](kovaaks_api_notes.md#evxl-benchmark-pages-linked-never-fetched).
+[kovaaks_api_notes.md](../../kovaaks_api_notes.md#evxl-benchmark-pages-linked-never-fetched).
 
 **Where the names come from.** A bundled file carries the KovaaK's playlist
 name, which is not Evxl's: "Viscose Benchmark S2 - Medium" is "Viscose

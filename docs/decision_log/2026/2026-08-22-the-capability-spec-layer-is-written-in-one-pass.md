@@ -65,7 +65,7 @@ inherit:
   restating them, and link another spec only to say a rule lives there.
 
 Consequences: the
-[2026-08-01 doc-style follow-up entry](#2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index)'s
+[2026-08-01 doc-style follow-up entry](2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index.md)'s
 "revisit a log index only if findability still hurts after specs land"
 loop closes when the pass's last PR merges — the specs are the findability
 fix, and a topic index stays rejected; until then the loop is open only in

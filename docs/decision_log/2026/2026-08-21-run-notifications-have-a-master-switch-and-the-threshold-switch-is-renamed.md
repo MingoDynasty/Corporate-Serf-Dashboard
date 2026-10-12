@@ -34,14 +34,14 @@ playlist toast families are untouched.
 **The threshold switch is the verdict sub-toggle, not a second master.** Four
 combinations, all defined: master off is silence whatever the threshold switch
 says; master on with threshold on is the behavior that shipped in the
-[notification redesign](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy);
+[notification redesign](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md);
 master on with threshold off is that redesign's judging-off behavior, meaning
 placement toasts and neutral digests only. Its id, default, and persistence
 are unchanged — renaming the id would orphan every value a browser has already
 stored under it — so only its label, its help text, and the dated code comment
 beside it move. That comment, and the "knowingly imprecise" consequence
 recorded in the
-[Chart options rename entry](#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options),
+[Chart options rename entry](2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md),
 are resolved here: this is the later copy pass that entry deferred, for the
 two strings it touches and no others.
 
@@ -78,13 +78,13 @@ the help text gained a second sentence naming the celebration's own setting.
 The last rejected alternative's deferral of the queue-to-UI redesign also
 falls, for the drain alone; the product question it protected, app-wide
 verdict toasts, stays deferred. Both are recorded in
-[A New Personal Best Celebrates On Every Page](#2026-09-02-a-new-personal-best-celebrates-on-every-page).
+[A New Personal Best Celebrates On Every Page](2026-09-02-a-new-personal-best-celebrates-on-every-page.md).
 
 **Superseded in part, for copy (2026-09-14).** The two control names this
 entry sets are sentence case: "Run notifications" and "Score threshold
 verdict". The verdict switch's help text names the master switch in bold,
 "Needs **Run notifications** turned on." What each switch gates is unchanged.
-See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out).
+See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
 Shipped in PR #245; design discussion in #240. Distilled from
 `docs/run_notifications_switch_proposal.md`, now deleted.

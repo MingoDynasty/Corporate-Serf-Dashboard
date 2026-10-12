@@ -12,7 +12,7 @@ tab by default, and one config setting turns that off; either way the
 console window prints the address it is serving.
 
 Statements below describe what the scripts, the CI job, and the app do today
-and link the [decision log](../decision_log.md) entries that set them;
+and link the [decision log](../decision_log/README.md) entries that set them;
 rationale lives in those entries, not here. A statement with no link is an
 implementation fact that no decision-log entry governs. Runtime structure is
 mapped in [architecture.md](../architecture.md); the user-facing rationale is
@@ -27,10 +27,10 @@ console lines quoted here are plain console output, not app notifications.
 - The `release` job in `.github/workflows/ci.yml` runs only on a push to
   `main`, with `needs: [test, release-gate]`, so a commit whose format, lint,
   type, or test gate failed never becomes a release
-  ([2026-07-19](../decision_log.md#2026-07-19-releases-are-automated-calver-tags-cut-by-ci);
+  ([2026-07-19](../decision_log/2026/2026-07-19-releases-are-automated-calver-tags-cut-by-ci.md);
   the gates themselves:
-  [2026-07-03](../decision_log.md#2026-07-03-ci-runs-the-merge-bar-on-every-pr),
-  [2026-07-06](../decision_log.md#2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec)).
+  [2026-07-03](../decision_log/2026/2026-07-03-ci-runs-the-merge-bar-on-every-pr.md),
+  [2026-07-06](../decision_log/2026/2026-07-06-adopt-the-cross-repo-python-v2-tooling-spec.md)).
   The job runs on Linux so `git archive` ships LF blobs. `scripts/**`,
   including `release_job.py`, is outside the lint and type gates and is
   covered by its unit tests only
@@ -41,34 +41,34 @@ console lines quoted here are plain console output, not app notifications.
   `tests/`, `.github/`, or `.idea/`; one release-worthy path releases the
   push, and an empty or unknowable range (new ref, force push, pruned base)
   releases conservatively
-  ([2026-07-19](../decision_log.md#2026-07-19-releases-are-automated-calver-tags-cut-by-ci);
+  ([2026-07-19](../decision_log/2026/2026-07-19-releases-are-automated-calver-tags-cut-by-ci.md);
   `.idea/`:
-  [2026-08-08](../decision_log.md#2026-08-08-pycharm-config-stays-tracked-and-its-upgrade-churn-is-committed-once)).
+  [2026-08-08](../decision_log/2026/2026-08-08-pycharm-config-stays-tracked-and-its-upgrade-churn-is-committed-once.md)).
 - Tags are `vYYYY.MM.DD` in UTC; same-day repeats take `.N`, counting from
   the highest serial already used. A rerun reuses a tag already pointing at
   `HEAD`, and a tag that exists but points elsewhere fails the job
-  ([2026-07-19](../decision_log.md#2026-07-19-releases-are-automated-calver-tags-cut-by-ci)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-releases-are-automated-calver-tags-cut-by-ci.md)).
 - Order is fixed: push the tag, build the assets, create (or resume) a
   **draft** release, attach assets with `--clobber`, validate, then publish.
   An already-published tag ends the job with nothing to do
-  ([2026-07-19](../decision_log.md#2026-07-19-releases-and-their-assets-are-immutable)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-releases-and-their-assets-are-immutable.md)).
 - Releases serialize through the `release` concurrency group (`queue: max`).
   At publish time the job scans every published release and passes
   `--latest=false` when any of them descends from its own commit; after
   claiming Latest it asserts `releases/latest` resolves to its tag
-  ([2026-07-19](../decision_log.md#2026-07-19-releases-are-automated-calver-tags-cut-by-ci)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-releases-are-automated-calver-tags-cut-by-ci.md)).
 - Assets are exactly two: `Corporate-Serf-Dashboard-<tag>.zip`, built by
   `git archive` with the prefix `Corporate-Serf-Dashboard-<tag>/`, and
   `release.json` with the frozen v1 fields `schema_version`, `tag`, `sha`,
   `commit_date`, `uv_version`, `python_version`, `source_asset`. `uv_version`
   is read from `tool.uv.required-version` in `pyproject.toml`, which must be
   an exact `==` pin, and `python_version` from `.python-version`
-  ([2026-07-19](../decision_log.md#2026-07-19-releases-are-automated-calver-tags-cut-by-ci),
-  [2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-releases-are-automated-calver-tags-cut-by-ci.md),
+  [2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `version.txt` carries `sha: $Format:%H$` and `commit-date: $Format:%cs$`
   under an `export-subst` attribute; `git archive` expands them, so the zip
   and GitHub's own source archive both carry the full SHA and commit date
-  ([2026-07-19](../decision_log.md#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md)).
   The `test` job separately downloads GitHub's archive of the commit under
   test (the PR head on a pull request)
   and fails if the stamp is unexpanded or names another SHA.
@@ -79,13 +79,13 @@ console lines quoted here are plain console output, not app notifications.
   with a child path under it); any `EXCLUDED_ARCHIVE_TREES` prefix is
   present; or `release.json` differs from the payload the job intended, in
   any field or by an extra field
-  ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)).
 - After validation the job reads the draft's assets back and requires
   exactly the zip and `release.json`, each in state `uploaded`, each with a
   GitHub digest equal to `sha256:` of the local file; a missing or `null`
   digest fails. No checksum file is published and the launcher verifies no
   hash
-  ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)).
 - The release page opens with `.github/release-notes-header.md`, prepended
   to GitHub's generated notes. Its first line is "Immutable GitHub releases ·
   SHA-256 digests for the app zip and release.json"; it says "The launcher
@@ -93,14 +93,14 @@ console lines quoted here are plain console output, not app notifications.
   explains `Get-FileHash`, and ends "The "Source code" downloads are
   generated by GitHub rather than by this project's build. They carry no
   digest. Use the app zip."
-  ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)).
 
 ## The archive contract
 
 - `.gitattributes` marks `/tests`, `/.idea`, and `/.github` `export-ignore`
   in the anchored directory form, so neither the release zip nor GitHub's
   source archive carries them, not even as empty directories. `docs/` ships
-  ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)).
 - A fresh install therefore holds, under `versions/<tag>/`, every tracked
   path outside those three trees, agent tooling (`.claude/`, `AGENTS.md`,
   `CLAUDE.md`) included. The contract guarantees at least `source/`,
@@ -108,7 +108,7 @@ console lines quoted here are plain console output, not app notifications.
   `pyproject.toml`, `uv.lock`, `.python-version`, `version.txt`,
   `example.toml`, `LICENSE`, and `README.md`; the staged `release.json` and
   the synced `.venv/` sit beside them
-  ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract.md)).
 
 ## Installing
 
@@ -119,21 +119,21 @@ console lines quoted here are plain console output, not app notifications.
   through any extra arguments. A 404 on either fetch prints "Corporate Serf
   Dashboard: the release is not ready yet -- try again shortly." and
   returns; the temp file is not deleted
-  ([2026-07-19](../decision_log.md#2026-07-19-the-installer-brings-its-own-toolchain-app-locally)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
 - `install.ps1` installs `-Tag` (pinned), else `-LatestTag` (unpinned), else
   the tag `releases/latest` resolves; with no release published it stops
   with "no release is published yet -- try again shortly." It then reads the
   tag's `release.json`, stops on a `schema_version` other than 1 ("Re-run
   the install one-liner to get the matching installer.") or a missing
   `tag`, `sha`, `commit_date`, `uv_version`, or `source_asset`
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - The install root defaults to `%LOCALAPPDATA%\CorporateSerfDashboard`
   (`-InstallRoot` overrides). The toolchain is app-local: uv at
   `uv\<uv_version>\uv.exe` via `UV_UNMANAGED_INSTALL` from
   `astral.sh/uv/<uv_version>/install.ps1`, CPython under `python\` via
   `UV_PYTHON_INSTALL_DIR` and `--managed-python`, the cache under
   `uv-cache\`. The uv version comes from the release, not the install
-  ([2026-07-19](../decision_log.md#2026-07-19-the-installer-brings-its-own-toolchain-app-locally)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
 - The zip is downloaded from the release's `source_asset`; a 404 falls back
   to `archive/refs/tags/<tag>.zip`. Exactly one top-level directory is
   required, its name discovered after extraction; the extracted
@@ -142,8 +142,8 @@ console lines quoted here are plain console output, not app notifications.
   `uv sync --locked --no-dev --managed-python` runs there. A reinstall onto
   a tag whose directory already exists parks that directory under `tmp\`
   first and restores it if the replacement fails before its sync completes
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract),
-  [2026-07-19](../decision_log.md#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md),
+  [2026-07-19](../decision_log/2026/2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md)).
 - Installs ask no questions. With no `config.toml` at the root, the installer
   writes one carrying only `port = 8050` under a comment header; an existing
   `config.toml` and `data/` are never touched ("Keeping the existing
@@ -151,23 +151,23 @@ console lines quoted here are plain console output, not app notifications.
   app's own `load_config()` with `CSD_STATE_DIR` set to the root, and a
   failure stops the install before the manifest or shortcut are written
   or replaced
-  ([2026-07-19](../decision_log.md#2026-07-19-the-installer-brings-its-own-toolchain-app-locally),
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md),
   port:
-  [2026-07-19](../decision_log.md#2026-07-19-default-port-is-8050-not-8080)).
+  [2026-07-19](../decision_log/2026/2026-07-19-default-port-is-8050-not-8080.md)).
 - `install.json` at the root carries `schema_version: 1`, `tag`, `sha`,
   `commit_date`, `update_policy` (`latest`, or `pinned` plus `pinned_tag`
   under `-Tag`). It never carries a uv or zip-prefix field. `config.toml`,
   `install.json`, and `launch.ps1` are written atomically (temp file, then
   `File.Replace` or move), UTF-8 without BOM, forward-slash paths; the
   `release.json` copy is exempt and kept verbatim
-  ([2026-07-19](../decision_log.md#2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths),
-  [2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths.md),
+  [2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `launch.ps1` at the root is a copy of the release's
   `scripts\launch_bootstrap.ps1`. The desktop shortcut "Corporate Serf
   Dashboard.lnk" targets `powershell.exe -NoProfile -ExecutionPolicy Bypass
   -File "<root>\launch.ps1"` with the root as working directory; it never
   points into a version directory
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - Closing lines: "Installed Corporate Serf Dashboard <tag>.", then under a
   pin "This install is PINNED to <tag> and will not auto-update." and
   "Re-run the installer without -Tag to return to automatic updates.", then
@@ -175,10 +175,10 @@ console lines quoted here are plain console output, not app notifications.
   uninstall: delete the shortcut and the folder <root>". Uninstall is
   exactly that; nothing outside the root is modified except the shortcut
   and the `%TEMP%` copy of the installer
-  ([2026-07-19](../decision_log.md#2026-07-19-the-installer-brings-its-own-toolchain-app-locally)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
 - All scripts target Windows PowerShell 5.1 and are committed BOM-free;
   the bootstrap must carry a `# csd-bootstrap-version: N` marker
-  ([2026-07-19](../decision_log.md#2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths.md)).
 
 ## Starting
 
@@ -187,18 +187,18 @@ console lines quoted here are plain console output, not app notifications.
   `versions\<tag>\scripts\launcher.ps1 -InstallRoot <root>`, exiting with
   its code. An unreadable manifest or missing launcher prints
   `ERROR: ...`, the reinstall one-liner, and waits on "Press Enter to close"
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - The launcher holds a named mutex `Local\CorporateSerfDashboard-<hash of
   root>` for its own and the app's lifetime. A second launch exits 0 without
   updating or touching the manifest
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
   It opens the browser only when `open_browser_on_launch` is on, printing
   "Corporate Serf Dashboard is already running; opening it in the browser.";
   with the setting off it prints "Corporate Serf Dashboard is already running
   at http://<browser>:<port>/." and opens nothing. This branch prints no
   "Dashboard running at" line and does not wait, so its console window closes
   at once
-  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+  ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
 - `Get-ConfiguredEndpoint` asks the selected version's own `load_config()`
   for `port`, `host`, and `open_browser_on_launch`, with `CSD_STATE_DIR` set
   to the root; it captures stdout only, takes the last line, requires exactly
@@ -213,19 +213,19 @@ console lines quoted here are plain console output, not app notifications.
   loader's own unknown-key warning would trigger; and stderr is discarded
   rather than merged, because the two pipes do not merge in a guaranteed
   order and a warning arriving last would be read as the answer
-  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+  ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
 - `Get-ProbeAddress` maps `0.0.0.0` to `127.0.0.1`, `::` to `[::1]`, and any
   other host to its literal (IPv6 bracketed). `Get-BrowserAddress` returns
   `localhost` only for the default host `127.0.0.1` and the probe address
   otherwise
-  ([2026-08-09](../decision_log.md#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001),
-  [2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001.md),
+  [2026-08-14](../decision_log/2026/2026-08-14-the-listen-address-is-configurable-loopback-by-default.md)).
 - `Start-AppVersion` runs `versions\<tag>\.venv\Scripts\python.exe
   source/app.py` with the version directory as working directory,
   `CSD_STATE_DIR` set to the root and `CSD_LAUNCH_TOKEN` set to a fresh
   GUID, stdout and stderr redirected to `data\logs\launcher-app-stdout.log`
   and `launcher-app-stderr.log`. No uv runs on a normal start
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `/health` returns JSON `tag`, `sha`, `commit_date`, `source` from
   `get_build_info()` plus `launch_token` echoed from `CSD_LAUNCH_TOKEN`,
   unauthenticated, on whatever `host` the app binds.
@@ -235,15 +235,15 @@ console lines quoted here are plain console output, not app notifications.
   equals the expected full SHA and `launch_token` equals the token; the tag
   is not checked. A child exit returns `exited` at the next loop check; the
   ceiling returns `timeout`
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract),
-  [2026-08-21](../decision_log.md#2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md),
+  [2026-08-21](../decision_log/2026/2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling.md)).
 - Heartbeat: nothing is printed if the app is ready within 5 s. Otherwise
   "Still starting Corporate Serf Dashboard ... N seconds elapsed." prints at
   5 s and then at least every 5 s (loop granularity can add up to ~2.5 s,
   and a slow-to-refuse loopback port shifts the first lines to ~7/12 s), and
   a ready that follows any heartbeat prints "Corporate Serf Dashboard is
   ready after N seconds."; `exited` and `timeout` print no completion line
-  ([2026-08-21](../decision_log.md#2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling.md)).
 - Normal start prints "Starting Corporate Serf Dashboard <tag> ...". A
   non-ready outcome kills the child tree, `Show-AppFailure` prints
   "WARNING: the dashboard failed to start (<state>)." plus the last 15
@@ -252,18 +252,18 @@ console lines quoted here are plain console output, not app notifications.
   on port <port>. A readiness failure can be config-caused: check
   config.toml in <root> and the app error output above.", the reinstall
   one-liner, and "Press Enter to close"
-  ([2026-08-21](../decision_log.md#2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling.md)).
 - After ready, the browser opens at `http://<browser>:<port>/` when
   `open_browser_on_launch` is on, old versions are pruned, the bootstrap is
   updated, and "Dashboard running at http://<browser>:<port>/ -- close this
   window (or press Ctrl+C) to stop it." prints either way; a failed
   post-start step prints a `WARNING:` and leaves the app running. The
   launcher then waits on the app and exits with its code
-  ([2026-08-09](../decision_log.md#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001),
-  [2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001.md),
+  [2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
 - A port already taken is the app's failure, not the launcher's: the app
   binds exclusively and exits, which the launcher reports as `exited`
-  ([2026-07-19](../decision_log.md#2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken.md)).
 
 ## Updating
 
@@ -273,7 +273,7 @@ console lines quoted here are plain console output, not app notifications.
   the installed version." and runs the installed version. A `pinned`
   policy skips the check entirely; re-running the installer without `-Tag`
   rewrites the policy to `latest`
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - A different tag prints "Update available: <old> -> <new>" and fetches its
   `release.json`. A failed fetch of `release.json`, a `schema_version`
   other than 1, a parse failure, or a
@@ -281,14 +281,14 @@ console lines quoted here are plain console output, not app notifications.
   this installed launcher cannot understand it (<reason>).", "Starting the
   installed version instead. Updating requires reinstalling:", the
   one-liner, and "(Reinstalling keeps your config and data.)"
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - The new release is provisioned and staged exactly as the installer does
   it (uv per release, download with source-archive fallback, one top-level
   directory, stamp must carry the SHA, verbatim `release.json`, `uv sync`),
   into its own `versions\<tag>\`; an existing directory of that tag is
   replaced. "Starting <tag> (pending activation) ..." starts it with a fresh
   token and `Wait-AppReady` gates it on that release's `sha`
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - On `ready` the manifest is rewritten atomically to the new tag, SHA, and
   date with policy `latest`, "Updated to <tag>." prints, the browser opens
   when `open_browser_on_launch` is on, the previous version is kept and
@@ -300,19 +300,19 @@ console lines quoted here are plain console output, not app notifications.
   pending process and prints "Update to <tag> failed (<reason>); starting
   the installed version."; after promotion it prints "WARNING: a
   post-update step failed (<reason>); the update itself succeeded."
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - The launcher that performs an update is the previous release's: the
   bootstrap picked it from the manifest before the check ran. A change to
   launcher behavior therefore takes effect from the launch after the one
   that installed it, not on that launch
-  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+  ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
 - A release that fails its gate is retried in full on every launch until a
   newer release appears
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `Remove-PrunedVersions` keeps the active tag plus the replaced tag when it
   still exists, else the most recently written other directory, and deletes
   the rest ("Pruned old version <tag>."; a failure is a `WARNING:`)
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `Update-Bootstrap` replaces the root `launch.ps1` only when the installed
   release's template carries a higher `csd-bootstrap-version` marker: it
   writes `launch.ps1.new` beside it, checks the copy's marker and parses it
@@ -321,12 +321,12 @@ console lines quoted here are plain console output, not app notifications.
   bootstrap failed validation; keeping the current one." Success prints
   "Updated the launch.ps1 bootstrap to version N." The live file is never
   truncated in place. The marker is `1` today
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - Everything an old launcher parses is the frozen v1 wire contract:
   `release.json` and `install.json` fields, asset names and download paths,
   the uv and Python provisioning inputs. Changes within v1 are additive
   only
-  ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 
 ## Build identity
 
@@ -337,7 +337,7 @@ console lines quoted here are plain console output, not app notifications.
   Either JSON file counts only when its `schema_version` is 1, it has a
   `sha`, and that `sha` equals the expanded stamp's; an unexpanded stamp
   disqualifies both
-  ([2026-07-19](../decision_log.md#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md)).
 - A dev checkout reports its HEAD SHA and date with `tag: None`,
   `source: "git"`, and `release_label` `dev`; an installed copy reports its
   tag and `release-file`; nothing identifiable reports `unknown`.
@@ -347,7 +347,7 @@ console lines quoted here are plain console output, not app notifications.
   carries the tag only when one is known; opt-in, `show_version_in_title`
   prefixes every tab title with the label. The Settings page section's own
   rules are set by
-  ([2026-08-02](../decision_log.md#2026-08-02-the-settings-page-owns-version-display)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-the-settings-page-owns-version-display.md)).
 
 ## State root
 
@@ -358,7 +358,7 @@ console lines quoted here are plain console output, not app notifications.
   launch token is cleared). In an installed copy the state root is therefore the install root:
   `config.toml`, `install.json`, and `data/` sit beside `versions/`. Unset
   means the working directory; what the root holds is set by
-  ([2026-07-19](../decision_log.md#2026-07-19-all-mutable-state-lives-under-an-explicit-state-root)).
+  ([2026-07-19](../decision_log/2026/2026-07-19-all-mutable-state-lives-under-an-explicit-state-root.md)).
 
 ## Schema migration shipping
 
@@ -369,4 +369,4 @@ console lines quoted here are plain console output, not app notifications.
   the state root from `--state-dir`, then `CSD_STATE_DIR`, then the install
   root inferred from a `versions/<tag>/scripts` shape with `install.json`
   above it, then the working directory. The store contract is set by
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).

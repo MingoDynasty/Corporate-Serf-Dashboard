@@ -12,7 +12,7 @@ position.
 **Direction.** The maintainer chose this on 2026-10-04, in chat, over leaving
 every identifier as it was and over parking the question. It supersedes one
 consequence of the
-[2026-07-06 entry](#2026-07-06-one-word-per-concept-in-leaderboard-verbiage),
+[2026-07-06 entry](2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md),
 which kept row field names along with every other internal identifier.
 
 **What changed.** On the row a scenario table draws, `rank_sort`,
@@ -50,12 +50,12 @@ table that maps `?sort=` names to column IDs.
 **Consequences.** The names in `?sort=` are unchanged, so a link saved before
 this change still sorts the table. `SORT_URL_NAMES` is the one place a name
 meets a column ID, which is what the
-[2026-09-27 entry](#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)
+[2026-09-27 entry](2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url.md)
 set it up for. No stored state keys on a row field name: the page's stores
 hold nothing between visits, and the grid's column state is read only to
 write the address. Everything else that says `rank` for a position is
 unchanged, including `ScenarioRankInfo`, the Home page's component IDs, and
-the cache. The [glossary](glossary.md) gives the code words as they now
+the cache. The [glossary](../../glossary.md) gives the code words as they now
 stand. A new row field for a leaderboard position says `position`.
 
 **Provenance.** No proposal. The change came out of a check of the glossary

@@ -44,7 +44,7 @@ overshoot the ceiling by about as much. On a machine where a closed loopback
 port is slow to refuse, every pre-listen probe burns its full timeout, which
 is why the PR's transcripts show 7/12 s rather than 5/10 s. The probe itself
 is unchanged. Its address stays governed by the
-[2026-08-14 configurable-listen-address entry](#2026-08-14-the-listen-address-is-configurable-loopback-by-default):
+[2026-08-14 configurable-listen-address entry](2026-08-14-the-listen-address-is-configurable-loopback-by-default.md):
 `Get-ProbeAddress` sends a wildcard bind to its own family's loopback and
 every other configured host to that host's literal URL form. The gate on
 the full SHA and launch token, and process exit detected at the next loop

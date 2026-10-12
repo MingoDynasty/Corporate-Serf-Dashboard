@@ -31,8 +31,8 @@ Then it applies the manifest's policy:
   untouched — a crashing release never becomes the recorded install. The gate
   deliberately does **not** require a tag match, because a build on trial is
   still described by the previous manifest and reports `tag: None` under the
-  corroboration rule above. Any network or API failure fails open: run what is
-  installed, offline-safe.
+  [corroboration rule](2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md).
+  Any network or API failure fails open: run what is installed, offline-safe.
 - **`pinned`** + `pinned_tag`: skip the update check entirely. A rollback
   install (`install.ps1 -Tag ...`) *writes this pin*; without it the next launch
   would immediately reinstall the bad release, making rollback a no-op. Undoing

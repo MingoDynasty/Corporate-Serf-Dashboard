@@ -1,7 +1,7 @@
 # 2026-07-11: The Playlist Overview Is The Playlist Management Surface
 
 Status: Accepted (amended by
-[2026-10-12](#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds):
+[2026-10-12](2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md):
 the Scenario Performance filter lists the visible playlists plus the hidden
 playlist it holds, so its option list is no longer the visible list alone)
 

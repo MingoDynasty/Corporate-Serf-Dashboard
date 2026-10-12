@@ -1,7 +1,7 @@
 # 2026-07-03: Import Benchmarks From Evxl And KovaaK's
 
 Status: Accepted (amended by
-[2026-09-26](#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed):
+[2026-09-26](2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed.md):
 KovaaK's threshold and scenario changes under an unchanged benchmark ID are
 now found by the importer's read-only drift check, which names the files a
 forced refresh regenerates)

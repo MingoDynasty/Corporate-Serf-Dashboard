@@ -40,4 +40,4 @@ ships: the same chat ruled the removal, with cm/360 fixed at one decimal, and
 queued it as a separate implementation.
 *(Resolved 2026-09-27: the knob is retired and every stored cm/360 value
 carries one decimal place, so the case can't arise. See
-[Sensitivity Precision Is Fixed Per Scale, And Its Config Knob Is Retired](#2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired).)*
+[Sensitivity Precision Is Fixed Per Scale, And Its Config Knob Is Retired](2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired.md).)*

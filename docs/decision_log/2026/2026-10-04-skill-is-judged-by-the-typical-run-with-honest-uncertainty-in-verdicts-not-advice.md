@@ -18,7 +18,7 @@ as recommended, with D3's evidence bar as amended in review. D5, what the
 roadmap's Future list holds, is recorded in the roadmap alone.
 
 The rules themselves are in the roadmap's
-[Guiding principles](roadmap.md#guiding-principles). This entry holds what
+[Guiding principles](../../roadmap.md#guiding-principles). This entry holds what
 the roadmap doesn't: the reasons, the evidence and its limits, and the
 options set aside.
 
@@ -37,7 +37,7 @@ is the Run History proposal's to set. *(Moved 2026-10-11: Run History
 neither defines nor shows the typical run, and its definition goes to a
 proposal of its own, written before the first feature that judges by it. See
 row S4 of
-[A Session Ends After A Break Of More Than 30 Minutes](#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes).)*
+[A Session Ends After A Break Of More Than 30 Minutes](2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md).)*
 
 **D1's evidence, and its limits.** The evidence is one player's history,
 checked on 2026-09-27. Ordering scenarios against each other by the typical
@@ -78,7 +78,7 @@ now or keep going" line shrinks to the facts the player's own rule reads.
 **The line D3 retires.** A run that passes the score threshold without
 placing gets a toast that ends "Ready to move on.", which tells the player
 when to stop. The
-[2026-09-14 copy entry](#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)
+[2026-09-14 copy entry](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)
 kept that line under its D4, ruled 2026-09-12. By the bar set out here it's
 a default rule the app vouches for, and no check came before it. Ruled
 (user) 2026-10-04,
@@ -119,7 +119,7 @@ What else it takes depends on what the app would be claiming.
 **D4, Run history builds sessions first.** Sessions, and the visits inside
 them, are built before either history view, as the foundation the views and
 later features share. This reverses two durable decisions in the
-[Run History proposal](proposals/run_history_proposal.md): "raw timestamps
+[Run History proposal](../../proposals/run_history_proposal.md): "raw timestamps
 first; sessions are a later quality-of-life layer", and the view order that
 followed from it. Both are marked superseded there, with their text kept.
 Nearly every planned feature needs sessions, and splitting the runs into them
@@ -129,8 +129,8 @@ carries the milestone's reasons and the Future list, which is planned work in
 no particular order.
 
 **Terms.** Typical run, visit, and rank-up chance are working words here, not
-[glossary](glossary.md) terms: nothing ships them yet. The proposal that
+[glossary](../../glossary.md) terms: nothing ships them yet. The proposal that
 ships each one names and defines it in its Terms block, and may rename it.
-*(2026-10-11: visit now has a [glossary entry](glossary.md#visit), under the
+*(2026-10-11: visit now has a [glossary entry](../../glossary.md#visit), under the
 same word. See
-[A Session Ends After A Break Of More Than 30 Minutes](#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes).)*
+[A Session Ends After A Break Of More Than 30 Minutes](2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md).)*

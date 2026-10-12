@@ -21,4 +21,4 @@ instead of duplicating their pixel values.
 **Superseded in part (2026-10-12).** The grid no longer virtualizes its rows.
 It draws every one, so the browser's own text search can reach them. The
 bounded grid, its own scrollbar, and the headers that stay in view all stand
-([2026-10-12](#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
+([2026-10-12](2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md)).

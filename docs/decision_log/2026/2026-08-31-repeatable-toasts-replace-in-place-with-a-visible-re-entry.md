@@ -127,7 +127,7 @@ wanted. This is a mechanism conformance change, not new celebration scope; the
 in-flight personal best celebration proposal is updated in step.
 
 **What this supersedes.** The
-[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+[2026-08-03 notification-layer entry](2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
 loses three clauses: its per-click-id exception to the stable-id rule (the green
 refresh confirmation and, via the 2026-08-09 entry, the blue unset-username
 notice are now subject-keyed and single-identity channels, so nothing needs a
@@ -138,7 +138,7 @@ visible at a time" (true once a response has been applied, with the crossfade
 qualifier above). Its "`hide` cannot substitute" note stands as written and is
 exactly why this works: the hide effect running *after* the send effect is what
 lets a differing id pair show-and-hide in one response. The
-[2026-08-09 unset-username entry](#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)
+[2026-08-09 unset-username entry](2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)
 loses only its per-click-id mechanism; its ruling -- that an unset username is
 configuration state answered blue, never a red failure -- is untouched.
 

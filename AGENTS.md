@@ -372,7 +372,7 @@ identity probe's persona names, a `sensitive` request's parameters) is
 decided where the value is handled. The existing lines were swept to match
 when the rules landed. The rationale and the measurements live in the
 decision-log entry
-[Log Lines Delimit Their Values By Kind](docs/decision_log.md#2026-09-26-log-lines-delimit-their-values-by-kind).
+[Log Lines Delimit Their Values By Kind](docs/decision_log/2026/2026-09-26-log-lines-delimit-their-values-by-kind.md).
 
 - Free text and paths take double quotes: `"%s"`. Free text is a string
   whose content someone outside the code chose: a scenario, playlist, or

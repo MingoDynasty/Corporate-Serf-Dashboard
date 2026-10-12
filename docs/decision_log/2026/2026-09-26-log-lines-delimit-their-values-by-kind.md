@@ -116,7 +116,7 @@ log text, each updated to assert the quoted rendering.
   every interpolated exception, which the floor makes unnecessary.
 - *D4, one full sweep, in the PR that lands the rule.* The comment and
   docstring conventions
-  ([2026-09-04](#2026-09-04-comment-and-docstring-conventions)) took no
+  ([2026-09-04](2026-09-04-comment-and-docstring-conventions.md)) took no
   backfill because they transcribed a style the tree already followed nine
   times in ten; here 1 of 103 placeholders did. Agents in this repository
   learn house style from neighboring code at least as much as from the

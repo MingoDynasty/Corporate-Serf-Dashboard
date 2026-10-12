@@ -93,7 +93,7 @@ adopts the columns. It fills five row fields: `tier_display`, `tier_sort`
 (ranks passed, so No rank is 0), `next_tier_display`, `next_tier_sort` (the
 unrounded gap), and `next_tier_tooltip`. *Tier* avoids the legacy `rank_*`
 fields, which hold the leaderboard position
-([2026-07-06](#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
+([2026-07-06](2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 A table is a benchmark's when `any(scenario.ranks …)` holds, the overview's
 Type test (`is_benchmark_playlist`), and a plain playlist's rows carry none
 of the fields. The two columns sit directly after Scenario with their header
@@ -103,7 +103,7 @@ in both directions. Both join the auto-size keys.
 
 **All three row paths carry the ladder.** Rows come from phase 1, the fill,
 and a cancelled fill's rebuild on its first terminal drain
-([2026-07-15](#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+([2026-07-15](2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill.md)).
 The last two are AG Grid update transactions, which replace a row's data
 whole, so a row built without its ladder would flip Rank and Next Rank to
 `N/A` until the page reopens. A cancelled fill is ordinary: opening any
@@ -117,7 +117,7 @@ an empty list a benchmark scenario without a ladder.
 **Sort names, checked per page.** `?sort=` gains `rank` for Rank and
 `next-rank` for Next Rank; the name table already reserved `rank` for the
 tier
-([2026-09-27](#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+([2026-09-27](2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url.md)).
 `SORT_URL_NAMES` stays one page-independent table, so `_parse_sort` checks
 each name against the columns the page actually has. A name for a missing
 column invalidates the whole value, as an unknown name does, so the table
@@ -154,7 +154,7 @@ to finish to reach the next rank, shown as "2.8% faster to Lavender". There,
 D1's `N/A` for a PB of zero or less applies only where pace is undefined.
 Every other row keeps D1 as written, and the ladder walk, the Rank column,
 the rounding, the sort, and the tooltip are unchanged for all rows. The
-[2026-10-05 entry](#2026-10-05-time-scored-scenarios-are-measured-by-pace)
+[2026-10-05 entry](2026-10-05-time-scored-scenarios-are-measured-by-pace.md)
 holds the formula and the reasons. Shipped in PR #343.
 
 **Provenance.** Proposal by `claude-opus-5-5` (PR #320), reviewed by

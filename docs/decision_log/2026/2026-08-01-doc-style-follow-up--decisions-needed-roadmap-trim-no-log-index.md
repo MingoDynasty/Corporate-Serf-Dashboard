@@ -1,12 +1,12 @@
 # 2026-08-01: Doc-Style Follow-Up — Decisions Needed, Roadmap Trim, No Log Index
 
 Status: Superseded in part by the
-[2026-09-28 no-backfill entry](#2026-09-28-no-backfill-covers-missing-summaries-not-broken-ones):
+[2026-09-28 no-backfill entry](2026-09-28-no-backfill-covers-missing-summaries-not-broken-ones.md):
 the sentence "No backfill: existing entries convert only when a change touches
 them anyway" no longer holds. An entry with no summary still waits for a
 payload edit, but a summary that breaks the rules is a defect, fixed on its
 own commit. Superseded in part also by the
-[2026-09-30 sentence-count entry](#2026-09-30-the-docs-test-counts-summary-sentences-and-its-count-is-the-definition):
+[2026-09-30 sentence-count entry](2026-09-30-the-docs-test-counts-summary-sentences-and-its-count-is-the-definition.md):
 the test now gates the summary sentence count, as it counts them, so "the test
 never judges prose quality" no longer holds for that count. The PR #174
 settlement still holds for Markdown rendering fidelity. Everything else here
@@ -15,11 +15,13 @@ stands.
 The proposal section listing what the maintainer must rule on is renamed
 from "Decision points" to "Decisions needed", so the heading itself tells
 you whether a document wants your attention. This entry now carries the
-complete doc-style rules and replaces the original entry below. The
+complete doc-style rules and replaces the original entry, "Durable Docs
+Open Plain And Proposals Lead With Decisions". The
 roadmap keeps only the few most recently shipped milestones instead of a
 full history. A topic index for this log was considered and rejected.
 
-Decision — the complete two-layer doc style (supersedes the entry below;
+Decision — the complete two-layer doc style (supersedes
+[the original entry](2026-08-01-durable-docs-open-plain-and-proposals-lead-with-decisions.md);
 the only rule change is the section rename, everything else carries
 forward unchanged):
 
@@ -77,4 +79,4 @@ proposal deleted per "Shipping a proposal" — git history holds the full
 text). This entry restates them in full with the post-merge follow-up
 refinements (external reviewer suggestions, maintainer-ratified scope:
 rename yes, "TL;DR" kept, trim yes, index no) and supersedes the
-original entry below.
+[original entry](2026-08-01-durable-docs-open-plain-and-proposals-lead-with-decisions.md).
