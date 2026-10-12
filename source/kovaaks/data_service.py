@@ -31,7 +31,7 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
-from source.kovaaks.play_sessions import PLAY_SESSION_BREAK_LIMIT
+from source.kovaaks.play_sessions import PLAY_SESSION_BREAK_LIMIT, in_play_order
 from source.kovaaks.request_logging import request_exception_summary
 from source.kovaaks.scenario_groups import ScenarioGroup, join_scenario_groups
 from source.utilities.atomic_write import atomic_write_text
@@ -395,6 +395,19 @@ def get_runs_newest_first(scenario_name: str) -> list[RunData]:
     if scenario_name not in kovaaks_database:
         return []
     return list(reversed(kovaaks_database[scenario_name]["time_vs_runs"]))
+
+
+def get_runs_in_play_order(scenario_name: str) -> list[RunData]:
+    """Return a copy of a scenario's runs in the order they were played, oldest first.
+
+    The order is the one play sessions are split in, which settles two runs
+    that ended in the same second. ``get_runs_newest_first`` orders by end
+    time alone and leaves such a pair as it was stored. Empty when the
+    scenario has no runs.
+    """
+    if scenario_name not in kovaaks_database:
+        return []
+    return in_play_order(kovaaks_database[scenario_name]["time_vs_runs"])
 
 
 def new_high_score_runs(runs: Iterable[RunData]) -> set[RunData]:

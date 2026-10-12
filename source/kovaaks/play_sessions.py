@@ -90,6 +90,17 @@ class ScenarioVisit(_ConsecutiveRuns):
         return self.runs[0].scenario
 
 
+def in_play_order(runs: Iterable[RunData]) -> list[RunData]:
+    """Return runs in the order they were played, oldest first.
+
+    It is the order play sessions are split in. A view that lists or plots
+    runs one by one takes it from here, so that it agrees with the play
+    sessions about which of two runs came first, two that ended in the same
+    second included.
+    """
+    return sorted(runs, key=_split_order)
+
+
 def split_into_play_sessions(runs: Iterable[RunData]) -> list[PlaySession]:
     """Split runs into play sessions, oldest first.
 
@@ -107,7 +118,7 @@ def split_into_play_sessions(runs: Iterable[RunData]) -> list[PlaySession]:
     # split at other places and nothing would show it. The key is total for
     # runs read from one stats folder, so no pair is left in the caller's
     # order.
-    ordered = sorted(runs, key=_split_order)
+    ordered = in_play_order(runs)
     groups: list[list[RunData]] = []
     for run in ordered:
         if (

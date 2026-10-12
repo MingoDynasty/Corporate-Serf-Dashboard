@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 import pytest
@@ -8,6 +8,7 @@ from source.utilities.utilities import (
     format_absolute_timestamp,
     format_approximate_duration,
     format_decimal,
+    format_short_date,
     ordinal,
 )
 
@@ -77,6 +78,20 @@ def test_format_absolute_timestamp_include_seconds() -> None:
 )
 def test_format_approximate_duration(seconds: float, expected: str) -> None:
     assert format_approximate_duration(seconds) == expected
+
+
+@pytest.mark.parametrize(
+    ("day", "expected"),
+    [
+        (date(2026, 10, 12), "Oct 12"),
+        # Unpadded, as the absolute timestamp writes its day.
+        (date(2026, 1, 4), "Jan 4"),
+        (date(2025, 12, 30), "Dec 30, 2025"),
+        (date(2027, 1, 1), "Jan 1, 2027"),
+    ],
+)
+def test_format_short_date_leaves_out_this_years_year(day: date, expected: str) -> None:
+    assert format_short_date(day, date(2026, 10, 12)) == expected
 
 
 def test_stopwatch_elapsed_after_start_and_stop() -> None:

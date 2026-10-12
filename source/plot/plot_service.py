@@ -4,9 +4,11 @@ This module handles functions around plots.
 
 import logging
 import re
-from collections.abc import Callable, Collection
+from collections.abc import Callable, Collection, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
+from itertools import groupby
+from operator import attrgetter
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -16,7 +18,11 @@ import plotly.graph_objs as go
 import plotly.io as pio
 
 from source.kovaaks.data_models import Rank, RunData
-from source.utilities.utilities import format_absolute_timestamp, format_decimal
+from source.utilities.utilities import (
+    format_absolute_timestamp,
+    format_decimal,
+    format_short_date,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +66,44 @@ NEW_PB_SIZE_PRESET_PX = {"Small": 9, "Large": 16}
 # can't drift apart. ``customdata[3]`` is empty for a run that wasn't converted,
 # so the line then ends at the sensitivity itself.
 _RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
+
+# The legend of every score chart, laid out horizontally above the plot
+# instead of in Plotly's default right-hand column: a few entries never
+# earned a reserved column, and the plot is the scarce thing on the page. It
+# lands in the top margin the title already reserved, so the plot area keeps
+# its full height and gains the column's width. Right-anchored to balance the
+# left-aligned title; at the narrowest the chart gets (the options panel open
+# just above its stacking threshold) it still clears the title rather than
+# colliding with it.
+_LEGEND_ABOVE_PLOT = {
+    "orientation": "h",
+    "x": 1,
+    "xanchor": "right",
+    "y": 1.02,
+    "yanchor": "bottom",
+}
+
+# The hover of a run point on the Run History chart, the same in each of its
+# modes: the run's own timestamp, then its score, sensitivity, and accuracy.
+_RUN_POINT_HOVER = (
+    "<b>%{customdata[0]}</b><br><br>"
+    "<b>Score</b>: %{y}<br>"
+    + _RUN_SENSITIVITY_HOVER_LINE
+    + "<b>Accuracy</b>: %{customdata[1]}%"
+    + "<extra></extra>"
+)
+
+# What the Score vs Run axis assumes when it thins its date labels: the width
+# of the plot area, and the room one character and one label's margin take.
+# The figure is built on the server, which never learns how wide the chart
+# is drawn, so the labels are spaced for a narrow one. The plot is 331px wide
+# in a 1600px window with the options panel open beside it (measured in Edge
+# and Firefox, 2026-10-12). A wider chart shows the same labels further
+# apart. On a narrower one plotly.js tilts the labels that no longer fit,
+# which is its own default for an axis that sets no tick angle.
+_RUN_AXIS_ASSUMED_PLOT_WIDTH_PX = 330
+_RUN_AXIS_LABEL_CHARACTER_PX = 8
+_RUN_AXIS_LABEL_MARGIN_PX = 14
 
 # ColorInput is set to hex, so this is the whole shape a stored value can
 # legitimately have. Anything else -- a cleared field's "", a hand-typed
@@ -253,6 +297,29 @@ def _new_high_scores_last(
     return [run for _, run in sorted(enumerate(runs), key=draw_order)]
 
 
+def _new_pb_trace(
+    x_values: Sequence[float | str | date],
+    scores: Sequence[float],
+) -> go.Scatter:
+    """Build the trace of stars drawn over the runs that set a new PB."""
+    return go.Scatter(
+        x=list(x_values),
+        y=list(scores),
+        mode="markers",
+        name=NEW_PB_TRACE_NAME,
+        # The run point under each star already answers a hover with that
+        # run's time, sensitivity, and accuracy. A label from this trace
+        # would compete for the same point with less to say.
+        hoverinfo="skip",
+        marker={
+            "symbol": "star",
+            "size": NEW_PB_SIZE_DEFAULT_PX,
+            "color": _NEW_PB_FILL_COLOR,
+            "line": {"color": _NEW_PB_OUTLINE_COLOR, "width": 1},
+        },
+    )
+
+
 def _generate_xy_plot(  # noqa: PLR0913
     scenario_data: dict[_K, list[RunData]],
     scenario_name: str,
@@ -381,45 +448,14 @@ def _generate_xy_plot(  # noqa: PLR0913
         font={
             "size": 14,
         },
-        # Lay the legend out horizontally above the plot instead of taking
-        # Plotly's default right-hand column: a few entries never earned a
-        # reserved column, and the plot is the scarce thing on this page. It
-        # lands in the top margin the title already reserved, so the plot area
-        # keeps its full height and gains the column's width. Right-anchored
-        # to balance the left-aligned title; at the narrowest the chart gets
-        # (the options panel open just above its stacking threshold) it still
-        # clears the title rather than colliding with it.
-        legend={
-            "orientation": "h",
-            "x": 1,
-            "xanchor": "right",
-            "y": 1.02,
-            "yanchor": "bottom",
-        },
+        legend=_LEGEND_ABOVE_PLOT,
     )
     figure_combined["data"][0]["name"] = RUN_DATA_POINT_TRACE_NAME
     figure_combined["data"][0]["showlegend"] = True
     figure_combined["data"][1]["name"] = "Average score"
     figure_combined["data"][1]["showlegend"] = True
     if new_pb_x:
-        figure_combined.add_trace(
-            go.Scatter(
-                x=new_pb_x,
-                y=new_pb_scores,
-                mode="markers",
-                name=NEW_PB_TRACE_NAME,
-                # The run point under each star already answers a hover with
-                # that run's time, sensitivity, and accuracy. A label from
-                # this trace would compete for the same point with less to say.
-                hoverinfo="skip",
-                marker={
-                    "symbol": "star",
-                    "size": NEW_PB_SIZE_DEFAULT_PX,
-                    "color": _NEW_PB_FILL_COLOR,
-                    "line": {"color": _NEW_PB_OUTLINE_COLOR, "width": 1},
-                },
-            )
-        )
+        figure_combined.add_trace(_new_pb_trace(new_pb_x, new_pb_scores))
 
     _add_rank_overlays(
         figure_combined,
@@ -506,6 +542,212 @@ def generate_time_plot(  # noqa: PLR0913
             hover_point_lines="<b>Date</b>: %{x}<br>" + _RUN_SENSITIVITY_HOVER_LINE,
         ),
         new_high_score_runs=new_high_score_runs,
+    )
+
+
+def _generate_run_history_plot(  # noqa: PLR0913
+    runs: Sequence[RunData],
+    x_values: Sequence[float | str | datetime],
+    scenario_name: str,
+    xaxis: dict[str, object],
+    rank_overlay_switch: bool,
+    rank_data: list[Rank],
+    show_all_ranks: bool,
+    new_high_score_runs: Collection[RunData],
+) -> go.Figure:
+    """Build a Run History figure: one point per run, at the x value given for it.
+
+    ``runs`` and ``x_values`` are in step, and the run trace keeps their
+    order. Each run in ``new_high_score_runs`` that is plotted gets a star,
+    in a trace that exists only when there is one to draw. The title is the
+    scenario's name alone, and no trace sums the runs up.
+    """
+    scores = [run.score for run in runs]
+    figure = go.Figure(
+        go.Scatter(
+            x=list(x_values),
+            y=scores,
+            mode="markers",
+            name=RUN_DATA_POINT_TRACE_NAME,
+            # One trace is not given a legend entry unless it asks for one.
+            showlegend=True,
+            customdata=[
+                [
+                    format_absolute_timestamp(
+                        run.datetime_object, include_seconds=True
+                    ),
+                    round(100 * run.accuracy, 2),
+                    f"{run.horizontal_sens} {run.sens_scale}",
+                    _recorded_sensitivity_suffix(run),
+                ]
+                for run in runs
+            ],
+            hovertemplate=_RUN_POINT_HOVER,
+            hoverlabel={"font_size": 16},
+        )
+    )
+    starred = [
+        (x_value, run.score)
+        for x_value, run in zip(x_values, runs, strict=True)
+        # Matched on the run, never on where it is plotted: two runs can
+        # share a point, and only one of them beat the PB.
+        if run in new_high_score_runs
+    ]
+    if starred:
+        figure.add_trace(
+            _new_pb_trace(
+                [x_value for x_value, _score in starred],
+                [score for _x_value, score in starred],
+            )
+        )
+    logger.debug('Generating plot for: "%s"', scenario_name)
+    figure.update_layout(
+        title=scenario_name,
+        xaxis=xaxis,
+        yaxis={"title": "Score"},
+        font={"size": 14},
+        legend=_LEGEND_ABOVE_PLOT,
+    )
+    _add_rank_overlays(figure, rank_overlay_switch, rank_data, scores, show_all_ranks)
+    return figure
+
+
+def _run_axis_date_ticks(
+    runs: Sequence[RunData],
+    run_numbers: Sequence[int],
+    today: date,
+) -> tuple[list[int], list[str]]:
+    """Label the Score vs Run axis with dates, thinned so they do not collide.
+
+    A date goes at the first plotted run of each day. The labels are then
+    thinned from the newest back, so the day being played always keeps its
+    own, and a label is dropped when it would sit too close to the one kept
+    after it. How close that is comes from the assumed plot width, since the
+    server does not know the real one.
+    """
+    first_of_day: list[tuple[int, str]] = []
+    last_day: date | None = None
+    for run_number, run in zip(run_numbers, runs, strict=True):
+        day = run.datetime_object.date()
+        if day != last_day:
+            first_of_day.append((run_number, format_short_date(day, today)))
+            last_day = day
+
+    pixels_per_run = _RUN_AXIS_ASSUMED_PLOT_WIDTH_PX / max(
+        run_numbers[-1] - run_numbers[0], 1
+    )
+
+    def half_width(label: str) -> float:
+        return (
+            len(label) * _RUN_AXIS_LABEL_CHARACTER_PX + _RUN_AXIS_LABEL_MARGIN_PX
+        ) / 2
+
+    kept: list[tuple[int, str]] = []
+    for run_number, label in reversed(first_of_day):
+        if kept:
+            later_run_number, later_label = kept[-1]
+            room = (later_run_number - run_number) * pixels_per_run
+            if room < half_width(label) + half_width(later_label):
+                continue
+        kept.append((run_number, label))
+    kept.reverse()
+    return [run_number for run_number, _label in kept], [
+        label for _run_number, label in kept
+    ]
+
+
+def generate_score_vs_run_plot(  # noqa: PLR0913
+    runs: Sequence[RunData],
+    first_run_number: int,
+    scenario_name: str,
+    rank_overlay_switch: bool,
+    rank_data: list[Rank],
+    show_all_ranks: bool,
+    new_high_score_runs: Collection[RunData],
+    today: date,
+) -> go.Figure:
+    """Build the Score vs Run figure: the runs given, evenly spaced, in their order.
+
+    ``runs`` is in the order the runs were played and must hold at least one.
+    A run's x value is its number in the scenario's whole history, counted
+    from ``first_run_number`` for the first run given, so a run keeps its
+    place on the axis when the range around it changes. The axis is numeric
+    and its labels are dates, which is why the ticks are written out here:
+    plotly places a point by its value and would label the axis with the run
+    numbers. ``today`` only decides which labels carry a year.
+    """
+    run_numbers = list(range(first_run_number, first_run_number + len(runs)))
+    tick_values, tick_labels = _run_axis_date_ticks(runs, run_numbers, today)
+    return _generate_run_history_plot(
+        runs,
+        run_numbers,
+        scenario_name,
+        {
+            "title": "Run",
+            "tickmode": "array",
+            "tickvals": tick_values,
+            "ticktext": tick_labels,
+        },
+        rank_overlay_switch,
+        rank_data,
+        show_all_ranks,
+        new_high_score_runs,
+    )
+
+
+def generate_score_vs_time_plot(  # noqa: PLR0913
+    runs: Sequence[RunData],
+    scenario_name: str,
+    rank_overlay_switch: bool,
+    rank_data: list[Rank],
+    show_all_ranks: bool,
+    new_high_score_runs: Collection[RunData],
+) -> go.Figure:
+    """Build the Score vs Time figure: each run given, at the time it ended.
+
+    ``runs`` is in the order the runs were played and must hold at least one.
+    A run's time is in whole seconds, so two runs that ended in the same
+    second with the same score share a point. Among such runs a new PB is
+    drawn last, so the hover under its star is its own.
+    """
+    drawn: list[RunData] = []
+    for _ended, ended_together in groupby(runs, key=attrgetter("datetime_object")):
+        drawn.extend(_new_high_scores_last(list(ended_together), new_high_score_runs))
+    return _generate_run_history_plot(
+        drawn,
+        [run.datetime_object for run in drawn],
+        scenario_name,
+        {"title": "Date"},
+        rank_overlay_switch,
+        rank_data,
+        show_all_ranks,
+        new_high_score_runs,
+    )
+
+
+def generate_score_vs_sensitivity_plot(
+    runs: Sequence[RunData],
+    scenario_name: str,
+    rank_overlay_switch: bool,
+    rank_data: list[Rank],
+    show_all_ranks: bool,
+) -> go.Figure:
+    """Build the Score vs Sensitivity figure: each run given, at its sensitivity.
+
+    ``runs`` must hold at least one. The axis lists the sensitivities in the
+    order their first runs are given in, so the caller hands the runs over
+    grouped by sensitivity, lowest first. No run is starred: along this axis
+    the stars would have no order to be read in.
+    """
+    return _generate_run_history_plot(
+        runs,
+        [f"{run.horizontal_sens} {run.sens_scale}" for run in runs],
+        scenario_name,
+        {"title": "Sensitivity"},
+        rank_overlay_switch,
+        rank_data,
+        show_all_ranks,
+        new_high_score_runs=(),
     )
 
 

@@ -3,7 +3,7 @@ Utility functions for the Corporate Serf app.
 """
 
 import math
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 # Abbreviated English month names, hardcoded so the absolute-timestamp format is
@@ -97,3 +97,16 @@ def format_absolute_timestamp(dt: datetime, *, include_seconds: bool = False) ->
     if include_seconds:
         time_part += f":{dt.second:02d}"
     return f"{month} {dt.day}, {dt.year}, {time_part} {meridiem}"
+
+
+def format_short_date(day: date, today: date) -> str:
+    """Format a date as ``Oct 12``, or ``Jan 1, 2027`` in another year than today's.
+
+    For a date shown beside others of the same year, where the year on each
+    would be noise. The month is the hardcoded English abbreviation and the
+    day is unpadded, as in ``format_absolute_timestamp``.
+    """
+    short = f"{_MONTH_ABBREVIATIONS[day.month - 1]} {day.day}"
+    if day.year == today.year:
+        return short
+    return f"{short}, {day.year}"
