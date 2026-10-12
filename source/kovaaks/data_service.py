@@ -94,7 +94,7 @@ MAX_RUN_LENGTH = min(PLAY_SESSION_BREAK_LIMIT, timedelta(hours=1))
 # writer, and raced reads self-heal on re-render (the home page's polling
 # tick, or the next interaction on pages without a data-driving interval).
 # See the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
-# docs/decision_log.md for the revisit triggers and why file-backed (WAL) is
+# docs/decision_log/ for the revisit triggers and why file-backed (WAL) is
 # the chosen shape for an eventual SQLite migration.
 kovaaks_database: dict = {}
 
@@ -1166,7 +1166,7 @@ def seed_leaderboard_ids_from_bundled_corpus() -> None:
     """Merge the bundled corpus's embedded leaderboard IDs into the mapping cache.
 
     Runs once at startup after load_playlists() and before rank lookups matter
-    (see docs/decision_log.md, the leaderboard-ID seeding entry).
+    (see docs/decision_log/, the leaderboard-ID seeding entry).
     """
     asserted, load_complete = get_bundled_leaderboard_seed()
     merge_seed_leaderboard_ids(asserted, allow_removals=load_complete)

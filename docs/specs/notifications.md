@@ -10,7 +10,7 @@ side by side. Toasts and the notices printed into the page share one severity
 color scale, so a color means the same thing wherever it appears.
 
 Statements below describe what the app does today and link the
-[decision log](../decision_log.md) entries that set them — rationale lives
+[decision log](../decision_log/README.md) entries that set them — rationale lives
 in those entries, not here. A statement with no link is an implementation
 fact that no decision-log entry governs. Runtime structure, including the
 thread-to-UI channels, is mapped in [architecture.md](../architecture.md);
@@ -28,14 +28,14 @@ their full behavior.
   without anything having failed; red is an error, an operation that failed;
   green is a positive outcome; orange is partial success, where the action
   committed but a follow-up step did not
-  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices),
+  ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md),
   widened from a follow-up write to any follow-up step by
-  [2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)).
+  [2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
   Green and orange are toast-only: no inline surface uses either.
 - Every inline notice carries a leading icon,
   `material-symbols:warning-outline` on yellow and
   `material-symbols:info-outline` on blue
-  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md)).
 - Which component a notice uses follows its content model. A text-only notice
   may be a `dmc.Alert`, whose root Mantine renders with `role="alert"`: an
   assertive, atomic live region, so assistive technology reads the element's
@@ -47,12 +47,12 @@ their full behavior.
   that the role is for text content rather than interactive elements like
   links or buttons, and for content that appears dynamically rather than with
   the page
-  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md)).
   Two text-only notices are `dmc.Paper` panels anyway: the stats-folder hint,
   whose other branch holds a link and which renders with the page rather than
   dynamically, and the Settings restart notice, which wears the anatomy the
   user sees next on the landing page
-  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+  ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md)).
 - The seven inline notices, each owned by the spec named beside it: the
   Settings store alert (settings spec) and the Playlists visibility alert
   (playlists spec) are yellow `dmc.Alert`s; the Aim Training Journey
@@ -62,11 +62,11 @@ their full behavior.
   card (settings and scenario-performance specs) is a `dmc.Paper` that is blue
   in its identity state and yellow in its stats-folder and unusable-store
   states
-  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices));
+  ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md));
   the stats-folder hint (scenario-performance spec) and the Settings restart
   notice (settings spec) are yellow `dmc.Paper` panels carrying the icon
   beside the sentence with no title
-  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+  ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md)).
 
 ## Delivery
 
@@ -74,20 +74,20 @@ their full behavior.
   `dmc.NotificationContainer` in the app shell, id `notification-container`,
   built by `toast()` in `utilities/notifications.py`. Python `logging` is the
   console and file record and never reaches the screen
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
 - A payload carries `action: "show"`, the id, title, message, color, and
   `autoClose`, plus an optional icon. The message is a string or a children
   list, which is how a toast body names a control in bold
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Ids are semantic. DMC's `show` ignores a
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). Ids are semantic. DMC's `show` ignores a
   payload whose id is already on screen
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)), which is why every
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)), which is why every
   toast that can recur is emitted through `channel_toast` under a rotating
   instance id rather than a fixed one
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - The nominal lifetime is 8000 ms. Three toast families pass
   `auto_close=False` and stay until dismissed: the Steam ID mismatch, the
   startup playlist warnings, and the personal best celebration
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   The helper always sets `autoClose`, so the container's own 4000 ms default
   never applies.
 - `channel_toast(notification, registry, clears=())` is how every
@@ -103,11 +103,11 @@ their full behavior.
   `auto_close=False` at its builder and stays until dismissed while a later
   celebration still replaces it. It is the only helper — there is no separate
   sticky pairing
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - Toasts are built only inside Dash callbacks. A background thread publishes
   to typed shared state that an interval callback polls, and never writes
   `sendNotifications` itself
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy);
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md);
   the channels are enumerated under
   [background threads never drive UI outputs](../architecture.md#background-threads-never-drive-ui-outputs)).
   The run-event channel is drained in the app shell, so it reaches the screen
@@ -122,7 +122,7 @@ their full behavior.
 
 Routing decides whether an event toasts at all. This section decides what id it
 toasts under, and it applies to every toast the app adds from here on
-([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 
 - The classifying test is **recurrence**: can the reported fact recur inside one
   toast lifetime, judged against the complete supported workflow including
@@ -156,7 +156,7 @@ toasts under, and it applies to every toast the app adds from here on
   all three and stacks with any of them. The personal best celebration is a
   persistent channel: it replaces its own previous instance and never expires
   on its own
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - **The registry.** `toast-channel-registry` is the per-client `dcc.Store`
   mapping each logical channel key to the instance id currently on screen for
   it, hosted in the app shell beside the container with initial data `{}`. It
@@ -187,12 +187,12 @@ toasts under, and it applies to every toast the app adds from here on
   swallowed. It is a background burst channel where anti-flood wins and its copy
   already points at `debug.log`; the inventory below conforms to this section in
   full apart from this row
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 
 ## Routing policy
 
 - Whether an event toasts is decided per event, in this order
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)):
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)):
   a persistent condition (misconfiguration, missing data, a degraded feature)
   is stated in place at the point of impact, never toasted; an automatic
   failure during passive navigation gets no toast, the field state conveys it
@@ -205,16 +205,16 @@ toasts under, and it applies to every toast the app adds from here on
   trigger and persistent until dismissed: the Steam ID mismatch, one toast per
   app session (per server process, not per browser), and the startup
   playlist warnings, one batch per boot
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   The mismatch toast itself is specified in
   [scenario_rank.md](scenario_rank.md#data-sources-and-identity).
 - An unset KovaaK's username is persistent configuration state, never a
   failure: the Position field and both playlist pages state it in place, and
   the only toast it earns is the blue answer to a Refresh click, on its own
   standing-condition channel
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)
+  ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)
   as amended by
-  [2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry));
+  [2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md));
   the instances are specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - With a scenario selected, Manual Refresh answers every click with a
@@ -223,20 +223,20 @@ toasts under, and it applies to every toast the app adds from here on
   emission, so a repeat click always re-pops its answer: the red and yellow
   outcomes share one problem channel, the green confirmation and the orange
   partial success share a channel keyed by scenario
-  ([2026-09-19](../decision_log.md#2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total)),
+  ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)),
   and the blue notice is its own standing-condition channel. The passive rank
   renders that used to toast red or yellow no longer do
-  ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)
+  ([2026-07-12](../decision_log/2026/2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank.md)
   as amended by
-  [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+  [2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
   and
-  [2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry));
+  [2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md));
   each outcome is specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - The title carries the verdict and never reads "Notification"; a run
   verdict's message leads with the scenario, with sensitivity as a trailing
   qualifier; a failing threshold verdict names the target it missed
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   A new personal best is the one achievement with a toast of its own, in its
   own family, amending that entry's rule that it earns nothing beyond the run
   verdict.
@@ -248,9 +248,9 @@ toasts under, and it applies to every toast the app adds from here on
   and a clean one all settle in place. It is an automatic failure during
   passive navigation with an in-place home, so the routing order above sends
   it there
-  ([2026-08-22](../decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only),
+  ([2026-08-22](../decision_log/2026/2026-08-22-the-playlist-fill-reports-degradation-in-place-only.md),
   superseding the aggregate-toast clause of
-  [2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+  [2026-07-15](../decision_log/2026/2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill.md)).
   The playlists spec owns the status line.
 
 ## Run notifications
@@ -258,13 +258,13 @@ toasts under, and it applies to every toast the app adds from here on
 - The watchdog thread imports a new run CSV, loads it into the in-memory
   stores, and only then appends a `NewFileMessage` to the process-wide
   `message_queue` deque
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   The message carries facts and no decision, so each consumer derives its own
   verdict: `nth_score` is the run's 1-based place among the scenario's runs at
   the same sensitivity, ties not counted as higher; `scenario_previous_best`
   is the scenario's pre-run high score across all sensitivities, and is `None`
   only for a scenario's very first run
-  ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb));
+  ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md));
   `is_new_sensitivity` is true for a scenario's first run and for the first
   run at a new sensitivity; `run_id` is the run CSV's file name. "The same
   sensitivity" and "a new sensitivity" both mean the normalized
@@ -279,7 +279,7 @@ toasts under, and it applies to every toast the app adds from here on
   the new run and the run that holds the previous best are eligible, and it
   is `None` otherwise and on a scenario's first run, which nothing judges or
   celebrates
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   Recognition and eligibility are specified in
   [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
   A lookup that fails costs the constant only: the run still imports, and
@@ -316,7 +316,7 @@ toasts under, and it applies to every toast the app adds from here on
   page narrates it under the ordinary rules below. Only the exact value `off`
   silences the family: any other stored value, including one a later build
   wrote and a store the browser has lost, still celebrates
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - The celebration toast is green with a trophy icon, titled "New personal
   best", and stays until dismissed. Its channel key is `pb-celebration`,
   deliberately not `run-verdict`, so an ordinary run toast lands beside it
@@ -325,7 +325,7 @@ toasts under, and it applies to every toast the app adds from here on
   `channel_toast` like every other replaceable toast, with `auto_close=False`
   passed at the builder, and the shell writes exactly the one
   `toast-channel-registry` key
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   With a positive previous best
   the message is
   `{scenario}: {score:.2f}. Up {pct:.1f}% on your previous best of {previous:.2f}.`;
@@ -335,7 +335,7 @@ toasts under, and it applies to every toast the app adds from here on
   `{scenario}: {score:.2f}. Finished {pct:.1f}% faster than your previous best of {previous:.2f}.`
   instead, `pct` being `((C − previous) / (C − score) − 1) × 100`, whatever
   the previous best's sign. What counts as a new personal best is unchanged
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - The animation lives in `assets/pbCelebration.js` and is driven by a
   clientside callback on `run-events-batch`, with the style store as `State`,
   so no server round trip separates the decision from the burst. It holds a
@@ -346,20 +346,20 @@ toasts under, and it applies to every toast the app adds from here on
   Pride cut to 2.5 s in Mantine's primary blue (`#228be6`) and white; `stars`
   is the upstream Stars recipe unchanged. An unknown style name plays
   `confetti`, so a style retired later never silently turns celebrations off
-  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
 - Every style returns a cancel closure, or nothing when it schedules nothing,
   and the module holds exactly one such handle and invokes it before any new
   play. That is what stops a looping style: `confetti.reset()` clears the
   particles already drawn but does not cancel an interval or an animation
   frame
-  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
 - It plays nothing when the setting is off and nothing when the browser
   prefers reduced motion; the toast still shows in that case, because it is
   informational and under reduced motion it is the whole celebration. A burst
   still in flight is cancelled before a new one starts. `animation_sequence`
   is what makes a repeat play at all: the same sequence never replays, and a
   payload naming no run plays nothing
-  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
 - While the tab is hidden, minimized or behind another tab, the burst is not
   dropped. At most one celebration is held, a newer one replacing it, and it
   plays on the next `visibilitychange` to visible; the toast is already on
@@ -368,7 +368,7 @@ toasts under, and it applies to every toast the app adds from here on
   game and the toast is what the player comes back to. The Settings page's
   Preview never reaches the held path, because clicking it needs a visible
   tab
-  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
 - Scenario Performance's `check_for_new_data` consumes `run-events-batch` as
   its only `Input`, with the follow switch and the scenario dropdown as
   `State`. It lands on the most recently played scenario when the follow
@@ -377,7 +377,7 @@ toasts under, and it applies to every toast the app adds from here on
   run's stamped record plus the batch's `celebrated_run_id` — changing the
   dropdown at most once; with no scenario selected and the follow switch off
   it forwards nothing
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   A control flip alone forwards nothing, because the controls are `State` and
   a Store replays its last value, and a remount does not replay a retained
   batch (`prevent_initial_call`).
@@ -385,15 +385,15 @@ toasts under, and it applies to every toast the app adds from here on
   process-wide and each drain's payload reaches one client, so with two tabs
   open a batch lands in whichever drain runs first. Extra tabs are crash-safe
   but unsynchronized
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   `open_browser_on_launch` is how a user stops the installed launcher adding
   one tab per start
-  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+  ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
   The interval keeps ticking while the tab is hidden
-  ([2026-07-17](../decision_log.md#2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating)).
+  ([2026-07-17](../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md)).
 - `generate_graph` builds the toast from the summary only when `run-events`
   triggered it, so a control change never re-toasts a stale payload
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   A summary whose latest run belongs to another scenario earns nothing, and
   a render that resolves to an empty-state plot skips the toast.
 - A run is judged only when Score threshold verdict is on, the threshold
@@ -402,7 +402,7 @@ toasts under, and it applies to every toast the app adds from here on
   `score >= scenario_previous_best × goal / 100`, compared as decimals so a
   run exactly at the goal passes; the message shows
   `score / scenario_previous_best × 100` and the goal, each to one decimal
-  ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
+  ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md)).
   A failing percentage is capped one tenth below the goal as printed, so a
   94.98% miss of a 95% goal reads `94.9%`, never `95.0%`.
   A run below `scenario_previous_best` is capped at `99.9%` whether it passes
@@ -420,35 +420,35 @@ toasts under, and it applies to every toast the app adds from here on
   unchanged, since a run's pace is below the previous best's exactly when
   its score is. Where a time is zero or less, the run is judged by score as
   above
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - The page narrates only the batch's latest matching run, and only when the
   batch's decision does not name it and it is stamped live: a named run yields,
   because the celebration toast is its one notification, and a stale run
   narrates nothing. Otherwise the threshold verdict headlines and the placement
   trails it; a run that is neither judged nor placed emits nothing
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   Pass: green, "Threshold passed",
   `{scenario}: {score:.2f}, {pct:.1f}% of PB. Also your {best|Nth-best} at {sensitivity}.`
   when placed, else `{scenario}: {score:.2f}, {pct:.1f}% of PB.`, with no
   coaching line after it
-  ([2026-10-04](../decision_log.md#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice)).
+  ([2026-10-04](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)).
   Fail: yellow, "Below threshold",
   `{scenario}: {score:.2f}, {pct:.1f}% of PB (need {goal:.1f}%). Still your {best|Nth-best} at {sensitivity}.`,
   the "Still" sentence only when placed, and no coaching line after it.
   Unjudged and placed: green, "New best score" or "New {Nth}-best score",
   `{scenario}: {score:.2f} at {sensitivity}.`
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out))
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md))
   A run judged by pace reads "% of PB pace" where these read "% of PB", and
   is otherwise the same: `{scenario}: {score:.2f}, {pct:.1f}% of PB pace.`
   on a pass, and
   `{scenario}: {score:.2f}, {pct:.1f}% of PB pace (need {goal:.1f}%).` on a
   miss, with the same placement sentences. The three titles are unchanged,
   so the one word is what tells the player which measure judged the run
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - Every other run in a batch earns nothing; its new point on the plot is its
   record. There is no catch-up digest: a batch of several runs rebuilds the
   graph once, auto-switches once, and toasts exactly as a single run would
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
 - The one-notification guarantee is per run, not per batch, and one-sided:
   every run earns at most one notification and the celebrated run earns
   exactly one. So one batch can put two toasts on screen — the celebration and
@@ -458,17 +458,17 @@ toasts under, and it applies to every toast the app adds from here on
   `run-verdict`, at most one is on screen once a response has been applied, a
   later verdict replaces it with a full lifetime, and this holds per browser
   client and survives page navigation
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   Each emission goes through `channel_toast`, so the newest verdict enters
   under a fresh instance id while the one it replaces is hidden in the same
   response; during that ~250 ms crossfade the outgoing instance is still
   animating out
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   The celebration toast is the deliberate exception to
   replaces-*this* lane: its own channel key and no lifetime, so it sits beside
   a run verdict and outlives it. It is not an exception to the mechanism —
   it replaces its own previous instance the same way
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - The Run notifications master switch (`run-notification-switch`, on by
   default; help text "Controls threshold verdict and placement notifications
   for your runs. Personal best celebrations use their own setting.") gates the
@@ -479,19 +479,19 @@ toasts under, and it applies to every toast the app adds from here on
   ([settings.md](settings.md#celebrations)); the two are independent families,
   so master off with celebrations on still celebrates a personal best on every
   page while ordinary runs stay silent
-  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
   It does not gate the run-import failure toast, the plot update, scenario
   auto-switching, or the rank, Steam ID, and playlist toast families either. It is
   read as `State`, so flipping it never rebuilds the plot
-  ([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
 - The Score threshold verdict switch (`score-threshold-notification-switch`,
   on by default; help text "Adds a pass or fail verdict to run notifications
   when the run can be judged against the score threshold. Needs **Run
   notifications** turned on.", the control name bold
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out))) decides only whether a run is judged and is an
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md))) decides only whether a run is judged and is an
   `Input` to the graph callback. Master off is silence whatever it says;
   master on with it off gives placement toasts only
-  ([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
+  ([2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
   Where the switches sit and how their values persist is the Chart options
   panel's concern, not specified here.
 
@@ -506,41 +506,41 @@ toasts under, and it applies to every toast the app adds from here on
   message above for one failure, or
   `{n} new run files couldn't be processed. See data/logs/debug.log.` for
   a batch; a drained batch never toasts again
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   It is the one burst toast, and the one accepted exception to the identity
   policy: the id is fixed and unwired, so a second drained batch inside one
   lifetime is swallowed
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - The warnings the startup playlist scan records — a file it could not
   load, the loser of a duplicate-code pair, a missing bundled directory — go
   to `playlist_startup_warning_queue`; `flush_startup_playlist_warnings` drains
   it 250 ms after a Scenario Performance mount (a one-shot interval), one
   yellow persistent toast per warning, ids `startup-playlist-warning-{n}`,
   title "Playlist not loaded"
-  ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)
+  ([2026-07-07](../decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)
   for the buffering,
-  [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+  [2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)
   for the persistence).
 - Background rank diagnostics are console-only: the score-aware refresh
   chain's exhaustion, its unknown-user stop, its unexpected-error net, and a
   failed refresh scheduling in the watchdog each log and never toast, and the
   displayed position keeps its last confirmed value
-  ([2026-08-03](../decision_log.md#2026-08-03-background-rank-diagnostics-are-console-only),
+  ([2026-08-03](../decision_log/2026/2026-08-03-background-rank-diagnostics-are-console-only.md),
   superseding the "asks the user to click Refresh" clause of
-  [2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+  [2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
   The playlist percentile warmup worker reports through the overview page's
   status strip and the log, never a toast.
 - Whether a background rank event ("rank updated after that PB", a timed-out
   position update) deserves a toast is deliberately open; any such toast
   needs its own typed channel
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
 
 ## Committed side effects
 
 - A screen never keeps showing a success claim after the write it describes
   failed, and an action whose irreversible work already happened still
   reports it even when a later step fails
-  ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails.md)).
   The instances are on the playlists overview: an import whose visibility
   write fails reports the split outcome in orange, "Playlist imported but
   hidden", with every other output matching the success path; a delete whose
@@ -573,7 +573,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `deleted-playlist-failed-notification` | channel | "Playlist delete failed" | red | — | `confirm_delete_playlist`; playlists spec |
 | `superseded-cleanup-successful-notification` | channel | "Leftover files deleted" | green | `superseded-cleanup-failed-notification` | `confirm_delete_superseded`; playlists spec |
 | `superseded-cleanup-failed-notification` | channel | "Cleanup failed" | red | — | `confirm_delete_superseded`; playlists spec |
-| `visibility-refused-notification` | channel | "Show and hide are unavailable" | red | — | `update_playlist_visibility`; playlists spec ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)) |
+| `visibility-refused-notification` | channel | "Show and hide are unavailable" | red | — | `update_playlist_visibility`; playlists spec ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)) |
 
 The channel rows were converted in one pass
-([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).

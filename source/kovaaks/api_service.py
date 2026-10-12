@@ -720,7 +720,7 @@ def merge_seed_leaderboard_ids(
     are already excluded by the caller). The whole merge is one atomic
     read-modify-write, per the cache conventions.
 
-    Rules (see docs/decision_log.md, the leaderboard-ID seeding entry):
+    Rules (see docs/decision_log/, the leaderboard-ID seeding entry):
 
     - an asserted name missing from the cache is added, tagged ``source="seed"``;
     - a ``source="seed"`` entry whose asserted value changed is refreshed, so

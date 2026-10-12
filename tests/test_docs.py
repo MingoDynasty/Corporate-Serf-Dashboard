@@ -9,7 +9,9 @@ links to a file that has been deleted (e.g. a proposal distilled into the
 decision log), and heading-anchor links point at headings that exist in the
 target document. From "Doc style — two readers, two layers": every spec and
 every decision-log entry since the rule landed opens with a 2–4 sentence
-summary, as ``count_sentences`` counts them.
+summary, as ``count_sentences`` counts them. The decision log is a folder
+with one file per entry, and each file's name opens with the date in its
+heading.
 """
 
 import re
@@ -22,7 +24,7 @@ from markdown_it import MarkdownIt
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SPECS_DIR = REPO_ROOT / "docs" / "specs"
 PROPOSALS_DIR = REPO_ROOT / "docs" / "proposals"
-DECISION_LOG = REPO_ROOT / "docs" / "decision_log.md"
+DECISION_LOG_DIR = REPO_ROOT / "docs" / "decision_log"
 
 DOC_FILES = sorted(
     [
@@ -50,8 +52,7 @@ SUMMARY_EXEMPT_ENTRIES = frozenset(
     {"2026-08-01: No Username Stays Fully Offline — User-Independent Totals Rejected"}
 )
 
-_H2_LINE = re.compile(r"^## (.+)$", re.MULTILINE)
-_ENTRY_DATE = re.compile(r"\d{4}-\d{2}-\d{2}(?=:)")
+_ENTRY_HEADING = re.compile(r"# (?P<title>(?P<date>\d{4}-\d{2}-\d{2}): .*)")
 _ABBREVIATION = re.compile(r"\b(e\.g|i\.e|vs|etc|approx|cf)\.", re.IGNORECASE)
 _SENTENCE_BREAK = re.compile(r"(?<=[.!?])[\"')\]*]*\s+(?=[A-Z\"'`*(\[])")
 
@@ -239,10 +240,16 @@ def test_heading_anchors_slug_rendered_text(tmp_path):
 def test_proposal_docs_live_in_proposals_dir():
     """The directory is the classifier: a lifecycle doc anywhere else under
     docs/ is misplaced, whether its name says proposal or only its Status
-    line does. Specs are current-state docs and carry no Status line."""
+    line does. Specs are current-state docs and carry no Status line. A
+    decision-log entry is exempt: its Status line states the decision's
+    standing, and its name is its title, which may say proposal."""
     misplaced = []
     for doc in (REPO_ROOT / "docs").rglob("*.md"):
-        if doc.is_relative_to(PROPOSALS_DIR) or doc.is_relative_to(SPECS_DIR):
+        if (
+            doc.is_relative_to(PROPOSALS_DIR)
+            or doc.is_relative_to(SPECS_DIR)
+            or doc.is_relative_to(DECISION_LOG_DIR)
+        ):
             continue
         lines = doc.read_text(encoding="utf-8").splitlines()[:STATUS_SEARCH_LINES]
         if "proposal" in doc.name or any(STATUS_PATTERN.search(line) for line in lines):
@@ -386,32 +393,33 @@ def spec_summary(text: str) -> str:
     return paragraphs[0] if paragraphs else ""
 
 
-def log_summaries(text: str) -> dict[str, str]:
-    """Map each gated decision-log heading to its layer-1 summary.
+def decision_log_entries() -> list[Path]:
+    """List every decision-log entry file: all but the folder's README."""
+    readme = DECISION_LOG_DIR / "README.md"
+    return sorted(doc for doc in DECISION_LOG_DIR.rglob("*.md") if doc != readme)
+
+
+def entry_summary(text: str) -> str | None:
+    """Return a gated decision-log entry's layer-1 summary.
 
     An entry is gated when its heading date is on or after
-    ``SUMMARY_CUTOVER_DATE`` and it isn't named in ``SUMMARY_EXEMPT_ENTRIES``.
-    Its summary is the first paragraph after the heading once the whole
-    ``Status:`` paragraph is skipped: a Status line wraps when it carries a
-    supersession note, and stopping at its first line reads the note as the
-    summary. Regions are cut from the source text, never from a render, so
-    the gate has no Markdown rendering edge cases to chase.
+    ``SUMMARY_CUTOVER_DATE`` and it isn't named in ``SUMMARY_EXEMPT_ENTRIES``;
+    any other entry returns ``None``. The summary is the first paragraph
+    after the heading once the whole ``Status:`` paragraph is skipped: a
+    Status line wraps when it carries a supersession note, and stopping at
+    its first line reads the note as the summary. Regions are cut from the
+    source text, never from a render, so the gate has no Markdown rendering
+    edge cases to chase.
     """
-    headings = list(_H2_LINE.finditer(text))
-    summaries = {}
-    for heading, following in zip(headings, [*headings[1:], None]):
-        title = heading.group(1).strip()
-        date = _ENTRY_DATE.match(title)
-        if not date or date.group() < SUMMARY_CUTOVER_DATE:
-            continue
-        if title in SUMMARY_EXEMPT_ENTRIES:
-            continue
-        end = following.start() if following else len(text)
-        paragraphs = _paragraphs(text[heading.end() : end])
-        if paragraphs and paragraphs[0].startswith("Status:"):
-            paragraphs = paragraphs[1:]
-        summaries[title] = paragraphs[0] if paragraphs else ""
-    return summaries
+    heading = _ENTRY_HEADING.match(text)
+    if not heading or heading["date"] < SUMMARY_CUTOVER_DATE:
+        return None
+    if heading["title"].strip() in SUMMARY_EXEMPT_ENTRIES:
+        return None
+    paragraphs = _paragraphs(text[heading.end() :])
+    if paragraphs and paragraphs[0].startswith("Status:"):
+        paragraphs = paragraphs[1:]
+    return paragraphs[0] if paragraphs else ""
 
 
 def test_layer1_summaries_hold_two_to_four_sentences():
@@ -421,13 +429,11 @@ def test_layer1_summaries_hold_two_to_four_sentences():
         )
         for spec in sorted(SPECS_DIR.rglob("*.md"))
     }
-    log = DECISION_LOG.read_text(encoding="utf-8")
-    counts.update(
-        {
-            f"decision_log.md: {title}": count_sentences(summary)
-            for title, summary in log_summaries(log).items()
-        }
-    )
+    for entry in decision_log_entries():
+        summary = entry_summary(entry.read_text(encoding="utf-8"))
+        if summary is not None:
+            name = entry.relative_to(REPO_ROOT).as_posix()
+            counts[name] = count_sentences(summary)
     bad = [
         f"{name}: {count} sentences"
         for name, count in counts.items()
@@ -444,11 +450,31 @@ def test_layer1_summaries_hold_two_to_four_sentences():
 def test_summary_exemptions_name_real_entries():
     # A renamed or deleted exempt entry would leave a dead name behind, and a
     # typo here would exempt nothing while looking like it exempts something.
-    titles = {
-        heading.group(1).strip()
-        for heading in _H2_LINE.finditer(DECISION_LOG.read_text(encoding="utf-8"))
-    }
+    headings = (
+        _ENTRY_HEADING.match(entry.read_text(encoding="utf-8"))
+        for entry in decision_log_entries()
+    )
+    titles = {heading["title"].strip() for heading in headings if heading}
     assert SUMMARY_EXEMPT_ENTRIES <= titles
+
+
+def test_decision_log_entries_are_named_by_their_heading_date():
+    """A file listing sorted by name is the log's chronology, and nothing
+    else keeps it. So the date that opens a file's name is the date in its
+    heading, and the file sits in the folder of that date's year. The rest
+    of the name is the author's."""
+    bad = []
+    for entry in decision_log_entries():
+        heading = _ENTRY_HEADING.match(entry.read_text(encoding="utf-8"))
+        date = heading["date"] if heading else None
+        name = entry.relative_to(DECISION_LOG_DIR).as_posix()
+        if date is None or not name.startswith(f"{date[:4]}/{date}-"):
+            bad.append(f"{name}: heading date {date}")
+    assert not bad, (
+        "A decision-log entry is docs/decision_log/<year>/<date>-<title>.md "
+        "and opens with a '# <date>: <Title>' heading that carries the same "
+        "date (docs/decision_log/README.md):\n" + "\n".join(bad)
+    )
 
 
 ABBREVIATIONS = ("e.g.", "i.e.", "vs.", "etc.", "cf.", "approx.", "E.g.")
@@ -493,25 +519,22 @@ def test_spec_summary_is_the_first_paragraph_after_the_h1():
     assert spec_summary(spec) == "One summary. Two."
 
 
-def test_log_summary_skips_the_whole_wrapped_status_paragraph():
-    log = (
-        "# Decision Log\n\n## Status Values\n\n- `Accepted`: current.\n\n"
-        "## 2026-09-01: Wrapped Status\n\n"
+def test_entry_summary_skips_the_whole_wrapped_status_paragraph():
+    entry = (
+        "# 2026-09-01: Wrapped Status\n\n"
         "Status: Superseded in part by the\n"
-        "[2026-09-02 entry](#x): the sentence. No longer holds. Rest stands.\n\n"
+        "[2026-09-02 entry](x.md): the sentence. No longer holds. Rest stands.\n\n"
         "One summary sentence. Two summary sentences.\n\n"
         "**Payload.** Dense. Detail. Here. And. More.\n"
     )
-    assert log_summaries(log) == {
-        "2026-09-01: Wrapped Status": "One summary sentence. Two summary sentences."
-    }
+    assert entry_summary(entry) == "One summary sentence. Two summary sentences."
 
 
-def test_log_summary_scope_starts_at_the_cutover_and_skips_the_exemption():
+def test_entry_summary_scope_starts_at_the_cutover_and_skips_the_exemption():
     exempt = min(SUMMARY_EXEMPT_ENTRIES)
-    log = (
-        "## 2026-09-01: Gated\n\nStatus: Accepted\n\nOne. Two.\n\n"
-        f"## {exempt}\n\nStatus: Accepted\n\nDecision: one only.\n\n"
-        "## 2026-07-31: Legacy\n\nStatus: Accepted\n\nDecision: a. B. C. D. E.\n"
-    )
-    assert log_summaries(log) == {"2026-09-01: Gated": "One. Two."}
+    gated = "# 2026-09-01: Gated\n\nStatus: Accepted\n\nOne. Two.\n"
+    exempted = f"# {exempt}\n\nStatus: Accepted\n\nDecision: one only.\n"
+    legacy = "# 2026-07-31: Legacy\n\nStatus: Accepted\n\nDecision: a. B. C. D. E.\n"
+    assert entry_summary(gated) == "One. Two."
+    assert entry_summary(exempted) is None
+    assert entry_summary(legacy) is None

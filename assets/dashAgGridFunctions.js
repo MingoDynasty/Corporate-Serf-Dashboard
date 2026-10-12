@@ -29,7 +29,7 @@ dagfuncs.nullsLastComparator = function (
 // `relativeTime(...)` directly, NOT `dagfuncs.relativeTime(...)` (there is no
 // `dagfuncs` in that scope) -- and the home page clientside callback, which runs
 // in real browser global scope and uses the full `window.dashAgGridFunctions` path.
-// See docs/decision_log.md (2026-06-20: Reference dash-ag-grid Grid Functions By
+// See docs/decision_log/ (2026-06-20: Reference dash-ag-grid Grid Functions By
 // Bare Name).
 //
 // `seconds` is epoch *seconds* (the grid already carries this; the home Store

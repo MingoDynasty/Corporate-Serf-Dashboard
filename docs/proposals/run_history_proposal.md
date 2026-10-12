@@ -48,13 +48,13 @@ doesn't reopen them:
 - **The three skill-judgment principles** in the roadmap's
   [Guiding principles](../roadmap.md#guiding-principles), ratified on
   2026-10-04
-  ([decision log](../decision_log.md#2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice)).
+  ([decision log](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)).
   The check and the star this page draws are verdicts against a bar the
   player set or a record they hold. The page gives no advice.
 - **Sessions come before the history views** (row D4 of the same entry).
 - **What a session is, and when one is in progress:** rows S1 to S3 of the
   Sessions proposal, ratified on 2026-10-11
-  ([decision log](../decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes)).
+  ([decision log](../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
   Its row S4 takes the typical score out of this milestone.
 - **The run toast:** rows T1 to T3 of the
   [Run toasts proposal](run_toasts_proposal.md), ratified on 2026-10-11. A
@@ -63,15 +63,15 @@ doesn't reopen them:
   is dropped, and the **Run notifications** switch moves to the Settings
   page.
 - **What a new PB is**
-  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
   R6 changes where stars are drawn, not which runs earn one.
 - **Pace** on a time-scored scenario
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - **One active tab** is the supported way to use the app
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   The maintainer on 2026-10-07: "Keep the one-active-tab model as it is."
 - **The two rules for a remembered control**
-  ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)):
+  ([2026-09-19](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)):
   its layout default never varies per visit, and a callback that writes it
   only on some visits must not starve the callbacks that depend on it.
 
@@ -86,7 +86,7 @@ Performance" stays only where history keeps it.
 
 **Recommendation: the navbar link, the page name, and the browser tab read
 "Run History".** This reverses one of the four rulings of the
-[2026-08-09 naming entry](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options),
+[2026-08-09 naming entry](../decision_log/2026/2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md),
 "The graph page's product name is 'Scenario Performance'". The other three
 stand: the panel is Chart options, Settings keeps its name, and the panel's
 column claims no exclusive tenancy.
@@ -439,7 +439,7 @@ and the 2026-10-05 ruling that only Score vs Time is marked is extended.
 
 **Recommendation: Score vs Run stars each plotted run that was a new PB, as
 Score vs Time does. Score vs Sensitivity still has none.** This extends the
-[2026-10-05 ruling](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star),
+[2026-10-05 ruling](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md),
 "Only Score vs Time is marked".
 
 - **The ruling's own reason covers it.** "Along the date axis the stars read
@@ -925,7 +925,7 @@ switch between the two, are a later proposal.
   are all open.
 - **The Columns menu** shows or hides Shots fired and Sensitivity, both
   shown to start. It is the menu the playlist tables use
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)),
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)),
   so its choices are remembered in the browser. The maintainer, asked
   whether they should be: "Yes."
 - **It loads 30 sessions at a time.** **Show older sessions** adds 30.
@@ -1012,7 +1012,7 @@ a switch.
 - **Threshold passed,** a check. The run met the score threshold, judged as
   the toast judges it today: against the PB the run was chasing, which is
   the scenario's best score before it at any sensitivity
-  ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
+  ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md)).
   It is judged by pace where the app measures pace on the run's own
   version of the scenario. See [A past run's pace basis](#a-past-runs-pace-basis).
 - **New PB,** a star: the rule the chart's stars use. A run can carry both.
@@ -1180,7 +1180,7 @@ control.
 
 Two rules, both measuring the page's own boxes and never the window, because
 the navbar takes 225 px without changing the window's width
-([2026-08-03](../decision_log.md#2026-08-03-homes-controls-row-measures-the-content-area-not-the-window)).
+([2026-08-03](../decision_log/2026/2026-08-03-homes-controls-row-measures-the-content-area-not-the-window.md)).
 
 - **The list drops under the top row when the page area is 900 px or
   narrower.** The order is then the top row, the card, the list at up to
@@ -1241,7 +1241,7 @@ Every string on the page. They follow the nine copy rules in
 [AGENTS.md](../../AGENTS.md#styling-conventions). The mockup's strings were
 placeholders. Scores are formatted as the playlist scenario table formats PB
 Score: thousands separators, at most two decimals, trailing zeros dropped
-([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)).
+([2026-09-27](../decision_log/2026/2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)).
 Durations use the app's existing form: `<1 min`, `9 min`, `1 hr 6 min`.
 
 **Navigation and Home**
@@ -1489,13 +1489,13 @@ entry. It erases nothing.
 
 | Entry | What changes | What stands |
 |---|---|---|
-| [2026-08-09, the naming entry](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options) | The page's name (R1). "The route restructure is deferred" is resolved, with `/run-history` in place of `/scenario` (R2). "Run History composes into this column" is answered with a second column (R3) | Chart options' name, Settings' name, no exclusive tenancy, and the rule that copy is checked against the app's own words |
-| [2026-08-09, the panel entry](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph) | The 62em threshold. "Ids and defaults survive verbatim", set aside once | The panel beside the chart, the container query, the clipping row, `.home-graph` as the resize hook, and the toggle's guard |
-| [2026-10-05, the stars](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star) | "Only Score vs Time is marked" (R6). The clauses about Top N, the oldest date, the kept tie, and the Average score trace stop applying (R5). The hover order at a shared position narrows from a same-day tie to a same-second one | What a new PB is, no stars on Score vs Sensitivity, a new PB ordered last among points at one position, the look, Point size, and no control |
-| [2026-09-19, query parameters](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory) | "`?scenario=` alone leaves the playlist filter on the restored value" gains one exception (R7) | The invariant and its corollary, which bind the new page. An unknown playlist code still clears the filter, and the URL is still not rewritten |
-| [2026-07-11, timestamps](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format) | The plot title's `updated:` use ends. Session names and the card drop this year's year, and a run row shows a time of day alone | The format and its rules |
-| [2026-10-05, pace](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace) | The watchdog's session lines leave its list of surfaces. The check and the card join it, and a past run is judged under its own version, not the newest run's | The pace rule |
-| [2026-09-12, Share chart](../decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button) | The figure shared holds every run in the range and no Average score line | The button stays |
+| [2026-08-09, the naming entry](../decision_log/2026/2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md) | The page's name (R1). "The route restructure is deferred" is resolved, with `/run-history` in place of `/scenario` (R2). "Run History composes into this column" is answered with a second column (R3) | Chart options' name, Settings' name, no exclusive tenancy, and the rule that copy is checked against the app's own words |
+| [2026-08-09, the panel entry](../decision_log/2026/2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md) | The 62em threshold. "Ids and defaults survive verbatim", set aside once | The panel beside the chart, the container query, the clipping row, `.home-graph` as the resize hook, and the toggle's guard |
+| [2026-10-05, the stars](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md) | "Only Score vs Time is marked" (R6). The clauses about Top N, the oldest date, the kept tie, and the Average score trace stop applying (R5). The hover order at a shared position narrows from a same-day tie to a same-second one | What a new PB is, no stars on Score vs Sensitivity, a new PB ordered last among points at one position, the look, Point size, and no control |
+| [2026-09-19, query parameters](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md) | "`?scenario=` alone leaves the playlist filter on the restored value" gains one exception (R7) | The invariant and its corollary, which bind the new page. An unknown playlist code still clears the filter, and the URL is still not rewritten |
+| [2026-07-11, timestamps](../decision_log/2026/2026-07-11-humanize-the-absolute-timestamp-format.md) | The plot title's `updated:` use ends. Session names and the card drop this year's year, and a run row shows a time of day alone | The format and its rules |
+| [2026-10-05, pace](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md) | The watchdog's session lines leave its list of surfaces. The check and the card join it, and a past run is judged under its own version, not the newest run's | The pace rule |
+| [2026-09-12, Share chart](../decision_log/2026/2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md) | The figure shared holds every run in the range and no Average score line | The button stays |
 
 The Run toasts proposal carries the entries its own rows change.
 
@@ -1531,7 +1531,7 @@ that a rewrite left them only in git history.
 
 The old file's three positions on sessions are not superseded: gap-based
 sessions, a fixed gap, and no SQLite migration. The sessions decision
-([2026-10-11](../decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes))
+([2026-10-11](../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md))
 carries them forward. Its open question about the navigation surface is
 answered by R3.
 

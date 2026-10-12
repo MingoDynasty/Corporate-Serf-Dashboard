@@ -8,7 +8,7 @@ screen shows any of this yet, and the Run History page is what will be built
 on it.
 
 Statements below describe what the app does today and link the
-[decision log](../decision_log.md) entry that set them. Rationale lives in
+[decision log](../decision_log/README.md) entry that set them. Rationale lives in
 that entry, not here. A statement with no link is an implementation fact that
 no decision-log entry governs. What the terms mean is in the
 [glossary](../glossary.md#session), and the modules are mapped in
@@ -158,4 +158,4 @@ as written. What follows is accepted ([2026-10-11][entry]).
   a five-minute break across the change ends the session.
 - A manual clock change, or a trip across time zones, does the same.
 
-[entry]: ../decision_log.md#2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes
+[entry]: ../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md

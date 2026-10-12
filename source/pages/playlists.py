@@ -630,7 +630,7 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
     A failed visibility write does not fail the import: the playlist file is
     already on disk, so the toast turns orange and reports the split outcome
     rather than vanishing (see the 2026-08-02 committed-side-effect entry in
-    ``docs/decision_log.md``).
+    ``docs/decision_log/``).
 
     Both landing outcomes clear the failure channel: it claims to report the
     latest attempt, so a corrected retry must not leave the red refusal beside
@@ -799,7 +799,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels)
     playlist_visibility.json from accumulating dead codes) and the refresh store bumps
     so the deleted row disappears without a page reload. A failed visibility
     write is logged and otherwise ignored: the delete is what the toast reports
-    (see the 2026-08-02 committed-side-effect entry in ``docs/decision_log.md``).
+    (see the 2026-08-02 committed-side-effect entry in ``docs/decision_log/``).
     Success clears the failure channel, so a retry that lands does not leave the
     red toast standing beside the green one.
 

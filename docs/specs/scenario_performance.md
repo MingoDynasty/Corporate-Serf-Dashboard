@@ -17,7 +17,7 @@ page also hosts the setup surfaces that point you at Settings, whether
 something has never been set or saved settings cannot be read.
 
 Statements below describe what the app does today and link the
-[decision log](../decision_log.md) entries that set them — rationale lives in
+[decision log](../decision_log/README.md) entries that set them — rationale lives in
 those entries, not here. A statement with no link is an implementation fact
 that no decision-log entry governs. Runtime structure is mapped in
 [architecture.md](../architecture.md), the user-facing rationale in
@@ -31,20 +31,20 @@ of scope here, apart from its chart toolbar, noted under The graph.
   Its product name is "Scenario Performance" — the navbar link, the page
   `name`, and the browser-tab title — applied as labels only; the module and
   route keep their historical names
-  ([2026-08-09](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md)).
 - The preference panel and its disclosure button are named "Chart options",
   and the controls inside carry the vocabulary the app's own chart
   annotations and the aim-training community already use — "PB score",
   "Score threshold" — rather than invented terms
-  ([2026-08-09](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md)).
   Control labels, placeholders, tooltips, and toast titles are sentence case;
   the page title, the group headings, and the named chart modes "Score vs
   Sensitivity" and "Score vs Time" keep their capitals
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - Page copy says "Position" for leaderboard placement and reserves "Rank"
   for benchmark tiers, as in the "Rank thresholds" overlay; the rule lives in
   [scenario_rank.md](scenario_rank.md)
-  ([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 - With `show_version_in_title` enabled, the tab title is prefixed with the
   build's release label; the key is specified in
   [settings.md](settings.md#the-configuration-file).
@@ -52,10 +52,10 @@ of scope here, apart from its chart toolbar, noted under The graph.
   and the selection they make is remembered exactly like one made by hand:
   arriving from a Playlists grid scenario link and then returning to the page
   shows that playlist and scenario, not an earlier one
-  ([2026-09-19](../decision_log.md#2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory)).
+  ([2026-09-19](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
   That holds for a hidden playlist too: `?playlist_code=` selects any loaded
   playlist, and the filter names it
-  ([2026-10-12](../decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
   A parameter the URL omits leaves its control on the remembered value, so
   `?scenario=` alone keeps the playlist filter — and a scenario that filter
   does not list is then dropped, leaving no scenario selected and nothing
@@ -87,10 +87,10 @@ of scope here, apart from its chart toolbar, noted under The graph.
   an arrow key there highlights the name first, so typing still starts a
   fresh search, and a right-click there highlights it when the field shows
   only a cursor
-  ([2026-10-12](../decision_log.md#2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name.md)).
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation
-  ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md)).
 - The playlist filter lists the visible playlists
   ([playlists.md](playlists.md#the-overview)), plus the playlist it
   holds when that one is hidden. A hidden playlist becomes the selection
@@ -101,7 +101,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   list marks it as hidden. A playlist the URL names is in the list when the
   page paints; one the browser restored is added by the callback that lists
   the playlist's scenarios, so its name appears just after the page paints
-  ([2026-10-12](../decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
 - While the playlist filter holds a loaded playlist, the "Open scenario
   table" link under it leads to that playlist's scenario table at
   `/playlists/{code}`, which opens in playlist order
@@ -114,15 +114,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
   the page loads, the filter drops it and is empty, with no clear button, and
   nothing is remembered: the list the filter is given has no such playlist,
   and the Select drops a value its new options lack
-  ([2026-10-12](../decision_log.md#2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
 - The row's responsive rules measure the content area rather than the
   window, and the two wide dropdowns narrow from their 400px target toward a
   200px floor before the row wraps
-  ([2026-08-03](../decision_log.md#2026-08-03-homes-controls-row-measures-the-content-area-not-the-window)).
+  ([2026-08-03](../decision_log/2026/2026-08-03-homes-controls-row-measures-the-content-area-not-the-window.md)).
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
   directory, named by each file's own `Scenario:` field
-  ([2026-09-12](../decision_log.md#2026-09-12-the-local-scenario-list-comes-from-the-run-store));
+  ([2026-09-12](../decision_log/2026/2026-09-12-the-local-scenario-list-comes-from-the-run-store.md));
   without a usable stats directory that local fallback is empty, while a
   selected playlist still lists its scenarios.
 
@@ -149,7 +149,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   day's filter keeps that tie and drops the new PB, the point has no star.
   With no new PB among its points the chart has no New PB trace and no legend
   entry, and Score vs Sensitivity never has one
-  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
 - A run recorded under a game's own sensitivity scale is normalized to cm/360
   when its file is parsed, from the file's own `Sens Increment` and `DPI`
   fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`; a run whose
@@ -157,19 +157,19 @@ of scope here, apart from its chart toolbar, noted under The graph.
   recorded value and scale. Every consumer reads the normalized fields, so the
   normalized sensitivity-and-scale group is the unit for grouping, for run
   placement, and for first-sensitivity detection
-  ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  ([2026-09-11](../decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)).
   A cm/360 value, native or converted, is rounded to one decimal place, so a
   typed value and a converted one a few hundredths apart share a group. The
   buckets have hard edges: `40.849` and `40.851` land in `40.8` and `40.9`. A
   value on any other scale keeps exactly what its file recorded, so
   `0.32 Valorant` reads `0.32 Valorant`
-  ([2026-09-27](../decision_log.md#2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired.md)).
   A converted run also keeps the value, scale, and DPI its file recorded,
   unrounded, for the point hover only
-  ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
+  ([2026-09-26](../decision_log/2026/2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md)).
 - Point hover shows the run's timestamp with seconds kept — the one surface
   that keeps them, cross-referencing KovaaK's second-stamped CSV filenames
-  ([2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-humanize-the-absolute-timestamp-format.md)).
   Then come the score, the day in Score vs Time, the run's
   sensitivity-and-scale string in both modes (in Score vs Sensitivity it is
   the x value, so it is not repeated), and the accuracy. A converted run's
@@ -178,20 +178,20 @@ of scope here, apart from its chart toolbar, noted under The graph.
   line ends at its sensitivity. The Average score hover names only the
   group's x value, since one group can hold runs recorded at different
   settings
-  ([2026-09-26](../decision_log.md#2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only)).
+  ([2026-09-26](../decision_log/2026/2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md)).
   A star takes no hover of its own, so hovering one shows its run's hover.
   Runs at one position share one hover, the one whose point comes last in the
   run trace. Where a new PB and a later same-day tie are both plotted, the
   new PB is ordered last among the run points there, so the star's hover
   names the run that set the PB; elsewhere a day's points keep their order,
   ascending by score with ties in time order
-  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
 - Three overlay families, all dashed labelled lines. "PB score ({value})"
   and "Score threshold ({value})" draw at the current post-run personal best
   and at the
   configured percentage of it — while the verdict in run notifications
   judges against the PB the run was chasing
-  ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
+  ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md)).
   On a [time-scored scenario](#time-scored-scenarios) whose PB can be
   measured by pace, the threshold line draws at the score that finishes at
   that percentage of the PB's pace, `C − (C − PB) × 100 / goal` for the
@@ -199,7 +199,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   draws at 890.74, where the score form would draw at 851.39. A goal above
   100% puts the line above the PB. The annotation is unchanged and still
   shows a score
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   "Rank thresholds" draws the selected playlist's rank lines, in ladder
   order and color: the ranks whose thresholds land inside the plotted score
   range plus every rank tied at the nearest threshold below and at the
@@ -224,7 +224,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - Until the first data callback resolves, the chart is a transparent,
   annotation-free placeholder; a resolved-but-empty result gets an explicit
   empty state instead
-  ([2026-07-16](../decision_log.md#2026-07-16-keep-pre-hydration-states-honest)):
+  ([2026-07-16](../decision_log/2026/2026-07-16-keep-pre-hydration-states-honest.md)):
   "No scenario selected" / "Select a scenario to see your score history.",
   "Graph settings incomplete" / "Set <b>Top N scores</b> and the oldest date
   to plot this scenario.", "No local runs found" / "Play this scenario once
@@ -233,30 +233,30 @@ of scope here, apart from its chart toolbar, noted under The graph.
   graph option" / "Choose <b>Score vs Sensitivity</b> or <b>Score vs
   Time</b>.". A control named in an empty-state message is bold through
   `<b>` in the annotation string
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - The figure takes the Mantine light or dark template with the app theme.
   With no point color chosen the run points draw in the template's own blue —
   `#228be6` light, `#1971c2` dark — while the Average score line keeps its
   baked `#636efa` in both themes
-  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+  ([2026-08-20](../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)
   as amended by
-  [2026-08-21](../decision_log.md#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme)).
+  [2026-08-21](../decision_log/2026/2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme.md)).
   A New PB star is plotly's `star` symbol, gold `#fab005` with a 1px
   `#5f3d00` outline, the same in both themes
-  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
 - "Point size" is a Small | Default | Large preset (Small 4px, Large 10px);
   Default leaves the generated size untouched rather than writing a pixel
   count. It sizes the New PB stars too: 9px on Small, 16px on Large, and the
   12px they are generated with on Default
-  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
   "Point color" accepts eight curated swatches on one row, a picker,
   or a typed hex value; the empty value means Default (placeholder
   "Default"), a "Use default" button is the only way back to it, and
   anything unparseable falls back to the generated color. The empty field's
   preview swatch shows the color the graph is using in the current theme
-  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+  ([2026-08-20](../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)
   as amended by
-  [2026-08-21](../decision_log.md#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme)).
+  [2026-08-21](../decision_log/2026/2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme.md)).
 - Color restyles only the run trace, and size restyles the run trace and the
   New PB trace. Each is selected by its name, "Run data point" or "New PB", in
   a cheap presentation callback applied after theming — the
@@ -264,15 +264,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
   placeholder and empty figures pass through untouched, as does a figure with
   no New PB trace. Nothing else on the chart is customizable, the stars' own
   color and shape included, and that boundary is deliberate
-  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there),
+  ([2026-08-20](../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md),
   with the stars' size as its one exception, set by
-  [2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  [2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
 - The stars have no control. Clicking "New PB" in the legend hides them and
   leaves every run point, and the choice is not remembered: the figure sets
   no `uirevision`, so the next figure draws them again, whether it comes from
   a new run on the scenario, a control that rebuilds the chart, or an
   appearance change
-  ([2026-10-05](../decision_log.md#2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
 - The chart keeps plotly.js's default modebar, which offers "Download plot as
   a PNG", a save to this PC, and "Share chart...". Pressing "Share chart..."
   opens plotly.js's confirmation naming Plotly Cloud, and nothing is sent
@@ -288,7 +288,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow; its figure is the playlist lines, their dates and
   progress percentages, and the aim-training-hours checkpoint labels
-  ([2026-09-12](../decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)).
+  ([2026-09-12](../decision_log/2026/2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md)).
 
 ## Time-scored scenarios
 
@@ -304,14 +304,14 @@ of scope here, apart from its chart toolbar, noted under The graph.
   is always a faster finish: the chart's points and axis, the Average score
   line, the PB score line, the rank lines, the Rank column, and top-N
   placement. No completion time is shown anywhere
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - Pace applies to a comparison only when three things hold: the scenario is
   recognized as time-scored, every score in the comparison is eligible, and
   both times are positive. Otherwise the surface behaves exactly as it does
   on any other scenario, with its own `N/A` and unjudged rules. A
   time-scored PB of zero or less still gets a pace percentage, because only
   the times have to be positive
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - A scenario is recognized from a performance file, the file KovaaK's writes
   beside each run's stats file. The file is time-scored when it has at least
   two score events and, after every one, the running score is within 0.5 of
@@ -323,7 +323,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   that is a positive, finite number. A run paused partway through is
   recognized like any other, because the file's timestamps leave paused
   time out
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - The scenario's newest run names the version. That run and the older runs
   with the same stats-file `Hash:` are tried newest first, and the first
   whose performance file can answer decides. A file that can't be read or
@@ -334,14 +334,14 @@ of scope here, apart from its chart toolbar, noted under The graph.
   `Hash:`, or when the stats folder has no `performances` folder beside it.
   A scenario's first run on a game build that writes these files therefore
   turns it to pace, and its numbers move then
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - A score is eligible for a pace comparison only when its run's `Hash:`
   equals the deciding file's `scenario_hash`. A rank threshold counts as
   eligible. A run whose stats file has no `Hash:` still loads, and its score
   is never eligible. So a PB set on an older version of the scenario keeps
   the score math, on the table and the chart, until a run on the current
   version beats it
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - A run's performance file is found by name: the stats file's name with
   ` Stats.csv` replaced by ` Performance.perf`, in the `performances` folder
   beside the stats folder
@@ -353,7 +353,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   the process. A file that can't be read is not remembered, so the next look
   tries again. A missing, unreadable, or malformed performance file costs
   only the detection, never the run
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   The first time a file is parsed, the debug log records its answer. For a
   file that can answer, the line also carries its time limit, its score
   event count, and its largest distance from the countdown.
@@ -366,20 +366,20 @@ of scope here, apart from its chart toolbar, noted under The graph.
   keeping them mounted and feeding their callbacks. When the chart row's own
   width — not the window's — drops to 62em, the same panel stacks above the
   chart
-  ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md)).
 - Four groups in order: **Overlays** ("Rank thresholds" on, "Show all ranks"
   off, "PB score" on), **Run Data Points** ("Point size" Default, "Point
   color" empty), **Score Threshold** ("Score threshold overlay" on, "Score
   threshold percentage" 95, minimum 1, placeholder "Percentage", "Score
   threshold verdict" on), and **Notifications** ("Run notifications" on)
-  ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph),
-  [2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there),
-  [2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed);
-  label casing as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md),
+  [2026-08-20](../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md),
+  [2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md);
+  label casing as amended by [2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   A help text that names another control renders the name bold: "Needs
   **Rank thresholds** turned on.", "Needs **Run notifications** turned on.",
   and the Top N scores help's "or per day in **Score vs Time**"
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - The Score threshold percentage help text reads the same on every scenario:
   "Sets the score goal as a percentage of your personal best. On a scenario
   scored by completion time, it's a percentage of your personal best's pace
@@ -387,11 +387,11 @@ of scope here, apart from its chart toolbar, noted under The graph.
   percentage of your score. The overlay line tracks your current personal
   best. Notifications judge a run against the personal best you had before
   the run."
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 - Every control in the panel persists via Dash persistence in the browser's
   local storage, so preferences are per browser and per origin — which is
   why every human-facing URL says `localhost`
-  ([2026-08-09](../decision_log.md#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001.md)).
 - What the two notification switches gate — the run-toast family, the
   verdict sub-toggle, and their interaction — is specified in
   [notifications.md](notifications.md#run-notifications); this page only
@@ -404,19 +404,19 @@ of scope here, apart from its chart toolbar, noted under The graph.
   overlay, not as a stats row.
 - "Last played" is a relative, single-unit humanized string ("5 minutes
   ago"), self-updating on its own 30-second interval
-  ([2026-06-21](../decision_log.md#2026-06-21-relative-humanized-last-played-timestamps)).
+  ([2026-06-21](../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md)).
   Its empty states are explicit: `—` with no scenario selected, `Never` for
   a scenario with no local runs, and only a real timestamp gets the tooltip
   affordance — hover, keyboard focus, or touch
-  ([2026-06-30](../decision_log.md#2026-06-30-model-home-last-played-empty-states-explicitly)).
+  ([2026-06-30](../decision_log/2026/2026-06-30-model-home-last-played-empty-states-explicitly.md)).
   The tooltip shows the absolute timestamp without seconds, in the shared
   GitHub-shaped format whose JS and Python implementations are kept in sync
   by hand
-  ([2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-humanize-the-absolute-timestamp-format.md)).
 - The Position field, its inline hints, and its Refresh button are fully
   specified in [scenario_rank.md](scenario_rank.md#failure-handling); on
   interval ticks the field re-reads caches only and makes no network calls
-  ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
+  ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
 
 ## Run delivery
 
@@ -427,12 +427,12 @@ of scope here, apart from its chart toolbar, noted under The graph.
   changes the dropdown at most once. The follow switch and the scenario
   dropdown are `State` there, so flipping either forwards nothing on its own.
   The supported usage model is one active tab
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   The drain semantics and the toasts the summary produces are specified in
   [notifications.md](notifications.md#run-notifications).
 - The graph rebuild consumes the forwarded summary, so a batch of several runs
   becomes one rebuild and one auto-switch rather than a replay
-  ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   Its other rebuild triggers are unchanged: any Chart options control that
   feeds it, a scenario change, and the date and axis controls.
 - The page still polls on `polling_interval` (default 1000 ms), now for two
@@ -440,7 +440,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   The shell's drain is the third poll, on its own interval, and it runs on
   every page. Waitress's 8 worker threads absorb the burst, and both intervals
   keep ticking while the tab is hidden
-  ([2026-07-17](../decision_log.md#2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating)).
+  ([2026-07-17](../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md)).
 - The page is also where two background queues reach the screen: run-import
   failures on the next poll tick, and the startup playlist warnings on a
   one-shot interval 250 ms after mount. Both toast families are specified in
@@ -451,15 +451,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - Runs are files: every run is a CSV in the stats directory, the in-memory
   stores are rebuilt from them at startup, and every score-over-sensitivity
   and score-over-time view is therefore recomputable at any time
-  ([2026-08-08](../decision_log.md#2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed)).
+  ([2026-08-08](../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md)).
 - Leaderboard positions are not history: only the latest position per
   scenario is cached, past positions are overwritten and cannot be
   reconstructed, and capture stays unbuilt until a position-over-time
   feature is designed — whose first deliverable must be that capture
-  ([2026-08-08](../decision_log.md#2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed)).
+  ([2026-08-08](../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md)).
 - The chart-appearance and notification preferences live only in the
   browser's local storage; nothing the panel sets is written server-side
-  ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)).
+  ([2026-08-20](../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)).
 
 ## Hosted setup surfaces
 
@@ -468,7 +468,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   file exists, but this version of the app can't use it, so the app started
   without your settings. Open Settings to see what's wrong and how to fix
   it.", with "Open Settings" as its one action
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
   The stats-folder state shows "Finish setting up" over "No KovaaK's stats
   folder was found, so this app can't read your runs yet. Set it in
   Settings." with "Open Settings" as its one action. The identity state
@@ -476,28 +476,28 @@ of scope here, apart from its chart toolbar, noted under The graph.
   percentiles for every scenario.", with "Open Settings", "Skip", and the
   fine print "Skipping keeps position lookups off. You can add your username
   anytime in Settings."
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence);
-  card copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md);
+  card copy as amended by [2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   The card is a panel wearing the shared alert treatment rather than a
   `dmc.Alert`, because it holds a link and a button: the unusable-store and
   stats-folder states are yellow with a warning icon beside the title, and the
-  identity state blue with an info icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  identity state blue with an info icon ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md)).
   When the card shows, which state wins, and what Skip writes are specified
   in [settings.md](settings.md#the-setup-card).
 - The stats-folder hint sits above the setup card and reads "No stats
   folder configured. Set it in Settings." with Settings linked and the period
-  outside the link ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)), or
+  outside the link ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)), or
   "Restart the app to apply your saved settings." while a saved directory
   awaits a restart. Its key-presence semantics are specified in
   [settings.md](settings.md#the-setup-card)
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
 - Both branches of the hint are a yellow panel wearing the same alert
   treatment as the card, with the warning icon beside the sentence, no title
   above it, and the card's width. A sentence too long for one line wraps
   beside the icon rather than under it
-  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+  ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md)).
 - The hint and the card can render together, hint first: a stored stats
   folder that has since vanished beside a username key that was never
   written leaves the yellow hint above the blue account offer, each speaking
   for its own key
-  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+  ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md)).

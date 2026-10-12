@@ -14,7 +14,7 @@ and each draws every row as text that can be selected and that the browser's
 own text search finds.
 
 Statements below describe what the app does today and link the
-[decision log](../decision_log.md) entries that set them — rationale lives
+[decision log](../decision_log/README.md) entries that set them — rationale lives
 in those entries, not here. A link follows the sentences its entry governs; a
 sentence after the link, or with no link, is an implementation fact that no
 decision-log entry governs. Structure is mapped in
@@ -24,20 +24,20 @@ the user guide's
 [Playlists and Benchmarks](../user_guide.md#playlists-and-benchmarks) section
 and [product.md](../product.md). Leaderboard placement is worded
 "Position"
-([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
+([2026-07-06](../decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 
 ## Vocabulary and identity
 
 - A *playlist* is a bare scenario list; a *benchmark* is a playlist plus rank
   thresholds and colors
-  ([2026-07-03](../decision_log.md#2026-07-03-import-benchmarks-from-evxl-and-kovaaks)).
+  ([2026-07-03](../decision_log/2026/2026-07-03-import-benchmarks-from-evxl-and-kovaaks.md)).
   The overview's Type column reads "Benchmark" when any scenario carries
   ranks, otherwise "Playlist".
 - The share code is the playlist's identity everywhere: `playlist_database`
   key, route value, selector value, import duplicate check, and filename
   suffix. Names are display-only labels, rendered `Name (CODE)` only when two
   loaded playlists share a name
-  ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)).
+  ([2026-07-07](../decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)).
   The show-list is keyed by code too (see the overview). Import writes
   `data/playlists/{sanitized name} [{sanitized code}].json`. Option lists are
   ordered by case-folded name, then name, then code; the overview's row data
@@ -45,16 +45,16 @@ and [product.md](../product.md). Leaderboard placement is worded
 - Scenario names match exactly on their stripped form, enforced at the CSV
   run parse and by the `Scenario.name` validator; a whitespace-only name
   becomes `""` rather than rejecting the playlist
-  ([2026-07-11](../decision_log.md#2026-07-11-match-scenario-names-on-their-stripped-form)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-match-scenario-names-on-their-stripped-form.md)).
 - `playlist_database` is unsynchronized; writes are single-key dict
   operations and iterating readers take a one-call `list()` snapshot first
-  ([2026-07-09](../decision_log.md#2026-07-09-accept-unsynchronized-in-memory-stores-single-writer)).
+  ([2026-07-09](../decision_log/2026/2026-07-09-accept-unsynchronized-in-memory-stores-single-writer.md)).
 
 ## Routes and navigation
 
 - `/playlists` and `/playlists/{playlistCode}` are stable contracts, and the
   bare-route selector dropdown is gone
-  ([2026-07-03](../decision_log.md#2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional)).
+  ([2026-07-03](../decision_log/2026/2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional.md)).
   `playlist_selector.py` is now only the shared props, a preset and a sizing
   rule, for the Home and Aim Training Journey dropdowns.
 - One cell in each row navigates, on both tables: a click anywhere in the
@@ -63,14 +63,14 @@ and [product.md](../product.md). Leaderboard placement is worded
   (prebuilt `/?playlist_code=<code>&scenario=<name>`). That cell shows the
   pointer cursor over its whole width. No other cell navigates, and a row
   keeps its hover tint
-  ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
   Both names are real anchors: a modified click (Ctrl/Cmd/Shift/Alt) on a
   name keeps the native anchor and stops the grid's `cellClicked`
   navigation; a plain click does the opposite. The anchor is only as wide as
   the name's text. A modified click in the rest of the name cell never
   reaches `cellClicked` either: with Ctrl or Cmd it opens the name in a new
   tab, and with Shift or Alt alone it opens nothing
-  ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 - The Scenario Performance page links back to the table: while its Playlist
   filter holds a loaded playlist, the "Open scenario table" link under the
   filter leads to `/playlists/{code}`. The link carries no `?sort=`, so the
@@ -80,7 +80,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   [scenario_performance.md](scenario_performance.md#the-controls-row).
 - The table load is driven by the mounted layout's `playlist-scenarios-code`
   store, never by the URL change
-  ([2026-04-29](../decision_log.md#2026-04-29-drive-playlist-table-loads-from-mounted-route-state)).
+  ([2026-04-29](../decision_log/2026/2026-04-29-drive-playlist-table-loads-from-mounted-route-state.md)).
   An unknown code renders "No imported playlist has the code {code}."; no
   code renders "Select a playlist from the Playlists page."
 
@@ -92,14 +92,14 @@ and [product.md](../product.md). Leaderboard placement is worded
   and delete action cells. The numeric and
   timestamp columns use the repo-owned `nullsLastComparator`, referenced by
   bare name
-  ([2026-04-29](../decision_log.md#2026-04-29-use-controlled-ag-grid-js-for-null-aware-sorting),
-  [2026-06-20](../decision_log.md#2026-06-20-reference-dash-ag-grid-grid-functions-by-bare-name)).
+  ([2026-04-29](../decision_log/2026/2026-04-29-use-controlled-ag-grid-js-for-null-aware-sorting.md),
+  [2026-06-20](../decision_log/2026/2026-06-20-reference-dash-ag-grid-grid-functions-by-bare-name.md)).
   Rows come from local run data and rank caches only, never the network.
   Last Played is relative with "Never" as sentinel and an absolute timestamp
   on hover, refreshed by a 30-second tick
-  ([2026-06-21](../decision_log.md#2026-06-21-relative-humanized-last-played-timestamps)
+  ([2026-06-21](../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md)
   as amended by
-  [2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
+  [2026-07-11](../decision_log/2026/2026-07-11-humanize-the-absolute-timestamp-format.md)).
   The hover adds a "Stalest: {scenario}, {relative}" second line.
 - Benchmark ID is KovaaK's numeric ID for a bundled benchmark, read from the
   bundled file's `generated_from` stamp. It shows as bare digits with no
@@ -107,12 +107,12 @@ and [product.md](../product.md). Leaderboard placement is worded
   benchmark ID: one imported by code, or any other file in the user's
   playlist folder. The column is not sortable. Its header tooltip reads "The
   number KovaaK's uses to identify this benchmark in its API."
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
 - Percentile aggregates cover played scenarios only. Until every played
   scenario is display-resolved (UNRANKED, or RANKED with a cached percentile)
   both cells read `{resolved}/{played} cached`; a resolved all-UNRANKED
   playlist, or one with no played scenario, reads `N/A`
-  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
+  ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)).
   The placeholder is dimmed with the tooltip "Shown once all N played
   scenarios have data. Open the playlist to fetch it now."; a Lowest value
   shows "Lowest: {scenario}" on hover.
@@ -124,9 +124,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   honors the total's TTL. A clicked Refresh on that scenario re-reads the
   total and does; otherwise it lasts until
   `leaderboard_total_cache_ttl_hours` lapses, a week by default
-  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)
+  ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)
   as amended by
-  [2026-09-20](../decision_log.md#2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile)).
+  [2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)).
 - The warmup status line has three renderings: "Updating percentile data: N
   remaining", the same with " (~{duration})" once a pace sample exists
   (smallest form "<1 min"), and "Updating percentile data: N remaining ·
@@ -137,18 +137,18 @@ and [product.md](../product.md). Leaderboard placement is worded
   one-second interval rebuilds rows without recording interactive activity,
   disables after one idle rebuild, and re-arms on the worker's enqueue
   generation
-  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
+  ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)).
   A start that has claimed the singleton counts as busy until it has published
   its worker and drained the enqueues parked meanwhile, so the interval stays
   armed across that window rather than reading a generation that does not exist
   yet as idle
-  ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-warmup-locks-are-never-held-across-cache-io.md)).
 - Visibility is a per-code show-list in `data/playlist_visibility.json`,
   uniform for bundled and user playlists. A missing or unusable file yields
   the first-run seed (fourteen Voltaic S5, Voltaic S5.5, and Viscose codes
   plus every user-root code) without writing; a usable file is
   authoritative, even empty. Hidden playlists still load, route, and draw rank overlays
-  ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md)).
   A hidden playlist is left out of the Scenario Performance filter and the
   Journey picker, except that the filter lists the hidden playlist it holds
   ([scenario_performance.md](scenario_performance.md#the-controls-row)).
@@ -156,27 +156,27 @@ and [product.md](../product.md). Leaderboard placement is worded
   cell toggles one code with no confirm step. The file is
   `schema_version`-stamped: an unusable or newer-build file yields the seed
   and shows the yellow alert "Playlist visibility isn't being used", with a
-  warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)), carrying the
+  warning icon ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md)), carrying the
   store's message; an unusable file is copied aside by the first write, and a
   newer-build file refuses every write
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
   A refused toggle answers with a red "Show and hide are unavailable" toast
   and leaves the rows alone. The toast is a channel, so a second refused click
   re-pops the same answer rather than reading as a dead toggle
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)). An ordinary failed toggle write propagates;
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)). An ordinary failed toggle write propagates;
   nothing was committed and the next click retries
-  ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails.md)).
 - With rows and no username the status line reads "Percentiles unavailable.
   Set your KovaaK's username in Settings." with Settings linked, as the rank
   spec states
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
   On an empty grid it reads "No playlists are loaded." or "All playlists are
   hidden. Turn on the **Show hidden** switch to manage them." instead, the
   control name rendered bold
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - Both grids feed their quick filter into AG Grid's built-in one client-side.
   Both log AG Grid's `columnSizeOptions` warning on every mount
-  ([2026-07-18](../decision_log.md#2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning)).
+  ([2026-07-18](../decision_log/2026/2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning.md)).
 - Both tables have a **Columns** button: on the overview between the **Show
   hidden** switch and the **Import** button, and on the scenario table at the
   right end of the filter row. It opens a menu of one checkbox per column the
@@ -211,14 +211,14 @@ and [product.md](../product.md). Leaderboard placement is worded
   bring the sort back. On the overview, hiding Last Played leaves the rows in
   name order, and showing it again keeps them there until the page is opened
   again
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
 
 ## Import and delete
 
 - Import opens the "Import playlist" modal (field "Playlist code",
   placeholder "KovaaK's playlist code", help "Paste a KovaaK's playlist share
   code and press **Import** to add that playlist to this list.", the button
-  name bold) ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Every submit spins the button, refusing
+  name bold) ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). Every submit spins the button, refusing
   clicks, for the
   callback's duration; an empty submit sets the inline error "Enter a
   playlist code." and makes no request.
@@ -226,32 +226,32 @@ and [product.md](../product.md). Leaderboard placement is worded
   records or more than one falls back to Evxl's exact `playlist-by-code`
   before refusing; the stored code is the canonical one the resolving source
   returned, never the pasted input
-  ([2026-07-17](../decision_log.md#2026-07-17-playlist-import-falls-back-to-evxl-exact-by-code)).
+  ([2026-07-17](../decision_log/2026/2026-07-17-playlist-import-falls-back-to-evxl-exact-by-code.md)).
   Both refuse with one message, "Couldn't load a playlist for the code
   {code}. Check the code and try again.", because the Evxl fallback can fail
   on a connection error as well as an unknown code. Two outcomes never
   consult Evxl: a search that raises refuses with "Couldn't look up {code}
   on KovaaK's. Check the code and try again.", and one record with a blank
   code refuses with "The playlist data for {code} is unusable."
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Each refusal's log line keeps its diagnostic detail.
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). Each refusal's log line keeps its diagnostic detail.
 - A loaded code is refused: 'The playlist code {code} is already imported as
   "{name}".'
-  ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)),
+  ([2026-07-07](../decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)),
   plus " It is currently hidden. Turn on the **Show hidden** switch on this
   page, then click the eye icon on its row to show it." when that playlist is
-  hidden ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Refusals are red "Playlist import failed"
+  hidden ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). Refusals are red "Playlist import failed"
   toasts leaving the modal open.
 - The stamped file is written to a temp path and replaced into place after a
   destination check: a newer-build file or any healthy playlist at that
   filename refuses the import; only an unusable file is copied aside and
   replaced
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
   The newer-build refusal reads 'The playlist "{name}" ({code}) would
   replace a playlist file written by a newer version of this app. Update the
   app to import it.', the collision 'The file for this playlist already holds
   "{name}" ({code}). Delete that playlist first, then import again.', and a
   failed write 'Couldn't save the playlist file for "{name}" ({code}). See
-  data/logs/debug.log.' ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  data/logs/debug.log.' ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   Success adds the code to the show-list, enqueues warmup, closes and clears
   the modal, rebuilds rows, and toasts green "Playlist imported" / 'Imported
   "{label}" ({code}).'. A failed or refused show-list write changes only the
@@ -259,17 +259,17 @@ and [product.md](../product.md). Leaderboard placement is worded
   couldn't be marked visible, so it may be missing from playlist selectors.
   Turn on the **Show hidden** switch on this page, then click the eye icon on
   its row to show it."
-  ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails);
-  copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails.md);
+  copy as amended by [2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - Both landing toasts are channels keyed by the canonical stored code, so two
   playlists imported back to back both stand while re-importing one playlist
   replaces its own toast. Either one also clears the import-failure channel,
   which is a single channel for the whole modal: a refused submit re-pops on
   every retry, and the retry that lands takes the red toast away with it
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - Delete exists only for user playlists; it unlinks the file recorded for
   the code, drops the store entry, and forgets the show-list membership
-  ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md)).
   Bundled rows render no icon and never open the modal. "Delete playlist"
   asks 'Delete "{label}" ({code})? You can re-import it later by share
   code.' When two user files share the code, every recorded file is unlinked
@@ -279,13 +279,13 @@ and [product.md](../product.md). Leaderboard placement is worded
   data/logs/debug.log. File: {path}" and leaves the store alone, and a code
   that is not a user playlist is refused with "The playlist code {code} isn't
   one you imported, so it can't be deleted."
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). A failed show-list
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). A failed show-list
   write after the delete is logged; the green toast still shows
-  ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
+  ([2026-08-02](../decision_log/2026/2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails.md)).
   The success is a channel keyed by the deleted code and clears the
   delete-failure channel; the failure is a single channel that re-pops on each
   retry
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   Confirm handlers act only on a real click (`n_clicks`), because
   duplicate-output callbacks can fire once on page load.
 
@@ -300,16 +300,16 @@ and [product.md](../product.md). Leaderboard placement is worded
   reads a formatted rank, "Unranked",
   `N/A`, or, while pending, a blank cell with an animated ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
   Played keeps "Never"; the 30-second tick refreshes both timestamp columns
-  ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps.md)).
   PB cm/360 is known when the PB run's sensitivity is in cm/360, natively or
   by parse-time conversion
   ([scenario_performance.md](scenario_performance.md#the-graph)); a legacy run
   without DPI and increment keeps `N/A`
-  ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  ([2026-09-11](../decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)).
   PB Score and PB cm/360 show up to two decimals with trailing zeros
   dropped, so a column can read `710` beside `863.94`, and the table's `50`
   is the chart's `50.0 cm/360`
-  ([2026-09-27](../decision_log.md#2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)).
   PB Accuracy prefers damage accuracy, falling back to hit accuracy.
 - Leaderboard ID is KovaaK's numeric ID for the scenario's global
   leaderboard, read from the app's name-to-ID mapping, the value the app
@@ -322,7 +322,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   streamed row carries an ID its own lookup just learned. The column is not
   sortable, so it has no `?sort=` name. Its header tooltip reads "The number
   KovaaK's uses to identify this scenario's leaderboard in its API."
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
   The menu that shows it is specified under [the overview](#the-overview).
 - A table is a benchmark's when any of its scenarios carries a ladder, the
   overview's Type test; a playlist's table has no Rank or Next Rank column,
@@ -345,7 +345,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   cancelled fill's rebuild carry each row's ladder, so their update
   transactions never blank the two cells. When a run lands, both stay as
   they were until the page reopens, as PB Score does
-  ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md)).
 - On a time-scored scenario whose PB can be measured by pace, Next Rank reads
   "+{gap}% faster to {rank name}", such as "+2.8% faster to Lavender". The
   gap is `((C − PB) / (C − next threshold) − 1) × 100`, where `C` is the
@@ -363,7 +363,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   reads "faster" is a scenario scored by completion time, and shows how much
   faster you have to finish than your PB. Lower is closer." on every
   benchmark table
-  ([2026-10-05](../decision_log.md#2026-10-05-time-scored-scenarios-are-measured-by-pace)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   How a scenario is recognized, and when its PB can be measured by pace, is
   in
   [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
@@ -384,7 +384,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   in another shape removes the link and logs one warning. The app requests
   nothing from Evxl for the link, its logo included, which is a file the app
   bundles
-  ([2026-10-04](../decision_log.md#2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page)).
+  ([2026-10-04](../decision_log/2026/2026-10-04-a-benchmarks-scenario-page-links-to-its-evxl-page.md)).
 - Opening the route has two phases. Phase 1 paints every row from local
   stats and TTL-ignored caches with explicit pending flags per unresolved
   Position, Total Players, and Percentile cell. Phase 2 hydrates leaderboard
@@ -396,23 +396,23 @@ and [product.md](../product.md). Leaderboard placement is worded
   consumed evicted before unconsumed. The first terminal tick alone drains
   final updates and rebuilds unresolved cancelled rows cache-only; it and
   every later tick assert the settled status
-  ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+  ([2026-07-15](../decision_log/2026/2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill.md)).
   Hydration is skipped when every scenario is already mapped. Status:
   "Updating positions from KovaaK's… {done}/{total}" live; "Update
   interrupted · {done} of {total} refreshed" cancelled; "{n} of {total}
   positions unavailable" (+ " · {m} from cache · KovaaK's unreachable") or
   "{m} of {total} positions from cache · KovaaK's unreachable" degraded;
-  empty when clean ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  empty when clean ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - That status line is the fill's only report. The fill emits no
   notification, whatever the outcome: unavailable positions, positions
   served from cache, a cancelled fill, and a clean one all settle in place.
   The drain callback declares no `sendNotifications` output at all
-  ([2026-08-22](../decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)).
+  ([2026-08-22](../decision_log/2026/2026-08-22-the-playlist-fill-reports-degradation-in-place-only.md)).
 - With no username the fill is skipped, pending flags are cleared, and the
   status reads "Positions unavailable. Set your KovaaK's username in
   Settings." with Settings linked and the period outside the link
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure);
-  copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md);
+  copy as amended by [2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   A playlist deleted between phase 1 and registration settles as "Update
   interrupted" with no pending cell.
 - The table's sort lives in the page URL as
@@ -424,28 +424,28 @@ and [product.md](../product.md). Leaderboard placement is worded
   starts unsorted, in playlist order. Sorting rewrites the current entry and
   adds none. A value that is not entirely valid opens the table unsorted and
   is removed from the address, as is a sort cleared through the header
-  ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url.md)).
   The exception is a sort on a column the Columns menu has hidden. Back,
   Forward, a reload, and a copied link do not restore or keep it: it is
   cleared on arrival and its name is removed from the address, while any
   other sort in the value is kept, as are the other query parameters and the
   hash
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
   A benchmark's table also takes `rank` and `next-rank`. On a playlist's
   table they name no column, so a value holding either is not valid there
-  ([2026-09-27](../decision_log.md#2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md)).
 - The scenarios grid owns vertical scrolling inside the AppShell viewport
   with a 300px minimum height
-  ([2026-07-06](../decision_log.md#2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling));
+  ([2026-07-06](../decision_log/2026/2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling.md));
   the overview grid uses the same layout, the floor being each grid's inline
   `minHeight` style. Neither declares initial `rowData`, so the loading
   overlay owns the gap
-  ([2026-07-16](../decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
+  ([2026-07-16](../decision_log/2026/2026-07-16-keep-pre-hydration-states-honest.md)).
 - Both grids draw every row, in view or not, so the browser's own text
   search (Ctrl+F) finds any row and scrolls the grid to it, with the header
   still in view. A search steps through its matches in the order the rows
   sit in the page, which after a sort is not their order on screen
-  ([2026-10-12](../decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them.md)).
 - Cell text on both tables can be selected and copied. In every cell but a
   name cell, a double-click or a drag selects it. A name cell navigates on
   a click, so a double-click there opens the name on its first click, and
@@ -455,12 +455,12 @@ and [product.md](../product.md). Leaderboard placement is worded
   screen. The merged Category and Subcategory cells cannot be selected. A
   drag down several rows after a sort selects rows in the order they sit
   in the page, not their order on screen
-  ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 
 ## Categories and subcategories on a benchmark's table
 
 All of this section is set by the
-[2026-10-06 entry](../decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory),
+[2026-10-06 entry](../decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md),
 except where another entry is linked.
 
 - A bundled benchmark's table gains up to two columns ahead of Scenario,
@@ -476,7 +476,7 @@ except where another entry is linked.
   header shows no text. The header's accessible name and its tooltip are
   "Category" or "Subcategory". The column can't be resized, sorted, or moved,
   and it has no `?sort=` name
-  ([2026-09-27](../decision_log.md#2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-the-playlist-scenario-table-keeps-its-sort-in-the-page-url.md)).
 - Its cells merge down each run of neighboring rows that share a group, over
   the rows as displayed. Two groups that share a name across a category
   boundary stay two cells. A merged cell is filled with its group's color,
@@ -516,14 +516,14 @@ except where another entry is linked.
   again leaves it 34 px wide. A stored choice applies as the page opens. The
   stored choices are keyed by the column IDs `category` and `subcategory`.
   Hiding a sorted column through the menu clears that sort
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)),
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)),
   and when that leaves no sort and an empty filter box, the table is grouped
   again.
 - The first paint, the fill's streamed rows, and a cancelled fill's rebuild
   all carry a row's group, so an update transaction never blanks a group
   cell, and a row that streams in while the table is ungrouped draws its
   second line
-  ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+  ([2026-07-15](../decision_log/2026/2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill.md)).
   The 30-second timestamp tick redraws the two timestamp columns and nothing
   else.
 - The groups come from Evxl's benchmark snapshot
@@ -558,16 +558,16 @@ except where another entry is linked.
 
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
-  ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface));
+  ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md));
   261 files as of 2026-09-26. It holds Evxl's listed, non-hidden benchmarks:
   a benchmark Evxl delists is removed even if KovaaK's still serves it, and
   a hidden one waits until Evxl unhides it
-  ([2026-09-15](../decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)).
+  ([2026-09-15](../decision_log/2026/2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks.md)).
   User playlists live under `data/playlists/`, created on first import.
   Files load in `(filename.casefold(), filename)`
   order per root, bundled root first; the first file for a code wins, and a
   shadowed one is skipped with a startup warning buffered for the UI
-  ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)).
+  ([2026-07-07](../decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)).
   Those warnings drain only when the Scenario Performance page mounts, as
   persistent yellow toasts titled "Playlist not loaded"; an app session that
   starts on `/playlists` sees them after its first visit there. Each body
@@ -575,12 +575,12 @@ except where another entry is linked.
   isn't valid JSON. File: {path}", and a shadowed file reads "Skipped a
   duplicate playlist file. Its playlist code {code} is already loaded from
   another file. Skipped file: {path} · Loaded file: {path}"
-  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - A user file whose code a bundled benchmark serves is recorded and never
   deleted at startup; the overview offers an in-app cleanup instead
-  ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
+  ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md)).
   The notice is a blue panel with an info icon, not a `dmc.Alert`, because it
-  holds a button ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)). It is titled "Leftover playlist files" and reads "1
+  holds a button ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md)). It is titled "Leftover playlist files" and reads "1
   leftover playlist file in data/playlists is superseded by bundled
   benchmarks." or
   "{N} leftover playlist files in data/playlists are superseded by bundled
@@ -592,11 +592,11 @@ except where another entry is linked.
   files already gone, keeps any that fail, and toasts "Leftover files deleted"
   or red "Cleanup failed". Both are channels, and the success clears the
   failure
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
 - User files are stamped and read through the store state machine (unusable
   or newer files skipped with an actionable warning); bundled files are
   unstamped by design
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
 - Every bundled scenario carries a `leaderboard_id`; startup merges the
   corpus's name→ID pairs (excluding names two files disagree on) into the
   permanent mapping cache: a live-learned entry is never overwritten, a
@@ -605,7 +605,7 @@ except where another entry is linked.
   generated file carries a `generated_from` stamp whose `schema_version`
   marks files written under an older schema as stale, so a plain importer
   run regenerates them through the benchmark payload cache without `--force`
-  ([2026-07-20](../decision_log.md#2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus)).
+  ([2026-07-20](../decision_log/2026/2026-07-20-seed-leaderboard-ids-from-the-bundled-benchmark-corpus.md)).
   The runtime lookup is the [rank spec](scenario_rank.md)'s. That cache is
   the app's KovaaK's benchmark cache under `data/cache/benchmarks/`; Evxl is
   re-queried on every regeneration. The stamp holds sharecode, benchmark ID,
@@ -617,14 +617,14 @@ except where another entry is linked.
   Only a bundled file's stamp is read, a missing or malformed one reads as no
   ID without stopping the file from loading, and when two bundled files share
   a code the table holds the winner's ID
-  ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
+  ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
   An empty bundled root also suppresses removals.
 - `scripts/benchmark_importer/` resolves playlist names and codes and the
   ordered (rank name, color) ladder through Evxl, and thresholds plus each
   scenario's `leaderboard_id` through KovaaK's, pairing the ladder with
   `rank_maxes` positionally; sharecodes Evxl lists twice with different
   payloads are skipped and reported
-  ([2026-07-03](../decision_log.md#2026-07-03-import-benchmarks-from-evxl-and-kovaaks)).
+  ([2026-07-03](../decision_log/2026/2026-07-03-import-benchmarks-from-evxl-and-kovaaks.md)).
   A rank-count mismatch or an empty benchmark is a deterministic failure.
   Deterministic failures land in `generated/failures.json` with the Evxl
   signature they failed against and are skipped until that changes,
@@ -635,7 +635,7 @@ except where another entry is linked.
   committed snapshot and reports drift by whole-benchmark inequality;
   regeneration still keys on Evxl metadata, so a refresh regenerates the
   files the check names
-  ([2026-09-26](../decision_log.md#2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed)).
+  ([2026-09-26](../decision_log/2026/2026-09-26-a-read-only-check-finds-bundled-benchmarks-that-kovaaks-changed.md)).
   Operator steps, including the refresh runbook, are
   in the [importer readme](../../scripts/benchmark_importer/readme.md); the
   script is exempt from the lint and type gates
@@ -654,11 +654,11 @@ except where another entry is linked.
   and an app-session outcome map; that recheck runs with the worker's lock
   released, so a warm-cache drain (where every queued scenario is skipped)
   delays neither the status line nor an import or unhide
-  ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
+  ([2026-09-02](../decision_log/2026/2026-09-02-warmup-locks-are-never-held-across-cache-io.md)).
   UNRANKED is cached only after one positive
   username validation per app session. `percentile_warmup_enabled = false` or an
   empty username skips the worker
-  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
+  ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)).
   Within each playlist, scenarios lacking a displayable percentile queue
   first, then most recently played; the prepend uses the same order. The quiet
   window is five seconds; the backoff ladder runs 30 s to 30 min. Connection
@@ -671,8 +671,8 @@ except where another entry is linked.
 - An unknown username stops the queue for the app session, whether confirmed by
   the API or by a fresh cached marker; the overview's status line and a
   WARNING log carry it, with no toast
-  ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)
+  ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)
   as amended by
-  [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  [2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   An unexpected exception in hydration or an item stops the queue the same
   way.
