@@ -4,8 +4,8 @@ The two surfaces explain why a page has no runs to show. The card speaks for
 a setting that was never written, or for a settings file the app cannot read.
 The hint speaks for a stats folder that is set and cannot be used. A page
 puts ``stats_dir_hint`` and a container holding ``setup_card_children`` in its
-layout. Nothing here registers a callback: the Skip button is answered by the
-page that offers it.
+layout, and gives each an id of its own. Nothing here registers a callback:
+the Skip button is answered by the page that offers the account.
 """
 
 import dash_mantine_components as dmc
@@ -67,8 +67,10 @@ SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
 STATS_DIR_HINT_CLASS = "alert-panel alert-panel-caution stats-dir-hint"
 
 
-def stats_dir_hint() -> list:
+def stats_dir_hint(hint_id: str) -> list:
     """Say so, persistently, when the app booted without a stats directory.
+
+    ``hint_id`` is the id the hosting page gives the panel.
 
     Unset and unusable read the same to the user, and both are repaired in the
     same place, so the hint carries one link to the settings page.
@@ -104,7 +106,11 @@ def stats_dir_hint() -> list:
     if get_usable_stats_dir() is not None:
         return []
     if is_stats_dir_change_pending() and settings.get(STATS_DIR_KEY):
-        return [_stats_dir_hint_panel("Restart the app to apply your saved settings.")]
+        return [
+            _stats_dir_hint_panel(
+                "Restart the app to apply your saved settings.", hint_id
+            )
+        ]
     if STATS_DIR_KEY not in settings:
         return []
     return [
@@ -113,12 +119,13 @@ def stats_dir_hint() -> list:
                 "No stats folder configured. Set it in ",
                 dmc.Anchor("Settings", href="/settings", refresh=False),
                 ".",
-            ]
+            ],
+            hint_id,
         )
     ]
 
 
-def _stats_dir_hint_panel(sentence: str | list) -> dmc.Paper:
+def _stats_dir_hint_panel(sentence: str | list, hint_id: str) -> dmc.Paper:
     """Wrap one hint sentence in the caution panel: the icon beside it, no title.
 
     A ``dmc.Paper`` rather than a ``dmc.Alert`` because the unconfigured
@@ -139,7 +146,7 @@ def _stats_dir_hint_panel(sentence: str | list) -> dmc.Paper:
             align="flex-start",
         ),
         className=STATS_DIR_HINT_CLASS,
-        id="stats-dir-hint",
+        id=hint_id,
         withBorder=True,
     )
 
@@ -212,8 +219,13 @@ def _setup_card(
     )
 
 
-def setup_card_children() -> list:
+def setup_card_children(*, offer_account: bool) -> list:
     """Ask, once, for whatever setup the app could not do on the user's behalf.
+
+    ``offer_account`` is whether the page shows the account offer, the one
+    state with Skip. A page that only explains why it has no runs to show
+    passes ``False`` and gets the two caution states alone. A page that
+    passes ``True`` answers the Skip button, ``SETUP_CARD_SKIP_ID``.
 
     Read from the stored view rather than the pinned accessors, and keyed on
     key *absence*: the card is the "never asked" surface, so a key that exists
@@ -260,7 +272,7 @@ def setup_card_children() -> list:
                 caution=True,
             )
         ]
-    if KOVAAKS_USERNAME_KEY not in settings:
+    if offer_account and KOVAAKS_USERNAME_KEY not in settings:
         return [
             _setup_card(
                 SETUP_CARD_IDENTITY_TITLE,

@@ -7,6 +7,8 @@ and are tested with their page.
 
 import json
 
+from dash._callback_context import falsy_triggered
+
 from source.app_shell import RunEventBatch, RunEventData
 from source.components import run_delivery
 from source.components.run_delivery import RunEventsPayload
@@ -130,3 +132,27 @@ def test_the_decision_travels_even_when_it_names_another_scenarios_run():
 
     assert payload["celebrated_run_id"] == "pb.csv"
     assert payload["latest"]["run_id"] == "ordinary.csv"
+
+
+def test_run_events_were_triggered_reads_the_trigger_and_not_the_value():
+    """The store replays its last summary, so only the trigger says a run landed."""
+    prop = "page-run-events.data"
+
+    assert run_delivery.run_events_were_triggered([{"prop_id": prop}], prop)
+    assert run_delivery.run_events_were_triggered(
+        [{"prop_id": "page-scenario.value"}, {"prop_id": prop}], prop
+    )
+    assert not run_delivery.run_events_were_triggered(
+        [{"prop_id": "page-scenario.value"}], prop
+    )
+    # Another page's store is not this page's.
+    assert not run_delivery.run_events_were_triggered(
+        [{"prop_id": "run-events.data"}], prop
+    )
+
+
+def test_a_call_nothing_triggered_is_not_a_landed_run():
+    """Dash hands an untriggered call a falsy list that still holds one item."""
+    assert not run_delivery.run_events_were_triggered(
+        falsy_triggered, "page-run-events.data"
+    )

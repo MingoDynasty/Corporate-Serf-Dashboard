@@ -36,6 +36,7 @@ from source.components.queued_notices import (
 from source.components.run_delivery import summarize_run_events
 from source.components.run_verdict_toast import build_run_event_notification
 from source.components.scenario_selection import (
+    SELECT_HIGHLIGHT_ON_OPEN_CLASS,
     ScenarioSelectionIds,
     deep_link_selection,
     initial_scenario_options,
@@ -102,12 +103,6 @@ logger = logging.getLogger(__name__)
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
-# Marks a dropdown's input for ``assets/selectHighlightOnOpen.js``, which
-# highlights the selected name when the list opens. dmc's
-# ``clearSearchOnFocus`` buys the same click-and-type search by emptying the
-# field instead, which leaves no name on screen to copy; setting it beside
-# this class empties the field before the script can highlight anything.
-SELECT_HIGHLIGHT_ON_OPEN_CLASS = "select-highlight-on-open"
 # The ids this page gives its playlist filter and scenario dropdown. The
 # browser stores each dropdown's value under its id, so changing one resets
 # that selection for every user.
@@ -164,6 +159,7 @@ CHART_OPTIONS_REFLOW_BREAKPOINT = HOME_GRID_BREAKPOINTS["md"]
 # The first-run setup card. Its container is always in the layout so the Skip
 # callback has an output to write to; the card itself is what comes and goes.
 SETUP_CARD_ID = "setup-card"
+STATS_DIR_HINT_ID = "stats-dir-hint"
 # Shown when Skip cannot be recorded, either because the settings file belongs
 # to a newer build or because the write itself failed. The card has to stay up
 # (nothing was written), so the toast is what explains why the click appeared
@@ -612,8 +608,11 @@ def layout(
                 interval=30_000,
                 n_intervals=0,
             ),
-            *stats_dir_hint(),
-            dmc.Box(id=SETUP_CARD_ID, children=setup_card_children()),
+            *stats_dir_hint(STATS_DIR_HINT_ID),
+            dmc.Box(
+                id=SETUP_CARD_ID,
+                children=setup_card_children(offer_account=True),
+            ),
             dmc.Grid(
                 children=[
                     dmc.GridCol(

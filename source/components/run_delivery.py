@@ -48,3 +48,17 @@ def summarize_run_events(
         "latest": matching_runs[-1],
         "celebrated_run_id": batch["celebrated_run_id"],
     }
+
+
+def run_events_were_triggered(
+    triggered: list[dict[str, str]],
+    run_events_prop: str,
+) -> bool:
+    """Return whether a callback invocation was caused by new run events.
+
+    ``triggered`` is ``ctx.triggered``, and ``run_events_prop`` names the
+    page's summary store as a trigger does: its id, a dot, and ``data``. The
+    store replays its last summary to every later call, so the value alone
+    cannot say that a run has just landed.
+    """
+    return any(trigger["prop_id"] == run_events_prop for trigger in triggered)

@@ -191,11 +191,14 @@ def test_the_run_notification_switch_is_state_not_input():
     """Flipping the preference must not rebuild the plot.
 
     Keyed by an output this callback writes, so it survives the dependency
-    list growing around it.
+    list growing around it. Anchored at the start, because the Run History
+    page's own store id ends the same way.
     """
-    spec = next(
-        spec for key, spec in GLOBAL_CALLBACK_MAP.items() if "cached-plot.data" in key
-    )
+    (spec,) = [
+        spec
+        for key, spec in GLOBAL_CALLBACK_MAP.items()
+        if key.startswith("..cached-plot.data...")
+    ]
 
     assert "run-notification-switch" not in {dep["id"] for dep in spec["inputs"]}
     assert ("run-notification-switch", "checked") in {

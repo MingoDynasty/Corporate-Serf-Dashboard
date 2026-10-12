@@ -15,6 +15,7 @@ import pytest
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
+from source.components import scenario_selection  # noqa: E402
 from source.pages import home  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -57,8 +58,10 @@ def test_dropdown_input_carries_the_class_the_script_finds_it_by(select_id, scri
     select = _dropdown(select_id)
 
     assert select.searchable is True
-    assert select.classNames == {"input": home.SELECT_HIGHLIGHT_ON_OPEN_CLASS}
-    assert f'"input.{home.SELECT_HIGHLIGHT_ON_OPEN_CLASS}"' in script
+    assert select.classNames == {
+        "input": scenario_selection.SELECT_HIGHLIGHT_ON_OPEN_CLASS
+    }
+    assert f'"input.{scenario_selection.SELECT_HIGHLIGHT_ON_OPEN_CLASS}"' in script
 
 
 @pytest.mark.parametrize("select_id", DROPDOWN_IDS)

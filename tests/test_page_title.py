@@ -15,6 +15,7 @@ from source.pages import (  # noqa: E402, F401
     home,
     playlist_scenarios,
     playlists,
+    run_history,
     settings,
 )
 from source.pages import page_title as page_title_module  # noqa: E402
@@ -125,6 +126,7 @@ def test_registration_does_not_read_the_config(
     ("module", "expected"),
     [
         ("source.pages.home", "Scenario Performance"),
+        ("source.pages.run_history", "Run History"),
         ("source.pages.playlists", "Playlists"),
         ("source.pages.settings", "Settings"),
         ("source.pages.aim_training_journey", "Aim Training Journey"),
@@ -135,7 +137,7 @@ def test_every_static_page_resolves_its_own_title(
     module: str,
     expected: str,
 ) -> None:
-    """All five registration sites go through the helper, prefix included."""
+    """Every static registration site goes through the helper, prefix included."""
     _set_flag(monkeypatch, True)
     _set_build(monkeypatch, CHECKOUT_BUILD)
 
@@ -147,7 +149,7 @@ def test_every_static_page_resolves_its_own_title(
 def test_the_templated_page_resolves_its_playlist_title(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The fifth site keeps the playlist name Dash passes it per request."""
+    """The templated site keeps the playlist name Dash passes it per request."""
     _set_flag(monkeypatch, True)
     _set_build(monkeypatch, CHECKOUT_BUILD)
     monkeypatch.setattr(

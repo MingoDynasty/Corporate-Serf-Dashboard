@@ -26,6 +26,15 @@ from source.plot.plot_service import (
 
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
+# What the Score threshold percentage help says on both pages, before the
+# sentence about what judges a run, which each page words for itself.
+_SCORE_THRESHOLD_PERCENTAGE_HELP = (
+    "Sets the score goal as a percentage of your personal best. On a "
+    "scenario scored by completion time, it's a percentage of your "
+    "personal best's pace instead, when the app can measure pace "
+    "reliably. Otherwise, it stays a percentage of your score. The "
+    "overlay line tracks your current personal best. "
+)
 SETTINGS_HELP_TEXT: dict[str, str | list] = {
     "automatically-change-scenario": (
         "Automatically selects the scenario you just played when a new run is detected."
@@ -48,12 +57,9 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         "current personal best."
     ),
     "score-threshold-percentage": (
-        "Sets the score goal as a percentage of your personal best. On a "
-        "scenario scored by completion time, it's a percentage of your "
-        "personal best's pace instead, when the app can measure pace "
-        "reliably. Otherwise, it stays a percentage of your score. The "
-        "overlay line tracks your current personal best. Notifications judge "
-        "a run against the personal best you had before the run."
+        _SCORE_THRESHOLD_PERCENTAGE_HELP
+        + "Notifications judge a run against the personal best you had before "
+        "the run."
     ),
     "score-threshold-notification": [
         "Adds a pass or fail verdict to run notifications when the run can be "
@@ -71,6 +77,19 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         control_name("Score vs Time"),
         ". A new run that lands in the top N also triggers a notification.",
     ],
+    # The Run History page's wording of two of the texts above. Its Follow
+    # clears a playlist filter that does not list the scenario just played,
+    # and on it a toast is not the only thing that judges a run.
+    "automatically-change-scenario-run-history": [
+        "Automatically selects the scenario you just played when a new run is "
+        "detected. If the ",
+        control_name("Playlist filter"),
+        " doesn't list that scenario, the filter is cleared.",
+    ],
+    "score-threshold-percentage-run-history": (
+        _SCORE_THRESHOLD_PERCENTAGE_HELP
+        + "A run is judged against the personal best you had before the run."
+    ),
 }
 # The chart options inspector. Its collapsed class is the open state: hiding
 # with ``display: none`` takes the controls out of the tab order and the
@@ -230,8 +249,19 @@ def _chart_options_group(title: str, controls: list) -> dmc.Stack:
     )
 
 
-def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
-    """Build the collapsible inspector that sits beside the chart."""
+def chart_options_panel(
+    ids: ChartOptionsIds,
+    *,
+    score_threshold_percentage_help: str | list = SETTINGS_HELP_TEXT[
+        "score-threshold-percentage"
+    ],
+) -> dmc.Box:
+    """Build the collapsible inspector that sits beside the chart.
+
+    ``score_threshold_percentage_help`` is the help text of the Score
+    threshold percentage field, which says what judges a run and so differs
+    between the pages that host the panel.
+    """
     return dmc.Box(
         id=ids.panel,
         className=_chart_options_panel_class(False),
@@ -360,7 +390,7 @@ def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
                         id=ids.score_threshold_percentage,
                         label=settings_help_label(
                             "Score threshold percentage",
-                            SETTINGS_HELP_TEXT["score-threshold-percentage"],
+                            score_threshold_percentage_help,
                         ),
                         min=1,
                         persistence=True,
