@@ -470,8 +470,8 @@ except where another entry is linked.
   Category or Subcategory entry in its Columns menu: a playlist, a playlist
   imported by code, a benchmark whose snapshot counts don't add up to its
   scenario count, one whose layout names nothing, and one on the exclusion
-  list. As of 2026-10-06, 258 of the 261 bundled benchmarks have groups, 180
-  with two levels and 78 with one.
+  list. As of 2026-10-12, 261 of the 265 bundled benchmarks have groups, 182
+  with two levels and 79 with one.
 - Each group column is 34 px wide and pinned to the table's left edge. Its
   header shows no text. The header's accessible name and its tooltip are
   "Category" or "Subcategory". The column can't be resized, sorted, or moved,
