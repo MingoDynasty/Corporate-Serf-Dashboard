@@ -345,12 +345,14 @@ So the rule for the window is: **a PR opened before the split merges only
 after it has synced with `main` and passed the gates again.** The rewrite
 rules in the Links table convert its links.
 
-On 2026-10-12 two other PRs are open, one of each kind:
+When this was written, on 2026-10-12, two other PRs were open, one of each
+kind:
 
 - [#360](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/360)
-  adds an entry to the log, and links to it in the old form.
+  added an entry to the log, and linked to it in the old form.
 - [#356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356)
-  does not edit the log, and adds 20 links in the old form.
+  did not edit the log, and added 20 links in the old form. It has since
+  merged.
 
 The maintainer picks the moment. The fewer PRs open, the shorter the window.
 
