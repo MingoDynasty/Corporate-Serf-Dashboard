@@ -102,13 +102,33 @@ each, on the Playlists table and on a grouped scenario table:
 - The name cell has the pointer, and the row and the cell checked beside it
   do not. Cell text computes as selectable, and the merged cells as not.
 
+**Checked by hand.** The automation delivers a double-click to Firefox as
+two single clicks, and its Firefox drags selected text from other cells and
+rows, on the old build as on the new one. So the maintainer tried the built
+branch by hand in Firefox on 2026-10-12, and reported each of these as
+working:
+
+- A double-click selects a value, and it can be copied.
+- A drag across the text of one cell selects that text.
+- A drag across a name, from the empty space beside it, selects the name
+  and does not open it. A click on the name afterwards still opens it.
+- A merged cell's label does not select.
+- A click on any other cell does nothing, and a click on a name or in the
+  empty part of its cell opens it.
+
+**A defect the hand test found.** A Ctrl+click on a name's text opens a new
+tab, and a Ctrl+click in the same cell beside the text navigates the current
+tab. The link is only as wide as its text, and a click beside it reaches the
+grid's own route, which cannot see modifier keys. It predates this change,
+which leaves the link and the scenario route as they were, and before it the
+Playlists table's whole row behaved this way. It ships as it is, a minor
+defect with a fix to come
+([tech debt](tech_debt.md#a-modified-click-beside-a-name-on-the-playlist-tables-navigates-the-current-tab)).
+
 **Not verified.**
 
-- Double-click selection in Firefox. The automation delivers a double-click
-  there as two single clicks, so it was checked in Edge only.
-- Dragging with a real mouse in Firefox. Under the automation a Firefox drag
-  selected text from other cells and rows, on the old build as on the new
-  one, so nothing here says what a hand-held drag selects there.
+- A drag across several cells and rows in Firefox. The hand test reported
+  no problem with one, without saying what it selected.
 - A drag down several rows after a sort. In Edge it picked up text from 14
   rows for 4 dragged over, because the grid leaves rows in the page in their
   old order. `ensureDomOrder` fixes that and is left for a change of its own,
