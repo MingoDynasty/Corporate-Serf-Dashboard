@@ -16,11 +16,15 @@ beside the old page and stays hidden until it can replace it in one release.
 
 ## Decisions needed
 
-**Nothing in this proposal is ratified.** Seven rows need the maintainer's
-judgment, R1 to R7. Each is the maintainer's lean or agreement in chat on
-2026-10-10, quoted where the row has their words, and argued here. A lean is
-not a ruling: reviewers are invited to contest any row, and any author-owned
-choice in [Design](#design).
+Seven rulings: R1 to R7. The maintainer ratified this proposal on
+2026-10-12: "I ratify the proposal." That settles each row as its
+recommendation, R2 as written and R4 with the check added at the direction
+checkpoint. Both review seats had endorsed all seven rows. Two rows were
+contested in review, R2 and R4, and each records the alternative that was
+not taken. Each row keeps what the maintainer said in chat, its argument,
+and what the alternatives would have changed, for the record. Everything
+else is author-owned, in [Design](#design), and the ratification covers it
+too, with the build approach.
 
 This is piece 4 of 5 of the Run History work. The groundwork, three refactor
 PRs with no proposal, has merged. Sessions is ratified and built: its
@@ -36,8 +40,7 @@ page. All scenarios is a later proposal. Two things cross between them:
   session. The functions exist, and this page is their first caller.
 - **The Run toasts proposal takes this page's name and address, and R7's
   rule for its link.** Its three rows were ratified leaning on R1, R2, and
-  R7 here, which are still open. If one of them goes another way, the
-  toast's link follows.
+  R7 here. All three are now ratified as it assumed.
 
 **Already decided, and binding here.** The proposal is held to these and
 doesn't reopen them:
@@ -74,7 +77,12 @@ doesn't reopen them:
 
 ### R1. The page is named Run History
 
-Status: Open. The maintainer, 2026-10-10: "I agree to reverse this decision."
+Status: Ratified (user), 2026-10-12: accept the recommendation below. Before
+that, the maintainer, 2026-10-10: "I agree to reverse this decision."
+
+The material consequence: the page, its navbar link, and its browser tab
+read "Run History" from the release that makes it public, and "Scenario
+Performance" stays only where history keeps it.
 
 **Recommendation: the navbar link, the page name, and the browser tab read
 "Run History".** This reverses one of the four rulings of the
@@ -109,10 +117,16 @@ was ratified as "Open in Run History", has to be worded again.
 
 ### R2. Run History gets its own address, and `/` becomes Home
 
-Status: Open. The maintainer, 2026-10-10: "Does it make sense to create a
-placeholder Home page for now? Eventually this will become the Overview page,
-which I plan to design/propose/ship after Run History page. This way the
-first time setup cards can live on its proper page."
+Status: Ratified (user), 2026-10-12: accept the recommendation below, with
+no forwarding of an old parameterized link. Before that, the maintainer,
+2026-10-10: "Does it make sense to create a placeholder Home page for now?
+Eventually this will become the Overview page, which I plan to
+design/propose/ship after Run History page. This way the first time setup
+cards can live on its proper page."
+
+The material consequence: the launcher opens Home, so each start is one
+click from Run History until the Overview ships. An old `/?scenario=` or
+`/?playlist_code=` link draws Home and selects nothing.
 
 **Recommendation: Run History is served at `/run-history`. `/` serves a new
 Home page, and `/home` and `/index` still redirect to it. Home holds the
@@ -173,8 +187,13 @@ removed again when the Overview ships.
 
 ### R3. The run list is a second column
 
-Status: Open. The maintainer's lean in the design discussion of 2026-10-06
-and 2026-10-07, from a full-size mockup.
+Status: Ratified (user), 2026-10-12: accept the recommendation below. Before
+that, the maintainer's lean in the design discussion of 2026-10-06 and
+2026-10-07, from a full-size mockup.
+
+The material consequence: the run list takes a column of its own, about
+500 px wide and always shown. The chart is narrower than it is today, and
+narrower again while Chart options is open.
 
 **Recommendation: the latest-run card sits in the top row, the chart is
 below it on the left, and the run list is below it on the right, about
@@ -223,12 +242,19 @@ options take turns in it.
 
 ### R4. The run list is built on AG Grid Community, with hand-built group rows
 
-Status: Open. **Both prototypes were checked with NVDA on 2026-10-11.** The
-maintainer, 2026-10-10, after trying both prototypes in Firefox and reading
-the library research: "let's go with AG Grid". Asked how to record that:
-"Take it as lean". That lean predates the NVDA result below. On 2026-10-12,
-with that result read, the maintainer agreed to the check on the built list
-that this row now carries.
+Status: Ratified (user), 2026-10-12: accept the recommendation below, with
+the check on the built list. **Both prototypes were checked with NVDA on
+2026-10-11.** Before the ratification, the maintainer, 2026-10-10, after
+trying both prototypes in Firefox and reading the library research: "let's
+go with AG Grid". Asked how to record that: "Take it as lean". That lean
+predates the NVDA result below. On 2026-10-12, with that result read, the
+maintainer agreed to the check on the built list that this row carries.
+
+The material consequence: the list is the grid the app's other tables use,
+made to behave as a tree by nine pieces of work that each need a recheck on
+an AG Grid upgrade. NVDA is run on the built list before the page goes
+public. A task it can't do is the maintainer's to decide, and does not by
+itself hold the release.
 
 **Recommendation: build the list on the grid the app's other tables use,
 dash-ag-grid 35.3.0 in its free edition. A session row is a full-width row
@@ -349,8 +375,13 @@ under it, and the list has no row virtualization.
 
 ### R5. The chart plots every run
 
-Status: Open. The maintainer, 2026-10-07: "ship Run History without the
-Median line", and "Average score line - we'll drop this".
+Status: Ratified (user), 2026-10-12: accept the recommendation below. Before
+that, the maintainer, 2026-10-07: "ship Run History without the Median
+line", and "Average score line - we'll drop this".
+
+The material consequence: the chart plots every run in its range, and no
+mode draws a summary line. Score vs Sensitivity shows every run at each
+sensitivity, with nothing that sums a sensitivity up, until its redesign.
 
 **Recommendation: the chart plots every run in its range. The Top N scores
 control, the Oldest date to consider picker, and the Average score line go.
@@ -399,8 +430,12 @@ it.
 
 ### R6. Stars are drawn on Score vs Run
 
-Status: Open. The maintainer, 2026-10-10, on stars in Score vs Run and Score
-vs Time and not in Score vs Sensitivity: "Agreed."
+Status: Ratified (user), 2026-10-12: accept the recommendation below. Before
+that, the maintainer, 2026-10-10, on stars in Score vs Run and Score vs
+Time and not in Score vs Sensitivity: "Agreed."
+
+The material consequence: the chart opens on a mode that stars each new PB,
+and the 2026-10-05 ruling that only Score vs Time is marked is extended.
 
 **Recommendation: Score vs Run stars each plotted run that was a new PB, as
 Score vs Time does. Score vs Sensitivity still has none.** This extends the
@@ -430,10 +465,15 @@ chart with no stars beside a list that has them.
 
 ### R7. Follow and a `?scenario=` link clear a Playlist filter that does not list the scenario
 
-Status: Open. The maintainer, 2026-10-10, on Follow: "For now if this
-happens, we can simply unfilter the playlist, as it probably implies that
-the user is not playing the playlist anymore." On the link: "I initially
-lean yes, but what is your take?"
+Status: Ratified (user), 2026-10-12: accept the recommendation below. Before
+that, the maintainer, 2026-10-10, on Follow: "For now if this happens, we
+can simply unfilter the playlist, as it probably implies that the user is
+not playing the playlist anymore." On the link: "I initially lean yes, but
+what is your take?"
+
+The material consequence: Follow and a link to a scenario empty a Playlist
+filter that does not list it, and the browser remembers the emptied filter.
+One run outside a playlist means picking the playlist again.
 
 **Recommendation: when Follow lands on a scenario the Playlist filter does
 not list, or a `?scenario=` link names one, the filter is cleared and the
@@ -495,8 +535,8 @@ changes landing in one release: "I think this is a non-issue."
 `claude-fable-5-1` first recommended changing the page in place, in shipped
 slices. Its breakdown of 2026-10-10 no longer contests the new page: the
 smaller version 1 gives most of what changing in place offered, and the
-groundwork is the same work either way. It settles when this proposal is
-ratified.
+groundwork is the same work either way. It was ratified with this proposal
+on 2026-10-12.
 
 ## Problem
 
@@ -622,8 +662,8 @@ carries what a reviewer needs from them.
 
 ## Design
 
-Every choice in this section is author-owned unless it names a row. Each is
-open to challenge.
+Every choice in this section is author-owned unless it names a row. The
+ratification of 2026-10-12 covers them.
 
 ### The page at a glance
 
@@ -1485,7 +1525,7 @@ that a rewrite left them only in git history.
     sessions come before either view, so "it needs no sessionization" no
     longer sets the order. Which view ships first was left open for the
     rewrite to decide.
-  - **Decided here, if this proposal is ratified:** view (2) ships first, on
+  - **Decided here, and ratified on 2026-10-12:** view (2) ships first, on
     sessions, as version 1's run list. View (1) is the All scenarios
     proposal's.
 
@@ -1497,8 +1537,9 @@ answered by R3.
 
 ### Optional, beyond the outline
 
-None of these is proposed. Each is a small addition a reviewer or the
-maintainer may want, with what it would cost.
+None of these is proposed, and the ratification does not cover them. Each
+is a small addition a reviewer or the maintainer may want, with what it
+would cost.
 
 - **The Score threshold percentage stops at 100.** Above 100 every check
   sits on a run that is also a new PB. The spec allows a goal above 100
@@ -1526,8 +1567,8 @@ and nothing linking to it, so nothing moves when it goes public.
    once. Chart options. Deep links, R7, and a layout that accepts a
    parameter it doesn't name. The stats-folder hint and the setup card's two
    yellow states.
-   - Needs this proposal ratified. The three groundwork PRs it also needed
-     have merged.
+   - Unblocked: this proposal was ratified on 2026-10-12, and the three
+     groundwork PRs it also needed have merged.
    - Measures and reports: the chart's box at 1400, 1600, and 1920 px with
      Chart options open and closed, and the zoom fit on Score vs Run's axis.
    - Recommended: `claude-opus-5-5` at xhigh. It carries the persistence
@@ -1583,11 +1624,11 @@ session. The Run toasts PR lands with PR 4 or after it.
   stored "off" for **Run notifications** is lost once whenever its change
   lands. Landing with PR 4, that is part of the one-time reset. Landing
   later, it is a second reset, for that one switch.
-- **R4 stalls review.** The run list and the card split into a proposal of
-  their own, which depends on this one and never the reverse. That lets the
-  rest be ratified and its first PR start. It changes nothing about what
-  goes public: the old page stays public until the list and the card have
-  shipped too. Going public with the chart alone would drop the surfaces
+- **R4 stalls review.** It did not: R4 was ratified with the rest on
+  2026-10-12, so the split this fallback describes was not needed. Its rule
+  stands for any later split of the work: the old page stays public until
+  the list and the card have shipped too. Going public with the chart alone
+  would drop the surfaces
   that hold a run's verdict, which the ratified Run toasts proposal depends
   on. That would need a direction decision of its own.
 - **The walk on the built list finds a task NVDA can't do.** The walk is
