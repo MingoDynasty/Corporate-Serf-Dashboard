@@ -10,7 +10,8 @@ in behind them, while a background worker keeps the overview's percentile
 columns warm.
 Each table has a Columns menu that shows or hides its columns and remembers
 the choice in the browser, with one KovaaK's ID column that starts hidden,
-and each draws every row, so the browser's own text search finds any of them.
+and each draws every row as text that can be selected and that the browser's
+own text search finds.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -438,12 +439,15 @@ and [product.md](../product.md). Leaderboard placement is worded
   still in view. A search steps through its matches in the order the rows
   sit in the page, which after a sort is not their order on screen
   ([2026-10-12](../decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
-- Cell text on both tables can be selected and copied, by a double-click or
-  by dragging. The merged Category and Subcategory cells are the exception.
-  A drag that selects text and ends in a name cell does not navigate, while
-  a plain click there still does, with or without a selection already on
-  screen. A drag down several rows after a sort selects rows in the order
-  they sit in the page, not their order on screen
+- Cell text on both tables can be selected and copied. In every cell but a
+  name cell, a double-click or a drag selects it. A name cell navigates on
+  a click, so a double-click there opens the name on its first click, and
+  a name is selected by dragging across it from beside its text: a drag
+  that selects text and ends in a name cell does not navigate, while a
+  plain click there still does, with or without a selection already on
+  screen. The merged Category and Subcategory cells cannot be selected. A
+  drag down several rows after a sort selects rows in the order they sit
+  in the page, not their order on screen
   ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 
 ## Categories and subcategories on a benchmark's table

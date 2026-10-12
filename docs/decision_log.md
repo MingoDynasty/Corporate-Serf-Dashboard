@@ -66,6 +66,11 @@ leaves them. Cells keep the grid's arrow cursor. The text cursor the ID cells
 had was there to override the pointer a row handed them, and that pointer is
 gone.
 
+A name is the one text a double-click cannot select. Its cell navigates on
+a click, so the first click of a double-click opens it. A name is selected
+by dragging across it from beside its text, which is the drag the guard
+protects.
+
 **The guard.** `assets/gridSelectionGuard.js` is one capture listener on the
 document. A browser sends a click when a drag ends on the element it began
 on, and a name cell navigates on a click anywhere in it, so dragging across a
