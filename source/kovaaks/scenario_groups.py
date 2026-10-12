@@ -5,7 +5,7 @@ benchmark snapshot lists each benchmark's categories in order, each with its
 subcategories and how many scenarios each holds, and no scenario names. The
 join is therefore positional: it walks the counts down the file's scenario
 list. The premise, and the importer comparison that checks it against
-KovaaK's own categories, are in ``docs/decision_log.md``.
+KovaaK's own categories, are in the 2026-10-06 entry in ``docs/decision_log/``.
 """
 
 import re

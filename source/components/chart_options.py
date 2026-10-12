@@ -98,7 +98,8 @@ POINT_COLOR_DEFAULT_CSS_VARIABLES = {
 # Eight color families, one shade each, chosen per family against both real
 # plot backgrounds (#ffffff light, #242424 dark) rather than by taking one
 # Mantine shade index across the board. Yellow, lime, gray, and dark are
-# omitted; docs/decision_log.md carries the reasoning and the contrast table.
+# omitted; the 2026-08-20 entry in docs/decision_log/ carries the reasoning
+# and the contrast table.
 POINT_COLOR_SWATCHES = [
     "#1c7ed6",  # blue-7
     "#0c8599",  # cyan-8
