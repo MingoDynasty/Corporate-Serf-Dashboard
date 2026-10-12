@@ -39,7 +39,10 @@ import pytest
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source import app_shell  # noqa: E402
-from source.components import scenario_selection  # noqa: E402
+from source.components import (  # noqa: E402
+    run_verdict_toast,
+    scenario_selection,
+)
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_CHANNEL,
@@ -171,7 +174,7 @@ class _Client:
     @property
     def verdict_instance(self) -> str | None:
         """The instance id the registry says this browser's verdict is under."""
-        return self.toast_channels.get(home._RUN_VERDICT_CHANNEL)
+        return self.toast_channels.get(run_verdict_toast.RUN_VERDICT_CHANNEL)
 
     def play(self, *, score: float) -> None:
         payload = {
@@ -227,7 +230,7 @@ def test_each_verdict_shows_a_fresh_instance_and_hides_the_one_it_replaces(plott
     first_instance = client.verdict_instance
 
     assert [payload["id"] for payload in client.last_shown] == [first_instance]
-    assert first_instance.startswith(f"{home._RUN_VERDICT_CHANNEL}-")
+    assert first_instance.startswith(f"{run_verdict_toast.RUN_VERDICT_CHANNEL}-")
     # Nothing to replace on the first emission, so nothing is hidden.
     assert client.last_hidden == []
 

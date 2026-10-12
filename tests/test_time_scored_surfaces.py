@@ -18,7 +18,10 @@ from sortedcontainers import SortedList
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.app_shell import _run_event_data  # noqa: E402
-from source.components import score_threshold  # noqa: E402
+from source.components import (  # noqa: E402
+    run_verdict_toast,
+    score_threshold,
+)
 from source.kovaaks import data_service, playlist_scenarios_service  # noqa: E402
 from source.kovaaks.api_models import (  # noqa: E402
     ScenarioRankInfo,
@@ -29,7 +32,6 @@ from source.kovaaks.time_scored_service import (  # noqa: E402
     index_performance_files,
 )
 from source.my_watchdog import file_watchdog  # noqa: E402
-from source.pages import home  # noqa: E402
 from tests.performance_files import (  # noqa: E402
     DEFAULT_HASH,
     build_performance_file,
@@ -327,7 +329,7 @@ def test_the_landed_run_reaches_the_toast_as_a_percentage_of_pb_pace(
     folders.performance_file(THIRD)
 
     message = _land(monkeypatch, folders.stats_file(THIRD, 883.02))
-    notification = home._build_run_event_notification(
+    notification = run_verdict_toast.build_run_event_notification(
         {
             # Projected the way the app shell's drain does.
             "latest": _run_event_data(message, message.datetime_created, 120.0),

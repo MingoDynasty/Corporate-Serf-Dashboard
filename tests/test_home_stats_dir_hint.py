@@ -9,7 +9,7 @@ import dash
 import dash_mantine_components as dmc
 import pytest
 
-from source.components import scenario_selection
+from source.components import scenario_selection, setup_surfaces
 from source.config import settings_service
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -236,6 +236,6 @@ def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished(
     card_box = _component_by_id(page, home.SETUP_CARD_ID)
     (card,) = card_box.children
     # The blue account offer, not a second stats-folder surface.
-    assert card.className == home.SETUP_CARD_CLASS
+    assert card.className == setup_surfaces.SETUP_CARD_CLASS
     order = [id(component) for component in _walk_components(page)]
     assert order.index(id(hint)) < order.index(id(card_box))
