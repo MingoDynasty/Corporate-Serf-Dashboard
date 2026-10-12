@@ -88,7 +88,9 @@ def _icon_mask(component):
 @pytest.fixture(autouse=True)
 def quiet_home(monkeypatch):
     """Keep the rest of the page out of the way of the card."""
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
 
 

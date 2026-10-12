@@ -41,6 +41,7 @@ from source.components.scenario_selection import (
     ScenarioSelectionIds,
     deep_link_selection,
     initial_scenario_options,
+    playlist_filter_options,
     register_scenario_selection,
 )
 from source.components.scenario_stats import (
@@ -73,9 +74,6 @@ from source.kovaaks.data_service import (
     get_sensitivities_vs_runs_filtered,
     get_time_vs_runs,
     is_scenario_in_database,
-)
-from source.kovaaks.playlist_visibility_service import (
-    get_visible_playlist_selector_options,
 )
 from source.pages.page_title import page_title
 from source.pages.playlist_selector import (
@@ -982,7 +980,7 @@ def layout(
 ):
     """Build the interactive home dashboard."""
     config = get_config()
-    playlist_options = get_visible_playlist_selector_options()
+    playlist_options = playlist_filter_options(playlist_code)
     scenario_options = initial_scenario_options(playlist_code)
 
     return dmc.Box(

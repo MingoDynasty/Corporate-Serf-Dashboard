@@ -100,7 +100,9 @@ def _assert_placeholder_figure(figure) -> None:
 
 
 def test_home_layout_initial_graph_has_placeholder(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     page = home.layout()

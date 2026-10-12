@@ -34,7 +34,9 @@ def _walk_components(component):
 
 def _layout_components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(
+        scenario_selection, "get_visible_playlist_selector_options", lambda: []
+    )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
