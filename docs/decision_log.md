@@ -125,7 +125,8 @@ the Columns menu. A click that closes the Columns menu still acts on what it
 lands on, which now matters only on a name cell.
 
 **Provenance.** Requested by the maintainer on 2026-10-12, with no proposal.
-Shipped in PR #PENDING.
+Shipped in
+[PR #364](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/364).
 
 ## 2026-10-12: Both Playlist Tables Draw Every Row, So A Browser Search Reaches Them
 
