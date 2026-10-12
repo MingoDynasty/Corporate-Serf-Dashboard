@@ -468,7 +468,8 @@ flowchart LR
   filter holds no loaded playlist.
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
   per visible playlist with coverage, runs, last-played, and cached-percentile
-  aggregates; any cell click navigates to that playlist's scenario table.
+  aggregates; a click in the Playlist name cell, and in no other, navigates
+  to that playlist's scenario table.
   Overview row rendering is local-only — it draws from local run data and rank
   caches and never triggers KovaaK's API calls. With no KovaaK's username
   configured every percentile cell reads N/A, so the status line states that
@@ -498,8 +499,7 @@ flowchart LR
   rather than a `dmc.Alert` because it holds a button (see decision log).
   The Columns menu sits between the "Show hidden" switch and Import, built by
   `components/columns_menu.py` from this page's `MENU_COLUMNS`. The Benchmark
-  ID column starts hidden (`initialHide`), and a click on its cell does not
-  navigate, so a double-click can select the number. The grid draws every
+  ID column starts hidden (`initialHide`). The grid draws every
   row, in view or not, so the browser's own text search reaches each one
   ([decision_log.md](decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
@@ -542,6 +542,11 @@ flowchart LR
   ([decision_log.md](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
   This grid draws every row too, for the same text search
   ([decision_log.md](decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
+  On both grids one stylesheet rule makes cell text selectable, the name
+  cell carries the `cell-navigates` class for its pointer, and
+  `assets/gridSelectionGuard.js` keeps a drag that selects text from
+  counting as a click
+  ([decision_log.md](decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
@@ -961,6 +966,12 @@ flowchart LR
   (`playlists.py`, `playlist_scenarios.py`) reference these from their column
   defs and run with `dangerously_allow_code=True`. Custom grid sort/format
   behavior belongs here — see the decision log.
+- `assets/gridSelectionGuard.js` — keeps a text selection made by dragging
+  inside either playlist grid from also counting as a click. One capture
+  listener on the document swallows a click when the pointer moved during
+  the press and left text selected. It finds a grid by its class, so the
+  two grid classes it names must match the layouts'. A click with no
+  movement, a modified click, and a keyboard click pass through.
 - `assets/dashMantineFunctions.js` — repo-owned client-side functions for
   dash-mantine-components function props, looked up by name in
   `window.dashMantineFunctions` when a prop is passed as

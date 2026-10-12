@@ -3,14 +3,15 @@
 The Playlists page is the one place playlists and benchmarks are managed, and
 it lists the playlists the user has chosen to see, with local aggregates. A
 benchmark is a playlist that also carries rank thresholds, and the bundled
-library ships with the app with only the popular ones visible. Clicking a row
-opens that playlist's scenario table, which paints local stats and a
+library ships with the app with only the popular ones visible. Clicking a
+playlist's name opens its scenario table, which paints local stats and a
 benchmark's ranks and categories immediately and streams leaderboard positions
 in behind them, while a background worker keeps the overview's percentile
 columns warm.
 Each table has a Columns menu that shows or hides its columns and remembers
 the choice in the browser, with one KovaaK's ID column that starts hidden,
-and each draws every row, so the browser's own text search finds any of them.
+and each draws every row as text that can be selected and that the browser's
+own text search finds.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -56,13 +57,19 @@ and [product.md](../product.md). Leaderboard placement is worded
   ([2026-07-03](../decision_log.md#2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional)).
   `playlist_selector.py` is now only the shared props, a preset and a sizing
   rule, for the Home and Aim Training Journey dropdowns.
-- Overview rows are full-row click targets (pointer cursor, hover tint): a
-  click on any cell except the Benchmark ID cell and the two action cells
-  navigates to `/playlists/{code}`. The Playlist name cell and the table's Scenario cell
-  (prebuilt `/?playlist_code=<code>&scenario=<name>`, the Scenario
-  Performance page) are real anchors: a modified click (Ctrl/Cmd/Shift/Alt)
-  keeps the native anchor and stops the grid's `cellClicked` navigation; a
-  plain click does the opposite.
+- One cell in each row navigates, on both tables: a click anywhere in the
+  Playlist name cell opens `/playlists/{code}`, and a click anywhere in the
+  table's Scenario cell opens that scenario on the Scenario Performance page
+  (prebuilt `/?playlist_code=<code>&scenario=<name>`). That cell shows the
+  pointer cursor over its whole width. No other cell navigates, and a row
+  keeps its hover tint
+  ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
+  Both names are real anchors: a modified click (Ctrl/Cmd/Shift/Alt) keeps
+  the native anchor and stops the grid's `cellClicked` navigation; a plain
+  click does the opposite. The anchor is only as wide as the name's text, so
+  a modified click in the cell beside the text navigates the current tab, a
+  known defect
+  ([tech debt](../tech_debt.md#a-modified-click-beside-a-name-on-the-playlist-tables-navigates-the-current-tab)).
 - The Scenario Performance page links back to the table: while its Playlist
   filter holds a loaded playlist, the "Open scenario table" link under the
   filter leads to `/playlists/{code}`. The link carries no `?sort=`, so the
@@ -97,10 +104,8 @@ and [product.md](../product.md). Leaderboard placement is worded
   bundled file's `generated_from` stamp. It shows as bare digits with no
   thousands separator, such as `2336`, and reads `N/A` for a playlist with no
   benchmark ID: one imported by code, or any other file in the user's
-  playlist folder. The column is not sortable, its text can be selected, and
-  a click on its cell does not open the playlist, so a double-click selects
-  the number. Its header tooltip reads "The number KovaaK's uses to identify
-  this benchmark in its API."
+  playlist folder. The column is not sortable. Its header tooltip reads "The
+  number KovaaK's uses to identify this benchmark in its API."
   ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
 - Percentile aggregates cover played scenarios only. Until every played
   scenario is display-resolved (UNRANKED, or RANKED with a cached percentile)
@@ -186,9 +191,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   change applies at once, and the menu stays open until an outside click or
   Escape. Opening the menu moves keyboard focus to its first checkbox, and
   Escape returns focus to the button. A click that closes the menu also acts
-  on what it lands on and keeps the focus it gave, so on the overview a click
-  on a row opens that playlist. Every column is shown by default except the
-  two ID columns.
+  on what it lands on and keeps the focus it gave, so a click that lands on
+  a name cell opens it. Every column is shown by default except the two ID
+  columns.
 - Each column's shown or hidden state is kept in the browser's local storage,
   one set per table, and the scenario table's set is shared by every
   playlist. A choice about Rank or Next Rank is left alone on a playlist's
@@ -314,9 +319,8 @@ and [product.md](../product.md). Leaderboard placement is worded
   disagree on it, until a lookup learns an ID for it. The first paint, the
   fill's streamed rows, and a cancelled fill's rebuild all carry it, and a
   streamed row carries an ID its own lookup just learned. The column is not
-  sortable, so it has no `?sort=` name, and its text can be selected. Its
-  header tooltip reads "The number KovaaK's uses to identify this scenario's
-  leaderboard in its API."
+  sortable, so it has no `?sort=` name. Its header tooltip reads "The number
+  KovaaK's uses to identify this scenario's leaderboard in its API."
   ([2026-10-05](../decision_log.md#2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones)).
   The menu that shows it is specified under [the overview](#the-overview).
 - A table is a benchmark's when any of its scenarios carries a ladder, the
@@ -441,6 +445,16 @@ and [product.md](../product.md). Leaderboard placement is worded
   still in view. A search steps through its matches in the order the rows
   sit in the page, which after a sort is not their order on screen
   ([2026-10-12](../decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
+- Cell text on both tables can be selected and copied. In every cell but a
+  name cell, a double-click or a drag selects it. A name cell navigates on
+  a click, so a double-click there opens the name on its first click, and
+  a name is selected by dragging across it from beside its text: a drag
+  that selects text and ends in a name cell does not navigate, while a
+  plain click there still does, with or without a selection already on
+  screen. The merged Category and Subcategory cells cannot be selected. A
+  drag down several rows after a sort selects rows in the order they sit
+  in the page, not their order on screen
+  ([2026-10-12](../decision_log.md#2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected)).
 
 ## Categories and subcategories on a benchmark's table
 

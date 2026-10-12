@@ -33,17 +33,41 @@ from source.pages import (  # noqa: E402
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_SIZING  # noqa: E402
 
 
-def test_playlists_overview_cell_click_routes_to_playlist():
+def test_playlists_overview_name_cell_click_routes_to_playlist():
     assert playlists.route_to_clicked_playlist(
         {"rowId": "KovaaKsTestCode", "colId": "name", "rowIndex": 0}
     ) == ("/playlists/KovaaKsTestCode")
 
 
+def test_playlists_overview_only_the_name_cell_navigates():
+    other_columns = [
+        column["field"]
+        for column in playlists.TABLE_COLUMN_DEFS
+        if column["field"] != playlists.PLAYLIST_COLUMN_ID
+    ]
+
+    # Every other cell's text can be selected, and a double-click to select
+    # it is two clicks on the cell, so none of them may open the playlist.
+    assert len(other_columns) == len(playlists.TABLE_COLUMN_DEFS) - 1
+    for column_id in other_columns:
+        assert (
+            playlists.route_to_clicked_playlist(
+                {"rowId": "KovaaKsTestCode", "colId": column_id}
+            )
+            is no_update
+        ), column_id
+
+
 def test_playlists_overview_cell_click_ignores_malformed_payloads():
     assert playlists.route_to_clicked_playlist(None) is no_update
     assert playlists.route_to_clicked_playlist({"colId": "name"}) is no_update
-    assert playlists.route_to_clicked_playlist({"rowId": ""}) is no_update
-    assert playlists.route_to_clicked_playlist({"rowId": 3}) is no_update
+    assert playlists.route_to_clicked_playlist({"rowId": "Code"}) is no_update
+    assert (
+        playlists.route_to_clicked_playlist({"rowId": "", "colId": "name"}) is no_update
+    )
+    assert (
+        playlists.route_to_clicked_playlist({"rowId": 3, "colId": "name"}) is no_update
+    )
 
 
 def test_playlists_overview_visibility_cell_click_does_not_navigate():
@@ -2246,9 +2270,10 @@ def test_playlist_scenarios_scenario_column_fills_remaining_width():
 
     assert column["flex"] == 1
     assert column["maxWidth"] == 400
-    # Link styling now rides on the anchor the renderer emits, not the cell.
+    # Link styling rides on the anchor the renderer emits, not the cell. The
+    # cell's one class carries the pointer, and no link styling.
     assert column["cellRenderer"] == "ScenarioLink"
-    assert "cellClass" not in column
+    assert column["cellClass"] == "cell-navigates"
     assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
 
 
@@ -2984,7 +3009,9 @@ def test_id_column_is_hidden_unsortable_and_selectable(
     assert column["initialHide"] is True
     assert "hide" not in column
     assert column["sortable"] is False
-    assert column["cellClass"] == "cell-selectable-text"
+    # Its text is selectable through the rule that covers every cell of both
+    # tables, so the column carries no class of its own for it.
+    assert "cellClass" not in column
     # The row carries the text to show, so nothing regroups the digits.
     assert "valueFormatter" not in column
     # Every other column is shown.
@@ -3002,13 +3029,74 @@ def test_benchmark_columns_are_shown_by_default():
     )
 
 
-def test_selectable_cell_class_turns_text_selection_back_on():
+def _stylesheet_rule(selector):
     stylesheet = STYLESHEET.read_text(encoding="utf-8")
-    rule = stylesheet.split(".ag-cell.cell-selectable-text {", 1)[1].split("}", 1)[0]
+    assert stylesheet.count(f"{selector} {{") == 1, selector
+    return stylesheet.split(f"{selector} {{", 1)[1].split("}", 1)[0]
+
+
+def test_cell_text_is_selectable_on_both_playlist_tables():
+    rule = _stylesheet_rule(
+        ".playlist-overview-grid .ag-cell,\n.playlist-scenarios-grid .ag-cell"
+    )
 
     assert "user-select: text;" in rule
-    # An overview row hands its cells a pointer; the ID cell does not navigate.
-    assert "cursor: text;" in rule
+    # The rule reaches a grid through its class, so each grid must carry it.
+    overview = _component_by_id(playlists.layout(), "playlists-overview-grid")
+    scenarios = _component_by_id(playlist_scenarios.layout(), "playlist-scenarios-grid")
+    assert "playlist-overview-grid" in overview.className.split()
+    assert "playlist-scenarios-grid" in scenarios.className.split()
+    # The grid's own switch is refused beside merged cells, so neither grid
+    # sets it.
+    assert "enableCellTextSelection" not in overview.dashGridOptions
+    assert "enableCellTextSelection" not in scenarios.dashGridOptions
+
+
+def test_merged_group_cells_stay_unselectable():
+    rule = _stylesheet_rule(
+        ".playlist-scenarios-grid .ag-cell.playlist-scenario-group-cell"
+    )
+
+    assert "user-select: none;" in rule
+    assert all(
+        playlist_scenarios._group_column_def(column)["cellClass"]
+        == "playlist-scenario-group-cell"
+        for column in playlist_scenarios.GROUP_COLUMNS
+    )
+
+
+def test_only_the_name_cells_show_the_pointer():
+    assert "cursor: pointer;" in _stylesheet_rule(".ag-cell.cell-navigates")
+    # A row is no longer a click target, so it hands its cells no pointer.
+    assert ".playlist-overview-grid .ag-row {" not in STYLESHEET.read_text(
+        encoding="utf-8"
+    )
+    for column_defs, name_column in (
+        (playlists.TABLE_COLUMN_DEFS, playlists.PLAYLIST_COLUMN_ID),
+        (playlist_scenarios.TABLE_COLUMN_DEFS, "scenario"),
+    ):
+        with_pointer = [
+            column["field"]
+            for column in column_defs
+            if column.get("cellClass") == "cell-navigates"
+        ]
+        assert with_pointer == [name_column]
+
+
+def test_selection_guard_covers_both_playlist_grids():
+    guard = (STYLESHEET.parent / "gridSelectionGuard.js").read_text(encoding="utf-8")
+
+    # The guard finds a grid by the class its layout gives it. A renamed class
+    # would switch the guard off with no error, and a drag that selects a name
+    # would open its page again.
+    for page_module, grid_id in (
+        (playlists, "playlists-overview-grid"),
+        (playlist_scenarios, "playlist-scenarios-grid"),
+    ):
+        grid = _component_by_id(page_module.layout(), grid_id)
+        marker = grid.className.split()[-1]
+        assert marker.startswith("playlist-")
+        assert f".{marker}" in guard
 
 
 def test_playlists_overview_benchmark_id_cell_click_does_not_navigate():
