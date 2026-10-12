@@ -35,25 +35,46 @@ the rare one. Keeping the name costs browsing nothing: Mantine filters only
 while the text differs from the selected option's label, so an untouched name
 still lists every option.
 
-**What the script catches.** Mantine opens the list from four places and
-reports none of them to Dash, so each is handled at the document:
+**What the script catches.** Mantine opens the list on focus, on a click, on
+an arrow key, and on an edit, and reports none of them to Dash, so each is
+handled at the document:
 
-- A press on a closed field, or on its label. After the click, a cursor
+- A primary press on a closed field. When the button comes up, a cursor
   becomes a highlight of the whole name, and a range is left alone, which is
   what keeps a drag. Whether the list was closed is read at `mousedown`,
   because the press itself opens it. The check runs in a zero timeout:
   Chromium collapses a click on highlighted text only after the click event
   (measured in Edge on 2026-10-12, where the selection was still whole in the
   click handler and a cursor in the timeout), and Firefox collapses it before.
+- A primary press on a closed field's label. It highlights the whole name
+  whatever the selection, because no drag can start there.
+- Focus arriving by any route but a press on the field: its label, a
+  right-click, Tab, the window coming back to the front. `focusin` highlights
+  the whole name, in a zero timeout because the browser restores its own
+  selection after the event.
 - An edit in a focused field whose list is closed, the state a pick or Escape
   leaves, with the cursor after the name. `beforeinput` highlights the name
   first, so the edit replaces it.
 - ArrowDown or ArrowUp in that same state.
-- Focus by Tab needs no handler. Both browsers highlight a field they tab
-  into.
+- A right-click in that same state, which opens no list. A cursor becomes a
+  highlight of the whole name, and a range showing there is left alone.
 
 A second click while the list is open is left to the browser, so it places a
 cursor.
+
+**A selection left over from an earlier visit.** An unfocused input keeps its
+last selection, and Chromium brings it back when focus returns by any route
+but a press on the field. A partial one then takes the next keystroke and
+leaves the rest of the name in the search: with "10 Sphere H" left selected
+in "10 Sphere Hipfire Extra Small", typing "zq" searched for "zqipfire Extra
+Small". The first version of the script kept any range it found after a
+press, taking it for a drag, and had no rule for focus. Review
+on [PR #360](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/360)
+found the label case. The right-click and the returning window have the same
+cause and failed the same way. So a range is kept only after a press on the
+field itself, the one place a drag can start, and every other way in
+highlights the whole name. Firefox highlights the whole field on label focus
+and did not show the label case.
 
 **Rejected: highlight when the list closes.** A `MutationObserver` on the
 open-list attribute could highlight a freshly picked name. The name reaches
@@ -79,13 +100,19 @@ it again leaves the typed text in the field until focus leaves. The value did
 not change, so Mantine's effect never runs. It did the same before this
 change.
 
-**Verified.** Headless Edge and the installed Firefox, both dropdowns on the
-real page, 36 of 36 checks each: click, copy, drag, a second click, typing,
-mouse and keyboard picks, an arrow key, Tab, the label, a keyboard pick after
-a right-click, and the highlight outlasting the page's one-second updates.
+**Verified.** Headless Edge, Chrome, and the installed Firefox, both
+dropdowns on the real page. A first set of 36 checks passes in each: click,
+copy, drag, a second click, typing, mouse and keyboard picks, an arrow key,
+Tab, the label, a keyboard pick after a right-click, and the highlight
+outlasting the page's one-second updates. A second set of 30 passes in each,
+all starting from a partial selection left behind: the label, a click inside
+and outside the old range, a fresh drag, Tab, a right-click, focus handed
+back by script, and a right-click and a label click on a focused field with
+its list closed. The script as first written failed 14 of those 30 in Edge.
 The automation cannot double-click in Firefox, so double-click word selection
 was automated in Edge only. The maintainer tried the page by hand in Firefox
-the same day and confirmed it works.
+the same day, before the focus and right-click rules were added, and
+confirmed it works.
 
 ## 2026-10-11: A Session Ends After A Break Of More Than 30 Minutes
 

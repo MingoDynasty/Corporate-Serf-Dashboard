@@ -76,11 +76,14 @@ of scope here, apart from its chart toolbar, noted under The graph.
   input carry help tooltips; the other row controls have plain labels.
 - Opening either dropdown's list keeps the selected name in the field and
   highlights it, so it can be copied, and the first keystroke replaces it
-  with a search. The list shows every option until then. A drag highlights
-  only the part dragged over, and a second click while the list is open
-  places a cursor. After a pick or Escape, focus stays in the field with the
-  list closed; an edit or an arrow key there highlights the name first, so
-  typing still starts a fresh search
+  with a search. The list shows every option until then. A drag on the field
+  highlights only the part dragged over, and a second click while the list is
+  open places a cursor. Every other way in highlights the whole name: a click
+  on the label, a right-click, Tab, and focus returning to the page. After a
+  pick or Escape, focus stays in the field with the list closed; an edit or
+  an arrow key there highlights the name first, so typing still starts a
+  fresh search, and a right-click there highlights it when the field shows
+  only a cursor
   ([2026-10-12](../decision_log.md#2026-10-12-opening-a-scenario-performance-dropdown-highlights-its-name)).
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation
