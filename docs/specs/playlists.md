@@ -432,6 +432,11 @@ and [product.md](../product.md). Leaderboard placement is worded
   `minHeight` style. Neither declares initial `rowData`, so the loading
   overlay owns the gap
   ([2026-07-16](../decision_log.md#2026-07-16-keep-pre-hydration-states-honest)).
+- Both grids draw every row, in view or not, so the browser's own text
+  search (Ctrl+F) finds any row and scrolls the grid to it, with the header
+  still in view. A search steps through its matches in the order the rows
+  sit in the page, which after a sort is not their order on screen
+  ([2026-10-12](../decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
 
 ## Categories and subcategories on a benchmark's table
 

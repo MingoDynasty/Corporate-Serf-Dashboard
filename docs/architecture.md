@@ -499,7 +499,9 @@ flowchart LR
   The Columns menu sits between the "Show hidden" switch and Import, built by
   `components/columns_menu.py` from this page's `MENU_COLUMNS`. The Benchmark
   ID column starts hidden (`initialHide`), and a click on its cell does not
-  navigate, so a double-click can select the number.
+  navigate, so a double-click can select the number. The grid draws every
+  row, in view or not, so the browser's own text search reaches each one
+  ([decision_log.md](decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log). It paints
@@ -538,6 +540,8 @@ flowchart LR
   columns after each row-model update, a workaround for stale merged cells
   in the bundled AG Grid
   ([decision_log.md](decision_log.md#2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory)).
+  This grid draws every row too, for the same text search
+  ([decision_log.md](decision_log.md#2026-10-12-both-playlist-tables-draw-every-row-so-a-browser-search-reaches-them)).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
