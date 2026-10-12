@@ -63,18 +63,23 @@ def test_dropdown_input_carries_the_class_the_script_finds_it_by(select_id, scri
 
 @pytest.mark.parametrize("select_id", DROPDOWN_IDS)
 def test_dropdown_does_not_also_empty_its_field(select_id):
-    """``clearSearchOnFocus`` runs first and leaves the script nothing to
-    highlight, so the name is gone again and nothing looks broken."""
+    """Keep ``clearSearchOnFocus`` off a dropdown the script highlights.
+
+    The prop runs first and leaves the script nothing to highlight, so the
+    name is gone again and nothing looks broken.
+    """
     assert not getattr(_dropdown(select_id), "clearSearchOnFocus", None)
 
 
 def test_bundled_mantine_still_flags_an_open_list_the_way_the_script_reads_it(
     script,
 ):
-    """The script tells an open list from a closed one by this attribute. If
-    an upgrade drops it every field reads as closed, and each keystroke of a
-    search then replaces the one before. A failure here means re-reading how
-    the bundle's Combobox target marks an open list before touching the
-    script."""
+    """Pin the attribute the script reads to tell an open list from a closed one.
+
+    If an upgrade drops it, every field reads as closed, and each keystroke
+    of a search then replaces the one before. A failure here means re-reading
+    how the bundle's Combobox target marks an open list before touching the
+    script.
+    """
     assert f"const OPEN = {OPEN_LIST_ATTRIBUTE};" in script
     assert f"{OPEN_LIST_ATTRIBUTE}:" in DMC_BUNDLE.read_text(encoding="utf-8")
