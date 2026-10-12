@@ -253,6 +253,12 @@ console lines quoted here are plain console output, not app notifications.
   config.toml in <root> and the app error output above.", the reinstall
   one-liner, and "Press Enter to close"
   ([2026-08-21](../decision_log/2026/2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling.md)).
+- `Start-AppVersion` sets `PYTHONIOENCODING` to `utf-8:surrogateescape` for
+  the app process, and restores the launcher's own value once the start is
+  over, whether or not it succeeded. Both redirected logs are therefore UTF-8
+  whatever `PYTHONIOENCODING` or `PYTHONUTF8` the launcher inherited, and
+  `Show-AppFailure` reads the stderr log as UTF-8. Windows PowerShell 5.1
+  would otherwise read it in the ANSI code page.
 - After ready, the browser opens at `http://<browser>:<port>/` when
   `open_browser_on_launch` is on, old versions are pruned, the bootstrap is
   updated, and "Dashboard running at http://<browser>:<port>/ -- close this
@@ -354,8 +360,8 @@ console lines quoted here are plain console output, not app notifications.
 - The installer sets `CSD_STATE_DIR` to the install root around its
   `load_config()` round-trip, clearing it afterward; the launcher sets it
   to the install root around the endpoint read, clearing it afterward, and
-  again when it starts the app process, where it is left set (only the
-  launch token is cleared). In an installed copy the state root is therefore the install root:
+  again when it starts the app process, where it is left set (the launch
+  token is cleared and `PYTHONIOENCODING` is put back). In an installed copy the state root is therefore the install root:
   `config.toml`, `install.json`, and `data/` sit beside `versions/`. Unset
   means the working directory; what the root holds is set by
   ([2026-07-19](../decision_log/2026/2026-07-19-all-mutable-state-lives-under-an-explicit-state-root.md)).

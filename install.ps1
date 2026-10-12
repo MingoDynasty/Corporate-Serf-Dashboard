@@ -18,7 +18,7 @@ now -- it lives in data/settings.json, which only the app ever writes.
 
 Serialization contract: every machine-readable file GENERATED here
 (config.toml, install.json) is UTF-8 WITHOUT BOM with forward-slash paths --
-the app's Python 3.14 tomllib rejects both a BOM and raw backslashes. The
+the app's tomllib rejects both a BOM and raw backslashes. The
 release.json copy staged into versions\<tag> is exempt: it is preserved
 byte-for-byte as the release published it, never re-serialized.
 

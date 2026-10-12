@@ -309,6 +309,15 @@ function Start-AppVersion([string]$VersionDir, [string]$Token) {
     New-Item -ItemType Directory -Force -Path $logDir | Out-Null
     $env:CSD_STATE_DIR = $InstallRoot
     $env:CSD_LAUNCH_TOKEN = $Token
+    # Pin the app's standard streams to UTF-8, which is how Show-AppFailure
+    # reads the stderr log back. UTF-8 is Python's own default since 3.15, but
+    # a PYTHONIOENCODING or a PYTHONUTF8=0 inherited from the user's
+    # environment overrides the default, and the log then holds code-page
+    # bytes. The error handler is named because the encoding alone resets
+    # stdout's from surrogateescape to strict. The pin is for the app only,
+    # so the launcher's own value comes back once the start is over.
+    $inheritedIoEncoding = $env:PYTHONIOENCODING
+    $env:PYTHONIOENCODING = 'utf-8:surrogateescape'
     try {
         return Start-Process -FilePath $python -ArgumentList 'source/app.py' `
             -WorkingDirectory $VersionDir -PassThru -NoNewWindow `
@@ -316,6 +325,9 @@ function Start-AppVersion([string]$VersionDir, [string]$Token) {
             -RedirectStandardError (Join-Path $logDir 'launcher-app-stderr.log')
     } finally {
         Remove-Item Env:\CSD_LAUNCH_TOKEN -ErrorAction SilentlyContinue
+        # Assigning $null removes the variable, which is what restores an
+        # environment that never had it.
+        $env:PYTHONIOENCODING = $inheritedIoEncoding
     }
 }
 
@@ -368,7 +380,11 @@ function Show-AppFailure([string]$Context) {
     Write-Host "WARNING: $Context" -ForegroundColor Yellow
     $errLog = Join-Path $InstallRoot 'data\logs\launcher-app-stderr.log'
     if (Test-Path -LiteralPath $errLog) {
-        $tail = Get-Content -LiteralPath $errLog -Tail 15 -ErrorAction SilentlyContinue
+        # Start-AppVersion pins the app's standard streams to UTF-8, so this
+        # log is UTF-8. With no -Encoding, Windows PowerShell 5.1 reads it in
+        # the ANSI code page and shows every non-ASCII character as two or
+        # three wrong ones.
+        $tail = Get-Content -LiteralPath $errLog -Tail 15 -Encoding UTF8 -ErrorAction SilentlyContinue
         if ($tail) {
             Write-Host '--- app error output ---'
             $tail | ForEach-Object { Write-Host $_ }

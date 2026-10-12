@@ -43,9 +43,8 @@ differently:
 | GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
-The Python version is not part of a refresh. Moving it touches
-`.python-version`, `requires-python`, and ruff's `target-version`, and is its
-own change.
+The Python version is not part of a refresh. Moving it is its own change, with
+its own steps, in [Moving Python](#moving-python).
 
 ## Package pass
 
@@ -315,3 +314,122 @@ uv sync
 ```
 
 Verify the fix by what moved, the same as a refresh.
+
+## Moving Python
+
+A move to a new Python minor version is its own PR, apart from a refresh. It
+changes the interpreter every installed copy runs, and the release it cuts is
+the first time the installer and the launcher meet that interpreter. A patch
+release needs no change to the repository, because `.python-version` names the
+minor version only.
+
+A move waits for three things: the final release of the new version, a uv
+release that lists it, and a wheel for every package that ships to users.
+
+1. Pin a uv that lists the new version. uv downloads only the interpreters its
+   own release knows, and an installed copy gets its Python from the pinned uv
+   ([Release and install](specs/release_and_install.md)). So the
+   [toolchain pass](#toolchain-pass) comes first, as its own PR, and the
+   Python PR is stacked on it or follows it. With the new uv on the machine:
+
+   ```powershell
+   uv python list 3.15
+   ```
+
+   The output must name the final release, such as `cpython-3.15.0`. A uv that
+   is too old names a release candidate, such as `cpython-3.15.0rc3`, or
+   prints nothing.
+
+2. Move the four places that name the version: `.python-version`,
+   `requires-python` and ruff's `target-version` in `pyproject.toml`, and the
+   opening paragraph of [AGENTS.md](../AGENTS.md). Then re-lock and sync:
+
+   ```powershell
+   uv lock
+   uv sync
+   ```
+
+   The re-lock drops the wheels built for the old version. If
+   `git diff uv.lock` shows a line starting `version = `, a package resolved
+   differently for the new interpreter: find out why before going on. Besides
+   the project itself, the first `uv sync` after the re-lock prints a
+   `Building` line for each package that has no wheel for the new version
+   yet, and compiles it from its source distribution. For a dev-only package
+   that is acceptable when the sync completes: name the package in the PR
+   body. pyyaml was one on the move to 3.15. Step 5 checks the packages that
+   ship to users.
+
+3. Read what the new version changes. Its What's New page lists the changed
+   defaults, the removals, and the porting notes: check each one against
+   `source/` and `scripts/`. The gates do not see a changed default. Python
+   3.15 made UTF-8 the default text encoding. Every file this app opens names
+   its encoding, so no file changed, but the text the app writes to a
+   redirected console did change encoding, and the launcher reads that text
+   back when a start fails. To measure a default, start Python the way the
+   launcher starts the app, and compare the bytes. A variable in the measuring
+   shell, such as `PYTHONIOENCODING`, overrides the default and hides the
+   change. The stop-and-ask rule under
+   [Packages that ship browser code](#packages-that-ship-browser-code) holds
+   here too.
+
+4. Run the gates in [AGENTS.md](../AGENTS.md#commands) on the new interpreter.
+   A new `target-version` can change what ruff reports and how it formats. Fix
+   what it finds in its own commit.
+
+5. Build the environment an install builds, and start it. The gates run the
+   development environment. An install has no dev packages, and it has a
+   Python folder and a package cache of its own, both empty at first. From
+   the committed head:
+
+   ```powershell
+   $root = Join-Path (Get-Location) "ignore\python-move"
+   New-Item -ItemType Directory -Force -Path $root | Out-Null
+   git archive --format=zip --prefix=app/ -o "$root\app.zip" HEAD
+   Expand-Archive -LiteralPath "$root\app.zip" -DestinationPath $root
+   $env:UV_PYTHON_INSTALL_DIR = "$root\python"
+   $env:UV_CACHE_DIR = "$root\uv-cache"
+   uv sync --directory "$root\app" --locked --no-dev --managed-python
+   ```
+
+   The last line is the installer's own command. uv must download the new
+   CPython into the empty folder, and the only `Building` line must be the
+   project itself. A second one names a package that ships to users and has no
+   wheel, which every install would then have to compile: stop, and wait for
+   the wheel. Then start the app, on a port nothing else holds:
+
+   ```powershell
+   Set-Content -Path "$root\config.toml" -Value "port = 8059"
+   $env:CSD_STATE_DIR = $root
+   Push-Location "$root\app"
+   .\.venv\Scripts\python.exe source/app.py
+   ```
+
+   Open `http://127.0.0.1:8059/health`. Its `sha` must be the head's
+   (`git rev-parse HEAD`) and its `source` must be `archive`. Then look at
+   every page and the browser console, as
+   [Packages that ship browser code](#packages-that-ship-browser-code)
+   describes. A new state root detects the stats folder, so the pages have
+   real runs, and it has no KovaaK's username, so position lookups stay off.
+   Stop the app with Ctrl+C, then clean up:
+
+   ```powershell
+   Pop-Location
+   Remove-Item Env:UV_PYTHON_INSTALL_DIR, Env:UV_CACHE_DIR, Env:CSD_STATE_DIR
+   Remove-Item -Recurse -Force $root
+   ```
+
+   The three variables must go before another uv command runs in that shell,
+   or it uses the scratch Python folder and cache.
+
+6. Know what none of this ran. `install.ps1` and `launcher.ps1` did not run,
+   and the `release-gate` and `release` jobs are skipped on a pull request, so
+   the release the merge cuts is their first run on the new version. Watch the
+   release job. Then launch an installed copy once: it must print
+   `Updated to <tag>.` A release that fails to start leaves the copy on its
+   previous version ([Updating](specs/release_and_install.md#updating)).
+
+Title the PR `chore: move Python to <version>`. In the body, say which
+packages build from source, what the new version changes for this app and
+what was done about each change, what step 5 showed, and that merging cuts a
+release. An installed copy that updates downloads the new interpreter and
+keeps the old one beside it.

@@ -180,10 +180,6 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
     interpreter; a copied ``python.exe`` would be a venv trampoline with no
     ``pyvenv.cfg`` above it.
     """
-    venv = Path(sys.executable).parent.parent
-    if not (venv / "pyvenv.cfg").is_file():
-        pytest.skip("not running from a virtual environment")
-
     root = tmp_path / "install-root"
     (root / "versions" / "dev").mkdir(parents=True)
     (root / "config.toml").write_text(config_body, encoding="utf-8")
@@ -200,24 +196,40 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
         ),
         encoding="utf-8",
     )
-    link = subprocess.run(
-        [
-            "cmd",
-            "/c",
-            "mklink",
-            "/J",
-            str(root / "versions" / "dev" / ".venv"),
-            str(venv),
-        ],
+    _link_this_venv(root / "versions" / "dev" / ".venv")
+
+    output = _run_under_windows_powershell(tmp_path, _DRIVER, root)
+    return output.strip().splitlines()[-1].strip()
+
+
+def _link_this_venv(link: Path) -> None:
+    """Make ``link`` a junction to the venv running the tests, or skip."""
+    venv = Path(sys.executable).parent.parent
+    if not (venv / "pyvenv.cfg").is_file():
+        pytest.skip("not running from a virtual environment")
+    result = subprocess.run(
+        ["cmd", "/c", "mklink", "/J", str(link), str(venv)],
         capture_output=True,
         text=True,
         check=False,
     )
-    if link.returncode != 0:
-        pytest.skip(f"cannot create a directory junction: {link.stderr.strip()}")
+    if result.returncode != 0:
+        pytest.skip(f"cannot create a directory junction: {result.stderr.strip()}")
 
-    driver = tmp_path / "driver.ps1"
-    driver.write_text(_DRIVER, encoding="utf-8")
+
+def _run_under_windows_powershell(
+    tmp_path: Path,
+    driver: str,
+    root: Path,
+    environment: dict[str, str] | None = None,
+) -> str:
+    """Run a driver script under Windows PowerShell 5.1 and return its stdout.
+
+    The driver receives the install root and the path of ``launcher.ps1`` as
+    its two arguments. ``environment`` replaces the one 5.1 would inherit.
+    """
+    driver_path = tmp_path / "driver.ps1"
+    driver_path.write_text(driver, encoding="utf-8")
     result = subprocess.run(
         [
             str(WINDOWS_POWERSHELL),
@@ -225,7 +237,7 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
             "-ExecutionPolicy",
             "Bypass",
             "-File",
-            str(driver),
+            str(driver_path),
             str(root),
             str(REPO_ROOT / "scripts" / "launcher.ps1"),
         ],
@@ -233,9 +245,10 @@ def _windows_powershell_endpoint(tmp_path: Path, config_body: str) -> str:
         text=True,
         check=False,
         timeout=120,
+        env=environment,
     )
     assert result.returncode == 0, result.stderr
-    return result.stdout.strip().splitlines()[-1].strip()
+    return result.stdout
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
@@ -280,3 +293,141 @@ def test_get_configured_endpoint_under_windows_powershell(
         pytest.skip(f"{WINDOWS_POWERSHELL} not found")
 
     assert _windows_powershell_endpoint(tmp_path, config_body) == expected, case
+
+
+# Dot-sources the real Start-AppVersion and Show-AppFailure out of launcher.ps1,
+# starts the stand-in app through the first, and prints what the second sends
+# to the host as code points, one line per host line. The text itself cannot
+# cross the pipe: 5.1 encodes piped output in the console's code page (437,
+# measured on 2026-10-12), which turned a CJK character into a question mark.
+# The two lines ahead of the tail say whether the start threw, and what the
+# launcher's own PYTHONIOENCODING is once Start-AppVersion is done.
+_START_AND_SHOW_DRIVER = """
+$ErrorActionPreference = 'Stop'
+$InstallRoot = $args[0]
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($args[1], [ref]$null, [ref]$null)
+foreach ($name in 'Start-AppVersion', 'Show-AppFailure') {
+    $function = $ast.FindAll({
+        param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+            $n.Name -eq $name }, $true)[0]
+    Invoke-Expression $function.Extent.Text
+}
+$started = 'started'
+try {
+    $process = Start-AppVersion (Join-Path (Join-Path $InstallRoot 'versions') 'dev') 'token'
+    $process.WaitForExit()
+} catch {
+    $started = 'start failed'
+}
+$started
+if (Test-Path Env:PYTHONIOENCODING) { "PYTHONIOENCODING=$env:PYTHONIOENCODING" } else { 'PYTHONIOENCODING unset' }
+Show-AppFailure 'the dashboard failed to start (exited).' 6>&1 | ForEach-Object {
+    (([string]$_).ToCharArray() | ForEach-Object { '{0:X4}' -f [int]$_ }) -join ' '
+}
+"""
+
+# What a launcher can inherit that chooses the encoding of Python's standard
+# streams in place of the interpreter's default.
+_INHERITED_STREAM_SETTINGS = [
+    pytest.param({}, id="no override"),
+    pytest.param({"PYTHONIOENCODING": "cp1252"}, id="PYTHONIOENCODING=cp1252"),
+    pytest.param({"PYTHONUTF8": "0"}, id="PYTHONUTF8=0"),
+]
+
+
+def _start_and_show(tmp_path: Path, root: Path, inherited: dict[str, str]) -> list[str]:
+    """Run the start-and-show driver with only ``inherited`` set, and decode it.
+
+    The session running the tests may carry either variable itself, so both
+    are dropped before ``inherited`` is applied.
+    """
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if name not in {"PYTHONIOENCODING", "PYTHONUTF8"}
+    }
+    environment.update(inherited)
+    output = _run_under_windows_powershell(
+        tmp_path, _START_AND_SHOW_DRIVER, root, environment
+    )
+    started, launcher_setting, *shown = output.splitlines()
+    return [
+        started,
+        launcher_setting,
+        *("".join(chr(int(code, 16)) for code in line.split()) for line in shown),
+    ]
+
+
+def _launcher_setting(inherited: dict[str, str]) -> str:
+    """Spell the driver's report of the launcher's own ``PYTHONIOENCODING``."""
+    if "PYTHONIOENCODING" in inherited:
+        return f"PYTHONIOENCODING={inherited['PYTHONIOENCODING']}"
+    return "PYTHONIOENCODING unset"
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize("inherited", _INHERITED_STREAM_SETTINGS)
+def test_failure_tail_shows_what_the_app_wrote(
+    tmp_path: Path, inherited: dict[str, str]
+) -> None:
+    """Hold the launcher's writer and its reader to one encoding.
+
+    The launcher redirects the app's stderr to a file and prints its last 15
+    lines when a start fails. Read with no encoding named, 5.1 took that file
+    for the Windows code page, which stopped being true when Python 3.15 made
+    UTF-8 the default: an accented letter in a path came out as two wrong
+    characters. Reading it as UTF-8 was half a fix, because a
+    ``PYTHONIOENCODING`` or a ``PYTHONUTF8=0`` that the launcher inherits puts
+    the code page back. So the stand-in app here is started by the real
+    ``Start-AppVersion`` and read back by the real ``Show-AppFailure``, under
+    each of those settings, and the launcher's own setting must come out of
+    the start unchanged.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+
+    root = tmp_path / "install-root"
+    version = root / "versions" / "dev"
+    (version / "source").mkdir(parents=True)
+    _link_this_venv(version / ".venv")
+    lines = [
+        f"line {number}: File: C:/Users/Zoë/config.toml 次" for number in range(20)
+    ]
+    text = "\n".join(lines) + "\n"
+    (version / "source" / "app.py").write_text(
+        f"import sys\nsys.stderr.write({ascii(text)})\n", encoding="utf-8"
+    )
+
+    started, launcher_setting, *shown = _start_and_show(tmp_path, root, inherited)
+
+    assert started == "started"
+    assert launcher_setting == _launcher_setting(inherited)
+    assert shown[0] == "WARNING: the dashboard failed to start (exited)."
+    assert shown[2:-1] == lines[-15:]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize("inherited", _INHERITED_STREAM_SETTINGS)
+def test_a_failed_start_leaves_the_launcher_setting_alone(
+    tmp_path: Path, inherited: dict[str, str]
+) -> None:
+    """A start that throws must not leave the launcher's environment pinned.
+
+    ``Start-AppVersion`` sets the stream encoding for the app alone. Whatever
+    the launcher starts next, such as the previous version after a failed
+    update, must see what the launcher itself inherited.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+
+    root = tmp_path / "install-root"
+    scripts = root / "versions" / "dev" / ".venv" / "Scripts"
+    scripts.mkdir(parents=True)
+    # Present, so the launcher gets as far as starting it, and not a program,
+    # so the start throws after the environment is set.
+    (scripts / "python.exe").write_text("not a program", encoding="utf-8")
+
+    started, launcher_setting, *_ = _start_and_show(tmp_path, root, inherited)
+
+    assert started == "start failed"
+    assert launcher_setting == _launcher_setting(inherited)
