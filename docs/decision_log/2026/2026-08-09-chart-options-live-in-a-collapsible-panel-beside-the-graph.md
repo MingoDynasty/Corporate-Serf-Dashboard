@@ -74,6 +74,19 @@ Consequences and constraints:
   open state and `aria-expanded` rides with it, so a regression test pins that
   both are unchanged before a real click.
 
+**Superseded in part (2026-10-12).** The 62em threshold no longer applies. On
+the Run History page, which replaced this one, the panel stacks above the
+chart when the chart's own area is 48em or narrower: the run list now takes
+a column beside the chart, and 62em would have stacked the panel in every
+window narrower than about 1,760 px. "Ids and defaults survive verbatim" was
+set aside once, for the move to a new page that keeps control ids of its
+own, and it stands for every later change. The panel beside the chart, the
+container query, the clipping row, `.home-graph` as the resize hook, and the
+toggle's guard all stand. See
+[The Run List Is A Second Column Beside The Chart](2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md)
+and
+[Run History Keeps Its Own Control Ids, So Every Browser Saw The Defaults Once](2026-10-12-run-history-keeps-its-own-control-ids-so-every-browser-saw-the-defaults-once.md).
+
 Shipped in PRs #209 and #215; design discussion in #206. This entry and
 [the naming entry](2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md)
 distil `docs/chart_options_inspector_proposal.md`, now deleted.

@@ -267,5 +267,14 @@ header tooltip holds as written, and the gap's formula, rounding, sort, and
 tooltip are unchanged. The string was author-owned copy, not a ruled row,
 and P1 and everything else here stand. Shipped in PR #348.
 
+**Superseded in part (2026-10-12).** The watchdog's session lines in the
+debug log leave the list of surfaces above. They were removed when the Run
+History page went public, in PR #373, because that page's run list is
+the record they stood in for. The run list's check and the latest-run card
+join the list. A past run's check is judged under its own version of the
+scenario, not under the version the scenario's newest run names, so a later
+run on another version changes no earlier check. The pace rule stands. See
+[A Past Run's Check Is Judged Against The PB It Was Chasing, Under Its Own Version](2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md).
+
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.

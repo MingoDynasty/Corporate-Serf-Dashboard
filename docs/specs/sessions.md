@@ -5,7 +5,7 @@ no more than 30 minutes. To measure a break it works out when each run began
 and how long it took, from two lines of the run's stats file. Inside a
 session it also finds each visit, the consecutive runs on one scenario. One
 page shows sessions so far, in its run list and its latest-run card: the Run
-History page, which is built and not yet public.
+History page.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in
@@ -25,8 +25,8 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - The run list lists a scenario's runs under the session each was played
   in, names a session by when it started, and counts the session's runs. It
   gives the length of the newest session alone.
-- That page is built and not yet public: it is served at its own address,
-  and nothing in the app links to it.
+- What the list and the card show in full is in
+  [run_history.md](run_history.md#the-run-list).
 - The list marks where a scenario was left and returned to within a session,
   which is the boundary between two of its visits, and counts the runs
   played on other scenarios between them. The word visit is not on screen.
@@ -45,8 +45,7 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - That page's chart plots a scenario's runs in the order sessions are split
   in (see [Sessions](#sessions)).
 - No toast or log line shows a session, a visit, a run's start, or a run's
-  length. The watchdog's interim per-run lines in the debug log are older
-  than these rules and don't use them.
+  length.
 - A run's start and its run length are shown nowhere by themselves. They
   decide which session a run joins, a session's name and its length are read
   from its first run's start, and the card's time on a scenario is read from

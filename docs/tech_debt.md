@@ -139,28 +139,11 @@ commands becomes burdensome.
 
 ### Watch for `is_scenario_in_database` early-return pattern
 
-`source/pages/home.py` previously had a bug where the rank callback short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.
+The rank callback, now in `source/components/scenario_stats.py`, previously had a bug where it short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.
 
 When building new UI features that consume `get_scenario_rank_info(...)`, grep for similar "is this in the local database" guards and confirm they do not inadvertently block lookups for unplayed scenarios.
 
 This is not a current bug; it is a code-pattern reminder so the same mistake does not recur.
-
-### Zero-width `dmc.Space` separators offset a wrapped control row
-
-`source/pages/home.py:1501-1502` (and `:1657`) use `dmc.Space(h="xl")` as
-separators inside `direction="row"` flex rows, but `h` sets height — they are
-zero-width flex items contributing only the row's own 12px gap. When the row
-wraps so that one lands at the start of a line, that line's first control sits
-12px right of the row's left edge. Originally measured at a 1280px viewport,
-with `Top N scores` at x=278 against the row's 266; PR #199 then changed where
-that row wraps, so reproduce it at whatever width now puts a separator first
-rather than at that one.
-
-Same defect class as the 32px playlist-filter indent fixed in PR #201, whose
-rewrap is what made this visible; left out of #201 because removing the
-separators is a judgment call about intended spacing rather than a mechanical
-fix. The graph-settings modal that held the other `Space(h="xs")` is gone
-(PR #209), so the three above are all that remain.
 
 ### A stored column choice can apply after the scenario table's first rows
 

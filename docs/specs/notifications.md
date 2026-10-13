@@ -58,10 +58,10 @@ their full behavior.
   (playlists spec) are yellow `dmc.Alert`s; the Aim Training Journey
   work-in-progress banner is a blue `dmc.Alert`, recorded only here because
   that page is work in progress and has no capability spec; the Playlists
-  leftover-files notice (playlists spec) is a blue `dmc.Paper`; the Home setup
-  card (settings and scenario-performance specs) is a `dmc.Paper` that is blue
-  in its identity state and yellow in its stats-folder and unusable-store
-  states
+  leftover-files notice (playlists spec) is a blue `dmc.Paper`; the setup
+  card on Home and Run History (settings and home specs) is a `dmc.Paper`
+  that is blue in its identity state and yellow in its stats-folder and
+  unusable-store states
   ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md));
   the stats-folder hint (scenario-performance spec) and the Settings restart
   notice (settings spec) are yellow `dmc.Paper` panels carrying the icon
@@ -111,10 +111,13 @@ their full behavior.
   the channels are enumerated under
   [background threads never drive UI outputs](../architecture.md#background-threads-never-drive-ui-outputs)).
   The run-event channel is drained in the app shell, so it reaches the screen
-  on every page. The two channels Scenario Performance drains — run-import
-  failures and startup playlist warnings — reach the screen only while that
-  page is mounted: the failures on its next poll tick, the warnings on a
-  one-shot interval after mount. The playlist fill's channel is drained by
+  on every page. The two channels Home and Run History drain — run-import
+  failures and startup playlist warnings — reach the screen only while one
+  of those two pages is mounted: the failures on its next poll tick, the
+  warnings on a one-shot interval after mount. Whichever of the two is open
+  empties the queue
+  ([2026-10-12](../decision_log/2026/2026-10-12-run-history-has-its-own-address-and-the-landing-address-is-home.md)).
+  The playlist fill's channel is drained by
   the playlist scenarios page and carries grid rows, never notifications; the
   playlists spec owns it.
 
@@ -270,7 +273,7 @@ toasts under, and it applies to every toast the app adds from here on
   sensitivity" and "a new sensitivity" both mean the normalized
   sensitivity-and-scale group, so a run recorded on a game's own scale is
   judged against the runs its converted value lands beside
-  ([scenario_performance.md](scenario_performance.md#the-graph)).
+  ([run_history.md](run_history.md#the-chart)).
 - The message also carries `pace_constant`, the constant a time-scored
   scenario's score counts down from, as a fact like the previous best. The
   watchdog works it out before the message is queued, with the landed run
@@ -281,7 +284,7 @@ toasts under, and it applies to every toast the app adds from here on
   celebrates
   ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   Recognition and eligibility are specified in
-  [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
+  [run_history.md](run_history.md#time-scored-scenarios).
   A lookup that fails costs the constant only: the run still imports, and
   its message carries `None`.
 - The app shell's `publish_run_events` is the deque's sole consumer. On each
@@ -289,8 +292,8 @@ toasts under, and it applies to every toast the app adds from here on
   drains every pending message and publishes one `run-events-batch` payload:
   the drained runs in order, each stamped `is_live`, plus the batch's
   `celebrated_run_id` (or none) and a monotonic `animation_sequence`. An empty
-  queue publishes nothing. The drain runs on every page, so a run no longer
-  waits for a Scenario Performance visit to be delivered.
+  queue publishes nothing. The drain runs on every page, so a run is
+  delivered whatever page is open.
 - A run is stamped live when its `datetime_created` is within the freshness
   window of the drain, and stale otherwise. The window is a 120-second cap
   plus one poll period, so it is 121 seconds at the default 1000 ms interval:
@@ -369,15 +372,18 @@ toasts under, and it applies to every toast the app adds from here on
   Preview never reaches the held path, because clicking it needs a visible
   tab
   ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
-- Scenario Performance's `check_for_new_data` consumes `run-events-batch` as
-  its only `Input`, with the follow switch and the scenario dropdown as
-  `State`. It lands on the most recently played scenario when the follow
-  switch is on and on the selected scenario otherwise, ignores runs for any
-  other scenario, and publishes one `run-events` summary — the latest matching
-  run's stamped record plus the batch's `celebrated_run_id` — changing the
-  dropdown at most once; with no scenario selected and the follow switch off
-  it forwards nothing
+- Run History's `forward_run_events` consumes `run-events-batch` as its
+  only `Input`, with the Follow switch and the scenario dropdown as `State`.
+  It summarizes the batch for the most recently played scenario when the
+  Follow switch is on and for the selected scenario otherwise, ignores runs
+  for any other scenario, and publishes one summary to the page's
+  `run-history-run-events` store — the latest matching run's stamped record
+  plus the batch's `celebrated_run_id`. With no scenario selected and the
+  Follow switch off it forwards no summary
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
+  It writes neither dropdown: the page's one selection callback reads the
+  summary and changes the scenario at most once per batch
+  ([2026-10-12](../decision_log/2026/2026-10-12-follow-and-a-scenario-link-clear-a-playlist-filter-that-does-not-list-the-scenario.md)).
   A control flip alone forwards nothing, because the controls are `State` and
   a Store replays its last value, and a remount does not replay a retained
   batch (`prevent_initial_call`).
@@ -391,8 +397,9 @@ toasts under, and it applies to every toast the app adds from here on
   ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
   The interval keeps ticking while the tab is hidden
   ([2026-07-17](../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md)).
-- `generate_graph` builds the toast from the summary only when `run-events`
-  triggered it, so a control change never re-toasts a stale payload
+- Run History's `generate_graph` builds the toast from the summary only when
+  the summary store triggered it, so a control change never re-toasts a stale
+  payload
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   A summary whose latest run belongs to another scenario earns nothing, and
   a render that resolves to an empty-state plot skips the toast.
@@ -407,8 +414,10 @@ toasts under, and it applies to every toast the app adds from here on
   94.98% miss of a 95% goal reads `94.9%`, never `95.0%`.
   A run below `scenario_previous_best` is capped at `99.9%` whether it passes
   or fails, so a run 0.03% short reads `99.9%`, never `100.0%`.
-  A run is placed when `nth_score` is at most the Top N value; first place is
-  phrased "best" and the rest "Nth-best".
+  A run is placed when `nth_score` is at most 5; first place is phrased
+  "best" and the rest "Nth-best". The 5 is fixed: the page plots every run
+  and has no Top N scores control
+  ([2026-10-12](../decision_log/2026/2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md)).
 - A run that carries a pace constant `C` is judged by pace wherever both
   times are positive. It passes when
   `(C − scenario_previous_best) × 100 >= goal × (C − score)`, compared as
@@ -469,7 +478,8 @@ toasts under, and it applies to every toast the app adds from here on
   a run verdict and outlives it. It is not an exception to the mechanism —
   it replaces its own previous instance the same way
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
-- The Run notifications master switch (`run-notification-switch`, on by
+- The Run notifications master switch (`run-history-run-notification-switch`,
+  on by
   default; help text "Controls threshold verdict and placement notifications
   for your runs. Personal best celebrations use their own setting.") gates the
   page-built shapes through one early return at the top of the producing
@@ -484,7 +494,8 @@ toasts under, and it applies to every toast the app adds from here on
   auto-switching, or the rank, Steam ID, and playlist toast families either. It is
   read as `State`, so flipping it never rebuilds the plot
   ([2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
-- The Score threshold verdict switch (`score-threshold-notification-switch`,
+- The Score threshold verdict switch
+  (`run-history-score-threshold-notification-switch`,
   on by default; help text "Adds a pass or fail verdict to run notifications
   when the run can be judged against the score threshold. Needs **Run
   notifications** turned on.", the control name bold
@@ -500,8 +511,8 @@ toasts under, and it applies to every toast the app adds from here on
 - When the watchdog cannot import a run file — a CSV that will not parse, a
   handler exception, or a store load that fails after a successful parse — it
   appends "Couldn't process a new run file. See data/logs/debug.log." to
-  `run_import_failure_queue`, and the observer thread survives. On each
-  `interval-component` tick `flush_run_import_failures` drains the queue into
+  `run_import_failure_queue`, and the observer thread survives. On each poll
+  tick of Home or Run History, `flush_run_import_failures` drains the queue into
   one red toast, id `run-import-failure`, title "Run not recorded": the
   message above for one failure, or
   `{n} new run files couldn't be processed. See data/logs/debug.log.` for
@@ -514,7 +525,7 @@ toasts under, and it applies to every toast the app adds from here on
 - The warnings the startup playlist scan records — a file it could not
   load, the loser of a duplicate-code pair, a missing bundled directory — go
   to `playlist_startup_warning_queue`; `flush_startup_playlist_warnings` drains
-  it 250 ms after a Scenario Performance mount (a one-shot interval), one
+  it 250 ms after Home or Run History mounts (a one-shot interval), one
   yellow persistent toast per warning, ids `startup-playlist-warning-{n}`,
   title "Playlist not loaded"
   ([2026-07-07](../decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)
@@ -557,7 +568,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 
 | Key | Pattern | Title | Color | Clears | Produced by |
 | --- | --- | --- | --- | --- | --- |
-| `run-verdict` | channel | per verdict | green / yellow | — | `generate_graph`; this spec |
+| `run-verdict` | channel | per verdict | green / yellow | — | Run History's `generate_graph`; this spec |
 | `pb-celebration` | channel, persistent | "New personal best" | green, until dismissed | — | `publish_run_events`; this spec |
 | `run-import-failure` | burst, fixed id | "Run not recorded" | red | — | `flush_run_import_failures`; this spec |
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |

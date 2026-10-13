@@ -63,3 +63,9 @@ README's summary. **Revisit trigger:** plotly.js changing the flow so data
 leaves before the dialog or without the Plotly Cloud tab, or changing the
 default `plotlyServerURL`; or a user report of the button being mistaken for
 a local save.
+
+**Superseded in part (2026-10-12).** What the shared figure carries changed
+with the chart. On the Run History page, which replaced Scenario
+Performance, the figure holds every run in the chart's range and no Average
+score line. The button stays, and so does everything else here. See
+[The Run History Chart Plots Every Run And Draws No Summary Line](2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md).

@@ -164,7 +164,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   nothing, and no scenario is then recognized as time-scored
   ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   What the files are read for is specified in
-  [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
+  [run_history.md](run_history.md#time-scored-scenarios).
 - Identity is a pair. Reads stay live until the first `get_identity` (or
   single-getter) call that observes a non-empty username, which freezes both
   values for the life of the process; a Steam ID without a username freezes
@@ -355,8 +355,8 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   One card covers both, because the Settings page's store alert is where they
   are told apart and where the remedy lives
   ([2026-08-11](../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md)).
-  Copy and treatment belong to the Scenario Performance spec.
-- The landing page's card is keyed to key absence in the stored view: an
+  Copy and treatment belong to the [Home spec](home.md#setup-surfaces).
+- The card on Home is keyed to key absence in the stored view: an
   absent `stats_dir` shows "Finish setting up" with no Skip and wins when both
   keys are absent; a present `stats_dir` with an absent `kovaaks_username`
   shows "Add your KovaaK's account" with "Open Settings" and "Skip". A key
@@ -364,7 +364,10 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   install never sees the card. Nothing renders while
   `is_stats_dir_change_pending()` holds
   ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
-  Placement and copy belong to the Scenario Performance spec.
+  Run History draws the same card without the account state: it shows
+  "Your settings can't be read" and "Finish setting up", and never Skip
+  ([2026-10-12](../decision_log/2026/2026-10-12-run-history-has-its-own-address-and-the-landing-address-is-home.md)).
+  Placement and copy belong to the [Home spec](home.md#setup-surfaces).
 - Skip calls `decline_identity`: the username becomes `""`, nothing else
   changes, no worker starts, nothing pins, and the card never returns
   ([2026-08-11](../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md)).
@@ -381,8 +384,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   retry that fails differently replaces the first explanation rather than
   sitting beside it
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
-- The landing page's in-place hint "No stats folder configured. Set it in
-  Settings." speaks only for a `stats_dir` key that exists and is unusable;
+- The in-place hint on Home and on Run History, "No stats folder
+  configured. Set it in Settings.", speaks only for a `stats_dir` key that
+  exists and is unusable;
   while a set directory awaits a restart it reads "Restart the app to apply
   your saved settings." instead
   ([2026-08-02](../decision_log/2026/2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself.md)
@@ -392,7 +396,7 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   render above the card
   ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md));
   the treatment is specified in
-  [scenario_performance.md](scenario_performance.md#hosted-setup-surfaces).
+  [home.md](home.md#setup-surfaces).
 - An empty username keeps the app fully offline; the short-circuit is
   specified in [scenario_rank.md](scenario_rank.md#data-sources-and-identity)
   ([2026-08-01](../decision_log/2026/2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected.md)),

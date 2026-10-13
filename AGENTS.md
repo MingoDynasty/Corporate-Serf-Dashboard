@@ -427,8 +427,8 @@ decision-log entry
   3. Sentence case for controls, placeholders, tooltips, status lines, chart
      annotations, legend entries, and toast, alert, and modal titles. Page
      titles, section headings, and grid column headers keep Title Case, as do
-     proper names and the chart modes `Score vs Sensitivity` and
-     `Score vs Time`.
+     proper names and the chart modes `Score vs Run`, `Score vs Time`, and
+     `Score vs Sensitivity`.
   4. The only ellipsis is the single `…` character, and only for work still
      in progress. Placeholders are bare noun phrases; never elide a path.
   5. Use the common contractions (can't, couldn't, doesn't, isn't, wasn't,

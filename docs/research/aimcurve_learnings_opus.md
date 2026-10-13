@@ -159,7 +159,7 @@ is shown as a gap with a count, such as "212 of 240 runs have bot detail",
 and never as a zero. [Scenario page, S4 and S5][scenario-page].
 
 **Our baseline:** Score vs Time plots by date. The
-[run-history proposal](../proposals/run_history_proposal.md) owns the
+[run-history proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/161b2cd34b9ac59559e41e2c57016e74f875268f/docs/proposals/run_history_proposal.md) owns the
 per-scenario history view, and the product direction in PR #327 proposes
 typical performance over best performance. Neither is ratified.
 

@@ -69,8 +69,9 @@ can write it by hand instead:
   the file and keeps a copy of the old one beside it.
 - `stats_dir` — the folder KovaaK's writes its run files into, usually
   `<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`. Without
-  it the dashboard still starts, but it has no runs to show and says so on the
-  Scenario Performance page. Left empty on purpose, it stays empty: the startup
+  it the dashboard still starts, but it has no runs to show and says so on
+  Home and on the Run History page. Left empty on purpose, it stays empty: the
+  startup
   detection only fills the value in when it has never been set.
 - `kovaaks_username` — enables the leaderboard position and percentile features;
   leave it out to run fully offline. `steam_id` is optional and makes player
@@ -120,10 +121,11 @@ those, a percentage of the score makes a real improvement look many times
 smaller than it is, so the app measures by pace instead, which is how fast you
 finish compared with your personal best. **Next Rank** then reads "+2.8%
 faster to Lavender": finish 2.8% faster than your personal best and you earn
-Lavender. On the Scenario Performance page, the **Score threshold percentage**
-becomes a percentage of your personal best's pace, so the threshold line and
-the run notification both judge by it, and the notification says "% of PB
-pace". A new personal best says how much faster you finished.
+Lavender. On the Run History page, the **Score threshold percentage**
+becomes a percentage of your personal best's pace, so the threshold line, the
+check beside a run's score, the latest-run card, and the run notification all
+judge by it, and the card and the notification say "% of PB pace". A new
+personal best says how much faster you finished.
 
 The app works this out from the performance files KovaaK's writes next to
 your stats files, so it can measure pace on a scenario once you have played it
@@ -155,7 +157,7 @@ in the **Columns** menu, as **Category** and **Subcategory**. A playlist you
 imported by share code has no groups, and neither do a few benchmarks whose
 grouping data doesn't line up with their scenario list.
 
-On the Scenario Performance page, the **Open scenario table** link under the
+On the Run History page, the **Open scenario table** link under the
 **Playlist filter** opens the scenario table of the playlist selected there.
 
 A playlist's scenario table keeps its sort when you come back to it with the
@@ -164,7 +166,7 @@ or from that link, starts it in playlist order; to clear a sort, click a sorted
 column's header until the table returns to that order.
 
 On both tables, click a name to open it. A playlist's name opens its scenario
-table, and a scenario's name opens that scenario on the Scenario Performance
+table, and a scenario's name opens that scenario on the Run History
 page. Everything else in a row is text you can select and copy: double-click a
 value, or drag across it. The exception is a benchmark's colored Category and
 Subcategory cells, whose labels can't be selected. A name is a link, so to copy
@@ -199,7 +201,7 @@ is already in use".** Another program holds the port — a second copy of the da
 one; Steam uses 8080. Close that program, or set a different `port` in `config.toml` (see
 [Configuration](#configuration)) and launch again.
 
-**The Scenario Performance page is empty, and a card says "No KovaaK's stats folder was found".**
+**Home and the Run History page show no runs, and a card says "No KovaaK's stats folder was found".**
 Steam detection missed — KovaaK's installed somewhere unusual, or not yet. Open Settings: the
 stats folder box suggests each Steam library it found, and the folder is normally
 `<Steam library>\steamapps\common\FPSAimTrainer\FPSAimTrainer\stats`. Save, and restart the
@@ -233,7 +235,7 @@ hand-edit surface.
 running anyway. Open <http://localhost:8050/> yourself — the console's "Dashboard running at"
 line names the exact address, including a configured port.
 
-**Notifications sometimes do not appear.** Keep one Scenario Performance tab open at a time.
+**Notifications sometimes do not appear.** Keep one Run History tab open at a time.
 Extra tabs are crash-safe, but a new run's notification goes to whichever tab asks first.
 
 **Where the logs are.** `%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`. `debug.log` is the

@@ -230,7 +230,7 @@ uv run python -c "import json, pathlib, dash_ag_grid; print(json.loads((pathlib.
   ask the maintainer.
 
 A dash-mantine-components bump needs two looks at the playlist filter on
-Scenario Performance, which no test can take. The filter lists a hidden
+Run History, which no test can take. The filter lists a hidden
 playlist while it holds one, and that rests on how the Select treats a value
 against its options: it names a value its options have, and drops a value its
 new options lack. Both were read in 2.8.0's bundle and seen in a browser, and
@@ -242,11 +242,11 @@ neither is documented
   must show that playlist's name, and still show it after a reload and after
   leaving the page and coming back.
 - **A playlist that is gone is dropped.** Give the filter a code no playlist
-  has: run the line below in the browser console on Scenario Performance,
+  has: run the line below in the browser console on Run History,
   then reload. The filter must come back empty, with no clear button.
 
   ```js
-  localStorage.setItem("_dash_persistence.playlist-dropdown-selection.value.true", '["KovaaKsNoSuchCode",null]')
+  localStorage.setItem("_dash_persistence.run-history-playlist-filter.value.true", '["KovaaKsNoSuchCode",null]')
   ```
 
 If either look fails, stop and ask the maintainer.

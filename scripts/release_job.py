@@ -54,7 +54,7 @@ REQUIRED_ARCHIVE_ENTRIES = (
     "resources/evxl/benchmarks.json",  # Evxl link names and benchmark categories
     "scripts/launch_bootstrap.ps1",  # install.ps1 copies it to launch.ps1
     "scripts/launcher.ps1",  # what that bootstrap then runs
-    "docs/screenshots/scenario_performance.png",  # the shipped README embeds it
+    "docs/screenshots/run_history.png",  # the shipped README embeds it
     "docs/screenshots/playlists.png",  # the shipped README embeds it
     "docs/screenshots/playlist_scenarios.png",  # the shipped README embeds it
     "docs/roadmap.md",  # the shipped README links it

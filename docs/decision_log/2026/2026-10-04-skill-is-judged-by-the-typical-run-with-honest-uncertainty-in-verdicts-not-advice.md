@@ -119,7 +119,7 @@ What else it takes depends on what the app would be claiming.
 **D4, Run history builds sessions first.** Sessions, and the visits inside
 them, are built before either history view, as the foundation the views and
 later features share. This reverses two durable decisions in the
-[Run History proposal](../../proposals/run_history_proposal.md): "raw timestamps
+[Run History proposal](2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md): "raw timestamps
 first; sessions are a later quality-of-life layer", and the view order that
 followed from it. Both are marked superseded there, with their text kept.
 Nearly every planned feature needs sessions, and splitting the runs into them
