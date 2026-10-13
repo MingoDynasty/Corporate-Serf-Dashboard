@@ -556,7 +556,7 @@ made by hand, does nothing. It lasts the eight seconds that toast is up.
 both keeps the encoded name and changes the page without reloading the app.
 
 **One function builds it.** Scenario links to the page are built in one
-place today (`scenario_home_href`), with each value encoded by
+place today (`scenario_run_history_href`), with each value encoded by
 `urlencode`. The toast's link comes from the same place, so the address is
 spelled once.
 
@@ -924,7 +924,7 @@ For the implementation PR:
   no Notifications group.
 - **What is gone.** The tests for the verdict and placement toasts are
   removed. The tests for the judging functions move with those functions.
-- **The channel.** `tests/test_home_run_verdict_lifetime.py` stays as the
+- **The channel.** `tests/test_run_verdict_lifetime.py` stays as the
   guard on replace-in-place behavior, which does not change.
 - **In a browser, with a scratch stats folder.** A run dropped while the
   Playlists page is open shows the toast, and its link opens Run History on
