@@ -22,13 +22,13 @@ from source.components.run_marks import (  # noqa: E402
     Chased,
     RunMark,
     mark_runs,
-    mark_scenario_runs,
     what_runs_chased,
 )
 from source.components.score_threshold import (  # noqa: E402
     ThresholdVerdict,
     Unjudged,
     judge_run,
+    normalize_score_threshold_percentage,
     threshold_verdict,
 )
 from source.kovaaks import data_service  # noqa: E402
@@ -39,6 +39,7 @@ from source.kovaaks.data_service import (  # noqa: E402
 )
 from source.kovaaks.time_scored_service import (  # noqa: E402
     PaceBasis,
+    get_version_pace_basis,
     index_performance_files,
 )
 from source.my_watchdog import file_watchdog  # noqa: E402
@@ -487,9 +488,23 @@ def _land(monkeypatch, stats_file: Path):
     return message
 
 
+def _marks_from_store(
+    percentage: float | str | None = 95.0,
+) -> dict[RunData, RunMark]:
+    """Mark the scenario's runs as the run list does, from the run store.
+
+    ``percentage`` is the percentage field's value as the browser sends it.
+    """
+    return mark_runs(
+        get_runs_in_play_order(SCENARIO),
+        normalize_score_threshold_percentage(percentage),
+        lambda version: get_version_pace_basis(SCENARIO, version),
+    )
+
+
 def _mark_of(stamp: str, percentage: float | str | None = 95.0) -> RunMark:
     """Mark the scenario's runs from the run store, and return one run's."""
-    marks = mark_scenario_runs(SCENARIO, percentage)
+    marks = _marks_from_store(percentage)
     (run,) = [
         run
         for run in marks
@@ -573,7 +588,7 @@ def test_a_cleared_percentage_field_turns_every_check_off(folders):
 def test_a_scenario_with_no_runs_has_no_marks(folders):
     folders.start()
 
-    assert mark_scenario_runs(SCENARIO, 95.0) == {}
+    assert _marks_from_store(95.0) == {}
 
 
 # --- The newest run's mark and the toast it got --------------------------------
@@ -590,7 +605,7 @@ def _toast_verdict(message, percentage: float) -> ThresholdVerdict | None:
 
 
 def _newest_mark(percentage: float) -> RunMark:
-    marks = mark_scenario_runs(SCENARIO, percentage)
+    marks = _marks_from_store(percentage)
     return marks[get_runs_in_play_order(SCENARIO)[-1]]
 
 
@@ -673,7 +688,7 @@ def test_every_star_is_on_a_run_the_chart_stars(folders):
     folders.stats_file(THIRD, 896.2)
     folders.start()
 
-    marks = mark_scenario_runs(SCENARIO, 95.0)
+    marks = _marks_from_store(95.0)
 
     assert {run for run, mark in marks.items() if mark.is_new_pb} == (
         new_high_score_runs(get_runs_in_play_order(SCENARIO))
