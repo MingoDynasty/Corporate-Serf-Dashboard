@@ -144,6 +144,11 @@ RUN_LANDED_STORE_ID = "run-history-run-landed"
 # when the answer changes, and the run list takes it as an input, which is
 # what takes "In progress" off a session nothing more is played in.
 SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
+# The id of the newest run in the run store, on whatever scenario. The card
+# writes it with what it shows, only when it is another run than the one
+# held. The graph takes it as an input: a figure rings its own scenario's
+# newest run, and the ring shows while this names the same run.
+LATEST_RUN_STORE_ID = "run-history-latest-run"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -401,6 +406,7 @@ def build_run_list_rows(  # noqa: PLR0913
     Output(LATEST_RUN_CARD_IDS.scenario_button, "value"),
     Output(LATEST_RUN_CARD_IDS.scenario_button, "aria-label"),
     Output(LATEST_RUN_CARD_IDS.body, "children"),
+    Output(LATEST_RUN_STORE_ID, "data"),
     # Any run, on any scenario: the card reports the last run played. It is
     # still worked out from the run store and never from the batch.
     Input(RUN_LANDED_STORE_ID, "data"),
@@ -413,13 +419,15 @@ def build_run_list_rows(  # noqa: PLR0913
     # "last session" with no run landing.
     Input(TODAY_STORE_ID, "data"),
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
+    State(LATEST_RUN_STORE_ID, "data"),
 )
-def show_latest_run(
+def show_latest_run(  # noqa: PLR0913
     _run_landed,
     selected_scenario,
     score_threshold_percentage,
     _held_date,
     _held_in_progress,
+    held_latest_run,
 ):
     """Write what the latest-run card shows, from the run store.
 
@@ -427,10 +435,16 @@ def show_latest_run(
     the scenario dropdown and the session store, both written by callbacks a
     run that lands also calls, so it waits for them and writes the card once
     per batch, for the scenario the page ends up on.
+
+    The last output is the run's id, written only when it is another run
+    than the one held. The graph takes that store as an input, so writing
+    the same id again would restyle a chart that nothing had changed.
     """
-    return latest_run_card_content(
-        latest_run_from_store(score_threshold_percentage, datetime.now()),
-        selected_scenario,
+    shown = latest_run_from_store(score_threshold_percentage, datetime.now())
+    latest_run_id = None if shown is None else shown.run_id
+    return (
+        *latest_run_card_content(shown, selected_scenario),
+        no_update if latest_run_id == held_latest_run else latest_run_id,
     )
 
 
@@ -580,7 +594,7 @@ clientside_callback(
     Input(CHART_MODE_ID, "value"),
 )
 
-register_chart_options(CHART_OPTIONS_IDS)
+register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
 register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
 register_scenario_selection_clearing_filter(
@@ -804,6 +818,7 @@ def layout(
             # find no date held, write one, and rebuild a chart just drawn.
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
             dcc.Store(id=RUN_LANDED_STORE_ID),
+            dcc.Store(id=LATEST_RUN_STORE_ID),
             # Drawn with the answer already in it, for the reason the date
             # is: the first tick would otherwise write it and rebuild a list
             # just drawn.

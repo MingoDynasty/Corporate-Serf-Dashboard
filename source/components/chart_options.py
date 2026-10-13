@@ -11,17 +11,20 @@ from typing import NamedTuple
 
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback, no_update
+from dash import Input, NoUpdate, Output, Patch, State, callback, ctx, no_update
 
 from source.components.control_name import control_name
 from source.components.local_icon import local_icon
 from source.plot.plot_service import (
+    LATEST_RUN_TRACE_NAME,
     POINT_SIZE_DEFAULT,
     POINT_SIZE_OPTIONS,
     apply_light_dark_mode,
     apply_point_appearance,
     generate_placeholder_plot,
     generated_point_color,
+    latest_run_ring_opacity,
+    show_latest_run_ring,
 )
 
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
@@ -206,6 +209,56 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
         plot_json = generate_placeholder_plot().to_json()
     figure = apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
     return apply_point_appearance(figure, point_size, point_color)
+
+
+def latest_run_ring_patch(plot_json: str | None, latest_run_id: str | None):
+    """Show or hide the ring on the graph as it stands, changing nothing else.
+
+    Returns a patch of the one trace, or ``no_update`` for a figure with no
+    ring. ``plot_json`` is the cached figure, read only for where the ring is
+    and which run it is round.
+
+    A patch, and not the figure again: a run on a scenario the page does not
+    show takes the ring off this chart, and a whole new figure would also
+    undo a zoom the player had made on a chart that run did not change.
+    """
+    if not plot_json:
+        return no_update
+    for index, trace in enumerate(json.loads(plot_json).get("data", [])):
+        if trace.get("name") == LATEST_RUN_TRACE_NAME:
+            patch = Patch()
+            patch["data"][index]["opacity"] = latest_run_ring_opacity(
+                trace.get("meta"), latest_run_id
+            )
+            return patch
+    return no_update
+
+
+def apply_graph_appearance_ringing_latest_run(  # noqa: PLR0913
+    color_scheme,
+    plot_json,
+    point_size,
+    point_color,
+    latest_run_id,
+    *,
+    only_the_latest_run_changed: bool,
+) -> go.Figure | Patch | NoUpdate:
+    """Style the graph as ``apply_graph_appearance`` does, and ring the latest run.
+
+    ``latest_run_id`` is the id of the newest run on any scenario. The cached
+    figure rings its own scenario's newest run, and the ring shows while the
+    two are the same run.
+
+    Which run is the latest is an input here and not something the page's
+    chart callback bakes into the figure. A run on a scenario the page does
+    not show rebuilds no chart, and it still has to take the ring off this
+    one. With ``only_the_latest_run_changed`` the answer is a patch of the
+    ring alone.
+    """
+    if only_the_latest_run_changed:
+        return latest_run_ring_patch(plot_json, latest_run_id)
+    figure = apply_graph_appearance(color_scheme, plot_json, point_size, point_color)
+    return show_latest_run_ring(figure, latest_run_id, color_scheme)
 
 
 def clear_point_color(n_clicks):
@@ -467,19 +520,59 @@ def chart_options_toggle(ids: ChartOptionsIds) -> dmc.Button:
     )
 
 
-def register_chart_options(ids: ChartOptionsIds) -> None:
+def register_chart_options(
+    ids: ChartOptionsIds,
+    *,
+    latest_run: str | None = None,
+) -> None:
     """Register the block's callbacks for one page's ids.
 
     Call once per page, at import, with the ids its layout is built from. The
     theme comes from the shell's color scheme switch, which every page shares.
+
+    ``latest_run`` is the id of a store holding the id of the newest run on
+    any scenario, for a page whose figures ring their scenario's newest run.
+    The graph's one callback then takes the store as an input too, so the
+    ring is shown or hidden when the latest run changes. It is one callback
+    and not a second writer of the figure, because Dash holds a callback
+    back for a queued writer of one of its inputs: when a run lands on the
+    chart's own scenario, the graph is written once, after both the new
+    figure and the new latest run are in.
     """
-    callback(
-        Output(ids.graph, "figure"),
+    appearance_inputs = [
         Input("color-scheme-switch", "computedColorScheme"),
         Input(ids.cached_plot, "data"),
         Input(ids.point_size, "value"),
         Input(ids.point_color, "value"),
-    )(apply_graph_appearance)
+    ]
+    if latest_run is None:
+        callback(Output(ids.graph, "figure"), *appearance_inputs)(
+            apply_graph_appearance
+        )
+    else:
+        latest_run_prop = f"{latest_run}.data"
+
+        @callback(
+            Output(ids.graph, "figure"),
+            *appearance_inputs,
+            Input(latest_run, "data"),
+        )
+        def ring_latest_run_on_graph(
+            color_scheme, plot_json, point_size, point_color, latest_run_id
+        ):
+            """Style the graph, or only move the ring when nothing else changed."""
+            return apply_graph_appearance_ringing_latest_run(
+                color_scheme,
+                plot_json,
+                point_size,
+                point_color,
+                latest_run_id,
+                only_the_latest_run_changed=(
+                    [trigger["prop_id"] for trigger in ctx.triggered]
+                    == [latest_run_prop]
+                ),
+            )
+
     callback(
         Output(ids.point_color, "value"),
         Input(ids.point_color_default, "n_clicks"),

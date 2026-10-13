@@ -446,6 +446,30 @@ def _sample_rows() -> dict[str, dict]:
     return rows
 
 
+def test_the_last_run_played_is_highlighted_by_a_rule_on_a_field_the_rows_carry():
+    """A rule, because the grid works a row's class out only when it draws it.
+
+    The run that was the latest stays in the list when the next one lands,
+    and a class given by ``getRowClass`` would stay on it.
+    """
+    rules = _options()["rowClassRules"]
+
+    assert rules == {"run-list-row-latest": "params.data.latest"}
+    assert "latest" in _sample_rows()["run"]
+    assert "latest" not in LIST_SCRIPT.read_text(encoding="utf-8")
+
+
+def test_the_highlight_is_a_look_and_tells_a_screen_reader_nothing():
+    """So it does not repeat the NVDA walk the list's record describes."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    rule = _css_block(css, ".run-history-list-grid .ag-row.run-list-row-latest")
+
+    assert "background-color: var(--mantine-color-blue-light);" in rule
+    assert "font-weight: 600;" in rule
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    assert "run-list-row-latest" not in script
+
+
 def test_the_script_reads_no_row_field_the_rows_do_not_carry():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
     carried = {field for row in _sample_rows().values() for field in row}

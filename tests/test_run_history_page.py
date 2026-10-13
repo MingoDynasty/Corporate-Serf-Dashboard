@@ -843,7 +843,7 @@ def test_the_page_registers_every_block_for_its_own_ids():
 
     stats, options = run_history.SCENARIO_STATS_IDS, run_history.CHART_OPTIONS_IDS
     assert answering(f"{stats.num_runs}.children") == "get_scenario_num_runs"
-    assert answering(f"{options.graph}.figure") == "apply_graph_appearance"
+    assert answering(f"{options.graph}.figure") == "ring_latest_run_on_graph"
     assert answering(f"{options.panel}.className") == "toggle_chart_options"
     flushes = {
         entry["inputs"][0]["id"]: GLOBAL_CALLBACK_MAP[entry["output"]][
@@ -1320,7 +1320,7 @@ def test_the_card_is_written_by_these_five_inputs_and_on_load():
     assert registration["output"] == (
         f"..{card.heading}.children...{card.scenario_button}.children"
         f"...{card.scenario_button}.value...{card.scenario_button}.aria-label"
-        f"...{card.body}.children.."
+        f"...{card.body}.children...{run_history.LATEST_RUN_STORE_ID}.data.."
     )
     assert _keys(registration["inputs"]) == [
         f"{run_history.RUN_LANDED_STORE_ID}.data",
@@ -1329,7 +1329,7 @@ def test_the_card_is_written_by_these_five_inputs_and_on_load():
         f"{run_history.TODAY_STORE_ID}.data",
         f"{run_history.SESSION_IN_PROGRESS_STORE_ID}.data",
     ]
-    assert registration["state"] == []
+    assert _keys(registration["state"]) == [f"{run_history.LATEST_RUN_STORE_ID}.data"]
     # The page load runs it, so the card is right with no new run.
     assert registration["prevent_initial_call"] is False
 
@@ -1384,20 +1384,26 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     monkeypatch.setattr(run_history, "latest_run_from_store", from_store)
     monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 22, 50))
 
-    answer = run_history.show_latest_run("landed.csv", SCENARIO, 95, "2026-10-12", True)
+    answer = run_history.show_latest_run(
+        "landed.csv", SCENARIO, 95, "2026-10-12", True, "held.csv"
+    )
 
     # The batch only calls it: nothing of the run is read from the store that
     # names it.
     assert asked == [(95, datetime(2026, 10, 12, 22, 50))]
-    assert rendered_text(answer.heading) == "Latest run · 10:50 PM · "
-    assert answer.scenario_button == "Scenario B"
-    assert answer.scenario_button_value == "Scenario B"
-    assert answer.scenario_button_label == "Show Scenario B"
-    assert [rendered_text(line) for line in answer.body] == [
+    heading, button, button_value, button_label, body, latest_run_id = answer
+    assert rendered_text(heading) == "Latest run · 10:50 PM · "
+    assert (button, button_value, button_label) == (
+        "Scenario B",
+        "Scenario B",
+        "Show Scenario B",
+    )
+    assert [rendered_text(line) for line in body] == [
         "812.4",
         "Accuracy 55%",
         "Run 1 this session · 4 min on this scenario",
     ]
+    assert latest_run_id == "landed.csv"
     # One value per output, in the outputs' order.
     assert len(answer) == len(_card_registration()["output"].split("..."))
 
@@ -1405,14 +1411,18 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
 def test_with_no_run_in_the_store_the_card_says_so(monkeypatch):
     monkeypatch.setattr(run_history, "latest_run_from_store", lambda *_arguments: None)
 
-    answer = run_history.show_latest_run(None, None, 95, "2026-10-12", False)
+    heading, button, _value, _label, body, latest_run_id = run_history.show_latest_run(
+        None, None, 95, "2026-10-12", False, None
+    )
 
-    assert answer.heading is None
-    assert answer.scenario_button is None
-    assert [rendered_text(line) for line in answer.body] == [
+    assert heading is None
+    assert button is None
+    assert [rendered_text(line) for line in body] == [
         "No runs yet",
         "Play a scenario in KovaaK's and your latest run will show here.",
     ]
+    # No run was held and none is: nothing to write.
+    assert latest_run_id is no_update
 
 
 def test_the_card_starts_empty_and_the_page_load_fills_it():
@@ -1423,3 +1433,107 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
     assert _by_id(page, card.heading).children is None
     assert _by_id(page, card.body).children is None
     assert _by_id(page, card.scenario_button).children is None
+
+
+# --- The latest run's id, and the ring ------------------------------------------------
+
+
+def _shown_run(run_id: str) -> latest_run_card.LatestRun:
+    return latest_run_card.LatestRun(
+        run_id=run_id,
+        scenario=SCENARIO,
+        time="10:50 PM",
+        score="812.4",
+        badge=None,
+        result="Accuracy 55%",
+        session="Run 1 this session · 4 min on this scenario",
+    )
+
+
+@pytest.mark.parametrize(
+    ("held", "shown", "written"),
+    [
+        # Another run than the one held: on load, and when a run lands.
+        (None, "a.csv", "a.csv"),
+        ("a.csv", "b.csv", "b.csv"),
+        # The same run: a change of scenario, of the percentage, of the date.
+        ("a.csv", "a.csv", no_update),
+    ],
+)
+def test_the_latest_runs_id_is_written_only_when_it_is_another_run(
+    monkeypatch, held, shown, written
+):
+    """The graph takes the store, so the same id again would restyle the chart."""
+    monkeypatch.setattr(
+        run_history, "latest_run_from_store", lambda *_arguments: _shown_run(shown)
+    )
+
+    *_card, latest_run_id = run_history.show_latest_run(
+        None, SCENARIO, 95, "2026-10-12", True, held
+    )
+
+    assert latest_run_id == written or latest_run_id is written
+
+
+def test_a_run_store_emptied_of_runs_takes_the_held_id_away(monkeypatch):
+    monkeypatch.setattr(run_history, "latest_run_from_store", lambda *_arguments: None)
+
+    *_card, latest_run_id = run_history.show_latest_run(
+        None, SCENARIO, 95, "2026-10-12", False, "a.csv"
+    )
+
+    assert latest_run_id is None
+
+
+def test_the_latest_run_store_starts_empty_and_the_page_load_fills_it():
+    store = _by_id(run_history.layout(), run_history.LATEST_RUN_STORE_ID)
+
+    assert run_history.LATEST_RUN_STORE_ID == "run-history-latest-run"
+    assert isinstance(store, dcc.Store)
+    assert getattr(store, "data", None) is None
+
+
+def test_the_graph_takes_the_latest_run_and_waits_for_both_of_its_writers():
+    """One writer of the figure, held for the chart and for the latest run.
+
+    A run on the chart's own scenario writes a new figure and a new latest
+    run. Dash holds a callback back for a queued writer of one of its
+    inputs, so the graph is written once, after both. A run on another
+    scenario writes only the latest run, which is what takes the ring off
+    with no new figure.
+    """
+    options = run_history.CHART_OPTIONS_IDS
+    graph = _registration(f"{options.graph}.figure")
+    chart = _chart_registration()
+    card = _card_registration()
+
+    assert graph["output"] == f"{options.graph}.figure"
+    assert _keys(graph["inputs"]) == [
+        "color-scheme-switch.computedColorScheme",
+        f"{options.cached_plot}.data",
+        f"{options.point_size}.value",
+        f"{options.point_color}.value",
+        f"{run_history.LATEST_RUN_STORE_ID}.data",
+    ]
+    assert graph["state"] == []
+    assert f"..{options.cached_plot}.data..." in chart["output"]
+    assert card["output"].endswith(f"...{run_history.LATEST_RUN_STORE_ID}.data..")
+    # Neither write is a duplicate one, which Dash would not hold the graph
+    # back for.
+    assert f"{options.cached_plot}.data@" not in chart["output"]
+    assert "@" not in card["output"]
+    # The chart is still not rebuilt for a run on another scenario.
+    assert f"{run_history.LATEST_RUN_STORE_ID}.data" not in _keys(chart["inputs"])
+    assert f"{run_history.RUN_LANDED_STORE_ID}.data" not in _keys(chart["inputs"])
+
+
+def test_the_other_pages_graph_takes_no_latest_run():
+    graph = GLOBAL_CALLBACK_MAP[f"{home.CHART_OPTIONS_IDS.graph}.figure"]
+
+    assert graph["callback"].__name__ == "apply_graph_appearance"
+    assert [entry["id"] for entry in graph["inputs"]] == [
+        "color-scheme-switch",
+        home.CHART_OPTIONS_IDS.cached_plot,
+        home.CHART_OPTIONS_IDS.point_size,
+        home.CHART_OPTIONS_IDS.point_color,
+    ]

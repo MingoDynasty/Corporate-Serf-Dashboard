@@ -6,10 +6,14 @@ hold what a browser's stored preferences depend on, each control's id and
 layout default, along with the groups, the help text, and the toggle.
 """
 
+import json
+from types import SimpleNamespace
+
 import dash
 import dash_mantine_components as dmc
+import plotly.graph_objects as go
 import pytest
-from dash import no_update
+from dash import Patch, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 from source.components import chart_options, scenario_selection
@@ -339,3 +343,150 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "second-panel",
     }
     assert all(GLOBAL_CALLBACK_MAP[key] is spec for key, spec in before.items())
+
+
+# --- A page whose figures ring the latest run ----------------------------------------
+
+
+def _ringed_plot(ringed_run_id: str = "newest.csv") -> str:
+    """Build a cached figure: run points, then a ring tagged with a run's id."""
+    figure = go.Figure(
+        [
+            go.Scatter(x=[1, 2], y=[10.0, 12.0], name="Run data point"),
+            go.Scatter(x=[2], y=[12.0], name="Latest run", meta=ringed_run_id),
+        ]
+    )
+    return figure.to_json()
+
+
+def _ring(figure):
+    (ring,) = [trace for trace in figure.data if trace.name == "Latest run"]
+    return ring
+
+
+@pytest.mark.parametrize(
+    ("latest_run", "opacity"),
+    [("newest.csv", 1), ("on-another-scenario.csv", 0), (None, 0)],
+)
+def test_styling_the_graph_shows_the_ring_only_round_the_last_run_played(
+    latest_run, opacity
+):
+    figure = chart_options.apply_graph_appearance_ringing_latest_run(
+        "dark",
+        _ringed_plot(),
+        "Large",
+        "",
+        latest_run,
+        only_the_latest_run_changed=False,
+    )
+
+    assert isinstance(figure, go.Figure)
+    assert _ring(figure).opacity == opacity
+    # The rest of the styling is the other page's own.
+    assert (
+        figure.layout.template
+        == go.Figure(
+            chart_options.apply_graph_appearance("dark", _ringed_plot(), "Large", "")
+        ).layout.template
+    )
+    assert figure.data[0].marker.size == 10
+
+
+@pytest.mark.parametrize(
+    ("latest_run", "opacity"),
+    [("newest.csv", 1), ("on-another-scenario.csv", 0), (None, 0)],
+)
+def test_a_change_of_latest_run_alone_patches_the_ring_and_nothing_else(
+    latest_run, opacity
+):
+    """A whole new figure would undo a zoom on a chart the run did not change."""
+    patch = chart_options.apply_graph_appearance_ringing_latest_run(
+        "dark",
+        _ringed_plot(),
+        "Large",
+        "#ff0000",
+        latest_run,
+        only_the_latest_run_changed=True,
+    )
+
+    assert isinstance(patch, Patch)
+    assert json.loads(json.dumps(patch.to_plotly_json()))["operations"] == [
+        {
+            "operation": "Assign",
+            "location": ["data", 1, "opacity"],
+            "params": {"value": opacity},
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "plot_json",
+    [
+        None,
+        "",
+        go.Figure(go.Scatter(x=[1], y=[10.0], name="Run data point")).to_json(),
+        go.Figure().to_json(),
+    ],
+)
+def test_a_figure_with_no_ring_is_left_alone_when_the_latest_run_changes(plot_json):
+    """The empty states, and a range that leaves the newest run out."""
+    assert (
+        chart_options.apply_graph_appearance_ringing_latest_run(
+            "light", plot_json, "Default", "", "a.csv", only_the_latest_run_changed=True
+        )
+        is no_update
+    )
+
+
+def test_a_page_that_rings_the_latest_run_gives_the_graph_one_more_input(
+    restored_callbacks,
+):
+    chart_options.register_chart_options(SECOND_PAGE_IDS, latest_run="second-latest")
+
+    spec = GLOBAL_CALLBACK_MAP["second-graph.figure"]
+
+    assert [f"{entry['id']}.{entry['property']}" for entry in spec["inputs"]] == [
+        "color-scheme-switch.computedColorScheme",
+        "second-cached_plot.data",
+        "second-point_size.value",
+        "second-point_color.value",
+        "second-latest.data",
+    ]
+    assert spec["state"] == []
+    # One writer of the figure, and a plain one: the graph is then held for
+    # the chart callback and for the latest run's writer alike.
+    assert [key for key in GLOBAL_CALLBACK_MAP if "second-graph.figure" in key] == [
+        "second-graph.figure"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("triggered", "patched"),
+    [
+        (["second-latest.data"], True),
+        # The new figure and the new latest run arrive together when a run
+        # lands on the chart's own scenario: the figure is styled whole.
+        (["second-cached_plot.data", "second-latest.data"], False),
+        (["second-cached_plot.data"], False),
+        (["color-scheme-switch.computedColorScheme"], False),
+        # The page load, which nothing triggered.
+        (["."], False),
+    ],
+)
+def test_the_graph_is_patched_only_when_the_latest_run_is_all_that_changed(
+    monkeypatch, restored_callbacks, triggered, patched
+):
+    chart_options.register_chart_options(SECOND_PAGE_IDS, latest_run="second-latest")
+    answer = GLOBAL_CALLBACK_MAP["second-graph.figure"]["callback"].__wrapped__
+    monkeypatch.setattr(
+        chart_options,
+        "ctx",
+        SimpleNamespace(
+            triggered=[{"prop_id": prop_id, "value": None} for prop_id in triggered]
+        ),
+    )
+
+    result = answer("light", _ringed_plot(), "Default", "", "newest.csv")
+
+    assert isinstance(result, Patch) == patched
+    assert isinstance(result, go.Figure) != patched

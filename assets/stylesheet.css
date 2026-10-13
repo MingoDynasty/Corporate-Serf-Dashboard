@@ -589,6 +589,13 @@
     border-top: 1px solid var(--ag-border-color);
 }
 
+/* The last run played, while its scenario is the one shown: the run the
+   latest-run card reports and the chart rings. */
+.run-history-list-grid .ag-row.run-list-row-latest {
+    background-color: var(--mantine-color-blue-light);
+    font-weight: 600;
+}
+
 /* The current session, held under the column headings while the list
    scrolls. Beside it the grid keeps a scrollbar of the row's own, so its
    columns stay in line with the body's. It scrolls nothing, so it is drawn

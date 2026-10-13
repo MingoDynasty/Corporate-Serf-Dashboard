@@ -12,6 +12,7 @@ from datetime import date, datetime, time, timedelta
 
 import plotly.graph_objects as go
 
+from source.components.run_history_list import run_id
 from source.kovaaks.data_service import (
     get_rank_data_from_playlist_code,
     get_runs_in_play_order,
@@ -117,8 +118,15 @@ def build_run_history_figure(  # noqa: PLR0913
     overlays and notifications. ``run_range`` and ``day_range`` are the two
     range selects' values, and the mode decides which one is read. ``today``
     is the app's own date: a range of days counts back from it.
+
+    The scenario's newest run is ringed when the range holds it, in a trace
+    tagged with the run's id. Whether the ring shows is not decided here: it
+    shows only while that run is also the last one played on any scenario,
+    and a run on another scenario changes that with no new figure.
     """
     runs = get_runs_in_play_order(selected_scenario)
+    newest = runs[-1]
+    newest_id = run_id(newest)
     # Judged over the whole history, and only then is the range applied: a
     # new PB the range leaves out is not drawn, and it still decides which
     # later runs beat it. Judged in play order, so the star sits on the same
@@ -138,6 +146,8 @@ def build_run_history_figure(  # noqa: PLR0913
                 show_all_ranks_switch,
                 new_pbs,
                 today,
+                newest,
+                newest_id,
             ),
             True,
         )
@@ -175,6 +185,8 @@ def build_run_history_figure(  # noqa: PLR0913
                 rank_data,
                 show_all_ranks_switch,
                 new_pbs,
+                newest,
+                newest_id,
             ),
             True,
         )
@@ -196,6 +208,8 @@ def build_run_history_figure(  # noqa: PLR0913
             rank_overlay_switch,
             rank_data,
             show_all_ranks_switch,
+            newest,
+            newest_id,
         ),
         True,
     )
