@@ -141,6 +141,15 @@ def format_score(value: float) -> str:
     return f"{value:,.2f}".rstrip("0").rstrip(".")
 
 
+def format_whole_percent(fraction: float) -> str:
+    """Format a fraction as a whole percentage, a half rounding up: 0.545 -> "55%".
+
+    Not ``round``, which sends a half to the even number: 54.5 would read
+    54% and 55.5 would read 56%.
+    """
+    return f"{math.floor(fraction * 100 + 0.5)}%"
+
+
 def format_elapsed_duration(seconds: float) -> str:
     """Format a measured length of time in the form the estimates use.
 

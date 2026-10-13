@@ -15,7 +15,6 @@ run and the row it opens, and the script applies that once per run.
 """
 
 import json
-import math
 from collections.abc import Iterable, Mapping
 from datetime import date, datetime
 from typing import Any, NamedTuple, TypedDict
@@ -53,6 +52,7 @@ from source.utilities.utilities import (
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
+    format_whole_percent,
 )
 
 # How many sessions the list loads at first, and how many more each press of
@@ -146,15 +146,6 @@ def _count(count: int, noun: str) -> str:
     return f"{count:,} {noun}" if count == 1 else f"{count:,} {noun}s"
 
 
-def _whole_percent(fraction: float) -> str:
-    """Format an accuracy to the whole percent, a half rounding up.
-
-    Not ``round``, which sends a half to the even number: 54.5 would read
-    54% and 55.5 would read 56%.
-    """
-    return f"{math.floor(fraction * 100 + 0.5)}%"
-
-
 def _check_text(mark: RunMark) -> str:
     """Word a run's verdict, or the reason it has none."""
     if isinstance(mark.verdict, ThresholdVerdict):
@@ -173,7 +164,7 @@ def _run_row(run: RunData, number: int, session_id: str, mark: RunMark) -> dict:
         "passed": mark.passed,
         "check_text": _check_text(mark),
         "new_pb": mark.is_new_pb,
-        "accuracy": _whole_percent(run.accuracy),
+        "accuracy": format_whole_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "sens": f"{run.horizontal_sens} {run.sens_scale}",
     }
