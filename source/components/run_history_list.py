@@ -14,11 +14,23 @@ Which rows are open is the browser's alone. The records only name the newest
 run and the row it opens, and the script applies that once per run.
 """
 
+import json
 import math
 from collections.abc import Iterable, Mapping
 from datetime import date, datetime
-from typing import Any, TypedDict
+from typing import Any, NamedTuple, TypedDict
 
+import dash_ag_grid as dag
+import dash_mantine_components as dmc
+from dash import Input, Output, State, clientside_callback, dcc, html
+
+from source.components.columns_menu import (
+    COLUMNS_MENU_GRID_OPTIONS,
+    MenuColumn,
+    columns_menu,
+    columns_menu_sink,
+    register_columns_menu,
+)
 from source.components.run_marks import RunMark, mark_runs
 from source.components.score_threshold import (
     ThresholdVerdict,
@@ -91,13 +103,16 @@ class RunListModel(TypedDict):
     ``newest_run`` is the id of the newest run in the whole run store, and
     ``forced_open`` the ids of the rows that run opens. The script opens them
     once per ``newest_run``, so a row the player closed is not reopened by a
-    later change of scenario. ``empty`` is the text shown in place of the
-    list when there is nothing to list, and ``None`` otherwise.
+    later change of scenario. ``session_limit`` is how many sessions the
+    rows were loaded up to, which the script adds to when older ones are
+    asked for. ``empty`` is the text shown in place of the list when there is
+    nothing to list, and ``None`` otherwise.
     """
 
     rows: list[dict[str, Any]]
     newest_run: str | None
     forced_open: list[str]
+    session_limit: int
     heading: str
     grid_name: str
     empty: str | None
@@ -109,6 +124,7 @@ def empty_run_list(text: str) -> RunListModel:
         "rows": [],
         "newest_run": None,
         "forced_open": [],
+        "session_limit": SESSIONS_PER_LOAD,
         "heading": "",
         "grid_name": "",
         "empty": text,
@@ -318,6 +334,7 @@ def build_run_list(
         "rows": rows,
         "newest_run": run_id(newest_session.runs[-1]),
         "forced_open": [rows[0]["id"]],
+        "session_limit": session_limit,
         "heading": f"{scenario} · {_count(scenario_run_count, 'run')}",
         "grid_name": f"Runs of {scenario}, by session",
         "empty": None,
@@ -358,3 +375,281 @@ def is_session_in_progress(now: datetime) -> bool:
     """
     sessions = split_into_play_sessions(get_all_runs())
     return find_play_session_in_progress(sessions, now) is not None
+
+
+# --- The list on a page --------------------------------------------------------
+
+EXPAND_ALL_LABEL = "Expand all"
+COLLAPSE_ALL_LABEL = "Collapse all"
+MARKS_HEADER = "Marks"
+# What a screen reader is told that a sighted reader sees drawn: the name of
+# a session row's button, and what a key pressed on the row just did to it.
+SESSION_TOGGLE_LABEL = "Session"
+EXPANDED_ANNOUNCEMENT = "Expanded"
+COLLAPSED_ANNOUNCEMENT = "Collapsed"
+
+RUN_LIST_CLASS = "run-history-list"
+# The list with nothing to list: its text shows in place of its header and
+# its grid.
+RUN_LIST_NOTHING_CLASS = f"{RUN_LIST_CLASS} run-history-list-nothing"
+RUN_LIST_GRID_CLASS = "run-history-list-grid"
+
+# The two columns the Columns menu shows or hides. Both are shown to start,
+# and the browser remembers each choice under the checkbox's id.
+RUN_LIST_MENU_COLUMNS = (
+    MenuColumn("shots", "Shots Fired"),
+    MenuColumn("sens", "Sensitivity"),
+)
+
+
+class RunListIds(NamedTuple):
+    """The component ids one page gives its run list.
+
+    ``columns_menu`` is the Columns menu's id, which is part of the id of
+    each of its checkboxes. The browser stores a checkbox's choice under its
+    id, so changing it resets that choice for every user.
+
+    ``session_limit`` is the store holding how many sessions to load. The
+    list's script adds to it when older sessions are asked for, and the page
+    takes it as an input of the callback that builds the rows. ``model`` is
+    the store that callback writes the rows to.
+    """
+
+    panel: str
+    heading: str
+    expand_all: str
+    columns_menu: str
+    grid: str
+    empty: str
+    announcer: str
+    model: str
+    session_limit: str
+    apply_sink: str
+    expand_all_sink: str
+
+
+def _fixed_width(width: int) -> dict[str, int]:
+    """Hold a column to one width.
+
+    The columns add up to the list's own width less a scrollbar, so the last
+    column is not clipped once enough rows are open to scroll. The minimum
+    and the maximum are what hold it: the shared Columns menu fits a column
+    to its content when it shows one, and a column with one allowed width
+    comes out of that fit unchanged.
+    """
+    return {"width": width, "minWidth": width, "maxWidth": width}
+
+
+def run_list_column_defs() -> list[dict[str, Any]]:
+    """Build the list's seven columns, each named for the row field it shows."""
+    return [
+        {
+            "field": "n",
+            "headerName": "#",
+            "cellClass": "run-list-number",
+            "headerClass": "run-list-number",
+            **_fixed_width(56),
+        },
+        {"field": "time", "headerName": "Time", **_fixed_width(66)},
+        {"field": "score", "headerName": "Score", **_fixed_width(72)},
+        {
+            # The check and the star. It has no visible header, and takes the
+            # room the fixed columns leave, so it is the one that gives when
+            # a scrollbar appears.
+            "colId": "marks",
+            "headerName": MARKS_HEADER,
+            "headerClass": "run-list-header-unseen",
+            "cellRenderer": "RunListMarks",
+            "flex": 1,
+            "minWidth": 34,
+        },
+        {
+            "field": "accuracy",
+            "headerName": "Accuracy",
+            "type": "rightAligned",
+            **_fixed_width(70),
+        },
+        {
+            "field": "shots",
+            "headerName": "Shots Fired",
+            "type": "rightAligned",
+            **_fixed_width(82),
+        },
+        {
+            "field": "sens",
+            "headerName": "Sensitivity",
+            "type": "rightAligned",
+            **_fixed_width(96),
+        },
+    ]
+
+
+def run_list_stores(ids: RunListIds) -> list[dcc.Store]:
+    """Build the stores the list's callbacks read and write."""
+    return [
+        dcc.Store(id=ids.model),
+        # Not remembered: every visit starts from the first load.
+        dcc.Store(id=ids.session_limit, data=SESSIONS_PER_LOAD),
+        dcc.Store(id=ids.apply_sink),
+        dcc.Store(id=ids.expand_all_sink),
+        columns_menu_sink(ids.columns_menu),
+    ]
+
+
+def run_list_panel(ids: RunListIds) -> dmc.Box:
+    """Build the list: its heading line, the grid, and the text for nothing to list.
+
+    The grid is given no rows. The page's callback writes them to
+    ``ids.model``, and the script registered by ``register_run_list`` hands
+    them to the grid.
+    """
+    live_region: dict[str, Any] = {"aria-live": "polite"}
+    return dmc.Box(
+        id=ids.panel,
+        className=RUN_LIST_CLASS,
+        children=[
+            dmc.Box(
+                className="run-history-list-header",
+                children=[
+                    dmc.Text(
+                        id=ids.heading,
+                        className="run-history-list-heading",
+                        fw=600,
+                        truncate="end",
+                    ),
+                    dmc.Button(EXPAND_ALL_LABEL, id=ids.expand_all, variant="default"),
+                    columns_menu(ids.columns_menu, RUN_LIST_MENU_COLUMNS),
+                ],
+            ),
+            dag.AgGrid(
+                id=ids.grid,
+                className=f"ag-theme-quartz {RUN_LIST_GRID_CLASS}",
+                columnDefs=run_list_column_defs(),
+                defaultColDef={
+                    # A sort would scatter each session's rows.
+                    "sortable": False,
+                    "resizable": False,
+                    "suppressMovable": True,
+                },
+                dashGridOptions={
+                    **COLUMNS_MENU_GRID_OPTIONS,
+                    "animateRows": False,
+                    "headerHeight": 28,
+                    # A run that lands must not move what the reader is
+                    # looking at. The script scrolls to the top itself, when
+                    # the page follows the scenario just played.
+                    "suppressScrollOnNewData": True,
+                    # A full-width row is drawn in a container of its own
+                    # unless embedded, and the grid moves rows by transform
+                    # and leaves them in the page in their old order. Without
+                    # these two a screen reader reads the session rows apart
+                    # from the runs under them.
+                    "embedFullWidthRows": True,
+                    "ensureDomOrder": True,
+                    "isFullWidthRow": {"function": "runListIsFullWidth(params)"},
+                    "fullWidthCellRenderer": "RunListWideRow",
+                    "isExternalFilterPresent": {"function": "true"},
+                    "doesExternalFilterPass": {"function": "runListFilterPass(params)"},
+                    "getRowHeight": {"function": "runListRowHeight(params)"},
+                    "getRowClass": {"function": "runListRowClass(params)"},
+                    # The grid would say "No Matching Rows" over a list whose
+                    # one session is closed, and "No Rows To Show" before the
+                    # first rows arrive.
+                    "suppressOverlays": ["loading", "noRows", "noMatchingRows"],
+                    "context": {
+                        "gridId": ids.grid,
+                        "limitStoreId": ids.session_limit,
+                        "expandAllId": ids.expand_all,
+                        "announcerId": ids.announcer,
+                        "sessionsPerLoad": SESSIONS_PER_LOAD,
+                        "labels": {
+                            "expandAll": EXPAND_ALL_LABEL,
+                            "collapseAll": COLLAPSE_ALL_LABEL,
+                            "session": SESSION_TOGGLE_LABEL,
+                            "expanded": EXPANDED_ANNOUNCEMENT,
+                            "collapsed": COLLAPSED_ANNOUNCEMENT,
+                            "inProgress": IN_PROGRESS_LABEL,
+                            "lengthHelp": SESSION_LENGTH_HELP,
+                            "newPb": NEW_PB_TEXT,
+                        },
+                    },
+                },
+                eventListeners={"cellKeyDown": ["runListKeyDown(params)"]},
+                getRowId="params.data.id",
+                dangerously_allow_code=True,
+                style={"flex": 1, "minHeight": 0, "width": "100%"},
+            ),
+            dmc.Text(id=ids.empty, className="run-history-list-empty"),
+            # Where a key pressed on a session row says what it did. In the
+            # page before anything is said: a live region added with its text
+            # already in it is not read out.
+            html.Div(
+                id=ids.announcer,
+                className="visually-hidden",
+                role="status",
+                **live_region,
+            ),
+        ],
+    )
+
+
+# Only the newest run applies: each waits for the grid on its own timer, so
+# an older one can finish last and would put its rows back. The source is a
+# function that returns the callback, so the counter it closes over lasts for
+# the life of the page.
+_APPLY_RUN_LIST = """
+(() => {
+    let latestRun = 0;
+
+    return async (model, follow) => {
+        const noUpdate = window.dash_clientside.no_update;
+        if (!model || !window.runHistoryList || !window.dash_ag_grid) {
+            return noUpdate;
+        }
+        latestRun += 1;
+        const run = latestRun;
+        const gridApi = await window.dash_ag_grid.getApiAsync(GRID_ID);
+        if (run === latestRun) {
+            window.runHistoryList.apply(gridApi, model, follow);
+        }
+        return noUpdate;
+    };
+})()
+"""
+
+_EXPAND_ALL = """
+async (clicks) => {
+    if (clicks && window.runHistoryList && window.dash_ag_grid) {
+        const gridApi = await window.dash_ag_grid.getApiAsync(GRID_ID);
+        window.runHistoryList.toggleAll(gridApi);
+    }
+    return window.dash_clientside.no_update;
+}
+"""
+
+
+def register_run_list(ids: RunListIds, *, follow_switch: str) -> None:
+    """Register the scripts that draw the list, for one page's ids.
+
+    Call once per page, at import. ``follow_switch`` is the id of the page's
+    Follow switch: while it is on, a run that lands scrolls the list back to
+    the top. It is read as state, so flipping it applies nothing.
+
+    The rows reach the grid through its API and never as Dash components or
+    through its ``rowData`` prop. Which rows are open is kept by the script
+    and never sent to the server.
+    """
+    grid_id = json.dumps(ids.grid)
+    clientside_callback(
+        _APPLY_RUN_LIST.replace("GRID_ID", grid_id),
+        Output(ids.apply_sink, "data"),
+        Input(ids.model, "data"),
+        State(follow_switch, "checked"),
+    )
+    clientside_callback(
+        _EXPAND_ALL.replace("GRID_ID", grid_id),
+        Output(ids.expand_all_sink, "data"),
+        Input(ids.expand_all, "n_clicks"),
+        prevent_initial_call=True,
+    )
+    register_columns_menu(ids.columns_menu, ids.grid)

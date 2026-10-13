@@ -832,3 +832,15 @@ def test_the_store_answers_whether_its_newest_session_is_in_progress(store):
 
 def test_an_empty_store_has_no_session_in_progress(store):
     assert is_session_in_progress(EVENING) is False
+
+
+# --- How many sessions were loaded ---------------------------------------------
+
+
+def test_the_model_carries_the_limit_it_was_loaded_up_to():
+    """The script adds to it when older sessions are asked for."""
+    runs = _one_run_a_day(35)
+
+    assert _build(runs)["session_limit"] == SESSIONS_PER_LOAD
+    assert _build(runs, limit=60)["session_limit"] == 60
+    assert build_run_list([], A, 90, EVENING, {})["session_limit"] == SESSIONS_PER_LOAD

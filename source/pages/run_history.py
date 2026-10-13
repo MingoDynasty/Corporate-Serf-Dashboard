@@ -1,9 +1,10 @@
 """Build the Run History page and its callbacks.
 
 The page shows one scenario's runs: a chart of every run in a range, with
-the Chart options panel beside it. It is built beside the Scenario
-Performance page and replaces it when it goes public. Until then it is
-served at its own address with no navbar entry and nothing linking to it.
+the Chart options panel beside it, and a list of the runs grouped by session.
+It is built beside the Scenario Performance page and replaces it when it
+goes public. Until then it is served at its own address with no navbar entry
+and nothing linking to it.
 
 It never imports the Scenario Performance page's module. Dash Pages loads
 each page file as ``pages.<name>``, so a second import path would make a
@@ -61,6 +62,17 @@ from source.components.run_history_chart import (
     SCORE_VS_RUN,
     build_run_history_figure,
 )
+from source.components.run_history_list import (
+    RUN_LIST_CLASS,
+    RUN_LIST_NOTHING_CLASS,
+    SESSIONS_PER_LOAD,
+    RunListIds,
+    is_session_in_progress,
+    register_run_list,
+    run_list_from_store,
+    run_list_panel,
+    run_list_stores,
+)
 from source.components.run_verdict_toast import build_run_event_notification
 from source.components.scenario_selection import (
     SELECT_HIGHLIGHT_ON_OPEN_CLASS,
@@ -115,6 +127,16 @@ STARTUP_PLAYLIST_WARNING_INTERVAL_ID = "run-history-startup-playlist-warning-int
 # text. It is written only when the date moves on, and the chart takes it as
 # an input, which is what redraws a chart that is left open past midnight.
 TODAY_STORE_ID = "run-history-today"
+# The id of the newest run in the last batch the shell published, whatever
+# scenario it was on. The summary store names only a run on the scenario the
+# page shows, so a run on another scenario leaves it unwritten, and what
+# counts every scenario's runs would never hear of that run: a session row's
+# count, a divider, the latest run. This one is written for every batch.
+RUN_LANDED_STORE_ID = "run-history-run-landed"
+# Whether the run store's newest session is in progress. It is written only
+# when the answer changes, and the run list takes it as an input, which is
+# what takes "In progress" off a session nothing more is played in.
+SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -150,6 +172,19 @@ CHART_OPTIONS_IDS = ChartOptionsIds(
     run_notification="run-history-run-notification-switch",
     graph="run-history-graph",
     cached_plot="run-history-cached-plot",
+)
+RUN_LIST_IDS = RunListIds(
+    panel="run-history-list",
+    heading="run-history-list-heading",
+    expand_all="run-history-list-expand-all",
+    columns_menu="run-history-list-columns",
+    grid="run-history-list-grid",
+    empty="run-history-list-empty",
+    announcer="run-history-list-announcer",
+    model="run-history-list-model",
+    session_limit="run-history-list-session-limit",
+    apply_sink="run-history-list-apply-sink",
+    expand_all_sink="run-history-list-expand-all-sink",
 )
 SCENARIO_STATS_IDS = ScenarioStatsIds(
     last_played="run-history-last-played",
@@ -201,6 +236,7 @@ def _empty_plot_json(title: str, message: str) -> str:
 
 @callback(
     Output(RUN_EVENTS_STORE_ID, "data"),
+    Output(RUN_LANDED_STORE_ID, "data"),
     Input(RUN_EVENTS_BATCH_STORE_ID, "data"),
     # State, not Input: a Store replays its last value, and a control flip
     # must not forward again a batch already processed. The same reason keeps
@@ -217,15 +253,26 @@ def forward_run_events(batch, follow_newly_played, selected_scenario):
     played while Follow is on, and the selected one otherwise. This callback
     writes neither dropdown. The selection callback reads the summary and
     moves them, so the chart, which waits on both, is rebuilt once per batch.
+
+    The second output is the id of the batch's newest run, written whether or
+    not there is a summary. Both are written in this one answer on purpose.
+    What rebuilds on the second also reads the scenario dropdown, and Dash
+    holds a callback back only for a writer that is already queued. Written
+    together, the selection callback is queued for the summary when the run
+    list is queued for the run, so the list waits for the selection to move
+    and is built once, for the scenario the page ends up on.
     """
-    if not batch:
-        return no_update
+    if not batch or not batch["runs"]:
+        return no_update, no_update
     _target_scenario, run_events = summarize_run_events(
         batch,
         selected_scenario,
         follow_newly_played,
     )
-    return no_update if run_events is None else run_events
+    return (
+        no_update if run_events is None else run_events,
+        batch["runs"][-1]["run_id"],
+    )
 
 
 register_run_import_failure_flush(POLLING_INTERVAL_ID)
@@ -259,6 +306,81 @@ def advance_today(_n_intervals, held_date):
     """
     today = _today_text()
     return no_update if today == held_date else today
+
+
+@callback(
+    Output(SESSION_IN_PROGRESS_STORE_ID, "data"),
+    Input(RELATIVE_TIME_INTERVAL_ID, "n_intervals"),
+    # A run that lands can start a session or reopen one. Taking it here puts
+    # this callback in the queue with the run list, which then waits for this
+    # answer and is built once per run, not once for the run and again on the
+    # next tick.
+    Input(RUN_LANDED_STORE_ID, "data"),
+    State(SESSION_IN_PROGRESS_STORE_ID, "data"),
+    # The layout draws the store with the answer already in it, as it does
+    # the date.
+    prevent_initial_call=True,
+)
+def track_session_in_progress(_n_intervals, _run_landed, held_answer):
+    """Write whether a session is in progress, once that is no longer what is held.
+
+    A session is in progress until 30 minutes after its last run, and nothing
+    happens at that moment: no run lands and no control changes. The run
+    list takes this store as an input, so this write is what clears
+    "In progress", within one tick. A tick that finds the same answer writes
+    nothing, so a tick alone never rebuilds the list.
+
+    The answer is the app's own, from its own clock. A browser's clock can be
+    in another time zone than the stats files were written in.
+    """
+    in_progress = is_session_in_progress(datetime.now())
+    return no_update if in_progress == held_answer else in_progress
+
+
+@callback(
+    Output(RUN_LIST_IDS.model, "data"),
+    Output(RUN_LIST_IDS.heading, "children"),
+    Output(RUN_LIST_IDS.empty, "children"),
+    Output(RUN_LIST_IDS.panel, "className"),
+    Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
+    # Any run, on any scenario: a session row counts all of a session's runs.
+    # The list is still built from the run store and never from the batch.
+    Input(RUN_LANDED_STORE_ID, "data"),
+    Input(RUN_LIST_IDS.session_limit, "data"),
+    # A change to the percentage marks every run again, at once.
+    Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
+    # The next two are read for nothing but their change. A session's name
+    # leaves the year out only while it is this year's, and "In progress"
+    # ends with no run landing.
+    Input(TODAY_STORE_ID, "data"),
+    Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
+)
+def build_run_list_rows(  # noqa: PLR0913
+    selected_scenario,
+    _run_landed,
+    session_limit,
+    score_threshold_percentage,
+    _held_date,
+    _held_in_progress,
+):
+    """Build the run list's rows for the selected scenario, from the run store.
+
+    Returns the rows and what the script needs with them, the heading line,
+    the text shown when there is nothing to list, and the list's class,
+    which is how that text takes the grid's place.
+    """
+    model = run_list_from_store(
+        selected_scenario,
+        session_limit or SESSIONS_PER_LOAD,
+        score_threshold_percentage,
+        datetime.now(),
+    )
+    return (
+        model,
+        model["heading"],
+        model["empty"],
+        RUN_LIST_NOTHING_CLASS if model["empty"] else RUN_LIST_CLASS,
+    )
 
 
 @callback(
@@ -408,6 +530,7 @@ clientside_callback(
 )
 
 register_chart_options(CHART_OPTIONS_IDS)
+register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
 register_scenario_selection_clearing_filter(
     SCENARIO_SELECTION_IDS,
@@ -587,6 +710,8 @@ def _chart_column() -> dmc.Box:
                             score_threshold_percentage_help=SETTINGS_HELP_TEXT[
                                 "score-threshold-percentage-run-history"
                             ],
+                            # Every check in the run list is judged by it.
+                            score_threshold_percentage_waits_for_commit=True,
                         ),
                     ],
                 ),
@@ -625,6 +750,15 @@ def layout(
             # The date the page is drawn on. Without it the first tick would
             # find no date held, write one, and rebuild a chart just drawn.
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
+            dcc.Store(id=RUN_LANDED_STORE_ID),
+            # Drawn with the answer already in it, for the reason the date
+            # is: the first tick would otherwise write it and rebuild a list
+            # just drawn.
+            dcc.Store(
+                id=SESSION_IN_PROGRESS_STORE_ID,
+                data=is_session_in_progress(datetime.now()),
+            ),
+            *run_list_stores(RUN_LIST_IDS),
             dcc.Interval(
                 id=STARTUP_PLAYLIST_WARNING_INTERVAL_ID,
                 interval=250,
@@ -657,8 +791,10 @@ def layout(
                 className="run-history-columns",
                 children=[
                     _chart_column(),
-                    # Reserved for the run list, at the width planned for it.
-                    dmc.Box(className="run-history-list-column"),
+                    dmc.Box(
+                        run_list_panel(RUN_LIST_IDS),
+                        className="run-history-list-column",
+                    ),
                 ],
             ),
         ],
