@@ -802,6 +802,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     :return: RunData object
     """
     accuracy = None
+    shots_fired = None
     damage_accuracy = None
     horizontal_sens = None
     scenario = None
@@ -834,6 +835,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                     hits = int(values[2])
                     if shots > 0:
                         accuracy = hits / shots
+                        # Kept beside the accuracy it produced, never read
+                        # from another row: a file can list several weapons,
+                        # and the two must describe the same one.
+                        shots_fired = shots
 
                 # Damage columns are useful for PB metadata, but keep them
                 # optional so older/shorter CSV rows still parse hit accuracy.
@@ -943,6 +948,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         stats_file_name=Path(full_file_path).name,
         run_start=run_start,
         run_length=run_length,
+        shots_fired=shots_fired,
     )
 
 

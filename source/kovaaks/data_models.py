@@ -38,6 +38,12 @@ class RunData:
     gives no usable start, and a run with neither is still a run: unknown is
     never read as zero. Every time is local wall-clock time, as the game
     wrote it.
+
+    ``shots_fired`` is the shot count ``accuracy`` was worked out from, so
+    the two always describe the same weapon row of the stats file. Every run
+    the parser returns has one, because a file with no shots is not a run.
+    It is ``None`` only on a record built some other way, and unknown is
+    never read as zero.
     """
 
     datetime_object: datetime.datetime
@@ -52,6 +58,7 @@ class RunData:
     stats_file_name: str | None = None
     run_start: datetime.datetime | None = None
     run_length: datetime.timedelta | None = None
+    shots_fired: int | None = None
 
 
 @dataclass()
