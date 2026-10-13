@@ -6,38 +6,23 @@
       "name": "ben Strafe 1w2ts Wide VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 48.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 51.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 54.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 59.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 62.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 65.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 68.0
         }
       ],
@@ -47,38 +32,23 @@
       "name": "ben Strafe 1w3t Vandal VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 50.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 54.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 58.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 66.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 70.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 74.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 78.0
         }
       ],
@@ -88,38 +58,23 @@
       "name": "ben Strafe Phantom Double Tap VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 41.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 44.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 47.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 53.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 57.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 61.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 65.0
         }
       ],
@@ -129,79 +84,75 @@
       "name": "ben Strafe Gallery VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 44.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 47.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 50.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 56.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 59.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 62.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 65.0
         }
       ],
       "leaderboard_id": 204673
     },
     {
+      "name": "ben Strafe 1w4tes Micro VALORANT",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#ee00ff",
+          "threshold": 45.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#0a5700",
+          "threshold": 50.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#700000",
+          "threshold": 55.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#bff45d",
+          "threshold": 60.0
+        }
+      ],
+      "leaderboard_id": 205399
+    },
+    {
       "name": "ben Strafe Re-Peek Micros Valorant",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 64.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 70.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 76.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 85.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 91.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 97.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 103.0
         }
       ],
@@ -211,38 +162,23 @@
       "name": "ben Strafe Micros Stairs VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 55.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 60.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 65.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 75.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 80.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 85.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 90.0
         }
       ],
@@ -252,38 +188,23 @@
       "name": "ben Strafe 1w1t Reflex Duel VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 30.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 32.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 34.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 37.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 39.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 42.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 45.0
         }
       ],
@@ -293,42 +214,79 @@
       "name": "ben Strafe Bind Clutch VALORANT",
       "ranks": [
         {
-          "name": "Novice 3",
-          "color": "#FFFFFF",
-          "threshold": 45.0
-        },
-        {
-          "name": "Novice 2",
-          "color": "#FFFFFF",
-          "threshold": 50.0
-        },
-        {
-          "name": "Novice 1",
-          "color": "#FFFFFF",
-          "threshold": 55.0
-        },
-        {
           "name": "Platinum",
-          "color": "#737373",
+          "color": "#ee00ff",
           "threshold": 64.0
         },
         {
-          "name": "Diamond",
-          "color": "#00ecf0",
+          "name": "Ascendant",
+          "color": "#0a5700",
           "threshold": 68.0
         },
         {
-          "name": "Sapphire",
-          "color": "#0040ff",
+          "name": "Immortal",
+          "color": "#700000",
           "threshold": 72.0
         },
         {
-          "name": "Jade",
-          "color": "#00bd1f",
+          "name": "Radiant",
+          "color": "#bff45d",
           "threshold": 76.0
         }
       ],
       "leaderboard_id": 204785
+    },
+    {
+      "name": "ben Strafe Ghost Duel VALORANT",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#ee00ff",
+          "threshold": 45.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#0a5700",
+          "threshold": 50.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#700000",
+          "threshold": 55.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#bff45d",
+          "threshold": 60.0
+        }
+      ],
+      "leaderboard_id": 205400
+    },
+    {
+      "name": "ben Strafe Ghost Gallery VALORANT",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#ee00ff",
+          "threshold": 37.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#0a5700",
+          "threshold": 40.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#700000",
+          "threshold": 43.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#bff45d",
+          "threshold": 46.0
+        }
+      ],
+      "leaderboard_id": 205402
     }
   ],
   "generated_from": {
@@ -336,35 +294,23 @@
     "kovaaks_benchmark_id": 2975,
     "rank_colors": [
       [
-        "Novice 3",
-        "#FFFFFF"
-      ],
-      [
-        "Novice 2",
-        "#FFFFFF"
-      ],
-      [
-        "Novice 1",
-        "#FFFFFF"
-      ],
-      [
         "Platinum",
-        "#737373"
+        "#ee00ff"
       ],
       [
-        "Diamond",
-        "#00ecf0"
+        "Ascendant",
+        "#0a5700"
       ],
       [
-        "Sapphire",
-        "#0040ff"
+        "Immortal",
+        "#700000"
       ],
       [
-        "Jade",
-        "#00bd1f"
+        "Radiant",
+        "#bff45d"
       ]
     ],
-    "generated_at": "2026-09-27T02:33:52.071020+00:00",
+    "generated_at": "2026-10-12T21:52:11.101885+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

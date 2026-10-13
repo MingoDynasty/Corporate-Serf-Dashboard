@@ -470,8 +470,7 @@ except where another entry is linked.
   Category or Subcategory entry in its Columns menu: a playlist, a playlist
   imported by code, a benchmark whose snapshot counts don't add up to its
   scenario count, one whose layout names nothing, and one on the exclusion
-  list. As of 2026-10-06, 258 of the 261 bundled benchmarks have groups, 180
-  with two levels and 78 with one.
+  list. As of 2026-10-12, 261 of the 265 bundled benchmarks have groups.
 - Each group column is 34 px wide and pinned to the table's left edge. Its
   header shows no text. The header's accessible name and its tooltip are
   "Category" or "Subcategory". The column can't be resized, sorted, or moved,
@@ -559,7 +558,7 @@ except where another entry is linked.
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
   ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md));
-  261 files as of 2026-09-26. It holds Evxl's listed, non-hidden benchmarks:
+  265 files as of 2026-10-12. It holds Evxl's listed, non-hidden benchmarks:
   a benchmark Evxl delists is removed even if KovaaK's still serves it, and
   a hidden one waits until Evxl unhides it
   ([2026-09-15](../decision_log/2026/2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks.md)).

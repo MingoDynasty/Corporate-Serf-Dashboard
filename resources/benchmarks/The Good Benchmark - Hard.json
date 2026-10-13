@@ -1,0 +1,655 @@
+{
+  "name": "The Good Benchmark - Hard",
+  "code": "KovaaKsDashingGoodHipfire",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky v3 OW Thin",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 874.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 881.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 888.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 894.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 901.0
+        }
+      ],
+      "leaderboard_id": 426
+    },
+    {
+      "name": "Ground Plaza Sparky V3 Thin",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 893.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 897.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 902.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 907.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 912.0
+        }
+      ],
+      "leaderboard_id": 1408
+    },
+    {
+      "name": "Aimerz+ VGS Hard S1",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 3950.0
+        }
+      ],
+      "leaderboard_id": 68332
+    },
+    {
+      "name": "Plaza Pure Revosect",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 899.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 904.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 910.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 915.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 920.0
+        }
+      ],
+      "leaderboard_id": 143331
+    },
+    {
+      "name": "Close Fast Strafes Invincible",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 12700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 13600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 14600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 15600.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 16800.0
+        }
+      ],
+      "leaderboard_id": 494
+    },
+    {
+      "name": "Air Angelic",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 922.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 926.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 930.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 934.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 938.0
+        }
+      ],
+      "leaderboard_id": 419
+    },
+    {
+      "name": "Air Voltaic",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 882.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 887.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 891.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 897.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 902.0
+        }
+      ],
+      "leaderboard_id": 29
+    },
+    {
+      "name": "Air Pure Revosect",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 882.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 890.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 898.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 906.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 913.0
+        }
+      ],
+      "leaderboard_id": 142823
+    },
+    {
+      "name": "AA4V OW",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 4750.0
+        }
+      ],
+      "leaderboard_id": 189514
+    },
+    {
+      "name": "Leaper 13",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 3550.0
+        }
+      ],
+      "leaderboard_id": 204272
+    },
+    {
+      "name": "Needle Strafes V2",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 11750.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 12750.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 14250.0
+        }
+      ],
+      "leaderboard_id": 204268
+    },
+    {
+      "name": "Aimerz+ Week #7 - Suavetrack",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 22500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 24500.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 27500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 30000.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 34500.0
+        }
+      ],
+      "leaderboard_id": 40784
+    },
+    {
+      "name": "Smoothbot Pauer Glider",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 32
+    },
+    {
+      "name": "rA S4 GLIDERTRACK HARD",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 93776
+    },
+    {
+      "name": "CB SmoothTrack",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 4400.0
+        }
+      ],
+      "leaderboard_id": 97841
+    },
+    {
+      "name": "Smoothsphere Grandmaster",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 7750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 11400.0
+        }
+      ],
+      "leaderboard_id": 14825
+    },
+    {
+      "name": "Smoothbot Voltaic XSmall",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 657
+    },
+    {
+      "name": "LeapBot SuperbAim",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 4300.0
+        }
+      ],
+      "leaderboard_id": 35905
+    },
+    {
+      "name": "Extra Controlsphere",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 12200.0
+        }
+      ],
+      "leaderboard_id": 562
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#fc69ab",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#68e9ff",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Nocturne",
+          "color": "#0e1323",
+          "threshold": 12500.0
+        }
+      ],
+      "leaderboard_id": 68993
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDashingGoodHipfire",
+    "kovaaks_benchmark_id": 2922,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#fff57b"
+      ],
+      [
+        "Nova",
+        "#b855d9"
+      ],
+      [
+        "Astra",
+        "#fc69ab"
+      ],
+      [
+        "Celestial",
+        "#68e9ff"
+      ],
+      [
+        "Nocturne",
+        "#0e1323"
+      ]
+    ],
+    "generated_at": "2026-10-12T21:52:15.197826+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

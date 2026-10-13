@@ -288,16 +288,18 @@ one PR. Run every command from the repository root with
    - Every scenario carries a `leaderboard_id`.
 6. **Land it.** Copy this refresh's files into `resources/benchmarks/`
    (`generated/` is local staging and keeps earlier sessions' output too).
-   Update the file count in
-   [docs/specs/playlists.md](../../docs/specs/playlists.md), and stage new
-   files intent-to-add (`git add -N resources/benchmarks`) so the
-   committed-corpus tests, which list files through `git ls-files`, see them.
+   Update the two dated counts in
+   [docs/specs/playlists.md](../../docs/specs/playlists.md), the file count
+   and how many benchmarks have groups, and stage new files intent-to-add
+   (`git add -N resources/benchmarks`) so the committed-corpus tests, which
+   list files through `git ls-files`, see them.
    Run the gates. One of those tests pins the bundled benchmarks that get no
    groups in the app (`_BENCHMARKS_WITHOUT_GROUPS` in
    `tests/test_playlist_rekey.py`). When it fails, a refreshed snapshot count
    no longer adds up to a file's scenario count, or a new benchmark has no
    usable layout. Regenerate that file, or add its code to the pinned set with
-   the reason. `--check --only` over the regenerated and new sharecodes
+   the reason. The spec's count of benchmarks with groups is the file count
+   less that set. `--check --only` over the regenerated and new sharecodes
    should now report them identical. Start the app once and confirm that
    `data/logs/debug.log` reports `Playlist startup load complete` with the new
    bundled count and `warnings=0`.

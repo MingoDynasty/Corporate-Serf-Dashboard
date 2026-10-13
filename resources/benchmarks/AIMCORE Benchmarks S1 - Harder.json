@@ -131,37 +131,37 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 147.0
+          "threshold": 150.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 154.0
+          "threshold": 157.0
         },
         {
           "name": "Zero",
           "color": "#e3a325",
-          "threshold": 161.0
+          "threshold": 164.0
         },
         {
           "name": "Delta",
           "color": "#df8139",
-          "threshold": 168.0
+          "threshold": 171.0
         },
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 175.0
+          "threshold": 178.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 182.0
+          "threshold": 185.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 189.0
+          "threshold": 192.0
         }
       ],
       "leaderboard_id": 203907
@@ -172,37 +172,37 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 67.0
+          "threshold": 64.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 71.0
+          "threshold": 68.0
         },
         {
           "name": "Zero",
           "color": "#e3a325",
-          "threshold": 75.0
+          "threshold": 73.0
         },
         {
           "name": "Delta",
           "color": "#df8139",
-          "threshold": 80.0
+          "threshold": 77.0
         },
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 85.0
+          "threshold": 82.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 90.0
+          "threshold": 87.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 95.0
+          "threshold": 92.0
         }
       ],
       "leaderboard_id": 203908
@@ -402,12 +402,12 @@
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 4200.0
+          "threshold": 4150.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 4350.0
+          "threshold": 4275.0
         }
       ],
       "leaderboard_id": 203912
@@ -443,12 +443,12 @@
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 4175.0
+          "threshold": 4150.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 4325.0
+          "threshold": 4275.0
         }
       ],
       "leaderboard_id": 203913
@@ -500,37 +500,37 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 122.0
+          "threshold": 119.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 128.0
+          "threshold": 125.0
         },
         {
           "name": "Zero",
           "color": "#e3a325",
-          "threshold": 133.0
+          "threshold": 130.0
         },
         {
           "name": "Delta",
           "color": "#df8139",
-          "threshold": 137.0
+          "threshold": 134.0
         },
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 141.0
+          "threshold": 138.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 144.0
+          "threshold": 141.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 147.0
+          "threshold": 145.0
         }
       ],
       "leaderboard_id": 203915
@@ -582,37 +582,37 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 107.0
+          "threshold": 105.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 112.0
+          "threshold": 110.0
         },
         {
           "name": "Zero",
           "color": "#e3a325",
-          "threshold": 117.0
+          "threshold": 115.0
         },
         {
           "name": "Delta",
           "color": "#df8139",
-          "threshold": 122.0
+          "threshold": 120.0
         },
         {
           "name": "Daemon",
           "color": "#dd5c41",
-          "threshold": 127.0
+          "threshold": 125.0
         },
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 132.0
+          "threshold": 130.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 137.0
+          "threshold": 135.0
         }
       ],
       "leaderboard_id": 203917
@@ -705,12 +705,12 @@
         {
           "name": "Nomad",
           "color": "#e5df00",
-          "threshold": 65.0
+          "threshold": 64.0
         },
         {
           "name": "Chrome",
           "color": "#e5c400",
-          "threshold": 69.0
+          "threshold": 68.0
         },
         {
           "name": "Zero",
@@ -730,12 +730,12 @@
         {
           "name": "Atomic",
           "color": "#da474c",
-          "threshold": 81.0
+          "threshold": 80.0
         },
         {
           "name": "Scarlet",
           "color": "#e01f2f",
-          "threshold": 84.0
+          "threshold": 82.0
         }
       ],
       "leaderboard_id": 203920
@@ -774,7 +774,7 @@
         "#e01f2f"
       ]
     ],
-    "generated_at": "2026-09-27T02:33:42.178065+00:00",
+    "generated_at": "2026-10-12T21:52:10.179949+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }
