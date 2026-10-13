@@ -12,6 +12,15 @@ here does not approve a feature or establish current app behavior.
 | [Aimcurve (Opus)](aimcurve_learnings_opus.md) | 2026-10-03 | Time-scored detection from `.perf` files, checked against local recordings; reset-file handling; scenario-history design |
 | [RefleK's](refleks_learnings.md) | 2026-07-03 | Additional run data, API observations, sessions, and analytics ideas |
 
+## Checks of this app
+
+A check records what was measured on this app's own build, where a survey
+looks at another app.
+
+| Check | Date | Focus |
+| --- | --- | --- |
+| [The Run History page's run list under NVDA](run_history_list_nvda_walk.md) | 2026-10-13 | What NVDA said on the built run list in Firefox, Chrome, and Edge, against the five tasks the page's proposal names, and what still does not work |
+
 ## More than one survey of an app
 
 Two models may survey the same app independently, and each survey then keeps
