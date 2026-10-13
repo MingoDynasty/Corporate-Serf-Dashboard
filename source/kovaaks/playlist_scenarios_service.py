@@ -34,6 +34,7 @@ from source.kovaaks.request_logging import request_exception_summary
 from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
 from source.utilities.stopwatch import Stopwatch
+from source.utilities.utilities import format_score
 
 PLAYLIST_RANK_MAX_WORKERS = 4
 FILL_TOMBSTONE_LIMIT = 8
@@ -120,7 +121,7 @@ def _format_percentile(value: float | None) -> str:
 def _format_score(value: float | None) -> str:
     if value is None:
         return "N/A"
-    return f"{value:,.2f}".rstrip("0").rstrip(".")
+    return format_score(value)
 
 
 def _format_accuracy(value: float | None) -> str:

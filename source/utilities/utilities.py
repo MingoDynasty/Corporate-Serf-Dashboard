@@ -110,3 +110,50 @@ def format_short_date(day: date, today: date) -> str:
     if day.year == today.year:
         return short
     return f"{short}, {day.year}"
+
+
+def format_time_of_day(dt: datetime) -> str:
+    """Format a time of day as ``10:50 PM``, with no date and no seconds.
+
+    The hour is 12-hour and unpadded, as in ``format_absolute_timestamp``.
+    For a time shown under something that already gives its date.
+    """
+    meridiem = "AM" if dt.hour < 12 else "PM"
+    return f"{dt.hour % 12 or 12}:{dt.minute:02d} {meridiem}"
+
+
+def format_short_timestamp(dt: datetime, today: date) -> str:
+    """Format a moment as ``Oct 4, 9:45 PM``, or ``Dec 30, 2025, 9:45 PM``.
+
+    The absolute timestamp's shape with the year left out while it is
+    today's year, which is ``format_short_date`` followed by the time of day.
+    """
+    return f"{format_short_date(dt.date(), today)}, {format_time_of_day(dt)}"
+
+
+def format_score(value: float) -> str:
+    """Format a score with thousands separators and at most two decimals.
+
+    Trailing zeros are dropped: ``3324.0`` reads ``3,324`` and ``896.2``
+    reads ``896.2``. Every table that shows a score formats it here, so one
+    run never reads two ways on two pages.
+    """
+    return f"{value:,.2f}".rstrip("0").rstrip(".")
+
+
+def format_elapsed_duration(seconds: float) -> str:
+    """Format a measured length of time in the form the estimates use.
+
+    Examples: 45 -> "<1 min", 599 -> "9 min", 3970 -> "1 hr 6 min". A
+    measurement counts the whole minutes gone by, as a clock does, where
+    ``format_approximate_duration`` rounds an estimate up to the next one.
+    """
+    minutes = int(seconds // 60)
+    if minutes < 1:
+        return "<1 min"
+    hours, remainder = divmod(minutes, 60)
+    if not hours:
+        return f"{minutes} min"
+    if not remainder:
+        return f"{hours} hr"
+    return f"{hours} hr {remainder} min"

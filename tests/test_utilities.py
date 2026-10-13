@@ -8,7 +8,11 @@ from source.utilities.utilities import (
     format_absolute_timestamp,
     format_approximate_duration,
     format_decimal,
+    format_elapsed_duration,
+    format_score,
     format_short_date,
+    format_short_timestamp,
+    format_time_of_day,
     ordinal,
 )
 
@@ -92,6 +96,80 @@ def test_format_approximate_duration(seconds: float, expected: str) -> None:
 )
 def test_format_short_date_leaves_out_this_years_year(day: date, expected: str) -> None:
     assert format_short_date(day, date(2026, 10, 12)) == expected
+
+
+@pytest.mark.parametrize(
+    ("seconds", "expected"),
+    [
+        (0, "<1 min"),
+        (59.9, "<1 min"),
+        (60, "1 min"),
+        # A measurement counts the whole minutes gone by. The estimate reads
+        # this one "2 min".
+        (61, "1 min"),
+        (599, "9 min"),
+        (3600, "1 hr"),
+        (3970, "1 hr 6 min"),
+        (98765, "27 hr 26 min"),
+        # A clock change can put a session's end before its start.
+        (-120, "<1 min"),
+    ],
+)
+def test_format_elapsed_duration_counts_whole_minutes(
+    seconds: float, expected: str
+) -> None:
+    assert format_elapsed_duration(seconds) == expected
+
+
+@pytest.mark.parametrize(
+    ("moment", "expected"),
+    [
+        (datetime(2026, 10, 4, 22, 50, 59), "10:50 PM"),
+        (datetime(2026, 10, 4, 7, 4), "7:04 AM"),
+        (datetime(2026, 10, 4, 0, 7), "12:07 AM"),
+        (datetime(2026, 10, 4, 12, 0), "12:00 PM"),
+    ],
+)
+def test_format_time_of_day_has_no_date_and_no_seconds(
+    moment: datetime, expected: str
+) -> None:
+    assert format_time_of_day(moment) == expected
+
+
+@pytest.mark.parametrize(
+    ("moment", "expected"),
+    [
+        (datetime(2026, 10, 4, 21, 45), "Oct 4, 9:45 PM"),
+        (datetime(2025, 12, 30, 21, 45), "Dec 30, 2025, 9:45 PM"),
+    ],
+)
+def test_format_short_timestamp_leaves_out_this_years_year(
+    moment: datetime, expected: str
+) -> None:
+    assert format_short_timestamp(moment, date(2026, 10, 12)) == expected
+
+
+def test_a_short_timestamp_of_another_year_is_the_absolute_timestamp() -> None:
+    moment = datetime(2025, 12, 30, 21, 45)
+
+    assert format_short_timestamp(
+        moment, date(2026, 10, 12)
+    ) == format_absolute_timestamp(moment)
+
+
+@pytest.mark.parametrize(
+    ("score", "expected"),
+    [
+        (3324.0, "3,324"),
+        (896.2, "896.2"),
+        (12345.678, "12,345.68"),
+        (0.0, "0"),
+        (-3.5, "-3.5"),
+        (100.004, "100"),
+    ],
+)
+def test_format_score_drops_trailing_zeros(score: float, expected: str) -> None:
+    assert format_score(score) == expected
 
 
 def test_stopwatch_elapsed_after_start_and_stop() -> None:

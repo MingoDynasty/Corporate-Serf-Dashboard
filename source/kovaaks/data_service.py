@@ -397,6 +397,16 @@ def get_runs_newest_first(scenario_name: str) -> list[RunData]:
     return list(reversed(kovaaks_database[scenario_name]["time_vs_runs"]))
 
 
+def get_all_runs() -> list[RunData]:
+    """Return a copy of every run of every scenario, ordered by when each ended.
+
+    A copy, so a view can split it into play sessions while the watchdog
+    thread goes on adding runs to the store. Runs that ended in the same
+    second are in the order they were stored.
+    """
+    return list(run_database)
+
+
 def get_runs_in_play_order(scenario_name: str) -> list[RunData]:
     """Return a copy of a scenario's runs in the order they were played, oldest first.
 

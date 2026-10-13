@@ -106,6 +106,32 @@ def test_get_runs_in_play_order_is_empty_for_an_unknown_scenario(load_runs):
     assert data_service.get_runs_in_play_order("Never Played") == []
 
 
+def test_get_all_runs_returns_a_copy_of_every_scenarios_runs_by_their_end(load_runs):
+    first = _run(100, START)
+    second = RunData(
+        datetime_object=START + timedelta(days=1),
+        score=300,
+        sens_scale="cm/360",
+        horizontal_sens=40.0,
+        scenario="Another Scenario",
+        accuracy=0.5,
+    )
+    third = _run(200, START + timedelta(days=2))
+    load_runs(third, first, second)
+
+    runs = data_service.get_all_runs()
+
+    assert runs == [first, second, third]
+    runs.clear()
+    assert len(data_service.get_all_runs()) == 3
+
+
+def test_get_all_runs_is_empty_for_an_empty_store(load_runs):
+    load_runs()
+
+    assert data_service.get_all_runs() == []
+
+
 def _playlist(code: str, *scenarios: Scenario) -> PlaylistData:
     return PlaylistData(name=f"{code} playlist", code=code, scenarios=list(scenarios))
 
