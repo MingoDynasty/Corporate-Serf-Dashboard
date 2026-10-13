@@ -636,7 +636,7 @@ def _existing_runs(*scores):
 
 
 def _import_through_watchdog(monkeypatch, file_path, *, group_scores, high_score):
-    """Import one real file and return the run event Home would receive."""
+    """Import one real file and return the run event the app would receive."""
     messages = []
     monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(

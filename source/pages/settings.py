@@ -10,8 +10,8 @@ decline the identity ask, which records an empty ``kovaaks_username`` through
 arrives here.
 
 Component ids are ``app-settings-*``: the prefix kept them clear of the bare
-``settings-*`` namespace that the Scenario Performance page's graph-settings
-modal owned, and it stays now that the modal is gone.
+``settings-*`` namespace that the chart page's graph-settings modal owned,
+and it stays now that the modal is gone.
 """
 
 import logging

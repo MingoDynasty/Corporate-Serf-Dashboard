@@ -45,8 +45,9 @@ def _build_run_import_failure_notification(
 def flush_run_import_failures(_n_intervals):
     """Deliver run imports the watchdog thread could not complete.
 
-    Home-gated, like the delivery it replaces: a missing run is a Home-visible
-    fact, so the next poll tick is soon enough.
+    Delivered only on the pages that register it, Home and Run History: a
+    missing run is a fact those pages show, so the next poll tick is soon
+    enough.
     """
     failures = drain_run_import_failures()
     if not failures:

@@ -38,15 +38,16 @@ logger = logging.getLogger(__name__)
 RUN_IMPORT_FAILURE_MESSAGE = "Couldn't process a new run file. See data/logs/debug.log."
 
 # Run files this thread failed to import. The watchdog runs outside any Dash
-# callback context, so it publishes here instead of driving a UI output, and a
-# Home interval callback drains it into one toast -- the same shape as the
-# startup playlist-warning queue. Typed and single-purpose on purpose: see the
-# background-thread rule in docs/architecture.md.
+# callback context, so it publishes here instead of driving a UI output, and
+# an interval callback on Home and on Run History drains it into one toast --
+# the same shape as the startup playlist-warning queue. Typed and
+# single-purpose on purpose: see the background-thread rule in
+# docs/architecture.md.
 run_import_failure_queue: deque[str] = deque()
 
 
 def drain_run_import_failures() -> list[str]:
-    """Drain run-import failures for UI delivery on the next Home tick."""
+    """Drain run-import failures for UI delivery on a page's next poll tick."""
     failures: list[str] = []
     while True:
         try:
@@ -86,7 +87,7 @@ def _get_created_csv_path(event) -> str | None:
 
 
 def _enqueue_after_loading(file: str, message: NewFileMessage) -> bool:
-    """Make a run visible to Home only after it is queryable in the stores."""
+    """Make a run visible to the UI only after it is queryable in the stores."""
     if not load_csv_file_into_database(file):
         # The store re-reads the CSV, so a file that parsed a moment ago in
         # _import_created_file can still fail here -- deleted or replaced in

@@ -32,8 +32,8 @@ def test_settings(
     """Keep the settings store off the developer's real one.
 
     Identity stays unset, and the stats directory is pinned the way a real
-    startup pins it -- at the fixture stats folder, so tests that render Home
-    or scan runs see the same directory they always have.
+    startup pins it -- at the fixture stats folder, so tests that render a
+    page or scan runs see the same directory they always have.
     """
     # Its own subdirectory: tests that drive the store directly point it at
     # ``tmp_path/data`` and expect to find nothing there but their own writes.

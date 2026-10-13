@@ -1,6 +1,7 @@
 """Shared props for the playlist-selector dropdowns.
 
-Home's ``dmc.Select`` filter and the Aim Training Journey ``dmc.MultiSelect``
+Run History's ``dmc.Select`` filter and the Aim Training Journey
+``dmc.MultiSelect``
 comparison picker stay distinct components with role-specific behavior
 (clearable/persistence/value semantics), but should share the same search,
 sizing, and scroll conventions so the two dropdowns look and behave

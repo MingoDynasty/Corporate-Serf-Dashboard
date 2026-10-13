@@ -205,7 +205,8 @@ def get_visible_playlist_selector_options() -> list[dict[str, str]]:
     """Get selector options filtered to visible playlists.
 
     The single visibility filter for every playlist option list (proposal
-    R13): the Home filter, the Aim Training Journey picker, and the overview
+    R13): the Run History filter, the Aim Training Journey picker, and the
+    overview
     all consume this wrapper, so they can never disagree about what is
     visible.
     """

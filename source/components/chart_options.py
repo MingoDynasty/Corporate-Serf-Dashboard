@@ -29,19 +29,13 @@ from source.plot.plot_service import (
 
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
-# What the Score threshold percentage help says on both pages, before the
-# sentence about what judges a run, which each page words for itself.
-_SCORE_THRESHOLD_PERCENTAGE_HELP = (
-    "Sets the score goal as a percentage of your personal best. On a "
-    "scenario scored by completion time, it's a percentage of your "
-    "personal best's pace instead, when the app can measure pace "
-    "reliably. Otherwise, it stays a percentage of your score. The "
-    "overlay line tracks your current personal best. "
-)
 SETTINGS_HELP_TEXT: dict[str, str | list] = {
-    "automatically-change-scenario": (
-        "Automatically selects the scenario you just played when a new run is detected."
-    ),
+    "automatically-change-scenario": [
+        "Automatically selects the scenario you just played when a new run is "
+        "detected. If the ",
+        control_name("Playlist filter"),
+        " doesn't list that scenario, the filter is cleared.",
+    ],
     "rank-overlay": (
         "Shows the selected playlist's rank threshold lines on the graph when "
         "rank data is available."
@@ -60,9 +54,12 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         "current personal best."
     ),
     "score-threshold-percentage": (
-        _SCORE_THRESHOLD_PERCENTAGE_HELP
-        + "Notifications judge a run against the personal best you had before "
-        "the run."
+        "Sets the score goal as a percentage of your personal best. On a "
+        "scenario scored by completion time, it's a percentage of your "
+        "personal best's pace instead, when the app can measure pace "
+        "reliably. Otherwise, it stays a percentage of your score. The "
+        "overlay line tracks your current personal best. A run is judged "
+        "against the personal best you had before the run."
     ),
     "score-threshold-notification": [
         "Adds a pass or fail verdict to run notifications when the run can be "
@@ -73,25 +70,6 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
     "run-notification": (
         "Controls threshold verdict and placement notifications for your runs. "
         "Personal best celebrations use their own setting."
-    ),
-    "top-n-scores": [
-        "How many of your best scores to plot per sensitivity within the "
-        "selected date range, or per day in ",
-        control_name("Score vs Time"),
-        ". A new run that lands in the top N also triggers a notification.",
-    ],
-    # The Run History page's wording of two of the texts above. Its Follow
-    # clears a playlist filter that does not list the scenario just played,
-    # and on it a toast is not the only thing that judges a run.
-    "automatically-change-scenario-run-history": [
-        "Automatically selects the scenario you just played when a new run is "
-        "detected. If the ",
-        control_name("Playlist filter"),
-        " doesn't list that scenario, the filter is cleared.",
-    ],
-    "score-threshold-percentage-run-history": (
-        _SCORE_THRESHOLD_PERCENTAGE_HELP
-        + "A run is judged against the personal best you had before the run."
     ),
 }
 # The chart options inspector. Its collapsed class is the open state: hiding
@@ -302,32 +280,8 @@ def _chart_options_group(title: str, controls: list) -> dmc.Stack:
     )
 
 
-def chart_options_panel(
-    ids: ChartOptionsIds,
-    *,
-    score_threshold_percentage_help: str | list = SETTINGS_HELP_TEXT[
-        "score-threshold-percentage"
-    ],
-    score_threshold_percentage_waits_for_commit: bool = False,
-) -> dmc.Box:
-    """Build the collapsible inspector that sits beside the chart.
-
-    ``score_threshold_percentage_help`` is the help text of the Score
-    threshold percentage field, which says what judges a run and so differs
-    between the pages that host the panel.
-
-    ``score_threshold_percentage_waits_for_commit`` makes that field send its
-    value on Enter or on losing focus, where it otherwise sends every
-    keystroke. A page that marks every listed run by the percentage sets it:
-    typing 90 over 95 passes through 9, and every mark would flicker through
-    it.
-    """
-    # Left out unless asked for. An explicit ``False`` is still a prop in the
-    # layout a browser is sent, and a page that does not ask for this must go
-    # on serving the layout it serves.
-    percentage_commit = (
-        {"debounce": True} if score_threshold_percentage_waits_for_commit else {}
-    )
+def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
+    """Build the collapsible inspector that sits beside the chart."""
     return dmc.Box(
         id=ids.panel,
         className=_chart_options_panel_class(False),
@@ -456,7 +410,7 @@ def chart_options_panel(
                         id=ids.score_threshold_percentage,
                         label=settings_help_label(
                             "Score threshold percentage",
-                            score_threshold_percentage_help,
+                            SETTINGS_HELP_TEXT["score-threshold-percentage"],
                         ),
                         min=1,
                         persistence=True,
@@ -469,7 +423,11 @@ def chart_options_panel(
                         # its input, so the modal's 12em box would wrap this
                         # label and strand its help icon on the line above.
                         w="100%",
-                        **percentage_commit,
+                        # Sent on Enter or on losing focus, never per
+                        # keystroke. Every mark in the run list is judged by
+                        # this value, and typing 90 over 95 passes through 9,
+                        # so every mark would flicker through it.
+                        debounce=True,
                     ),
                     # Stays in this group, beside the percentage it judges
                     # against, even though the master switch it depends on
@@ -520,58 +478,45 @@ def chart_options_toggle(ids: ChartOptionsIds) -> dmc.Button:
     )
 
 
-def register_chart_options(
-    ids: ChartOptionsIds,
-    *,
-    latest_run: str | None = None,
-) -> None:
+def register_chart_options(ids: ChartOptionsIds, *, latest_run: str) -> None:
     """Register the block's callbacks for one page's ids.
 
     Call once per page, at import, with the ids its layout is built from. The
     theme comes from the shell's color scheme switch, which every page shares.
 
     ``latest_run`` is the id of a store holding the id of the newest run on
-    any scenario, for a page whose figures ring their scenario's newest run.
-    The graph's one callback then takes the store as an input too, so the
-    ring is shown or hidden when the latest run changes. It is one callback
-    and not a second writer of the figure, because Dash holds a callback
-    back for a queued writer of one of its inputs: when a run lands on the
-    chart's own scenario, the graph is written once, after both the new
-    figure and the new latest run are in.
+    any scenario. The page's figures ring their scenario's newest run, and
+    the graph's one callback takes the store as an input, so the ring is
+    shown or hidden when the latest run changes. It is one callback and not a
+    second writer of the figure, because Dash holds a callback back for a
+    queued writer of one of its inputs: when a run lands on the chart's own
+    scenario, the graph is written once, after both the new figure and the
+    new latest run are in.
     """
-    appearance_inputs = [
+    latest_run_prop = f"{latest_run}.data"
+
+    @callback(
+        Output(ids.graph, "figure"),
         Input("color-scheme-switch", "computedColorScheme"),
         Input(ids.cached_plot, "data"),
         Input(ids.point_size, "value"),
         Input(ids.point_color, "value"),
-    ]
-    if latest_run is None:
-        callback(Output(ids.graph, "figure"), *appearance_inputs)(
-            apply_graph_appearance
+        Input(latest_run, "data"),
+    )
+    def ring_latest_run_on_graph(
+        color_scheme, plot_json, point_size, point_color, latest_run_id
+    ):
+        """Style the graph, or only move the ring when nothing else changed."""
+        return apply_graph_appearance_ringing_latest_run(
+            color_scheme,
+            plot_json,
+            point_size,
+            point_color,
+            latest_run_id,
+            only_the_latest_run_changed=(
+                [trigger["prop_id"] for trigger in ctx.triggered] == [latest_run_prop]
+            ),
         )
-    else:
-        latest_run_prop = f"{latest_run}.data"
-
-        @callback(
-            Output(ids.graph, "figure"),
-            *appearance_inputs,
-            Input(latest_run, "data"),
-        )
-        def ring_latest_run_on_graph(
-            color_scheme, plot_json, point_size, point_color, latest_run_id
-        ):
-            """Style the graph, or only move the ring when nothing else changed."""
-            return apply_graph_appearance_ringing_latest_run(
-                color_scheme,
-                plot_json,
-                point_size,
-                point_color,
-                latest_run_id,
-                only_the_latest_run_changed=(
-                    [trigger["prop_id"] for trigger in ctx.triggered]
-                    == [latest_run_prop]
-                ),
-            )
 
     callback(
         Output(ids.point_color, "value"),

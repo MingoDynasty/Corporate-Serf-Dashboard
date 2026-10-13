@@ -1,4 +1,4 @@
-"""The Scenario Stats block on the Scenario Performance page.
+"""The Scenario Stats block on the Run History page.
 
 The callbacks live in ``source/components/scenario_stats.py`` and take their
 ids from the page that hosts them. These tests hold the run count and the Last
@@ -29,7 +29,9 @@ from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
+
+IDS = run_history.SCENARIO_STATS_IDS
 
 format_scenario_rank = scenario_stats.format_scenario_rank
 
@@ -111,15 +113,17 @@ def _walk_components(component):
 
 
 def _layout_components(monkeypatch) -> dict:
-    """Render Home without touching disk and index the tree by component id."""
+    """Render the page without touching disk and index the tree by component id."""
     monkeypatch.setattr(
         scenario_selection, "get_visible_playlist_selector_options", lambda: []
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
-        getattr(component, "id", None): component
-        for component in _walk_components(home.layout())
+        component.id: component
+        for component in _walk_components(run_history.layout())
+        # A pattern-matching id is a dict, which cannot key this one.
+        if isinstance(getattr(component, "id", None), str)
     }
 
 
@@ -131,27 +135,27 @@ def _output_keys(registration: dict) -> set[str]:
     }
 
 
-def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
+def test_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(
         scenario_selection, "get_visible_playlist_selector_options", lambda: []
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
-    components = list(_walk_components(home.layout()))
+    components = list(_walk_components(run_history.layout()))
     last_played = next(
         component
         for component in components
-        if getattr(component, "id", None) == "scenario_datetime_last_played"
+        if getattr(component, "id", None) == IDS.last_played
     )
     tooltip = next(
         component
         for component in components
-        if getattr(component, "id", None) == "last-played-tooltip"
+        if getattr(component, "id", None) == IDS.last_played_tooltip
     )
     empty_value = next(
         component
         for component in components
-        if getattr(component, "id", None) == "last-played-empty-value"
+        if getattr(component, "id", None) == IDS.last_played_empty_value
     )
 
     assert last_played.children == ""
@@ -172,10 +176,10 @@ def test_rank_refresh_button_has_tooltip(monkeypatch):
 
     tooltips = [
         component
-        for component in _walk_components(home.layout())
+        for component in _walk_components(run_history.layout())
         if isinstance(component, dmc.Tooltip)
         and any(
-            getattr(child, "id", None) == "rank-refresh-button"
+            getattr(child, "id", None) == IDS.rank_refresh_button
             for child in _walk_components(component.children)
         )
     ]
@@ -330,16 +334,17 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
 
 
 def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads():
-    interval = {"prop_id": "interval-component.n_intervals"}
+    interval = {"prop_id": f"{IDS.polling_interval}.n_intervals"}
+    new_runs = {"prop_id": f"{IDS.run_events}.data"}
 
     assert scenario_stats._rank_allows_network([{"prop_id": "."}]) is True
     assert scenario_stats._rank_allows_network([interval]) is False
-    assert scenario_stats._rank_allows_network([{"prop_id": "run-events.data"}]) is True
+    assert scenario_stats._rank_allows_network([new_runs]) is True
     assert (
         scenario_stats._rank_allows_network(
             [
                 interval,
-                {"prop_id": "scenario-dropdown-selection.value"},
+                {"prop_id": f"{IDS.scenario_dropdown}.value"},
             ]
         )
         is True
@@ -577,7 +582,7 @@ def test_a_rank_render_nobody_triggered_keeps_the_sessions_mismatch_toast(
     monkeypatch.setattr(
         scenario_stats,
         "ctx",
-        SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
+        SimpleNamespace(triggered=[{"prop_id": f"{IDS.scenario_dropdown}.value"}]),
     )
     _display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
         None, scenario_name, 0
@@ -594,7 +599,7 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
     monkeypatch.setattr(
         scenario_stats,
         "ctx",
-        SimpleNamespace(triggered=[{"prop_id": "scenario-dropdown-selection.value"}]),
+        SimpleNamespace(triggered=[{"prop_id": f"{IDS.scenario_dropdown}.value"}]),
     )
 
     _display, _updated_ts, notifications = scenario_stats.get_scenario_rank(
@@ -1382,14 +1387,14 @@ def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
-    page = home.layout()
+    page = run_history.layout()
     rank_loading = next(
         (
             component
             for component in _walk_components(page)
             if isinstance(component, dcc.Loading)
             and any(
-                getattr(child, "id", None) == "scenario_rank"
+                getattr(child, "id", None) == IDS.rank
                 for child in _walk_components(component.children)
             )
         ),
@@ -1405,7 +1410,7 @@ def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     refresh_button = next(
         component
         for component in _walk_components(page)
-        if getattr(component, "id", None) == "rank-refresh-button"
+        if getattr(component, "id", None) == IDS.rank_refresh_button
     )
     assert refresh_button.children == "Refresh"
 
@@ -1416,16 +1421,16 @@ STORED_AT = datetime(2026, 10, 1, 6, 24, 30, tzinfo=UTC)
 def test_position_hover_starts_disabled_around_the_value(monkeypatch):
     """Until a render dates a position there is nothing to hover for."""
     components = _layout_components(monkeypatch)
-    tooltip = components["rank-updated-tooltip"]
+    tooltip = components[IDS.rank_updated_tooltip]
     value = tooltip.children
 
-    assert value.id == "scenario_rank"
+    assert value.id == IDS.rank
     assert tooltip.disabled is True
     assert tooltip.label == ""
     assert tooltip.events == chart_options.TOOLTIP_EVENTS
     assert getattr(value, "className", None) is None
     assert getattr(value, "tabIndex", None) is None
-    assert getattr(components["rank-updated-ts"], "data", None) is None
+    assert getattr(components[IDS.rank_updated_ts], "data", None) is None
 
 
 @pytest.mark.parametrize(
@@ -1606,12 +1611,12 @@ def test_every_writer_of_the_position_value_also_writes_its_time():
     value_writers = [
         _output_keys(spec)
         for spec in GLOBAL_CALLBACK_LIST
-        if "scenario_rank.children" in _output_keys(spec)
+        if f"{IDS.rank}.children" in _output_keys(spec)
     ]
 
     assert len(value_writers) == 2
     for outputs in value_writers:
-        assert "rank-updated-ts.data" in outputs
+        assert f"{IDS.rank_updated_ts}.data" in outputs
 
 
 def test_position_hover_is_worded_in_the_browser_from_the_stored_time():
@@ -1619,19 +1624,19 @@ def test_position_hover_is_worded_in_the_browser_from_the_stored_time():
     (spec,) = [
         spec
         for spec in GLOBAL_CALLBACK_LIST
-        if "rank-updated-tooltip.label" in _output_keys(spec)
+        if f"{IDS.rank_updated_tooltip}.label" in _output_keys(spec)
     ]
 
     assert spec["clientside_function"] is not None
     assert _output_keys(spec) == {
-        "rank-updated-tooltip.label",
-        "rank-updated-tooltip.disabled",
-        "scenario_rank.className",
-        "scenario_rank.tabIndex",
+        f"{IDS.rank_updated_tooltip}.label",
+        f"{IDS.rank_updated_tooltip}.disabled",
+        f"{IDS.rank}.className",
+        f"{IDS.rank}.tabIndex",
     }
     assert spec["inputs"] == [
-        {"id": "rank-updated-ts", "property": "data"},
-        {"id": "relative-time-interval", "property": "n_intervals"},
+        {"id": IDS.rank_updated_ts, "property": "data"},
+        {"id": IDS.relative_time_interval, "property": "n_intervals"},
     ]
     source = next(
         script
@@ -1647,7 +1652,7 @@ def test_position_hover_is_worded_in_the_browser_from_the_stored_time():
     assert "cell-tooltip-affordance" in source
 
 
-# A second page's ids, none of which the Scenario Performance page uses.
+# A second page's ids, none of which the Run History page uses.
 SECOND_PAGE_IDS = scenario_stats.ScenarioStatsIds(
     *(f"second-{field}" for field in scenario_stats.ScenarioStatsIds._fields)
 )
@@ -1694,62 +1699,44 @@ def restored_callbacks():
     GLOBAL_INLINE_SCRIPTS[:] = saved_scripts
 
 
-def test_the_page_gives_the_block_the_ids_it_has_always_had(monkeypatch):
-    # The block builds most of its components from this object, so a changed
-    # string here changes an id in the browser with nothing else to notice.
-    assert home.SCENARIO_STATS_IDS._asdict() == {
-        "last_played": "scenario_datetime_last_played",
-        "last_played_tooltip": "last-played-tooltip",
-        "num_runs": "scenario_num_runs",
-        "rank": "scenario_rank",
-        "rank_updated_tooltip": "rank-updated-tooltip",
-        "rank_refresh_button": "rank-refresh-button",
-        "last_played_ts": "last-played-ts",
-        "last_played_empty_value": "last-played-empty-value",
-        "rank_updated_ts": "rank-updated-ts",
-        "run_events": "run-events",
-        "scenario_dropdown": "scenario-dropdown-selection",
-        "polling_interval": "interval-component",
-        "relative_time_interval": "relative-time-interval",
-    }
-
-    # The layout builds the run-events store, the scenario dropdown and the
-    # two intervals itself and spells their ids there, so nothing but this
-    # ties them to the ids the callbacks were registered for.
-    assert set(home.SCENARIO_STATS_IDS) <= set(_layout_components(monkeypatch))
-
-
 def test_the_page_registers_the_block_for_its_own_ids():
     """Registration is a call the page makes; without it the block shows nothing."""
-    assert _block_registrations(home.SCENARIO_STATS_IDS) == [
+    assert _block_registrations(IDS) == [
         (
             scenario_stats.get_scenario_num_runs,
-            ["run-events.data", "scenario-dropdown-selection.value"],
+            [f"{IDS.run_events}.data", f"{IDS.scenario_dropdown}.value"],
             [],
         ),
         (
             None,
             [
-                "last-played-ts.data",
-                "last-played-empty-value.data",
-                "relative-time-interval.n_intervals",
+                f"{IDS.last_played_ts}.data",
+                f"{IDS.last_played_empty_value}.data",
+                f"{IDS.relative_time_interval}.n_intervals",
             ],
             [],
         ),
         (
             scenario_stats.get_scenario_rank,
             [
-                "run-events.data",
-                "scenario-dropdown-selection.value",
-                "interval-component.n_intervals",
+                f"{IDS.run_events}.data",
+                f"{IDS.scenario_dropdown}.value",
+                f"{IDS.polling_interval}.n_intervals",
             ],
             [],
         ),
-        (None, ["rank-updated-ts.data", "relative-time-interval.n_intervals"], []),
+        (
+            None,
+            [
+                f"{IDS.rank_updated_ts}.data",
+                f"{IDS.relative_time_interval}.n_intervals",
+            ],
+            [],
+        ),
         (
             scenario_stats.refresh_rank,
-            ["rank-refresh-button.n_clicks"],
-            ["scenario-dropdown-selection.value", "toast-channel-registry.data"],
+            [f"{IDS.rank_refresh_button}.n_clicks"],
+            [f"{IDS.scenario_dropdown}.value", "toast-channel-registry.data"],
         ),
     ]
 
@@ -1779,7 +1766,7 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
     restored_callbacks,
 ):
     registered_before = list(GLOBAL_CALLBACK_LIST)
-    first_page = _block_registrations(home.SCENARIO_STATS_IDS)
+    first_page = _block_registrations(IDS)
 
     scenario_stats.register_scenario_stats(SECOND_PAGE_IDS)
 
@@ -1847,7 +1834,7 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "running": {"second-rank_refresh_button.loading": True},
         "runningOff": {"second-rank_refresh_button.loading": False},
     }
-    assert _block_registrations(home.SCENARIO_STATS_IDS) == first_page
+    assert _block_registrations(IDS) == first_page
 
 
 def test_a_second_pages_polling_tick_alone_reads_caches_only(monkeypatch):

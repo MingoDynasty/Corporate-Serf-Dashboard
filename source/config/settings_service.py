@@ -175,7 +175,7 @@ def get_identity() -> tuple[str | None, str | None]:
     Practical consequence, intended: when identity is already configured at
     boot, the first consumer read -- normally the warmup starter during
     startup, though its ``percentile_warmup_enabled`` guard short-circuits
-    ahead of the identity read, leaving the freeze to a Home render or a
+    ahead of the identity read, leaving the freeze to a page render or a
     watchdog event -- pins it there. Freeze-on-read only ever matters for the
     unset-to-set flow.
     """

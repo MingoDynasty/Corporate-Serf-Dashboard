@@ -86,7 +86,8 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
             )
 
     # Nothing to plot is a state, not an event: say so where the chart would
-    # be, the way Home's empty plots do, instead of toasting over the page.
+    # be, the way Run History's empty charts do, instead of toasting over the
+    # page.
     # Only a selection with no runs at all takes the empty state; a partial
     # selection still plots what it has.
     if not any(journey_data.values()):

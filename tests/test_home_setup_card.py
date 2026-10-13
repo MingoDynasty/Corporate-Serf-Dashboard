@@ -16,7 +16,7 @@ import pytest
 from dash import no_update
 from dash._callback import GLOBAL_CALLBACK_MAP
 
-from source.components import scenario_selection, setup_surfaces
+from source.components import setup_surfaces
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
 from source.utilities.store_schema import StoreState, UnsupportedSchemaError
@@ -85,15 +85,6 @@ def _icon_mask(component):
     return icon.style["mask"]
 
 
-@pytest.fixture(autouse=True)
-def quiet_home(monkeypatch):
-    """Keep the rest of the page out of the way of the card."""
-    monkeypatch.setattr(
-        scenario_selection, "get_visible_playlist_selector_options", lambda: []
-    )
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
-
-
 @pytest.fixture
 def stats_dir():
     """The fixture stats folder, the same one a real startup would pin."""
@@ -150,7 +141,7 @@ def test_the_card_asks_for_the_account_when_only_identity_is_unasked(
     [{}, {USERNAME_KEY: ""}, {USERNAME_KEY: "MingoDynasty"}],
 )
 def test_a_never_configured_stats_folder_wins_and_offers_no_skip(identity):
-    """Without runs there is nothing to plot, so this state is not dismissible."""
+    """Without runs the app has nothing to show, so this state is not dismissible."""
     _store(**identity)
 
     card = _card(home.layout())
@@ -206,8 +197,8 @@ def test_an_unusable_store_gets_its_own_card_instead_of_a_fresh_install_one(
 def test_each_card_state_wears_its_own_severity_treatment(stats_dir):
     """Blocking setup is caution; the account offer is information.
 
-    The stats-folder state cannot be dismissed and leaves every plot on the
-    page empty, so it takes the yellow treatment and the warning icon. The
+    The stats-folder state cannot be dismissed and leaves the app with no
+    runs to show, so it takes the yellow treatment and the warning icon. The
     identity state is an optional offer, so it stays blue with the info icon.
     """
     _store()

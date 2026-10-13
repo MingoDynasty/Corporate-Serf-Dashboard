@@ -40,7 +40,7 @@ from source.kovaaks.playlist_scenarios_service import (
     PlaylistScenarioFillDrain,
     build_playlist_scenario_rank_rows,
     drain_playlist_scenario_fill,
-    scenario_home_href,
+    scenario_run_history_href,
     start_playlist_scenario_fill,
 )
 from source.pages.page_title import page_title
@@ -90,7 +90,7 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Scenario",
         "field": "scenario",
-        # Real anchor to the scenario's Home plot. The renderer reads the
+        # Real anchor to the scenario on Run History. The renderer reads the
         # prebuilt row "href" and carries the link styling on the anchor
         # itself, so new-tab / copy-link work; the cellClicked callback still
         # handles the fast in-app left-click nav.
@@ -515,8 +515,8 @@ def _menu_columns(
     State("playlist-scenarios-code", "data"),
     prevent_initial_call=True,
 )
-def route_to_scenario_home(cell_clicked, current_playlist_code):
-    """Open the Home plot for a clicked scenario cell."""
+def route_to_scenario_run_history(cell_clicked, current_playlist_code):
+    """Open a clicked scenario cell's scenario on Run History."""
     if (
         not isinstance(cell_clicked, dict)
         or cell_clicked.get("colId") != "scenario"
@@ -524,7 +524,7 @@ def route_to_scenario_home(cell_clicked, current_playlist_code):
         or not current_playlist_code
     ):
         return no_update
-    return scenario_home_href(cell_clicked["value"], current_playlist_code)
+    return scenario_run_history_href(cell_clicked["value"], current_playlist_code)
 
 
 @callback(

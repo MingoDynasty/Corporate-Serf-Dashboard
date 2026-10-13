@@ -26,7 +26,7 @@ from source.components import (  # noqa: E402
     scenario_selection,
 )
 from source.my_queue.message_queue import NewFileMessage  # noqa: E402
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_CHANNEL,
     TOAST_CHANNEL_REGISTRY_STORE_ID,
@@ -417,7 +417,10 @@ def test_the_shell_hosts_the_drain_interval_and_the_batch_store(monkeypatch):
 
     assert app_shell.PB_CELEBRATION_INTERVAL_ID in ids
     assert app_shell.RUN_EVENTS_BATCH_STORE_ID in ids
-    assert app_shell.RUN_EVENTS_BATCH_STORE_ID not in _component_ids(home.layout())
+    # The page that listens to the store holds no copy of it.
+    assert app_shell.RUN_EVENTS_BATCH_STORE_ID not in _component_ids(
+        run_history.layout()
+    )
 
 
 def _component(root, component_id):

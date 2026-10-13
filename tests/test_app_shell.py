@@ -95,7 +95,7 @@ def test_index_string_declares_english_language():
 
 
 def test_nav_link_uses_single_mantine_anchor_for_dash_navigation():
-    link = app_shell.nav_link("Scenario Performance", "/", "bi:house-door-fill")
+    link = app_shell.nav_link("Home", "/", "bi:house-door-fill")
 
     assert isinstance(link, dmc.NavLink)
     assert link.href == "/"
@@ -112,7 +112,8 @@ def test_navbar_links_to_every_navigable_page():
     ]
 
     assert links == [
-        ("Scenario Performance", "/"),
+        ("Home", "/"),
+        ("Run History", "/run-history"),
         ("Playlists", "/playlists"),
         ("Settings", "/settings"),
     ]

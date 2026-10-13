@@ -3,6 +3,8 @@
 A run that failed to import is queued from a plain thread, and a playlist that
 did not load is queued while the app starts. Each has a flush in
 ``source/components/queued_notices.py`` that drains its queue into toasts.
+Home and Run History both host the two flushes, so whichever is open
+delivers what is queued.
 """
 
 import dash
@@ -15,7 +17,20 @@ from source.my_watchdog import file_watchdog
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.pages import home  # noqa: E402
+from source.pages import home, run_history  # noqa: E402
+
+# Each hosting page's two intervals, with the flush registered on each.
+HOME_FLUSHES = [
+    (home.POLLING_INTERVAL_ID, "flush_run_import_failures"),
+    (home.STARTUP_PLAYLIST_WARNING_INTERVAL_ID, "flush_startup_playlist_warnings"),
+]
+RUN_HISTORY_FLUSHES = [
+    (run_history.POLLING_INTERVAL_ID, "flush_run_import_failures"),
+    (
+        run_history.STARTUP_PLAYLIST_WARNING_INTERVAL_ID,
+        "flush_startup_playlist_warnings",
+    ),
+]
 
 
 @pytest.fixture(autouse=True)
@@ -128,17 +143,8 @@ def restored_callbacks():
     GLOBAL_CALLBACK_MAP.update(saved_map)
 
 
-@pytest.mark.parametrize(
-    ("interval_id", "flush"),
-    [
-        ("interval-component", "flush_run_import_failures"),
-        ("startup-playlist-warning-interval", "flush_startup_playlist_warnings"),
-    ],
-)
-def test_the_page_registers_each_flush_on_an_interval_its_layout_builds(
-    monkeypatch, interval_id, flush
-):
-    """Registration is a call the page makes; without it a queue never empties."""
+def _assert_registered_flush(interval_id: str, flush: str) -> None:
+    """Hold one interval to exactly one registration, answered by its flush."""
     (registration,) = _flushes_on(interval_id)
 
     assert _answering(registration) == flush
@@ -146,19 +152,43 @@ def test_the_page_registers_each_flush_on_an_interval_its_layout_builds(
     # Registered to answer the interval's tick, not the mount.
     assert registration["prevent_initial_call"] is True
 
+
+def _mounted_ids(page) -> set[str]:
+    """Collect a layout's plain ids. A pattern-matching id is a dict."""
+    return {
+        component.id
+        for component in _walk_components(page)
+        if isinstance(getattr(component, "id", None), str)
+    }
+
+
+@pytest.mark.parametrize(("interval_id", "flush"), HOME_FLUSHES)
+def test_home_registers_each_flush_on_an_interval_its_layout_builds(interval_id, flush):
+    """Registration is a call the page makes; without it a queue never empties.
+
+    Home is the page the launcher opens, so a warning raised at startup is
+    delivered there.
+    """
+    _assert_registered_flush(interval_id, flush)
+
+    assert interval_id in _mounted_ids(home.layout())
+
+
+@pytest.mark.parametrize(("interval_id", "flush"), RUN_HISTORY_FLUSHES)
+def test_run_history_registers_each_flush_on_an_interval_its_layout_builds(
+    monkeypatch, interval_id, flush
+):
+    """A run that failed to import is reported on the page that would show it."""
+    _assert_registered_flush(interval_id, flush)
+
     monkeypatch.setattr(
         scenario_selection, "get_visible_playlist_selector_options", lambda: []
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
-    mounted = {
-        getattr(component, "id", None) for component in _walk_components(home.layout())
-    }
-    # The layout spells each interval's id itself, so nothing but this ties
-    # it to the id the flush was registered on.
-    assert interval_id in mounted
+    assert interval_id in _mounted_ids(run_history.layout())
 
 
-def test_a_second_page_registers_each_flush_on_an_interval_of_its_own(
+def test_another_page_registers_each_flush_on_an_interval_of_its_own(
     restored_callbacks,
 ):
     registered_before = len(GLOBAL_CALLBACK_LIST)
@@ -178,9 +208,10 @@ def test_a_second_page_registers_each_flush_on_an_interval_of_its_own(
         ([("second-poll", "n_intervals")], [], "flush_run_import_failures"),
         ([("second-startup", "n_intervals")], [], "flush_startup_playlist_warnings"),
     ]
-    # Both pages write the shell's one notification container. Dash tells the
-    # writers apart by their inputs, so each registration is its own output
-    # and the first page's two are still there.
+    # Every hosting page writes the shell's one notification container. Dash
+    # tells the writers apart by their inputs, so each registration is its
+    # own output, and the two each of Home and Run History has are still
+    # there.
     writers = [
         entry["output"]
         for entry in GLOBAL_CALLBACK_LIST
@@ -188,5 +219,5 @@ def test_a_second_page_registers_each_flush_on_an_interval_of_its_own(
     ]
     assert len(writers) == len(set(writers))
     assert {entry["output"] for entry in added} <= set(writers)
-    assert len(_flushes_on("interval-component")) == 1
-    assert len(_flushes_on("startup-playlist-warning-interval")) == 1
+    for interval_id, _flush in HOME_FLUSHES + RUN_HISTORY_FLUSHES:
+        assert len(_flushes_on(interval_id)) == 1

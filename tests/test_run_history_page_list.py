@@ -38,7 +38,7 @@ from source.components.run_history_list import (  # noqa: E402
 )
 from source.components.run_marks import mark_runs  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
-from source.pages import home, run_history  # noqa: E402
+from source.pages import run_history  # noqa: E402
 from source.plot import plot_service  # noqa: E402
 from tests.rendered_text import rendered_text  # noqa: E402
 
@@ -912,30 +912,21 @@ def test_the_answer_is_the_apps_own_clocks(monkeypatch):
 # --- The percentage field ------------------------------------------------------
 
 
-def _percentage_field(page, field_id: str) -> dmc.NumberInput:
-    field = _by_id(page, field_id)
-    assert isinstance(field, dmc.NumberInput)
-    return field
-
-
 def test_the_percentage_is_sent_on_enter_or_on_leaving_the_field():
-    """Typing 90 over 95 passes through 9, and every check would flicker."""
-    field = _percentage_field(
+    """Typing 90 over 95 passes through 9, and every check would flicker.
+
+    The Chart options panel has one percentage field, and it always waits
+    for a commit.
+    """
+    field = _by_id(
         run_history.layout(),
         run_history.CHART_OPTIONS_IDS.score_threshold_percentage,
     )
 
+    assert isinstance(field, dmc.NumberInput)
     assert field.debounce is True
     # A remembered control: the change must not move its default.
     assert (field.value, field.persistence) == (95, True)
-
-
-def test_the_other_pages_percentage_field_still_sends_every_keystroke():
-    field = _percentage_field(
-        home.layout(), home.CHART_OPTIONS_IDS.score_threshold_percentage
-    )
-
-    assert "debounce" not in field.to_plotly_json()["props"]
 
 
 # --- The stylesheet ------------------------------------------------------------

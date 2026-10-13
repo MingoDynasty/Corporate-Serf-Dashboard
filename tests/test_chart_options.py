@@ -1,12 +1,15 @@
-"""The Chart options panel on the Scenario Performance page.
+"""The Chart options panel on the Run History page.
 
 The panel and its callbacks live in ``source/components/chart_options.py`` and
 take their ids from the page that hosts them. These tests render that page and
-hold what a browser's stored preferences depend on, each control's id and
-layout default, along with the groups, the help text, and the toggle.
+hold what a browser's stored preferences depend on, each control's layout
+default, along with the groups, the help text, the toggle, and the stylesheet
+rules that open and collapse the panel beside the graph.
 """
 
 import json
+import re
+from pathlib import Path
 from types import SimpleNamespace
 
 import dash
@@ -21,7 +24,10 @@ from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
+
+IDS = run_history.CHART_OPTIONS_IDS
+STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
 
 def _walk_components(component):
@@ -37,15 +43,17 @@ def _walk_components(component):
 
 
 def _layout_components(monkeypatch) -> dict:
-    """Render Home without touching disk and index the tree by component id."""
+    """Render the page without touching disk and index the tree by component id."""
     monkeypatch.setattr(
         scenario_selection, "get_visible_playlist_selector_options", lambda: []
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
-        getattr(component, "id", None): component
-        for component in _walk_components(home.layout())
+        component.id: component
+        for component in _walk_components(run_history.layout())
+        # A pattern-matching id is a dict, which cannot key this one.
+        if isinstance(getattr(component, "id", None), str)
     }
 
 
@@ -60,15 +68,15 @@ def _label_text(component) -> str:
 # must not move: Dash persistence is keyed by component id, and changing a
 # layout default silently wipes every value the browser already stored under
 # it. The Run Data Points controls answer to the same rule; they are covered in
-# tests/test_home_point_appearance.py, where the rest of their behavior lives.
+# tests/test_chart_point_appearance.py, where the rest of their behavior lives.
 CHART_OPTIONS_INPUT_DEFAULTS = {
-    "rank-overlay-switch": ("checked", True),
-    "show-all-ranks-switch": ("checked", False),
-    "high-score-overlay-switch": ("checked", True),
-    "score-threshold-overlay-switch": ("checked", True),
-    "score-threshold-percentage": ("value", 95),
-    "score-threshold-notification-switch": ("checked", True),
-    "run-notification-switch": ("checked", True),
+    IDS.rank_overlay: ("checked", True),
+    IDS.show_all_ranks: ("checked", False),
+    IDS.high_score_overlay: ("checked", True),
+    IDS.score_threshold_overlay: ("checked", True),
+    IDS.score_threshold_percentage: ("value", 95),
+    IDS.score_threshold_notification: ("checked", True),
+    IDS.run_notification: ("checked", True),
 }
 COLLAPSED_PANEL_CLASS = (
     f"{chart_options.CHART_OPTIONS_PANEL_CLASS} "
@@ -80,15 +88,14 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
     """Coverage is per control id, wherever the control now lives."""
     components = _layout_components(monkeypatch)
     expected_settings = {
-        "automatically-change-scenario-switch": "automatically-change-scenario",
-        "rank-overlay-switch": "rank-overlay",
-        "show-all-ranks-switch": "show-all-ranks",
-        "high-score-overlay-switch": "high-score-overlay",
-        "score-threshold-overlay-switch": "score-threshold-overlay",
-        "score-threshold-percentage": "score-threshold-percentage",
-        "score-threshold-notification-switch": "score-threshold-notification",
-        "run-notification-switch": "run-notification",
-        "top_n_scores": "top-n-scores",
+        run_history.FOLLOW_SWITCH_ID: "automatically-change-scenario",
+        IDS.rank_overlay: "rank-overlay",
+        IDS.show_all_ranks: "show-all-ranks",
+        IDS.high_score_overlay: "high-score-overlay",
+        IDS.score_threshold_overlay: "score-threshold-overlay",
+        IDS.score_threshold_percentage: "score-threshold-percentage",
+        IDS.score_threshold_notification: "score-threshold-notification",
+        IDS.run_notification: "run-notification",
     }
 
     for component_id, help_key in expected_settings.items():
@@ -105,34 +112,29 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         assert tooltips[0].withArrow is True
         assert tooltips[0].multiline is True
 
-    score_threshold_percentage = components["score-threshold-percentage"]
+    score_threshold_percentage = components[IDS.score_threshold_percentage]
     assert score_threshold_percentage.min == 1
 
 
 def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypatch):
     components = _layout_components(monkeypatch)
     expected = {
-        "show-all-ranks-switch": (
+        IDS.show_all_ranks: (
             "Draws every rank in the playlist's ladder instead of only the ones "
             "around your plotted scores. Needs **Rank thresholds** turned on."
         ),
-        "score-threshold-percentage": (
+        IDS.score_threshold_percentage: (
             "Sets the score goal as a percentage of your personal best. On a "
             "scenario scored by completion time, it's a percentage of your "
             "personal best's pace instead, when the app can measure pace "
             "reliably. Otherwise, it stays a percentage of your score. The "
-            "overlay line tracks your current personal best. Notifications judge "
-            "a run against the personal best you had before the run."
+            "overlay line tracks your current personal best. A run is judged "
+            "against the personal best you had before the run."
         ),
-        "score-threshold-notification-switch": (
+        IDS.score_threshold_notification: (
             "Adds a pass or fail verdict to run notifications when the run can be "
             "judged against the score threshold. Needs **Run notifications** "
             "turned on."
-        ),
-        "top_n_scores": (
-            "How many of your best scores to plot per sensitivity within the "
-            "selected date range, or per day in **Score vs Time**. A new run that "
-            "lands in the top N also triggers a notification."
         ),
     }
 
@@ -145,7 +147,16 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
         assert rendered_text(tooltip.label) == text
 
 
-def test_chart_options_inputs_keep_their_ids_and_defaults(monkeypatch):
+def test_the_run_notifications_help_text_names_both_families():
+    # The switch's own family, then the one it deliberately does not reach: the
+    # celebration has its own setting, and the digest it once mentioned is gone.
+    assert chart_options.SETTINGS_HELP_TEXT["run-notification"] == (
+        "Controls threshold verdict and placement notifications for your runs. "
+        "Personal best celebrations use their own setting."
+    )
+
+
+def test_chart_options_inputs_keep_their_defaults(monkeypatch):
     components = _layout_components(monkeypatch)
 
     for component_id, (prop, default) in CHART_OPTIONS_INPUT_DEFAULTS.items():
@@ -157,7 +168,7 @@ def test_chart_options_inputs_keep_their_ids_and_defaults(monkeypatch):
 
 def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch):
     components = _layout_components(monkeypatch)
-    panel = components[home.CHART_OPTIONS_IDS.panel]
+    panel = components[IDS.panel]
 
     labels = {
         component.id: _label_text(component)
@@ -166,13 +177,13 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
     }
 
     assert labels == {
-        "rank-overlay-switch": "Rank thresholds",
-        "show-all-ranks-switch": "Show all ranks",
-        "high-score-overlay-switch": "PB score",
-        "score-threshold-overlay-switch": "Score threshold overlay",
-        "score-threshold-percentage": "Score threshold percentage",
-        "score-threshold-notification-switch": "Score threshold verdict",
-        "run-notification-switch": "Run notifications",
+        IDS.rank_overlay: "Rank thresholds",
+        IDS.show_all_ranks: "Show all ranks",
+        IDS.high_score_overlay: "PB score",
+        IDS.score_threshold_overlay: "Score threshold overlay",
+        IDS.score_threshold_percentage: "Score threshold percentage",
+        IDS.score_threshold_notification: "Score threshold verdict",
+        IDS.run_notification: "Run notifications",
     }
 
 
@@ -183,7 +194,7 @@ def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
     that Notifications is the trailing group and holds the master switch.
     """
     components = _layout_components(monkeypatch)
-    panel = components[home.CHART_OPTIONS_IDS.panel]
+    panel = components[IDS.panel]
 
     groups = [
         (
@@ -196,13 +207,13 @@ def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
 
     assert titles[-1] == "Notifications"
     assert titles.index("Score Threshold") < titles.index("Notifications")
-    assert groups[-1][1] == ["run-notification-switch"]
+    assert groups[-1][1] == [IDS.run_notification]
 
 
 def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypatch):
     components = _layout_components(monkeypatch)
-    panel = components[home.CHART_OPTIONS_IDS.panel]
-    toggle = components[home.CHART_OPTIONS_IDS.toggle].to_plotly_json()["props"]
+    panel = components[IDS.panel]
+    toggle = components[IDS.toggle].to_plotly_json()["props"]
 
     # Collapsed is a class, never conditional rendering: the inputs stay in the
     # layout tree feeding their callbacks with their persisted values.
@@ -212,7 +223,7 @@ def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypa
 
     assert toggle["children"] == "Chart options"
     assert toggle["aria-expanded"] == "false"
-    assert toggle["aria-controls"] == home.CHART_OPTIONS_IDS.panel
+    assert toggle["aria-controls"] == IDS.panel
 
 
 def test_chart_options_toggle_flips_the_panel_class_and_aria_expanded():
@@ -238,7 +249,7 @@ def test_chart_options_toggle_ignores_a_fire_no_click_caused():
     )
 
 
-# A second page's ids, none of which the Scenario Performance page uses.
+# A second page's ids, none of which the Run History page uses.
 SECOND_PAGE_IDS = chart_options.ChartOptionsIds(
     *(f"second-{field}" for field in chart_options.ChartOptionsIds._fields)
 )
@@ -255,39 +266,12 @@ def restored_callbacks():
     GLOBAL_CALLBACK_MAP.update(saved_map)
 
 
-def test_the_page_gives_the_block_the_ids_browsers_store_values_under(monkeypatch):
-    # The ids are data the page passes in, so a typo there is a reset of every
-    # user's stored setting. The four the other tests reach only through this
-    # object are held to their strings here too.
-    assert home.CHART_OPTIONS_IDS._asdict() == {
-        "panel": "chart-options-panel",
-        "toggle": "chart-options-toggle",
-        "rank_overlay": "rank-overlay-switch",
-        "show_all_ranks": "show-all-ranks-switch",
-        "high_score_overlay": "high-score-overlay-switch",
-        "point_size": "point-size",
-        "point_size_label": "point-size-label",
-        "point_color": "point-color",
-        "point_color_default": "point-color-default",
-        "score_threshold_overlay": "score-threshold-overlay-switch",
-        "score_threshold_percentage": "score-threshold-percentage",
-        "score_threshold_notification": "score-threshold-notification-switch",
-        "run_notification": "run-notification-switch",
-        "graph": "graph-content",
-        "cached_plot": "cached-plot",
-    }
-
-    # The graph and the store are built by the page, not by the block, so
-    # nothing but this ties their ids in the layout to the ones passed in.
-    assert set(home.CHART_OPTIONS_IDS) <= set(_layout_components(monkeypatch))
-
-
 def test_the_page_registers_the_block_for_its_own_ids():
     """Registration is a call the page makes; without it all three go quiet."""
     assert {
-        "graph-content.figure",
-        "point-color.value",
-        "..chart-options-panel.className...chart-options-toggle.aria-expanded..",
+        f"{IDS.graph}.figure",
+        f"{IDS.point_color}.value",
+        f"..{IDS.panel}.className...{IDS.toggle}.aria-expanded..",
     } <= set(GLOBAL_CALLBACK_MAP)
 
 
@@ -318,7 +302,7 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
 ):
     before = dict(GLOBAL_CALLBACK_MAP)
 
-    chart_options.register_chart_options(SECOND_PAGE_IDS)
+    chart_options.register_chart_options(SECOND_PAGE_IDS, latest_run="second-latest")
 
     added = {
         key: spec for key, spec in GLOBAL_CALLBACK_MAP.items() if key not in before
@@ -329,6 +313,7 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "..second-panel.className...second-toggle.aria-expanded..",
     }
     # The theme switch belongs to the shell, so both pages read the same one.
+    # The store that names the latest run is the page's own.
     assert {
         entry["id"]
         for spec in added.values()
@@ -341,11 +326,12 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "second-point_color_default",
         "second-toggle",
         "second-panel",
+        "second-latest",
     }
     assert all(GLOBAL_CALLBACK_MAP[key] is spec for key, spec in before.items())
 
 
-# --- A page whose figures ring the latest run ----------------------------------------
+# --- The ring round the latest run ---------------------------------------------------
 
 
 def _ringed_plot(ringed_run_id: str = "newest.csv") -> str:
@@ -382,7 +368,7 @@ def test_styling_the_graph_shows_the_ring_only_round_the_last_run_played(
 
     assert isinstance(figure, go.Figure)
     assert _ring(figure).opacity == opacity
-    # The rest of the styling is the other page's own.
+    # The rest of the styling is ``apply_graph_appearance``'s own.
     assert (
         figure.layout.template
         == go.Figure(
@@ -438,7 +424,7 @@ def test_a_figure_with_no_ring_is_left_alone_when_the_latest_run_changes(plot_js
     )
 
 
-def test_a_page_that_rings_the_latest_run_gives_the_graph_one_more_input(
+def test_a_registration_gives_the_graph_one_writer_that_takes_the_latest_run(
     restored_callbacks,
 ):
     chart_options.register_chart_options(SECOND_PAGE_IDS, latest_run="second-latest")
@@ -490,3 +476,58 @@ def test_the_graph_is_patched_only_when_the_latest_run_is_all_that_changed(
 
     assert isinstance(result, Patch) == patched
     assert isinstance(result, go.Figure) != patched
+
+
+# --- The stylesheet rules that open and collapse the panel ---------------------------
+
+
+@pytest.fixture
+def stylesheet():
+    return STYLESHEET.read_text(encoding="utf-8")
+
+
+def _css_block(css, selector):
+    """Return the declarations of one top-level rule, by exact selector."""
+    match = re.search(rf"(?m)^{re.escape(selector)} \{{(.*?)^\}}", css, re.DOTALL)
+    assert match, f"no {selector} rule in the stylesheet"
+    return match.group(1)
+
+
+def test_collapsing_the_inspector_animates_the_track_the_graph_grows_into(
+    stylesheet,
+):
+    """The graph has to grow and shrink, not jump.
+
+    Plotly redraws off the ResizeObserver, so the animation is what turns one
+    jump into a sequence of redraws -- and the panel holding its own width
+    while the track moves under it is what keeps a lagging redraw from
+    painting over the controls.
+    """
+    row = _css_block(stylesheet, ".home-chart-row")
+    collapsed = _css_block(
+        stylesheet,
+        ".home-chart-row:has(> .chart-options-panel-hidden)",
+    )
+    panel = _css_block(stylesheet, ".chart-options-panel")
+
+    assert "transition:" in row
+    assert "grid-template-columns var(--chart-options-collapse-duration)" in row
+    assert "overflow: hidden;" in row
+    assert "grid-template-columns: minmax(0, 1fr) 0;" in collapsed
+    assert "column-gap: 0;" in collapsed
+    assert "width: 20rem;" in panel
+    # Opaque, or the wider plot shows through the panel for a frame.
+    assert "background-color: var(--mantine-color-body);" in panel
+
+
+def test_the_collapsed_panel_leaves_the_tab_order_after_the_animation(stylesheet):
+    """display: none is what removes it; allow-discrete is what defers that
+    flip to the end of the collapse instead of cancelling the animation."""
+    hidden = _css_block(stylesheet, ".chart-options-panel-hidden")
+    deferred = _css_block(
+        stylesheet,
+        ".chart-options-panel,\n.chart-options-panel-hidden",
+    )
+
+    assert "display: none;" in hidden
+    assert "allow-discrete" in deferred

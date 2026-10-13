@@ -8,12 +8,9 @@ ids once, at import. Its layout takes the deep-link store's data from
 ``initial_scenario_options``. The callbacks are plain functions here and are
 registered once per page.
 
-There are two registrations, which differ in what happens when a link or a
-new run names a scenario the playlist filter does not list.
-``register_scenario_selection`` is the Scenario Performance page's: the
-filter stays and the scenario is dropped.
-``register_scenario_selection_clearing_filter`` is the Run History page's:
-the filter is cleared and the scenario is selected.
+When a link, a new run, or the page's scenario button names a scenario the
+playlist filter does not list, the filter is cleared and the scenario is
+selected.
 """
 
 from typing import NamedTuple
@@ -128,7 +125,7 @@ def playlist_filter_options(held_playlist: str | None) -> list[dict[str, str]]:
     ]
 
 
-def select_playlist(selected_playlist, _deep_link, _run_events=None):
+def select_playlist(selected_playlist, _deep_link, _run_landed):
     """List the selected playlist's scenarios, link to its table, and list the filter.
 
     With no playlist selected, or a remembered code that no longer resolves,
@@ -138,10 +135,9 @@ def select_playlist(selected_playlist, _deep_link, _run_events=None):
     the value on every mount and every change. The layout sees a value the URL
     names and never one the browser restored.
 
-    ``_run_events`` is the store a page registered to follow a run to its
-    scenario writes for every batch of new runs. It is read for nothing but
-    its change: the local list is read again, so it holds a scenario whose
-    first run has just landed.
+    ``_run_landed`` is the store the page's run delivery writes for every
+    batch of new runs. It is read for nothing but its change: the local list
+    is read again, so it holds a scenario whose first run has just landed.
     """
     options = playlist_filter_options(selected_playlist)
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
@@ -192,32 +188,6 @@ def initial_scenario_options(playlist_code: str | None) -> list[str]:
     return _local_scenario_options()
 
 
-def apply_deep_link(selection):
-    """Set the two dropdowns from this visit's query parameters.
-
-    The values arrive by callback rather than as the layout's ``value`` so
-    that Dash persistence records them: a persisted control's layout default
-    has to be the same on every visit, or the stored edit is discarded instead
-    of restored. Writing them here makes a Playlists grid click an ordinary
-    selection, which the browser then remembers like any other.
-
-    Under DashProxy an ``allow_duplicate`` callback can fire once on load with
-    nothing triggering it. Re-emitting the same values is harmless -- Dash
-    skips a persistence write when the value is unchanged -- so this needs no
-    guard beyond the empty payload every non-deep-linked visit carries.
-
-    Returning ``no_update`` for a control the URL did not name leaves that
-    control's dependents unwritten, which is why ``select_playlist`` carries a
-    second Input.
-    """
-    if not selection:
-        return no_update, no_update
-    return (
-        selection.get("playlist", no_update),
-        selection.get("scenario", no_update),
-    )
-
-
 def _filter_leaves_out(playlist_code: str | None, scenario: str) -> bool:
     """Tell whether a playlist filter keeps a scenario with local runs off the list.
 
@@ -243,12 +213,19 @@ def reach_scenario(
     """Select the scenario a link or a new run names, and clear a filter in its way.
 
     Two things reach a scenario. A visit's query parameters do, through the
-    deep-link store, as ``apply_deep_link`` applies them. And a run that
-    lands does while the page follows the scenario just played: ``run_events``
-    is the page's summary of the batch, whose latest run is on that scenario.
-    Either way, a playlist filter that does not list the scenario is cleared
-    in the same write, so the dropdown can name what the rest of the page
-    shows. The cleared filter is then what the browser remembers.
+    deep-link store, and a control the URL did not name is left alone. And a
+    run that lands does while the page follows the scenario just played:
+    ``run_events`` is the page's summary of the batch, whose latest run is on
+    that scenario. Either way, a playlist filter that does not list the
+    scenario is cleared in the same write, so the dropdown can name what the
+    rest of the page shows. The cleared filter is then what the browser
+    remembers.
+
+    A link's values arrive here, by callback, and never as the layout's
+    ``value``. A remembered control's layout default has to be the same on
+    every visit, or the browser discards the stored value instead of
+    restoring it. Written here, a link's selection is an ordinary one, which
+    the browser then remembers like any other.
 
     ``run_events`` is empty until a batch lands, and the deep-link store only
     changes when the page is drawn again, which also empties ``run_events``.
@@ -336,74 +313,6 @@ def reach_scenario_or_the_one_asked_for(  # noqa: PLR0913
     )
 
 
-def _register_select_playlist(
-    ids: ScenarioSelectionIds,
-    runs_landed: str | None = None,
-) -> None:
-    """Register ``select_playlist`` for one page's ids.
-
-    ``runs_landed`` is the id of the store a page's run delivery writes for
-    every batch, in the same answer as the summary ``reach_scenario`` reads.
-    Only a page that follows a run to its scenario passes it.
-    """
-    inputs = [
-        Input(ids.playlist_filter, "value"),
-        # Scheduling, not data: this Input looks removable and is not. The value
-        # above is an output of the callback that applies a visit's query
-        # parameters, ``apply_deep_link`` or ``reach_scenario``, and the
-        # renderer prunes a ready callback whose every Input is a declared
-        # output of a group member that already ran and whose none was actually
-        # written. On a visit with no ``?playlist_code=`` that callback returns
-        # ``no_update``, so without a second Input nothing writes these outputs:
-        # the scenario dropdown keeps the layout's full local set while the
-        # filter names a playlist, and that playlist's link never appears.
-        # Nothing writes this store, so the prune's "every Input covered" test
-        # fails and the initial call survives. See the 2026-09-19 decision-log
-        # entry.
-        Input(ids.deep_link, "data"),
-    ]
-    if runs_landed is not None:
-        # A run can be the first of its scenario, which the list drawn before
-        # it lacks. ``reach_scenario`` then selects a scenario the dropdown
-        # cannot name, and a Select goes on showing the previous name for a
-        # value its options lack. With no filter to clear, nothing else would
-        # write the list again. The same answer that writes this store writes
-        # the summary that triggers ``reach_scenario``, whose plain output is
-        # the filter's value, so Dash holds this call until the selection has
-        # moved and the list is never built for a filter about to be cleared.
-        inputs.append(Input(runs_landed, "data"))
-    callback(
-        Output(ids.scenario_dropdown, "data"),
-        Output(ids.playlist_table_link, "children"),
-        # The Select drops a value its new options lack, and the browser then
-        # stores the empty filter. So the list written here has to hold the
-        # playlist the filter holds: the visible list alone would clear a
-        # hidden selection for good. That drop is also what empties the filter
-        # of a remembered code no playlist has.
-        Output(ids.playlist_filter, "data"),
-        *inputs,
-    )(select_playlist)
-
-
-def register_scenario_selection(ids: ScenarioSelectionIds) -> None:
-    """Register the block's callbacks for one page's ids.
-
-    Call once per page, at import, with the ids its layout is built from. A
-    link that names a scenario the playlist filter does not list keeps the
-    filter, and the scenario is dropped.
-    """
-    _register_select_playlist(ids)
-    callback(
-        Output(ids.playlist_filter, "value"),
-        Output(ids.scenario_dropdown, "value", allow_duplicate=True),
-        Input(ids.deep_link, "data"),
-        # Not ``True``: applying the deep link *is* the mount's job, but Dash
-        # refuses an ``allow_duplicate`` output without one of the
-        # ``prevent_initial_call`` forms.
-        prevent_initial_call="initial_duplicate",
-    )(apply_deep_link)
-
-
 def register_scenario_selection_clearing_filter(
     ids: ScenarioSelectionIds,
     *,
@@ -412,7 +321,7 @@ def register_scenario_selection_clearing_filter(
     run_landed: str,
     scenario_button: str,
 ) -> None:
-    """Register the block for a page that clears a filter in the way of a scenario.
+    """Register the block's callbacks for one page's ids.
 
     Call once per page, at import, with the ids its layout is built from.
     ``run_events`` is the id of the store the page's run delivery writes its
@@ -432,7 +341,38 @@ def register_scenario_selection_clearing_filter(
     its layout at all times: the selection callback's outputs are always
     there, so each of its inputs has to be too.
     """
-    _register_select_playlist(ids, run_landed)
+    callback(
+        Output(ids.scenario_dropdown, "data"),
+        Output(ids.playlist_table_link, "children"),
+        # The Select drops a value its new options lack, and the browser then
+        # stores the empty filter. So the list written here has to hold the
+        # playlist the filter holds: the visible list alone would clear a
+        # hidden selection for good. That drop is also what empties the filter
+        # of a remembered code no playlist has.
+        Output(ids.playlist_filter, "data"),
+        Input(ids.playlist_filter, "value"),
+        # Scheduling, not data: this Input looks removable and is not. The value
+        # above is an output of the callback that applies a visit's query
+        # parameters, and the renderer prunes a ready callback whose every
+        # Input is a declared output of a group member that already ran and
+        # whose none was actually written. On a visit with no
+        # ``?playlist_code=`` that callback returns ``no_update``, so without a
+        # second Input nothing writes these outputs: the scenario dropdown
+        # keeps the layout's full local set while the filter names a playlist,
+        # and that playlist's link never appears. Nothing writes this store, so
+        # the prune's "every Input covered" test fails and the initial call
+        # survives. See the 2026-09-19 decision-log entry.
+        Input(ids.deep_link, "data"),
+        # A run can be the first of its scenario, which the list drawn before
+        # it lacks. ``reach_scenario`` then selects a scenario the dropdown
+        # cannot name, and a Select goes on showing the previous name for a
+        # value its options lack. With no filter to clear, nothing else would
+        # write the list again. The same answer that writes this store writes
+        # the summary that triggers ``reach_scenario``, whose plain output is
+        # the filter's value, so Dash holds this call until the selection has
+        # moved and the list is never built for a filter about to be cleared.
+        Input(run_landed, "data"),
+    )(select_playlist)
     callback(
         Output(ids.playlist_filter, "value"),
         Output(ids.scenario_dropdown, "value"),

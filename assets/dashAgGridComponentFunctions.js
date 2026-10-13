@@ -132,7 +132,7 @@ function scenarioGroupLine(props) {
 }
 
 // Real anchor for the per-playlist Scenario column. The href is prebuilt
-// server-side (row "href", via scenario_home_href) so query-string encoding
+// server-side (row "href", via scenario_run_history_href) so query-string encoding
 // stays in Python; this renderer only wires it to an anchor with the same
 // hybrid click handling as PlaylistNameLink. While the table is ungrouped the
 // anchor also holds the row's group names on a second line, so a click there

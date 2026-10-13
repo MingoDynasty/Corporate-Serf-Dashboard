@@ -1,4 +1,4 @@
-"""The Scenario Performance dropdowns keep their name on screen when opened.
+"""The Run History dropdowns keep their name on screen when opened.
 
 ``assets/selectHighlightOnOpen.js`` does the work in the browser, where no
 test here can run it. These tests pin the joints it hangs on: the class the
@@ -16,14 +16,14 @@ import pytest
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.components import scenario_selection  # noqa: E402
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "assets" / "selectHighlightOnOpen.js"
 DMC_BUNDLE = Path(dmc.__file__).parent / "dash_mantine_components.js"
 DROPDOWN_IDS = (
-    home.SCENARIO_SELECTION_IDS.playlist_filter,
-    home.SCENARIO_SELECTION_IDS.scenario_dropdown,
+    run_history.SCENARIO_SELECTION_IDS.playlist_filter,
+    run_history.SCENARIO_SELECTION_IDS.scenario_dropdown,
 )
 OPEN_LIST_ATTRIBUTE = '"data-expanded"'
 
@@ -43,7 +43,7 @@ def _walk_components(component):
 def _dropdown(select_id):
     return next(
         component
-        for component in _walk_components(home.layout())
+        for component in _walk_components(run_history.layout())
         if getattr(component, "id", None) == select_id
     )
 
