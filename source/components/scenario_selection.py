@@ -138,8 +138,8 @@ def select_playlist(selected_playlist, _deep_link, _run_events=None):
     the value on every mount and every change. The layout sees a value the URL
     names and never one the browser restored.
 
-    ``_run_events`` is a page's summary of a batch of new runs, on a page
-    registered to follow a run to its scenario. It is read for nothing but
+    ``_run_events`` is the store a page registered to follow a run to its
+    scenario writes for every batch of new runs. It is read for nothing but
     its change: the local list is read again, so it holds a scenario whose
     first run has just landed.
     """
@@ -287,12 +287,13 @@ def reach_scenario(
 
 def _register_select_playlist(
     ids: ScenarioSelectionIds,
-    run_events: str | None = None,
+    runs_landed: str | None = None,
 ) -> None:
     """Register ``select_playlist`` for one page's ids.
 
-    ``run_events`` is the id of the store a page's run delivery writes its
-    summary to. Only a page that follows a run to its scenario passes it.
+    ``runs_landed`` is the id of the store a page's run delivery writes for
+    every batch, in the same answer as the summary ``reach_scenario`` reads.
+    Only a page that follows a run to its scenario passes it.
     """
     inputs = [
         Input(ids.playlist_filter, "value"),
@@ -310,16 +311,16 @@ def _register_select_playlist(
         # entry.
         Input(ids.deep_link, "data"),
     ]
-    if run_events is not None:
+    if runs_landed is not None:
         # A run can be the first of its scenario, which the list drawn before
         # it lacks. ``reach_scenario`` then selects a scenario the dropdown
         # cannot name, and a Select goes on showing the previous name for a
         # value its options lack. With no filter to clear, nothing else would
-        # write the list again. The summary also triggers ``reach_scenario``,
-        # whose plain output is the filter's value, so Dash holds this call
-        # until the selection has moved and the list is never built for a
-        # filter about to be cleared.
-        inputs.append(Input(run_events, "data"))
+        # write the list again. The same answer that writes this store writes
+        # the summary that triggers ``reach_scenario``, whose plain output is
+        # the filter's value, so Dash holds this call until the selection has
+        # moved and the list is never built for a filter about to be cleared.
+        inputs.append(Input(runs_landed, "data"))
     callback(
         Output(ids.scenario_dropdown, "data"),
         Output(ids.playlist_table_link, "children"),
@@ -357,6 +358,7 @@ def register_scenario_selection_clearing_filter(
     *,
     run_events: str,
     follow_switch: str,
+    run_landed: str,
 ) -> None:
     """Register the block for a page that clears a filter in the way of a scenario.
 
@@ -364,10 +366,16 @@ def register_scenario_selection_clearing_filter(
     ``run_events`` is the id of the store the page's run delivery writes its
     summary to, and ``follow_switch`` the id of its Follow switch. The page's
     run delivery must not write the scenario dropdown itself: ``reach_scenario``
-    does, from the summary. The same summary has the scenario list read
-    again, so that a scenario whose first run has just landed is in it.
+    does, from the summary.
+
+    ``run_landed`` is the id of the store the same delivery writes for every
+    batch, in the same answer as the summary. It has the scenario list read
+    again, so that a scenario whose first run has just landed is in it. The
+    summary cannot do that alone: it is written only for a batch the page
+    shows, so a first run landing while Follow is off would leave its
+    scenario out of the list until the filter next changed.
     """
-    _register_select_playlist(ids, run_events)
+    _register_select_playlist(ids, run_landed)
     callback(
         Output(ids.playlist_filter, "value"),
         Output(ids.scenario_dropdown, "value"),

@@ -654,6 +654,7 @@ def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
         SECOND_PAGE_IDS,
         run_events="second-run_events",
         follow_switch="second-follow_switch",
+        run_landed="second-run_landed",
     )
 
     assert GLOBAL_CALLBACK_LIST[: len(registered_before)] == registered_before
@@ -678,13 +679,15 @@ def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
     # The scenario list keeps the Input nothing writes, for the same reason
     # as on the other page.
     assert not _input_keys(select_playlist) <= _output_keys(reach_scenario)
-    # It also takes the run summary, so a scenario whose first run has just
-    # landed joins the list. The filter's value is ``reach_scenario``'s plain
-    # output, which is what makes Dash hold the list for the selection.
+    # It also takes the store written for every batch, so a scenario whose
+    # first run has just landed joins the list. Not the summary, which is
+    # written only for a batch the page shows: with Follow off the scenario
+    # would stay out of the list. The filter's value is ``reach_scenario``'s
+    # plain output, which is what makes Dash hold the list for the selection.
     assert _input_keys(select_playlist) == {
         "second-playlist_filter.value",
         "second-deep_link.data",
-        "second-run_events.data",
+        "second-run_landed.data",
     }
 
 

@@ -565,7 +565,10 @@ flowchart LR
   reads the app's clock on the 30-second tick and on each landed run, and
   writes its store only when the answer changes. That write is what takes
   "In progress" off a session with no run landing, and a tick that finds the
-  same answer rebuilds nothing. The page's Score threshold percentage field
+  same answer rebuilds nothing. The same store has the scenario dropdown's
+  list read again (`select_playlist`, registered with `run_landed`), so a
+  scenario whose first run lands joins the list whether or not Follow is on.
+  The page's Score threshold percentage field
   sends its value on Enter or on losing focus, where the old page's sends
   every keystroke, because every check in the list is judged by it.
   `generate_graph` asks `components/run_history_chart.py` for the figure,
@@ -799,11 +802,14 @@ flowchart LR
   value. Both outputs are plain on purpose: Dash holds a dependent callback
   back for a plain output and not for an `allow_duplicate` one, and the
   scenario list must not be built for the filter as it was. In this
-  registration `select_playlist` takes the run summary store as a third
-  `Input`, so the list is read again when a run lands: a run can be the
-  first of its scenario, which the list drawn before it lacks, and the
-  dropdown cannot name a scenario its list does not hold. The Run History
-  page uses this registration and the Scenario Performance page the first.
+  registration `select_playlist` takes, as a third `Input`, the store the
+  page writes for every batch of runs, so the list is read again when a run
+  lands: a run can be the first of its scenario, which the list drawn before
+  it lacks, and the dropdown cannot name a scenario its list does not hold.
+  It is not the run summary store, which is written only for a batch the
+  page shows and would leave a first run out while Follow is off. The Run
+  History page uses this registration and the Scenario Performance page the
+  first.
   The module also holds `SELECT_HIGHLIGHT_ON_OPEN_CLASS`, the class both
   pages put on their dropdowns' inputs.
 - `components/queued_notices.py` — the two flushes that bring a queued

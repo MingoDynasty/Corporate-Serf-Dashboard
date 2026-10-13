@@ -788,7 +788,7 @@ def test_the_scenario_list_callback_keeps_the_input_nothing_writes():
     assert set(_keys(registration["inputs"])) == {
         f"{ids.playlist_filter}.value",
         f"{ids.deep_link}.data",
-        f"{run_history.RUN_EVENTS_STORE_ID}.data",
+        f"{run_history.RUN_LANDED_STORE_ID}.data",
     }
     assert _output_keys(registration) == {
         f"{ids.scenario_dropdown}.data",
@@ -801,17 +801,27 @@ def test_the_scenario_list_is_read_again_when_a_run_lands_and_waits_for_the_sele
     """Follow can land on a scenario that had no runs when the page was drawn.
 
     The list has to gain it, or the dropdown names the old scenario while the
-    chart and the stats show the new one. The run summary is what calls the
-    list, and it calls ``reach_scenario`` too. The list also takes the
-    filter's value, a plain output of that callback, so Dash holds the list
-    until the selection has moved.
+    chart and the stats show the new one. The store written for every batch
+    is what calls the list, and the summary, written in the same answer,
+    calls ``reach_scenario``. The list also takes the filter's value, a plain
+    output of that callback, so Dash holds the list until the selection has
+    moved.
+
+    It is the store for every batch and not the summary, so that a scenario
+    whose first run lands while Follow is off joins the list too: no summary
+    is written for a run the page does not show.
     """
     ids = run_history.SCENARIO_SELECTION_IDS
     scenario_list = _registration(f"{ids.scenario_dropdown}.data")
     selection = _selection_registration()
     summary = f"{run_history.RUN_EVENTS_STORE_ID}.data"
+    run_landed = f"{run_history.RUN_LANDED_STORE_ID}.data"
+    delivery = _registration(summary)
 
-    assert summary in _keys(scenario_list["inputs"])
+    assert run_landed in _keys(scenario_list["inputs"])
+    assert summary not in _keys(scenario_list["inputs"])
+    assert summary in delivery["output"]
+    assert run_landed in delivery["output"]
     assert summary in _keys(selection["inputs"])
     assert f"{ids.playlist_filter}.value" in _keys(scenario_list["inputs"])
     assert f"{ids.playlist_filter}.value" in _output_keys(selection)

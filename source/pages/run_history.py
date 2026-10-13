@@ -536,6 +536,7 @@ register_scenario_selection_clearing_filter(
     SCENARIO_SELECTION_IDS,
     run_events=RUN_EVENTS_STORE_ID,
     follow_switch=FOLLOW_SWITCH_ID,
+    run_landed=RUN_LANDED_STORE_ID,
 )
 
 
