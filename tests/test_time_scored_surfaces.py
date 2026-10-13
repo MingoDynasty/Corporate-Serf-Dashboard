@@ -349,71 +349,33 @@ def test_the_landed_run_reaches_the_toast_as_a_percentage_of_pb_pace(
     )
 
 
-def _session_log(caplog) -> list[str]:
-    return [
+def test_a_landed_run_logs_no_verdict_of_its_own(folders, monkeypatch, caplog):
+    """The watchdog judges nothing: the run list is the record of how a run went.
+
+    It used to log each run's distance from the high score and a pass or a
+    miss at a fixed 95%, as a stand-in for that record.
+    """
+    folders.stats_file(FIRST, 884.41)
+    folders.stats_file(SECOND, 896.17)
+    folders.performance_file(SECOND)
+    folders.start()
+    folders.performance_file(THIRD)
+
+    with caplog.at_level(logging.DEBUG, logger=file_watchdog.logger.name):
+        _land(monkeypatch, folders.stats_file(THIRD, 883.02))
+
+    log = [
         record.getMessage()
         for record in caplog.records
         if record.name == file_watchdog.logger.name
     ]
-
-
-def test_the_session_log_judges_a_time_scored_run_by_pace(folders, monkeypatch, caplog):
-    """883.02 is 98.5% of 896.17 by score, and 88.8% of its pace."""
-    folders.stats_file(FIRST, 884.41)
-    folders.stats_file(SECOND, 896.17)
-    folders.performance_file(SECOND)
-    folders.start()
-    folders.performance_file(THIRD)
-
-    with caplog.at_level(logging.DEBUG, logger=file_watchdog.logger.name):
-        _land(monkeypatch, folders.stats_file(THIRD, 883.02))
-
-    log = _session_log(caplog)
-    assert (
-        "Current score (883.02) is -11.24% from high score (896.17) by pace "
-        "with score threshold (890.71)"
-    ) in log
-    assert "Failed to meet the score threshold. Keep grinding..." in log
-    assert not any(line.startswith("Successfully passed") for line in log)
-
-
-def test_the_session_log_keeps_score_for_a_run_with_no_constant(
-    folders, monkeypatch, caplog
-):
-    folders.stats_file(FIRST, 884.41)
-    folders.stats_file(SECOND, 896.17)
-    folders.start()
-
-    with caplog.at_level(logging.DEBUG, logger=file_watchdog.logger.name):
-        _land(monkeypatch, folders.stats_file(THIRD, 883.02))
-
-    log = _session_log(caplog)
-    assert (
-        "Current score (883.02) is -1.47% from high score (896.17) "
-        "with score threshold (851.36)"
-    ) in log
-    assert any(line.startswith("Successfully passed") for line in log)
-
-
-def test_the_session_log_moves_the_pace_threshold_on_a_new_high_score(
-    folders, monkeypatch, caplog
-):
-    folders.stats_file(FIRST, 870.0)
-    folders.stats_file(SECOND, 884.41)
-    folders.performance_file(SECOND)
-    folders.start()
-    folders.performance_file(THIRD)
-
-    with caplog.at_level(logging.DEBUG, logger=file_watchdog.logger.name):
-        _land(monkeypatch, folders.stats_file(THIRD, 896.17))
-
-    log = _session_log(caplog)
-    assert (
-        "Current score (896.17) is +11.33% from high score (884.41) by pace "
-        "with score threshold (878.33)"
-    ) in log
-    assert "Score threshold increased from (878.33) to (890.71)" in log
-    assert any(line.startswith("Successfully passed") for line in log)
+    # The import still logs what it found, so an empty log would prove nothing.
+    assert any("place score" in line for line in log)
+    assert not [
+        line
+        for line in log
+        if "threshold" in line.lower() or "high score" in line.lower()
+    ]
 
 
 def test_a_failed_pace_lookup_costs_the_constant_and_never_the_run(

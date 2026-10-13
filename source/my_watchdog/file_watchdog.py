@@ -24,7 +24,6 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
     load_csv_file_into_database,
 )
-from source.kovaaks.pace import pace_goal_met, pace_threshold_score, percent_faster
 from source.kovaaks.time_scored_service import (
     eligible_pace_constant,
     get_pace_basis,
@@ -54,24 +53,6 @@ def drain_run_import_failures() -> list[str]:
             failures.append(run_import_failure_queue.popleft())
         except IndexError:
             return failures
-
-
-# Percentage of the high score a run must beat to "pass" in the debug logs
-# below. This is an interim, developer-facing stand-in for reviewing runs
-# within a session: unlike the ephemeral toast, the log keeps a scrollable
-# per-run record. Retained until the Run History feature supersedes it
-# (see docs/proposals/run_history_proposal.md).
-#
-# Known limitation: the real threshold is a live UI control this watchdog
-# thread can't read, so this constant only matches the UI verdict when the UI
-# is left at 95% (the usual case). The score and percent-from-high-score
-# figures logged next to it are always correct regardless.
-#
-# On a time-scored scenario the log judges by pace, as the toast does: the
-# goal is 95% of the high score's pace, and the percentage logged is how much
-# faster or slower the run finished. Left on score, the log would pass every
-# run the toast fails.
-SESSION_LOG_SCORE_THRESHOLD_PCT = 0.95
 
 
 def _get_created_csv_path(event) -> str | None:
@@ -147,78 +128,6 @@ def _pace_constant_for_landed_run(
         return None
 
 
-def _log_run_against_high_score(
-    score: float,
-    high_score: float,
-    pace_constant: float | None,
-) -> None:
-    """Log one run's interim pass or fail against the session log's fixed goal."""
-    goal_percentage = SESSION_LOG_SCORE_THRESHOLD_PCT * 100
-    passed_by_pace = None
-    if pace_constant is not None:
-        passed_by_pace = pace_goal_met(
-            pace_constant, high_score, score, goal_percentage
-        )
-    if pace_constant is not None and passed_by_pace is not None:
-        score_threshold = pace_threshold_score(
-            pace_constant, high_score, goal_percentage
-        )
-        logger.debug(
-            "Current score (%g) is %+.2f%% from high score (%g) by pace "
-            "with score threshold (%.2f)",
-            score,
-            percent_faster(pace_constant, high_score, score),
-            high_score,
-            score_threshold,
-        )
-        if score > high_score:
-            logger.debug(
-                "Score threshold increased from (%.2f) to (%.2f)",
-                score_threshold,
-                pace_threshold_score(pace_constant, score, goal_percentage),
-            )
-        passed = passed_by_pace
-    else:
-        score_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT * high_score
-        if high_score > 0:
-            pct_diff = (score / high_score - 1) * 100
-            logger.debug(
-                "Current score (%g) is %+.2f%% from high score (%g) "
-                "with score threshold (%.2f)",
-                score,
-                pct_diff,
-                high_score,
-                score_threshold,
-            )
-        else:
-            # KovaaK's scores are unconstrained floats, so a scenario whose
-            # stored runs all scored 0 divides by zero here and drops the run
-            # before it is ever loaded. There is no usable denominator, not a
-            # zero-percent one, so log the raw figures instead -- the same
-            # judgment ``threshold_verdict`` makes in
-            # source/components/score_threshold.py.
-            logger.debug(
-                "Current score (%g) has no percentage from high score (%g) "
-                "with score threshold (%.2f)",
-                score,
-                high_score,
-                score_threshold,
-            )
-        if score > high_score:
-            logger.debug(
-                "Score threshold increased from (%.2f) to (%.2f)",
-                score_threshold,
-                SESSION_LOG_SCORE_THRESHOLD_PCT * score,
-            )
-        passed = score > score_threshold
-    if passed:
-        logger.debug(
-            "Successfully passed the score threshold! Ready to move onto the next scenario."
-        )
-    else:
-        logger.debug("Failed to meet the score threshold. Keep grinding...")
-
-
 class NewFileHandler(FileSystemEventHandler):
     """
     This class handles monitoring a specified directory for newly created files.
@@ -268,12 +177,6 @@ class NewFileHandler(FileSystemEventHandler):
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
             logger.debug('Found new scenario: "%s"', run_data.scenario)
-            new_score_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT * run_data.score
-            logger.debug(
-                "Current score (%.2f) sets the score threshold at (%.2f)",
-                run_data.score,
-                new_score_threshold,
-            )
             message = NewFileMessage(
                 datetime_created=datetime.datetime.now(),
                 is_new_sensitivity=True,
@@ -298,7 +201,6 @@ class NewFileHandler(FileSystemEventHandler):
             run_data,
             get_personal_best_run(run_data.scenario),
         )
-        _log_run_against_high_score(run_data.score, high_score, pace_constant)
 
         # Case 2: new sensitivity.
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
