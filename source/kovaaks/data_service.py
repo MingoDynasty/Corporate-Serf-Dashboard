@@ -397,6 +397,16 @@ def get_runs_newest_first(scenario_name: str) -> list[RunData]:
     return list(reversed(kovaaks_database[scenario_name]["time_vs_runs"]))
 
 
+def get_all_runs() -> list[RunData]:
+    """Return a copy of every run of every scenario, ordered by when each ended.
+
+    A copy, so a view can split it into play sessions while the watchdog
+    thread goes on adding runs to the store. Runs that ended in the same
+    second are in the order they were stored.
+    """
+    return list(run_database)
+
+
 def get_runs_in_play_order(scenario_name: str) -> list[RunData]:
     """Return a copy of a scenario's runs in the order they were played, oldest first.
 
@@ -802,6 +812,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     :return: RunData object
     """
     accuracy = None
+    shots_fired = None
     damage_accuracy = None
     horizontal_sens = None
     scenario = None
@@ -834,6 +845,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                     hits = int(values[2])
                     if shots > 0:
                         accuracy = hits / shots
+                        # Kept beside the accuracy it produced, never read
+                        # from another row: a file can list several weapons,
+                        # and the two must describe the same one.
+                        shots_fired = shots
 
                 # Damage columns are useful for PB metadata, but keep them
                 # optional so older/shorter CSV rows still parse hit accuracy.
@@ -943,6 +958,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         stats_file_name=Path(full_file_path).name,
         run_start=run_start,
         run_length=run_length,
+        shots_fired=shots_fired,
     )
 
 

@@ -173,7 +173,15 @@ def test_the_layout_builds_every_id_the_blocks_are_registered_for():
         run_history.RUN_RANGE_FIELD_ID,
         run_history.DAY_RANGE_FIELD_ID,
         run_history.SETUP_CARD_ID,
+        run_history.RUN_LANDED_STORE_ID,
+        run_history.SESSION_IN_PROGRESS_STORE_ID,
     } <= mounted
+    # The Columns menu's own id is part of its checkboxes' ids and is no
+    # component's id by itself.
+    list_ids = run_history.RUN_LIST_IDS._asdict()
+    menu_id = list_ids.pop("columns_menu")
+    assert set(list_ids.values()) <= mounted
+    assert {f"{menu_id}-button", f"{menu_id}-sink"} <= mounted
 
 
 def test_the_ids_are_the_ones_browsers_store_values_under():
@@ -257,13 +265,13 @@ def test_the_top_row_holds_the_dropdowns_the_stats_and_the_cards_slot():
     assert getattr(card_slot, "children", None) is None
 
 
-def test_the_chart_sits_left_of_the_reserved_list_column():
+def test_the_chart_sits_left_of_the_run_list():
     columns = _by_class(run_history.layout(), "run-history-columns")
 
     chart_column, list_column = columns.children
     assert chart_column.className == "run-history-chart-column"
     assert list_column.className == "run-history-list-column"
-    assert getattr(list_column, "children", None) is None
+    assert list_column.children.id == run_history.RUN_LIST_IDS.panel
 
 
 def test_the_charts_header_holds_the_mode_both_ranges_and_the_options_button():
@@ -626,15 +634,23 @@ def _keys(dependencies) -> list[str]:
     return [f"{dep['id']}.{dep['property']}" for dep in dependencies]
 
 
-def test_run_delivery_takes_the_shells_batch_and_writes_only_the_summary():
+def test_run_delivery_takes_the_shells_batch_and_writes_its_two_stores():
     """It writes neither dropdown: the selection callback moves them.
 
     The controls are State, and prevent_initial_call stays on, because the
     shell's store replays its last batch to a page that mounts.
+
+    The summary and the newest run's id leave in one answer. Dash holds a
+    callback back only for a writer that is already queued, so the run list,
+    which is queued for the id, waits for the selection callback only when
+    that one was queued for the summary at the same moment.
     """
     registration = _registration(f"{run_history.RUN_EVENTS_STORE_ID}.data")
 
-    assert registration["output"] == f"{run_history.RUN_EVENTS_STORE_ID}.data"
+    assert registration["output"] == (
+        f"..{run_history.RUN_EVENTS_STORE_ID}.data"
+        f"...{run_history.RUN_LANDED_STORE_ID}.data.."
+    )
     assert _keys(registration["inputs"]) == ["run-events-batch.data"]
     assert set(_keys(registration["state"])) == {
         f"{run_history.FOLLOW_SWITCH_ID}.checked",
@@ -644,12 +660,14 @@ def test_run_delivery_takes_the_shells_batch_and_writes_only_the_summary():
 
 
 def test_run_delivery_forwards_nothing_without_a_batch():
-    assert run_history.forward_run_events(None, True, SCENARIO) is no_update
-    assert run_history.forward_run_events(_batch(), True, SCENARIO) is no_update
+    nothing = (no_update, no_update)
+
+    assert run_history.forward_run_events(None, True, SCENARIO) == nothing
+    assert run_history.forward_run_events(_batch(), True, SCENARIO) == nothing
 
 
 def test_with_follow_on_the_summary_is_for_the_scenario_just_played():
-    summary = run_history.forward_run_events(
+    summary, run_landed = run_history.forward_run_events(
         _batch(_run(SCENARIO, run_id="a.csv"), _run("Scenario B", run_id="b.csv")),
         True,
         SCENARIO,
@@ -659,17 +677,27 @@ def test_with_follow_on_the_summary_is_for_the_scenario_just_played():
         "latest": _run("Scenario B", run_id="b.csv"),
         "celebrated_run_id": None,
     }
+    assert run_landed == "b.csv"
 
 
-def test_with_follow_off_a_run_on_another_scenario_forwards_nothing():
-    """So nothing on the page rebuilds for a run it does not show."""
-    assert (
-        run_history.forward_run_events(_batch(_run("Scenario B")), False, SCENARIO)
-        is no_update
-    )
+def test_with_follow_off_a_run_on_another_scenario_forwards_no_summary():
+    """So the chart is not rebuilt for a run it does not plot.
+
+    The run's id is still written. A session row counts every scenario's
+    runs, so the run list is rebuilt for a run on any of them.
+    """
     assert run_history.forward_run_events(
-        _batch(_run(SCENARIO, run_id="a.csv"), _run("Scenario B")), False, SCENARIO
-    ) == {"latest": _run(SCENARIO, run_id="a.csv"), "celebrated_run_id": None}
+        _batch(_run("Scenario B", run_id="b.csv")), False, SCENARIO
+    ) == (no_update, "b.csv")
+    assert run_history.forward_run_events(
+        _batch(_run(SCENARIO, run_id="a.csv"), _run("Scenario B", run_id="b.csv")),
+        False,
+        SCENARIO,
+    ) == (
+        {"latest": _run(SCENARIO, run_id="a.csv"), "celebrated_run_id": None},
+        # The batch's newest run, whatever scenario the summary is for.
+        "b.csv",
+    )
 
 
 def test_the_page_never_pops_the_run_event_queue():
@@ -760,7 +788,7 @@ def test_the_scenario_list_callback_keeps_the_input_nothing_writes():
     assert set(_keys(registration["inputs"])) == {
         f"{ids.playlist_filter}.value",
         f"{ids.deep_link}.data",
-        f"{run_history.RUN_EVENTS_STORE_ID}.data",
+        f"{run_history.RUN_LANDED_STORE_ID}.data",
     }
     assert _output_keys(registration) == {
         f"{ids.scenario_dropdown}.data",
@@ -773,17 +801,27 @@ def test_the_scenario_list_is_read_again_when_a_run_lands_and_waits_for_the_sele
     """Follow can land on a scenario that had no runs when the page was drawn.
 
     The list has to gain it, or the dropdown names the old scenario while the
-    chart and the stats show the new one. The run summary is what calls the
-    list, and it calls ``reach_scenario`` too. The list also takes the
-    filter's value, a plain output of that callback, so Dash holds the list
-    until the selection has moved.
+    chart and the stats show the new one. The store written for every batch
+    is what calls the list, and the summary, written in the same answer,
+    calls ``reach_scenario``. The list also takes the filter's value, a plain
+    output of that callback, so Dash holds the list until the selection has
+    moved.
+
+    It is the store for every batch and not the summary, so that a scenario
+    whose first run lands while Follow is off joins the list too: no summary
+    is written for a run the page does not show.
     """
     ids = run_history.SCENARIO_SELECTION_IDS
     scenario_list = _registration(f"{ids.scenario_dropdown}.data")
     selection = _selection_registration()
     summary = f"{run_history.RUN_EVENTS_STORE_ID}.data"
+    run_landed = f"{run_history.RUN_LANDED_STORE_ID}.data"
+    delivery = _registration(summary)
 
-    assert summary in _keys(scenario_list["inputs"])
+    assert run_landed in _keys(scenario_list["inputs"])
+    assert summary not in _keys(scenario_list["inputs"])
+    assert summary in delivery["output"]
+    assert run_landed in delivery["output"]
     assert summary in _keys(selection["inputs"])
     assert f"{ids.playlist_filter}.value" in _keys(scenario_list["inputs"])
     assert f"{ids.playlist_filter}.value" in _output_keys(selection)

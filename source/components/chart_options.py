@@ -255,13 +255,26 @@ def chart_options_panel(
     score_threshold_percentage_help: str | list = SETTINGS_HELP_TEXT[
         "score-threshold-percentage"
     ],
+    score_threshold_percentage_waits_for_commit: bool = False,
 ) -> dmc.Box:
     """Build the collapsible inspector that sits beside the chart.
 
     ``score_threshold_percentage_help`` is the help text of the Score
     threshold percentage field, which says what judges a run and so differs
     between the pages that host the panel.
+
+    ``score_threshold_percentage_waits_for_commit`` makes that field send its
+    value on Enter or on losing focus, where it otherwise sends every
+    keystroke. A page that marks every listed run by the percentage sets it:
+    typing 90 over 95 passes through 9, and every mark would flicker through
+    it.
     """
+    # Left out unless asked for. An explicit ``False`` is still a prop in the
+    # layout a browser is sent, and a page that does not ask for this must go
+    # on serving the layout it serves.
+    percentage_commit = (
+        {"debounce": True} if score_threshold_percentage_waits_for_commit else {}
+    )
     return dmc.Box(
         id=ids.panel,
         className=_chart_options_panel_class(False),
@@ -403,6 +416,7 @@ def chart_options_panel(
                         # its input, so the modal's 12em box would wrap this
                         # label and strand its help icon on the line above.
                         w="100%",
+                        **percentage_commit,
                     ),
                     # Stays in this group, beside the percentage it judges
                     # against, even though the master switch it depends on

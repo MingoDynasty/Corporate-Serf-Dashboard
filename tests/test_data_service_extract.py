@@ -150,9 +150,44 @@ def test_extract_data_from_file_parses_valid_file() -> None:
         assert run.horizontal_sens == 2.3456
         assert run.scenario == "1w4ts"
         assert run.accuracy == 0.5
+        assert run.shots_fired == 100
         assert run.damage_accuracy == 0.75
     finally:
         file_path.unlink(missing_ok=True)
+
+
+def test_shots_fired_is_the_count_of_the_weapon_row_accuracy_came_from() -> None:
+    """A file can list two weapons, and only the first row is read.
+
+    The shots and the accuracy have to be the same row's, or the list would
+    show an accuracy beside a shot count it was not worked out from.
+    """
+    fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "generated"
+    fixtures_dir.mkdir(parents=True, exist_ok=True)
+    file_path = fixtures_dir / "two-guns - Challenge - 2025.01.01-10.00.00 Stats.csv"
+    try:
+        _write_stats_file(file_path, "Rifle,80,60,75,100\nPistol,40,10,5,10")
+
+        run = extract_data_from_file(str(file_path))
+
+        assert run is not None
+        assert run.shots_fired == 80
+        assert run.accuracy == 0.75
+    finally:
+        file_path.unlink(missing_ok=True)
+
+
+def test_a_run_record_built_without_shots_has_none_and_not_zero() -> None:
+    run = RunData(
+        datetime_object=datetime(2026, 7, 1, 12, 0, 0),
+        score=1.0,
+        sens_scale="cm/360",
+        horizontal_sens=40.0,
+        scenario=SCENARIO_NAME,
+        accuracy=0.5,
+    )
+
+    assert run.shots_fired is None
 
 
 def test_extract_data_from_file_reads_the_hash_and_the_file_name() -> None:

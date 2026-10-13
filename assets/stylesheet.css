@@ -379,6 +379,251 @@
     min-width: 0;
 }
 
+/* The run list fills its column: the heading line, then the grid, which
+   scrolls inside its own box so the chart beside it never moves. */
+.run-history-list {
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* The heading line, then the two buttons on a line of their own at the
+   right. Beside the buttons the heading had about 240px, which cut a
+   scenario's name short before its run count. */
+.run-history-list-header {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-xs);
+    justify-content: flex-end;
+    padding: var(--mantine-spacing-xs);
+}
+
+/* A whole line, which is what puts the buttons on the next one. min-width: 0
+   because a flex item's automatic minimum is its text, and a name longer
+   than the line would push the list wider than its column. */
+.run-history-list-heading {
+    flex: 1 0 100%;
+    min-width: 0;
+}
+
+/* With nothing to list, one line of text takes the place of the heading
+   line and the grid. Both stay mounted: the grid keeps its columns and the
+   Columns menu keeps its choices for when there are rows again. */
+.run-history-list-empty {
+    color: var(--mantine-color-dimmed);
+    display: none;
+    font-weight: 600;
+    margin: auto;
+}
+
+.run-history-list-nothing > .run-history-list-header,
+.run-history-list-nothing > .run-history-list-grid {
+    display: none;
+}
+
+.run-history-list-nothing > .run-history-list-empty {
+    display: block;
+}
+
+/* In the page for a screen reader and for nothing else: the name of the
+   list's marks column, the reason a run has no check, and the line that
+   says a row was opened or closed. */
+.visually-hidden {
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* The run list's grid. Its rows are denser than the playlist tables', and
+   it draws no cell borders: a session's rows read as one block under their
+   session row. The colors are the playlist tables' own, further down. */
+.run-history-list-grid.ag-theme-quartz {
+    --ag-borders: none;
+    --ag-cell-horizontal-padding: 4px;
+    --ag-font-size: 13px;
+    --ag-row-border-width: 0;
+    --ag-wrapper-border-radius: 0;
+}
+
+.run-history-list-grid .ag-root-wrapper {
+    border: 0;
+    border-top: 1px solid var(--ag-border-color);
+}
+
+.run-history-list-grid .ag-header-cell-text {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* No striping: a session's runs are told apart from the next session's by
+   the session rows, and stripes would run across both. */
+.run-history-list-grid .ag-row {
+    border-bottom: 0;
+}
+
+.run-history-list-grid .ag-row-odd {
+    background-color: var(--ag-background-color);
+}
+
+.run-history-list-grid .ag-row.run-list-row-run .ag-cell {
+    line-height: 26px;
+}
+
+.run-history-list-grid .ag-row.run-list-row-session {
+    border-top: 1px solid var(--ag-border-color);
+}
+
+/* The current session, held under the column headings while the list
+   scrolls. Beside it the grid keeps a scrollbar of the row's own, so its
+   columns stay in line with the body's. It scrolls nothing, so it is drawn
+   in no color and only its width is left. */
+.run-history-list-grid .ag-floating-top {
+    border-bottom: 1px solid var(--ag-border-color);
+    scrollbar-color: transparent transparent;
+}
+
+/* A run's number sits under its session's name, clear of the session row's
+   button. */
+.run-history-list-grid .run-list-number {
+    color: var(--mantine-color-dimmed);
+    padding-left: 30px;
+}
+
+/* The marks column's header has a name and shows none. */
+.run-history-list-grid .run-list-header-unseen .ag-header-cell-text {
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* The whole cell answers a hover with the reason a run has no check, so the
+   span that carries it fills the cell. */
+.run-list-marks {
+    display: block;
+    height: 100%;
+}
+
+.run-list-check {
+    color: var(--mantine-color-green-7);
+    font-weight: 700;
+}
+
+:root[data-mantine-color-scheme="dark"] .run-list-check {
+    color: var(--mantine-color-green-4);
+}
+
+/* The chart's own gold for a new PB. */
+.run-list-star {
+    color: #fab005;
+}
+
+/* What the list's script draws in a full-width row: a session row, a
+   divider, a date header, the note under a session the scenario was not
+   played in, and the button that loads older sessions. */
+.run-list-wide {
+    align-items: center;
+    display: flex;
+    font-size: 13px;
+    gap: 6px;
+    height: 100%;
+    padding: 0 12px;
+    width: 100%;
+}
+
+.run-list-session {
+    cursor: pointer;
+}
+
+.run-list-session-name {
+    font-weight: 600;
+}
+
+/* The space that ends a part of a session row, for a screen reader: see
+   partEnd in runHistoryList.js. Kept, or the browser would drop a space at
+   the end of a line, and sized to nothing, so the row looks as it did. */
+.run-list-part-end {
+    font-size: 0;
+    white-space: pre;
+}
+
+.run-list-session-facts {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.run-list-toggle {
+    background: none;
+    border: 0;
+    color: var(--mantine-color-dimmed);
+    cursor: pointer;
+    font-size: 11px;
+    padding: 0;
+    width: 14px;
+}
+
+.run-list-in-progress {
+    background-color: var(--mantine-color-blue-light);
+    border-radius: var(--mantine-radius-sm);
+    color: var(--mantine-color-blue-light-color);
+    font-size: 11px;
+    padding: 0 6px;
+    white-space: nowrap;
+}
+
+.run-list-divider,
+.run-list-date,
+.run-list-note {
+    color: var(--mantine-color-dimmed);
+    font-size: 11px;
+    padding-left: 30px;
+}
+
+/* A dashed rule either side of a divider's count, so it reads as a break in
+   the runs and not as a row of them. */
+.run-list-divider {
+    gap: 8px;
+}
+
+.run-list-divider::before,
+.run-list-divider::after {
+    border-top: 1px dashed var(--mantine-color-default-border);
+    content: "";
+    flex: 1;
+}
+
+.run-list-date {
+    font-weight: 600;
+}
+
+.run-list-more {
+    justify-content: center;
+}
+
+.run-list-more-button {
+    background-color: var(--mantine-color-default);
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    padding: 3px 10px;
+}
+
 /* Below 48em of room for the chart and its panel together, a 20rem panel
    leaves too little chart to read, so the panel stacks above the graph. The
    declarations are the Scenario Performance page's own stacking rule, under
@@ -404,7 +649,9 @@
 
 /* At 900px of page or less the run list no longer fits beside the chart, so
    it goes above it and the page scrolls. The chart's column stops shrinking
-   there: it would otherwise give all its height to the list. */
+   there: it would otherwise give all its height to the list. The list has no
+   column to fill any more, so it takes a height of its own, short enough
+   that the chart under it is still in reach. */
 @container run-history-page (max-width: 900px) {
     .run-history-columns {
         display: flex;
@@ -416,6 +663,8 @@
     }
 
     .run-history-list-column {
+        flex: 0 0 auto;
+        height: min(600px, 70dvh);
         order: -1;
     }
 }
@@ -717,7 +966,8 @@ a.playlist-scenarios-evxl-link {
 }
 
 .playlist-scenarios-grid.ag-theme-quartz,
-.playlist-overview-grid.ag-theme-quartz {
+.playlist-overview-grid.ag-theme-quartz,
+.run-history-list-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-body);
     --ag-border-color: var(--mantine-color-gray-3);
     --ag-font-family: var(--mantine-font-family);
@@ -850,7 +1100,8 @@ a.playlist-scenarios-evxl-link {
 }
 
 :root[data-mantine-color-scheme="dark"] .playlist-scenarios-grid.ag-theme-quartz,
-:root[data-mantine-color-scheme="dark"] .playlist-overview-grid.ag-theme-quartz {
+:root[data-mantine-color-scheme="dark"] .playlist-overview-grid.ag-theme-quartz,
+:root[data-mantine-color-scheme="dark"] .run-history-list-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-dark-7);
     --ag-border-color: var(--mantine-color-dark-4);
     --ag-foreground-color: var(--mantine-color-dark-0);

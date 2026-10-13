@@ -168,8 +168,38 @@ def get_pace_basis(
         )
     if not runs or runs[0].scenario_hash is None:
         return None
-    version = runs[0].scenario_hash
-    for run in runs:
+    return _version_pace_basis(runs, runs[0].scenario_hash)
+
+
+def get_version_pace_basis(
+    scenario_name: str,
+    scenario_hash: str | None,
+) -> PaceBasis | None:
+    """Return the constant of one version of a scenario, or ``None``.
+
+    ``get_pace_basis`` answers for the version the scenario's newest run
+    names, which is the one a run that just landed is judged under. A view
+    that judges a past run asks about that run's own version here, so a later
+    run on another version cannot change what the past run was measured by.
+
+    The answer is one for the whole version: its runs are tried newest first,
+    and the first performance file that can answer decides. It is not fixed,
+    because a later run of the same version can bring a file that answers
+    differently. For the scenario's current version it is the answer
+    ``get_pace_basis`` gives. ``None`` also covers a run whose stats file
+    names no version.
+    """
+    if scenario_hash is None or not _performance_file_names:
+        return None
+    return _version_pace_basis(get_runs_newest_first(scenario_name), scenario_hash)
+
+
+def _version_pace_basis(
+    runs_newest_first: list[RunData],
+    version: str,
+) -> PaceBasis | None:
+    """Return the answer of the newest file of one version that can answer."""
+    for run in runs_newest_first:
         if run.scenario_hash != version:
             continue
         name = _performance_file_name(run)
