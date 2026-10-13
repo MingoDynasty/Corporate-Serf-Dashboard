@@ -678,6 +678,55 @@ def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
     # The scenario list keeps the Input nothing writes, for the same reason
     # as on the other page.
     assert not _input_keys(select_playlist) <= _output_keys(reach_scenario)
+    # It also takes the run summary, so a scenario whose first run has just
+    # landed joins the list. The filter's value is ``reach_scenario``'s plain
+    # output, which is what makes Dash hold the list for the selection.
+    assert _input_keys(select_playlist) == {
+        "second-playlist_filter.value",
+        "second-deep_link.data",
+        "second-run_events.data",
+    }
+
+
+def test_a_run_summary_has_the_local_list_read_again(monkeypatch, playlist_lists):
+    """The first run of a scenario adds it to the list a page drew before it.
+
+    With no filter to clear, nothing else writes the list, and the dropdown
+    would go on showing the old name for a scenario it cannot name.
+    """
+    drawn_with = scenario_selection.select_playlist(None, None)
+    monkeypatch.setattr(
+        scenario_selection, "get_scenario_names", lambda: ["All", "Just Played"]
+    )
+
+    scenarios, link, options = scenario_selection.select_playlist(
+        None, None, _landed_on("Just Played")
+    )
+
+    assert drawn_with[0] == ["All"]
+    assert scenarios == ["All", "Just Played"]
+    assert (link, options) == (None, VISIBLE_PLAYLISTS)
+
+
+def test_a_run_summary_leaves_a_playlists_list_as_it_is(playlist_lists):
+    """A filter that stays lists its playlist's scenarios, run or no run."""
+    assert scenario_selection.select_playlist(
+        "KovaaKsAlpha", None, _landed_on("KovaaKsAlpha Scenario")
+    )[0] == ["KovaaKsAlpha Scenario"]
+
+
+def test_the_old_pages_scenario_list_takes_no_run_summary():
+    """Its Follow never clears a filter, and its served callbacks must not change."""
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if "scenario-dropdown-selection.data" in entry["output"]
+    ]
+
+    assert _input_keys(registration) == {
+        "playlist-dropdown-selection.value",
+        f"{home.SCENARIO_SELECTION_IDS.deep_link}.data",
+    }
 
 
 def test_the_old_page_keeps_the_rule_that_drops_the_scenario():

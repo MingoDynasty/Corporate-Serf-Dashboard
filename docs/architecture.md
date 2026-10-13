@@ -761,7 +761,11 @@ flowchart LR
   both dropdowns as `State`, and it is the only writer of either dropdown's
   value. Both outputs are plain on purpose: Dash holds a dependent callback
   back for a plain output and not for an `allow_duplicate` one, and the
-  scenario list must not be built for the filter as it was. The Run History
+  scenario list must not be built for the filter as it was. In this
+  registration `select_playlist` takes the run summary store as a third
+  `Input`, so the list is read again when a run lands: a run can be the
+  first of its scenario, which the list drawn before it lacks, and the
+  dropdown cannot name a scenario its list does not hold. The Run History
   page uses this registration and the Scenario Performance page the first.
   The module also holds `SELECT_HIGHLIGHT_ON_OPEN_CLASS`, the class both
   pages put on their dropdowns' inputs.

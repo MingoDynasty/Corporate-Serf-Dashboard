@@ -760,12 +760,34 @@ def test_the_scenario_list_callback_keeps_the_input_nothing_writes():
     assert set(_keys(registration["inputs"])) == {
         f"{ids.playlist_filter}.value",
         f"{ids.deep_link}.data",
+        f"{run_history.RUN_EVENTS_STORE_ID}.data",
     }
     assert _output_keys(registration) == {
         f"{ids.scenario_dropdown}.data",
         f"{ids.playlist_table_link}.children",
         f"{ids.playlist_filter}.data",
     }
+
+
+def test_the_scenario_list_is_read_again_when_a_run_lands_and_waits_for_the_selection():
+    """Follow can land on a scenario that had no runs when the page was drawn.
+
+    The list has to gain it, or the dropdown names the old scenario while the
+    chart and the stats show the new one. The run summary is what calls the
+    list, and it calls ``reach_scenario`` too. The list also takes the
+    filter's value, a plain output of that callback, so Dash holds the list
+    until the selection has moved.
+    """
+    ids = run_history.SCENARIO_SELECTION_IDS
+    scenario_list = _registration(f"{ids.scenario_dropdown}.data")
+    selection = _selection_registration()
+    summary = f"{run_history.RUN_EVENTS_STORE_ID}.data"
+
+    assert summary in _keys(scenario_list["inputs"])
+    assert summary in _keys(selection["inputs"])
+    assert f"{ids.playlist_filter}.value" in _keys(scenario_list["inputs"])
+    assert f"{ids.playlist_filter}.value" in _output_keys(selection)
+    assert "@" not in selection["output"]
 
 
 def test_the_page_registers_every_block_for_its_own_ids():
