@@ -3,10 +3,9 @@
 The app groups a player's runs into sessions: the runs separated by breaks of
 no more than 30 minutes. To measure a break it works out when each run began
 and how long it took, from two lines of the run's stats file. Inside a
-session it also finds each visit, the consecutive runs on one scenario. No
-screen shows any of this yet: the Run History page will be the first, and so
-far its chart, built but not yet public, only plots runs in the order
-sessions put them in.
+session it also finds each visit, the consecutive runs on one scenario. One
+screen shows sessions so far, the run list of the Run History page, which is
+built and not yet public.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in
@@ -19,18 +18,30 @@ Two words are kept apart throughout. A **break** is time between runs. A
 **pause** is the game's own pause inside a run, which a stats file records as
 `Pause Duration:`.
 
-## Not on screen yet
+## Where sessions show
 
-- No page, toast, or log line shows a session, a visit, a run's start, or a
-  run's length. Nothing outside the parser and the session module reads them
-  ([2026-10-11][entry]). The watchdog's interim per-run lines in the debug
-  log are older than these rules and don't use them.
-- The functions that split runs into sessions and visits are called by
-  nothing yet. The Run History page is their first planned caller
-  ([roadmap](../roadmap.md#upcoming-milestones)). The order runs are split in
-  (see [Sessions](#sessions)) has one use outside the session module: the
-  chart of that page, which is built and not yet public, plots a scenario's
-  runs in it.
+- The Run History page's run list is the one place a session is shown. It
+  lists a scenario's runs under the session each was played in, names a
+  session by when it started, and counts the session's runs. It gives the
+  length of the newest session alone
+  ([proposal](../proposals/run_history_proposal.md#the-run-list)).
+- That page is built and not yet public: it is served at its own address,
+  and nothing in the app links to it
+  ([roadmap](../roadmap.md#upcoming-milestones)).
+- The list marks where a scenario was left and returned to within a session,
+  which is the boundary between two of its visits, and counts the runs
+  played on other scenarios between them. The word visit is not on screen
+  ([proposal](../proposals/run_history_proposal.md#the-run-list)).
+- The newest session is always the list's first row, whether or not it is in
+  progress, and is marked while it is (see [In progress](#in-progress)).
+- That page's chart plots a scenario's runs in the order sessions are split
+  in (see [Sessions](#sessions)).
+- No toast or log line shows a session, a visit, a run's start, or a run's
+  length. The watchdog's interim per-run lines in the debug log are older
+  than these rules and don't use them.
+- A run's start and its run length are shown nowhere by themselves. They
+  decide which session a run joins, and a session's name and its length are
+  read from its first run's start.
 
 ## Run start and run length
 
@@ -123,8 +134,11 @@ Two words are kept apart throughout. A **break** is time between runs. A
   began a minute after the last one ended and took 40 minutes to play starts
   a new session ([2026-10-11][entry]).
 - Nothing happens when a session ends, so a view that shows the state has to
-  re-check it on a timer. No such view exists yet
-  ([2026-10-11][entry]).
+  re-check it on a timer ([2026-10-11][entry]).
+- The Run History page's run list asks again every 30 seconds, and when a
+  run lands. So its mark for a session in progress clears within 30 seconds
+  of the session ending, with no run landing
+  ([proposal](../proposals/run_history_proposal.md#the-run-list)).
 
 ## Visits
 
