@@ -550,6 +550,14 @@
     font-weight: 600;
 }
 
+/* The space that ends a part of a session row, for a screen reader: see
+   partEnd in runHistoryList.js. Kept, or the browser would drop a space at
+   the end of a line, and sized to nothing, so the row looks as it did. */
+.run-list-part-end {
+    font-size: 0;
+    white-space: pre;
+}
+
 .run-list-session-facts {
     color: var(--mantine-color-dimmed);
     font-size: 12px;

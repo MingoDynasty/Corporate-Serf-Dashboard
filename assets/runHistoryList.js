@@ -266,6 +266,15 @@
     return h.apply(null, ["div", attributes].concat(children));
   }
 
+  // A session row's parts are flex items with no text between them, and
+  // Chrome and Edge hand a screen reader their text joined up: "2:22 AMIn
+  // progress" (NVDA, 2026-10-13). A space between the items does nothing,
+  // because a flex container drops it. This one sits inside a part, at its
+  // end, where the stylesheet keeps it and gives it no size.
+  function partEnd() {
+    return h("span", { className: "run-list-part-end" }, " ");
+  }
+
   dagcomponentfuncs.RunListWideRow = function (props) {
     var data = props.data;
     var api = props.api;
@@ -323,9 +332,9 @@
         },
         open ? "▾" : "▸"
       ),
-      h("span", { className: "run-list-session-name" }, data.name),
+      h("span", { className: "run-list-session-name" }, data.name, partEnd()),
       data.in_progress
-        ? h("span", { className: "run-list-in-progress" }, labels.inProgress)
+        ? h("span", { className: "run-list-in-progress" }, labels.inProgress, partEnd())
         : null,
       h(
         "span",
@@ -452,8 +461,14 @@
   };
 
   // Expand all opens every loaded session, and closes them all once every
-  // one is open.
+  // one is open. It says so through the live region: the press changes the
+  // button's own name, which Chrome and Edge do not report to a screen
+  // reader, so there the press would be silent.
   state.toggleAll = function (api) {
-    setOpen(api, state.sessionIds, !allOpen());
+    var opening = !allOpen();
+    setOpen(api, state.sessionIds, opening);
+    var context = contextOf(api);
+    var labels = context.labels || {};
+    announce(context, opening ? labels.expanded : labels.collapsed);
   };
 })();

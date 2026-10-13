@@ -1225,7 +1225,11 @@ flowchart LR
   session is a pinned top row, so the pinned row and the body rows go in
   together through `updateGridOptions`. After new rows are applied it puts
   focus back on the cell of the same row id, since the grid holds focus by
-  position. Its comment lists the nine pieces of grid work, each a place an
+  position. A row opened or closed from the keyboard, and a press of Expand
+  all, are said through the panel's live region, and each part of a session
+  row ends with a space that only a screen reader is given
+  ([what NVDA said](research/run_history_list_nvda_walk.md)). Its comment
+  lists the nine pieces of grid work, each a place an
   AG Grid upgrade can break. It holds no copy: every string comes with the
   rows or with the grid's `context`.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Scenario

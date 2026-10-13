@@ -567,6 +567,40 @@ def test_a_key_that_opens_or_closes_a_row_is_said_through_the_live_region():
     assert getattr(region, "children", None) is None
 
 
+def test_expand_all_is_said_through_the_live_region_too():
+    """Its press changes the button's name, which Chrome and Edge do not report."""
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    toggling = script[script.index("state.toggleAll = function (api) {") :]
+
+    assert "var opening = !allOpen();" in toggling
+    assert "setOpen(api, state.sessionIds, opening);" in toggling
+    assert (
+        "announce(context, opening ? labels.expanded : labels.collapsed);" in toggling
+    )
+
+
+def test_a_session_rows_parts_end_with_a_space_a_screen_reader_is_given():
+    """Chrome and Edge join the text of flex items, and drop a space between them.
+
+    So the space is inside the part, kept by ``white-space: pre``, and sized to
+    nothing so the row's layout does not move.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    part_end = _css_block(STYLESHEET.read_text(encoding="utf-8"), ".run-list-part-end")
+
+    assert 'return h("span", { className: "run-list-part-end" }, " ");' in script
+    assert (
+        'h("span", { className: "run-list-session-name" }, data.name, partEnd()),'
+        in script
+    )
+    assert (
+        'h("span", { className: "run-list-in-progress" }, labels.inProgress, partEnd())'
+        in script
+    )
+    assert "font-size: 0;" in part_end
+    assert "white-space: pre;" in part_end
+
+
 def test_the_marks_cell_says_why_a_run_has_no_check():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
 
