@@ -7,6 +7,7 @@ from source.kovaaks.data_models import RunData
 from source.kovaaks.play_sessions import (
     PlaySession,
     find_play_session_in_progress,
+    in_play_order,
     split_into_play_sessions,
     split_into_scenario_visits,
 )
@@ -265,6 +266,31 @@ def test_runs_that_share_an_end_second_split_the_same_way_in_any_order() -> None
             ("A", (began_later, no_start_a1, no_start_a2)),
             ("C", (no_start_c, after)),
         ]
+
+
+def test_play_order_is_the_order_sessions_are_split_in() -> None:
+    """A view that lists runs one by one orders them as their sessions do.
+
+    Three runs end in one second. The one that began first comes first, a run
+    with no usable start counts as beginning at its end, and the stats
+    file's name settles the two that are left.
+    """
+    began_first = _run(TEN, seconds=90, stats_file_name="b.csv")
+    no_start_a = _run(TEN, seconds=None, stats_file_name="a.csv")
+    no_start_c = _run(TEN, seconds=None, stats_file_name="c.csv")
+    earlier = _run(TEN - timedelta(minutes=5), stats_file_name="z.csv")
+    later = _run(TEN + timedelta(minutes=5), stats_file_name="0.csv")
+    played = [earlier, began_first, no_start_a, no_start_c, later]
+
+    for handed_over in permutations(played):
+        assert in_play_order(handed_over) == played
+
+    (play_session,) = split_into_play_sessions(reversed(played))
+    assert list(play_session.runs) == played
+
+
+def test_play_order_of_no_runs_is_empty() -> None:
+    assert in_play_order([]) == []
 
 
 def test_no_runs_make_no_sessions() -> None:

@@ -16,7 +16,7 @@ import pytest
 from dash import no_update
 from dash._callback import GLOBAL_CALLBACK_MAP
 
-from source.components import scenario_selection
+from source.components import scenario_selection, setup_surfaces
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
 from source.utilities.store_schema import StoreState, UnsupportedSchemaError
@@ -137,11 +137,11 @@ def test_the_card_asks_for_the_account_when_only_identity_is_unasked(
 
     assert card is not None
     assert _texts(card) == [
-        home.SETUP_CARD_IDENTITY_TITLE,
-        home.SETUP_CARD_IDENTITY_BODY,
-        home.SETUP_CARD_SKIP_FINE_PRINT,
+        setup_surfaces.SETUP_CARD_IDENTITY_TITLE,
+        setup_surfaces.SETUP_CARD_IDENTITY_BODY,
+        setup_surfaces.SETUP_CARD_SKIP_FINE_PRINT,
     ]
-    assert _button_labels(card) == [home.SETUP_CARD_SKIP_LABEL]
+    assert _button_labels(card) == [setup_surfaces.SETUP_CARD_SKIP_LABEL]
     assert _anchors(card)[0].href == "/settings"
 
 
@@ -157,11 +157,11 @@ def test_a_never_configured_stats_folder_wins_and_offers_no_skip(identity):
 
     assert card is not None
     assert _texts(card) == [
-        home.SETUP_CARD_STATS_DIR_TITLE,
-        home.SETUP_CARD_STATS_DIR_BODY,
+        setup_surfaces.SETUP_CARD_STATS_DIR_TITLE,
+        setup_surfaces.SETUP_CARD_STATS_DIR_BODY,
     ]
     assert _button_labels(card) == []
-    assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+    assert _anchors(card)[0].children == setup_surfaces.SETUP_CARD_OPEN_SETTINGS_LABEL
 
 
 @pytest.mark.parametrize(
@@ -192,14 +192,14 @@ def test_an_unusable_store_gets_its_own_card_instead_of_a_fresh_install_one(
 
     assert card is not None
     assert _texts(card) == [
-        home.SETUP_CARD_STORE_TITLE,
-        home.SETUP_CARD_STORE_BODY,
+        setup_surfaces.SETUP_CARD_STORE_TITLE,
+        setup_surfaces.SETUP_CARD_STORE_BODY,
     ]
-    assert home.SETUP_CARD_STATS_DIR_TITLE not in _texts(card)
+    assert setup_surfaces.SETUP_CARD_STATS_DIR_TITLE not in _texts(card)
     assert _button_labels(card) == []
-    assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+    assert _anchors(card)[0].children == setup_surfaces.SETUP_CARD_OPEN_SETTINGS_LABEL
     assert _anchors(card)[0].href == "/settings"
-    assert card.className == home.SETUP_CARD_CAUTION_CLASS
+    assert card.className == setup_surfaces.SETUP_CARD_CAUTION_CLASS
     assert "material-symbols-warning-outline.svg" in _icon_mask(card)
 
 
@@ -217,11 +217,11 @@ def test_each_card_state_wears_its_own_severity_treatment(stats_dir):
     offered = _card(home.layout())
 
     assert blocked is not None
-    assert blocked.className == home.SETUP_CARD_CAUTION_CLASS
+    assert blocked.className == setup_surfaces.SETUP_CARD_CAUTION_CLASS
     assert "material-symbols-warning-outline.svg" in _icon_mask(blocked)
 
     assert offered is not None
-    assert offered.className == home.SETUP_CARD_CLASS
+    assert offered.className == setup_surfaces.SETUP_CARD_CLASS
     assert "material-symbols-info-outline.svg" in _icon_mask(offered)
 
 
@@ -268,7 +268,7 @@ def test_the_card_stands_aside_while_a_stats_folder_change_awaits_a_restart(
 
 def test_skip_records_the_decline_and_takes_the_card_away(monkeypatch, stats_dir):
     monkeypatch.setattr(
-        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+        home, "ctx", SimpleNamespace(triggered_id=setup_surfaces.SETUP_CARD_SKIP_ID)
     )
     _store(**{STATS_DIR_KEY: str(stats_dir), STEAM_ID_KEY: "76561197986713986"})
 
@@ -290,7 +290,7 @@ def test_skip_records_the_decline_and_takes_the_card_away(monkeypatch, stats_dir
 def test_skip_leaves_a_missing_stats_folder_for_the_next_boot_to_find(monkeypatch):
     """The decline is identity-only: the bootstrap must keep retrying."""
     monkeypatch.setattr(
-        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+        home, "ctx", SimpleNamespace(triggered_id=setup_surfaces.SETUP_CARD_SKIP_ID)
     )
     _store()
 
@@ -302,7 +302,7 @@ def test_skip_leaves_a_missing_stats_folder_for_the_next_boot_to_find(monkeypatc
 def test_skip_starts_no_warmup_worker_and_needs_no_restart(monkeypatch, stats_dir):
     """There is no username to warm anything for, and nothing pins on a decline."""
     monkeypatch.setattr(
-        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+        home, "ctx", SimpleNamespace(triggered_id=setup_surfaces.SETUP_CARD_SKIP_ID)
     )
     monkeypatch.setattr(
         percentile_warmup_service,
@@ -333,9 +333,9 @@ def test_the_settings_cta_is_one_interactive_element(stored):
     anchors = _anchors(card)
     assert len(anchors) == 1
     cta = anchors[0]
-    assert cta.children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+    assert cta.children == setup_surfaces.SETUP_CARD_OPEN_SETTINGS_LABEL
     assert cta.href == "/settings"
-    assert cta.className == home.SETUP_CARD_CTA_CLASS
+    assert cta.className == setup_surfaces.SETUP_CARD_CTA_CLASS
     assert _button_labels(cta) == []
 
 
@@ -345,7 +345,7 @@ def test_the_settings_cta_class_is_styled():
         Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
     ).read_text(encoding="utf-8")
 
-    assert f".{home.SETUP_CARD_CTA_CLASS} {{" in stylesheet
+    assert f".{setup_surfaces.SETUP_CARD_CTA_CLASS} {{" in stylesheet
 
 
 def test_the_skip_input_is_optional():
@@ -364,7 +364,7 @@ def test_the_skip_input_is_optional():
 
     assert spec["inputs"] == [
         {
-            "id": home.SETUP_CARD_SKIP_ID,
+            "id": setup_surfaces.SETUP_CARD_SKIP_ID,
             "property": "n_clicks",
             "allow_optional": True,
         }
@@ -395,7 +395,7 @@ def test_a_skip_nobody_clicked_declines_nothing(monkeypatch, n_clicks, triggered
 def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
     """Taking the card away would claim a decline that was never recorded."""
     monkeypatch.setattr(
-        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+        home, "ctx", SimpleNamespace(triggered_id=setup_surfaces.SETUP_CARD_SKIP_ID)
     )
 
     def refuse():
@@ -433,7 +433,7 @@ def test_a_skip_whose_write_fails_says_so_and_leaves_the_card_up(
     store exactly as it was and the card has to stay up.
     """
     monkeypatch.setattr(
-        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+        home, "ctx", SimpleNamespace(triggered_id=setup_surfaces.SETUP_CARD_SKIP_ID)
     )
 
     def fail():
@@ -460,7 +460,7 @@ def test_the_two_skip_problems_replace_each_other_rather_than_stack(
 ):
     """One click has one answer, so a retry must not leave two on screen."""
     monkeypatch.setattr(
-        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+        home, "ctx", SimpleNamespace(triggered_id=setup_surfaces.SETUP_CARD_SKIP_ID)
     )
 
     def refuse():

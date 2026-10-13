@@ -502,3 +502,240 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "second-deep_link.data",
     }
     assert not _input_keys(select_playlist) <= _output_keys(apply_deep_link)
+
+
+# --- A scenario the playlist filter does not list --------------------------------
+#
+# ``reach_scenario`` is the Run History page's rule: a link or a followed run
+# that names such a scenario clears the filter and selects the scenario. The
+# Scenario Performance page keeps ``apply_deep_link``, which the tests above
+# hold: the filter stays and the scenario is dropped.
+
+ALPHA_CODE, BETA_CODE = "KovaaKsAlpha", "KovaaKsBeta"
+LISTED = "KovaaKsAlpha Scenario"
+OUTSIDE = "Outside Scenario"
+NEVER_PLAYED = "Never Played"
+
+
+@pytest.fixture
+def played(monkeypatch, playlist_lists):
+    """Two loaded playlists that each list one scenario, and two scenarios with runs.
+
+    ``LISTED`` is in the first playlist and has runs. ``OUTSIDE`` has runs
+    and is in neither. ``NEVER_PLAYED`` is in neither and has none.
+    """
+    monkeypatch.setattr(
+        scenario_selection,
+        "is_scenario_in_database",
+        lambda name: name in {LISTED, OUTSIDE},
+    )
+
+
+def _landed_on(scenario_name: str) -> dict:
+    """Build a page's run summary whose latest run is on a scenario."""
+    return {"latest": {"scenario_name": scenario_name}, "celebrated_run_id": None}
+
+
+@pytest.mark.parametrize(
+    ("selection", "held_filter", "expected"),
+    [
+        # No parameters: nothing is written, whatever the browser restored.
+        ({}, ALPHA_CODE, (no_update, no_update)),
+        (None, ALPHA_CODE, (no_update, no_update)),
+        # ?scenario= alone, against the filter the browser restored.
+        ({"scenario": LISTED}, ALPHA_CODE, (no_update, LISTED)),
+        ({"scenario": OUTSIDE}, ALPHA_CODE, (None, OUTSIDE)),
+        ({"scenario": OUTSIDE}, None, (no_update, OUTSIDE)),
+        ({"scenario": OUTSIDE}, "", (no_update, OUTSIDE)),
+        # A remembered code no playlist has filters nothing, and the scenario
+        # list callback drops it.
+        ({"scenario": OUTSIDE}, "KovaaKsGoneCode", (no_update, OUTSIDE)),
+        # Clearing the filter would not put a scenario with no runs on the
+        # list, so the filter stays.
+        ({"scenario": NEVER_PLAYED}, ALPHA_CODE, (no_update, NEVER_PLAYED)),
+        ({"scenario": None}, ALPHA_CODE, (no_update, None)),
+        # ?playlist_code= alone names no scenario, so nothing is cleared.
+        ({"playlist": ALPHA_CODE}, BETA_CODE, (ALPHA_CODE, no_update)),
+        ({"playlist": None}, ALPHA_CODE, (None, no_update)),
+        # Both: the filter the link itself names is the one that counts.
+        ({"playlist": ALPHA_CODE, "scenario": LISTED}, BETA_CODE, (ALPHA_CODE, LISTED)),
+        ({"playlist": ALPHA_CODE, "scenario": OUTSIDE}, None, (None, OUTSIDE)),
+        ({"playlist": ALPHA_CODE, "scenario": OUTSIDE}, ALPHA_CODE, (None, OUTSIDE)),
+        (
+            {"playlist": ALPHA_CODE, "scenario": NEVER_PLAYED},
+            None,
+            (ALPHA_CODE, NEVER_PLAYED),
+        ),
+        ({"playlist": ALPHA_CODE, "scenario": None}, BETA_CODE, (ALPHA_CODE, None)),
+        # An unknown code arrives as no playlist, which clears the filter as
+        # it always did.
+        ({"playlist": None, "scenario": OUTSIDE}, ALPHA_CODE, (None, OUTSIDE)),
+    ],
+)
+def test_a_link_to_a_scenario_the_filter_does_not_list_clears_the_filter(
+    played, selection, held_filter, expected
+):
+    """Each combination of the two parameters, on a visit with no run landed."""
+    assert (
+        scenario_selection.reach_scenario(
+            selection, None, True, held_filter, "Remembered Scenario"
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize("follow_newly_played", [True, False])
+def test_a_link_is_applied_whatever_the_follow_switch_says(played, follow_newly_played):
+    assert scenario_selection.reach_scenario(
+        {"scenario": OUTSIDE}, None, follow_newly_played, ALPHA_CODE, LISTED
+    ) == (None, OUTSIDE)
+
+
+@pytest.mark.parametrize(
+    ("played_on", "held_filter", "selected", "expected"),
+    [
+        # The filter does not list the scenario just played: it is cleared.
+        (OUTSIDE, ALPHA_CODE, LISTED, (None, OUTSIDE)),
+        # It lists it, or there is no filter: only the scenario moves.
+        (LISTED, ALPHA_CODE, OUTSIDE, (no_update, LISTED)),
+        (OUTSIDE, None, LISTED, (no_update, OUTSIDE)),
+        (OUTSIDE, "KovaaKsGoneCode", LISTED, (no_update, OUTSIDE)),
+        (OUTSIDE, ALPHA_CODE, None, (None, OUTSIDE)),
+        # Still on the scenario being played: nothing to write.
+        (LISTED, ALPHA_CODE, LISTED, (no_update, no_update)),
+        (OUTSIDE, None, OUTSIDE, (no_update, no_update)),
+    ],
+)
+def test_follow_selects_the_scenario_just_played_and_clears_a_filter_in_its_way(
+    played, played_on, held_filter, selected, expected
+):
+    assert (
+        scenario_selection.reach_scenario(
+            {}, _landed_on(played_on), True, held_filter, selected
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize("played_on", [LISTED, OUTSIDE])
+def test_with_follow_off_a_landed_run_moves_nothing(played, played_on):
+    """The summary is then for the selected scenario, and the switch is read anyway.
+
+    A selection the user changes while a batch is on its way must not be put
+    back by the summary of the scenario they left.
+    """
+    assert scenario_selection.reach_scenario(
+        {}, _landed_on(played_on), False, ALPHA_CODE, LISTED
+    ) == (no_update, no_update)
+
+
+def test_a_landed_run_is_not_answered_by_applying_the_link_again(played):
+    """The visit's parameters are applied once, when the page is drawn.
+
+    The deep-link store still holds them when a run lands, and the selection
+    the user has since made must not be put back.
+    """
+    opened_with = {"playlist": ALPHA_CODE, "scenario": LISTED}
+
+    assert scenario_selection.reach_scenario(
+        opened_with, _landed_on(OUTSIDE), True, BETA_CODE, OUTSIDE
+    ) == (no_update, no_update)
+    assert scenario_selection.reach_scenario(
+        opened_with, _landed_on(OUTSIDE), True, ALPHA_CODE, LISTED
+    ) == (None, OUTSIDE)
+
+
+def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
+    restored_callbacks,
+):
+    registered_before = list(GLOBAL_CALLBACK_LIST)
+
+    scenario_selection.register_scenario_selection_clearing_filter(
+        SECOND_PAGE_IDS,
+        run_events="second-run_events",
+        follow_switch="second-follow_switch",
+    )
+
+    assert GLOBAL_CALLBACK_LIST[: len(registered_before)] == registered_before
+    select_playlist, reach_scenario = GLOBAL_CALLBACK_LIST[len(registered_before) :]
+    assert _answering(select_playlist) == "select_playlist"
+    assert _answering(reach_scenario) == "reach_scenario"
+    # Plain outputs, both: a callback is held back for a plain output and not
+    # for a duplicate one, and the scenario list must wait for the filter.
+    assert reach_scenario["output"] == (
+        "..second-playlist_filter.value...second-scenario_dropdown.value.."
+    )
+    assert _input_keys(reach_scenario) == {
+        "second-deep_link.data",
+        "second-run_events.data",
+    }
+    assert [f"{dep['id']}.{dep['property']}" for dep in reach_scenario["state"]] == [
+        "second-follow_switch.checked",
+        "second-playlist_filter.value",
+        "second-scenario_dropdown.value",
+    ]
+    assert reach_scenario["prevent_initial_call"] is False
+    # The scenario list keeps the Input nothing writes, for the same reason
+    # as on the other page.
+    assert not _input_keys(select_playlist) <= _output_keys(reach_scenario)
+    # It also takes the run summary, so a scenario whose first run has just
+    # landed joins the list. The filter's value is ``reach_scenario``'s plain
+    # output, which is what makes Dash hold the list for the selection.
+    assert _input_keys(select_playlist) == {
+        "second-playlist_filter.value",
+        "second-deep_link.data",
+        "second-run_events.data",
+    }
+
+
+def test_a_run_summary_has_the_local_list_read_again(monkeypatch, playlist_lists):
+    """The first run of a scenario adds it to the list a page drew before it.
+
+    With no filter to clear, nothing else writes the list, and the dropdown
+    would go on showing the old name for a scenario it cannot name.
+    """
+    drawn_with = scenario_selection.select_playlist(None, None)
+    monkeypatch.setattr(
+        scenario_selection, "get_scenario_names", lambda: ["All", "Just Played"]
+    )
+
+    scenarios, link, options = scenario_selection.select_playlist(
+        None, None, _landed_on("Just Played")
+    )
+
+    assert drawn_with[0] == ["All"]
+    assert scenarios == ["All", "Just Played"]
+    assert (link, options) == (None, VISIBLE_PLAYLISTS)
+
+
+def test_a_run_summary_leaves_a_playlists_list_as_it_is(playlist_lists):
+    """A filter that stays lists its playlist's scenarios, run or no run."""
+    assert scenario_selection.select_playlist(
+        "KovaaKsAlpha", None, _landed_on("KovaaKsAlpha Scenario")
+    )[0] == ["KovaaKsAlpha Scenario"]
+
+
+def test_the_old_pages_scenario_list_takes_no_run_summary():
+    """Its Follow never clears a filter, and its served callbacks must not change."""
+    (registration,) = [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if "scenario-dropdown-selection.data" in entry["output"]
+    ]
+
+    assert _input_keys(registration) == {
+        "playlist-dropdown-selection.value",
+        f"{home.SCENARIO_SELECTION_IDS.deep_link}.data",
+    }
+
+
+def test_the_old_page_keeps_the_rule_that_drops_the_scenario():
+    """R7 is the new page's alone until it replaces this one."""
+    answering = {
+        _answering(entry)
+        for entry in GLOBAL_CALLBACK_LIST
+        if home.SCENARIO_SELECTION_IDS.deep_link
+        in {dep["id"] for dep in entry["inputs"]}
+    }
+
+    assert answering == {"select_playlist", "apply_deep_link"}

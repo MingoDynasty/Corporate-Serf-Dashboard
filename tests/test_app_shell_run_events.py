@@ -20,7 +20,11 @@ from source.app_shell import (  # noqa: E402
     CELEBRATION_STYLE_CONFETTI,
     CELEBRATION_STYLE_OFF,
 )
-from source.components import scenario_selection  # noqa: E402
+from source.components import (  # noqa: E402
+    run_delivery,
+    run_verdict_toast,
+    scenario_selection,
+)
 from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
@@ -256,7 +260,7 @@ def test_the_celebration_toast_has_its_own_channel(monkeypatch, frozen_clock):
 
     assert notifications[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
     assert set(_registry_writes(patch)) == {CELEBRATION_CHANNEL}
-    assert CELEBRATION_CHANNEL != home._RUN_VERDICT_CHANNEL
+    assert CELEBRATION_CHANNEL != run_verdict_toast.RUN_VERDICT_CHANNEL
 
 
 def test_a_later_celebration_replaces_the_one_on_screen(monkeypatch, frozen_clock):
@@ -682,8 +686,8 @@ def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
         # personal best and the newest-qualifying rule cannot pick this one.
         _message("Scenario A", run_id="ordinary.csv", score=780.0),
     )
-    _target, payload = home._summarize_run_events(batch, "Scenario A", False)
-    verdict = home._build_run_event_notification(
+    _target, payload = run_delivery.summarize_run_events(batch, "Scenario A", False)
+    verdict = run_verdict_toast.build_run_event_notification(
         payload,
         "Scenario A",
         5,
@@ -695,5 +699,5 @@ def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
     assert batch["celebrated_run_id"] == "pb.csv"
     assert celebration[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
     assert celebration[0]["message"].startswith("Scenario B: 900.00.")
-    assert verdict["id"] == home._RUN_VERDICT_CHANNEL
+    assert verdict["id"] == run_verdict_toast.RUN_VERDICT_CHANNEL
     assert verdict["message"].startswith("Scenario A: 780.00")

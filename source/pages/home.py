@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import Any, TypedDict
+from typing import Any
 
 import dash
 import dash_mantine_components as dmc
@@ -19,11 +19,7 @@ from dash import (
     no_update,
 )
 
-from source.app_shell import (
-    RUN_EVENTS_BATCH_STORE_ID,
-    RunEventBatch,
-    RunEventData,
-)
+from source.app_shell import RUN_EVENTS_BATCH_STORE_ID
 from source.components.chart_options import (
     SETTINGS_HELP_TEXT,
     ChartOptionsIds,
@@ -37,7 +33,10 @@ from source.components.queued_notices import (
     register_run_import_failure_flush,
     register_startup_playlist_warning_flush,
 )
+from source.components.run_delivery import summarize_run_events
+from source.components.run_verdict_toast import build_run_event_notification
 from source.components.scenario_selection import (
+    SELECT_HIGHLIGHT_ON_OPEN_CLASS,
     ScenarioSelectionIds,
     deep_link_selection,
     initial_scenario_options,
@@ -51,22 +50,16 @@ from source.components.scenario_stats import (
     scenario_stats_stores,
 )
 from source.components.score_threshold import (
-    ThresholdVerdict,
     normalize_score_threshold_percentage,
     score_threshold_line,
-    shown_percentage,
-    threshold_verdict,
+)
+from source.components.setup_surfaces import (
+    SETUP_CARD_SKIP_ID,
+    setup_card_children,
+    stats_dir_hint,
 )
 from source.config.config_service import get_config
-from source.config.settings_service import (
-    KOVAAKS_USERNAME_KEY,
-    STATS_DIR_KEY,
-    decline_identity,
-    get_settings,
-    get_settings_store_state,
-    get_usable_stats_dir,
-    is_stats_dir_change_pending,
-)
+from source.config.settings_service import decline_identity
 from source.kovaaks.data_service import (
     get_high_score,
     get_new_high_score_runs,
@@ -93,8 +86,7 @@ from source.utilities.notifications import (
     channel_toast,
     toast,
 )
-from source.utilities.store_schema import StoreState, UnsupportedSchemaError
-from source.utilities.utilities import ordinal
+from source.utilities.store_schema import UnsupportedSchemaError
 
 logger = logging.getLogger(__name__)
 # The controls grid measures these against its own width rather than the
@@ -111,12 +103,6 @@ logger = logging.getLogger(__name__)
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 PLAYLIST_FIELD_CLASS = "home-playlist-field"
-# Marks a dropdown's input for ``assets/selectHighlightOnOpen.js``, which
-# highlights the selected name when the list opens. dmc's
-# ``clearSearchOnFocus`` buys the same click-and-type search by emptying the
-# field instead, which leaves no name on screen to copy; setting it beside
-# this class empties the field before the script can highlight anything.
-SELECT_HIGHLIGHT_ON_OPEN_CLASS = "select-highlight-on-open"
 # The ids this page gives its playlist filter and scenario dropdown. The
 # browser stores each dropdown's value under its id, so changing one resets
 # that selection for every user.
@@ -173,31 +159,7 @@ CHART_OPTIONS_REFLOW_BREAKPOINT = HOME_GRID_BREAKPOINTS["md"]
 # The first-run setup card. Its container is always in the layout so the Skip
 # callback has an output to write to; the card itself is what comes and goes.
 SETUP_CARD_ID = "setup-card"
-SETUP_CARD_SKIP_ID = "setup-card-skip"
-SETUP_CARD_IDENTITY_TITLE = "Add your KovaaK's account"
-SETUP_CARD_IDENTITY_BODY = (
-    "See your leaderboard position and percentiles for every scenario."
-)
-SETUP_CARD_SKIP_FINE_PRINT = (
-    "Skipping keeps position lookups off. You can add your username anytime in "
-    "Settings."
-)
-SETUP_CARD_STATS_DIR_TITLE = "Finish setting up"
-SETUP_CARD_STATS_DIR_BODY = (
-    "No KovaaK's stats folder was found, so this app can't read your runs yet. "
-    "Set it in Settings."
-)
-# Shown when the settings file exists but cannot be used. The key-absence
-# states below cannot speak for it: an unusable store reads as no keys at all,
-# so they would claim a fresh install when a configured one is sitting on disk.
-SETUP_CARD_STORE_TITLE = "Your settings can't be read"
-SETUP_CARD_STORE_BODY = (
-    "A settings file exists, but this version of the app can't use it, so the "
-    "app started without your settings. Open Settings to see what's wrong and "
-    "how to fix it."
-)
-SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
-SETUP_CARD_SKIP_LABEL = "Skip"
+STATS_DIR_HINT_ID = "stats-dir-hint"
 # Shown when Skip cannot be recorded, either because the settings file belongs
 # to a newer build or because the write itself failed. The card has to stay up
 # (nothing was written), so the toast is what explains why the click appeared
@@ -213,25 +175,6 @@ SETUP_CARD_SKIP_REFUSED_MESSAGE = (
 SETUP_CARD_SKIP_FAILED_MESSAGE = (
     "Nothing was written. Try again. See data/logs/debug.log."
 )
-# The primary action navigates, so it ships as one link wearing the button's
-# styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
-# ``<button>`` inside a focusable ``<a>``: two tab stops with the same name,
-# and interactive content nested where HTML does not allow it. Mantine's own
-# escape hatch (``component="a"``) is not exposed by the dmc 2.8.0 wrapper, so
-# the styling lives in ``assets/stylesheet.css`` instead.
-SETUP_CARD_CTA_CLASS = "setup-card-cta"
-# The card wears the shared alert anatomy on the ``dmc.Paper`` it already is.
-# Blue is the informational default; the caution modifier swaps in the yellow
-# tokens for the stats-folder state, which blocks every plot on the page and
-# cannot be dismissed.
-SETUP_CARD_CLASS = "alert-panel setup-card"
-SETUP_CARD_CAUTION_CLASS = f"{SETUP_CARD_CLASS} alert-panel-caution"
-SETUP_CARD_CAUTION_ICON = "material-symbols:warning-outline"
-SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
-# The stats-folder hint wears the caution panel in both of its branches: each
-# one leaves every plot on the page empty, the same reason the card's
-# stats-folder state is yellow.
-STATS_DIR_HINT_CLASS = "alert-panel alert-panel-caution stats-dir-hint"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
 _SELECT_SCENARIO_PLOT_MESSAGE = "Select a scenario to see your score history."
@@ -249,11 +192,6 @@ _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
 _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = (
     "Choose <b>Score vs Sensitivity</b> or <b>Score vs Time</b>."
 )
-# One run, one toast: every run verdict shares this channel key, so the newest
-# one replaces whatever is on screen instead of stacking. The celebration toast
-# is deliberately not in this lane -- it has its own id and stays until
-# dismissed.
-_RUN_VERDICT_CHANNEL = "run-verdict"
 dash.register_page(
     __name__,
     path="/",
@@ -271,44 +209,6 @@ def _empty_plot_json(title: str, message: str) -> str:
 def _placeholder_plot_json() -> str:
     """Serialize the neutral pre-hydration graph placeholder."""
     return generate_placeholder_plot().to_json()
-
-
-class RunEventsPayload(TypedDict):
-    """Summary passed from the batch-store consumer to Home's callbacks."""
-
-    latest: RunEventData
-    celebrated_run_id: str | None
-
-
-def _summarize_run_events(
-    batch: RunEventBatch,
-    selected_scenario: str | None,
-    automatically_change_scenario: bool,
-) -> tuple[str | None, RunEventsPayload | None]:
-    """Summarize one shell batch for the scenario this page should show."""
-    runs = batch["runs"]
-    if not runs:
-        return selected_scenario, None
-
-    target_scenario = (
-        runs[-1]["scenario_name"]
-        if automatically_change_scenario
-        else selected_scenario
-    )
-    if target_scenario is None:
-        return None, None
-
-    matching_runs = [run for run in runs if run["scenario_name"] == target_scenario]
-    if not matching_runs:
-        return target_scenario, None
-
-    # Coalescing, as before: several runs rebuild the plot once and only the
-    # latest matching one is narrated. The drain's decision travels with it,
-    # because the celebrated run may belong to another scenario entirely.
-    return target_scenario, {
-        "latest": matching_runs[-1],
-        "celebrated_run_id": batch["celebrated_run_id"],
-    }
 
 
 @callback(
@@ -329,7 +229,7 @@ def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
     if not batch:
         return no_update, no_update
 
-    target_scenario, run_events = _summarize_run_events(
+    target_scenario, run_events = summarize_run_events(
         batch,
         selected_scenario,
         automatically_change_scenario,
@@ -350,114 +250,6 @@ register_scenario_stats(SCENARIO_STATS_IDS)
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
     """Return whether a callback invocation was caused by new run events."""
     return any(trigger["prop_id"] == _RUN_EVENTS_PROP for trigger in triggered)
-
-
-def _placement_phrase(nth_score: int) -> str:
-    """Name a top-N placement: first place is "best", the rest are "Nth-best"."""
-    return "best" if nth_score == 1 else f"{ordinal(nth_score)}-best"
-
-
-def _build_live_run_notification(
-    latest: RunEventData,
-    selected_scenario: str,
-    top_n_scores: int,
-    verdict: ThresholdVerdict | None,
-) -> dict[str, object] | None:
-    """Build the one toast a just-played run earned, if it earned one.
-
-    The threshold verdict is the headline whenever there is one; a top-N
-    placement is the trailing detail. A run that is neither judged nor placed
-    says nothing worth interrupting for -- its new point on the plot is the
-    confirmation that it landed.
-    """
-    placed = latest["nth_score"] <= top_n_scores
-    placement = (
-        f"your {_placement_phrase(latest['nth_score'])} at {latest['sensitivity']}"
-    )
-    score = f"{selected_scenario}: {latest['score']:.2f}"
-
-    if verdict is None:
-        if not placed:
-            return None
-        return toast(
-            _RUN_VERDICT_CHANNEL,
-            f"New {_placement_phrase(latest['nth_score'])} score",
-            f"{score} at {latest['sensitivity']}.",
-            color="green",
-            icon=local_icon("fontisto:line-chart"),
-        )
-
-    shown = shown_percentage(verdict)
-    # The one word that tells the player which measure judged the run.
-    measure = "PB pace" if verdict.by_pace else "PB"
-    if verdict.passed:
-        # A pass ends at the fact: a line saying what to do next would be
-        # advice, and the app states verdicts only.
-        message = f"{score}, {shown:.1f}% of {measure}."
-        if placed:
-            message += f" Also {placement}."
-        return toast(
-            _RUN_VERDICT_CHANNEL,
-            "Threshold passed",
-            message,
-            color="green",
-            icon=local_icon("material-symbols:check"),
-        )
-
-    shortfall = f"{score}, {shown:.1f}% of {measure} "
-    shortfall += f"(need {verdict.goal_percentage:.1f}%)."
-    if placed:
-        shortfall += f" Still {placement}."
-    return toast(
-        _RUN_VERDICT_CHANNEL,
-        "Below threshold",
-        shortfall,
-        color="yellow",
-        icon=local_icon("material-symbols:warning-outline"),
-    )
-
-
-def _build_run_event_notification(  # noqa: PLR0913
-    run_events: RunEventsPayload | None,
-    selected_scenario: str,
-    top_n_scores: int,
-    score_threshold_percentage: float | str | None,
-    score_threshold_notification_switch: bool,
-    run_notification_switch: bool,
-) -> dict[str, object] | None:
-    """Build the at-most-one toast this page's latest matching run earned.
-
-    Nothing here predicts or re-derives: the drain stamped the celebration and
-    each run's liveness, and this reads the stamps. The master switch is
-    checked first, so it gates the whole page-built family, and the yield to
-    the celebration comes second -- with celebrations reporting a run, that
-    run's one notification is the celebration toast.
-
-    A batch's other runs earn nothing: the plot is their record, which is what
-    retires the "While you were away" digest.
-    """
-    if not run_notification_switch:
-        return None
-    if run_events is None or run_events["latest"]["scenario_name"] != selected_scenario:
-        return None
-
-    latest = run_events["latest"]
-    if run_events["celebrated_run_id"] == latest["run_id"]:
-        return None
-    if not latest["is_live"]:
-        return None
-
-    verdict = threshold_verdict(
-        latest,
-        score_threshold_percentage,
-        score_threshold_notification_switch,
-    )
-    return _build_live_run_notification(
-        latest,
-        selected_scenario,
-        top_n_scores,
-        verdict,
-    )
 
 
 def _empty_state_graph_response(
@@ -681,7 +473,7 @@ def generate_graph(  # noqa: PLR0913
         notifications = []
         hide_notifications = []
         if _run_events_were_triggered(ctx.triggered):
-            run_verdict = _build_run_event_notification(
+            run_verdict = build_run_event_notification(
                 run_events,
                 selected_scenario,
                 top_n_scores,
@@ -699,211 +491,6 @@ def generate_graph(  # noqa: PLR0913
 register_chart_options(CHART_OPTIONS_IDS)
 register_startup_playlist_warning_flush("startup-playlist-warning-interval")
 register_scenario_selection(SCENARIO_SELECTION_IDS)
-
-
-def _stats_dir_hint() -> list:
-    """Say so, persistently, when the app booted without a stats directory.
-
-    Unset and unusable read the same to the user, and both are repaired in the
-    same place, so the hint carries one link to the settings page.
-
-    A save this process has not applied yet is neither: a directory is
-    configured, so claiming nothing is would tell the user the save failed. The
-    hint defers to the restart instead, the same pin-versus-store
-    reconciliation the settings page's notice derives from.
-
-    What that branch must not do is confirm the save. It renders on every visit
-    while the change is pending, so a user returning days later would be told
-    they had just saved. It names the restart and what the restart applies, in
-    the settings page's vocabulary: "the app", never "the dashboard", which a
-    user reads as the browser page they would merely reload.
-
-    That deferral is doubly narrow, because the restart copy carries no link
-    and whatever it displaces has to be worth displacing. The pending change
-    has to be to the *stats directory*: an identity change leaves the directory
-    as unconfigured as it was, and no restart will configure it. And it has to
-    leave one *set*: clearing the field is a pending change too -- rightly so
-    for the settings page's notice, since this process serves the old directory
-    until it restarts -- but what the restart would then apply is nothing
-    configured, which is what the plain hint below already says, and it says it
-    with the link.
-
-    The plain hint is narrower still: it speaks only for a ``stats_dir`` key
-    that *exists* and cannot be used -- deliberately emptied, or a stored path
-    that has since vanished. A key that was never written is the never-asked
-    case, which the setup card owns, so each condition is explained by exactly
-    one surface instead of two stacked lines saying the same thing.
-    """
-    settings = get_settings()
-    if get_usable_stats_dir() is not None:
-        return []
-    if is_stats_dir_change_pending() and settings.get(STATS_DIR_KEY):
-        return [_stats_dir_hint_panel("Restart the app to apply your saved settings.")]
-    if STATS_DIR_KEY not in settings:
-        return []
-    return [
-        _stats_dir_hint_panel(
-            [
-                "No stats folder configured. Set it in ",
-                dmc.Anchor("Settings", href="/settings", refresh=False),
-                ".",
-            ]
-        )
-    ]
-
-
-def _stats_dir_hint_panel(sentence: str | list) -> dmc.Paper:
-    """Wrap one hint sentence in the caution panel: the icon beside it, no title.
-
-    A ``dmc.Paper`` rather than a ``dmc.Alert`` because the unconfigured
-    sentence holds a link, and both branches share the one slot and its id.
-    """
-    return dmc.Paper(
-        dmc.Group(
-            [
-                local_icon(SETUP_CARD_CAUTION_ICON, className="alert-panel-icon"),
-                dmc.Text(sentence),
-            ],
-            # ``dmc.Group`` defaults to ``wrap="wrap"``, which sizes the text at
-            # its one-line width and drops a sentence too wide for the space
-            # beside the icon whole onto the row under it instead of wrapping it
-            # there.
-            wrap="nowrap",
-            gap="xs",
-            align="flex-start",
-        ),
-        className=STATS_DIR_HINT_CLASS,
-        id="stats-dir-hint",
-        withBorder=True,
-    )
-
-
-def _setup_card(
-    title: str,
-    body: str,
-    *,
-    offer_skip: bool,
-    caution: bool,
-) -> dmc.Paper:
-    """Build one state of the setup card: a heading, a reason, and a way out.
-
-    Navigation and dismissal only. The primary action is a link to the settings
-    page, where detection and Save already live, so the card never grows a
-    second detection UI and opening it costs no KovaaK's request. Skip comes
-    with the fine print that says what it gives up, because a dismissal the
-    user cannot interpret is worse than the question.
-
-    The two actions are deliberately different elements: one navigates and is a
-    link, the other acts on this page and is a button.
-
-    ``caution`` picks the severity treatment rather than being read off
-    ``offer_skip``: the two happen to agree today, but one is about how loud the
-    card is and the other about whether it can be dismissed. It stays a
-    ``dmc.Paper`` wearing the alert anatomy through CSS, because the card holds
-    a link and a button and ``role="alert"`` is for text content.
-    """
-    actions = [
-        dmc.Anchor(
-            SETUP_CARD_OPEN_SETTINGS_LABEL,
-            href="/settings",
-            refresh=False,
-            className=SETUP_CARD_CTA_CLASS,
-            underline="never",
-        )
-    ]
-    if offer_skip:
-        actions.append(
-            dmc.Button(
-                SETUP_CARD_SKIP_LABEL,
-                id=SETUP_CARD_SKIP_ID,
-                # Secondary to the one action that finishes the setup.
-                variant="subtle",
-            )
-        )
-    children = [
-        dmc.Group(
-            [
-                local_icon(
-                    SETUP_CARD_CAUTION_ICON if caution else SETUP_CARD_INFO_ICON,
-                    className="alert-panel-icon",
-                ),
-                dmc.Text(title, className="alert-panel-title"),
-            ],
-            gap="xs",
-            align="center",
-        ),
-        dmc.Text(body),
-        dmc.Group(actions, gap="sm"),
-    ]
-    if offer_skip:
-        children.append(
-            dmc.Text(SETUP_CARD_SKIP_FINE_PRINT, className="setup-card-fine-print")
-        )
-    return dmc.Paper(
-        dmc.Stack(children, gap="xs"),
-        className=SETUP_CARD_CAUTION_CLASS if caution else SETUP_CARD_CLASS,
-        withBorder=True,
-    )
-
-
-def _setup_card_children() -> list:
-    """Ask, once, for whatever setup the app could not do on the user's behalf.
-
-    Read from the stored view rather than the pinned accessors, and keyed on
-    key *absence*: the card is the "never asked" surface, so a key that exists
-    -- with any value, ``""`` included -- retires it permanently. A degraded
-    setting that does exist is explained where it bites instead, by the hints
-    above and beside the values it affects.
-
-    The missing stats directory wins when both are missing: without it the app
-    has nothing to plot, so it is not dismissible and the identity ask can wait
-    for a page that shows something.
-
-    Nothing renders while a saved stats-directory change is waiting on a
-    restart. The user is mid-setup, the restart hint owns that moment, and
-    stacking the identity ask on top of it would be two banners for one
-    unfinished action. The card comes back after the restart if identity is
-    still unasked.
-
-    Key absence only means "never asked" for a store the app can read. An
-    unusable one -- a hand-edited typo, or a file stamped by a newer build --
-    yields no keys either, and startup detection declines to run against it, so
-    the key-absence states below would report a fresh install and a search that
-    never happened. That state gets its own card, which does nothing but route
-    to the Settings page, where the store alert already names the real problem
-    and distinguishes the two ways a store can be unusable.
-    """
-    if is_stats_dir_change_pending():
-        return []
-    if get_settings_store_state() in (StoreState.ERROR, StoreState.FUTURE):
-        return [
-            _setup_card(
-                SETUP_CARD_STORE_TITLE,
-                SETUP_CARD_STORE_BODY,
-                offer_skip=False,
-                caution=True,
-            )
-        ]
-    settings = get_settings()
-    if STATS_DIR_KEY not in settings:
-        return [
-            _setup_card(
-                SETUP_CARD_STATS_DIR_TITLE,
-                SETUP_CARD_STATS_DIR_BODY,
-                offer_skip=False,
-                caution=True,
-            )
-        ]
-    if KOVAAKS_USERNAME_KEY not in settings:
-        return [
-            _setup_card(
-                SETUP_CARD_IDENTITY_TITLE,
-                SETUP_CARD_IDENTITY_BODY,
-                offer_skip=True,
-                caution=False,
-            )
-        ]
-    return []
 
 
 @callback(
@@ -1021,8 +608,11 @@ def layout(
                 interval=30_000,
                 n_intervals=0,
             ),
-            *_stats_dir_hint(),
-            dmc.Box(id=SETUP_CARD_ID, children=_setup_card_children()),
+            *stats_dir_hint(STATS_DIR_HINT_ID),
+            dmc.Box(
+                id=SETUP_CARD_ID,
+                children=setup_card_children(offer_account=True),
+            ),
             dmc.Grid(
                 children=[
                     dmc.GridCol(

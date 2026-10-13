@@ -113,6 +113,12 @@ each tick and publishes one batch for whatever page is open. The page reads that
 batch and never accesses the queue directly, so run delivery no longer depends
 on Scenario Performance being mounted.
 
+The diagram shows the Scenario Performance page's callbacks. The Run History
+page (`run_history.py`), which is hidden until it replaces that page, consumes
+the same batch with callbacks of its own, in three steps where the diagram has
+two: `forward_run_events` writes the summary, `reach_scenario` moves the two
+dropdowns from it, and `generate_graph` rebuilds once both have settled.
+
 ### Background threads never drive UI outputs
 
 Dash outputs — including the notification container's `sendNotifications` —
@@ -138,7 +144,8 @@ The sanctioned channels, each typed and single-purpose:
   could not import, drained by a Scenario Performance interval callback into
   one red toast. The callbacks that drain these two queues are defined in
   `components/queued_notices.py`, and the page registers each on one of its
-  intervals.
+  intervals. The Run History page registers both on intervals of its own, so
+  whichever of the two pages is open drains them.
 - The JSON caches under `data/cache/` — the rank pipeline: refresh Timers
   write, cache-only interval reads pick the value up on the next tick.
 - `playlist_scenarios_service._FILL_REGISTRY` — the progressive fill's
@@ -233,6 +240,7 @@ flowchart LR
 
     subgraph Pages["Pages (source/pages/)"]
         Home["home.py"]
+        RunHistory["run_history.py"]
         Playlists["playlists.py"]
         PlaylistScenarios["playlist_scenarios.py"]
         Journey["aim_training_journey.py"]
@@ -248,6 +256,10 @@ flowchart LR
         QueuedNotices["components/<br/>queued_notices.py"]
         ScoreThreshold["components/<br/>score_threshold.py"]
         ScenarioStats["components/<br/>scenario_stats.py"]
+        SetupSurfaces["components/<br/>setup_surfaces.py"]
+        RunDelivery["components/<br/>run_delivery.py"]
+        RunVerdictToast["components/<br/>run_verdict_toast.py"]
+        RunHistoryChart["components/<br/>run_history_chart.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -304,6 +316,27 @@ flowchart LR
     ScenarioStats --> LocalIcon
     ScenarioStats --> DataService
     ScenarioStats --> ApiService
+    Home --> SetupSurfaces
+    SetupSurfaces --> LocalIcon
+    Home --> RunDelivery
+    RunDelivery --> Shell
+    Home --> RunVerdictToast
+    RunVerdictToast --> RunDelivery
+    RunVerdictToast --> ScoreThreshold
+    RunVerdictToast --> LocalIcon
+    RunHistory --> DataService
+    RunHistory --> PlotService
+    RunHistory --> ChartOptions
+    RunHistory --> ScenarioSelection
+    RunHistory --> QueuedNotices
+    RunHistory --> ScoreThreshold
+    RunHistory --> ScenarioStats
+    RunHistory --> SetupSurfaces
+    RunHistory --> RunDelivery
+    RunHistory --> RunVerdictToast
+    RunHistory --> RunHistoryChart
+    RunHistoryChart --> DataService
+    RunHistoryChart --> PlotService
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -383,8 +416,9 @@ flowchart LR
   their names; the rename was labels-only): sensitivity/time plots, high score,
   rank, and the chart options inspector. Owns the live-update callbacks
   (`check_for_new_data` takes the shell's `run-events-batch` store as its only
-  `Input` and summarizes it for the shown scenario; `generate_graph` consumes
-  the resulting `run-events` summary). The follow switch and the scenario
+  `Input` and summarizes it for the shown scenario, with
+  `summarize_run_events` of `components/run_delivery.py`; `generate_graph`
+  consumes the resulting `run-events` summary). The follow switch and the scenario
   dropdown are `State` there, not `Input`: a Store replays its last value, so a
   control flip would otherwise re-forward a batch already processed.
   `?scenario=` and `?playlist_code=` reach the two dropdowns through the
@@ -397,9 +431,10 @@ flowchart LR
   `SCENARIO_SELECTION_IDS`.
   The page also registers the two flushes of `components/queued_notices.py`,
   failed run imports on its polling interval and the startup playlist
-  warnings on a one-shot interval. Its run toast builders and `generate_graph`
-  call `components/score_threshold.py` for a run's threshold verdict and for
-  the score the threshold line is drawn at.
+  warnings on a one-shot interval. `generate_graph` calls
+  `components/run_verdict_toast.py` for the toast a landed run earned, and
+  `components/score_threshold.py` for the score the threshold line is drawn
+  at.
   The Scenario Stats block (Last played, Number of runs, and Position with
   its Refresh button) is built by `components/scenario_stats.py` from this
   page's `SCENARIO_STATS_IDS`, and `register_scenario_stats` wires that
@@ -409,15 +444,17 @@ flowchart LR
   the polling interval, and the 30-second interval that keeps the relative
   times current.
   As the landing page it also carries the first-run setup card
-  (`_setup_card_children`), which is suppressed while a stats-directory change
+  (`setup_card_children` of `components/setup_surfaces.py`, asked for with the
+  account offer), which is suppressed while a stats-directory change
   awaits a restart. It asks the store's read state before anything else: an
   `ERROR` or `FUTURE` settings file gets a card of its own, because those
   states read as no keys and the key-absence states below would take them for
   a fresh install. Otherwise it renders while a settings key has never been
   written — an absent `stats_dir`, or an absent `kovaaks_username` once the
-  directory exists. It only links to `/settings`; its Skip button calls
+  directory exists. It only links to `/settings`; its Skip button is answered
+  by this page's `skip_identity_setup`, which calls
   `settings_service.decline_identity` and removes the card. Key *presence* is
-  the line between it and `_stats_dir_hint`, which explains a directory that
+  the line between it and `stats_dir_hint`, which explains a directory that
   is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
   overlay, run-point, score-threshold, and run-notification preferences. It
@@ -466,6 +503,49 @@ flowchart LR
   playlist's scenario list and, into a holder under the filter, the link to
   that playlist's scenario table (`/playlists/{code}`), or nothing when the
   filter holds no loaded playlist.
+- `run_history.py` (`/run-history`) — the Run History page, built beside
+  `home.py` to replace it. It is registered at its final address with no
+  navbar entry and nothing linking to it, and it never imports `home.py`:
+  what both pages need is under `components/`. In this state it has the top
+  row, the chart, and the Chart options panel, with a slot reserved for the
+  latest-run card and a 500px column reserved for the run list.
+  Every id it draws is its own (`SCENARIO_SELECTION_IDS`, `CHART_OPTIONS_IDS`,
+  `SCENARIO_STATS_IDS`, and the constants beside them), its stores and
+  intervals included, because a page that holds one output of a callback has
+  to hold every input of it. So none of the old page's remembered values
+  carry over, and each shared block is registered a second time for these
+  ids.
+  Run delivery is three callbacks. `forward_run_events` takes the shell's
+  batch and writes this page's summary store, and writes neither dropdown.
+  `reach_scenario` (`components/scenario_selection.py`) is the one writer of
+  both dropdowns' values: it applies a visit's query parameters when the page
+  is drawn, moves the selection to the scenario just played while Follow is
+  on, and in both cases clears a playlist filter that does not list the
+  scenario. `generate_graph` takes both dropdowns as `Input`, so Dash holds it
+  until `reach_scenario` has answered and the chart is rebuilt once per
+  batch. Its toast outputs are `allow_duplicate`, because the old page's
+  chart callback is the plain writer of the same shell-hosted props.
+  The chart's mode is a segmented control and its range is two selects, one
+  in runs and one in days, both always in the layout: a clientside callback
+  hides the one the mode does not use by a class. They are two controls
+  because each is remembered, and a remembered control's layout default
+  cannot change with the mode. A range of days counts back from today, so
+  `advance_today` reads the app's date on the page's 30-second tick and
+  writes it to a store only when it has moved on. That store is an `Input`
+  of `generate_graph`: a chart left open past midnight is redrawn once for
+  the new date, and a tick inside one date rebuilds nothing.
+  `generate_graph` asks `components/run_history_chart.py` for the figure,
+  adds the PB score and Score threshold lines, and builds the run toast with
+  `components/run_verdict_toast.py` at a Top N fixed at 5, since the page has
+  no Top N scores control.
+  With no runs to read it draws `stats_dir_hint` and the setup card's two
+  caution states, and never the account offer, so it registers no Skip
+  callback.
+  Its stylesheet rules measure the page's own boxes: `.run-history-page` is
+  the container the two columns stack on at 900px, and
+  `.run-history-chart-area` the one the panel stacks on at 48em. The graph
+  row inside it is the old page's `.home-chart-row`, and the graph carries
+  `.home-graph`, so both graph scripts serve it.
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; a click in the Playlist name cell, and in no other, navigates
@@ -643,8 +723,11 @@ flowchart LR
   `apply_graph_appearance` for those ids. The functions are module-level and
   stay unregistered until a page asks, so tests call them directly. The
   module also holds the controls' help text (`SETTINGS_HELP_TEXT`) and
-  `settings_help_label()`, the label with a help icon, which `home.py` also
-  uses for controls outside the panel. Importing it registers the Mantine
+  `settings_help_label()`, the label with a help icon, which the hosting
+  pages also use for controls outside the panel. Two of the help texts have a
+  second wording for the Run History page, under keys ending in
+  `-run-history`: the Follow switch's, and the Score threshold percentage's,
+  which `chart_options_panel()` takes as an argument. Importing it registers the Mantine
   figure templates (`dmc.add_figure_templates()`), which
   `plot_service.apply_light_dark_mode` and `generated_point_color` look up
   by name.
@@ -670,6 +753,22 @@ flowchart LR
   `select_playlist` takes the store as a second `Input` so that the renderer
   cannot drop its first call
   ([decision log](decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
+  There is a second registration, for a page where a link or a followed run
+  that names a scenario the filter does not list clears the filter:
+  `register_scenario_selection_clearing_filter()` registers `select_playlist`
+  and, in place of `apply_deep_link`, `reach_scenario`. That callback takes
+  the page's run summary store as a second `Input` and its Follow switch and
+  both dropdowns as `State`, and it is the only writer of either dropdown's
+  value. Both outputs are plain on purpose: Dash holds a dependent callback
+  back for a plain output and not for an `allow_duplicate` one, and the
+  scenario list must not be built for the filter as it was. In this
+  registration `select_playlist` takes the run summary store as a third
+  `Input`, so the list is read again when a run lands: a run can be the
+  first of its scenario, which the list drawn before it lacks, and the
+  dropdown cannot name a scenario its list does not hold. The Run History
+  page uses this registration and the Scenario Performance page the first.
+  The module also holds `SELECT_HIGHLIGHT_ON_OPEN_CLASS`, the class both
+  pages put on their dropdowns' inputs.
 - `components/queued_notices.py` — the two flushes that bring a queued
   notice to the screen: `flush_run_import_failures` and
   `flush_startup_playlist_warnings`. Each drains one queue on the server
@@ -711,6 +810,32 @@ flowchart LR
   `components/chart_options.py`. What the block shows is specified in
   [scenario_performance.md](specs/scenario_performance.md) and
   [scenario_rank.md](specs/scenario_rank.md).
+- `components/setup_surfaces.py` — the setup card and the stats-folder hint,
+  as layout builders with no callback. `stats_dir_hint()` takes the id the
+  hosting page gives the panel. `setup_card_children()` takes
+  `offer_account`: the Scenario Performance page passes `True` and answers
+  the Skip button, `SETUP_CARD_SKIP_ID`, with a callback of its own, and the
+  Run History page passes `False` and gets the two caution states alone.
+- `components/run_delivery.py` — what a page's batch consumer works out.
+  `summarize_run_events()` turns one batch of the shell's into the page's
+  summary, a `RunEventsPayload`: the latest run on the scenario the page
+  should show, which is the one just played while it follows, and the
+  shell's celebration decision. `run_events_were_triggered()` tells a call
+  that a new summary triggered from one that only read the summary the store
+  replays.
+- `components/run_verdict_toast.py` — the toast a page builds for a run that
+  landed on its scenario: `build_run_event_notification()`, which applies
+  the master switch, the yield to the celebration, and the liveness stamp,
+  and `build_live_run_notification()`, which words the threshold verdict and
+  the top-N placement. Every such toast shares `RUN_VERDICT_CHANNEL`.
+- `components/run_history_chart.py` — what the Run History chart plots, with
+  no component ids: the three modes, the range options in runs and in days,
+  the empty-state copy, and `build_run_history_figure()`. That function
+  reads a scenario's runs in play order, judges the new PBs over all of
+  them, applies the range the mode counts in, and hands the runs to one of
+  `plot_service`'s three builders. A range of N days starts at the midnight
+  N minus 1 days before the app's own date
+  (`first_moment_of_day_range()`).
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -735,6 +860,9 @@ flowchart LR
   `get_runs_newest_first` hands
   a scenario's runs to the time-scored lookup
   ([decision log](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
+  `get_runs_in_play_order` hands them to the Run History chart, oldest
+  first, in the order play sessions are split in, which settles two runs
+  that ended in the same second where the store keeps them as loaded.
   `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
   runs in time order, and `get_new_high_score_runs` applies it to everything
   the scenario holds, never to a filtered view
@@ -848,14 +976,17 @@ flowchart LR
   for its group comparison
   ([decision log](decision_log/2026/2026-10-06-benchmark-scenario-tables-group-scenarios-by-category-and-subcategory.md)).
 - `play_sessions.py` — groups runs into play sessions and scenario visits,
-  the code's words for a session and a visit. Three pure functions over a
+  the code's words for a session and a visit. Pure functions over a
   list of runs, which never read the run store and hold no clock:
   `split_into_play_sessions` sorts the runs and splits them at a break longer
   than `PLAY_SESSION_BREAK_LIMIT`, `find_play_session_in_progress` takes
   every play session and the current time, and `split_into_scenario_visits`
   splits one play session. `PlaySession` and `ScenarioVisit` are frozen
-  tuples of runs with a start and an end, and nothing is stored. Nothing
-  calls the functions yet: the Run History page is the first planned caller.
+  tuples of runs with a start and an end, and nothing is stored.
+  `in_play_order` is that sort by itself, which the Run History chart also
+  asks for, through `data_service.get_runs_in_play_order`. Nothing calls the
+  other three yet: the Run History page's run list is their first planned
+  caller.
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
@@ -866,7 +997,16 @@ flowchart LR
 ### Plotting
 - `plot/plot_service.py` — pure figure builders (`generate_sensitivity_plot`,
   `generate_time_plot`, `generate_aim_training_journey_plot`, overlays, light/dark
-  theming). No I/O.
+  theming). No I/O. The Run History chart has three builders of its own
+  beside the first two: `generate_score_vs_run_plot`,
+  `generate_score_vs_time_plot`, and `generate_score_vs_sensitivity_plot`.
+  Each plots every run it is given as one point, titles the figure with the
+  scenario's name alone, and draws no Average score line. Score vs Run puts a
+  run at its number in the scenario's whole history on a numeric axis and
+  writes the axis ticks itself, a date at the first plotted run of each day,
+  thinned for an assumed plot width since the server does not know the real
+  one. The star trace and the legend's layout have one definition, which
+  both pages' builders use.
 
 ### Infrastructure
 - `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its
@@ -982,7 +1122,8 @@ flowchart LR
   `window.dashMantineFunctions` when a prop is passed as
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
-- `assets/homeGraphResize.js` — keeps the Scenario Performance graph drawn at
+- `assets/homeGraphResize.js` — keeps the Scenario Performance graph, and the
+  Run History page's, drawn at
   its container's size. Plotly only redraws a responsive graph on window
   `resize` events, but this graph's box changes without one: its height is
   flex-driven by the controls above it, and the chart options inspector beside
@@ -992,8 +1133,11 @@ flowchart LR
   `window.Plotly.Plots.resize` on the plot div. The `window.Plotly` guard is
   load-bearing: dcc injects plotly.js lazily, so until the first graph renders
   there is nothing to resize.
-- `assets/homeGraphZoomFit.js` — refits the Scenario Performance graph's
-  score axis to the runs in view when the x axis is zoomed. It listens on
+- `assets/homeGraphZoomFit.js` — refits the score axis of the Scenario
+  Performance graph, and of the Run History page's, to the runs in view when
+  the x axis is zoomed. It reads the x axis through plotly.js's own
+  converters, so it serves a category axis, a date axis, and the numeric
+  axis of Score vs Run alike. It listens on
   each `.home-graph` plot div for `plotly_relayout` events that carry an x
   range and, while x is zoomed, for `plotly_restyle` events that change trace
   visibility. It fits visible trace points only, never the overlay shapes. The
@@ -1017,7 +1161,8 @@ flowchart LR
   a searchable dropdown opens, highlighted so it can be copied, where dmc's
   `clearSearchOnFocus` would empty the field. It acts on any input carrying
   the `select-highlight-on-open` class (`SELECT_HIGHLIGHT_ON_OPEN_CLASS` in
-  `pages/home.py`, on both Scenario Performance dropdowns). Document-level
+  `components/scenario_selection.py`, on both dropdowns of the Scenario
+  Performance page and of the Run History page). Document-level
   listeners catch the focus, the press, the edit, and the arrow key that open
   a list, since Mantine reports none of them to Dash, and Mantine's
   `data-expanded` attribute tells an open list from a closed one
@@ -1037,7 +1182,8 @@ flowchart LR
 | To change... | Start in |
 | --- | --- |
 | What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
-| The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `pages/home.py` callbacks + `my_queue/message_queue.py` |
+| The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `pages/home.py` callbacks + `my_queue/message_queue.py`; `components/run_delivery.py` for the summary a page makes of a batch; `pages/run_history.py` for that page's own three callbacks |
+| The Run History page: its layout, its ids, or what its chart plots | `pages/run_history.py` for the layout, the ids, and the page's callbacks; `components/run_history_chart.py` for the modes, the ranges, and which runs are plotted; `plot/plot_service.py` for the three figure builders; `assets/stylesheet.css` for the columns and the two stacking rules; the design is in `docs/proposals/run_history_proposal.md` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | What a session or a visit is, or how a run's start and length are read | `kovaaks/play_sessions.py` for the session limit and the three pure functions; `kovaaks/data_service.py` (`_run_start_and_length`) for the two fields; the rules are in `docs/specs/sessions.md` |
 | How a time-scored scenario is recognized, or the pace math | `kovaaks/performance_file.py` for the file reader and the countdown check; `kovaaks/time_scored_service.py` for which file decides and which scores are eligible; `kovaaks/pace.py` for the formulas; the rules are in `docs/specs/scenario_performance.md` |
@@ -1048,11 +1194,12 @@ flowchart LR
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`); `playlist_filter_options()` in `components/scenario_selection.py` for the hidden playlist the Scenario Performance filter holds |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | A benchmark's categories and subcategories on that table | `kovaaks/evxl_snapshot.py` for the read of `resources/evxl/benchmarks.json`; `kovaaks/scenario_groups.py` for the join and the exclusion list; `kovaaks/data_service.py` (`get_scenario_groups`) for the side table; `pages/playlist_scenarios.py` for the columns, the grouped state, and the merged-cell workaround; `scripts/benchmark_importer/script.py` (`find_group_crossings`) for the comparison with KovaaK's categories; the rules are in `docs/specs/playlists.md` |
-| The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/home.py`) for the component ids |
-| What `?scenario=` and `?playlist_code=` select, what the two dropdowns list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the layout helpers; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/home.py`) for the component ids |
+| The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/home.py` and in `pages/run_history.py`) for the component ids |
+| What `?scenario=` and `?playlist_code=` select, what the two dropdowns list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the layout helpers, `reach_scenario` there for the page that clears a filter in the way of a scenario; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/home.py` and in `pages/run_history.py`) for the component ids |
 | How a failed run import or a startup playlist warning reaches the screen | `components/queued_notices.py` for the two flushes; `my_watchdog/file_watchdog.py` and `kovaaks/data_service.py` for the queues; the hosting page for the interval each flush is registered on |
-| The Scenario Stats block, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the block and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/home.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
-| How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `pages/home.py` for the run toast builders and the chart callback that call it |
+| The Scenario Stats block, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the block and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/home.py` and in `pages/run_history.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
+| How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `components/run_verdict_toast.py` for the run toast builders, and each chart page's `generate_graph`, which call it |
+| The setup card or the stats-folder hint | `components/setup_surfaces.py` for both builders and their copy; `pages/home.py` for the Skip callback and its toasts; each hosting page's layout for which states it asks for |
 | The Columns menu, or which columns a playlist table can hide | `components/columns_menu.py` for the control and its callback; each page's `MENU_COLUMNS` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |

@@ -279,6 +279,147 @@
     }
 }
 
+/* The Run History page fills the viewport below the AppShell header, as the
+   Scenario Performance page does, so the chart takes whatever height the rows
+   above it leave. It is also the box its own column rule measures. The
+   AppShell navbar is fixed-position and 225px wide, so it narrows the page
+   without touching the viewport, and a media query would keep two columns in
+   a page too narrow for them. */
+.run-history-page {
+    container: run-history-page / inline-size;
+    display: flex;
+    flex-direction: column;
+    height: calc(
+        100dvh
+        - var(--app-shell-header-offset, 0rem)
+        - 2 * var(--app-shell-padding, 0rem)
+    );
+}
+
+/* The two dropdowns, the Scenario Stats block, and the latest-run card's
+   slot. It wraps on its own width, so it needs no breakpoint: each dropdown
+   joins the line at 200px and grows back toward 400px with the room left
+   over. Spaced off the chart with a margin and not a gap on the page, because
+   the page's column also holds the setup card's container, which is empty on
+   a configured install and would still be given a gap. */
+.run-history-top-row {
+    align-items: flex-start;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-sm);
+    margin-bottom: var(--mantine-spacing-md);
+}
+
+/* The room the latest-run card will take: the rest of the row, at one height
+   in every state so the chart under it never jumps. Empty until the card
+   ships, and reserved now so the chart is laid out in the page it will sit
+   in. */
+.run-history-card-slot {
+    flex: 1 1 380px;
+    min-height: 132px;
+    min-width: min(380px, 100%);
+}
+
+/* The chart beside the run list. The list's column is as wide as its seven
+   columns need, and the chart takes the rest. */
+.run-history-columns {
+    display: grid;
+    flex: 1 1 0;
+    gap: var(--mantine-spacing-md);
+    grid-template-columns: minmax(0, 1fr) 500px;
+    min-height: 0;
+}
+
+/* min-width: 0 because a grid item's automatic minimum is its content, and
+   the chart's header would otherwise hold the track wider than its share. */
+.run-history-chart-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mantine-spacing-sm);
+    min-height: 0;
+    min-width: 0;
+}
+
+/* The chart mode, the range, and the Chart options button. They wrap onto a
+   second line while the open panel leaves the chart too narrow for one. */
+.run-history-chart-header {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+/* The range select the chart's mode does not use. Hidden, not removed: both
+   selects are remembered and both feed the chart callback, and a control
+   taken out of the layout does neither. */
+.run-history-range-field-hidden {
+    display: none;
+}
+
+/* The chart and its options panel share this area, as on the Scenario
+   Performance page, and the row inside it is that page's .home-chart-row. The
+   area is a container of its own because the panel stacks at a different
+   width here: this chart's area is the page less the run list, so the other
+   page's threshold would stack the panel in almost every window. */
+.run-history-chart-area {
+    /* Matches dmc.AppShell's own transitionDuration, so opening the panel and
+       collapsing the navbar move the chart at the same speed. */
+    --chart-options-collapse-duration: 200ms;
+
+    container: run-history-chart-area / inline-size;
+    display: grid;
+    flex: 1 1 0;
+    min-height: 20rem;
+}
+
+.run-history-list-column {
+    min-height: 0;
+    min-width: 0;
+}
+
+/* Below 48em of room for the chart and its panel together, a 20rem panel
+   leaves too little chart to read, so the panel stacks above the graph. The
+   declarations are the Scenario Performance page's own stacking rule, under
+   this page's container and threshold. */
+@container run-history-chart-area (max-width: 48em) {
+    .home-chart-row {
+        --chart-options-collapse-duration: 0s;
+
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .chart-options-panel {
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--mantine-spacing-xl);
+        order: -1;
+        width: auto;
+    }
+}
+
+/* At 900px of page or less the run list no longer fits beside the chart, so
+   it goes above it and the page scrolls. The chart's column stops shrinking
+   there: it would otherwise give all its height to the list. */
+@container run-history-page (max-width: 900px) {
+    .run-history-columns {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .run-history-chart-column {
+        flex: 1 0 auto;
+    }
+
+    .run-history-list-column {
+        order: -1;
+    }
+}
+
 /* The alert anatomy for inline notices built on ``dmc.Paper`` instead of
    ``dmc.Alert``, most of them because they hold a link or a button that must
    not sit inside ``role="alert"``. These classes carry the look: the tint, a

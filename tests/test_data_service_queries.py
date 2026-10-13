@@ -47,6 +47,65 @@ def test_get_runs_newest_first_is_empty_for_an_unknown_scenario(load_runs):
     assert data_service.get_runs_newest_first("Never Played") == []
 
 
+def test_get_runs_in_play_order_returns_a_copy_oldest_first(load_runs):
+    first = _run(100, START)
+    second = _run(300, START + timedelta(days=1))
+    third = _run(200, START + timedelta(days=2))
+    load_runs(second, third, first)
+
+    runs = data_service.get_runs_in_play_order(SCENARIO_NAME)
+
+    assert runs == [first, second, third]
+    runs.clear()
+    assert len(data_service.get_runs_in_play_order(SCENARIO_NAME)) == 3
+
+
+@pytest.mark.parametrize("stored_first", ["began_first", "began_second"])
+def test_get_runs_in_play_order_settles_two_runs_that_ended_in_one_second(
+    load_runs, stored_first
+):
+    """The store keeps such a pair as it was loaded. Play order does not.
+
+    ``get_runs_newest_first`` orders by end time alone, so it returns the
+    pair either way round, depending on which file was read first.
+    """
+    began_first = RunData(
+        datetime_object=START,
+        score=100,
+        sens_scale="cm/360",
+        horizontal_sens=40.0,
+        scenario=SCENARIO_NAME,
+        accuracy=0.5,
+        run_start=START - timedelta(seconds=90),
+        run_length=timedelta(seconds=90),
+    )
+    began_second = RunData(
+        datetime_object=START,
+        score=200,
+        sens_scale="cm/360",
+        horizontal_sens=40.0,
+        scenario=SCENARIO_NAME,
+        accuracy=0.5,
+        run_start=START - timedelta(seconds=30),
+        run_length=timedelta(seconds=30),
+    )
+    if stored_first == "began_first":
+        load_runs(began_first, began_second)
+    else:
+        load_runs(began_second, began_first)
+
+    assert data_service.get_runs_in_play_order(SCENARIO_NAME) == [
+        began_first,
+        began_second,
+    ]
+
+
+def test_get_runs_in_play_order_is_empty_for_an_unknown_scenario(load_runs):
+    load_runs()
+
+    assert data_service.get_runs_in_play_order("Never Played") == []
+
+
 def _playlist(code: str, *scenarios: Scenario) -> PlaylistData:
     return PlaylistData(name=f"{code} playlist", code=code, scenarios=list(scenarios))
 

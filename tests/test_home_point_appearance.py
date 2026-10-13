@@ -389,7 +389,9 @@ def test_appearance_preferences_never_reach_the_expensive_graph_callback():
     inputs = {
         key: {entry["id"] for entry in spec["inputs"]}
         for key, spec in GLOBAL_CALLBACK_MAP.items()
-        if "cached-plot.data" in key or key == "graph-content.figure"
+        # Anchored at the start: the Run History page's own store id ends the
+        # same way.
+        if key.startswith("..cached-plot.data...") or key == "graph-content.figure"
     }
 
     figure_inputs = inputs.pop("graph-content.figure")
