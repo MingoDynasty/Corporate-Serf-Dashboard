@@ -924,7 +924,7 @@ For the implementation PR:
   no Notifications group.
 - **What is gone.** The tests for the verdict and placement toasts are
   removed. The tests for the judging functions move with those functions.
-- **The channel.** `tests/test_run_verdict_lifetime.py` stays as the
+- **The channel.** `tests/test_home_run_verdict_lifetime.py` stays as the
   guard on replace-in-place behavior, which does not change.
 - **In a browser, with a scratch stats folder.** A run dropped while the
   Playlists page is open shows the toast, and its link opens Run History on
