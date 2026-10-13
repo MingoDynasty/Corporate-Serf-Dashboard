@@ -402,7 +402,9 @@ def nav_link(label: str, href: str, icon: str) -> dmc.NavLink:
     return dmc.NavLink(
         label=label,
         leftSection=dmc.ThemeIcon(
-            local_icon(icon, height=36),
+            # Both sizes, so a file that is wider than tall is scaled to fit
+            # the box. Sized by its height alone it hangs out of both sides.
+            local_icon(icon, width=36, height=36),
             size="lg",
             variant="outline",
         ),

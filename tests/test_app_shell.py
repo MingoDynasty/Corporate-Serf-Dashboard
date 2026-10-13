@@ -119,6 +119,34 @@ def test_navbar_links_to_every_navigable_page():
     ]
 
 
+def test_every_navbar_icon_is_drawn_in_the_same_square():
+    """Hold a file that is wider than tall to the box the square ones fill.
+
+    Run History's icon is 32 by 24. Sized by its height alone it was drawn 48
+    px wide in a 34 px box, and hung out of both sides of it.
+    """
+    shell = app_shell.layout()
+
+    sizes = {
+        link.label: (
+            link.leftSection.children.style["width"],
+            link.leftSection.children.style["height"],
+        )
+        for link in _walk_components(shell)
+        if isinstance(link, dmc.NavLink)
+    }
+
+    assert sizes == dict.fromkeys(
+        ["Home", "Run History", "Playlists", "Settings"], (36, 36)
+    )
+
+
+def test_a_navbar_icon_keeps_its_shape_inside_its_square():
+    link = app_shell.nav_link("Run History", "/run-history", "fontisto:line-chart")
+
+    assert "center / contain" in link.leftSection.children.style["mask"]
+
+
 def test_navbar_defaults_to_open_on_a_first_run():
     shell = app_shell.layout()
 
