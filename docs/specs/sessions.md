@@ -4,8 +4,9 @@ The app groups a player's runs into sessions: the runs separated by breaks of
 no more than 30 minutes. To measure a break it works out when each run began
 and how long it took, from two lines of the run's stats file. Inside a
 session it also finds each visit, the consecutive runs on one scenario. No
-screen shows any of this yet, and the Run History page is what will be built
-on it.
+screen shows any of this yet: the Run History page will be the first, and so
+far its chart, built but not yet public, only plots runs in the order
+sessions put them in.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in
