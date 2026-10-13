@@ -13,6 +13,7 @@ from source.utilities.utilities import (
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
+    format_whole_percent,
     ordinal,
 )
 
@@ -119,6 +120,22 @@ def test_format_elapsed_duration_counts_whole_minutes(
     seconds: float, expected: str
 ) -> None:
     assert format_elapsed_duration(seconds) == expected
+
+
+@pytest.mark.parametrize(
+    ("fraction", "expected"),
+    [
+        (0.0, "0%"),
+        (0.544, "54%"),
+        # A half rounds up, where ``round`` would send these two to 54 and 56.
+        (0.545, "55%"),
+        (0.555, "56%"),
+        (0.999, "100%"),
+        (1.0, "100%"),
+    ],
+)
+def test_format_whole_percent_rounds_a_half_up(fraction: float, expected: str) -> None:
+    assert format_whole_percent(fraction) == expected
 
 
 @pytest.mark.parametrize(

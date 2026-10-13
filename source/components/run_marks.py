@@ -18,15 +18,10 @@ from source.components.score_threshold import (
     ThresholdVerdict,
     Unjudged,
     judge_run,
-    normalize_score_threshold_percentage,
 )
 from source.kovaaks.data_models import RunData
-from source.kovaaks.data_service import get_runs_in_play_order, new_high_score_runs
-from source.kovaaks.time_scored_service import (
-    PaceBasis,
-    eligible_pace_constant,
-    get_version_pace_basis,
-)
+from source.kovaaks.data_service import new_high_score_runs
+from source.kovaaks.time_scored_service import PaceBasis, eligible_pace_constant
 
 
 class Chased(NamedTuple):
@@ -133,20 +128,3 @@ def mark_runs(
         )
         for run, chased in what_runs_chased(runs, version_pace_basis).items()
     }
-
-
-def mark_scenario_runs(
-    scenario_name: str,
-    score_threshold_percentage: float | str | None,
-) -> dict[RunData, RunMark]:
-    """Mark every run the run store holds for one scenario.
-
-    ``score_threshold_percentage`` is the percentage field's value as the
-    browser sends it, which is an empty string once the field is cleared.
-    Empty for a scenario with no runs.
-    """
-    return mark_runs(
-        get_runs_in_play_order(scenario_name),
-        normalize_score_threshold_percentage(score_threshold_percentage),
-        lambda version: get_version_pace_basis(scenario_name, version),
-    )

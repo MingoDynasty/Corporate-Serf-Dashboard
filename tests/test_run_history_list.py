@@ -636,6 +636,7 @@ def test_a_run_row_formats_each_value_for_its_column():
         "id": f"r:{run_id(run)}",
         "kind": "run",
         "sid": model["rows"][0]["id"],
+        "latest": True,
         "n": 2,
         "time": "9:47 PM",
         "score": "3,324.5",
@@ -844,3 +845,45 @@ def test_the_model_carries_the_limit_it_was_loaded_up_to():
     assert _build(runs)["session_limit"] == SESSIONS_PER_LOAD
     assert _build(runs, limit=60)["session_limit"] == 60
     assert build_run_list([], A, 90, EVENING, {})["session_limit"] == SESSIONS_PER_LOAD
+
+
+# --- The row of the last run played --------------------------------------------
+
+
+def _latest_rows(model) -> list[str]:
+    return [row["id"] for row in _of_kind(model, "run") if row["latest"]]
+
+
+def test_the_row_of_the_last_run_played_is_the_one_marked_latest():
+    runs = [
+        *_minutes(0, 5, start=EVENING - timedelta(days=1)),
+        *_minutes(0, 5, 10),
+    ]
+
+    model = _build(runs)
+
+    assert _latest_rows(model) == [f"r:{run_id(runs[-1])}"]
+    assert _latest_rows(model) == [f"r:{model['newest_run']}"]
+    assert len(_of_kind(model, "run")) == 5
+
+
+def test_no_row_is_marked_latest_while_another_scenario_was_the_last_played():
+    """The last run played is then not in the list at all."""
+    runs = [*_minutes(0, 5), *_minutes(10, scenario=B)]
+
+    model = _build(runs)
+
+    assert model["newest_run"] == run_id(runs[-1])
+    assert _latest_rows(model) == []
+    assert _latest_rows(_build(runs, B)) == [f"r:{run_id(runs[-1])}"]
+
+
+def test_a_run_that_lands_takes_the_mark_from_the_run_before_it():
+    runs = _minutes(0, 5)
+    landed = _run(A, EVENING + timedelta(minutes=9))
+
+    before = _build(runs)
+    after = _build([*runs, landed])
+
+    assert _latest_rows(before) == [f"r:{run_id(runs[-1])}"]
+    assert _latest_rows(after) == [f"r:{run_id(landed)}"]

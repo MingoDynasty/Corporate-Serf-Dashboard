@@ -2,6 +2,7 @@
 
 The page shows one scenario's runs: a chart of every run in a range, with
 the Chart options panel beside it, and a list of the runs grouped by session.
+A card in its top row reports the last run played, on whatever scenario.
 It is built beside the Scenario Performance page and replaces it when it
 goes public. Until then it is served at its own address with no navbar entry
 and nothing linking to it.
@@ -39,6 +40,12 @@ from source.components.chart_options import (
     chart_options_toggle,
     register_chart_options,
     settings_help_label,
+)
+from source.components.latest_run_card import (
+    LatestRunCardIds,
+    latest_run_card,
+    latest_run_card_content,
+    latest_run_from_store,
 )
 from source.components.queued_notices import (
     register_run_import_failure_flush,
@@ -137,6 +144,11 @@ RUN_LANDED_STORE_ID = "run-history-run-landed"
 # when the answer changes, and the run list takes it as an input, which is
 # what takes "In progress" off a session nothing more is played in.
 SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
+# The id of the newest run in the run store, on whatever scenario. The card
+# writes it with what it shows, only when it is another run than the one
+# held. The graph takes it as an input: a figure rings its own scenario's
+# newest run, and the ring shows while this names the same run.
+LATEST_RUN_STORE_ID = "run-history-latest-run"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -185,6 +197,11 @@ RUN_LIST_IDS = RunListIds(
     session_limit="run-history-list-session-limit",
     apply_sink="run-history-list-apply-sink",
     expand_all_sink="run-history-list-expand-all-sink",
+)
+LATEST_RUN_CARD_IDS = LatestRunCardIds(
+    heading="run-history-card-heading",
+    scenario_button="run-history-card-scenario-button",
+    body="run-history-card-body",
 )
 SCENARIO_STATS_IDS = ScenarioStatsIds(
     last_played="run-history-last-played",
@@ -384,6 +401,54 @@ def build_run_list_rows(  # noqa: PLR0913
 
 
 @callback(
+    Output(LATEST_RUN_CARD_IDS.heading, "children"),
+    Output(LATEST_RUN_CARD_IDS.scenario_button, "children"),
+    Output(LATEST_RUN_CARD_IDS.scenario_button, "value"),
+    Output(LATEST_RUN_CARD_IDS.scenario_button, "aria-label"),
+    Output(LATEST_RUN_CARD_IDS.body, "children"),
+    Output(LATEST_RUN_STORE_ID, "data"),
+    # Any run, on any scenario: the card reports the last run played. It is
+    # still worked out from the run store and never from the batch.
+    Input(RUN_LANDED_STORE_ID, "data"),
+    # The run's scenario is a button only while another one is selected.
+    Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
+    # The percentage decides the badge of a run that is not a new PB.
+    Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
+    # The next two are read for nothing but their change. The run's time is a
+    # time of day only on the day it was played, and "this session" becomes
+    # "last session" with no run landing.
+    Input(TODAY_STORE_ID, "data"),
+    Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
+    State(LATEST_RUN_STORE_ID, "data"),
+)
+def show_latest_run(  # noqa: PLR0913
+    _run_landed,
+    selected_scenario,
+    score_threshold_percentage,
+    _held_date,
+    _held_in_progress,
+    held_latest_run,
+):
+    """Write what the latest-run card shows, from the run store.
+
+    The page load runs it, so the card is right with no new run. It takes
+    the scenario dropdown and the session store, both written by callbacks a
+    run that lands also calls, so it waits for them and writes the card once
+    per batch, for the scenario the page ends up on.
+
+    The last output is the run's id, written only when it is another run
+    than the one held. The graph takes that store as an input, so writing
+    the same id again would restyle a chart that nothing had changed.
+    """
+    shown = latest_run_from_store(score_threshold_percentage, datetime.now())
+    latest_run_id = None if shown is None else shown.run_id
+    return (
+        *latest_run_card_content(shown, selected_scenario),
+        no_update if latest_run_id == held_latest_run else latest_run_id,
+    )
+
+
+@callback(
     Output(CHART_OPTIONS_IDS.cached_plot, "data"),
     # ``allow_duplicate``: the Scenario Performance page's chart callback
     # writes the same three shell-hosted props, and Dash allows one plain
@@ -529,7 +594,7 @@ clientside_callback(
     Input(CHART_MODE_ID, "value"),
 )
 
-register_chart_options(CHART_OPTIONS_IDS)
+register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
 register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
 register_scenario_selection_clearing_filter(
@@ -537,6 +602,7 @@ register_scenario_selection_clearing_filter(
     run_events=RUN_EVENTS_STORE_ID,
     follow_switch=FOLLOW_SWITCH_ID,
     run_landed=RUN_LANDED_STORE_ID,
+    scenario_button=LATEST_RUN_CARD_IDS.scenario_button,
 )
 
 
@@ -566,7 +632,7 @@ def _range_select(
 
 
 def _top_row(playlist_code: str | None) -> dmc.Box:
-    """Build the row above the chart: both dropdowns, the stats, the card's slot."""
+    """Build the row above the chart: both dropdowns, the stats, the latest-run card."""
     return dmc.Box(
         className="run-history-top-row",
         children=[
@@ -641,10 +707,10 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                 **DROPDOWN_FIELD_SIZING,
             ),
             scenario_stats_panel(SCENARIO_STATS_IDS),
-            # Reserved for the latest-run card, at the size planned for it,
-            # so the chart under this row is measured in the layout it will
-            # ship in.
-            dmc.Box(className="run-history-card-slot"),
+            dmc.Box(
+                latest_run_card(LATEST_RUN_CARD_IDS),
+                className="run-history-card-slot",
+            ),
         ],
     )
 
@@ -752,6 +818,7 @@ def layout(
             # find no date held, write one, and rebuild a chart just drawn.
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
             dcc.Store(id=RUN_LANDED_STORE_ID),
+            dcc.Store(id=LATEST_RUN_STORE_ID),
             # Drawn with the answer already in it, for the reason the date
             # is: the first tick would otherwise write it and rebuild a list
             # just drawn.

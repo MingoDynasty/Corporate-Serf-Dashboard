@@ -62,6 +62,19 @@ _NEW_PB_OUTLINE_COLOR = "#5f3d00"
 NEW_PB_SIZE_DEFAULT_PX = 12
 NEW_PB_SIZE_PRESET_PX = {"Small": 9, "Large": 16}
 
+# The trace that rings one run on a Run History figure: the scenario's newest
+# run, which is ringed while it is also the last run played on any scenario.
+# The name is the handle the ring is shown, hidden, and sized by. It is never
+# a legend entry.
+LATEST_RUN_TRACE_NAME = "Latest run"
+# The app's blue, darker on the light plot background and lighter on the
+# dark one, so the ring stands off both.
+_LATEST_RUN_RING_COLORS = {"light": "#1c7ed6", "dark": "#74c0fc"}
+# Wide enough to clear a New PB star at the same preset, so a ringed new PB
+# shows both.
+LATEST_RUN_RING_SIZE_DEFAULT_PX = 18
+LATEST_RUN_RING_SIZE_PRESET_PX = {"Small": 14, "Large": 22}
+
 # The run points' sensitivity hover line, shared by both chart modes so they
 # can't drift apart. ``customdata[3]`` is empty for a run that wasn't converted,
 # so the line then ends at the sensitivity itself.
@@ -320,6 +333,68 @@ def _new_pb_trace(
     )
 
 
+def _latest_run_ring_trace(
+    x_value: float | str | datetime,
+    score: float,
+    run_id: str,
+) -> go.Scatter:
+    """Build the ring drawn round one run's point, tagged with that run's id.
+
+    ``show_latest_run_ring`` decides whether it shows, by the id in ``meta``.
+    """
+    return go.Scatter(
+        x=[x_value],
+        y=[score],
+        mode="markers",
+        name=LATEST_RUN_TRACE_NAME,
+        meta=run_id,
+        # The ring says nothing a legend entry or a hover could add: the run
+        # point inside it already answers a hover.
+        showlegend=False,
+        hoverinfo="skip",
+        marker={
+            "symbol": "circle-open",
+            "size": LATEST_RUN_RING_SIZE_DEFAULT_PX,
+            "color": _LATEST_RUN_RING_COLORS["light"],
+            "line": {"width": 2},
+        },
+    )
+
+
+def latest_run_ring_opacity(ringed_run_id: object, latest_run_id: str | None) -> int:
+    """Return the ring's opacity: shown only round the last run played.
+
+    The ring is hidden by its opacity and never by ``visible``. plotly.js
+    leaves a trace that is not visible out of its axis ranges, and the ring
+    is wider than a run point, so hiding it that way would move every point
+    on an axis the ring had been padding.
+    """
+    return 1 if latest_run_id is not None and ringed_run_id == latest_run_id else 0
+
+
+def show_latest_run_ring(
+    figure: go.Figure,
+    latest_run_id: str | None,
+    color_scheme: str,
+) -> go.Figure:
+    """Show a figure's ring if it is round the last run played, in place.
+
+    A Run History figure rings its scenario's newest run. ``latest_run_id``
+    is the id of the newest run on any scenario, so the two match only while
+    the figure's scenario is the one last played. A figure with no ring, as
+    when the newest run is outside the range, is left as it is.
+    """
+    color = _LATEST_RUN_RING_COLORS.get(color_scheme, _LATEST_RUN_RING_COLORS["light"])
+    figure.for_each_trace(
+        lambda trace: trace.update(
+            opacity=latest_run_ring_opacity(trace.meta, latest_run_id),
+            marker={"color": color},
+        ),
+        selector={"name": LATEST_RUN_TRACE_NAME},
+    )
+    return figure
+
+
 def _generate_xy_plot(  # noqa: PLR0913
     scenario_data: dict[_K, list[RunData]],
     scenario_name: str,
@@ -554,6 +629,8 @@ def _generate_run_history_plot(  # noqa: PLR0913
     rank_data: list[Rank],
     show_all_ranks: bool,
     new_high_score_runs: Collection[RunData],
+    ringed_run: RunData | None = None,
+    ringed_run_id: str = "",
 ) -> go.Figure:
     """Build a Run History figure: one point per run, at the x value given for it.
 
@@ -561,6 +638,9 @@ def _generate_run_history_plot(  # noqa: PLR0913
     order. Each run in ``new_high_score_runs`` that is plotted gets a star,
     in a trace that exists only when there is one to draw. The title is the
     scenario's name alone, and no trace sums the runs up.
+
+    ``ringed_run`` gets a ring when it is plotted, tagged ``ringed_run_id``,
+    in a trace of its own that comes last so the ring is drawn over a star.
     """
     scores = [run.score for run in runs]
     figure = go.Figure(
@@ -599,6 +679,18 @@ def _generate_run_history_plot(  # noqa: PLR0913
                 [x_value for x_value, _score in starred],
                 [score for _x_value, score in starred],
             )
+        )
+    ringed_at = next(
+        (
+            x_value
+            for x_value, run in zip(x_values, runs, strict=True)
+            if run == ringed_run
+        ),
+        None,
+    )
+    if ringed_run is not None and ringed_at is not None:
+        figure.add_trace(
+            _latest_run_ring_trace(ringed_at, ringed_run.score, ringed_run_id)
         )
     logger.debug('Generating plot for: "%s"', scenario_name)
     figure.update_layout(
@@ -665,6 +757,8 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
     show_all_ranks: bool,
     new_high_score_runs: Collection[RunData],
     today: date,
+    ringed_run: RunData | None = None,
+    ringed_run_id: str = "",
 ) -> go.Figure:
     """Build the Score vs Run figure: the runs given, evenly spaced, in their order.
 
@@ -692,6 +786,8 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
         rank_data,
         show_all_ranks,
         new_high_score_runs,
+        ringed_run,
+        ringed_run_id,
     )
 
 
@@ -702,6 +798,8 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
     rank_data: list[Rank],
     show_all_ranks: bool,
     new_high_score_runs: Collection[RunData],
+    ringed_run: RunData | None = None,
+    ringed_run_id: str = "",
 ) -> go.Figure:
     """Build the Score vs Time figure: each run given, at the time it ended.
 
@@ -722,15 +820,19 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
         rank_data,
         show_all_ranks,
         new_high_score_runs,
+        ringed_run,
+        ringed_run_id,
     )
 
 
-def generate_score_vs_sensitivity_plot(
+def generate_score_vs_sensitivity_plot(  # noqa: PLR0913
     runs: Sequence[RunData],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
     show_all_ranks: bool,
+    ringed_run: RunData | None = None,
+    ringed_run_id: str = "",
 ) -> go.Figure:
     """Build the Score vs Sensitivity figure: each run given, at its sensitivity.
 
@@ -748,6 +850,8 @@ def generate_score_vs_sensitivity_plot(
         rank_data,
         show_all_ranks,
         new_high_score_runs=(),
+        ringed_run=ringed_run,
+        ringed_run_id=ringed_run_id,
     )
 
 
@@ -790,12 +894,12 @@ def apply_point_appearance(
 
     ``point_size`` is a value from ``POINT_SIZE_OPTIONS`` and ``point_color``
     a hex color string. Both restyle the raw-run trace, and the size also
-    sizes the New PB stars, which keep their own fill and outline whatever
-    the color. Runs after the theme template, so an explicit color wins over
-    the colorway the template just applied. Everything unrecognized falls
-    through to the generated appearance: the Default size, an empty or
-    malformed color, a figure whose traces are the empty state's (none), and
-    a figure from a version that named its traces differently.
+    sizes the New PB stars and the latest run's ring, which keep their own
+    colors whatever the color. Runs after the theme template, so an explicit
+    color wins over the colorway the template just applied. Everything
+    unrecognized falls through to the generated appearance: the Default size,
+    an empty or malformed color, a figure whose traces are the empty state's
+    (none), and a figure from a version that named its traces differently.
     """
     marker: dict[str, int | str] = {}
     size = POINT_SIZE_PRESET_PX.get(point_size or "")
@@ -813,6 +917,11 @@ def apply_point_appearance(
     if new_pb_size is not None:
         figure.update_traces(
             marker={"size": new_pb_size}, selector={"name": NEW_PB_TRACE_NAME}
+        )
+    ring_size = LATEST_RUN_RING_SIZE_PRESET_PX.get(point_size or "")
+    if ring_size is not None:
+        figure.update_traces(
+            marker={"size": ring_size}, selector={"name": LATEST_RUN_TRACE_NAME}
         )
     return figure
 

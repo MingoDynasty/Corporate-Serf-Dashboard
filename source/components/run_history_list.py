@@ -15,7 +15,6 @@ run and the row it opens, and the script applies that once per run.
 """
 
 import json
-import math
 from collections.abc import Iterable, Mapping
 from datetime import date, datetime
 from typing import Any, NamedTuple, TypedDict
@@ -53,6 +52,7 @@ from source.utilities.utilities import (
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
+    format_whole_percent,
 )
 
 # How many sessions the list loads at first, and how many more each press of
@@ -146,15 +146,6 @@ def _count(count: int, noun: str) -> str:
     return f"{count:,} {noun}" if count == 1 else f"{count:,} {noun}s"
 
 
-def _whole_percent(fraction: float) -> str:
-    """Format an accuracy to the whole percent, a half rounding up.
-
-    Not ``round``, which sends a half to the even number: 54.5 would read
-    54% and 55.5 would read 56%.
-    """
-    return f"{math.floor(fraction * 100 + 0.5)}%"
-
-
 def _check_text(mark: RunMark) -> str:
     """Word a run's verdict, or the reason it has none."""
     if isinstance(mark.verdict, ThresholdVerdict):
@@ -162,29 +153,38 @@ def _check_text(mark: RunMark) -> str:
     return UNJUDGED_TEXT[mark.verdict]
 
 
-def _run_row(run: RunData, number: int, session_id: str, mark: RunMark) -> dict:
+def _run_row(
+    run: RunData,
+    number: int,
+    session_id: str,
+    mark: RunMark,
+    newest_run: str,
+) -> dict:
     return {
         "id": f"r:{run_id(run)}",
         "kind": RUN_ROW,
         "sid": session_id,
+        # The last run played, on any scenario: the row the list highlights.
+        "latest": run_id(run) == newest_run,
         "n": number,
         "time": format_time_of_day(run.datetime_object),
         "score": format_score(run.score),
         "passed": mark.passed,
         "check_text": _check_text(mark),
         "new_pb": mark.is_new_pb,
-        "accuracy": _whole_percent(run.accuracy),
+        "accuracy": format_whole_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "sens": f"{run.horizontal_sens} {run.sens_scale}",
     }
 
 
-def _session_child_rows(
+def _session_child_rows(  # noqa: PLR0913
     session: PlaySession,
     scenario: str,
     session_id: str,
     today: date,
     marks: Mapping[RunData, RunMark],
+    newest_run: str,
 ) -> list[dict]:
     """Build the rows under one session row, in the order the list shows them.
 
@@ -252,7 +252,7 @@ def _session_child_rows(
                     "text": format_short_date(ended_on, today),
                 }
             )
-        rows.append(_run_row(run, index + 1, session_id, marks[run]))
+        rows.append(_run_row(run, index + 1, session_id, marks[run], newest_run))
     return rows
 
 
@@ -285,6 +285,7 @@ def build_run_list(
         return empty_run_list(NO_RUNS_TEXT)
 
     newest_session = sessions[-1]
+    newest_run = run_id(newest_session.runs[-1])
     in_progress = find_play_session_in_progress(sessions, now) is not None
     today = now.date()
     listed = [
@@ -316,7 +317,9 @@ def build_run_list(
                 "counts": f"{played:,} of {_count(len(session.runs), 'run')}",
             }
         )
-        rows.extend(_session_child_rows(session, scenario, session_id, today, marks))
+        rows.extend(
+            _session_child_rows(session, scenario, session_id, today, marks, newest_run)
+        )
     if len(listed) > session_limit:
         rows.append(
             {
@@ -332,7 +335,7 @@ def build_run_list(
     )
     return {
         "rows": rows,
-        "newest_run": run_id(newest_session.runs[-1]),
+        "newest_run": newest_run,
         "forced_open": [rows[0]["id"]],
         "session_limit": session_limit,
         "heading": f"{scenario} · {_count(scenario_run_count, 'run')}",
@@ -393,6 +396,7 @@ RUN_LIST_CLASS = "run-history-list"
 # its grid.
 RUN_LIST_NOTHING_CLASS = f"{RUN_LIST_CLASS} run-history-list-nothing"
 RUN_LIST_GRID_CLASS = "run-history-list-grid"
+LATEST_ROW_CLASS = "run-list-row-latest"
 
 # The two columns the Columns menu shows or hides. Both are shown to start,
 # and the browser remembers each choice under the checkbox's id.
@@ -552,6 +556,12 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                     "doesExternalFilterPass": {"function": "runListFilterPass(params)"},
                     "getRowHeight": {"function": "runListRowHeight(params)"},
                     "getRowClass": {"function": "runListRowClass(params)"},
+                    # The highlight of the last run played. A rule, and not
+                    # part of the row's class: the grid works a row's class
+                    # out once, when it draws the row, and a rule again each
+                    # time the row's data changes. The run that was the
+                    # latest stays in the list, and has to lose it.
+                    "rowClassRules": {LATEST_ROW_CLASS: "params.data.latest"},
                     # The grid would say "No Matching Rows" over a list whose
                     # one session is closed, and "No Rows To Show" before the
                     # first rows arrive.

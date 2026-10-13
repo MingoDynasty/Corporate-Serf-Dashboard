@@ -22,7 +22,11 @@ from source.components.run_history_chart import (
 )
 from source.kovaaks import data_service
 from source.kovaaks.data_models import Rank, RunData
-from source.plot.plot_service import NEW_PB_TRACE_NAME, RUN_DATA_POINT_TRACE_NAME
+from source.plot.plot_service import (
+    LATEST_RUN_TRACE_NAME,
+    NEW_PB_TRACE_NAME,
+    RUN_DATA_POINT_TRACE_NAME,
+)
 
 SCENARIO = "1w4ts"
 TODAY = date(2026, 10, 12)
@@ -310,7 +314,10 @@ def test_score_vs_sensitivity_has_no_stars(load_runs) -> None:
     figure, _supports_overlays = _figure(SCORE_VS_SENSITIVITY)
 
     assert _stars(figure) == []
-    assert [trace.name for trace in figure.data] == [RUN_DATA_POINT_TRACE_NAME]
+    assert [trace.name for trace in figure.data] == [
+        RUN_DATA_POINT_TRACE_NAME,
+        LATEST_RUN_TRACE_NAME,
+    ]
 
 
 def test_a_chart_with_no_new_pb_in_range_has_no_star_trace(load_runs) -> None:
@@ -320,7 +327,10 @@ def test_a_chart_with_no_new_pb_in_range_has_no_star_trace(load_runs) -> None:
 
     figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range="50")
 
-    assert [trace.name for trace in figure.data] == [RUN_DATA_POINT_TRACE_NAME]
+    assert [trace.name for trace in figure.data] == [
+        RUN_DATA_POINT_TRACE_NAME,
+        LATEST_RUN_TRACE_NAME,
+    ]
 
 
 @pytest.mark.parametrize("stored_first", ["began_first", "began_second"])
@@ -443,3 +453,82 @@ def test_the_mode_and_range_options_read_as_the_copy_block_words_them() -> None:
         "Last 12 months",
         "All time",
     ]
+
+
+# --- The ring round the scenario's newest run ---------------------------------
+
+
+def _ring(figure):
+    return next(
+        (trace for trace in figure.data if trace.name == LATEST_RUN_TRACE_NAME), None
+    )
+
+
+def test_each_mode_rings_the_scenarios_newest_run_tagged_with_its_id(load_runs) -> None:
+    """The id is how the page tells whether that run is the last one played."""
+    runs = [
+        _run(100.0, MIDNIGHT_TODAY - timedelta(days=2), sens=30.0, file_name="a.csv"),
+        _run(120.0, MIDNIGHT_TODAY - timedelta(days=1), sens=40.0, file_name="b.csv"),
+        _run(110.0, MIDNIGHT_TODAY, sens=30.0, file_name="c.csv"),
+    ]
+    load_runs(*runs)
+
+    by_run, _ = _figure(SCORE_VS_RUN)
+    by_time, _ = _figure(SCORE_VS_TIME)
+    by_sensitivity, _ = _figure(SCORE_VS_SENSITIVITY)
+
+    assert (list(_ring(by_run).x), list(_ring(by_run).y)) == ([3], [110.0])
+    assert list(_ring(by_time).x) == [MIDNIGHT_TODAY]
+    assert list(_ring(by_sensitivity).x) == ["30.0 cm/360"]
+    for figure in (by_run, by_time, by_sensitivity):
+        assert _ring(figure).meta == "c.csv"
+        assert list(_ring(figure).y) == [110.0]
+
+
+@pytest.mark.parametrize("run_range", ["50", "100", "200", "all"])
+def test_a_range_in_runs_always_holds_the_run_it_rings(load_runs, run_range) -> None:
+    load_runs(*_daily_runs(260))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range=run_range)
+
+    assert (list(_ring(figure).x), list(_ring(figure).y)) == ([260], [260.0])
+
+
+@DAY_MODES
+def test_a_newest_run_the_range_leaves_out_is_not_ringed(load_runs, mode) -> None:
+    """The chart then has no run of the scenario to draw at all."""
+    load_runs(
+        *[
+            _run(100.0 + day, MIDNIGHT_TODAY - timedelta(days=20 + day))
+            for day in range(3)
+        ]
+    )
+
+    in_range, _ = _figure(mode, day_range="30")
+    out_of_range, supports_overlays = _figure(mode, day_range="7")
+
+    assert _ring(in_range) is not None
+    assert _ring(out_of_range) is None
+    assert supports_overlays is False
+
+
+@pytest.mark.parametrize("stored_first", ["began_first", "began_second"])
+def test_of_two_runs_that_ended_in_one_second_the_later_played_is_ringed(
+    load_runs, stored_first
+) -> None:
+    """The order the sessions are split in settles it, as it does for the list."""
+    began_first = _run(500.0, MIDNIGHT_TODAY, seconds=90, file_name="first.csv")
+    began_second = _run(400.0, MIDNIGHT_TODAY, seconds=30, file_name="second.csv")
+    pair = (
+        [began_first, began_second]
+        if stored_first == "began_first"
+        else [began_second, began_first]
+    )
+    load_runs(
+        _run(100.0, MIDNIGHT_TODAY - timedelta(days=1), file_name="old.csv"), *pair
+    )
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+
+    assert _ring(figure).meta == "second.csv"
+    assert (list(_ring(figure).x), list(_ring(figure).y)) == ([3], [400.0])

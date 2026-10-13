@@ -19,7 +19,7 @@ the filter is cleared and the scenario is selected.
 from typing import NamedTuple
 
 import dash_mantine_components as dmc
-from dash import Input, NoUpdate, Output, State, callback, no_update
+from dash import Input, NoUpdate, Output, State, callback, ctx, no_update
 
 from source.config.settings_service import get_usable_stats_dir
 from source.kovaaks.data_service import (
@@ -257,11 +257,11 @@ def reach_scenario(
     selected and moves nothing. The switch is still read here, so that a
     selection the user changes while a batch is on its way is not undone.
 
-    This is the one callback that writes either dropdown's value. A second
-    writer would need ``allow_duplicate``, and Dash does not hold a callback
-    back for an output written that way: the scenario list could then be
-    built for the filter as it was, land after the scenario was selected, and
-    drop it.
+    One callback writes either dropdown's value, and this is what it runs for
+    a link and for a run. A second writer would need ``allow_duplicate``, and
+    Dash does not hold a callback back for an output written that way: the
+    scenario list could then be built for the filter as it was, land after
+    the scenario was selected, and drop it.
     """
     playlist: str | None | NoUpdate
     scenario: str | None | NoUpdate
@@ -283,6 +283,57 @@ def reach_scenario(
         if _filter_leaves_out(held_playlist, scenario):
             playlist = None
     return playlist, scenario
+
+
+def _button_was_clicked(triggered: list[dict]) -> bool:
+    """Tell whether a click on the page's scenario button is what called.
+
+    ``triggered`` is ``ctx.triggered``. The button is the callback's one
+    ``n_clicks`` input. Its count is read as well, because a call that
+    nothing triggered names no input, and a button just drawn has no clicks.
+    """
+    return any(
+        trigger["prop_id"].endswith(".n_clicks") and trigger["value"]
+        for trigger in triggered
+    )
+
+
+def reach_scenario_or_the_one_asked_for(  # noqa: PLR0913
+    selection,
+    run_events,
+    _button_clicks,
+    follow_newly_played,
+    selected_playlist,
+    selected_scenario,
+    asked_scenario,
+):
+    """Select the scenario a link, a new run, or the page's scenario button names.
+
+    The button is a third way to reach a scenario, beside the two
+    ``reach_scenario`` takes: its ``value`` names a scenario, and a click
+    selects it, clearing a playlist filter that does not list it. The button
+    comes here, and writes neither dropdown itself, because this is the one
+    callback that writes either value.
+
+    Which of the three called is read from what triggered the call, never
+    from the values. The summary store replays its last batch to every later
+    call, so on a click ``run_events`` can still hold a run from minutes ago,
+    and ``reach_scenario`` would follow that run and not the click.
+    """
+    if not _button_was_clicked(ctx.triggered):
+        return reach_scenario(
+            selection,
+            run_events,
+            follow_newly_played,
+            selected_playlist,
+            selected_scenario,
+        )
+    if not asked_scenario or asked_scenario == selected_scenario:
+        return no_update, no_update
+    return (
+        None if _filter_leaves_out(selected_playlist, asked_scenario) else no_update,
+        asked_scenario,
+    )
 
 
 def _register_select_playlist(
@@ -359,6 +410,7 @@ def register_scenario_selection_clearing_filter(
     run_events: str,
     follow_switch: str,
     run_landed: str,
+    scenario_button: str,
 ) -> None:
     """Register the block for a page that clears a filter in the way of a scenario.
 
@@ -374,6 +426,11 @@ def register_scenario_selection_clearing_filter(
     summary cannot do that alone: it is written only for a batch the page
     shows, so a first run landing while Follow is off would leave its
     scenario out of the list until the filter next changed.
+
+    ``scenario_button`` is the id of a button on the page whose ``value``
+    names a scenario and whose click selects it. The page keeps the button in
+    its layout at all times: the selection callback's outputs are always
+    there, so each of its inputs has to be too.
     """
     _register_select_playlist(ids, run_landed)
     callback(
@@ -381,7 +438,9 @@ def register_scenario_selection_clearing_filter(
         Output(ids.scenario_dropdown, "value"),
         Input(ids.deep_link, "data"),
         Input(run_events, "data"),
+        Input(scenario_button, "n_clicks"),
         State(follow_switch, "checked"),
         State(ids.playlist_filter, "value"),
         State(ids.scenario_dropdown, "value"),
-    )(reach_scenario)
+        State(scenario_button, "value"),
+    )(reach_scenario_or_the_one_asked_for)

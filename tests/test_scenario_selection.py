@@ -8,6 +8,8 @@ that keeps the scenario list from going unwritten on a visit with no query
 parameters.
 """
 
+from types import SimpleNamespace
+
 import dash
 import dash_mantine_components as dmc
 import pytest
@@ -645,6 +647,106 @@ def test_a_landed_run_is_not_answered_by_applying_the_link_again(played):
     ) == (None, OUTSIDE)
 
 
+def _called_by(monkeypatch, *prop_ids: str, value=1) -> None:
+    """Say which inputs triggered the call, as Dash reports them."""
+    triggered = [{"prop_id": prop_id, "value": value} for prop_id in prop_ids]
+    monkeypatch.setattr(
+        scenario_selection,
+        "ctx",
+        # A call nothing triggered reports one item that names no input.
+        SimpleNamespace(triggered=triggered or [{"prop_id": ".", "value": None}]),
+    )
+
+
+BUTTON_CLICKED = "page-scenario-button.n_clicks"
+
+
+@pytest.mark.parametrize(
+    ("asked", "held_filter", "selected", "expected"),
+    [
+        # The filter does not list the scenario asked for: it is cleared.
+        (OUTSIDE, ALPHA_CODE, LISTED, (None, OUTSIDE)),
+        # It lists it, or there is no filter: only the scenario moves.
+        (LISTED, ALPHA_CODE, OUTSIDE, (no_update, LISTED)),
+        (OUTSIDE, None, LISTED, (no_update, OUTSIDE)),
+        (OUTSIDE, "KovaaKsGoneCode", LISTED, (no_update, OUTSIDE)),
+        (OUTSIDE, ALPHA_CODE, None, (None, OUTSIDE)),
+        # Already selected, or the button names nothing: nothing to write.
+        (LISTED, ALPHA_CODE, LISTED, (no_update, no_update)),
+        (None, ALPHA_CODE, LISTED, (no_update, no_update)),
+        ("", ALPHA_CODE, LISTED, (no_update, no_update)),
+    ],
+)
+def test_the_scenario_button_selects_its_scenario_and_clears_a_filter_in_its_way(
+    monkeypatch, played, asked, held_filter, selected, expected
+):
+    _called_by(monkeypatch, BUTTON_CLICKED)
+
+    assert (
+        scenario_selection.reach_scenario_or_the_one_asked_for(
+            {}, None, 1, True, held_filter, selected, asked
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize("follow_newly_played", [True, False])
+def test_a_click_is_answered_and_not_the_run_summary_still_in_its_store(
+    monkeypatch, played, follow_newly_played
+):
+    """The summary store replays its last batch to every later call.
+
+    Read from the values, a click made after a run landed would be taken for
+    that run: with Follow on the page would go back to the scenario last
+    played, and with Follow off the click would do nothing.
+    """
+    _called_by(monkeypatch, BUTTON_CLICKED)
+
+    assert scenario_selection.reach_scenario_or_the_one_asked_for(
+        {"scenario": LISTED},
+        _landed_on(LISTED),
+        1,
+        follow_newly_played,
+        ALPHA_CODE,
+        LISTED,
+        OUTSIDE,
+    ) == (None, OUTSIDE)
+
+
+def test_a_run_that_lands_after_a_click_is_followed_as_before(monkeypatch, played):
+    """The button's count stays above zero, and is not what called."""
+    _called_by(monkeypatch, "page-run-events.data")
+
+    assert scenario_selection.reach_scenario_or_the_one_asked_for(
+        {}, _landed_on(OUTSIDE), 3, True, ALPHA_CODE, LISTED, NEVER_PLAYED
+    ) == (None, OUTSIDE)
+    assert scenario_selection.reach_scenario_or_the_one_asked_for(
+        {}, _landed_on(OUTSIDE), 3, False, ALPHA_CODE, LISTED, NEVER_PLAYED
+    ) == (no_update, no_update)
+
+
+def test_the_page_load_applies_the_link_and_not_a_button_nobody_clicked(
+    monkeypatch, played
+):
+    _called_by(monkeypatch)
+
+    assert scenario_selection.reach_scenario_or_the_one_asked_for(
+        {"scenario": OUTSIDE}, None, 0, True, ALPHA_CODE, LISTED, NEVER_PLAYED
+    ) == (None, OUTSIDE)
+    assert scenario_selection.reach_scenario_or_the_one_asked_for(
+        {}, None, 0, True, ALPHA_CODE, LISTED, NEVER_PLAYED
+    ) == (no_update, no_update)
+
+
+def test_a_button_that_reports_no_clicks_is_not_a_click(monkeypatch, played):
+    """A button just drawn calls with a count of nothing."""
+    _called_by(monkeypatch, BUTTON_CLICKED, value=0)
+
+    assert scenario_selection.reach_scenario_or_the_one_asked_for(
+        {}, None, 0, True, ALPHA_CODE, LISTED, OUTSIDE
+    ) == (no_update, no_update)
+
+
 def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
     restored_callbacks,
 ):
@@ -655,12 +757,13 @@ def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
         run_events="second-run_events",
         follow_switch="second-follow_switch",
         run_landed="second-run_landed",
+        scenario_button="second-scenario_button",
     )
 
     assert GLOBAL_CALLBACK_LIST[: len(registered_before)] == registered_before
     select_playlist, reach_scenario = GLOBAL_CALLBACK_LIST[len(registered_before) :]
     assert _answering(select_playlist) == "select_playlist"
-    assert _answering(reach_scenario) == "reach_scenario"
+    assert _answering(reach_scenario) == "reach_scenario_or_the_one_asked_for"
     # Plain outputs, both: a callback is held back for a plain output and not
     # for a duplicate one, and the scenario list must wait for the filter.
     assert reach_scenario["output"] == (
@@ -669,11 +772,13 @@ def test_the_clearing_registration_adds_callbacks_for_its_own_ids_only(
     assert _input_keys(reach_scenario) == {
         "second-deep_link.data",
         "second-run_events.data",
+        "second-scenario_button.n_clicks",
     }
     assert [f"{dep['id']}.{dep['property']}" for dep in reach_scenario["state"]] == [
         "second-follow_switch.checked",
         "second-playlist_filter.value",
         "second-scenario_dropdown.value",
+        "second-scenario_button.value",
     ]
     assert reach_scenario["prevent_initial_call"] is False
     # The scenario list keeps the Input nothing writes, for the same reason

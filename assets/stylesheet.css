@@ -311,14 +311,121 @@
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* The room the latest-run card will take: the rest of the row, at one height
-   in every state so the chart under it never jumps. Empty until the card
-   ships, and reserved now so the chart is laid out in the page it will sit
-   in. */
+/* The room the latest-run card takes: the rest of the row, at one height in
+   every state so the chart under it never jumps. */
 .run-history-card-slot {
     flex: 1 1 380px;
     min-height: 132px;
     min-width: min(380px, 100%);
+}
+
+/* The latest-run card. Its height is fixed, and not a minimum, at the slot's
+   own: its second line can take two lines in a narrow card, and a card that
+   grew for it would move the chart. The lines are centered in that height,
+   and the tallest state, with the second line on two lines, still fits. */
+.run-history-card {
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 132px;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0 var(--mantine-spacing-sm);
+}
+
+/* "Latest run", the run's time, and its scenario, on one line. A long
+   scenario name is the part that is cut short. */
+.run-history-card-heading {
+    color: var(--mantine-color-dimmed);
+    display: flex;
+    font-size: 12px;
+    line-height: 18px;
+    min-width: 0;
+}
+
+/* Not a box of its own: the label and the name inside it are laid out as the
+   heading's own items, beside the scenario button. */
+.run-history-card-heading-text {
+    display: contents;
+}
+
+/* Kept whole, with the space it ends on: a flex container drops a space
+   between two items, and the label would run into the name. */
+.run-history-card-label {
+    flex: 0 0 auto;
+    white-space: pre;
+}
+
+.run-history-card-scenario {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The scenario's name while another scenario is selected: a button, since it
+   changes what the page shows and goes nowhere, drawn as the app draws a
+   link. With no name to show it is out of the page, and out of the tab
+   order with it. */
+.run-history-card-scenario-button {
+    background: none;
+    border: 0;
+    color: var(--mantine-color-anchor);
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-align: left;
+}
+
+.run-history-card-scenario-button:hover {
+    text-decoration: underline;
+}
+
+.run-history-card-scenario-button:empty {
+    display: none;
+}
+
+/* Not a box of its own either, so the heading and the lines under it are
+   spaced by the card's one gap. */
+.run-history-card-body {
+    display: contents;
+}
+
+.run-history-card-score-row {
+    align-items: center;
+    display: flex;
+    gap: var(--mantine-spacing-sm);
+}
+
+.run-history-card-score {
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 33px;
+}
+
+.run-history-card-result {
+    font-size: 13px;
+    line-height: 19px;
+}
+
+.run-history-card-session {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+/* With no run in the store: a title over one sentence, as the chart's empty
+   states have them. */
+.run-history-card-empty-title {
+    font-weight: 600;
+}
+
+.run-history-card-empty-message {
+    color: var(--mantine-color-dimmed);
+    font-size: 13px;
 }
 
 /* The chart beside the run list. The list's column is as wide as its seven
@@ -480,6 +587,13 @@
 
 .run-history-list-grid .ag-row.run-list-row-session {
     border-top: 1px solid var(--ag-border-color);
+}
+
+/* The last run played, while its scenario is the one shown: the run the
+   latest-run card reports and the chart rings. */
+.run-history-list-grid .ag-row.run-list-row-latest {
+    background-color: var(--mantine-color-blue-light);
+    font-weight: 600;
 }
 
 /* The current session, held under the column headings while the list

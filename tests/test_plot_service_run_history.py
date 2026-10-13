@@ -14,6 +14,10 @@ import pytest
 from source.kovaaks.data_models import Rank, RecordedSensitivity, RunData
 from source.plot import plot_service
 from source.plot.plot_service import (
+    LATEST_RUN_RING_SIZE_DEFAULT_PX,
+    LATEST_RUN_RING_SIZE_PRESET_PX,
+    LATEST_RUN_TRACE_NAME,
+    NEW_PB_SIZE_DEFAULT_PX,
     NEW_PB_SIZE_PRESET_PX,
     NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
@@ -22,6 +26,8 @@ from source.plot.plot_service import (
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
     generate_score_vs_time_plot,
+    latest_run_ring_opacity,
+    show_latest_run_ring,
 )
 
 SCENARIO = "1w4ts"
@@ -404,3 +410,176 @@ def test_score_vs_sensitivity_plots_every_run_at_its_sensitivity() -> None:
     assert list(points.x) == ["30.0 cm/360", "30.0 cm/360", "40.8 cm/360"]
     assert list(points.y) == [100.0, 105.0, 120.0]
     assert figure.layout.xaxis.title.text == "Sensitivity"
+
+
+# --- The ring round the latest run -------------------------------------------
+
+
+def _ring(figure):
+    """Return the figure's ring trace, or None when it has none."""
+    return next(
+        (trace for trace in figure.data if trace.name == LATEST_RUN_TRACE_NAME), None
+    )
+
+
+def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
+    runs = [
+        _run(100.0, NOON, sens=30.0),
+        _run(120.0, NOON + timedelta(minutes=1), sens=40.8),
+        _run(110.0, NOON + timedelta(minutes=2), sens=30.0),
+    ]
+    ringed = runs[1]
+
+    by_run = generate_score_vs_run_plot(
+        runs, 5, SCENARIO, True, [], False, (), TODAY, ringed, "ringed.csv"
+    )
+    by_time = generate_score_vs_time_plot(
+        runs, SCENARIO, True, [], False, (), ringed, "ringed.csv"
+    )
+    by_sensitivity = generate_score_vs_sensitivity_plot(
+        runs, SCENARIO, True, [], False, ringed, "ringed.csv"
+    )
+
+    assert (list(_ring(by_run).x), list(_ring(by_run).y)) == ([6], [120.0])
+    assert list(_ring(by_time).x) == [ringed.datetime_object]
+    assert list(_ring(by_time).y) == [120.0]
+    assert list(_ring(by_sensitivity).x) == ["40.8 cm/360"]
+    assert list(_ring(by_sensitivity).y) == [120.0]
+    for figure in (by_run, by_time, by_sensitivity):
+        assert _ring(figure).meta == "ringed.csv"
+
+
+def test_the_ring_has_no_legend_entry_and_no_hover_of_its_own() -> None:
+    runs = _three_runs()
+
+    ring = _ring(
+        generate_score_vs_run_plot(
+            runs, 1, SCENARIO, True, [], False, (), TODAY, runs[-1], "newest.csv"
+        )
+    )
+
+    assert ring.showlegend is False
+    assert ring.hoverinfo == "skip"
+    assert ring.mode == "markers"
+    assert ring.marker.symbol == "circle-open"
+    # Wider than the star, so a ringed new PB shows both.
+    assert ring.marker.size == LATEST_RUN_RING_SIZE_DEFAULT_PX
+    assert LATEST_RUN_RING_SIZE_DEFAULT_PX > NEW_PB_SIZE_DEFAULT_PX
+
+
+def test_the_ring_is_drawn_last_so_it_sits_over_a_star() -> None:
+    runs = _three_runs()
+
+    figure = generate_score_vs_run_plot(
+        runs, 1, SCENARIO, True, [], False, {runs[-1]}, TODAY, runs[-1], "newest.csv"
+    )
+
+    assert [trace.name for trace in figure.data] == [
+        RUN_DATA_POINT_TRACE_NAME,
+        NEW_PB_TRACE_NAME,
+        LATEST_RUN_TRACE_NAME,
+    ]
+
+
+def test_a_run_that_is_not_plotted_gets_no_ring() -> None:
+    """As when the range leaves the scenario's newest run out."""
+    runs = _three_runs()
+    outside = _run(999.0, NOON + timedelta(days=30))
+
+    figure = generate_score_vs_run_plot(
+        runs, 1, SCENARIO, True, [], False, (), TODAY, outside, "outside.csv"
+    )
+
+    assert _ring(figure) is None
+    assert _ring(_score_vs_run(runs)) is None
+    assert _ring(_score_vs_time(runs)) is None
+    assert _ring(_score_vs_sensitivity(runs)) is None
+
+
+def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
+    """Matched on the run, as a star is: the ring takes that run's own score."""
+    first = _run(100.0, NOON)
+    second = _run(100.0, NOON, accuracy=0.9)
+
+    figure = generate_score_vs_run_plot(
+        [first, second], 1, SCENARIO, True, [], False, (), TODAY, second, "second.csv"
+    )
+
+    assert list(_ring(figure).x) == [2]
+
+
+@pytest.mark.parametrize(
+    ("ringed", "latest", "opacity"),
+    [
+        ("a.csv", "a.csv", 1),
+        # Another scenario's run is the last one played.
+        ("a.csv", "b.csv", 0),
+        # An empty run store names no run.
+        ("a.csv", None, 0),
+        (None, None, 0),
+    ],
+)
+def test_the_ring_shows_only_round_the_last_run_played(ringed, latest, opacity) -> None:
+    assert latest_run_ring_opacity(ringed, latest) == opacity
+
+
+@pytest.mark.parametrize(
+    ("color_scheme", "color"),
+    [("light", "#1c7ed6"), ("dark", "#74c0fc"), ("unknown", "#1c7ed6")],
+)
+def test_the_ring_is_shown_in_the_schemes_blue_and_hidden_by_its_opacity(
+    color_scheme, color
+) -> None:
+    """Never by ``visible``, which would take the ring out of the axis ranges."""
+    runs = _three_runs()
+    figure = generate_score_vs_run_plot(
+        runs, 1, SCENARIO, True, [], False, (), TODAY, runs[-1], "newest.csv"
+    )
+
+    shown = show_latest_run_ring(figure, "newest.csv", color_scheme)
+
+    assert shown is figure
+    assert (_ring(figure).opacity, _ring(figure).marker.color) == (1, color)
+    assert _ring(figure).visible is None
+
+    show_latest_run_ring(figure, "another.csv", color_scheme)
+
+    assert _ring(figure).opacity == 0
+    assert _ring(figure).visible is None
+
+
+def test_showing_the_ring_leaves_a_figure_with_no_ring_as_it_is() -> None:
+    figure = _score_vs_run(_three_runs())
+    before = figure.to_json()
+
+    show_latest_run_ring(figure, "newest.csv", "light")
+
+    assert figure.to_json() == before
+
+
+@pytest.mark.parametrize("point_size", ["Small", "Large"])
+def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
+    runs = _three_runs()
+    figure = generate_score_vs_run_plot(
+        runs, 1, SCENARIO, True, [], False, {runs[-1]}, TODAY, runs[-1], "newest.csv"
+    )
+
+    apply_point_appearance(figure, point_size, "#ff0000")
+
+    assert _ring(figure).marker.size == LATEST_RUN_RING_SIZE_PRESET_PX[point_size]
+    assert (
+        LATEST_RUN_RING_SIZE_PRESET_PX[point_size] > NEW_PB_SIZE_PRESET_PX[point_size]
+    )
+    # The point color is the run points' alone.
+    assert _ring(figure).marker.color == "#1c7ed6"
+
+
+def test_the_default_point_size_leaves_the_rings_own() -> None:
+    runs = _three_runs()
+    figure = generate_score_vs_run_plot(
+        runs, 1, SCENARIO, True, [], False, (), TODAY, runs[-1], "newest.csv"
+    )
+
+    apply_point_appearance(figure, "Default", "")
+
+    assert _ring(figure).marker.size == LATEST_RUN_RING_SIZE_DEFAULT_PX
