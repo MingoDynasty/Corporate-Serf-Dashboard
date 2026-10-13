@@ -467,10 +467,20 @@ def test_the_number_counts_this_scenarios_runs_in_the_runs_own_session_only():
     )
 
 
-def test_a_first_run_of_under_a_minute_reads_less_than_a_minute():
-    runs = [_run(A, EVENING, length=timedelta(seconds=45))]
+@pytest.mark.parametrize(
+    ("seconds", "time"),
+    [
+        (15, "<1 min"),
+        (45, "1 min"),
+        # A run of 60 seconds measures a little under 60: its start is
+        # written to the millisecond and its end is a whole second.
+        (59.9, "1 min"),
+    ],
+)
+def test_the_time_on_a_scenario_rounds_to_the_nearest_minute(seconds, time):
+    runs = [_run(A, EVENING, length=timedelta(seconds=seconds))]
 
-    assert _shown(runs).session == "Run 1 this session · <1 min on this scenario"
+    assert _shown(runs).session == f"Run 1 this session · {time} on this scenario"
 
 
 @pytest.mark.parametrize(

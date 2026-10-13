@@ -191,14 +191,25 @@ def test_only_the_first_row_gives_its_length_and_can_be_in_progress():
         ((0, 25, 50, 75, 100, 125), "2 hr 6 min"),
     ],
 )
-def test_the_session_length_counts_whole_minutes(offsets, length):
+def test_the_session_length_is_given_in_minutes_and_hours(offsets, length):
     assert _build(_minutes(*offsets))["rows"][0]["length"] == length
 
 
-def test_a_session_of_one_short_run_is_under_a_minute():
-    run = _run(A, EVENING, length=timedelta(seconds=40))
+@pytest.mark.parametrize(
+    ("seconds", "length"),
+    [
+        (15, "<1 min"),
+        (29, "<1 min"),
+        (40, "1 min"),
+        # A run of 60 seconds measures a little under 60: its start is
+        # written to the millisecond and its end is a whole second.
+        (59.9, "1 min"),
+    ],
+)
+def test_a_session_of_one_short_run_rounds_to_the_nearest_minute(seconds, length):
+    run = _run(A, EVENING, length=timedelta(seconds=seconds))
 
-    assert _build([run])["rows"][0]["length"] == "<1 min"
+    assert _build([run])["rows"][0]["length"] == length
 
 
 # --- A session row's counts, and its runs --------------------------------------
