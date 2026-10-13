@@ -128,7 +128,7 @@ def playlist_filter_options(held_playlist: str | None) -> list[dict[str, str]]:
     ]
 
 
-def select_playlist(selected_playlist, _deep_link):
+def select_playlist(selected_playlist, _deep_link, _run_events=None):
     """List the selected playlist's scenarios, link to its table, and list the filter.
 
     With no playlist selected, or a remembered code that no longer resolves,
@@ -137,6 +137,11 @@ def select_playlist(selected_playlist, _deep_link):
     The filter's own options are written here because only this callback sees
     the value on every mount and every change. The layout sees a value the URL
     names and never one the browser restored.
+
+    ``_run_events`` is a page's summary of a batch of new runs, on a page
+    registered to follow a run to its scenario. It is read for nothing but
+    its change: the local list is read again, so it holds a scenario whose
+    first run has just landed.
     """
     options = playlist_filter_options(selected_playlist)
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
@@ -280,17 +285,16 @@ def reach_scenario(
     return playlist, scenario
 
 
-def _register_select_playlist(ids: ScenarioSelectionIds) -> None:
-    """Register ``select_playlist`` for one page's ids."""
-    callback(
-        Output(ids.scenario_dropdown, "data"),
-        Output(ids.playlist_table_link, "children"),
-        # The Select drops a value its new options lack, and the browser then
-        # stores the empty filter. So the list written here has to hold the
-        # playlist the filter holds: the visible list alone would clear a
-        # hidden selection for good. That drop is also what empties the filter
-        # of a remembered code no playlist has.
-        Output(ids.playlist_filter, "data"),
+def _register_select_playlist(
+    ids: ScenarioSelectionIds,
+    run_events: str | None = None,
+) -> None:
+    """Register ``select_playlist`` for one page's ids.
+
+    ``run_events`` is the id of the store a page's run delivery writes its
+    summary to. Only a page that follows a run to its scenario passes it.
+    """
+    inputs = [
         Input(ids.playlist_filter, "value"),
         # Scheduling, not data: this Input looks removable and is not. The value
         # above is an output of the callback that applies a visit's query
@@ -305,6 +309,27 @@ def _register_select_playlist(ids: ScenarioSelectionIds) -> None:
         # fails and the initial call survives. See the 2026-09-19 decision-log
         # entry.
         Input(ids.deep_link, "data"),
+    ]
+    if run_events is not None:
+        # A run can be the first of its scenario, which the list drawn before
+        # it lacks. ``reach_scenario`` then selects a scenario the dropdown
+        # cannot name, and a Select goes on showing the previous name for a
+        # value its options lack. With no filter to clear, nothing else would
+        # write the list again. The summary also triggers ``reach_scenario``,
+        # whose plain output is the filter's value, so Dash holds this call
+        # until the selection has moved and the list is never built for a
+        # filter about to be cleared.
+        inputs.append(Input(run_events, "data"))
+    callback(
+        Output(ids.scenario_dropdown, "data"),
+        Output(ids.playlist_table_link, "children"),
+        # The Select drops a value its new options lack, and the browser then
+        # stores the empty filter. So the list written here has to hold the
+        # playlist the filter holds: the visible list alone would clear a
+        # hidden selection for good. That drop is also what empties the filter
+        # of a remembered code no playlist has.
+        Output(ids.playlist_filter, "data"),
+        *inputs,
     )(select_playlist)
 
 
@@ -339,9 +364,10 @@ def register_scenario_selection_clearing_filter(
     ``run_events`` is the id of the store the page's run delivery writes its
     summary to, and ``follow_switch`` the id of its Follow switch. The page's
     run delivery must not write the scenario dropdown itself: ``reach_scenario``
-    does, from the summary.
+    does, from the summary. The same summary has the scenario list read
+    again, so that a scenario whose first run has just landed is in it.
     """
-    _register_select_playlist(ids)
+    _register_select_playlist(ids, run_events)
     callback(
         Output(ids.playlist_filter, "value"),
         Output(ids.scenario_dropdown, "value"),

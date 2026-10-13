@@ -12070,6 +12070,68 @@
     ]
   },
   {
+    "benchmarkName": "33 - Horizontal Collection by unnamed33",
+    "rankCalculation": "33",
+    "abbreviation": "S33",
+    "color": "#04fbeb",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-10-07",
+    "difficulties": [
+      {
+        "difficultyName": "Collection",
+        "kovaaksBenchmarkId": 3059,
+        "sharecode": "KovaaKsPeekingEggplantBfg",
+        "rankColors": {
+          "x": "#b5b5b5",
+          "Gold": "#fff70a",
+          "Platinum": "#00bfff",
+          "Diamond": "#0830f7",
+          "Clear": "#f80d0d",
+          "Extra": "#a510ea",
+          "Ultimate": "#000000"
+        },
+        "categories": [
+          {
+            "categoryName": "Horizontal",
+            "color": "#FF5733",
+            "subcategories": [
+              {
+                "subcategoryName": "Centering",
+                "scenarioCount": 3,
+                "color": "#FFC300"
+              },
+              {
+                "subcategoryName": "Ground",
+                "scenarioCount": 3,
+                "color": "#e11919"
+              },
+              {
+                "subcategoryName": "Long",
+                "scenarioCount": 3,
+                "color": "#243dbc"
+              },
+              {
+                "subcategoryName": "Suave",
+                "scenarioCount": 2,
+                "color": "#dd12f8"
+              },
+              {
+                "subcategoryName": "Gauntlet",
+                "scenarioCount": 2,
+                "color": "#05ecf0"
+              },
+              {
+                "subcategoryName": "Needle",
+                "scenarioCount": 2,
+                "color": "#63ed07"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "benchmarkName": "Ultimate Valorant Benchmark",
     "rankCalculation": "basic",
     "abbreviation": "UVB",
@@ -15887,54 +15949,46 @@
     "benchmarkName": "The Good Benchmark",
     "rankCalculation": "Good-Energy",
     "abbreviation": "TGB",
-    "color": "#f7b509",
+    "color": "#fad2b1",
     "spreadsheetURL": "",
-    "dateAdded": "2026-09-04",
-    "hidden": true,
-    "hiddenSlug": "tgb",
+    "dateAdded": "2026-09-27",
     "difficulties": [
       {
         "difficultyName": "Normal",
         "kovaaksBenchmarkId": 2923,
         "sharecode": "KovaaKsDeathballingGooshedDeathball",
         "rankColors": {
-          "Diamond": "#B9F2FF",
-          "Jade": "#85FA85",
-          "Master": "#cd30c1",
-          "Grandmaster": "#feeb01",
-          "Nova": "#6f1d89",
-          "Abendregen": "#0e00b9"
+          "Diamond": "#b9f2ff",
+          "Jade": "#b1fcb1",
+          "Master": "#db68d2",
+          "Grandmaster": "#fff57b",
+          "Nova": "#b855d9",
+          "Abendregen": "#2500d5"
         },
         "categories": [
           {
-            "categoryName": "Good Reactive",
-            "color": "#06004f",
+            "categoryName": "",
+            "color": "#ffffff",
             "subcategories": [
               {
                 "subcategoryName": "Good Ground",
                 "scenarioCount": 5,
-                "color": "#06004f"
+                "color": "#fe9295"
               },
               {
                 "subcategoryName": "Good Air",
                 "scenarioCount": 5,
-                "color": "#06004f"
-              }
-            ]
-          },
-          {
-            "categoryName": "Good Precise",
-            "color": "#06004f",
-            "subcategories": [
-              {
-                "subcategoryName": "Good Raw",
-                "scenarioCount": 5,
-                "color": "#06004f"
+                "color": "#9ff1ff"
               },
               {
-                "subcategoryName": "Good Precision",
+                "subcategoryName": "Good Smoothness",
                 "scenarioCount": 5,
-                "color": "#06004f"
+                "color": "#ffd2a6"
+              },
+              {
+                "subcategoryName": "Good Precise",
+                "scenarioCount": 5,
+                "color": "#d7b5fd"
               }
             ]
           }
@@ -15945,42 +15999,58 @@
         "kovaaksBenchmarkId": 2922,
         "sharecode": "KovaaKsDashingGoodHipfire",
         "rankColors": {
-          "Grandmaster": "#feeb01",
-          "Nova": "#6f1d89",
-          "Astra": "#c4065b",
-          "Celestial": "#56e4fe",
-          "Nocturne": "#020017"
+          "Grandmaster": "#fff57b",
+          "Nova": "#b855d9",
+          "Astra": "#fc69ab",
+          "Celestial": "#68e9ff",
+          "Nocturne": "#0e1323"
         },
         "categories": [
           {
-            "categoryName": "Good Reactive",
-            "color": "#06004f",
+            "categoryName": "",
+            "color": "#ffffff",
             "subcategories": [
               {
                 "subcategoryName": "Good Ground",
                 "scenarioCount": 5,
-                "color": "#06004f"
+                "color": "#fe9295"
               },
               {
                 "subcategoryName": "Good Air",
                 "scenarioCount": 5,
-                "color": "#06004f"
-              }
-            ]
-          },
-          {
-            "categoryName": "Good Precise",
-            "color": "#06004f",
-            "subcategories": [
-              {
-                "subcategoryName": "Good Raw",
-                "scenarioCount": 5,
-                "color": "#06004f"
+                "color": "#9ff1ff"
               },
               {
-                "subcategoryName": "Good Smooth",
+                "subcategoryName": "Good Smoothness",
                 "scenarioCount": 5,
-                "color": "#06004f"
+                "color": "#ffd2a6"
+              },
+              {
+                "subcategoryName": "Good Precise",
+                "scenarioCount": 5,
+                "color": "#d7b5fd"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Fundamentals",
+        "kovaaksBenchmarkId": 3017,
+        "sharecode": "KovaaKsGlidingCopperAutomatic",
+        "rankColors": {
+          "Bad": "#f90000",
+          "Good": "#1cfd02"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#cccccc",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 9,
+                "color": "#030303"
               }
             ]
           }
@@ -16208,87 +16278,57 @@
     "dateAdded": "2026-09-17",
     "difficulties": [
       {
-        "difficultyName": "Immersive",
+        "difficultyName": "Experienced",
         "kovaaksBenchmarkId": 2975,
         "sharecode": "KovaaKsWipingBraveGasmask",
         "rankColors": {
-          "Novice 3": "#FFFFFF",
-          "Novice 2": "#FFFFFF",
-          "Novice 1": "#FFFFFF",
-          "Platinum": "#737373",
-          "Diamond": "#00ecf0",
-          "Sapphire": "#0040ff",
-          "Jade": "#00bd1f"
+          "Platinum": "#ee00ff",
+          "Ascendant": "#0a5700",
+          "Immortal": "#700000",
+          "Radiant": "#bff45d"
         },
         "categories": [
           {
-            "categoryName": "Agility",
+            "categoryName": "Pure",
             "color": "#ff0000",
             "subcategories": [
               {
-                "subcategoryName": "",
-                "scenarioCount": 1,
+                "subcategoryName": "Agility",
+                "scenarioCount": 2,
                 "color": "#f95353"
               },
               {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#f95353"
+                "subcategoryName": "Precision",
+                "scenarioCount": 3,
+                "color": "#9f1d1d"
               }
             ]
           },
           {
-            "categoryName": "Precision",
-            "color": "#0040ff",
+            "categoryName": "Immersive",
+            "color": "#0011ff",
             "subcategories": [
               {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#8381fe"
+                "subcategoryName": "Micros",
+                "scenarioCount": 2,
+                "color": "#6d94ee"
               },
               {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#8381fe"
-              }
-            ]
-          },
-          {
-            "categoryName": "Micros",
-            "color": "#ffdd00",
-            "subcategories": [
-              {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#f66504"
+                "subcategoryName": "Blended",
+                "scenarioCount": 2,
+                "color": "#4f38ff"
               },
               {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#f66504"
-              }
-            ]
-          },
-          {
-            "categoryName": "Immersion",
-            "color": "#268000",
-            "subcategories": [
-              {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#52f047"
-              },
-              {
-                "subcategoryName": "",
-                "scenarioCount": 1,
-                "color": "#52f047"
+                "subcategoryName": "Pistols",
+                "scenarioCount": 2,
+                "color": "#0400ff"
               }
             ]
           }
         ]
       }
     ],
-    "lastUpdated": "2026-09-17"
+    "lastUpdated": "2026-10-01"
   },
   {
     "benchmarkName": "Intro to KovaaK's Benchmark",

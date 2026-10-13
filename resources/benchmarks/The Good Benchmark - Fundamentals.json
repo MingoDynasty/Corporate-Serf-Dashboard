@@ -1,0 +1,167 @@
+{
+  "name": "The Good Benchmark - Fundamentals",
+  "code": "KovaaKsGlidingCopperAutomatic",
+  "scenarios": [
+    {
+      "name": "gp 1sumo",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 1744.7
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 1953.66
+        }
+      ],
+      "leaderboard_id": 127911
+    },
+    {
+      "name": "gp 1 invincible x5",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 4316.2
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 7109.76
+        }
+      ],
+      "leaderboard_id": 127907
+    },
+    {
+      "name": "Peepo Narrow",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 64.3
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 1149.45
+        }
+      ],
+      "leaderboard_id": 197015
+    },
+    {
+      "name": "Air Pure Small OW",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 327.8
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 851.06
+        }
+      ],
+      "leaderboard_id": 131233
+    },
+    {
+      "name": "ENV Controlsphere S5 - ved special edition",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 336.0
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 2468.0
+        }
+      ],
+      "leaderboard_id": 128967
+    },
+    {
+      "name": "Dimensional Revolving Track",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 7.8
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 119.39
+        }
+      ],
+      "leaderboard_id": 115332
+    },
+    {
+      "name": "Super Hoover Cart Racers",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 7068.4
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 7132.27
+        }
+      ],
+      "leaderboard_id": 65667
+    },
+    {
+      "name": "Cockroach Simulator [with easter eggs]",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 3.0
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 15.0
+        }
+      ],
+      "leaderboard_id": 29962
+    },
+    {
+      "name": "interstellar",
+      "ranks": [
+        {
+          "name": "Bad",
+          "color": "#f90000",
+          "threshold": 420.0
+        },
+        {
+          "name": "Good",
+          "color": "#1cfd02",
+          "threshold": 26880.0
+        }
+      ],
+      "leaderboard_id": 205299
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGlidingCopperAutomatic",
+    "kovaaks_benchmark_id": 3017,
+    "rank_colors": [
+      [
+        "Bad",
+        "#f90000"
+      ],
+      [
+        "Good",
+        "#1cfd02"
+      ]
+    ],
+    "generated_at": "2026-10-12T21:52:16.096144+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

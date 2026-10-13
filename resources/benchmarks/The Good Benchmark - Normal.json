@@ -1,0 +1,759 @@
+{
+  "name": "The Good Benchmark - Normal",
+  "code": "KovaaKsDeathballingGooshedDeathball",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 880.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 885.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 889.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 893.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 897.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 910.0
+        }
+      ],
+      "leaderboard_id": 871
+    },
+    {
+      "name": "Ground Plaza Sparky V3",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 895.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 898.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 902.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 906.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 910.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 920.0
+        }
+      ],
+      "leaderboard_id": 517
+    },
+    {
+      "name": "Aimerz+ VGS Med S1",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 69298
+    },
+    {
+      "name": "Plaza Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 896.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 900.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 905.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 910.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 915.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 926.0
+        }
+      ],
+      "leaderboard_id": 142844
+    },
+    {
+      "name": "Close Fast Strafes Easy Invincible",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 14600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 15200.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 16800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 17600.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 20000.0
+        }
+      ],
+      "leaderboard_id": 128
+    },
+    {
+      "name": "Air Angelic Easier",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 921.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 927.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 932.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 936.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 939.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 948.0
+        }
+      ],
+      "leaderboard_id": 189778
+    },
+    {
+      "name": "Air Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 872.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 881.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 889.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 896.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 902.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 914.0
+        }
+      ],
+      "leaderboard_id": 568
+    },
+    {
+      "name": "Air Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 872.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 881.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 889.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 896.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 902.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 918.0
+        }
+      ],
+      "leaderboard_id": 142834
+    },
+    {
+      "name": "AA4V OW Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 5250.0
+        }
+      ],
+      "leaderboard_id": 189519
+    },
+    {
+      "name": "Leaper 13 Easier",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 3650.0
+        }
+      ],
+      "leaderboard_id": 204273
+    },
+    {
+      "name": "Needle Strafes V2 Easier",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 12250.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 13250.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 15250.0
+        }
+      ],
+      "leaderboard_id": 204269
+    },
+    {
+      "name": "VT Suavetrack Intermediate",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 21500.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 24000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 26500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 28500.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 35600.0
+        }
+      ],
+      "leaderboard_id": 40783
+    },
+    {
+      "name": "Smoothbot Pauer Glider 60% Larger",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 6000.0
+        }
+      ],
+      "leaderboard_id": 85148
+    },
+    {
+      "name": "rA S4 GLIDERTRACK EASY",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 98105
+    },
+    {
+      "name": "CB Smoothtrack Easier",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 204247
+    },
+    {
+      "name": "Smoothsphere Grandmaster Larger",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 9600.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 11800.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 15250.0
+        }
+      ],
+      "leaderboard_id": 161270
+    },
+    {
+      "name": "Smoothbot Voltaic",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 300
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 10250.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 12750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 13750.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 15750.0
+        }
+      ],
+      "leaderboard_id": 392
+    },
+    {
+      "name": "LeapBot SuperbAim Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 4600.0
+        }
+      ],
+      "leaderboard_id": 35906
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#b1fcb1",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Master",
+          "color": "#db68d2",
+          "threshold": 10250.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#fff57b",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#b855d9",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Abendregen",
+          "color": "#2500d5",
+          "threshold": 15000.0
+        }
+      ],
+      "leaderboard_id": 69150
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDeathballingGooshedDeathball",
+    "kovaaks_benchmark_id": 2923,
+    "rank_colors": [
+      [
+        "Diamond",
+        "#b9f2ff"
+      ],
+      [
+        "Jade",
+        "#b1fcb1"
+      ],
+      [
+        "Master",
+        "#db68d2"
+      ],
+      [
+        "Grandmaster",
+        "#fff57b"
+      ],
+      [
+        "Nova",
+        "#b855d9"
+      ],
+      [
+        "Abendregen",
+        "#2500d5"
+      ]
+    ],
+    "generated_at": "2026-10-12T21:52:14.276604+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
