@@ -165,6 +165,7 @@ def test_the_layout_builds_every_id_the_blocks_are_registered_for():
         run_history.POLLING_INTERVAL_ID,
         run_history.RELATIVE_TIME_INTERVAL_ID,
         run_history.STARTUP_PLAYLIST_WARNING_INTERVAL_ID,
+        run_history.TODAY_STORE_ID,
         run_history.FOLLOW_SWITCH_ID,
         run_history.CHART_MODE_ID,
         run_history.RUN_RANGE_ID,
@@ -802,8 +803,12 @@ def _chart_registration() -> dict:
     return _registration(f"{run_history.CHART_OPTIONS_IDS.cached_plot}.data")
 
 
-def test_the_chart_rebuilds_on_the_mode_both_ranges_and_the_playlist_filter():
-    """The filter is an Input, so the rank lines follow it at once."""
+def test_the_chart_rebuilds_on_the_mode_both_ranges_the_date_and_the_playlist_filter():
+    """The filter is an Input, so the rank lines follow it at once.
+
+    The date is one too: a range of days counts back from today, and nothing
+    else changes at midnight on a page that is left open.
+    """
     registration = _chart_registration()
     ids, options = run_history.SCENARIO_SELECTION_IDS, run_history.CHART_OPTIONS_IDS
 
@@ -814,6 +819,7 @@ def test_the_chart_rebuilds_on_the_mode_both_ranges_and_the_playlist_filter():
         f"{run_history.CHART_MODE_ID}.value",
         f"{run_history.RUN_RANGE_ID}.value",
         f"{run_history.DAY_RANGE_ID}.value",
+        f"{run_history.TODAY_STORE_ID}.data",
         f"{options.rank_overlay}.checked",
         f"{options.show_all_ranks}.checked",
         f"{options.high_score_overlay}.checked",
@@ -887,6 +893,7 @@ def _graph(
         mode,
         run_range,
         day_range,
+        "2026-10-12",
         True,
         False,
         high_score_overlay,
@@ -908,8 +915,8 @@ def _annotations(plot_json: str) -> list[str]:
 
 def test_with_no_scenario_selected_the_chart_says_so():
     plot, notifications, hidden, channels = run_history.generate_graph(
-        None, None, None, "score_vs_run", "100", "90", True, False, True, True,
-        95, True, True, {},
+        None, None, None, "score_vs_run", "100", "90", "2026-10-12", True, False,
+        True, True, 95, True, True, {},
     )  # fmt: skip
 
     assert _annotations(plot) == [
@@ -923,8 +930,8 @@ def test_a_scenario_with_no_local_runs_says_so(monkeypatch):
     monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _name: False)
 
     plot, notifications, _hidden, _channels = run_history.generate_graph(
-        None, "Never Played", None, "score_vs_run", "100", "90", True, False,
-        True, True, 95, True, True, {},
+        None, "Never Played", None, "score_vs_run", "100", "90", "2026-10-12",
+        True, False, True, True, 95, True, True, {},
     )  # fmt: skip
 
     assert _annotations(plot) == [
@@ -1060,6 +1067,91 @@ def test_the_verdict_switch_off_leaves_only_a_placement_to_report(monkeypatch):
     )
 
     assert [toast["title"] for toast in notifications] == ["New 2nd-best score"]
+
+
+# --- The date the ranges of days count back from ---------------------------------------
+
+
+def _clock_at(*moment):
+    """Return a ``datetime`` whose ``now`` is always the moment given."""
+
+    class _FrozenDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(*moment)
+
+    return _FrozenDatetime
+
+
+def test_the_layout_holds_the_date_the_page_is_drawn_on(monkeypatch):
+    """So the first tick finds the date held, and rebuilds no chart just drawn."""
+    monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 9, 0))
+
+    store = _by_id(run_history.layout(), run_history.TODAY_STORE_ID)
+
+    assert run_history.TODAY_STORE_ID == "run-history-today"
+    assert isinstance(store, dcc.Store)
+    assert store.data == "2026-10-12"
+
+
+def test_the_date_is_checked_on_the_slow_tick_and_never_on_load():
+    """A call on load would hold the first chart for an answer that writes nothing."""
+    registration = _registration(f"{run_history.TODAY_STORE_ID}.data")
+
+    assert registration["output"] == f"{run_history.TODAY_STORE_ID}.data"
+    assert _keys(registration["inputs"]) == [
+        f"{run_history.RELATIVE_TIME_INTERVAL_ID}.n_intervals"
+    ]
+    assert _keys(registration["state"]) == [f"{run_history.TODAY_STORE_ID}.data"]
+    assert registration["prevent_initial_call"] is True
+
+
+def test_a_tick_inside_the_same_date_writes_nothing(monkeypatch):
+    """The store is the chart's input, so no write means no rebuild."""
+    monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 23, 59, 59))
+
+    assert run_history.advance_today(1, "2026-10-12") is no_update
+    assert run_history.advance_today(2, "2026-10-12") is no_update
+
+
+def test_the_first_tick_past_midnight_writes_the_new_date_and_the_next_does_not(
+    monkeypatch,
+):
+    """One write a day, so the date moving on rebuilds the chart once."""
+    monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 13, 0, 0, 0))
+
+    written = run_history.advance_today(3, "2026-10-12")
+
+    assert written == "2026-10-13"
+    assert run_history.advance_today(4, written) is no_update
+
+
+@pytest.mark.parametrize("held", [None, "", "not a date"])
+def test_a_page_holding_no_date_is_given_todays(monkeypatch, held):
+    monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 9, 0))
+
+    assert run_history.advance_today(1, held) == "2026-10-12"
+
+
+def test_a_chart_left_open_past_midnight_is_rebuilt_for_the_new_date(monkeypatch):
+    """The date's write calls the chart, which reads the clock for itself.
+
+    The last run's summary is still in its store on that call, and it earns
+    no second toast.
+    """
+    monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 13, 0, 0, 20))
+
+    (_plot, notifications, hidden, channels), built = _graph(
+        monkeypatch,
+        run_events=_payload(score=830.0),
+        mode="score_vs_time",
+        day_range="7",
+        triggered=f"{run_history.TODAY_STORE_ID}.data",
+    )
+
+    assert [arguments[-1] for arguments in built] == [date(2026, 10, 13)]
+    assert (notifications, hidden) == ([], [])
+    assert channels is no_update
 
 
 # --- The stylesheet --------------------------------------------------------------------

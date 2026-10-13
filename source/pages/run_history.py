@@ -111,6 +111,10 @@ RUN_EVENTS_STORE_ID = "run-history-run-events"
 POLLING_INTERVAL_ID = "run-history-polling-interval"
 RELATIVE_TIME_INTERVAL_ID = "run-history-relative-time-interval"
 STARTUP_PLAYLIST_WARNING_INTERVAL_ID = "run-history-startup-playlist-warning-interval"
+# The date the chart's ranges of days were last counted back from, as ISO
+# text. It is written only when the date moves on, and the chart takes it as
+# an input, which is what redraws a chart that is left open past midnight.
+TODAY_STORE_ID = "run-history-today"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -228,6 +232,35 @@ register_run_import_failure_flush(POLLING_INTERVAL_ID)
 register_scenario_stats(SCENARIO_STATS_IDS)
 
 
+def _today_text() -> str:
+    """Return the app's own date as the ISO text the date store holds."""
+    return datetime.now().date().isoformat()
+
+
+@callback(
+    Output(TODAY_STORE_ID, "data"),
+    Input(RELATIVE_TIME_INTERVAL_ID, "n_intervals"),
+    State(TODAY_STORE_ID, "data"),
+    # The layout draws the store with the date already in it. A call on load
+    # would write nothing, and the first chart would be held for its answer.
+    prevent_initial_call=True,
+)
+def advance_today(_n_intervals, held_date):
+    """Write the app's date to the page once it is no longer the one held.
+
+    A range of days counts back from today, so a point leaves the chart at
+    midnight, and nothing a user does at midnight redraws a chart that is
+    left open. The chart takes this store as an input, so this write is what
+    redraws it, within one tick of the date moving on. A tick inside the same
+    date writes nothing, so a tick alone never rebuilds the chart.
+
+    The date is the server's, read as the chart reads it. A date taken from
+    the browser's clock could move on when the chart's own had not.
+    """
+    today = _today_text()
+    return no_update if today == held_date else today
+
+
 @callback(
     Output(CHART_OPTIONS_IDS.cached_plot, "data"),
     # ``allow_duplicate``: the Scenario Performance page's chart callback
@@ -245,6 +278,10 @@ register_scenario_stats(SCENARIO_STATS_IDS)
     Input(CHART_MODE_ID, "value"),
     Input(RUN_RANGE_ID, "value"),
     Input(DAY_RANGE_ID, "value"),
+    # Read for nothing but its change. A range of days counts back from
+    # today, and on a page that is left open no other input changes at
+    # midnight, so without this the chart would keep the day that left.
+    Input(TODAY_STORE_ID, "data"),
     Input(CHART_OPTIONS_IDS.rank_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.show_all_ranks, "checked"),
     Input(CHART_OPTIONS_IDS.high_score_overlay, "checked"),
@@ -268,6 +305,7 @@ def generate_graph(  # noqa: PLR0913
     chart_mode,
     run_range,
     day_range,
+    _held_date,
     rank_overlay_switch,
     show_all_ranks_switch,
     high_score_overlay_switch,
@@ -282,8 +320,8 @@ def generate_graph(  # noqa: PLR0913
     Returns the figure serialized to JSON, the toasts to show, the toast
     instances to hide, and the channel registry patch that records the swap.
     ``run_events`` is the summary of newly landed runs when this call has
-    one. A toast is built only on a call that summary triggered, so a control
-    change never repeats the last run's toast.
+    one. A toast is built only on a call that summary triggered, so neither a
+    control change nor the date moving on repeats the last run's toast.
     """
     if not selected_scenario:
         return (
@@ -586,6 +624,9 @@ def layout(
                 data=generate_placeholder_plot().to_json(),
             ),
             *scenario_stats_stores(SCENARIO_STATS_IDS),
+            # The date the page is drawn on. Without it the first tick would
+            # find no date held, write one, and rebuild a chart just drawn.
+            dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
             dcc.Interval(
                 id=STARTUP_PLAYLIST_WARNING_INTERVAL_ID,
                 interval=250,

@@ -529,9 +529,13 @@ flowchart LR
   in runs and one in days, both always in the layout: a clientside callback
   hides the one the mode does not use by a class. They are two controls
   because each is remembered, and a remembered control's layout default
-  cannot change with the mode. `generate_graph` asks
-  `components/run_history_chart.py` for the figure, adds the PB score and
-  Score threshold lines, and builds the run toast with
+  cannot change with the mode. A range of days counts back from today, so
+  `advance_today` reads the app's date on the page's 30-second tick and
+  writes it to a store only when it has moved on. That store is an `Input`
+  of `generate_graph`: a chart left open past midnight is redrawn once for
+  the new date, and a tick inside one date rebuilds nothing.
+  `generate_graph` asks `components/run_history_chart.py` for the figure,
+  adds the PB score and Score threshold lines, and builds the run toast with
   `components/run_verdict_toast.py` at a Top N fixed at 5, since the page has
   no Top N scores control.
   With no runs to read it draws `stats_dir_hint` and the setup card's two
