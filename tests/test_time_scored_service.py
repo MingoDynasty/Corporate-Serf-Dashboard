@@ -12,6 +12,7 @@ from source.kovaaks.time_scored_service import (
     PaceBasis,
     eligible_pace_constant,
     get_pace_basis,
+    get_version_pace_basis,
     index_performance_files,
     note_performance_file,
 )
@@ -402,3 +403,84 @@ def test_the_constant_is_eligible_only_for_runs_of_its_version():
     assert eligible_pace_constant(basis, no_hash) is None
     assert eligible_pace_constant(basis, current, None) is None
     assert eligible_pace_constant(None, current) is None
+
+
+# --- One version of a scenario -------------------------------------------------
+
+
+def test_the_current_versions_answer_is_the_scenarios_own(folders, store):
+    stats_dir, performance_dir = folders
+    older, newest = _run(OLDER), _run(NEWEST)
+    store(older, newest)
+    _performance_file(performance_dir, older).write_bytes(COUNTDOWN)
+    index_performance_files(str(stats_dir))
+
+    assert get_version_pace_basis(SCENARIO, DEFAULT_HASH) == get_pace_basis(SCENARIO)
+    assert get_version_pace_basis(SCENARIO, DEFAULT_HASH) == PaceBasis(
+        1000.0, DEFAULT_HASH
+    )
+
+
+def test_an_older_version_is_answered_by_its_own_files(folders, store):
+    """Whatever version the scenario's newest run names."""
+    stats_dir, performance_dir = folders
+    older, newest = _run(OLDER, scenario_hash=OTHER_HASH), _run(NEWEST)
+    store(older, newest)
+    _performance_file(performance_dir, older).write_bytes(OTHER_VERSION_COUNTDOWN)
+    _performance_file(performance_dir, newest).write_bytes(FIXED_LENGTH)
+    index_performance_files(str(stats_dir))
+
+    assert get_pace_basis(SCENARIO) is None
+    assert get_version_pace_basis(SCENARIO, OTHER_HASH) == PaceBasis(1000.0, OTHER_HASH)
+    assert get_version_pace_basis(SCENARIO, DEFAULT_HASH) is None
+
+
+def test_a_versions_newest_file_that_can_answer_decides_for_all_of_it(folders, store):
+    """A later file that shows no countdown turns the version's runs to score."""
+    stats_dir, performance_dir = folders
+    oldest, older, newest = (
+        _run(OLDEST, scenario_hash=OTHER_HASH),
+        _run(OLDER, scenario_hash=OTHER_HASH),
+        _run(NEWEST),
+    )
+    store(oldest, older, newest)
+    _performance_file(performance_dir, oldest).write_bytes(OTHER_VERSION_COUNTDOWN)
+    index_performance_files(str(stats_dir))
+    assert get_version_pace_basis(SCENARIO, OTHER_HASH) == PaceBasis(1000.0, OTHER_HASH)
+
+    _performance_file(performance_dir, older).write_bytes(FIXED_LENGTH)
+    note_performance_file(older)
+
+    assert get_version_pace_basis(SCENARIO, OTHER_HASH) is None
+
+
+def test_a_version_whose_files_cannot_answer_is_not_recognized(folders, store):
+    stats_dir, performance_dir = folders
+    older, newest = _run(OLDER, scenario_hash=OTHER_HASH), _run(NEWEST)
+    store(older, newest)
+    _performance_file(performance_dir, older).write_bytes(UNKNOWN_SCHEMA)
+    _performance_file(performance_dir, newest).write_bytes(COUNTDOWN)
+    index_performance_files(str(stats_dir))
+
+    assert get_version_pace_basis(SCENARIO, OTHER_HASH) is None
+
+
+def test_no_version_and_an_unplayed_version_are_not_recognized(folders, store):
+    stats_dir, performance_dir = folders
+    newest = _run(NEWEST)
+    store(newest)
+    _performance_file(performance_dir, newest).write_bytes(COUNTDOWN)
+    index_performance_files(str(stats_dir))
+
+    assert get_version_pace_basis(SCENARIO, None) is None
+    assert get_version_pace_basis(SCENARIO, OTHER_HASH) is None
+    assert get_version_pace_basis("Another Scenario", DEFAULT_HASH) is None
+
+
+def test_a_version_is_not_recognized_with_no_performances_folder(tmp_path, store):
+    stats_dir = tmp_path / "stats"
+    stats_dir.mkdir()
+    store(_run(NEWEST))
+    index_performance_files(str(stats_dir))
+
+    assert get_version_pace_basis(SCENARIO, DEFAULT_HASH) is None

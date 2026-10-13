@@ -1,6 +1,7 @@
 """Judge a run against the score threshold and place the threshold line."""
 
 from decimal import Decimal
+from enum import Enum
 from typing import NamedTuple
 
 from source.app_shell import RunEventData
@@ -37,45 +38,56 @@ class ThresholdVerdict(NamedTuple):
     by_pace: bool = False
 
 
-def threshold_verdict(
-    latest: RunEventData,
-    score_threshold_percentage: float | str | None,
-    score_threshold_notification_switch: bool,
-) -> ThresholdVerdict | None:
-    """Judge a run against the threshold, or return None when nothing judges it.
+class Unjudged(Enum):
+    """Why nothing judges a run against the score threshold.
 
-    A run goes unjudged when the switch is off, the goal percentage is blank,
-    the run is the first at its sensitivity, or the scenario has no positive
-    previous best to be a percentage of -- there is no denominator, not a
-    failing one. The message carries the facts and this derives the gate; the
-    two used to be bundled into one nullable field that meant both.
-
-    A run whose message carries a pace constant is judged by pace wherever
-    pace is defined, which needs positive times and not a positive previous
-    best. Where it is undefined, the run is judged by score as any other.
+    A run can fit more than one, and takes the first in this order.
     """
-    goal_percentage = normalize_score_threshold_percentage(score_threshold_percentage)
-    scenario_previous_best = latest["scenario_previous_best"]
-    if (
-        not score_threshold_notification_switch
-        or not goal_percentage
-        or latest["is_new_sensitivity"]
-        or scenario_previous_best is None
-    ):
-        return None
-    pace_constant = latest["pace_constant"]
+
+    NO_PERCENTAGE_SET = "no_percentage_set"
+    FIRST_RUN = "first_run"
+    NO_PERCENTAGE_TO_JUDGE_BY = "no_percentage_to_judge_by"
+
+
+def judge_run(
+    score: float,
+    previous_best: float | None,
+    is_new_sensitivity: bool,
+    pace_constant: float | None,
+    goal_percentage: float | None,
+) -> ThresholdVerdict | Unjudged:
+    """Judge one run against the score threshold, or say why nothing judges it.
+
+    ``previous_best`` is the PB the run was chasing: the scenario's best score
+    before it, at any sensitivity, and ``None`` for the scenario's first run.
+    ``is_new_sensitivity`` says the run is the first at its sensitivity, and
+    ``pace_constant`` is the scenario's constant when the run and that PB can
+    be compared by pace. ``goal_percentage`` is ``None`` while the percentage
+    is empty.
+
+    A run goes unjudged when the goal percentage is empty, when it is the
+    first at its sensitivity, or when it is compared by score with a previous
+    best of zero or less: there is no denominator, not a failing one. A run
+    with a pace constant is judged by pace wherever pace is defined, which
+    needs positive times and not a positive previous best. Where it is
+    undefined, the run is judged by score as any other.
+
+    The run toast and the run list's check both judge through this, so a run
+    that just landed and the same run read back from the run store cannot get
+    two answers from the same facts.
+    """
+    if not goal_percentage:
+        return Unjudged.NO_PERCENTAGE_SET
+    if is_new_sensitivity or previous_best is None:
+        return Unjudged.FIRST_RUN
     if pace_constant is not None:
         passed_by_pace = pace_goal_met(
             pace_constant,
-            scenario_previous_best,
-            latest["score"],
+            previous_best,
+            score,
             goal_percentage,
         )
-        percentage_of_pace = pace_percent(
-            pace_constant,
-            scenario_previous_best,
-            latest["score"],
-        )
+        percentage_of_pace = pace_percent(pace_constant, previous_best, score)
         if passed_by_pace is not None and percentage_of_pace is not None:
             return ThresholdVerdict(
                 passed=passed_by_pace,
@@ -83,19 +95,42 @@ def threshold_verdict(
                 goal_percentage=goal_percentage,
                 by_pace=True,
             )
-    if scenario_previous_best <= 0:
-        return None
+    if previous_best <= 0:
+        return Unjudged.NO_PERCENTAGE_TO_JUDGE_BY
     # Compared as decimals: in floats, 20.6 * 95 / 100 is 19.570000000000004,
     # which fails a 19.57 run sitting exactly at 95% of a 20.60 PB. A float's
     # str() is the decimal the stats CSV wrote.
-    passed = Decimal(str(latest["score"])) * 100 >= Decimal(
-        str(scenario_previous_best)
-    ) * Decimal(str(goal_percentage))
+    passed = Decimal(str(score)) * 100 >= Decimal(str(previous_best)) * Decimal(
+        str(goal_percentage)
+    )
     return ThresholdVerdict(
         passed=passed,
-        percentage=latest["score"] / scenario_previous_best * 100,
+        percentage=score / previous_best * 100,
         goal_percentage=goal_percentage,
     )
+
+
+def threshold_verdict(
+    latest: RunEventData,
+    score_threshold_percentage: float | str | None,
+    score_threshold_notification_switch: bool,
+) -> ThresholdVerdict | None:
+    """Judge a run that just landed, or return None when nothing judges it.
+
+    A run goes unjudged when the switch is off, and for each reason
+    ``judge_run`` gives. The message carries the facts and this derives the
+    gate; the two used to be bundled into one nullable field that meant both.
+    """
+    if not score_threshold_notification_switch:
+        return None
+    judged = judge_run(
+        latest["score"],
+        latest["scenario_previous_best"],
+        latest["is_new_sensitivity"],
+        latest["pace_constant"],
+        normalize_score_threshold_percentage(score_threshold_percentage),
+    )
+    return judged if isinstance(judged, ThresholdVerdict) else None
 
 
 def shown_percentage(verdict: ThresholdVerdict) -> float:
