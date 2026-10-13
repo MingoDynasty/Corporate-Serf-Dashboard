@@ -1553,6 +1553,52 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
     assert _by_id(page, card.scenario_button).children is None
 
 
+def test_pressing_the_cards_button_hands_focus_on_from_a_script_of_its_own():
+    """The button leaves the page once its scenario is selected.
+
+    Keyboard focus would go with it, so a script takes the press as its one
+    input. It writes a store nothing reads, and no page load calls it.
+    """
+    registration = _registration(f"{run_history.CARD_FOCUS_SINK_ID}.data")
+    button = run_history.LATEST_RUN_CARD_IDS.scenario_button
+
+    assert _keys(registration["inputs"]) == [f"{button}.n_clicks"]
+    assert registration["state"] == []
+    assert registration["prevent_initial_call"] is True
+    assert registration["clientside_function"] is not None
+    assert isinstance(
+        _by_id(run_history.layout(), run_history.CARD_FOCUS_SINK_ID), dcc.Store
+    )
+    # Nothing reads the store it writes.
+    assert not [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if run_history.CARD_FOCUS_SINK_ID
+        in {dep["id"] for dep in entry["inputs"] + entry["state"]}
+    ]
+
+
+def test_the_focus_script_waits_for_the_button_to_go_and_then_focuses_the_dropdown():
+    """The script is not run here, so its text is held.
+
+    It acts only on a press from the keyboard: a click with the mouse loses
+    nothing by losing focus, and focus on the dropdown opens its list. It
+    leaves focus alone once the user has moved it somewhere else.
+    """
+    script = run_history._HAND_FOCUS_TO_SCENARIO_SCRIPT
+    card = run_history.LATEST_RUN_CARD_IDS
+    selection = run_history.SCENARIO_SELECTION_IDS
+
+    assert f'document.getElementById("{card.scenario_button}")' in script
+    assert f'document.getElementById("{selection.scenario_dropdown}")' in script
+    assert 'button.matches(":focus-visible")' in script
+    assert "button.offsetParent !== null" in script
+    assert "held === button || held === document.body" in script
+    assert "field.focus();" in script
+    assert "BUTTON_ID" not in script
+    assert "SCENARIO_ID" not in script
+
+
 # --- The latest run's id, and the ring ------------------------------------------------
 
 

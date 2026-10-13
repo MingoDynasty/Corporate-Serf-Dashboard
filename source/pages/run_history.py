@@ -10,6 +10,7 @@ module with its own state. What it shares with the Home page, the setup
 surfaces and the queued notices, lives under ``source/components/``.
 """
 
+import json
 import logging
 from datetime import datetime
 from typing import Any
@@ -145,6 +146,10 @@ SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
 # held. The graph takes it as an input: a figure rings its own scenario's
 # newest run, and the ring shows while this names the same run.
 LATEST_RUN_STORE_ID = "run-history-latest-run"
+# A store nothing reads. The script that hands keyboard focus on from the
+# card's scenario button writes nothing, and a clientside callback has to
+# have an output.
+CARD_FOCUS_SINK_ID = "run-history-card-focus-sink"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -588,6 +593,52 @@ clientside_callback(
     Input(CHART_MODE_ID, "value"),
 )
 
+# Pressing the card's scenario button selects its scenario, and the button
+# then leaves the page, which drops keyboard focus to the document: the next
+# Tab would start again from the top of the page. So once the button has
+# gone, focus goes to the Selected scenario dropdown, which then names the
+# scenario that was asked for. It waits for the button to go because that is
+# when the new value is in the dropdown, and it stands down if focus has
+# moved elsewhere meanwhile.
+#
+# Only for a press from the keyboard, which is what ``:focus-visible`` on the
+# button says. A click with the mouse loses nothing by losing focus, and
+# focus on a searchable dropdown opens its list.
+_HAND_FOCUS_TO_SCENARIO_SCRIPT = """
+(clicks) => {
+    const button = document.getElementById(BUTTON_ID);
+    if (clicks && button && button.matches(":focus-visible")) {
+        const started = Date.now();
+        const handOn = () => {
+            if (button.offsetParent !== null) {
+                if (Date.now() - started < 5000) {
+                    window.setTimeout(handOn, 50);
+                }
+                return;
+            }
+            const held = document.activeElement;
+            if (!held || held === button || held === document.body) {
+                const field = document.getElementById(SCENARIO_ID);
+                if (field) {
+                    field.focus();
+                }
+            }
+        };
+        handOn();
+    }
+    return window.dash_clientside.no_update;
+}
+""".replace("BUTTON_ID", json.dumps(LATEST_RUN_CARD_IDS.scenario_button)).replace(
+    "SCENARIO_ID", json.dumps(SCENARIO_SELECTION_IDS.scenario_dropdown)
+)
+
+clientside_callback(
+    _HAND_FOCUS_TO_SCENARIO_SCRIPT,
+    Output(CARD_FOCUS_SINK_ID, "data"),
+    Input(LATEST_RUN_CARD_IDS.scenario_button, "n_clicks"),
+    prevent_initial_call=True,
+)
+
 register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
 register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
@@ -804,6 +855,7 @@ def layout(
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
             dcc.Store(id=RUN_LANDED_STORE_ID),
             dcc.Store(id=LATEST_RUN_STORE_ID),
+            dcc.Store(id=CARD_FOCUS_SINK_ID),
             # Drawn with the answer already in it, for the reason the date
             # is: the first tick would otherwise write it and rebuild a list
             # just drawn.
