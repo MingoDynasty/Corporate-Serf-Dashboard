@@ -389,9 +389,7 @@ def generate_graph(  # noqa: PLR0913
 
 
 # Which range select shows: the one in runs under Score vs Run, and the one
-# in days under the other two modes. Held in a constant because Dash names an
-# inline script by a hash of its source, so the text must not move with the
-# indentation of the code around it.
+# in days under the other two modes.
 _SHOW_RANGE_FOR_MODE_SCRIPT = f"""
     (mode) => {{
         const inRuns = mode === "{SCORE_VS_RUN}";
