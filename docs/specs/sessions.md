@@ -23,15 +23,12 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - The Run History page's run list is the one place a session is shown. It
   lists a scenario's runs under the session each was played in, names a
   session by when it started, and counts the session's runs. It gives the
-  length of the newest session alone
-  ([proposal](../proposals/run_history_proposal.md#the-run-list)).
+  length of the newest session alone.
 - That page is built and not yet public: it is served at its own address,
-  and nothing in the app links to it
-  ([roadmap](../roadmap.md#upcoming-milestones)).
+  and nothing in the app links to it.
 - The list marks where a scenario was left and returned to within a session,
   which is the boundary between two of its visits, and counts the runs
-  played on other scenarios between them. The word visit is not on screen
-  ([proposal](../proposals/run_history_proposal.md#the-run-list)).
+  played on other scenarios between them. The word visit is not on screen.
 - The newest session is always the list's first row, whether or not it is in
   progress, and is marked while it is (see [In progress](#in-progress)).
 - That page's chart plots a scenario's runs in the order sessions are split
@@ -137,8 +134,7 @@ Two words are kept apart throughout. A **break** is time between runs. A
   re-check it on a timer ([2026-10-11][entry]).
 - The Run History page's run list asks again every 30 seconds, and when a
   run lands. So its mark for a session in progress clears within 30 seconds
-  of the session ending, with no run landing
-  ([proposal](../proposals/run_history_proposal.md#the-run-list)).
+  of the session ending, with no run landing.
 
 ## Visits
 
