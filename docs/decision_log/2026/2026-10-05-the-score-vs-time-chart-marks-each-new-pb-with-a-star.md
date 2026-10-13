@@ -239,11 +239,13 @@ A trend or a verdict read from the stars.
 **Superseded in part (2026-10-12).** "Only Score vs Time is marked" is
 extended: on the Run History page, which replaced this chart, Score vs Run
 stars each new PB too. That chart plots every run in its range, so the
-clauses here about Top N, the oldest date, the kept tie, and the Average
-score trace stop applying. The hover order at a shared position narrows from
-a same-day tie to a same-second one. What a new PB is, no stars on Score vs
-Sensitivity, a new PB ordered last among points at one position, the look,
-Point size, and no control all stand. See
+clauses here about Top N, the oldest date, and the Average score trace stop
+applying. The kept tie loses its cause and keeps its rule: no filter drops a
+new PB now, but a range can still leave one off the chart and keep a later
+run that tied it, and that run gets no star. The hover order at a shared
+position narrows from a same-day tie to a same-second one. What a new PB is,
+no stars on Score vs Sensitivity, a new PB ordered last among points at one
+position, the look, Point size, and no control all stand. See
 [Score vs Run Stars Each New PB](2026-10-12-score-vs-run-stars-each-new-pb.md)
 and
 [The Run History Chart Plots Every Run And Draws No Summary Line](2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md).

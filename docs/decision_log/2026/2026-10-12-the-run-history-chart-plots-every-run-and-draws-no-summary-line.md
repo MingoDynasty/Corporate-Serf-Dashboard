@@ -261,8 +261,10 @@ a lean, and the ratification covered it.
 **What this changes in older entries.** Each keeps its text and gains a
 dated note.
 
-- The 2026-10-05 stars entry: its clauses about Top N, the oldest date, the
-  kept tie, and the Average score trace stop applying. The rest is in
+- The 2026-10-05 stars entry: its clauses about Top N, the oldest date, and
+  the Average score trace stop applying. Its kept tie keeps its rule, since
+  a range can still leave a new PB off the chart and keep a run that tied
+  it. The rest is in
   [the stars entry for Score vs Run](2026-10-12-score-vs-run-stars-each-new-pb.md).
 - [2026-09-12, Share chart](2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md):
   the figure shared holds every run in the range and no Average score line,
