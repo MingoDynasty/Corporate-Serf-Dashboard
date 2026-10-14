@@ -15,6 +15,11 @@ the walk and not a repair: a task that fails goes to the maintainer.
 what a screen reader is told about a row, in which key does what, or in where
 focus goes. A change to how the list looks does not need it.
 
+**It was run again on 2026-10-14,** when the list gained a second view, All
+scenarios. That walk has its own section,
+[the last in this file](#2026-10-14-the-walk-again-with-the-all-scenarios-tree).
+Everything before it is the first record, as it was written.
+
 ## Summary
 
 - **All five tasks can be done in Firefox, Chrome, and Edge.** None failed.
@@ -216,3 +221,250 @@ both walks, a file of every step per walk, and NVDA's own logs are scratch
 files on the maintainer's machine, under
 `ignore/scripts/run-history-page-pr2/nvda/`. Pull request #371's description
 says how to run the walk again.
+
+## 2026-10-14: The walk again, with the All scenarios tree
+
+Date: 2026-10-14
+Author: claude-opus-5-5 · effort: xhigh
+Source revision: `8ba57a2` on pull request #378's branch
+
+The run list gained a second view, All scenarios: each session whole, a
+scenario row for each visit to a scenario, and its runs under it. Its
+proposal ([PR #375](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/375))
+changes what a screen reader is told about a row, which key does what, and
+where focus goes, so R4's rule required the walk again before the change
+merges. The proposal names eight tasks for the tree. The walk takes them, and
+R4's five again, because a session row under This scenario gains a button.
+As before, it is a measurement and not a decision, and a task that fails goes
+to the maintainer.
+
+### Summary of the second walk
+
+- **All thirteen tasks can be done in Firefox, Chrome, and Edge:** the
+  tree's eight, and R4's five again. None failed.
+- **The three pieces never tried under a screen reader all work, in all
+  three browsers.** A scenario row opened or closed from the keyboard says
+  `Expanded` or `Collapsed`. A press on a scenario's name says
+  `Selected scenario: Whisphere Viscose` and leaves focus on the button, now
+  `current`. A session's count, followed from This scenario, puts focus on
+  that session's row in the tree, and NVDA reads the row.
+- **Two things only NVDA could decide went as rehearsed.** Right and Left on
+  the view switch reach the page, because NVDA turns focus mode on when
+  Shift+Tab lands on the switch. Escape closes the Columns menu.
+- **R4's five tasks say what they said on 2026-10-13,** apart from the count
+  this pull request made a button, and a run's toast, which an earlier change
+  made plain.
+- **The tree adds seven things that do not work well.** None stops a task.
+  They are under
+  [What still does not work in the tree](#what-still-does-not-work-in-the-tree),
+  each with whether a fix is known.
+- **Not covered,** as before: Narrator, JAWS, and a person listening.
+
+### How the second walk was run
+
+| | |
+|---|---|
+| Screen reader | NVDA 2026.2, the same unpacked copy, muted, started and stopped by the script |
+| Browsers | Firefox 157.0, Chrome 155.0.8059.79, Edge 155.0.4283.45, visible and maximized, at 1.5x scaling |
+| App | The pull request's build at `8ba57a2`, on a scratch copy of five scenarios' stats files, 1,051 runs. The page showed VT DotTS Intermediate S5 |
+| Keys | Real key presses to the foreground window: 418 in Firefox and 419 in each of Chrome and Edge, over fourteen walks, then 35 in a fifteenth |
+| Runs landed | Five in each browser, each a stats file written to the scratch stats folder: two before the walks, two in R4's landing walk, and one of another scenario in the tree's |
+| Checks | The script checked where focus was, what the live region was given, and which view the list held, against a rehearsal without NVDA. All 284 checks held in each browser, and every key went where the rehearsal said it would |
+
+The walks are one per task, a pass of NVDA's browse mode by line, and a pass
+of its table keys. Each starts from a fresh load of the page with what the
+browser remembers for the app forgotten, so on This scenario. A walk on the
+tree turns the switch from the keyboard. Each browser took about nine and a
+half minutes. Nothing went wrong on the way.
+
+### The tree's eight tasks
+
+#### 1. Switching the list to All scenarios and back, and hearing which view it is in
+
+**It works.** The switch is a group of two radio buttons. The view is heard
+on the switch, and in the list's name when focus enters the list. Nothing
+else is said when the list changes. All three browsers said the same:
+
+| Key | NVDA |
+|---|---|
+| Shift+Tab from Expand all | `Run list view  grouping`, then `This scenario  radio button  checked  1 of 2`, then `Focus mode` |
+| Right | `All scenarios  radio button  checked  2 of 2` |
+| Tab into the list, past Expand all and Columns | `Runs of all scenarios, by session  table`, then `#  column header  row 1  column 1` |
+| Left, back on the switch | `This scenario  radio button  checked  1 of 2` |
+| Tab into the list again | `Runs of VT DotTS Intermediate S5, by session  table` |
+
+#### 2. Telling a session row, a scenario row, and a run row apart, and hearing whether a scenario row is open
+
+**It works, with one more key than it should need.** Each kind of row begins
+differently. A scenario row does not say whether it is open until focus is on
+its button, or until it is toggled, as a session row does not.
+
+| Key | Chrome and Edge | Firefox |
+|---|---|---|
+| Down from the headings, to the current session | `Session Oct 14, 6:42 AM In progress 1 min · 2 runs · 1 scenario Hide all runs  row` | The same, then `not selected  row 2  2 of 34` |
+| Down, to its scenario row | `Scenario 1. Show VT DotTS Intermediate S5 2 runs  row` | `Scenario 1. Show VT DotTS Intermediate S5 VT DotTS Intermediate S5 2 runs  row  not selected  row 2  2 of 34` |
+| Down, to a run | `2  row 4  #  column 1` | `2  row 3  #  column 1` |
+| Tab from the scenario row, to its button | `Scenario  button  expanded` | The same |
+
+An open session row in the tree is read with its **Show all runs** or **Hide
+all runs** button, and a closed one with neither:
+`Session Oct 9, 4:49 PM 1 min · 1 run · 1 scenario  row`.
+
+**Opening and closing a scenario row is announced** as a session row's is.
+In all three browsers:
+
+| Key on the row | NVDA |
+|---|---|
+| Left | `Collapsed` |
+| Right | `Expanded` |
+| Enter | `Collapsed` |
+| Space | `Expanded` |
+| Right on a row already open | nothing |
+
+From the row's button, Enter said `collapsed` and Space said `expanded`, the
+button's own state. A closed scenario row's button says
+`Scenario  button  collapsed`.
+
+#### 3. Hearing which scenario and which session a run belongs to
+
+**It works, by moving up.** A run's cells say their values and headings and
+nothing else, such as `16,360  row 7  Score  column 3` in Chrome. Up from the
+run reaches its scenario row, then the session's other scenario rows, then the
+session row:
+
+| Key, from run 8 of Whisphere Viscose in the session Oct 8, 2:07 PM | Chrome and Edge |
+|---|---|
+| Up | `Scenario 1. Show Whisphere Viscose 8 runs  row` |
+| Up | `Scenario 2. Show VT Controlsphere Viscose 8 runs  row` |
+| Up | `Session Oct 8, 2:07 PM 39 min · 16 runs · 2 scenarios Show all runs  row` |
+
+Firefox said the same, with each scenario's name twice and each row's
+position. In browse mode, NVDA's table key going up from the run's
+Sensitivity cell said `Edge of table` four times and did not move, in all
+three browsers.
+
+#### 4. Selecting a scenario from its row, and hearing that it was selected
+
+**It works.** Tab from a scenario row reaches its toggle, then its name.
+Enter on the name selects the scenario for the page, says so through the live
+region, and leaves focus on the button, now the current one. NVDA said
+nothing when the tree was drawn again. All three browsers said the same:
+
+| Key | NVDA |
+|---|---|
+| Tab, Tab from the row of the selected scenario | `Scenario  button  expanded`, then `Show VT DotTS Intermediate S5  button  current` |
+| Tab, Tab from a row of Whisphere Viscose, in an older session | `Scenario  button  collapsed`, then `Show Whisphere Viscose  button` |
+| Enter | `Selected scenario: Whisphere Viscose`, then `current` |
+| Insert+Tab, NVDA's report of focus, after the tree was drawn again | `Show Whisphere Viscose  button  focused  current` |
+| Back up to the row of VT DotTS Intermediate S5, Tab, Tab | `Scenario  button  expanded`, then `Show VT DotTS Intermediate S5  button` |
+
+#### 5. Following a session's count, and arriving on that session in the tree
+
+**It works.** Under This scenario, Tab from a session row reaches its toggle,
+then its count. Enter switches the list to All scenarios, and focus lands on
+that session's row, which NVDA reads at once, in focus mode. The live region
+says nothing, and nothing names the view.
+
+| Key | Chrome and Edge | Firefox |
+|---|---|---|
+| Tab, Tab from the session row Feb 13, 10:50 PM | `Session  button  collapsed`, then `9 of 9 runs  button  Show the whole session` | The same |
+| Enter | `Session Feb 13, 10:50 PM 20 min · 9 runs · 1 scenario Hide all runs  row  row 49`, then `Focus mode` | The same, with `not selected  row 49  49 of 60` |
+| Down | `Scenario 1. Show VT DotTS Intermediate S5 9 runs New PB  row  row 50` | The same, with the name twice |
+| Down | `9  row 51  #  column 1` | The same |
+
+#### 6. Opening one session's runs with Show all runs, and hearing that they opened
+
+**It works.** On an open session row in the tree, Tab reaches its toggle,
+then **Show all runs**. Enter opens every scenario row of the session, and
+focus stays on the button. It says what **Expand all** says:
+
+| Key | Chrome and Edge | Firefox |
+|---|---|---|
+| Tab, Tab from the session row Oct 8, 2:07 PM | `Session  button  expanded`, then `Show all runs  button` | The same |
+| Enter | `Expanded` | `Expanded`, then `Hide all runs` |
+| Enter on Hide all runs, later | `Collapsed` | `Collapsed`, then `Show all runs` |
+
+#### 7. Staying on the same run when a new run lands and adds a scenario row above it
+
+**It works.** With Follow off and focus in a run's Score cell in the current
+session, a run of another scenario was landed. In each browser, keyboard focus
+stayed in the same row, by its id, and in the same column. The new scenario
+row and its run came in above it, so the row moved two places down: Chrome
+said `1,180  cell  focused  row 6` for the cell that had been row 4.
+
+- **Up from the run** reached its own scenario row, then the new run, then the
+  new scenario row, `Scenario 2. Show VT Raw Control Intermediate S5 1 run  row`,
+  then the session row, now `9 min · 5 runs · 2 scenarios`.
+- **At the landing,** Firefox and Chrome read the app's run toast:
+  `alert  New run detected`, the scenario's name, and
+  `Open in Run History  link`. Edge read nothing.
+
+#### 8. Hearing a row's two figures with Median and best on
+
+**It works.** Enter on Columns opens its menu, Tab reaches **Median and
+best**, Space checks it, and Escape closes the menu and puts focus back on
+Columns. A row's figures are read with the row, after its counts. All three
+browsers said the same words:
+
+| Row | NVDA, in Chrome and Edge |
+|---|---|
+| A session under This scenario | `Session Feb 13, 10:50 PM 9 of 9 runs Median 1,178 · Best 1,220  row` |
+| A scenario row of eight runs | `Scenario 2. Show VT Controlsphere Viscose 8 runs Median 3,036 · Best 3,126  row` |
+| A scenario row of one run | `Scenario 1. Show Whisphere Viscose 1 run Score 17,340  row` |
+
+In the menu, Enter said `Columns  dialog`, the first checkbox, and
+`Columns  dialog` again. Space on Median and best said `checked`. Escape said
+`button  Columns`, then `Columns  button`.
+
+### R4's five tasks again
+
+**All five can still be done, and NVDA said what it said on 2026-10-13, in
+all three browsers.** Each step's speech was compared with the first
+record's, with the current session's time and counts set aside. Three things
+differ, and none is a failure:
+
+- **Tab from a session row's toggle reaches its count first,**
+  `9 of 9 runs  button  Show the whole session`, and a second Tab the first
+  cell of the newest run. In browse mode a session row reads its count as a
+  button: `Feb 13, 10:50 PM   button  9 of 9 runs`.
+- **The toast at a landing is the plain run toast,**
+  `alert  New run detected`, the scenario's name, and
+  `Open in Run History  link`, where the first record heard
+  `Threshold passed`. That change is the
+  [plain run toast](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md),
+  already on this pull request's base. Focus stayed on the same run at both
+  landings, as before.
+- **Rows sit at other numbers,** because each browser's walk landed other
+  runs.
+
+### What still does not work in the tree
+
+None of these stops one of the thirteen tasks. The six things under
+[What still does not work](#what-still-does-not-work) still hold. The tree
+adds these:
+
+| | What | Where | Stops a task | Fix |
+|---|---|---|---|---|
+| 1 | A row's depth is never said, now over three levels. A run names neither its scenario nor its session: Up reaches the scenario row, and Up again, past the session's other scenario rows, the session row | All three | No. Task 3 is done by moving up | None known in AG Grid's free edition |
+| 2 | A scenario row does not say whether it is open when focus arrives on it, as a session row does not | All three | No. Task 2 takes one more key, Tab to the row's button | None tried. The open state is on the button by design |
+| 3 | A scenario row is read with its name button's name, so it says `Show` before the scenario: `Scenario 1. Show Whisphere Viscose 8 runs`. Firefox then says the name a second time | All three. The second name, Firefox | No | Not tried. The second name is most likely the hover on the part around the name, which holds the whole name. That is an inference |
+| 4 | A scenario row does not say that it is the selected scenario's. Its name's button says `current` | All three | No | None tried. The mark is on the button by design |
+| 5 | After a jump, nothing names the view. NVDA reads the session row focus lands on, whose words are the tree's: `9 runs · 1 scenario`, where This scenario said `9 of 9 runs` | All three | No | None tried |
+| 6 | In browse mode, NVDA's table key going up from a run under a scenario row, in the Sensitivity column, says `Edge of table` and does not move | All three | No. In focus mode Up reaches the scenario row and the session row | Not looked for. It is most likely the first record's fifth item again: a group row is one cell, in the first column |
+| 7 | Noise. Firefox reads a session row again after it is opened or closed in the tree, because the row gains or loses Show all runs. Asked where focus is, NVDA calls the switch's radio buttons `off screen`. The Columns menu is announced as a dialog twice when it opens. In Firefox, Down from a group row, after a Tab to its button and back, went to the Score or Time column, where Chrome and Edge went to the first | As named | No | Not looked for |
+
+### Not captured in the second walk
+
+- **Why Edge spoke no toast at the landing in task 7.** It spoke the toast at
+  both of R4's landings, and Firefox and Chrome spoke it at all three.
+- **Browse mode over the tree, by line.** The browse-mode walk runs under This
+  scenario. The tree was walked in focus mode, with one pass of the table
+  keys in task 3.
+- **A voice, Narrator, JAWS, and a person listening,** as before.
+
+### Where the second walk's raw output is
+
+Not in the repository. The walk's scripts, each browser's console output, a
+file of every step per walk, and NVDA's own logs are scratch files on the
+maintainer's machine, under `ignore/scripts/run-history-all-scenarios/impl/nvda/`,
+with a README that says how to run the walk again.

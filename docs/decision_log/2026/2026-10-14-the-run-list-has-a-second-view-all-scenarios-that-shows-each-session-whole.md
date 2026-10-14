@@ -173,7 +173,9 @@ row's level belongs to a `treegrid`, which AG Grid sets only through its paid
 features. Each kind of row begins differently instead: a session row reads
 `Session` and a date, a scenario row `Scenario`, a number, and a name, and a
 run row is read a cell at a time. A run row does not say which scenario it
-is under; that is heard by moving up. What NVDA said of the built tree is in
+is under; that is heard by moving up. NVDA was run on the built tree on
+2026-10-14, in Firefox, Chrome, and Edge, and the tree's eight tasks and R4's
+five can all be done. What it said is in
 [run_history_list_nvda_walk.md](../../research/run_history_list_nvda_walk.md).
 
 **Measured.** On the maintainer's history, 9,135 runs, by the app's own

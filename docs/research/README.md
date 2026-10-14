@@ -19,7 +19,7 @@ looks at another app.
 
 | Check | Date | Focus |
 | --- | --- | --- |
-| [The Run History page's run list under NVDA](run_history_list_nvda_walk.md) | 2026-10-13 | What NVDA said on the built run list in Firefox, Chrome, and Edge, against the five tasks the page's proposal names, and what still does not work |
+| [The Run History page's run list under NVDA](run_history_list_nvda_walk.md) | 2026-10-13, 2026-10-14 | What NVDA said on the built run list in Firefox, Chrome, and Edge, against the five tasks the page's proposal names and the eight the All scenarios tree adds, and what still does not work |
 
 ## More than one survey of an app
 
