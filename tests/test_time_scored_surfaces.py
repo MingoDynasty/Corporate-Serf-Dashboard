@@ -358,11 +358,14 @@ def test_a_landed_run_logs_no_verdict_of_its_own(folders, monkeypatch, caplog):
         if record.name == file_watchdog.logger.name
     ]
     # The import still logs what it found, so an empty log would prove nothing.
-    assert any("place score" in line for line in log)
+    assert any("Detected new file" in line for line in log)
+    # Nor does it place the run among the others at its sensitivity any more.
     assert not [
         line
         for line in log
-        if "threshold" in line.lower() or "high score" in line.lower()
+        if "threshold" in line.lower()
+        or "high score" in line.lower()
+        or "place score" in line.lower()
     ]
 
 

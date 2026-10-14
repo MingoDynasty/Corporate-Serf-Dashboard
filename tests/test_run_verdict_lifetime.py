@@ -144,7 +144,6 @@ def _message(run_id: str, score: float) -> NewFileMessage:
     return NewFileMessage(
         datetime_created=datetime.now(),
         is_new_sensitivity=False,
-        nth_score=2,
         run_id=run_id,
         scenario_name="Scenario A",
         scenario_previous_best=800.0,

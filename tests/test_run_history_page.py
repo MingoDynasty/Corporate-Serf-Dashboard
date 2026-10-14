@@ -689,7 +689,6 @@ def _run(scenario_name: str = SCENARIO, **fields):
         "run_id": "run-1.csv",
         "scenario_name": scenario_name,
         "sensitivity": "34.64 cm/360",
-        "nth_score": 2,
         "score": 812.4,
         "scenario_previous_best": 800.0,
         "pace_constant": None,

@@ -47,14 +47,12 @@ def _message(
     score: float = 812.4,
     scenario_previous_best: float | None = 800.0,
     is_new_sensitivity: bool = False,
-    nth_score: int = 2,
     age_seconds: float = 0.0,
     pace_constant: float | None = None,
 ) -> NewFileMessage:
     return NewFileMessage(
         datetime_created=_NOW - timedelta(seconds=age_seconds),
         is_new_sensitivity=is_new_sensitivity,
-        nth_score=nth_score,
         run_id=run_id,
         scenario_name=scenario_name,
         scenario_previous_best=scenario_previous_best,
@@ -230,7 +228,6 @@ def test_a_scenarios_first_run_only_sets_the_baseline(monkeypatch, frozen_clock)
             score=800.0,
             scenario_previous_best=None,
             is_new_sensitivity=True,
-            nth_score=1,
         ),
     )
 
@@ -243,9 +240,7 @@ def test_a_new_sensitivity_run_can_still_win_the_celebration(monkeypatch, frozen
     # sensitivity beats the scenario best often enough to matter.
     batch, _notifications = _drain(
         monkeypatch,
-        _message(
-            run_id="new-sens.csv", score=900.0, is_new_sensitivity=True, nth_score=1
-        ),
+        _message(run_id="new-sens.csv", score=900.0, is_new_sensitivity=True),
     )
 
     assert batch["celebrated_run_id"] == "new-sens.csv"
@@ -670,7 +665,6 @@ def _celebration_message(
             "run_id": "run-1.csv",
             "scenario_name": "Scenario A",
             "sensitivity": "34.64 cm/360",
-            "nth_score": 1,
             "score": score,
             "scenario_previous_best": previous_best,
             "pace_constant": pace_constant,

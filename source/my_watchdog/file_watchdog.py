@@ -7,9 +7,7 @@ import logging
 import time
 from collections import deque
 from pathlib import Path
-from typing import cast
 
-from sortedcontainers import SortedKeyList
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import get_config
@@ -30,7 +28,6 @@ from source.kovaaks.time_scored_service import (
     note_performance_file,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
-from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +177,6 @@ class NewFileHandler(FileSystemEventHandler):
             message = NewFileMessage(
                 datetime_created=datetime.datetime.now(),
                 is_new_sensitivity=True,
-                nth_score=1,
                 run_id=Path(file).name,
                 scenario_name=run_data.scenario,
                 scenario_previous_best=None,
@@ -210,7 +206,6 @@ class NewFileHandler(FileSystemEventHandler):
             message = NewFileMessage(
                 datetime_created=datetime.datetime.now(),
                 is_new_sensitivity=True,
-                nth_score=1,
                 run_id=Path(file).name,
                 scenario_name=run_data.scenario,
                 scenario_previous_best=high_score,
@@ -222,30 +217,10 @@ class NewFileHandler(FileSystemEventHandler):
                 _refresh_rank_after_high_score(run_data.scenario, run_data.score)
             return
 
-        # Case 3: existing scenario and existing sensitivity, find nth score.
-        # The value is a SortedKeyList keyed by score ascending (see
-        # data_service.load_csv_file_into_database); the annotation widens it to
-        # list, so cast to reach bisect_key_right. The count of runs scoring
-        # strictly higher than this run is len - bisect_key_right(score); the +1
-        # makes it a 1-based rank (ties are not counted as higher). The new run
-        # is not yet in the store, so this bisect ranks against the pre-insert
-        # list.
-        runs_by_score = cast(SortedKeyList, sensitivities_vs_runs[sensitivity_key])
-        higher_count = len(runs_by_score) - runs_by_score.bisect_key_right(
-            run_data.score
-        )
-        nth_score = higher_count + 1
-        logger.debug(
-            '"%s" has a new %s place score: %s',
-            sensitivity_key,
-            ordinal(nth_score),
-            run_data.score,
-        )
-
+        # Case 3: existing scenario and existing sensitivity.
         message = NewFileMessage(
             datetime_created=datetime.datetime.now(),
             is_new_sensitivity=False,
-            nth_score=nth_score,
             run_id=Path(file).name,
             scenario_name=run_data.scenario,
             scenario_previous_best=high_score,

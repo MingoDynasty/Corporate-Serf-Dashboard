@@ -376,7 +376,6 @@ def _event(runs: list[RunData], pace) -> dict:
         "run_id": run_id(newest),
         "scenario_name": newest.scenario,
         "sensitivity": "40.8 cm/360",
-        "nth_score": 99,
         "score": newest.score,
         "scenario_previous_best": chased.previous_best,
         "pace_constant": chased.pace_constant,

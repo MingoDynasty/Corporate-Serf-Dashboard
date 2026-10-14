@@ -187,41 +187,6 @@ def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
     assert schedules == []
 
 
-@pytest.mark.parametrize(
-    ("new_score", "expected_nth"),
-    [
-        (115.0, 2),  # slots between 110 and 120
-        (120.0, 1),  # ties the top score; ties are not counted as higher
-        (90.0, 4),  # below every existing run
-    ],
-)
-def test_on_created_computes_nth_place_via_bisect(
-    monkeypatch,
-    new_score,
-    expected_nth,
-):
-    run_data = _run_data(score=new_score)
-    messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
-    monkeypatch.setattr(
-        file_watchdog,
-        "is_scenario_in_database",
-        lambda _scenario: True,
-    )
-    monkeypatch.setattr(file_watchdog, "get_high_score", lambda _scenario: 120.0)
-    monkeypatch.setattr(
-        file_watchdog,
-        "get_sensitivities_vs_runs",
-        lambda _scenario: {SENSITIVITY_KEY: _sorted_runs(100.0, 110.0, 120.0)},
-    )
-
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
-
-    assert len(messages) == 1
-    assert messages[0].nth_score == expected_nth
-
-
 def test_on_created_preserves_detection_log_for_non_csv(caplog):
     with caplog.at_level(logging.DEBUG, logger=file_watchdog.logger.name):
         file_watchdog.NewFileHandler().on_created(
@@ -450,7 +415,6 @@ def test_the_run_message_carries_no_decision_field():
     assert {field.name for field in dataclasses.fields(NewFileMessage)} == {
         "datetime_created",
         "is_new_sensitivity",
-        "nth_score",
         "pace_constant",
         "run_id",
         "scenario_name",
@@ -563,14 +527,13 @@ def _import_real_file(monkeypatch, file_path, *, group_scores, high_score):
     return message
 
 
-def test_a_converted_run_is_placed_against_the_group_it_normalizes_into(
+def test_a_converted_run_joins_the_group_it_normalizes_into(
     monkeypatch,
     tmp_path,
 ):
     # The converted run joins a group that already holds native runs, so it is
-    # not the first at its sensitivity, and its place is counted against the
-    # merged history. Against the converted runs alone it would have been the
-    # best. Here it is sixth.
+    # not the first at its sensitivity. Among the converted runs alone it
+    # would have been.
     message = _import_real_file(
         monkeypatch,
         _stats_file(
@@ -586,7 +549,6 @@ def test_a_converted_run_is_placed_against_the_group_it_normalizes_into(
 
     assert message.sensitivity == NORMALIZED_KEY
     assert message.is_new_sensitivity is False
-    assert message.nth_score == 6
 
 
 def test_a_native_run_at_a_converted_groups_value_is_not_a_new_sensitivity(

@@ -149,7 +149,6 @@ class RunEventData(TypedDict):
     run_id: str
     scenario_name: str
     sensitivity: str
-    nth_score: int
     score: float
     scenario_previous_best: float | None
     pace_constant: float | None
@@ -203,7 +202,6 @@ def _run_event_data(
         "run_id": message.run_id,
         "scenario_name": message.scenario_name,
         "sensitivity": message.sensitivity,
-        "nth_score": message.nth_score,
         "score": message.score,
         "scenario_previous_best": message.scenario_previous_best,
         "pace_constant": message.pace_constant,
