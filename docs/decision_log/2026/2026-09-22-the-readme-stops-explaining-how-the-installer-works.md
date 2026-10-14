@@ -95,5 +95,14 @@ spec states those edges.
 **Size.** 772 words in 148 lines by the front-door entry's measure, down from
 1,196 at #308's merge.
 
+**Superseded in part (2026-10-13).** The Run notifications bullet reads "a
+toast on every page when a new run is detected, with a link to its scenario on
+Run History." Every run notifying, which this entry says "has not fully
+shipped", has shipped: the edges listed above went with the verdict and the
+placement, and the toast no longer needs one page open. One edge is left, by
+the maintainer's ruling: runs detected together share one toast, for the
+newest. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md).
+
 Provenance: the maintainer's own README edits, reviewed and completed in PR
 #309; no proposal.

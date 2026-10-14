@@ -65,7 +65,7 @@ for a remembered control bind the page as well.
 browser under the old ids, unread, and nothing clears them.
 
 **One switch is reset once more.** The
-[Run toasts proposal](../../proposals/run_toasts_proposal.md), ratified and
+[Run toasts proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/2c5c072d0670c7c6d4873eb9e77f676dca1f6d43/docs/proposals/run_toasts_proposal.md), ratified and
 not yet built when the page went public, moves **Run notifications** to the
 Settings page and keeps it in a store that does not read the old control's
 value. A browser that had turned run toasts off starts on again when that
@@ -73,6 +73,13 @@ change lands. Had it landed in the release that made the page public, that
 would have been part of this reset. The page went public first, so it is a
 second reset, for that one switch. Until then the page carries both
 notification switches as they were.
+
+**Superseded in part (2026-10-13).** That change has landed, and the second
+reset happened with it: a browser that had run toasts off started on again.
+The page carries neither notification switch. The values stored for the two
+old switches are left in each browser under their old ids, unread, as the old
+page's are. See
+[Run Notifications Is A Browser-Local Setting, On The Settings Page](2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md).
 
 Proposed in
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356),

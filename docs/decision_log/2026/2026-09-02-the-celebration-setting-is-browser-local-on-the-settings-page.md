@@ -111,4 +111,11 @@ falls back to Confetti — a wrong answer rather than a visible failure. A
 JavaScript test harness was considered again here and again declined; the
 centralized cancellation is what shrinks the surface one would have covered.
 
+**Superseded in part (2026-10-13).** The celebration select is no longer the
+only browser-local control on the Settings page. A Notifications section sits
+directly above this one, with the Run notifications switch, held in a second
+shell-hosted store and filled by the same tick. This entry's reason for the
+Settings page now covers both. See
+[Run Notifications Is A Browser-Local Setting, On The Settings Page](2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md).
+
 Shipped in PR #268, and the style select in #272; ruled on #248.

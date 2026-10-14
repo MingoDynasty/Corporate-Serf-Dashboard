@@ -75,7 +75,7 @@ UI — the server side (pull-based reads):
 flowchart TD
     subgraph Shell["Server threads (app_shell.py, mounted on every page)"]
         ShellTick["dcc.Interval tick<br/>pb-celebration-interval"]
-        Drain["publish_run_events<br/>empties the queue, stamps each run live<br/>or stale, names at most one celebrated<br/>run and sends its toast"]
+        Drain["publish_run_events<br/>empties the queue, stamps each run live<br/>or stale, names at most one celebrated<br/>run, and sends the celebration toast<br/>and the run toast"]
         ShellTick --> Drain
     end
 
@@ -267,7 +267,6 @@ flowchart LR
         ScenarioStats["components/<br/>scenario_stats.py"]
         SetupSurfaces["components/<br/>setup_surfaces.py"]
         RunDelivery["components/<br/>run_delivery.py"]
-        RunVerdictToast["components/<br/>run_verdict_toast.py"]
         RunHistoryChart["components/<br/>run_history_chart.py"]
         RunHistoryList["components/<br/>run_history_list.py"]
         RunMarks["components/<br/>run_marks.py"]
@@ -305,6 +304,7 @@ flowchart LR
     Shell --> LocalIcon
     Shell --> Queue
     Shell --> Pace
+    Shell --> PlaylistService
     Home --> DataService
     Home --> LocalIcon
     Home --> QueuedNotices
@@ -316,7 +316,6 @@ flowchart LR
     QueuedNotices --> LocalIcon
     QueuedNotices --> DataService
     QueuedNotices --> FileWatchdog
-    ScoreThreshold --> Shell
     ScoreThreshold --> DataService
     ScoreThreshold --> TimeScored
     ScoreThreshold --> Pace
@@ -326,9 +325,6 @@ flowchart LR
     ScenarioStats --> ApiService
     SetupSurfaces --> LocalIcon
     RunDelivery --> Shell
-    RunVerdictToast --> RunDelivery
-    RunVerdictToast --> ScoreThreshold
-    RunVerdictToast --> LocalIcon
     RunHistory --> DataService
     RunHistory --> PlotService
     RunHistory --> ChartOptions
@@ -338,7 +334,6 @@ flowchart LR
     RunHistory --> ScenarioStats
     RunHistory --> SetupSurfaces
     RunHistory --> RunDelivery
-    RunHistory --> RunVerdictToast
     RunHistory --> RunHistoryChart
     RunHistory --> RunHistoryList
     RunHistory --> LatestRunCard
@@ -416,6 +411,14 @@ flowchart LR
   It also hosts the app-wide run-event drain: `pb-celebration-interval` (period
   `polling_interval`), the `run-events-batch` `dcc.Store`, and the
   `publish_run_events` callback that is `message_queue`'s only consumer.
+  The same callback sends both toasts a run can earn, in the response that
+  publishes the batch: the personal best celebration, and the plain run
+  toast for the batch's newest live run, whose link
+  `playlist_scenarios_service.scenario_run_history_href` builds. When one
+  response carries both, `channel_toasts` builds the one registry patch.
+  The Run notifications setting is the shell's `run-notifications` store
+  (`storage_type="local"`, `"on"` or `"off"`), which the Settings page
+  edits and the drain reads as `State`.
   Beside them sit the celebration's two other stores: `pb-celebration-style`
   (`storage_type="local"`, default `"confetti"`), which *is* the setting the
   Settings page edits and the drain reads as `State`, and
@@ -506,18 +509,17 @@ flowchart LR
   the new date, and a tick inside one date rebuilds nothing.
   `generate_graph` asks `components/run_history_chart.py` for the figure,
   adds the PB score and Score threshold lines (the threshold's score comes
-  from `components/score_threshold.py`), and builds the run toast with
-  `components/run_verdict_toast.py` at a Top N fixed at 5, since the page has
-  no Top N scores control. Its toast outputs are `allow_duplicate`, as every
-  other writer of those shell-hosted props is. The stars come from the same
+  from `components/score_threshold.py`). The figure is its one output: the
+  page builds no toast for a run, which the shell's drain sends on every
+  page. The stars come from the same
   rebuild: `build_run_history_figure` asks `data_service.new_high_score_runs`
   which of the scenario's runs set a new PB, over its whole history in play
   order, and the Score vs Run and Score vs Time builders star the ones they
   plot, matched by run, in a second trace
   ([decision log](decision_log/2026/2026-10-05-the-score-vs-time-chart-marks-each-new-pb-with-a-star.md)).
   The Chart options panel is a collapsible in-flow column beside the chart
-  holding the overlay, run-point, score-threshold, and run-notification
-  preferences. It is built by `components/chart_options.py` from this page's
+  holding the overlay, run-point, and score-threshold preferences. It is
+  built by `components/chart_options.py` from this page's
   `CHART_OPTIONS_IDS`, and `register_chart_options` wires that module's
   callbacks to the same ids. The panel starts closed on every visit and its
   open state is never persisted. `toggle_chart_options` writes that open
@@ -530,20 +532,9 @@ flowchart LR
   callback instead, `ring_latest_run_on_graph`, which themes the cached
   figure with `apply_graph_appearance` and hands it to
   `plot_service.apply_point_appearance` — appearance never reruns the data
-  read, the overlays, or the notification logic. That function restyles
+  read or the overlays. That function restyles
   traces selected by name: the size and color go to the run trace, and the
   size alone to the New PB stars and the latest run's ring.
-  The two notification controls draw nothing at all, and they differ in what
-  flipping them costs. *Score threshold verdict* is an `Input` on
-  `generate_graph`, so it re-runs the whole callback and rebuilds a figure
-  identical to the one on screen. It earns no toast on its own trigger,
-  because `run_events_were_triggered` gates that on the summary store. It
-  has the same State-worthy property as the master switch but stays an
-  `Input` deliberately, as an out-of-scope behavior change
-  ([2026-08-21](decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
-  The *Run notifications* master switch is the cheaper shape: it defaults to
-  on and is a `State`, read only when a run event fires, so flipping it does
-  not re-run the callback at all.
   The Scenario Stats block (Last played, Number of runs, and Position with
   its Refresh button) is built by `components/scenario_stats.py` from this
   page's `SCENARIO_STATS_IDS`, and `register_scenario_stats` wires that
@@ -717,7 +708,10 @@ flowchart LR
   detection's report replaces it; it keeps the conclusive no-match message for
   the one outcome that ruled everything out, while unchecked probes and
   unreadable account lists each say so in their own words.
-  Below the form and outside it, a **Celebrations** section holds the personal
+  Below the form and outside it, a **Notifications** section holds the Run
+  notifications switch. Its value is the shell's `run-notifications` store,
+  and it is initialized and gated by the tick described next.
+  Under it, a **Celebrations** section holds the personal
   best celebration's style select — Off, Confetti, Fireworks, Cannons, Stars —
   its description, and a Preview button. The authoritative value is the shell's
   `pb-celebration-style` store, not the control: a one-shot `dcc.Interval`
@@ -848,10 +842,9 @@ flowchart LR
   with no component ids. `judge_run()` judges one run against the personal
   best it was chasing: by pace when it is handed a pace constant and pace is
   defined, and by score otherwise. Where nothing judges the run it returns
-  the reason, an `Unjudged`. `threshold_verdict()` is `judge_run()` for a run
-  that just landed, from the shell's `RunEventData`, and
-  `components/run_marks.py` calls it for a past run, so the toast and the
-  run list's check cannot give one run two answers.
+  the reason, an `Unjudged`. `components/run_marks.py` calls it for every
+  run of a scenario and `components/latest_run_card.py` for the newest run,
+  so the run list's check and the card cannot give one run two answers.
   `shown_percentage()` is the figure to print for that verdict. `score_threshold_line()` is the score the chart's
   threshold line is drawn at, from the current personal best.
   `normalize_score_threshold_percentage()` reads the percentage input, which
@@ -890,15 +883,7 @@ flowchart LR
 - `components/run_delivery.py` — what a page's batch consumer works out.
   `summarize_run_events()` turns one batch of the shell's into the page's
   summary, a `RunEventsPayload`: the latest run on the scenario the page
-  should show, which is the one just played while it follows, and the
-  shell's celebration decision. `run_events_were_triggered()` tells a call
-  that a new summary triggered from one that only read the summary the store
-  replays.
-- `components/run_verdict_toast.py` — the toast a page builds for a run that
-  landed on its scenario: `build_run_event_notification()`, which applies
-  the master switch, the yield to the celebration, and the liveness stamp,
-  and `build_live_run_notification()`, which words the threshold verdict and
-  the top-N placement. Every such toast shares `RUN_VERDICT_CHANNEL`.
+  should show, which is the one just played while it follows.
 - `components/run_history_chart.py` — what the Run History chart plots, with
   no component ids: the three modes, the range options in runs and in days,
   the empty-state copy, and `build_run_history_figure()`. That function
@@ -948,7 +933,7 @@ flowchart LR
   new PB's gain, and its number and the time on its scenario in its session.
   It judges the run with `score_threshold.judge_run()` from what
   `run_marks.what_runs_chased()` works out, as the run list does, and prints
-  the percentage with `shown_percentage()`, as the toast does. A run nothing
+  the percentage with `shown_percentage()`. A run nothing
   judges is measured against a goal of 100 for its percentage alone. The time
   on the scenario is the sum of its visits in the session, and reads as
   unknown where a visit's first run has no usable start.
@@ -1144,12 +1129,12 @@ flowchart LR
 - `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its
   performance file, work out the run's pace constant, update DBs, push
   `NewFileMessage`, and schedule the bounded rank freshness poll on a new
-  high score. It judges no run: what it logs for one is what it found, the
-  scenario, the sensitivity, and the run's place among the scores there.
+  high score. It judges no run and places none: what it logs for one is
+  what it found, a new scenario or a new sensitivity.
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
   watchdog-to-UI hand-off, drained by the app shell. Its `pace_constant`
-  field is copied into the shell's `RunEventData`, where the threshold
-  verdict and the New personal best toast read it.
+  field is copied into the shell's `RunEventData`, where the New personal
+  best toast reads it.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
   Unknown keys are named in one warning and ignored, so a config carrying keys
   a release has retired still loads.
@@ -1219,8 +1204,11 @@ flowchart LR
   `clears`, and returning a per-key `dash.Patch` for the per-client
   `TOAST_CHANNEL_REGISTRY_STORE_ID` store, and carrying the payload's
   `autoClose` through untouched so the until-dismissed personal best
-  celebration rides the same one helper),
-  `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
+  celebration rides the same one helper; `channel_toasts()` is that
+  emission for several channels in one response, with one patch that
+  assigns each channel's key; `RUN_VERDICT_CHANNEL` and
+  `CELEBRATION_CHANNEL` name the shell's two channels),
+  `stopwatch`, `utilities` (`format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
   performs, with an optional `before_replace` hook the playlist, visibility,
@@ -1348,7 +1336,8 @@ flowchart LR
 | What `?scenario=` and `?playlist_code=` select, what the two dropdowns list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the layout helpers, `reach_scenario` and `reach_scenario_or_the_one_asked_for` there for the rule that clears a filter in the way of a scenario; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/run_history.py`) for the component ids |
 | How a failed run import or a startup playlist warning reaches the screen | `components/queued_notices.py` for the two flushes; `my_watchdog/file_watchdog.py` and `kovaaks/data_service.py` for the queues; the hosting page for the interval each flush is registered on |
 | The Scenario Stats block, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the block and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/run_history.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
-| How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `components/run_verdict_toast.py` for the run toast builders, and the Run History page's `generate_graph`, which call it; `components/run_marks.py` for a past run, which is judged under its own version of the scenario |
+| How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `components/run_marks.py` for the run list's check, where a past run is judged under its own version of the scenario; `components/latest_run_card.py` for the card; the Run History page's `generate_graph` for the line |
+| The run toast: what it says, which run earns it, its link, or the switch that turns it off | `app_shell.py` for `publish_run_events`, `_run_toast`, and the `run-notifications` store; `utilities/notifications.py` for the channel helpers; `kovaaks/playlist_scenarios_service.py` for `scenario_run_history_href`; `pages/settings.py` for the switch; the rules are in `docs/specs/notifications.md` |
 | The setup card or the stats-folder hint | `components/setup_surfaces.py` for both builders and their copy; `pages/home.py` for the Skip callback and its toasts; each hosting page's layout for which states it asks for |
 | The Columns menu, or which columns a table can hide | `components/columns_menu.py` for the control and its callback; each playlist page's `MENU_COLUMNS` and `RUN_LIST_MENU_COLUMNS` in `components/run_history_list.py` for the entries |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
