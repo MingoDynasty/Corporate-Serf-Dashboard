@@ -397,9 +397,24 @@ theme_switch_component = dmc.Tooltip(
 )
 
 
-def nav_link(label: str, href: str, icon: str) -> dmc.NavLink:
+# The navbar's entries, in order: id, label, address, icon. Kept as one list
+# because the callback that marks the open page writes to every link, so an
+# entry added here is marked with no second edit.
+NAVBAR_LINKS = (
+    ("navbar-home", "Home", "/", "bi:house-door-fill"),
+    ("navbar-run-history", "Run History", "/run-history", "fontisto:line-chart"),
+    ("navbar-playlists", "Playlists", "/playlists", "material-symbols:playlist-play"),
+    ("navbar-settings", "Settings", "/settings", "clarity:settings-line"),
+)
+
+# Read by the callback that marks the open page, and written by nothing.
+NAVBAR_LOCATION_ID = "navbar-location"
+
+
+def nav_link(link_id: str, label: str, href: str, icon: str) -> dmc.NavLink:
     """Build a single-anchor Dash-native navbar link."""
     return dmc.NavLink(
+        id=link_id,
         label=label,
         leftSection=dmc.ThemeIcon(
             # Both sizes, so a file that is wider than tall is scaled to fit
@@ -423,6 +438,7 @@ def layout(**kwargs):  # noqa: ARG001
             dmc.AppShell(
                 children=[
                     dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
+                    dcc.Location(id=NAVBAR_LOCATION_ID, refresh=False),
                     # Beside the container on purpose: a toast outlives the
                     # page that emitted it, so the registry that knows which
                     # instance to replace has to outlive it too. The shell's
@@ -506,24 +522,7 @@ def layout(**kwargs):  # noqa: ARG001
                     ),
                     dmc.AppShellNavbar(
                         id="navbar",
-                        children=[
-                            nav_link("Home", "/", "bi:house-door-fill"),
-                            nav_link(
-                                "Run History",
-                                "/run-history",
-                                "fontisto:line-chart",
-                            ),
-                            nav_link(
-                                "Playlists",
-                                "/playlists",
-                                "material-symbols:playlist-play",
-                            ),
-                            nav_link(
-                                "Settings",
-                                "/settings",
-                                "clarity:settings-line",
-                            ),
-                        ],
+                        children=[nav_link(*entry) for entry in NAVBAR_LINKS],
                         p="md",
                     ),
                     dmc.AppShellMain(dash.page_container),
@@ -561,4 +560,32 @@ clientside_callback(
     Output("appshell", "navbar"),
     Input("burger", "opened"),
     State("appshell", "navbar"),
+)
+
+
+# Marks the open page. ``aria-current`` is the whole mechanism: a screen
+# reader announces it, and the bundled Mantine stylesheet draws a link that
+# carries it exactly as it draws an active one. The component's own ``active``
+# matching looks like the simpler way and is left unset on purpose: it draws
+# the same mark but never sets the attribute, so a second matcher would be
+# needed for the attribute, and the two could disagree where nobody looking
+# at the screen would see it. A link is marked when the address is its own or
+# lies under it, which keeps Playlists marked on a playlist's scenario table.
+# The addresses come from the links themselves, so none is written twice.
+clientside_callback(
+    """
+    (pathname, ...hrefs) => {
+        // The router serves a page with or without a trailing slash.
+        const path =
+            pathname.length > 1 && pathname.endsWith("/")
+                ? pathname.slice(0, -1)
+                : pathname;
+        return hrefs.map((href) =>
+            path === href || path.startsWith(href + "/") ? "page" : null
+        );
+    }
+    """,
+    [Output(link_id, "aria-current") for link_id, *_ in NAVBAR_LINKS],
+    Input(NAVBAR_LOCATION_ID, "pathname"),
+    [State(link_id, "href") for link_id, *_ in NAVBAR_LINKS],
 )
