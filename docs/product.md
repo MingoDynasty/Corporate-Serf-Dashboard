@@ -116,8 +116,8 @@ are one view or two is a design choice for the feature that builds them.
   the run for as long as the run exists. A run that beats your personal
   best gets the celebration below instead, and runs detected together
   share one toast, for the newest. The toast replaces itself rather than
-  stacking, and a run that was played more than a couple of minutes
-  before the app saw it reaches the page silently. One switch on the
+  stacking, and a run the app imported more than a couple of minutes
+  before a page could show it reaches the page silently. One switch on the
   Settings page, Run notifications, turns the toast off: the page still
   updates, a personal best still celebrates when celebrations are on, and
   a run file that failed to import still says so. *Problem solved:* the
