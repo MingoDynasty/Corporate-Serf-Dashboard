@@ -1808,7 +1808,8 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
                 rank_cache_ttl_hours,
             )
             # Verdict logging only on the network path: the cache-only branch
-            # serves Home's per-second interval ticks and would spam debug.log.
+            # serves Run History's per-second interval ticks and would spam
+            # debug.log.
             if cached_rank:
                 logger.debug(
                     'Rank cache hit for "%s" (leaderboard %s).',

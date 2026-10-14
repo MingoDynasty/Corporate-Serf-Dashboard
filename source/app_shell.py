@@ -402,7 +402,9 @@ def nav_link(label: str, href: str, icon: str) -> dmc.NavLink:
     return dmc.NavLink(
         label=label,
         leftSection=dmc.ThemeIcon(
-            local_icon(icon, height=36),
+            # Both sizes, so a file that is wider than tall is scaled to fit
+            # the box. Sized by its height alone it hangs out of both sides.
+            local_icon(icon, width=36, height=36),
             size="lg",
             variant="outline",
         ),
@@ -427,9 +429,9 @@ def layout(**kwargs):  # noqa: ARG001
                     # own celebration channel is written from here as well.
                     dcc.Store(id=TOAST_CHANNEL_REGISTRY_STORE_ID, data={}),
                     # The app-wide run-event channel. The drain and its batch
-                    # live here rather than on Scenario Performance so a run
-                    # reaches the screen whatever page is open; that page
-                    # listens to the store instead of popping the queue.
+                    # live here rather than on Run History so a run reaches
+                    # the screen whatever page is open; that page listens to
+                    # the store instead of popping the queue.
                     dcc.Store(id=RUN_EVENTS_BATCH_STORE_ID),
                     # The celebration setting, and the output the animation's
                     # clientside callback needs but never writes. The setting
@@ -505,10 +507,11 @@ def layout(**kwargs):  # noqa: ARG001
                     dmc.AppShellNavbar(
                         id="navbar",
                         children=[
+                            nav_link("Home", "/", "bi:house-door-fill"),
                             nav_link(
-                                "Scenario Performance",
-                                "/",
-                                "bi:house-door-fill",
+                                "Run History",
+                                "/run-history",
+                                "fontisto:line-chart",
                             ),
                             nav_link(
                                 "Playlists",

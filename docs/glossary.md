@@ -30,7 +30,7 @@ faster finish scores higher. On one, the app measures by pace instead of
 score wherever it can measure pace reliably
 ([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 How it recognizes one, and when it can't measure pace, is in
-[scenario_performance.md](specs/scenario_performance.md#time-scored-scenarios).
+[run_history.md](specs/run_history.md#time-scored-scenarios).
 
 - On screen: a scenario scored by completion time.
 
@@ -67,15 +67,15 @@ time-scored
 ### Sensitivity
 
 The mouse sensitivity a run was played at: a value on a scale, such as 34.6
-cm/360. A scenario's runs are compared within one sensitivity, on the Score vs
-Sensitivity chart and in top-N placement.
+cm/360. The Score vs Sensitivity chart plots each run at its sensitivity, and
+top-N placement compares a run with the runs at the same one.
 
 ### cm/360
 
 The scale the app shows sensitivity in: centimeters of mouse travel per full
 360-degree turn, so higher is slower. How runs recorded on a game's own scale
 are converted, and which ones can't be, is in
-[scenario_performance.md](specs/scenario_performance.md#the-graph).
+[run_history.md](specs/run_history.md#the-chart).
 
 ### Session
 
@@ -114,6 +114,34 @@ The two moments the app is used in
 at the app between runs while KovaaK's runs fullscreen, so an answer has to
 work at a glance. Between sessions, before or after one, they look back at how
 they're doing and ahead to what to train, usually with more attention to give.
+
+## The Run History page
+
+### Run History
+
+The page that shows one scenario's runs: a chart of its scores, a list of its
+runs grouped by session, and the latest run played. With Follow on, it
+follows the scenario being played
+([run_history.md](specs/run_history.md)).
+
+- In code: `run_history`.
+- Not Home, the page the app opens on.
+
+### Score vs Run
+
+The chart mode that plots a scenario's runs in the order they were played,
+evenly spaced, so a busy day and a quiet month each take the room their runs
+need. Score vs Time plots the same runs by when they were played
+([run_history.md](specs/run_history.md#the-chart)).
+
+### Latest-run card
+
+The panel at the top of Run History that reports the last run played, on
+whatever scenario, with its verdict
+([run_history.md](specs/run_history.md#the-latest-run-card)).
+
+- On screen it has no title. Its first line reads
+  `Latest run · {time} · {scenario}`.
 
 ## Playlists
 
@@ -268,7 +296,7 @@ How the gap is computed and shown is in
 ### Rank overlay
 
 The chart's lines for a scenario's rank thresholds
-([scenario_performance.md](specs/scenario_performance.md#the-graph)).
+([run_history.md](specs/run_history.md#the-chart)).
 
 - On screen: the Rank thresholds switch.
 
@@ -292,10 +320,13 @@ A run that beat its scenario's PB when it was played. It held the PB until a
 later run beat it, and the latest one is the PB run. A scenario's first run
 sets the PB without beating one, so it isn't a new PB. Where the chart marks
 them is in
-[scenario_performance.md](specs/scenario_performance.md#the-graph).
+[run_history.md](specs/run_history.md#the-chart), and how the run list and
+the latest-run card mark them is in
+[run_history.md](specs/run_history.md#marks-the-check-and-the-star).
 
-- On screen: New PB in the chart legend. The celebration toast's title says
-  New personal best.
+- On screen: New PB in the chart legend, on a star beside a run's score in
+  the run list, and as the latest-run card's badge. The celebration toast's
+  title says New personal best.
 - In code: `new_high_score`.
 - Not the PB run, the one run that holds the PB now.
 
@@ -313,8 +344,9 @@ other run's time divided by this one's. A run at 95% of PB pace takes the PB's
 time divided by 0.95
 ([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 
-- On screen: PB pace in a verdict, and faster in the Next Rank column and the
-  New personal best toast.
+- On screen: PB pace in a verdict and on the latest-run card, and faster in
+  the Next Rank column, the New personal best toast, and the card's line for
+  a new PB.
 
 ### Score threshold
 
@@ -322,22 +354,24 @@ A score goal set as a percentage of the PB, or of the PB's pace where the app
 measures a time-scored scenario by pace
 ([2026-07-08](decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md),
 [2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
-How a run is judged against it is in
-[notifications.md](specs/notifications.md#run-notifications).
+How a run toast judges a run against it is in
+[notifications.md](specs/notifications.md#run-notifications), and how a past
+run is judged for its check is in
+[run_history.md](specs/run_history.md#marks-the-check-and-the-star).
 
-- On screen, the verdict reads Threshold passed or Below threshold.
+- On screen, the verdict reads Threshold passed or Below threshold, and a
+  check beside a run's score in the run list says the run passed.
 - Not a rank's threshold, which comes from a benchmark file.
 
 ### Top-N placement
 
 Where a new run's score places among the scenario's runs at the same
 sensitivity: first is best, and the rest are Nth-best, such as 2nd-best. A
-placement within Top N scores earns a run notification
-([notifications.md](specs/notifications.md#run-notifications)). The same N
-bounds what the chart plots
-([scenario_performance.md](specs/scenario_performance.md#the-graph)).
+placement within the top 5 earns a run notification
+([notifications.md](specs/notifications.md#run-notifications)). The chart
+plots every run, whatever its placement.
 
-- On screen: the Top N scores control, and toasts such as New 2nd-best score.
+- On screen: toasts such as New 2nd-best score.
 - In code: `nth_score` and `top_n_scores`.
 
 ### Run notification

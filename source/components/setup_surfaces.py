@@ -55,14 +55,14 @@ SETUP_CARD_SKIP_LABEL = "Skip"
 SETUP_CARD_CTA_CLASS = "setup-card-cta"
 # The card wears the shared alert anatomy on the ``dmc.Paper`` it already is.
 # Blue is the informational default; the caution modifier swaps in the yellow
-# tokens for the stats-folder state, which blocks every plot on the page and
-# cannot be dismissed.
+# tokens for the stats-folder state, which leaves the app with no run to
+# show and cannot be dismissed.
 SETUP_CARD_CLASS = "alert-panel setup-card"
 SETUP_CARD_CAUTION_CLASS = f"{SETUP_CARD_CLASS} alert-panel-caution"
 SETUP_CARD_CAUTION_ICON = "material-symbols:warning-outline"
 SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
 # The stats-folder hint wears the caution panel in both of its branches: each
-# one leaves every plot on the page empty, the same reason the card's
+# one leaves the app with no run to show, the same reason the card's
 # stats-folder state is yellow.
 STATS_DIR_HINT_CLASS = "alert-panel alert-panel-caution stats-dir-hint"
 

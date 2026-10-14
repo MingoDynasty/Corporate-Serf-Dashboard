@@ -4,14 +4,11 @@ This module handles functions around plots.
 
 import logging
 import re
-from collections.abc import Callable, Collection, Sequence
-from dataclasses import dataclass
+from collections.abc import Collection, Sequence
 from datetime import date, datetime
 from itertools import groupby
 from operator import attrgetter
-from typing import Generic, TypeVar
 
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
@@ -26,17 +23,15 @@ from source.utilities.utilities import (
 
 logger = logging.getLogger(__name__)
 
-_K = TypeVar("_K")
-
 # The raw-run scatter's trace name. It is the handle the Run Data Points
 # preferences select on: index 0 is an implementation detail of how the
 # combined figure is assembled, while the name is what the legend, the hover
 # template, and the appearance callback all already agree on.
 RUN_DATA_POINT_TRACE_NAME = "Run data point"
 # The Mantine figure template each color scheme draws with. The run trace
-# carries no color of its own (see the ``px.scatter`` note in the generator),
-# so the template's colorway is what colors the points, and it is also where
-# the Point color field's Default preview comes from.
+# sets no color of its own, so the template's colorway is what colors the
+# points, and it is also where the Point color field's Default preview comes
+# from.
 _THEME_TEMPLATES = {"light": "mantine_light", "dark": "mantine_dark"}
 
 POINT_SIZE_DEFAULT = "Default"
@@ -47,8 +42,8 @@ POINT_SIZE_DEFAULT = "Default"
 POINT_SIZE_OPTIONS = ("Small", POINT_SIZE_DEFAULT, "Large")
 POINT_SIZE_PRESET_PX = {"Small": 4, "Large": 10}
 
-# The trace of stars on the Score vs Time runs that set a new PB, and the
-# handle the Point size preference sizes it by. Its name is the legend entry.
+# The trace of stars on the runs that set a new PB, and the handle the Point
+# size preference sizes it by. Its name is the legend entry.
 NEW_PB_TRACE_NAME = "New PB"
 # One gold for both themes. On the light plot background the fill alone is
 # too faint to find, so the dark outline is what carries the mark there, and
@@ -75,9 +70,8 @@ _LATEST_RUN_RING_COLORS = {"light": "#1c7ed6", "dark": "#74c0fc"}
 LATEST_RUN_RING_SIZE_DEFAULT_PX = 18
 LATEST_RUN_RING_SIZE_PRESET_PX = {"Small": 14, "Large": 22}
 
-# The run points' sensitivity hover line, shared by both chart modes so they
-# can't drift apart. ``customdata[3]`` is empty for a run that wasn't converted,
-# so the line then ends at the sensitivity itself.
+# The run points' sensitivity hover line. ``customdata[3]`` is empty for a run
+# that wasn't converted, so the line then ends at the sensitivity itself.
 _RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
 
 # The legend of every score chart, laid out horizontally above the plot
@@ -242,34 +236,6 @@ def _add_rank_overlays(
         )
 
 
-@dataclass(frozen=True)
-class _AxisDescriptor(Generic[_K]):
-    """Per-axis configuration for the shared scatter/line plot builder.
-
-    ``_K`` is the type of the ``scenario_data`` grouping key, so the x-value
-    extractors stay honest per plot: sensitivity groups by ``str``, time groups
-    by ``datetime.date``.
-
-    :param axis_title: label for the x column, axis, and dataframe key.
-    :param empty_message: empty-state message shown when there is no data.
-    :param scatter_x: per-run x value from the ``(dict key, run)`` pair.
-    :param line_x: per-group x value from the dict key.
-    :param hover_x_label: hovertemplate fragment for the x value, shown by the
-        Average score line only. It must not read ``customdata``: the line
-        carries none, and a group can span recorded sensitivities.
-    :param hover_point_lines: hovertemplate lines, each ending in ``<br>``, that
-        the run points show between Score and Accuracy. They may read
-        ``customdata``.
-    """
-
-    axis_title: str
-    empty_message: str
-    scatter_x: Callable[[_K, RunData], float | str | date]
-    line_x: Callable[[_K], float | str | date]
-    hover_x_label: str
-    hover_point_lines: str
-
-
 def _recorded_sensitivity_suffix(run_data: RunData) -> str:
     """Name the setting a converted run was recorded at, or return ``""``.
 
@@ -393,231 +359,6 @@ def show_latest_run_ring(
         selector={"name": LATEST_RUN_TRACE_NAME},
     )
     return figure
-
-
-def _generate_xy_plot(  # noqa: PLR0913
-    scenario_data: dict[_K, list[RunData]],
-    scenario_name: str,
-    rank_overlay_switch: bool,
-    rank_data: list[Rank],
-    show_all_ranks: bool,
-    axis: _AxisDescriptor[_K],
-    new_high_score_runs: Collection[RunData],
-) -> go.Figure:
-    """Build a scatter-plus-average-line score plot against a configurable x axis.
-
-    ``axis`` describes the x column, its values, and the hover labels.
-    ``show_all_ranks`` draws the full rank ladder instead of the bracketing
-    selection around the plotted score range. Each run in
-    ``new_high_score_runs`` that ``scenario_data`` holds gets a star, in a
-    trace that exists only when there is one to draw.
-    """
-    if not scenario_data:
-        return generate_empty_plot(
-            "No runs to plot",
-            axis.empty_message,
-        )
-
-    axis_title = axis.axis_title
-    hover_x_label = axis.hover_x_label
-    scores: list[float] = []
-    scatter_plot_data: dict[str, list[float | str | date]] = {
-        "Score": [],
-        axis_title: [],
-        "Datetime": [],
-        "Accuracy": [],
-        # Not "Sensitivity": that is the x column's key in Score vs Sensitivity.
-        "Run sensitivity": [],
-        "Recorded sensitivity": [],
-    }
-    line_plot_data: dict[str, list[float | str | date]] = {
-        "Score": [],
-        axis_title: [],
-    }
-    new_pb_x: list[float | str | date] = []
-    new_pb_scores: list[float] = []
-
-    for key, runs_data in scenario_data.items():
-        for run_data in _new_high_scores_last(runs_data, new_high_score_runs):
-            x_value = axis.scatter_x(key, run_data)
-            scores.append(run_data.score)
-            scatter_plot_data["Score"].append(run_data.score)
-            scatter_plot_data[axis_title].append(x_value)
-            # Matched on the run, never on where it is plotted. A later run
-            # the same day with the same score sits at the same point, and
-            # the day's filter can keep that tie while dropping the new PB,
-            # so a match on position would star a run that never beat the PB.
-            if run_data in new_high_score_runs:
-                new_pb_x.append(x_value)
-                new_pb_scores.append(run_data.score)
-            scatter_plot_data["Datetime"].append(
-                format_absolute_timestamp(
-                    run_data.datetime_object, include_seconds=True
-                ),
-            )
-            scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
-            scatter_plot_data["Run sensitivity"].append(
-                f"{run_data.horizontal_sens} {run_data.sens_scale}"
-            )
-            scatter_plot_data["Recorded sensitivity"].append(
-                _recorded_sensitivity_suffix(run_data)
-            )
-        line_plot_data[axis_title].append(axis.line_x(key))
-        line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
-    # If we want to generate a trendline (e.g. lowess)
-    # if len(data.keys()) <= 2:
-    #     # We need at least 3 sensitivities to generate a trendline
-    #     logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
-    #     return
-
-    current_datetime = format_absolute_timestamp(datetime.today())
-    title = f"{scenario_name} (updated: {current_datetime!s})"
-    logger.debug('Generating plot for: "%s"', scenario_name)
-
-    figure_scatter = px.scatter(
-        data_frame=pd.DataFrame(scatter_plot_data),
-        x=axis_title,
-        y="Score",
-        hover_name="Datetime",
-        hover_data=["Datetime"],
-        custom_data=[
-            "Datetime",
-            "Accuracy",
-            "Run sensitivity",
-            "Recorded sensitivity",
-        ],
-    )
-    figure_scatter.update_traces(
-        # px bakes the first colorway entry of Plotly's default template into
-        # the trace, and a template applied later never overrides a property
-        # the trace already sets. Clearing it leaves the color to whichever
-        # Mantine template the theme applies at render, as the first trace's
-        # share of that template's colorway.
-        marker_color=None,
-        hovertemplate="<b>%{customdata[0]}</b><br><br>"
-        + "<b>Score</b>: %{y}<br>"
-        + axis.hover_point_lines
-        + "<b>Accuracy</b>: %{customdata[1]}%"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    # trendline="lowess"  # simply using average line for now
-    figure_line = px.line(
-        data_frame=pd.DataFrame(line_plot_data),
-        x=axis_title,
-        y="Score",
-    )
-    figure_line.update_traces(
-        hovertemplate="<b>Average score</b>: %{y}<br>"
-        + hover_x_label
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    figure_combined = go.Figure(data=figure_scatter.data + figure_line.data)
-    figure_combined.update_layout(
-        title=title,
-        xaxis={"title": axis_title},
-        yaxis={"title": "Score"},
-        font={
-            "size": 14,
-        },
-        legend=_LEGEND_ABOVE_PLOT,
-    )
-    figure_combined["data"][0]["name"] = RUN_DATA_POINT_TRACE_NAME
-    figure_combined["data"][0]["showlegend"] = True
-    figure_combined["data"][1]["name"] = "Average score"
-    figure_combined["data"][1]["showlegend"] = True
-    if new_pb_x:
-        figure_combined.add_trace(_new_pb_trace(new_pb_x, new_pb_scores))
-
-    _add_rank_overlays(
-        figure_combined,
-        rank_overlay_switch,
-        rank_data,
-        scores,
-        show_all_ranks,
-    )
-    return figure_combined
-
-
-def generate_sensitivity_plot(
-    scenario_data: dict[str, list[RunData]],
-    scenario_name: str,
-    rank_overlay_switch: bool,
-    rank_data: list[Rank],
-    show_all_ranks: bool = False,
-) -> go.Figure:
-    """
-    Generate a plot using the scenario data.
-    :param scenario_data: the scenario data to use for the plot.
-    :param scenario_name: the name of the scenario to use for the plot.
-    :param rank_overlay_switch: enable/disable rank overlay.
-    :param rank_data: an optional list of ranks to plot.
-    :param show_all_ranks: draw the full rank ladder instead of the bracketing
-        selection around the plotted score range.
-    :return: go.Figure Plot
-    """
-    return _generate_xy_plot(
-        scenario_data,
-        scenario_name,
-        rank_overlay_switch,
-        rank_data,
-        show_all_ranks,
-        _AxisDescriptor[str](
-            axis_title="Sensitivity",
-            empty_message="No sensitivity data is available for this scenario yet.",
-            scatter_x=lambda _key, run: f"{run.horizontal_sens} {run.sens_scale}",
-            line_x=lambda key: key,
-            hover_x_label="<b>Sensitivity</b>: %{x}",
-            # The sensitivity line shows the same value as %{x}, plus the setting
-            # a converted run was recorded at, so it stands in for the x line
-            # rather than repeating it.
-            hover_point_lines=_RUN_SENSITIVITY_HOVER_LINE,
-        ),
-        # Empty on purpose: the stars are Score vs Time's alone. This chart
-        # keeps only the top scores at each sensitivity, so it would draw the
-        # latest new PBs and silently leave out the ones since beaten.
-        new_high_score_runs=(),
-    )
-
-
-def generate_time_plot(  # noqa: PLR0913
-    scenario_data: dict[date, list[RunData]],
-    scenario_name: str,
-    rank_overlay_switch: bool,
-    rank_data: list[Rank],
-    show_all_ranks: bool = False,
-    new_high_score_runs: Collection[RunData] = (),
-) -> go.Figure:
-    """Build the Score vs Time figure from a scenario's kept runs, grouped by day.
-
-    ``new_high_score_runs`` is the scenario's new PBs, judged over its whole
-    history and not over ``scenario_data``, which holds only the runs the
-    page's filters kept. Each one that is plotted gets a star in a third
-    trace, named ``NEW_PB_TRACE_NAME`` and drawn over the other two, and with
-    none plotted the figure has no such trace. ``show_all_ranks`` draws the
-    full rank ladder instead of the bracketing selection around the plotted
-    score range.
-    """
-    return _generate_xy_plot(
-        scenario_data,
-        scenario_name,
-        rank_overlay_switch,
-        rank_data,
-        show_all_ranks,
-        _AxisDescriptor[date](
-            axis_title="Date",
-            empty_message="No score history is available for this scenario yet.",
-            scatter_x=lambda key, _run: key,
-            line_x=lambda key: key,
-            hover_x_label="<b>Date</b>: %{x}",
-            # A day's runs can span sensitivities, so each point names its own.
-            hover_point_lines="<b>Date</b>: %{x}<br>" + _RUN_SENSITIVITY_HOVER_LINE,
-        ),
-        new_high_score_runs=new_high_score_runs,
-    )
 
 
 def _generate_run_history_plot(  # noqa: PLR0913

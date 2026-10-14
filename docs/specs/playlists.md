@@ -56,11 +56,13 @@ and [product.md](../product.md). Leaderboard placement is worded
   bare-route selector dropdown is gone
   ([2026-07-03](../decision_log/2026/2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional.md)).
   `playlist_selector.py` is now only the shared props, a preset and a sizing
-  rule, for the Home and Aim Training Journey dropdowns.
+  rule, for the Run History and Aim Training Journey dropdowns.
 - One cell in each row navigates, on both tables: a click anywhere in the
   Playlist name cell opens `/playlists/{code}`, and a click anywhere in the
-  table's Scenario cell opens that scenario on the Scenario Performance page
-  (prebuilt `/?playlist_code=<code>&scenario=<name>`). That cell shows the
+  table's Scenario cell opens that scenario on the Run History page
+  (prebuilt `/run-history?playlist_code=<code>&scenario=<name>`,
+  [2026-10-12](../decision_log/2026/2026-10-12-run-history-has-its-own-address-and-the-landing-address-is-home.md)).
+  That cell shows the
   pointer cursor over its whole width. No other cell navigates, and a row
   keeps its hover tint
   ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
@@ -71,13 +73,13 @@ and [product.md](../product.md). Leaderboard placement is worded
   reaches `cellClicked` either: with Ctrl or Cmd it opens the name in a new
   tab, and with Shift or Alt alone it opens nothing
   ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
-- The Scenario Performance page links back to the table: while its Playlist
+- The Run History page links back to the table: while its Playlist
   filter holds a loaded playlist, the "Open scenario table" link under the
   filter leads to `/playlists/{code}`. The link carries no `?sort=`, so the
   table opens unsorted, in playlist order. A plain click navigates inside the
   app and a modified click keeps the native anchor. The link's own states are
   specified in
-  [scenario_performance.md](scenario_performance.md#the-controls-row).
+  [run_history.md](run_history.md#the-top-row).
 - The table load is driven by the mounted layout's `playlist-scenarios-code`
   store, never by the URL change
   ([2026-04-29](../decision_log/2026/2026-04-29-drive-playlist-table-loads-from-mounted-route-state.md)).
@@ -149,9 +151,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   plus every user-root code) without writing; a usable file is
   authoritative, even empty. Hidden playlists still load, route, and draw rank overlays
   ([2026-07-11](../decision_log/2026/2026-07-11-the-playlist-overview-is-the-playlist-management-surface.md)).
-  A hidden playlist is left out of the Scenario Performance filter and the
+  A hidden playlist is left out of the Run History filter and the
   Journey picker, except that the filter lists the hidden playlist it holds
-  ([scenario_performance.md](scenario_performance.md#the-controls-row)).
+  ([run_history.md](run_history.md#the-top-row)).
   The browser-persisted "Show hidden" switch reveals them muted, and the eye
   cell toggles one code with no confirm step. The file is
   `schema_version`-stamped: an unusable or newer-build file yields the seed
@@ -303,7 +305,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   ([2026-08-09](../decision_log/2026/2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps.md)).
   PB cm/360 is known when the PB run's sensitivity is in cm/360, natively or
   by parse-time conversion
-  ([scenario_performance.md](scenario_performance.md#the-graph)); a legacy run
+  ([run_history.md](run_history.md#the-chart)); a legacy run
   without DPI and increment keeps `N/A`
   ([2026-09-11](../decision_log/2026/2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi.md)).
   PB Score and PB cm/360 show up to two decimals with trailing zeros
@@ -366,7 +368,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
   How a scenario is recognized, and when its PB can be measured by pace, is
   in
-  [scenario_performance.md](scenario_performance.md#time-scored-scenarios).
+  [run_history.md](run_history.md#time-scored-scenarios).
   Only a row with a ladder and a PB asks, so a playlist's table reads no
   performance file, and a lookup that fails costs the pace gap, never the
   row.
@@ -567,9 +569,9 @@ except where another entry is linked.
   order per root, bundled root first; the first file for a code wins, and a
   shadowed one is skipped with a startup warning buffered for the UI
   ([2026-07-07](../decision_log/2026/2026-07-07-use-playlist-codes-as-playlist-identity.md)).
-  Those warnings drain only when the Scenario Performance page mounts, as
+  Those warnings drain only when Home or the Run History page mounts, as
   persistent yellow toasts titled "Playlist not loaded"; an app session that
-  starts on `/playlists` sees them after its first visit there. Each body
+  starts on `/playlists` sees them after its first visit to either. Each body
   names the file by kind and ends with its path, such as "The playlist file
   isn't valid JSON. File: {path}", and a shadowed file reads "Skipped a
   duplicate playlist file. Its playlist code {code} is already loaded from

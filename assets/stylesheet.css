@@ -33,8 +33,8 @@
 
 /* The AppShell header is a fixed 4em band; keep its content on one line and
    truncate the title so a narrow window can't wrap it over the page content
-   below (the home page height calc assumes the header stays inside its
-   offset). */
+   below (each full-height page's height calc assumes the header stays inside
+   its offset). */
 .app-header-title-col,
 .app-header-title-anchor {
     /* Every flex level above the title must be allowed to shrink below its
@@ -53,20 +53,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-/* Home fills the viewport below the AppShell header so the graph can flex to
-   whatever height the controls leave over. A fixed-height graph forced
-   vertical scrolling to reach the X axis whenever zoom or a narrow window
-   made the controls wrap taller. */
-.home-page {
-    display: flex;
-    flex-direction: column;
-    height: calc(
-        100dvh
-        - var(--app-shell-header-offset, 0rem)
-        - 2 * var(--app-shell-padding, 0rem)
-    );
 }
 
 /* Outer column for the grid pages (playlists overview, playlist scenarios).
@@ -119,24 +105,6 @@
     min-height: 20rem;
     min-width: 0;
     overflow: hidden;
-}
-
-/* The chart and its options inspector share this area. The reflow threshold
-   measures the area rather than the window: the AppShell navbar is
-   fixed-position and 225px wide, so it shrinks the content area without
-   touching the viewport, and a media query would keep the inspector beside a
-   chart it has already crushed. A container query cannot match on the element
-   that declares the container, hence the wrapper -- this is the flex child
-   .home-page grows, so it carries the growth and height floor. */
-.home-chart-area {
-    /* Matches dmc.AppShell's own transitionDuration, so opening the inspector
-       and collapsing the navbar move the chart at the same speed. */
-    --chart-options-collapse-duration: 200ms;
-
-    container: home-chart-area / inline-size;
-    display: grid;
-    flex: 1 1 0;
-    min-height: 20rem;
 }
 
 /* Beside the chart: the graph's track absorbs whatever the inspector's does
@@ -220,8 +188,8 @@
    shows that color rather than Mantine's stand-in. ColorInput paints the
    preview of an empty value white, as an inline style, which is what the
    !important is for. The color itself is the graph template's, one per color
-   scheme: Home sets --point-color-default-light and -dark on the field from
-   plot_service.generated_point_color, so the swatch cannot drift from the
+   scheme: the panel sets --point-color-default-light and -dark on the field
+   from plot_service.generated_point_color, so the swatch cannot drift from the
    graph. A typed or picked color hides the placeholder, and with it these
    rules: Mantine's own preview of that color takes over. */
 .point-color-field:has(input:placeholder-shown)
@@ -248,43 +216,13 @@
     transform: rotate(180deg);
 }
 
-/* Below this much room for the chart row, a 20rem rail leaves too little
-   chart to read: the same DOM stacks the inspector above the graph instead.
-   The threshold is Mantine's md step, the scale Home's controls grid already
-   measures itself against (home.CHART_OPTIONS_REFLOW_BREAKPOINT). */
-@container home-chart-area (max-width: 62em) {
-    .home-chart-row {
-        /* Stacking is a height change with no width to animate, so the panel
-           appears and goes at once rather than lingering for a collapse that
-           is not happening. Inherited by the panel. */
-        --chart-options-collapse-duration: 0s;
-
-        display: flex;
-        flex-direction: column;
-        /* Nothing overflows sideways here, and clipping would cut the graph
-           off at the row instead of letting the page scroll. */
-        overflow: visible;
-    }
-
-    /* Stacked, the panel is as wide as the page and every row of controls it
-       adds is height the chart loses, so the groups run side by side and the
-       panel keeps its natural height instead of shrinking the graph. */
-    .chart-options-panel {
-        flex: 0 0 auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: var(--mantine-spacing-xl);
-        order: -1;
-        width: auto;
-    }
-}
-
-/* The Run History page fills the viewport below the AppShell header, as the
-   Scenario Performance page does, so the chart takes whatever height the rows
-   above it leave. It is also the box its own column rule measures. The
-   AppShell navbar is fixed-position and 225px wide, so it narrows the page
-   without touching the viewport, and a media query would keep two columns in
-   a page too narrow for them. */
+/* The Run History page fills the viewport below the AppShell header, so the
+   chart takes whatever height the rows above it leave. A fixed-height chart
+   forced vertical scrolling to reach the X axis whenever zoom or a narrow
+   window made the rows above it wrap taller. The page is also the box its
+   own column rule measures. The AppShell navbar is fixed-position and 225px
+   wide, so it narrows the page without touching the viewport, and a media
+   query would keep two columns in a page too narrow for them. */
 .run-history-page {
     container: run-history-page / inline-size;
     display: flex;
@@ -465,11 +403,15 @@
     display: none;
 }
 
-/* The chart and its options panel share this area, as on the Scenario
-   Performance page, and the row inside it is that page's .home-chart-row. The
-   area is a container of its own because the panel stacks at a different
-   width here: this chart's area is the page less the run list, so the other
-   page's threshold would stack the panel in almost every window. */
+/* The chart and its options panel share this area, and the row inside it is
+   .home-chart-row. The stacking threshold measures the area and never the
+   window: the AppShell navbar is fixed-position and 225px wide, and the run
+   list takes 500px more, so both narrow the chart without touching the
+   viewport, and a media query would keep the panel beside a chart it has
+   already crushed. A container query cannot match on the element that
+   declares the container, hence the wrapper around the row. It is the flex
+   child the chart's column grows, so it carries the growth and the height
+   floor. */
 .run-history-chart-area {
     /* Matches dmc.AppShell's own transitionDuration, so opening the panel and
        collapsing the navbar move the chart at the same speed. */
@@ -739,18 +681,26 @@
 }
 
 /* Below 48em of room for the chart and its panel together, a 20rem panel
-   leaves too little chart to read, so the panel stacks above the graph. The
-   declarations are the Scenario Performance page's own stacking rule, under
-   this page's container and threshold. */
+   leaves too little chart to read, so the same DOM stacks the panel above the
+   graph. */
 @container run-history-chart-area (max-width: 48em) {
     .home-chart-row {
+        /* Stacking is a height change with no width to animate, so the panel
+           appears and goes at once rather than lingering for a collapse that
+           is not happening. Inherited by the panel. */
         --chart-options-collapse-duration: 0s;
 
         display: flex;
         flex-direction: column;
+        /* Nothing overflows sideways here, and clipping would cut the graph
+           off at the row instead of letting the page scroll. */
         overflow: visible;
     }
 
+    /* Stacked, the panel is as wide as the chart's column and every row of
+       controls it adds is height the chart loses, so the groups run side by
+       side and the panel keeps its natural height instead of shrinking the
+       graph. */
     .chart-options-panel {
         flex: 0 0 auto;
         flex-direction: row;
@@ -818,7 +768,7 @@
     font-weight: 600;
 }
 
-/* The first-run setup card at the top of Scenario Performance, and the
+/* The first-run setup card at the top of Home and of Run History, and the
    stats-folder hint above it. The card asks for what the app could not
    configure on its own and the hint explains why every scenario control is
    empty, so each reads as one bounded block rather than page furniture:
@@ -880,7 +830,7 @@
     font-size: var(--mantine-font-size-xs);
 }
 
-/* Trailing explanation for the Home Position value: why it reads N/A, or why
+/* Trailing explanation for the Position value: why it reads N/A, or why
    it is a cached number rather than current truth. Dimmed and smaller so the
    position itself stays the thing the eye lands on. */
 .scenario-rank-hint {

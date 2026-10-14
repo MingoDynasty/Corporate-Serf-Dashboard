@@ -404,6 +404,47 @@ def test_no_playlist_means_no_rank_lines_and_no_lookup(
     assert not figure.layout.annotations
 
 
+@pytest.mark.parametrize("mode", [SCORE_VS_RUN, SCORE_VS_TIME, SCORE_VS_SENSITIVITY])
+def test_both_rank_switches_reach_the_figure(load_runs, monkeypatch, mode) -> None:
+    """Silver is inside the plotted scores, and Bronze and Gold are the nearest outside.
+
+    Platinum is drawn only with Show all ranks on, and none is drawn with
+    Rank thresholds off, whatever Show all ranks says.
+    """
+    load_runs(
+        _run(90.0, MIDNIGHT_TODAY - timedelta(days=1)),
+        _run(120.0, MIDNIGHT_TODAY),
+    )
+    ladder = [
+        Rank(name="Bronze", color="#aaaaaa", threshold=80),
+        Rank(name="Silver", color="#bbbbbb", threshold=110),
+        Rank(name="Gold", color="#ffcc00", threshold=150),
+        Rank(name="Platinum", color="#cccccc", threshold=500),
+    ]
+    monkeypatch.setattr(
+        run_history_chart, "get_rank_data_from_playlist_code", lambda *_args: ladder
+    )
+
+    def drawn_ranks(rank_overlay: bool, show_all_ranks: bool) -> list[str]:
+        figure, _supports_overlays = build_run_history_figure(
+            mode,
+            SCENARIO,
+            "100",
+            "90",
+            rank_overlay,
+            show_all_ranks,
+            "KovaaKsTestCode",
+            TODAY,
+        )
+        return [
+            annotation.text.split(" (")[0] for annotation in figure.layout.annotations
+        ]
+
+    assert drawn_ranks(True, False) == ["Bronze", "Silver", "Gold"]
+    assert drawn_ranks(True, True) == ["Bronze", "Silver", "Gold", "Platinum"]
+    assert drawn_ranks(False, True) == []
+
+
 def test_an_unexpected_mode_names_the_three_it_could_have_been(
     load_runs, caplog
 ) -> None:

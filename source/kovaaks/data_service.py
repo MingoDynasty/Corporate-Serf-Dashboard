@@ -10,7 +10,7 @@ import re
 import threading
 from collections import Counter, deque
 from collections.abc import Iterable
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -91,8 +91,9 @@ MIN_RUN_LENGTH = timedelta(seconds=1)
 MAX_RUN_LENGTH = min(PLAY_SESSION_BREAK_LIMIT, timedelta(hours=1))
 
 # Deliberately unsynchronized: after startup the watchdog thread is the only
-# writer, and raced reads self-heal on re-render (the home page's polling
-# tick, or the next interaction on pages without a data-driving interval).
+# writer, and raced reads self-heal on re-render (the Run History page's
+# polling tick, or the next interaction on pages without a data-driving
+# interval).
 # See the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
 # docs/decision_log/ for the revisit triggers and why file-backed (WAL) is
 # the chosen shape for an eventual SQLite migration.
@@ -438,74 +439,6 @@ def new_high_score_runs(runs: Iterable[RunData]) -> set[RunData]:
             best = run.score
             new_high_scores.add(run)
     return new_high_scores
-
-
-def get_new_high_score_runs(scenario_name: str) -> set[RunData]:
-    """Return the runs of a scenario that were new PBs when they were played.
-
-    Judged over every run the scenario holds, never a filtered view of them:
-    a run the chart leaves out still decides which later runs beat the PB.
-    """
-    return new_high_score_runs(kovaaks_database[scenario_name]["time_vs_runs"])
-
-
-def get_sensitivities_vs_runs_filtered(
-    scenario_name: str,
-    top_n_scores: int,
-    oldest_date: datetime,
-) -> dict[str, list[RunData]]:
-    """
-    Get sensitivities vs runs for a scenario, filtered by top N scores, and oldest date.
-    :param scenario_name: the name of the scenario to filter by.
-    :param top_n_scores: the number of top scores to filter by.
-    :param oldest_date: oldest date to filter by (inclusive).
-    """
-    # This logic might get blown away if/when we migrate to SQLite.
-    filtered_data: dict[str, list[RunData]] = {}
-    for key, runs_data in kovaaks_database[scenario_name][
-        "sensitivities_vs_runs"
-    ].items():
-        filtered_data[key] = []
-
-        # RunData list is already sorted by score, so we can simply iterate backwards.
-        for run_data in reversed(runs_data):
-            if run_data.datetime_object < oldest_date:
-                continue
-            filtered_data[key].append(run_data)
-            if len(filtered_data[key]) >= top_n_scores:
-                break
-
-        # avoid issues with empty arrays in the dictionary
-        if not filtered_data[key]:
-            del filtered_data[key]
-    return filtered_data
-
-
-def get_time_vs_runs(
-    scenario_name: str,
-    top_n_scores: int,
-    oldest_date: datetime,
-) -> dict[date, list[RunData]]:
-    """Group a scenario's top runs by date within the selected time range."""
-    # This logic might get blown away if/when we migrate to SQLite.
-
-    # 1. Build a dictionary with <Date, [RunData]>
-    data: dict[date, list[RunData]] = {}
-    for run_data in kovaaks_database[scenario_name]["time_vs_runs"]:
-        if run_data.datetime_object < oldest_date:
-            continue
-
-        date_obj = run_data.datetime_object.date()
-        if date_obj not in data:
-            data[date_obj] = []
-        data[date_obj].append(run_data)
-
-    # 2. Filter the data down to the Top N Scores
-    filtered_data = {}
-    for date_obj, runs_data in data.items():
-        sorted_list = sorted(runs_data, key=lambda item: item.score)
-        filtered_data[date_obj] = sorted_list[-top_n_scores:]
-    return filtered_data
 
 
 def get_playlist_selector_options() -> list[dict[str, str]]:

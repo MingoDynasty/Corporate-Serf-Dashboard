@@ -22,7 +22,6 @@ class IconAsset:
 
 ICONS: dict[str, IconAsset] = {
     "bi:house-door-fill": IconAsset("bi-house-door-fill.svg", 16, 16),
-    "clarity:date-line": IconAsset("clarity-date-line.svg", 36, 36),
     "clarity:settings-line": IconAsset("clarity-settings-line.svg", 36, 36),
     # Evxl's own logo, a PNG and not an Iconify icon: assets/icons/README.md
     # records whose it is and on what terms the app ships it.

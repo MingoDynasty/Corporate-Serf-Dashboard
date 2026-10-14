@@ -1,15 +1,16 @@
 """The Run Data Points preferences restyle the cached figure and nothing else.
 
 Point size and color are appearance, so they hang off the cheap callback that
-themes the figure Home already built and cached -- never off ``generate_graph``,
-which rereads scenario data, rebuilds overlays, and decides notifications. These
-tests pin that split, the two controls' persisted layout defaults, and the
-fallbacks that keep an unrecognized preference from breaking the graph.
+themes the figure the page already built and cached -- never off
+``generate_graph``, which rereads scenario data, rebuilds overlays, and decides
+notifications. These tests pin that split, the two controls' persisted layout
+defaults, and the fallbacks that keep an unrecognized preference from breaking
+the graph. The page is Run History, which hosts the Chart options panel.
 """
 
 import json
 import re
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import dash
@@ -23,21 +24,21 @@ from dash._callback import GLOBAL_CALLBACK_MAP  # noqa: E402
 
 from source.components import chart_options, scenario_selection  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
 from source.plot.plot_service import (  # noqa: E402
     NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
     apply_light_dark_mode,
-    generate_sensitivity_plot,
-    generate_time_plot,
+    generate_empty_plot,
+    generate_score_vs_run_plot,
+    generate_score_vs_sensitivity_plot,
+    generate_score_vs_time_plot,
     generated_point_color,
 )
 
-APPEARANCE_INPUT_IDS = {
-    home.CHART_OPTIONS_IDS.point_size,
-    home.CHART_OPTIONS_IDS.point_color,
-}
+IDS = run_history.CHART_OPTIONS_IDS
+APPEARANCE_INPUT_IDS = {IDS.point_size, IDS.point_color}
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
 
@@ -55,21 +56,23 @@ def _walk_components(component):
 
 @pytest.fixture
 def components(monkeypatch) -> dict:
-    """Render Home without touching disk and index the tree by component id."""
+    """Render the page without touching disk and index the tree by component id."""
     monkeypatch.setattr(
         scenario_selection, "get_visible_playlist_selector_options", lambda: []
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     return {
-        getattr(component, "id", None): component
-        for component in _walk_components(home.layout())
+        component.id: component
+        for component in _walk_components(run_history.layout())
+        # A pattern-matching id is a dict, which cannot key this one.
+        if isinstance(getattr(component, "id", None), str)
     }
 
 
-def _run(score: float) -> RunData:
+def _run(score: float, hour: int) -> RunData:
     return RunData(
-        datetime_object=datetime(2025, 1, 1, 10),
+        datetime_object=datetime(2025, 1, 1, hour),
         score=score,
         sens_scale="Overwatch",
         horizontal_sens=2.0,
@@ -78,26 +81,30 @@ def _run(score: float) -> RunData:
     )
 
 
-@pytest.fixture(params=["score_vs_sensitivity", "score_vs_time"])
+def _two_runs() -> list[RunData]:
+    return [_run(100.0, 10), _run(120.0, 11)]
+
+
+@pytest.fixture(params=["score_vs_run", "score_vs_time", "score_vs_sensitivity"])
 def cached_plot(request) -> str:
-    """A real cached-plot payload, one per graph mode."""
-    runs = [_run(100.0), _run(120.0)]
-    if request.param == "score_vs_sensitivity":
-        figure = generate_sensitivity_plot({"2.0 Overwatch": runs}, "1w4ts", False, [])
-    else:
-        figure = generate_time_plot(
-            {datetime(2025, 1, 1).date(): runs}, "1w4ts", False, []
+    """A real cached-plot payload, one per chart mode."""
+    runs = _two_runs()
+    if request.param == "score_vs_run":
+        figure = generate_score_vs_run_plot(
+            runs, 1, "1w4ts", False, [], False, (), date(2025, 1, 2)
         )
+    elif request.param == "score_vs_time":
+        figure = generate_score_vs_time_plot(runs, "1w4ts", False, [], False, ())
+    else:
+        figure = generate_score_vs_sensitivity_plot(runs, "1w4ts", False, [], False)
     return figure.to_json()
 
 
 @pytest.fixture
 def starred_plot() -> str:
     """A cached Score vs Time payload whose second run set a new PB."""
-    runs = [_run(100.0), _run(120.0)]
-    figure = generate_time_plot(
-        {datetime(2025, 1, 1).date(): runs}, "1w4ts", False, [], False, {runs[1]}
-    )
+    runs = _two_runs()
+    figure = generate_score_vs_time_plot(runs, "1w4ts", False, [], False, {runs[1]})
     return figure.to_json()
 
 
@@ -112,7 +119,7 @@ def _new_pb_trace(figure: go.Figure):
 
 
 def test_run_data_points_group_sits_between_overlays_and_score_threshold(components):
-    panel = components[home.CHART_OPTIONS_IDS.panel]
+    panel = components[IDS.panel]
 
     titles = [
         component.children
@@ -132,8 +139,8 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
     # Dash persistence is keyed by component id, and changing a layout default
     # silently wipes every value the browser already stored under it. Default
     # and an empty color are also what "leave the figure alone" means.
-    size = components[home.CHART_OPTIONS_IDS.point_size]
-    color = components[home.CHART_OPTIONS_IDS.point_color]
+    size = components[IDS.point_size]
+    color = components[IDS.point_color]
 
     assert size.value == "Default"
     assert size.data == ["Small", "Default", "Large"]
@@ -145,9 +152,7 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
     assert color.placeholder == "Default"
     assert color.persistence is True
 
-    assert (
-        components[home.CHART_OPTIONS_IDS.point_color_default].children == "Use default"
-    )
+    assert components[IDS.point_color_default].children == "Use default"
 
 
 def test_empty_point_color_field_previews_the_generated_color(components):
@@ -158,13 +163,11 @@ def test_empty_point_color_field_previews_the_generated_color(components):
     # to the same names.
     field = next(
         component
-        for component in _walk_components(components[home.CHART_OPTIONS_IDS.panel])
+        for component in _walk_components(components[IDS.panel])
         if chart_options.POINT_COLOR_FIELD_CLASS in getattr(component, "className", "")
     )
 
-    assert home.CHART_OPTIONS_IDS.point_color in [
-        getattr(child, "id", None) for child in field.children
-    ]
+    assert IDS.point_color in [getattr(child, "id", None) for child in field.children]
     assert field.style == {
         "--point-color-default-light": generated_point_color("light"),
         "--point-color-default-dark": generated_point_color("dark"),
@@ -204,7 +207,7 @@ def test_generated_run_points_take_the_theme_template_colorway(cached_plot):
 
 
 def test_point_color_offers_the_curated_swatches_on_one_row(components):
-    color = components[home.CHART_OPTIONS_IDS.point_color]
+    color = components[IDS.point_color]
 
     assert color.swatches == [
         "#1c7ed6",
@@ -230,11 +233,11 @@ def test_point_color_offers_the_curated_swatches_on_one_row(components):
 def test_point_size_is_named_by_its_own_visible_label(components):
     # SegmentedControl has no Mantine label slot, so the visible text becomes
     # the control's accessible name by reference rather than by proximity.
-    size = components[home.CHART_OPTIONS_IDS.point_size].to_plotly_json()["props"]
-    label = components[home.CHART_OPTIONS_IDS.point_size_label]
+    size = components[IDS.point_size].to_plotly_json()["props"]
+    label = components[IDS.point_size_label]
 
     assert label.children == "Point size"
-    assert size["aria-labelledby"] == home.CHART_OPTIONS_IDS.point_size_label
+    assert size["aria-labelledby"] == IDS.point_size_label
 
 
 def test_default_size_and_empty_color_leave_the_cached_figure_untouched(
@@ -250,7 +253,7 @@ def test_default_size_and_empty_color_leave_the_cached_figure_untouched(
     assert styled == themed_only
 
 
-def test_size_and_color_reach_only_the_run_trace_in_both_graph_modes(cached_plot):
+def test_size_and_color_reach_the_run_trace_in_every_chart_mode(cached_plot):
     figure = chart_options.apply_graph_appearance(
         "dark", cached_plot, "Large", "#f03e3e"
     )
@@ -258,10 +261,6 @@ def test_size_and_color_reach_only_the_run_trace_in_both_graph_modes(cached_plot
     run_trace = _run_trace(figure)
     assert run_trace.marker.size == POINT_SIZE_PRESET_PX["Large"]
     assert run_trace.marker.color == "#f03e3e"
-
-    average = next(trace for trace in figure.data if trace.name == "Average score")
-    assert average.marker.size is None
-    assert average.marker.color is None
 
     # Appearance is not analysis: the axes and the trace names the legend and
     # hover labels read from stay the ones generate_graph produced.
@@ -314,10 +313,7 @@ def test_point_color_changes_the_run_points_and_never_the_new_pb_stars(starred_p
 def test_a_figure_with_no_new_pb_trace_passes_through_the_star_sizing(cached_plot):
     figure = chart_options.apply_graph_appearance("light", cached_plot, "Large", "")
 
-    assert [trace.name for trace in figure.data] == [
-        RUN_DATA_POINT_TRACE_NAME,
-        "Average score",
-    ]
+    assert [trace.name for trace in figure.data] == [RUN_DATA_POINT_TRACE_NAME]
     assert _run_trace(figure).marker.size == POINT_SIZE_PRESET_PX["Large"]
 
 
@@ -335,8 +331,26 @@ def test_unusable_preferences_fall_back_to_the_generated_appearance(cached_plot)
         )
 
 
+def _assert_placeholder_figure(figure) -> None:
+    placeholder = go.Figure(figure)
+
+    assert not placeholder.layout.annotations
+    assert placeholder.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert placeholder.layout.plot_bgcolor == "rgba(0,0,0,0)"
+    assert placeholder.layout.dragmode is False
+    assert placeholder.layout.xaxis.visible is False
+    assert placeholder.layout.yaxis.visible is False
+
+
+def test_graph_theme_callback_falls_back_to_initial_placeholder():
+    figure = chart_options.apply_graph_appearance("light", None, "Default", "")
+
+    _assert_placeholder_figure(figure)
+    assert figure.layout.template.layout.paper_bgcolor == "#ffffff"
+
+
 def test_placeholder_and_empty_figures_tolerate_every_persisted_preference():
-    empty = home._empty_plot_json("No runs to plot", "Nothing here yet.")
+    empty = generate_empty_plot("No runs to plot", "Nothing here yet.").to_json()
 
     for plot_json in (None, "", empty):
         for size in ("Small", "Default", "Large", "Enormous"):
@@ -389,12 +403,11 @@ def test_appearance_preferences_never_reach_the_expensive_graph_callback():
     inputs = {
         key: {entry["id"] for entry in spec["inputs"]}
         for key, spec in GLOBAL_CALLBACK_MAP.items()
-        # Anchored at the start: the Run History page's own store id ends the
-        # same way.
-        if key.startswith("..cached-plot.data...") or key == "graph-content.figure"
+        if key.startswith(f"..{IDS.cached_plot}.data...")
+        or key == f"{IDS.graph}.figure"
     }
 
-    figure_inputs = inputs.pop("graph-content.figure")
+    figure_inputs = inputs.pop(f"{IDS.graph}.figure")
     assert APPEARANCE_INPUT_IDS <= figure_inputs
 
     # Whatever else it outputs, the callback that writes cached-plot is the one

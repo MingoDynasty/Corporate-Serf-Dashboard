@@ -28,6 +28,18 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **The Run History page** — the page that charts a scenario's scores now
+  shows every run, and where each run fits in a session. Its chart plots
+  every run in a range, in the order the runs were played, by time, or by
+  sensitivity, where it used to keep only each day's top few. Beside it a
+  list groups the scenario's runs by session, with a check on each run that
+  met the score threshold and a star on each new personal best, and a card
+  above reports the last run played. The page has a new name and an address
+  of its own, and the app now opens on a small Home page that holds
+  first-time setup. Each browser's remembered chart settings started over
+  once. (PRs #370, #371, #372, #373; design in #356; sessions in #359,
+  design in #355) Design rationale distilled into
+  [`decision_log/`](./decision_log/README.md).
 - **Categories and subcategories on benchmarks** — a benchmark's scenario
   table now draws the groups its author sorted the scenarios into: two narrow
   columns of merged, colored cells ahead of the scenario names, each labeled
@@ -64,69 +76,43 @@ sequence.
   unchanged. The stars record achievements, and whether the player is
   improving stays the trend verdict's question. (PR #346; design in #337)
   Design rationale distilled into [`decision_log/`](./decision_log/README.md).
-- **Rank and next-rank gap on benchmarks** — a benchmark's scenario table now
-  shows the rank each personal best has reached and how much it has to grow
-  to reach the next one, such as "+4.8% to Gold", with the threshold and the
-  points still needed on hover. Sorting that column ascending lists the
-  scenarios closest to ranking up, the question that used to send players to
-  Evxl. Both columns come from the bundled thresholds and the local personal
-  best, so they appear with the table and work offline. (PR #321; design in
-  #320) Design rationale distilled into
-  [`decision_log/`](./decision_log/README.md).
 ---
 
 ## Upcoming milestones
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **Run History, in five pieces, sessions first** — a reviewable record of
-  past runs that the per-run toast can't provide: the session in progress,
-  recent sessions, and a scenario's history over weeks. It was planned as one
-  proposal and is now five pieces, so that one can ship while another is
-  still being debated. Each piece's proposal carries its own open decisions,
-  and nothing below is ratified by being listed here.
-  1. **Groundwork** — moves the code the new page keeps out of the Scenario
-     Performance page's module, with no change in behavior. It has no
-     proposal.
-  2. **Sessions** — built, with nothing on screen (PR #359; design in #355):
-     what a session is, and a start and a length for every run. The app
-     splits the runs into sessions at a break of more than 30 minutes between
-     runs, and finds each visit, an unbroken stretch of runs on one scenario
-     inside a session. The rules are in
-     [`specs/sessions.md`](./specs/sessions.md), and their reasons in
-     [`decision_log/`](./decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md).
-  3. **The Run History page, version 1** — a page of its own with a chart
-     that plots every run, the selected scenario's runs listed by session,
-     and a card for the latest run. It's built hidden and made public when
-     it's complete. The design is in its
-     [proposal](./proposals/run_history_proposal.md), ratified on
-     2026-10-12.
-  4. **Run toasts** — what a run's toast says once the page shows how the
-     run went. It lands when the page goes public, or after, and has a
-     proposal of its own.
-  5. **All scenarios** — a second view of the run list: each session's
-     scenarios in the order they were played. It follows the public page,
-     and has a proposal of its own.
+- **Run History, the last two pieces** — the page is public, and two pieces
+  of the work it was split into remain. Each piece's proposal carries its own
+  decisions, and nothing below is ratified by being listed here.
+  1. **Run toasts** — what a run's toast says now that the page shows how
+     the run went: one plain toast on every page, which links to Run
+     History, in place of the verdict toast the page builds today. Its
+     [proposal](./proposals/run_toasts_proposal.md) was ratified on
+     2026-10-11 and waited for the page to go public. Until it lands, the
+     page builds today's toast, with placement fixed at the top 5 and both
+     notification switches still in Chart options.
+  2. **All scenarios** — a second view of the run list: each session's
+     scenarios in the order they were played. It has a proposal of its own,
+     not yet written.
 
-  The pieces are built in that order. Sessions can be built beside the
-  groundwork, and Run toasts and All scenarios don't wait for each other.
-  Version 1 leaves out the typical run. Its definition moves to a proposal
-  of its own, which the sessions decision settled. Going public retires
-  the interim per-run lines the watchdog writes to the debug log.
+  The two don't wait for each other. Version 1 of the page left out the
+  typical run. Its definition moves to a proposal of its own, which the
+  sessions decision settled. Score vs Sensitivity now plots every run at
+  each sensitivity with nothing that sums a sensitivity up, and its redesign
+  is later work.
 
-  Why it's next, and why sessions first:
-  - Nearly every planned feature needs sessions: history grouped by session,
-    time spent in a session, the trend verdict built on session medians, and
-    the typical run.
-  - They're cheap: one pure pass over the runs the app already holds in time
-    order, with no new data to capture beyond two lines of each stats file.
-  - It's what gets used most in session: a scenario's history and the
-    session so far are what the player checks between runs.
-  - All three seats that reviewed the in-session and between-sessions framing
-    (#317) recommended building the session review first.
+  Why it's next:
+  - Run toasts finishes what going public started. The page now holds a
+    run's verdict, so the toast no longer has to carry it, and two switches
+    in Chart options exist only for the toast.
+  - All scenarios is what the session review still lacks: the page shows one
+    scenario's runs in a session, and not yet the session across scenarios.
+  - Both build on what shipped: the sessions, the run list, and the page's
+    address.
 
-  Baseline in
-  [`specs/scenario_performance.md`](./specs/scenario_performance.md).
+  The page's behavior is in
+  [`specs/run_history.md`](./specs/run_history.md).
 ---
 
 ## Future (briefly)
@@ -164,7 +150,7 @@ next.
   them.
 - **Scenarios page** — scenario-first navigation for scenarios that live in
   several playlists or in none, parked from the playlist-overview design. The
-  overview → scenario table → Scenario Performance drill chain covers
+  overview → scenario table → Run History drill chain covers
   playlist-first navigation; this would answer "show me this scenario
   regardless of playlist."
 - **Weakness by the typical run** — columns on the playlist scenario table
@@ -172,7 +158,7 @@ next.
   wait on a re-check, due around 2026-10-09, of the evidence that the typical
   run orders weaknesses better.
 - **An overview** — time spent and activity across all scenarios. No design
-  yet.
+  yet. Home, the page the app opens on, holds its place.
 - **KovaaK's own log** — the game's log records what stats files usually
   don't: restarts, freeplay, and how long the game was open, which could give
   time spent an upper bound. A local archive outside the app is already

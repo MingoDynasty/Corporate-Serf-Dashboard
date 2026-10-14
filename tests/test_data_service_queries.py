@@ -1,5 +1,5 @@
 import logging
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 import pytest
 from sortedcontainers import SortedList
@@ -136,10 +136,6 @@ def _playlist(code: str, *scenarios: Scenario) -> PlaylistData:
     return PlaylistData(name=f"{code} playlist", code=code, scenarios=list(scenarios))
 
 
-def _scores(grouped: dict) -> dict:
-    return {key: [run.score for run in runs] for key, runs in grouped.items()}
-
-
 @pytest.fixture
 def load_runs(monkeypatch):
     """Load runs through the real CSV loader, so every store has its real shape."""
@@ -173,87 +169,6 @@ def playlists(monkeypatch):
         )
 
     return install
-
-
-def test_time_vs_runs_keeps_each_days_highest_scores_ascending(load_runs):
-    load_runs(
-        _run(5.0, START),
-        _run(9.0, START + timedelta(hours=1)),
-        _run(7.0, START + timedelta(hours=2)),
-        _run(3.0, START + timedelta(days=1)),
-    )
-
-    result = data_service.get_time_vs_runs(SCENARIO_NAME, 2, datetime(2026, 1, 1))
-
-    assert _scores(result) == {
-        date(2026, 7, 1): [7.0, 9.0],
-        date(2026, 7, 2): [3.0],
-    }
-
-
-def test_time_vs_runs_keeps_every_run_when_top_n_exceeds_the_day(load_runs):
-    load_runs(_run(5.0, START), _run(9.0, START + timedelta(hours=1)))
-
-    result = data_service.get_time_vs_runs(SCENARIO_NAME, 10, datetime(2026, 1, 1))
-
-    assert _scores(result) == {date(2026, 7, 1): [5.0, 9.0]}
-
-
-def test_time_vs_runs_oldest_date_is_inclusive(load_runs):
-    load_runs(
-        _run(9.0, START - timedelta(seconds=1)),
-        _run(5.0, START),
-        _run(7.0, START + timedelta(hours=1)),
-    )
-
-    result = data_service.get_time_vs_runs(SCENARIO_NAME, 10, START)
-
-    assert _scores(result) == {date(2026, 7, 1): [5.0, 7.0]}
-
-
-def test_sensitivities_filtered_keeps_each_keys_highest_scores_highest_first(
-    load_runs,
-):
-    load_runs(
-        _run(5.0, START, horizontal_sens=40.0),
-        _run(9.0, START + timedelta(hours=1), horizontal_sens=40.0),
-        _run(7.0, START + timedelta(hours=2), horizontal_sens=40.0),
-        _run(4.0, START + timedelta(hours=3), horizontal_sens=35.0),
-        _run(6.0, START + timedelta(hours=4), horizontal_sens=35.0),
-        _run(2.0, START + timedelta(hours=5), horizontal_sens=35.0),
-    )
-
-    result = data_service.get_sensitivities_vs_runs_filtered(
-        SCENARIO_NAME, 2, datetime(2026, 1, 1)
-    )
-
-    assert _scores(result) == {
-        "40.0 cm/360": [9.0, 7.0],
-        "35.0 cm/360": [6.0, 4.0],
-    }
-
-
-def test_sensitivities_filtered_drops_a_key_with_no_runs_in_range(load_runs):
-    load_runs(
-        _run(8.0, START - timedelta(days=1), horizontal_sens=30.0),
-        _run(5.0, START + timedelta(hours=1), horizontal_sens=40.0),
-    )
-
-    result = data_service.get_sensitivities_vs_runs_filtered(SCENARIO_NAME, 5, START)
-
-    assert _scores(result) == {"40.0 cm/360": [5.0]}
-
-
-def test_sensitivities_filtered_oldest_date_is_inclusive(load_runs):
-    load_runs(
-        _run(9.0, START - timedelta(seconds=1)),
-        _run(5.0, START),
-        _run(7.0, START + timedelta(hours=1)),
-    )
-
-    result = data_service.get_sensitivities_vs_runs_filtered(SCENARIO_NAME, 5, START)
-
-    assert _scores(result) == {"40.0 cm/360": [7.0, 5.0]}
 
 
 def test_new_high_score_is_a_run_above_every_earlier_run():
@@ -312,16 +227,6 @@ def test_new_high_score_finds_none_when_scores_only_fall():
     ]
 
     assert data_service.new_high_score_runs(falling) == set()
-
-
-def test_get_new_high_score_runs_reads_the_scenarios_whole_history(load_runs):
-    other_scenario = _run(999.0, START, scenario="Other")
-    first = _run(50.0, START + timedelta(hours=1), horizontal_sens=40.0)
-    new_pb = _run(60.0, START + timedelta(days=30), horizontal_sens=30.0)
-    load_runs(new_pb, other_scenario, first)
-
-    assert data_service.get_new_high_score_runs(SCENARIO_NAME) == {new_pb}
-    assert data_service.get_new_high_score_runs("Other") == set()
 
 
 @pytest.mark.parametrize(

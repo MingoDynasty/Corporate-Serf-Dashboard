@@ -67,6 +67,20 @@ verdict", and the annotations "PB score" and "Score threshold". The group
 headings keep their capitals as section headings. The vocabulary rule this
 entry carries is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
+**Superseded in part (2026-10-12).** The page's name is now "Run History",
+which reverses the third ruling above. "The route restructure is deferred" is
+resolved: Run History is served at `/run-history`, in place of the
+`/scenario` this entry expected, and `/` serves a new Home page. "Run History
+composes into this column" is answered with a second column: the run list
+has a column of its own beside the chart, and Chart options opens between the
+two. Chart options' name, Settings' name, the ruling that the panel's column
+claims no exclusive tenancy, and the rule that copy is checked against the
+app's own words all stand. See
+[The Chart Page Is Named Run History](2026-10-12-the-chart-page-is-named-run-history.md),
+[Run History Has Its Own Address, And The Landing Address Is Home](2026-10-12-run-history-has-its-own-address-and-the-landing-address-is-home.md),
+and
+[The Run List Is A Second Column Beside The Chart](2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md).
+
 Shipped in PRs #209 and #215; design discussion in #206. Distilled with
 [the inspector entry](2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md)
 from `docs/chart_options_inspector_proposal.md`, now deleted.

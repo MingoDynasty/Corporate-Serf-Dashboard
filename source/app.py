@@ -122,8 +122,8 @@ def log_rank_lookup_availability() -> None:
     """Note once, at startup, that leaderboard lookups are off for lack of a name.
 
     An unset username is a supported state -- the app runs fully offline -- so
-    it is reported once here rather than per lookup. Home's Position field
-    carries the user-facing half, with a link to the settings page.
+    it is reported once here rather than per lookup. Run History's Position
+    field carries the user-facing half, with a link to the settings page.
 
     Reads the store rather than ``get_identity``: this is a report on what is
     configured, not a consumer of the identity, and it must not be the read
@@ -419,7 +419,7 @@ def main() -> None:
                 port=config.port,
             )
         else:
-            # Each Home poll tick bursts several callback POSTs at once;
+            # Each Run History poll tick bursts several callback POSTs at once;
             # Waitress's default 4 threads left no headroom (task queue depth
             # warnings with a single open tab).
             serve(

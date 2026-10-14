@@ -33,12 +33,14 @@ designed for a moment as well as for a question.
   the app between runs: an alt-tab, a second monitor, or a phone. Most looks
   are a glance, so an answer here has to work at a glance. Two questions
   come up that the three above don't cover. The first is *how did that run
-  go?*, which the run toast, the personal best celebration, and the plot
-  answer today. The second is *how is this session going?*, and it serves a
-  decision: keep pushing this scenario (and whether to push for speed or for
-  accuracy), switch to another, or stop. What rank the scores are reaching,
-  how long they've played, how many runs, and which scenarios are the
-  evidence for that call.
+  go?*, which the latest-run card, the run toast, the personal best
+  celebration, and the chart answer today. The second is *how is this
+  session going?*, and it serves a decision: keep pushing this scenario (and
+  whether to push for speed or for accuracy), switch to another, or stop.
+  What rank the scores are reaching, how long they've played, how many runs,
+  and which scenarios are the evidence for that call. Run History's list
+  answers it for the scenario on screen, and not yet for the session across
+  scenarios.
 - **Between sessions.** Before a session or after one. The user usually has
   more attention to give, though not always: just before a session they
   want to get playing. They look back (*am I improving?*, often starting
@@ -63,10 +65,43 @@ are one view or two is a design choice for the feature that builds them.
   playing without manual imports. *Problem solved:* manual tracking
   (spreadsheets, screenshots) dies because logging a run after every play is
   friction — here the act of playing *is* the act of logging.
-- **Sensitivity vs score and score-over-time plots.** Per-scenario plots with
-  runs grouped by sensitivity. *Problem solved:* "is my current sensitivity
-  actually better?" and "am I trending up on this scenario?" are answered
-  visually instead of by gut feel.
+- **A chart of every run** (Run History page, PR #370; design in #356). The
+  chart plots every run of a scenario in a range, three ways: in the order
+  the runs were played, by when they were played, and by sensitivity. It
+  opens on the last 100 runs in play order, where every run of a session
+  sits apart. *Problem solved:* "am I trending up on this scenario?" and "how
+  did the runs I just played go?" are answered visually instead of by gut
+  feel. The chart used to keep only the top few scores of each day or each
+  sensitivity, so a run you had just watched land could have no point at
+  all, and a whole day's runs shared one position. Score vs Sensitivity lost
+  its summaries in the same change: it shows every run at each sensitivity
+  and nothing yet that sums a sensitivity up.
+- **Runs listed by session** (Run History page, PR #371; design in #356).
+  Beside the chart, a list shows the scenario's runs under the session each
+  was played in, newest first: each run's time, score, accuracy, shots
+  fired, and sensitivity, how many of a session's runs were on this
+  scenario, and where you left the scenario and came back to it. A check
+  marks each run that met your score threshold and a star each new personal
+  best, each judged as of when the run was played, so a later best takes no
+  check away. *Problem solved:* between runs the question is what you scored
+  on the runs just before this one and how many you have played this
+  session, and the app couldn't answer it. A finished run was a toast that
+  disappeared, and a point on the chart only if it placed among the day's
+  best.
+- **The latest run, on a card** (Run History page, PR #372; design in #356).
+  A card at the top of the page reports the last run played, whatever
+  scenario is selected: its score, whether it passed your threshold or set a
+  new personal best, its percentage of the personal best it was chasing, and
+  which run of the session it was. *Problem solved:* the verdict on the run
+  you just finished was on screen for a few seconds, in a toast. The card
+  keeps it until the next run, and names a run played on another scenario
+  with one click to go there.
+- **Sessions** (PR #359; design in #355). The app groups your runs into
+  sessions: the runs separated by breaks of no more than 30 minutes. A
+  session reads as in progress until 30 minutes after its last run.
+  *Problem solved:* "how is this session going?" needs the app to know what
+  a session is, and so does nearly everything planned after it: time spent,
+  the trend verdict, and the typical run.
 - **Older runs land on the same sensitivity axis.** Runs recorded on a game's
   own sensitivity scale are shown in cm/360 like everything else, with a
   chart hover that names the setting and DPI each was recorded at, and the
@@ -118,8 +153,8 @@ are one view or two is a design choice for the feature that builds them.
 - **Personal best celebration.** A run that beats a scenario's personal best
   gets a short burst of confetti and a toast of its own: "New personal best",
   naming the scenario, the score, and how far ahead of your old best it landed.
-  It fires on whatever page you are looking at rather than only on Scenario
-  Performance, and for every scenario rather than the one on screen, because a
+  It fires on whatever page you are looking at rather than only on Run
+  History, and for every scenario rather than the one on screen, because a
   personal best is an achievement whatever you happen to be watching. The
   toast stays until you dismiss it, because the run that earned it was played
   in a fullscreen game and the news should still be there when you alt-tab
@@ -148,7 +183,7 @@ are one view or two is a design choice for the feature that builds them.
 - **No username means quiet, on the position surfaces too** (PR #227). With
   no KovaaK's username configured, opening a playlist skips the position
   update entirely and the table says "Positions unavailable. Set your
-  KovaaK's username in Settings."; clicking Refresh on Scenario Performance
+  KovaaK's username in Settings."; clicking Refresh on Run History
   answers with a blue notice naming the missing username. *Problem solved:*
   a fresh install could not open a playlist without watching a progress line
   count through an update that was fetching nothing, then land on a red
@@ -167,8 +202,9 @@ are one view or two is a design choice for the feature that builds them.
   default it draws only the bands around your scores, so the runs fill the
   chart; a **Show all ranks** chart option draws the whole ladder instead, for
   when you want to see how far the climb goes rather than what is next.
-- **New PB stars on the time chart** (Scenario Performance page, PR #346;
-  design in #337). On Score vs Time, a gold star marks each plotted run that
+- **New PB stars on the chart** (Run History page, PR #346; design in #337;
+  Score vs Run in PR #370). On Score vs Run and Score vs Time, a gold star
+  marks each plotted run that
   beat the scenario's personal best when it was played. The rule is the
   celebration's: strictly above every earlier run of the scenario, at any
   sensitivity and however far back, so a tie and a scenario's first run get
@@ -176,12 +212,12 @@ are one view or two is a design choice for the feature that builds them.
   New PB in the legend hides them until the chart next redraws. *Problem
   solved:* a new personal best was celebrated at the moment of the run and
   then left no trace. Every run on the chart was the same dot, and a day's
-  runs share one position, so the runs that set each best could only be found
+  runs shared one position, so the runs that set each best could only be found
   by comparing every dot with all the ones before it, and within a day not at
   all. The chart now shows what you reached and when. The stars record
   achievements and judge nothing: a personal best only ever rises, so a row
   of stars can't say whether you're improving.
-- **Point size and color** (Scenario Performance page, PR #241; design in
+- **Point size and color** (Run History page, PR #241; design in
   #238). Chart options can make the raw run points smaller, larger, or a color
   you choose, from eight curated swatches or any hex value. *Problem solved:*
   the points are one fixed size and one fixed blue, which is too faint to pick
@@ -191,7 +227,7 @@ are one view or two is a design choice for the feature that builds them.
   deliberately stops there: nothing else about the chart is customizable,
   because a graph that answers "am I improving" should not turn into a style
   editor.
-- **Chart options beside the chart** (Scenario Performance page, PRs #209,
+- **Chart options beside the chart** (Run History page, PRs #209,
   #215). The graph's display preferences — the overlays, and the score
   threshold and its percentage — open in a panel next to the chart, grouped by
   what they affect, and collapse back out of the way. On a narrow window the
@@ -199,10 +235,10 @@ are one view or two is a design choice for the feature that builds them.
   in a modal that dimmed and blocked the only surface that shows what they do,
   so picking a threshold percentage meant guessing, closing the modal to look,
   and opening it again. Now the chart answers immediately. The same change
-  gave the page a name of its own, **Scenario Performance**, so "Settings"
-  means the Settings page and nothing else — the modal, the button that opened
-  it, and the navbar link had all been calling themselves Settings, two of
-  them with the same icon.
+  gave the page a name of its own, Scenario Performance then and Run History
+  since, so "Settings" means the Settings page and nothing else — the modal,
+  the button that opened it, and the navbar link had all been calling
+  themselves Settings, two of them with the same icon.
 - **One color language for notices** (PR #260; design in #256). Every notice
   the app prints into the page now uses the same severity colors the toasts
   use — blue for information, yellow for caution, red for a failure — and
@@ -237,7 +273,7 @@ are one view or two is a design choice for the feature that builds them.
   about to put the app in front of new users, the copy is now something a
   cold reader can trust, and a test keeps the em dash from creeping back.
 - **The lines that ask something of you look like it** (PR #298; design in
-  #281). The stats-folder line at the top of Scenario Performance, the line
+  #281). The stats-folder line at the top of Home and Run History, the line
   that asks for a restart after a save, and the Settings page's restart
   notice are now yellow panels with a warning icon, like every other notice
   in the app. Nothing they say changed. *Problem solved:* the three messages
@@ -247,7 +283,7 @@ are one view or two is a design choice for the feature that builds them.
 
 ### Standing: where do I rank
 
-- **Scenario rank and percentile** (PRs #8–#10). The Scenario Performance page
+- **Scenario rank and percentile** (PRs #8–#10). The Run History page
   shows your global leaderboard standing for the selected scenario —
   `Position: 11,290 of 63,892 (82.33% percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
@@ -280,9 +316,9 @@ are one view or two is a design choice for the feature that builds them.
   playlist by hand before cross-playlist weakness comparisons become useful.
 - **Playlist show/hide** (PR #87). Per-playlist Hide/Unhide on the
   overview, a "Show hidden" toggle for managing hidden ones, and hiding
-  filters every playlist dropdown (Scenario Performance filter, Journey
+  filters every playlist dropdown (Run History filter, Journey
   picker). Hidden playlists stay loaded — routes and rank overlays keep
-  working. The Scenario Performance filter still lists a hidden playlist
+  working. The Run History filter still lists a hidden playlist
   while it is the one selected, so arriving from a hidden playlist's scenario
   table shows its name; it leaves the list when another is picked. *Problem
   solved:* focus — dropdowns and the overview show only the playlists you
@@ -386,7 +422,7 @@ are one view or two is a design choice for the feature that builds them.
   one public KovaaK's lookup. Identity now arrives verified rather than
   remembered, and a wrong pick is repaired by choosing a suggestion. Nothing is
   written until Save, so a suggestion is never a decision made for the user.
-- **A fresh install explains itself, once** (Scenario Performance page, PRs
+- **A fresh install explains itself, once** (Home page, PRs
   #235, #236). A setup card appears while something has never been asked
   about, or while saved settings cannot be read: it says so when no stats
   folder was found, when a settings file exists that this build cannot use,
@@ -400,8 +436,15 @@ are one view or two is a design choice for the feature that builds them.
   the folder lookup missed, exactly one page explained why everything was
   empty. The app now states what is missing without a wizard, and stops asking
   the moment the user answers — including when the answer is no.
+- **A Home page** (PR #373; design in #356). The app opens on a small
+  Home page that holds first-time setup and one line saying how many runs it
+  found, across how many scenarios. *Problem solved:* setup belongs to the
+  app and not to one scenario's history, and a new user's first question
+  after setup is whether the app found their runs. Home stands in for an
+  overview of all play, which is planned and not yet designed, so until then
+  each start of the app is one click from Run History.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
-  previously the Home Settings modal). *Problem solved:* onboarding a playlist
+  previously the old chart page's Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the
   playlist management surface, where the imported playlist lands as a new
   visible row; a duplicate-code refusal whose playlist is hidden points the
@@ -497,9 +540,9 @@ user problems (each becomes a roadmap milestone when it's next up):
 
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.
-- *"How did the rest of this session go?"* — a reviewable run history; the
-  per-run toast is ephemeral and the watchdog's debug-log lines are a
-  developer-facing stopgap.
+- *"How did the rest of this session go?"* — Run History lists one
+  scenario's runs by session. The session across scenarios, each scenario in
+  the order it was played, is the view still to come.
 
 ## Maintaining this doc
 

@@ -1,4 +1,4 @@
-// Plotly autoranges the home graph's score axis once, over every run, and an
+// Plotly autoranges the Run History graph's score axis once, over every run, and an
 // x-only zoom never recomputes it, so the runs in a zoomed slice sit squashed
 // in a thin band. plotly.js has no option to autorange y over the visible x
 // window, so refit the score axis to the runs in view whenever x is zoomed.
@@ -8,8 +8,8 @@
     // a y range this asset set and never one the user dragged themselves.
     const lastFit = new WeakMap();
 
-    // Only traces are fitted: the run points, the Average score line, and
-    // the New PB stars, which repeat run points and so never move the fit.
+    // Only traces are fitted: the run points, and the New PB stars and the
+    // latest run's ring, which repeat run points and so never move the fit.
     // Overlay lines are shapes and stay out on purpose: the PB score line
     // sits at or above every run, so fitting it would pin the axis top there
     // and undo most of the refit.
@@ -17,8 +17,9 @@
         // _fullLayout, _fullData, and the axis converters are plotly.js
         // internals, unchanged through plotly.js 4. The in-range test
         // mirrors plotly.js's own tick code: range and data both go to linear
-        // coordinates (category index or date ms), and d2l_noadd keeps a
-        // category axis from appending a category it has not seen.
+        // coordinates (category index, date ms, or the run number as it
+        // is), and d2l_noadd keeps a category axis from appending a category
+        // it has not seen.
         const xaxis = gd._fullLayout.xaxis;
         const toLinear = (value) =>
             xaxis.type === "category" ? xaxis.d2l_noadd(value) : xaxis.d2l(value);
@@ -107,7 +108,7 @@
     }
 
     // Dash mounts and remounts the page contents dynamically, so watch the
-    // document for the home graph's plot div appearing.
+    // document for the graph's plot div appearing.
     new MutationObserver(() => {
         for (const gd of document.querySelectorAll(".home-graph .js-plotly-plot")) {
             // plotly.js installs gd.on when it first plots the div; a div

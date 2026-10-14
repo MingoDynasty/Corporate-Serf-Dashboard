@@ -122,3 +122,12 @@ go away: it puts the mount-fire hazard on the one callback whose contract is
 that a mount must not replay the retained run-event batch, which is worth more
 than one never-drawn plot build per deep-linked visit. No prior entry governed
 the original behavior, so nothing is superseded.
+
+**Superseded in part (2026-10-12).** "`?scenario=` alone leaves the playlist
+filter on the restored value" gains one exception. On the Run History page,
+which replaced this one at a new address, a `?scenario=` link to a scenario
+the filter does not list clears the filter and selects the scenario, as a
+followed run does. The invariant and its corollary stand, and both bind the
+new page. An unknown playlist code still clears the filter, and the URL is
+still not rewritten. See
+[Follow And A Scenario Link Clear A Playlist Filter That Does Not List The Scenario](2026-10-12-follow-and-a-scenario-link-clear-a-playlist-filter-that-does-not-list-the-scenario.md).

@@ -125,7 +125,7 @@ def test_registration_does_not_read_the_config(
 @pytest.mark.parametrize(
     ("module", "expected"),
     [
-        ("source.pages.home", "Scenario Performance"),
+        ("source.pages.home", "Home"),
         ("source.pages.run_history", "Run History"),
         ("source.pages.playlists", "Playlists"),
         ("source.pages.settings", "Settings"),

@@ -1498,13 +1498,13 @@ def test_playlists_overview_layout_includes_enable_only_warmup_interval():
     assert interval.disabled is True
 
 
-def test_playlist_scenarios_cell_click_callback_builds_home_link():
+def test_playlist_scenarios_cell_click_callback_builds_run_history_link():
     assert (
-        playlist_scenarios.route_to_scenario_home(
+        playlist_scenarios.route_to_scenario_run_history(
             {"colId": "scenario", "value": "VT Pasu & Friends"},
             "Code/One",
         )
-        == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
+        == "/run-history?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
     )
 
 
@@ -1522,8 +1522,9 @@ def test_aim_training_journey_playlist_picker_shares_home_scroll_and_height():
         if getattr(component, "id", None) == "playlists-multi-select"
     )
 
-    # Adopted from the Home filter via the shared preset so the two dropdowns
-    # scroll and cap height consistently once the library grows past a screen.
+    # Adopted from the Run History filter via the shared preset so the two
+    # dropdowns scroll and cap height consistently once the library grows past
+    # a screen.
     assert picker.scrollAreaProps == {"type": "always"}
     assert picker.maxDropdownHeight == "75vh"
     # The picker is its row's flex item, so it takes the shared sizing itself.
@@ -1698,7 +1699,9 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
             "total_sort": 100,
             "percentile_display": "90.50%",
             "percentile_sort": 90.5,
-            "href": playlist_scenarios.scenario_home_href("First", "KovaaKsTestCode"),
+            "href": playlist_scenarios.scenario_run_history_href(
+                "First", "KovaaKsTestCode"
+            ),
         }
     ]
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
@@ -1731,7 +1734,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
 
     assert rows == expected_rows
     # Each row gains an anchor href for the ScenarioLink renderer.
-    assert rows[0]["href"] == playlist_scenarios.scenario_home_href(
+    assert rows[0]["href"] == playlist_scenarios.scenario_run_history_href(
         "First", "KovaaKsTestCode"
     )
     assert status == "Updating positions from KovaaK's… 0/1"
@@ -1754,7 +1757,7 @@ def test_playlist_scenarios_row_href_encodes_scenario_with_space(monkeypatch):
         lambda _code, _token: [
             {
                 "scenario": "VT Pasu Air",
-                "href": playlist_scenarios.scenario_home_href(
+                "href": playlist_scenarios.scenario_run_history_href(
                     "VT Pasu Air", "KovaaKsTestCode"
                 ),
             }
@@ -1768,7 +1771,9 @@ def test_playlist_scenarios_row_href_encodes_scenario_with_space(monkeypatch):
         playlist_scenarios.load_playlist_scenario_rows("KovaaKsTestCode")
     )
 
-    assert rows[0]["href"] == "/?playlist_code=KovaaKsTestCode&scenario=VT+Pasu+Air"
+    assert rows[0]["href"] == (
+        "/run-history?playlist_code=KovaaKsTestCode&scenario=VT+Pasu+Air"
+    )
 
 
 def test_playlist_scenarios_layout_includes_quick_filter_input():
@@ -2104,13 +2109,13 @@ def test_playlist_scenarios_table_includes_local_stat_columns():
     assert "pb_score_sort" in fields
 
 
-def test_playlist_scenarios_scenario_home_href_url_encodes_values():
-    href = playlist_scenarios.scenario_home_href(
+def test_playlist_scenarios_scenario_run_history_href_url_encodes_values():
+    href = playlist_scenarios.scenario_run_history_href(
         "VT Pasu & Friends",
         "Code/One",
     )
 
-    assert href == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
+    assert href == "/run-history?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
 
 
 def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():

@@ -153,11 +153,20 @@ def format_whole_percent(fraction: float) -> str:
 def format_elapsed_duration(seconds: float) -> str:
     """Format a measured length of time in the form the estimates use.
 
-    Examples: 45 -> "<1 min", 599 -> "9 min", 3970 -> "1 hr 6 min". A
-    measurement counts the whole minutes gone by, as a clock does, where
-    ``format_approximate_duration`` rounds an estimate up to the next one.
+    Examples: 15 -> "<1 min", 45 -> "1 min", 599 -> "10 min", 3970 ->
+    "1 hr 6 min". A measurement is rounded to the nearest minute, a half
+    rounding up, where ``format_approximate_duration`` rounds an estimate up
+    to the next one: a session of 1 hr 6 min 1 s reads "1 hr 6 min".
+
+    Not the whole minutes gone by. A run's start is written to the
+    millisecond and its end is the whole second in its stats file's name, so
+    a run of 60 seconds measures a little under 60 and would read "<1 min".
+    A time that rounds to zero reads "<1 min", which so means under 30
+    seconds.
     """
-    minutes = int(seconds // 60)
+    # Not ``round``, which sends a half to the even number: 2.5 minutes
+    # would read 2 and 3.5 would read 4.
+    minutes = math.floor(seconds / 60 + 0.5)
     if minutes < 1:
         return "<1 min"
     hours, remainder = divmod(minutes, 60)

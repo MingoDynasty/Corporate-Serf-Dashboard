@@ -88,9 +88,13 @@ class PlaylistScenarioFillDrain:
     consuming_terminal: bool
 
 
-def scenario_home_href(scenario_name: str, playlist_code: str) -> str:
-    """Build the Home URL carried by each complete AG Grid row."""
-    return "/?" + urlencode(
+def scenario_run_history_href(scenario_name: str, playlist_code: str) -> str:
+    """Build the address that opens a scenario on Run History, filtered to a playlist.
+
+    Every link from a playlist's table to a scenario is built here, so the
+    page's address and its two parameters are written in one place.
+    """
+    return "/run-history?" + urlencode(
         {
             "playlist_code": playlist_code,
             "scenario": scenario_name,
@@ -368,7 +372,7 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
             mark_unresolved_pending and rank_info.percentile is None
         )
     if playlist_code is not None:
-        row["href"] = scenario_home_href(scenario_name, playlist_code)
+        row["href"] = scenario_run_history_href(scenario_name, playlist_code)
     return row
 
 

@@ -116,7 +116,7 @@ benchmark tier) — see the
   both default to `168`
   ([2026-04-29](../decision_log/2026/2026-04-29-cache-leaderboard-totals-for-one-week.md)).
 - Both TTLs govern automatic paths that fetch. A cache-only read
-  (`allow_network=False`, used by the playlists overview, the Home interval
+  (`allow_network=False`, used by the playlists overview, the Run History interval
   tick and the playlist scenarios first paint) serves the rank and total
   caches regardless of age, so neither TTL applies to it. `force_refresh`
   marks a lookup board-authoritative for the whole readout and bypasses the
@@ -128,7 +128,7 @@ benchmark tier) — see the
   replaces a known better value; only a user-clicked Refresh is
   board-authoritative and may write a lower score or `UNRANKED`
   ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
-- The Scenario Performance Position value says when its position was stored:
+- The Run History Position value says when its position was stored:
   hovering or focusing it shows `Last updated {age} · {timestamp}`, from the
   rank cache entry's `fetched_at`, and the value takes the dotted underline
   the Last played value has. The time moves only when a leaderboard read is
@@ -163,7 +163,7 @@ benchmark tier) — see the
   ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
   A chain that does catch up writes a board-authoritative rank, so it re-reads
   the leaderboard total too, TTL bypassed ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
-- The Scenario Performance rank widget passively re-reads the rank and total
+- The Run History rank widget passively re-reads the rank and total
   caches on its existing interval — TTL ignored, no network calls
   ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
 - Background refresh failures are recorded in the console/file logs only;
@@ -190,7 +190,7 @@ benchmark tier) — see the
 - Passive renders never toast — the routing policy sends persistent conditions
   to in-place UI
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
-  The Scenario Performance Position field carries its own
+  The Run History Position field carries its own
   explanation instead: `N/A` plus " · set your KovaaK's username in Settings",
   with Settings linked, when no username is configured, `N/A` plus
   " · lookup failed" when the lookup failed with nothing cached, and the

@@ -557,10 +557,11 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                     "getRowHeight": {"function": "runListRowHeight(params)"},
                     "getRowClass": {"function": "runListRowClass(params)"},
                     # The highlight of the last run played. A rule, and not
-                    # part of the row's class: the grid works a row's class
-                    # out once, when it draws the row, and a rule again each
-                    # time the row's data changes. The run that was the
-                    # latest stays in the list, and has to lose it.
+                    # part of the class ``getRowClass`` returns: when a row
+                    # is refreshed the grid adds that class again and never
+                    # takes off one it added before, where it both adds and
+                    # removes a rule's class. The run that was the latest
+                    # stays in the list, and has to lose the highlight.
                     "rowClassRules": {LATEST_ROW_CLASS: "params.data.latest"},
                     # The grid would say "No Matching Rows" over a list whose
                     # one session is closed, and "No Rows To Show" before the

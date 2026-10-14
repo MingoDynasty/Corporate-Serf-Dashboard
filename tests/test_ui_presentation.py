@@ -18,9 +18,11 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 dmc.add_figure_templates()
 
 from source.pages import aim_training_journey as journey  # noqa: E402
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
 
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+# The class of the column Run History's playlist filter shares with its link.
+PLAYLIST_FIELD_CLASS = "run-history-playlist-field"
 
 # Anything that would push a control right of its row's left edge. Padding
 # counts as much as margin: it leaves the wrapper's own box where it is, so a
@@ -71,9 +73,9 @@ def test_help_icon_labels_inherit_the_input_label_font():
     <label>, so a label built as a component renders 16px/400 beside the
     14px/700 of every label passed as a plain string. ``inherit`` is what
     makes the two indistinguishable."""
-    labels = list(_help_icon_labels(home.layout()))
+    labels = list(_help_icon_labels(run_history.layout()))
 
-    assert labels, "Home should still build labels with the help-icon helper"
+    assert labels, "Run History should still build labels with the help-icon helper"
     for owner, label in labels:
         text = label.children[0]
         assert isinstance(text, dmc.Text)
@@ -86,22 +88,23 @@ def test_help_icon_labels_inherit_the_input_label_font():
 def test_playlist_filters_start_at_the_pages_left_edge():
     """The filter is the first control in its row, so an indent on it puts
     the row outside the left rail the graph and everything below share."""
-    home_page = home.layout()
-    # Home's filter sits in a column with its link, and an indent on the
-    # column moves the filter just as one on the filter would.
-    home_field = next(
+    run_history_page = run_history.layout()
+    # Run History's filter sits in a column with its link, and an indent on
+    # the column moves the filter just as one on the filter would.
+    run_history_field = next(
         (
             component
-            for component in _walk_components(home_page)
-            if getattr(component, "className", None) == home.PLAYLIST_FIELD_CLASS
+            for component in _walk_components(run_history_page)
+            if getattr(component, "className", None) == PLAYLIST_FIELD_CLASS
         ),
         None,
     )
-    home_filter = _component_by_id(home_page, "playlist-dropdown-selection")
+    filter_id = run_history.SCENARIO_SELECTION_IDS.playlist_filter
+    run_history_filter = _component_by_id(run_history_page, filter_id)
     journey_picker = _component_by_id(journey.layout(), "playlists-multi-select")
     for name, selector in (
-        ("playlist-dropdown-selection", home_filter),
-        (home.PLAYLIST_FIELD_CLASS, home_field),
+        (filter_id, run_history_filter),
+        (PLAYLIST_FIELD_CLASS, run_history_field),
         ("playlists-multi-select", journey_picker),
     ):
         assert selector is not None, f"{name} is missing from its page"

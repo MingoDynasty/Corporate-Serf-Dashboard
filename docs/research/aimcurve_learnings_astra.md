@@ -23,9 +23,9 @@ because our current run model does not retain the events it needs.
   was inspected separately; its build revision was not established.
 - Compared against this checkout at `161b2cd34b9ac59559e41e2c57016e74f875268f`,
   particularly [product framing](../product.md),
-  [Scenario Performance](../specs/scenario_performance.md),
+  [Scenario Performance](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/161b2cd34b9ac59559e41e2c57016e74f875268f/docs/specs/scenario_performance.md),
   [the roadmap](../roadmap.md),
-  [the run-history proposal](../proposals/run_history_proposal.md), and
+  [the run-history proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/161b2cd34b9ac59559e41e2c57016e74f875268f/docs/proposals/run_history_proposal.md), and
   [the current run model](../../source/kovaaks/data_models.py).
 - This was product research with targeted source inspection. We did not import
   the user's recordings, run Aimcurve's test suite, or independently reproduce

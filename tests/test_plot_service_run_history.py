@@ -6,6 +6,7 @@ stars, the scenario's name as the title, and no line that sums the runs up.
 Which runs they are given is ``tests/test_run_history_chart.py``.
 """
 
+import json
 from datetime import date, datetime, timedelta
 
 import plotly.graph_objs as go
@@ -312,6 +313,23 @@ def test_score_vs_run_stars_each_plotted_run_that_was_a_new_pb() -> None:
     ]
 
 
+def test_a_star_is_gold_with_a_dark_outline_and_leaves_its_run_point_in_place() -> None:
+    """One gold for both themes: the outline is what carries it on a light plot."""
+    runs = _three_runs()
+
+    figure = _score_vs_run(runs, new_pbs={runs[1]})
+
+    stars = _trace(figure, NEW_PB_TRACE_NAME)
+    assert stars.mode == "markers"
+    assert stars.marker.size == NEW_PB_SIZE_DEFAULT_PX == 12
+    assert stars.marker.color == "#fab005"
+    assert stars.marker.line.color == "#5f3d00"
+    assert stars.marker.line.width == 1
+    # The run trace still holds every run, so hiding the stars from the
+    # legend leaves an ordinary point where each one was.
+    assert list(_trace(figure, RUN_DATA_POINT_TRACE_NAME).y) == [100.0, 120.0, 110.0]
+
+
 def test_a_new_pb_the_figure_is_not_given_draws_no_star() -> None:
     """The stars are matched on the run, so one out of range adds nothing."""
     runs = _three_runs()
@@ -392,6 +410,52 @@ def test_runs_that_share_a_second_keep_their_order_without_a_new_pb() -> None:
     points = _trace(_score_vs_time([first, second]), RUN_DATA_POINT_TRACE_NAME)
 
     assert [row[1] for row in points.customdata] == [11.0, 22.0]
+
+
+def test_a_new_pb_follows_every_run_that_ties_it_and_nothing_else_moves() -> None:
+    """Five runs that ended in one second, two of them new PBs.
+
+    The one at 100 goes after both runs that tie it. The one at 110 has no
+    tie and stays where it was, as does the run below them all.
+    """
+    lower = _run(80.0, NOON, accuracy=0.11)
+    new_pb = _run(100.0, NOON, accuracy=0.22)
+    tie = _run(100.0, NOON, accuracy=0.33)
+    later_tie = _run(100.0, NOON, accuracy=0.44)
+    higher = _run(110.0, NOON, accuracy=0.55)
+    ended_together = [lower, new_pb, tie, later_tie, higher]
+
+    plain = _score_vs_time(ended_together)
+    starred = _score_vs_time(ended_together, new_pbs={new_pb, higher})
+
+    def accuracies(figure: go.Figure) -> list[float]:
+        points = _trace(figure, RUN_DATA_POINT_TRACE_NAME)
+        return [row[1] for row in points.customdata]
+
+    assert accuracies(plain) == [11.0, 22.0, 33.0, 44.0, 55.0]
+    assert accuracies(starred) == [11.0, 33.0, 44.0, 22.0, 55.0]
+    # Only the order within the trace changed: the same scores at the same
+    # positions, and one star for the three runs at 100.
+    assert sorted(_trace(starred, RUN_DATA_POINT_TRACE_NAME).y) == sorted(
+        _trace(plain, RUN_DATA_POINT_TRACE_NAME).y
+    )
+    assert list(_trace(starred, NEW_PB_TRACE_NAME).y) == [100.0, 110.0]
+    assert ended_together == [lower, new_pb, tie, later_tie, higher]
+
+
+def test_a_star_reaches_the_browser_at_its_run_points_own_time() -> None:
+    """A star whose time serialized differently from its run's would sit beside it."""
+    runs = _three_runs()
+
+    figure = _score_vs_time(runs, new_pbs={runs[1]})
+    points, stars = json.loads(figure.to_json())["data"]
+
+    assert points["x"] == [
+        "2026-10-10T12:00:00",
+        "2026-10-10T12:05:00",
+        "2026-10-11T12:00:00",
+    ]
+    assert stars["x"] == ["2026-10-10T12:05:00"]
 
 
 # --- Score vs Sensitivity -----------------------------------------------------

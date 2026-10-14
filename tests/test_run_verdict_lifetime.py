@@ -28,6 +28,9 @@ clock. Four behaviors are modelled, and all four were read out of
 
 If a DMC upgrade changes any of those, this model goes stale -- re-read the
 bundle before trusting a green run here.
+
+The verdicts are sent by the Run History page's chart callback, which is what
+each test drives.
 """
 
 from types import SimpleNamespace
@@ -43,7 +46,7 @@ from source.components import (  # noqa: E402
     run_verdict_toast,
     scenario_selection,
 )
-from source.pages import home  # noqa: E402
+from source.pages import run_history  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_CHANNEL,
     DEFAULT_AUTO_CLOSE_MS,
@@ -133,17 +136,17 @@ def apply_registry_patch(registry: dict, patch) -> None:
 @pytest.fixture
 def plotting(monkeypatch):
     """Stub out everything generate_graph needs that is not the toast."""
-    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+    monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _scenario: True)
     monkeypatch.setattr(
-        home, "get_time_vs_runs", lambda *_a: {"2026-07-06": [object()]}
+        run_history, "build_run_history_figure", lambda *_a: (go.Figure(), True)
     )
-    monkeypatch.setattr(home, "get_new_high_score_runs", lambda _scenario: set())
-    monkeypatch.setattr(home, "generate_time_plot", lambda *_a: go.Figure())
-    monkeypatch.setattr(home, "get_high_score", lambda _scenario: 830.0)
+    monkeypatch.setattr(run_history, "get_high_score", lambda _scenario: 830.0)
     monkeypatch.setattr(
-        home,
+        run_history,
         "ctx",
-        SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
+        SimpleNamespace(
+            triggered=[{"prop_id": f"{run_history.RUN_EVENTS_STORE_ID}.data"}]
+        ),
     )
 
 
@@ -181,12 +184,14 @@ class _Client:
             "latest": _run_event(score),
             "celebrated_run_id": None,
         }
-        _plot, notifications, hidden, registry_patch = home.generate_graph(
+        _plot, notifications, hidden, registry_patch = run_history.generate_graph(
             payload,
             "Scenario A",
-            5,
-            "2026-07-01",
-            "score_vs_time",
+            None,
+            "score_vs_run",
+            "100",
+            "90",
+            "2026-07-06",
             False,
             False,
             False,
@@ -194,7 +199,6 @@ class _Client:
             "",
             True,
             True,
-            None,
             self.toast_channels,
         )
         self.last_shown = notifications
@@ -283,11 +287,11 @@ def test_a_verdict_after_navigating_away_and_back_gets_a_full_lifetime(
     client.play(score=812.4)
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
 
-    # Navigate away and back: Home's layout is rebuilt from scratch, so every
-    # store it declares resets to its default. The container and the registry
-    # sit outside that layout, so the toast is still up and the registry still
-    # knows which instance it is showing.
-    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(home.layout())
+    # Navigate away and back: the page's layout is rebuilt from scratch, so
+    # every store it declares resets to its default. The container and the
+    # registry sit outside that layout, so the toast is still up and the
+    # registry still knows which instance it is showing.
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(run_history.layout())
     assert len(client.container.visible) == 1
 
     client.play(score=901.7)
@@ -322,7 +326,7 @@ def test_the_toast_channel_registry_is_hosted_by_the_app_shell(monkeypatch):
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
 
     assert TOAST_CHANNEL_REGISTRY_STORE_ID in _component_ids(app_shell.layout())
-    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(home.layout())
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(run_history.layout())
 
 
 def _component_ids(component) -> set[str]:

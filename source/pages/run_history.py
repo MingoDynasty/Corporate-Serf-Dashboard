@@ -3,16 +3,14 @@
 The page shows one scenario's runs: a chart of every run in a range, with
 the Chart options panel beside it, and a list of the runs grouped by session.
 A card in its top row reports the last run played, on whatever scenario.
-It is built beside the Scenario Performance page and replaces it when it
-goes public. Until then it is served at its own address with no navbar entry
-and nothing linking to it.
 
-It never imports the Scenario Performance page's module. Dash Pages loads
-each page file as ``pages.<name>``, so a second import path would make a
-second copy of that module with its own state. What both pages need lives
-under ``source/components/``.
+It never imports another page's module. Dash Pages loads each page file as
+``pages.<name>``, so a second import path would make a second copy of that
+module with its own state. What it shares with the Home page, the setup
+surfaces and the queued notices, lives under ``source/components/``.
 """
 
+import json
 import logging
 from datetime import datetime
 from typing import Any
@@ -122,10 +120,9 @@ logger = logging.getLogger(__name__)
 
 # Every id below is this page's alone, its stores and intervals included. A
 # page that holds one output of a callback has to hold every input of it, so
-# two pages cannot share part of a callback, and the Scenario Performance
-# page's callbacks are registered for its own ids. The browser also stores
-# each remembered control's value under its id, so changing one of these
-# resets that value for every user.
+# two pages cannot share part of a callback. The browser also stores each
+# remembered control's value under its id, so changing one of these resets
+# that value for every user.
 RUN_EVENTS_STORE_ID = "run-history-run-events"
 POLLING_INTERVAL_ID = "run-history-polling-interval"
 RELATIVE_TIME_INTERVAL_ID = "run-history-relative-time-interval"
@@ -149,6 +146,10 @@ SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
 # held. The graph takes it as an input: a figure rings its own scenario's
 # newest run, and the ring shows while this names the same run.
 LATEST_RUN_STORE_ID = "run-history-latest-run"
+# A store nothing reads. The script that hands keyboard focus on from the
+# card's scenario button writes nothing, and a clientside callback has to
+# have an output.
+CARD_FOCUS_SINK_ID = "run-history-card-focus-sink"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -220,13 +221,12 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
 )
 
 # The Top N this page's run toast places a run against. The page plots every
-# run, so it has no Top N scores control, and the toast keeps today's rule at
-# the old control's default until the plain run toast replaces it.
+# run, so it has no control for it, and the toast places a run against a
+# fixed 5 until the plain run toast replaces it.
 RUN_TOAST_TOP_N_SCORES = 5
 
 # The class the resize script and the zoom fit script find a graph by
-# (``assets/homeGraphResize.js``, ``assets/homeGraphZoomFit.js``). Both pages'
-# graphs carry it, so both scripts serve both.
+# (``assets/homeGraphResize.js``, ``assets/homeGraphZoomFit.js``).
 GRAPH_CLASS = "home-graph"
 RANGE_FIELD_CLASS = "run-history-range-field"
 RANGE_FIELD_HIDDEN_CLASS = f"{RANGE_FIELD_CLASS} run-history-range-field-hidden"
@@ -450,9 +450,8 @@ def show_latest_run(  # noqa: PLR0913
 
 @callback(
     Output(CHART_OPTIONS_IDS.cached_plot, "data"),
-    # ``allow_duplicate``: the Scenario Performance page's chart callback
-    # writes the same three shell-hosted props, and Dash allows one plain
-    # writer per output.
+    # ``allow_duplicate``: the shell's run-event drain writes the same three
+    # shell-hosted props, and so does every other callback that sends a toast.
     Output("notification-container", "sendNotifications", allow_duplicate=True),
     Output("notification-container", "hideNotifications", allow_duplicate=True),
     Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
@@ -594,6 +593,52 @@ clientside_callback(
     Input(CHART_MODE_ID, "value"),
 )
 
+# Pressing the card's scenario button selects its scenario, and the button
+# then leaves the page, which drops keyboard focus to the document: the next
+# Tab would start again from the top of the page. So once the button has
+# gone, focus goes to the Selected scenario dropdown, which then names the
+# scenario that was asked for. It waits for the button to go because that is
+# when the new value is in the dropdown, and it stands down if focus has
+# moved elsewhere meanwhile.
+#
+# Only for a press from the keyboard, which is what ``:focus-visible`` on the
+# button says. A click with the mouse loses nothing by losing focus, and
+# focus on a searchable dropdown opens its list.
+_HAND_FOCUS_TO_SCENARIO_SCRIPT = """
+(clicks) => {
+    const button = document.getElementById(BUTTON_ID);
+    if (clicks && button && button.matches(":focus-visible")) {
+        const started = Date.now();
+        const handOn = () => {
+            if (button.offsetParent !== null) {
+                if (Date.now() - started < 5000) {
+                    window.setTimeout(handOn, 50);
+                }
+                return;
+            }
+            const held = document.activeElement;
+            if (!held || held === button || held === document.body) {
+                const field = document.getElementById(SCENARIO_ID);
+                if (field) {
+                    field.focus();
+                }
+            }
+        };
+        handOn();
+    }
+    return window.dash_clientside.no_update;
+}
+""".replace("BUTTON_ID", json.dumps(LATEST_RUN_CARD_IDS.scenario_button)).replace(
+    "SCENARIO_ID", json.dumps(SCENARIO_SELECTION_IDS.scenario_dropdown)
+)
+
+clientside_callback(
+    _HAND_FOCUS_TO_SCENARIO_SCRIPT,
+    Output(CARD_FOCUS_SINK_ID, "data"),
+    Input(LATEST_RUN_CARD_IDS.scenario_button, "n_clicks"),
+    prevent_initial_call=True,
+)
+
 register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
 register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
@@ -693,9 +738,7 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                         labelPosition="right",
                         label=settings_help_label(
                             "Follow newly played scenario",
-                            SETTINGS_HELP_TEXT[
-                                "automatically-change-scenario-run-history"
-                            ],
+                            SETTINGS_HELP_TEXT["automatically-change-scenario"],
                         ),
                         checked=True,
                         persistence=True,
@@ -772,14 +815,7 @@ def _chart_column() -> dmc.Box:
                             # not just on window resize.
                             responsive=True,
                         ),
-                        chart_options_panel(
-                            CHART_OPTIONS_IDS,
-                            score_threshold_percentage_help=SETTINGS_HELP_TEXT[
-                                "score-threshold-percentage-run-history"
-                            ],
-                            # Every check in the run list is judged by it.
-                            score_threshold_percentage_waits_for_commit=True,
-                        ),
+                        chart_options_panel(CHART_OPTIONS_IDS),
                     ],
                 ),
             ),
@@ -819,6 +855,7 @@ def layout(
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
             dcc.Store(id=RUN_LANDED_STORE_ID),
             dcc.Store(id=LATEST_RUN_STORE_ID),
+            dcc.Store(id=CARD_FOCUS_SINK_ID),
             # Drawn with the answer already in it, for the reason the date
             # is: the first tick would otherwise write it and rebuild a list
             # just drawn.

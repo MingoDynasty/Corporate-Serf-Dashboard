@@ -103,20 +103,34 @@ def test_format_short_date_leaves_out_this_years_year(day: date, expected: str) 
     ("seconds", "expected"),
     [
         (0, "<1 min"),
-        (59.9, "<1 min"),
+        (15, "<1 min"),
+        (29.9, "<1 min"),
+        # A half rounds up, here and at every later half.
+        (30, "1 min"),
+        (45, "1 min"),
+        # A run of 60 seconds, as the app measures it: its start is written
+        # to the millisecond and its end is a whole second.
+        (59.9, "1 min"),
         (60, "1 min"),
-        # A measurement counts the whole minutes gone by. The estimate reads
-        # this one "2 min".
+        # The estimate reads this one "2 min".
         (61, "1 min"),
-        (599, "9 min"),
+        (89.9, "1 min"),
+        (90, "2 min"),
+        (149.9, "2 min"),
+        (150, "3 min"),
+        (599, "10 min"),
+        (3570, "1 hr"),
         (3600, "1 hr"),
+        # A session of 1 hr 6 min 1 s is not rounded up to the next minute.
+        (3961, "1 hr 6 min"),
         (3970, "1 hr 6 min"),
+        (3990, "1 hr 7 min"),
         (98765, "27 hr 26 min"),
         # A clock change can put a session's end before its start.
         (-120, "<1 min"),
     ],
 )
-def test_format_elapsed_duration_counts_whole_minutes(
+def test_format_elapsed_duration_rounds_to_the_nearest_minute(
     seconds: float, expected: str
 ) -> None:
     assert format_elapsed_duration(seconds) == expected

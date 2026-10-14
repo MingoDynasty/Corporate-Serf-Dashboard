@@ -1,15 +1,16 @@
-"""Home says so, and lists no scenarios, when no stats directory is pinned.
+"""Home says so when no stats directory is pinned.
 
 The hint speaks for a ``stats_dir`` key that exists and cannot be used. A key
 that was never written is the setup card's case (``test_home_setup_card.py``),
-so the two surfaces never explain the same condition twice.
+so the two surfaces never explain the same condition twice. What the scenario
+dropdown lists without a stats directory is ``test_scenario_selection.py``.
 """
 
 import dash
 import dash_mantine_components as dmc
 import pytest
 
-from source.components import scenario_selection, setup_surfaces
+from source.components import setup_surfaces
 from source.config import settings_service
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -66,35 +67,17 @@ def _hint_sentence(hint):
     return text.children
 
 
-@pytest.fixture(autouse=True)
-def quiet_playlists(monkeypatch):
-    monkeypatch.setattr(
-        scenario_selection, "get_visible_playlist_selector_options", lambda: []
-    )
-
-
-def test_hint_is_absent_while_the_pinned_directory_is_usable(monkeypatch):
+def test_hint_is_absent_while_the_pinned_directory_is_usable():
     """The autouse fixtures pin the fixture stats folder, as startup would."""
-    monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
-
     page = home.layout()
 
     assert _component_by_id(page, "stats-dir-hint") is None
-    assert _component_by_id(page, "scenario-dropdown-selection").data == ["All"]
 
 
 @pytest.mark.parametrize("stored", ["", "no-such-stats-dir"])
-def test_hint_replaces_the_scenario_list_without_a_usable_directory(
-    monkeypatch,
-    stored,
-):
+def test_hint_points_at_settings_without_a_usable_directory(stored):
     settings_service.save_settings({settings_service.STATS_DIR_KEY: stored})
     settings_service.resolve_stats_dir()
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
 
     page = home.layout()
 
@@ -108,46 +91,34 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
     assert link.href == "/settings"
     # Its own child, so the period does not render underlined inside the link.
     assert period == "."
-    assert _component_by_id(page, "scenario-dropdown-selection").data == []
 
 
-def test_hint_cedes_the_never_configured_case_to_the_setup_card(monkeypatch):
+def test_hint_cedes_the_never_configured_case_to_the_setup_card():
     """One condition, one surface: an absent key has never been asked about."""
     settings_service.save_settings({})
     settings_service.resolve_stats_dir()
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
 
     page = home.layout()
 
     assert _component_by_id(page, "stats-dir-hint") is None
     assert _component_by_id(page, home.SETUP_CARD_ID).children != []
-    assert _component_by_id(page, "scenario-dropdown-selection").data == []
 
 
-def test_hint_defers_to_the_restart_after_a_post_boot_save(monkeypatch, tmp_path):
+def test_hint_defers_to_the_restart_after_a_post_boot_save(tmp_path):
     """A saved-but-unapplied directory must not read as "not configured"."""
     settings_service.save_settings({})
     settings_service.resolve_stats_dir()
     settings_service.save_settings({settings_service.STATS_DIR_KEY: str(tmp_path)})
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
 
     page = home.layout()
 
     hint = _component_by_id(page, "stats-dir-hint")
     assert hint is not None
-    # Yellow like the unconfigured branch: nothing plots until the restart.
+    # Yellow like the unconfigured branch: no run is read until the restart.
     assert _hint_sentence(hint) == RESTART_HINT_TEXT
 
 
-def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
+def test_hint_keeps_its_link_when_only_the_identity_changed():
     """A restart cannot repair a directory whose stored path does not exist."""
     settings_service.save_settings(
         {
@@ -166,11 +137,6 @@ def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
     )
     assert settings_service.is_restart_pending() is True
     assert settings_service.is_stats_dir_change_pending() is False
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
 
     page = home.layout()
 
@@ -182,7 +148,7 @@ def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
     assert period == "."
 
 
-def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
+def test_hint_keeps_its_link_when_the_directory_was_cleared():
     """A restart cannot apply a directory the user just emptied."""
     settings_service.save_settings(
         {settings_service.STATS_DIR_KEY: "no-such-stats-dir"}
@@ -190,11 +156,6 @@ def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
     settings_service.resolve_stats_dir()
     settings_service.save_settings({settings_service.STATS_DIR_KEY: ""})
     assert settings_service.is_stats_dir_change_pending() is True
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
 
     page = home.layout()
 
@@ -206,9 +167,7 @@ def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
     assert period == "."
 
 
-def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished(
-    monkeypatch,
-):
+def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished():
     """Both surfaces speak, each for its own key, and the blocker comes first.
 
     Startup detection writes only ``stats_dir``, so a detected folder that is
@@ -219,11 +178,6 @@ def test_hint_stacks_above_the_account_offer_when_a_detected_folder_vanished(
         {settings_service.STATS_DIR_KEY: "no-such-stats-dir"}
     )
     settings_service.resolve_stats_dir()
-    monkeypatch.setattr(
-        scenario_selection,
-        "get_scenario_names",
-        lambda: pytest.fail("listed scenarios without a usable stats directory"),
-    )
 
     page = home.layout()
 

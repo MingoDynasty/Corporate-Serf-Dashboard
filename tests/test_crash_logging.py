@@ -95,7 +95,7 @@ def test_on_created_survives_unexpected_error(monkeypatch, caplog):
     # exc_info rides along, so the traceback reaches debug.log.
     assert "file still locked" in caplog.text
     # The watchdog thread has no callback context, so it publishes the failure
-    # for Home's interval callback to drain rather than driving a UI output.
+    # for a page's interval callback to drain rather than driving a UI output.
     assert file_watchdog.drain_run_import_failures() == [
         "Couldn't process a new run file. See data/logs/debug.log."
     ]

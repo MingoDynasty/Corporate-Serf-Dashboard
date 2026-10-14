@@ -1,10 +1,11 @@
 """The Run History page: where it is served, what its layout holds, and its callbacks.
 
-The page is built beside the Scenario Performance page and hidden until it
-replaces it, so these tests also hold what keeps the two apart: an address
-with no link to it, and an id of its own for everything it draws. What the
-chart plots is ``tests/test_run_history_chart.py``, and the rule for a
-scenario the playlist filter does not list is ``tests/test_scenario_selection.py``.
+The page has its own address and its own navbar entry, beside the Home page
+at ``/``. These tests also hold what keeps the two pages apart: the places
+the address is written in, and an id of its own for everything the page
+draws. What the chart plots is ``tests/test_run_history_chart.py``, and the
+rule for a scenario the playlist filter does not list is
+``tests/test_scenario_selection.py``.
 """
 
 import json
@@ -91,7 +92,7 @@ def quiet_lists(monkeypatch):
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: ["All"])
 
 
-# --- Where the page is, and that nothing leads to it ---------------------------
+# --- Where the page is, and what leads to it -----------------------------------
 
 
 def test_the_page_is_registered_at_its_final_address_under_its_name():
@@ -101,19 +102,25 @@ def test_the_page_is_registered_at_its_final_address_under_its_name():
     assert page["name"] == "Run History"
 
 
-def test_the_hidden_page_has_no_navbar_entry():
+def test_the_page_has_its_navbar_entry_second_after_home():
     links = [
         (component.label, component.href)
         for component in _walk_components(app_shell.layout())
         if isinstance(component, dmc.NavLink)
     ]
 
-    assert "/run-history" not in [href for _label, href in links]
-    assert "Run History" not in [label for label, _href in links]
+    assert links[:2] == [("Home", "/"), ("Run History", "/run-history")]
+    # One entry: the page is listed once, and under no other name.
+    assert [href for _label, href in links].count("/run-history") == 1
 
 
-def test_nothing_in_the_app_links_to_the_hidden_page():
-    """Its address appears in one place: the line that registers it."""
+def test_the_pages_address_is_written_in_three_places_and_no_other():
+    """The line that registers it, the navbar, and the one link builder.
+
+    Counted per file, so a new hard-coded copy of the address fails here. A
+    link to a scenario on the page is built by the link builder, which is
+    what keeps the address and its two parameters in one place.
+    """
     mentions = {
         path.relative_to(SOURCE_ROOT).as_posix(): path.read_text(
             encoding="utf-8"
@@ -122,20 +129,26 @@ def test_nothing_in_the_app_links_to_the_hidden_page():
         if "/run-history" in path.read_text(encoding="utf-8")
     }
 
-    assert mentions == {"pages/run_history.py": 1}
+    assert mentions == {
+        "pages/run_history.py": 1,
+        "app_shell.py": 1,
+        "kovaaks/playlist_scenarios_service.py": 1,
+    }
 
 
-def test_the_old_page_still_owns_the_landing_address():
+def test_home_owns_the_landing_address():
     page = dash.page_registry["source.pages.home"]
 
-    assert (page["path"], page["name"]) == ("/", "Scenario Performance")
+    assert (page["path"], page["name"]) == ("/", "Home")
 
 
-def test_the_page_never_imports_the_old_pages_module():
+def test_the_page_never_imports_another_pages_module():
     """Dash Pages loads a page file as ``pages.<name>``.
 
     A second import path would make a second copy of the module, with its own
-    state and its own callback registrations.
+    state and its own callback registrations. Home is the page it shares the
+    setup surfaces and the queued notices with, and both live under
+    ``source/components/`` so that neither page imports the other.
     """
     source = (SOURCE_ROOT / "pages" / "run_history.py").read_text(encoding="utf-8")
 
@@ -267,6 +280,47 @@ def test_the_top_row_holds_the_dropdowns_the_stats_and_the_latest_run_card():
     assert _ids(card_slot) == set(run_history.LATEST_RUN_CARD_IDS)
 
 
+def test_the_playlist_filters_scrollbar_is_always_visible():
+    """A long list of playlists should read as one that scrolls."""
+    playlist_filter = _by_id(
+        run_history.layout(), run_history.SCENARIO_SELECTION_IDS.playlist_filter
+    )
+
+    assert playlist_filter.scrollAreaProps == {"type": "always"}
+
+
+def test_the_playlist_link_holder_starts_empty_and_takes_no_room():
+    """The holder is a callback's output, so it is in the layout on every visit.
+
+    It starts empty because the layout cannot know the remembered selection,
+    and an empty holder must take no room under the filter.
+    """
+    field = _by_class(run_history.layout(), "run-history-playlist-field")
+    holder = field.children[1]
+
+    assert holder.id == run_history.SCENARIO_SELECTION_IDS.playlist_table_link
+    assert getattr(holder, "children", None) is None
+    # A Stack's gap or a margin on the holder would be paid while there is no
+    # link to space. The link brings its own.
+    assert isinstance(field, dmc.Box)
+    assert getattr(holder, "mt", None) is None
+
+
+def test_section_titles_keep_visual_size_with_accessible_heading_order():
+    titles = {
+        component.children: component
+        for component in _walk_components(run_history.layout())
+        if isinstance(component, dmc.Title)
+    }
+
+    assert titles["Scenario Stats"].order == 2
+    assert titles["Scenario Stats"].size == "h6"
+    # The panel's groups sit under the page's h2 sections.
+    for group in ("Overlays", "Run Data Points", "Score Threshold", "Notifications"):
+        assert titles[group].order == 3
+        assert titles[group].size == "h6"
+
+
 def test_the_chart_sits_left_of_the_run_list():
     columns = _by_class(run_history.layout(), "run-history-columns")
 
@@ -301,6 +355,13 @@ def test_chart_options_opens_between_the_chart_and_the_list():
 
 
 def test_the_graph_carries_the_class_both_graph_scripts_find_it_by():
+    """Each script is pinned by the selector in its text, as no test runs it.
+
+    Opening and collapsing the Chart options panel resizes the graph's
+    container without a window resize, which is the one case
+    ``homeGraphResize.js`` exists for: ``responsive=True`` alone only redraws
+    on a window resize.
+    """
     graph = _by_id(run_history.layout(), run_history.CHART_OPTIONS_IDS.graph)
 
     assert isinstance(graph, dcc.Graph)
@@ -313,11 +374,19 @@ def test_the_graph_carries_the_class_both_graph_scripts_find_it_by():
 
 
 def test_the_chart_starts_as_the_neutral_placeholder():
+    """Both the graph and the store it is restyled from, so neither flashes an axis."""
     page = run_history.layout()
 
+    graph = _by_id(page, run_history.CHART_OPTIONS_IDS.graph)
     cached = json.loads(_by_id(page, run_history.CHART_OPTIONS_IDS.cached_plot).data)
-    assert cached["layout"]["xaxis"]["visible"] is False
-    assert "annotations" not in cached["layout"]
+    for drawn in (graph.figure, cached):
+        placeholder = go.Figure(drawn)
+        assert not placeholder.layout.annotations
+        assert placeholder.layout.paper_bgcolor == "rgba(0,0,0,0)"
+        assert placeholder.layout.plot_bgcolor == "rgba(0,0,0,0)"
+        assert placeholder.layout.dragmode is False
+        assert placeholder.layout.xaxis.visible is False
+        assert placeholder.layout.yaxis.visible is False
 
 
 def test_the_page_has_no_top_n_control_and_no_date_picker():
@@ -449,20 +518,45 @@ def test_the_percentage_help_says_a_run_is_judged_whatever_judges_it():
     assert "Notifications judge" not in tooltip.label
 
 
-def test_the_old_page_keeps_its_own_two_help_texts():
-    page = home.layout()
+def test_each_help_text_has_one_wording():
+    """One key a help text, and no second key for a control's help.
 
-    follow = _by_id(page, "automatically-change-scenario-switch")
-    percentage = _by_id(page, home.CHART_OPTIONS_IDS.score_threshold_percentage)
-    assert "filter is cleared" not in rendered_text(follow.label)
-    (tooltip,) = [
-        component
-        for component in _walk_components(percentage.label)
-        if isinstance(component, dmc.Tooltip)
-    ]
-    assert tooltip.label.endswith(
-        "Notifications judge a run against the personal best you had before the run."
+    A second key would hold a wording no control shows, and the two would
+    drift apart with nothing on screen to show it.
+    """
+    help_text = chart_options.SETTINGS_HELP_TEXT
+
+    assert set(help_text) == {
+        "automatically-change-scenario",
+        "rank-overlay",
+        "show-all-ranks",
+        "high-score-overlay",
+        "score-threshold-overlay",
+        "score-threshold-percentage",
+        "score-threshold-notification",
+        "run-notification",
+    }
+    assert rendered_text(help_text["automatically-change-scenario"]).endswith(
+        "If the **Playlist filter** doesn't list that scenario, the filter is cleared."
     )
+    assert help_text["score-threshold-percentage"].endswith(
+        "A run is judged against the personal best you had before the run."
+    )
+    # What the control draws is the text under its own key.
+    page = run_history.layout()
+    shown = {
+        run_history.FOLLOW_SWITCH_ID: "automatically-change-scenario",
+        run_history.CHART_OPTIONS_IDS.score_threshold_percentage: (
+            "score-threshold-percentage"
+        ),
+    }
+    for component_id, key in shown.items():
+        (tooltip,) = [
+            component
+            for component in _walk_components(_by_id(page, component_id).label)
+            if isinstance(component, dmc.Tooltip)
+        ]
+        assert tooltip.label == help_text[key]
 
 
 # --- The setup surfaces ------------------------------------------------------------
@@ -587,7 +681,7 @@ def test_a_configured_install_draws_neither_surface():
     assert _card(page) is None
 
 
-def test_the_hint_has_this_pages_id_and_never_the_old_pages():
+def test_the_hint_has_this_pages_id_and_never_homes():
     _store(**{STATS_DIR_KEY: ""})
 
     assert _by_id(run_history.layout(), home.STATS_DIR_HINT_ID) is None
@@ -903,7 +997,7 @@ def test_the_chart_rebuilds_on_the_mode_both_ranges_the_date_and_the_playlist_fi
 
 
 def test_the_chart_shares_the_shells_toast_outputs_as_duplicates_and_still_loads():
-    """The old page's chart callback is the plain writer of the same three."""
+    """The shell's run-event drain writes the same three, as every toast's sender does."""
     registration = _chart_registration()
     outputs = registration["output"].strip(".").split("...")
 
@@ -1051,7 +1145,9 @@ def test_the_pb_score_and_score_threshold_lines_are_drawn_on_the_figure(monkeypa
     assert _annotations(plot) == ["PB score (830.00)", "Score threshold (788.50)"]
 
 
-def test_an_empty_percentage_draws_no_threshold_line(monkeypatch):
+@pytest.mark.parametrize("empty_percentage", [None, ""])
+def test_an_empty_percentage_draws_no_threshold_line(monkeypatch, empty_percentage):
+    """A cleared field sends an empty string, and one never set sends nothing."""
     monkeypatch.setattr(
         run_history,
         "score_threshold_line",
@@ -1059,10 +1155,29 @@ def test_an_empty_percentage_draws_no_threshold_line(monkeypatch):
     )
 
     (plot, *_rest), _built = _graph(
-        monkeypatch, high_score_overlay=True, threshold_overlay=True, percentage=""
+        monkeypatch,
+        high_score_overlay=True,
+        threshold_overlay=True,
+        percentage=empty_percentage,
     )
 
     assert _annotations(plot) == ["PB score (830.00)"]
+
+
+@pytest.mark.parametrize("empty_percentage", [None, ""])
+def test_a_run_no_percentage_can_judge_is_still_placed(monkeypatch, empty_percentage):
+    """The run goes unjudged, and its placement still earns the toast."""
+    (_plot, notifications, hidden, channels), _built = _graph(
+        monkeypatch,
+        run_events=_payload(score=780.0),
+        threshold_overlay=True,
+        percentage=empty_percentage,
+    )
+
+    assert [toast["action"] for toast in notifications] == ["show"]
+    assert [toast["title"] for toast in notifications] == ["New 2nd-best score"]
+    assert hidden == []
+    assert channels is not no_update
 
 
 def test_an_empty_range_takes_no_overlay_and_sends_no_toast(monkeypatch):
@@ -1096,7 +1211,7 @@ def test_a_run_that_just_landed_gets_todays_toast(monkeypatch):
 def test_the_toast_places_a_run_against_a_top_n_fixed_at_five(
     monkeypatch, nth_score, placed
 ):
-    """The page has no Top N scores control, so the old control's default stands."""
+    """The page plots every run and has no control for it, so the five is fixed."""
     (_plot, notifications, _hidden, _channels), _built = _graph(
         monkeypatch,
         run_events=_payload(nth_score=nth_score, is_new_sensitivity=True),
@@ -1239,7 +1354,11 @@ def test_the_list_takes_a_column_of_500px_beside_the_chart():
 
 
 def test_chart_options_stacks_on_the_charts_own_area_at_48em():
-    """A container of its own: the old page's 62em is pinned to its own name."""
+    """Measured on the chart's own area, never the window.
+
+    The navbar and the run list take their room first, so the window's width
+    says little about the room the chart has.
+    """
     css = STYLESHEET.read_text(encoding="utf-8")
     area = _css_block(css, ".run-history-chart-area")
 
@@ -1248,9 +1367,8 @@ def test_chart_options_stacks_on_the_charts_own_area_at_48em():
     assert re.findall(
         r"@container run-history-chart-area \(max-width: ([^)]+)\)", css
     ) == ["48em"]
-    assert re.findall(r"@container home-chart-area \(max-width: ([^)]+)\)", css) == [
-        "62em"
-    ]
+    # The one threshold the panel stacks at: no other container has a say.
+    assert "home-chart-area" not in css
 
 
 def test_the_columns_stack_when_the_page_itself_is_900px_or_narrower():
@@ -1435,6 +1553,52 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
     assert _by_id(page, card.scenario_button).children is None
 
 
+def test_pressing_the_cards_button_hands_focus_on_from_a_script_of_its_own():
+    """The button leaves the page once its scenario is selected.
+
+    Keyboard focus would go with it, so a script takes the press as its one
+    input. It writes a store nothing reads, and no page load calls it.
+    """
+    registration = _registration(f"{run_history.CARD_FOCUS_SINK_ID}.data")
+    button = run_history.LATEST_RUN_CARD_IDS.scenario_button
+
+    assert _keys(registration["inputs"]) == [f"{button}.n_clicks"]
+    assert registration["state"] == []
+    assert registration["prevent_initial_call"] is True
+    assert registration["clientside_function"] is not None
+    assert isinstance(
+        _by_id(run_history.layout(), run_history.CARD_FOCUS_SINK_ID), dcc.Store
+    )
+    # Nothing reads the store it writes.
+    assert not [
+        entry
+        for entry in GLOBAL_CALLBACK_LIST
+        if run_history.CARD_FOCUS_SINK_ID
+        in {dep["id"] for dep in entry["inputs"] + entry["state"]}
+    ]
+
+
+def test_the_focus_script_waits_for_the_button_to_go_and_then_focuses_the_dropdown():
+    """The script is not run here, so its text is held.
+
+    It acts only on a press from the keyboard: a click with the mouse loses
+    nothing by losing focus, and focus on the dropdown opens its list. It
+    leaves focus alone once the user has moved it somewhere else.
+    """
+    script = run_history._HAND_FOCUS_TO_SCENARIO_SCRIPT
+    card = run_history.LATEST_RUN_CARD_IDS
+    selection = run_history.SCENARIO_SELECTION_IDS
+
+    assert f'document.getElementById("{card.scenario_button}")' in script
+    assert f'document.getElementById("{selection.scenario_dropdown}")' in script
+    assert 'button.matches(":focus-visible")' in script
+    assert "button.offsetParent !== null" in script
+    assert "held === button || held === document.body" in script
+    assert "field.focus();" in script
+    assert "BUTTON_ID" not in script
+    assert "SCENARIO_ID" not in script
+
+
 # --- The latest run's id, and the ring ------------------------------------------------
 
 
@@ -1527,13 +1691,24 @@ def test_the_graph_takes_the_latest_run_and_waits_for_both_of_its_writers():
     assert f"{run_history.RUN_LANDED_STORE_ID}.data" not in _keys(chart["inputs"])
 
 
-def test_the_other_pages_graph_takes_no_latest_run():
-    graph = GLOBAL_CALLBACK_MAP[f"{home.CHART_OPTIONS_IDS.graph}.figure"]
+def test_the_graphs_figure_has_exactly_one_writer_which_takes_the_latest_run():
+    """One callback, and not one for the figure and one for the ring.
 
-    assert graph["callback"].__name__ == "apply_graph_appearance"
-    assert [entry["id"] for entry in graph["inputs"]] == [
-        "color-scheme-switch",
-        home.CHART_OPTIONS_IDS.cached_plot,
-        home.CHART_OPTIONS_IDS.point_size,
-        home.CHART_OPTIONS_IDS.point_color,
-    ]
+    Dash holds a callback back for a queued writer of one of its inputs, so
+    a run on the chart's own scenario writes the graph once, after both the
+    new figure and the new latest run are in. Two writers would write it
+    twice.
+    """
+    options = run_history.CHART_OPTIONS_IDS
+    writers = [key for key in GLOBAL_CALLBACK_MAP if f"{options.graph}.figure" in key]
+
+    assert writers == [f"{options.graph}.figure"]
+    (graph,) = (GLOBAL_CALLBACK_MAP[key] for key in writers)
+    assert graph["callback"].__name__ == "ring_latest_run_on_graph"
+    assert run_history.LATEST_RUN_STORE_ID in [entry["id"] for entry in graph["inputs"]]
+    # No graph anywhere is styled by a callback that never hears of the
+    # latest run.
+    assert "apply_graph_appearance" not in {
+        getattr(spec.get("callback"), "__name__", None)
+        for spec in GLOBAL_CALLBACK_MAP.values()
+    }

@@ -7,12 +7,14 @@ improving, where you're weak, and what to train next.
 
 The name of this app is in honor of [Corporate Serf](https://www.youtube.com/watch?v=a-MShVYe3kY).
 
-![Scenario Performance page](docs/screenshots/scenario_performance.png "Scenario Performance page")
+![Run History page](docs/screenshots/run_history.png "Run History page")
 
 ## Features
 
-- **Scenario plots**: Score vs Sensitivity and Score vs Time per scenario, with PB, score-threshold,
-  and benchmark-rank overlays.
+- **Scenario plots**: every run of a scenario as Score vs Run, Score vs Time, or Score vs
+  Sensitivity, with PB, score-threshold, and benchmark-rank overlays.
+- **Run history**: a scenario's runs listed by session, with a check on each run that met your
+  score threshold and a star on each new personal best.
 - **Run notifications**: a toast to compare your new run against your personal best.
 - **Personal best celebration**: confetti, fireworks, cannons, or stars when a run beats your
   scenario best.
@@ -47,7 +49,7 @@ Windows only.
    Double-clicking the shortcut while it is already running opens another browser tab.
 
 3. On its first start the dashboard finds your KovaaK's stats folder through Steam. If it
-   can't, a card on the Scenario Performance page says so and sends you to Settings to set it.
+   can't, a card on the Home page says so and sends you to Settings to set it.
 
 4. The same page then offers to add your KovaaK's account, which turns on leaderboard
    positions and percentiles. You can skip it and add it in Settings later.
