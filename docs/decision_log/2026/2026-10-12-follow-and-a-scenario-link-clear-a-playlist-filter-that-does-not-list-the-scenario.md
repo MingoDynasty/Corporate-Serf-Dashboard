@@ -1,6 +1,12 @@
 # 2026-10-12: Follow And A Scenario Link Clear A Playlist Filter That Does Not List The Scenario
 
-Status: Accepted
+Status: Superseded in part, 2026-10-14, by the
+[All scenarios entry](2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md):
+the click in the All scenarios view this entry foresaw has arrived, as a
+fourth way in. A scenario's name pressed in the tree is the selection
+callback's fourth input, so "which of the three called" now reads which of
+the four, still from what triggered the call. R7, and one callback as the
+only writer of both dropdowns, stand.
 
 When a run lands on a scenario the Playlist filter does not list, or a link
 names one, Run History now empties the filter and selects the scenario.

@@ -1,4 +1,11 @@
-"""Build a table's Columns menu and apply its choices to the grid."""
+"""Build a table's Columns menu and apply its choices to the grid.
+
+A menu lists one checkbox per column it shows or hides, and after them, on a
+table that has any, one per choice that is not a column. A column's checkbox
+reaches the grid through ``register_columns_menu``. A choice that is not a
+column has an id of another shape, so that callback never sees it, and the
+table that offers the choice reads it with a callback of its own.
+"""
 
 import json
 from collections.abc import Sequence
@@ -31,6 +38,18 @@ class MenuColumn(NamedTuple):
     column_id: str
     label: str
     shown_by_default: bool = True
+
+
+class MenuChoice(NamedTuple):
+    """One choice a table's Columns menu offers that is not a column.
+
+    ``checked_by_default`` must never differ between two layouts of the same
+    table, for the reason ``MenuColumn.shown_by_default`` gives.
+    """
+
+    choice_id: str
+    label: str
+    checked_by_default: bool = False
 
 
 # Applied through the grid API, never by writing the grid's ``columnState`` prop
@@ -105,12 +124,27 @@ def _checkbox_id(menu_id: str, column: object) -> dict:
     return {"type": menu_id, "column": column}
 
 
+def choice_checkbox_id(menu_id: str, choice_id: str) -> dict:
+    """Return the id of the checkbox of a choice that is not a column.
+
+    Its ``type`` is not the menu's id. The callback that shows and hides
+    columns matches every checkbox whose ``type`` is, and would ask the grid
+    to show a column that does not exist. The id is also the checkbox's
+    local-storage key, so renaming it resets that stored choice once.
+    """
+    return {"type": f"{menu_id}-choice", "choice": choice_id}
+
+
 def columns_menu_sink(menu_id: str) -> dcc.Store:
     """Build the store the menu's clientside callback outputs into."""
     return dcc.Store(id=f"{menu_id}-sink")
 
 
-def columns_menu(menu_id: str, columns: Sequence[MenuColumn]) -> dmc.Popover:
+def columns_menu(
+    menu_id: str,
+    columns: Sequence[MenuColumn],
+    choices: Sequence[MenuChoice] = (),
+) -> dmc.Popover:
     """Build the Columns button and its menu of one checkbox per column.
 
     A checked column is shown. The menu closes on an outside click or Escape,
@@ -118,6 +152,10 @@ def columns_menu(menu_id: str, columns: Sequence[MenuColumn]) -> dmc.Popover:
     live in the browser's local storage, and they reach the grid through
     ``register_columns_menu``, which runs with the stored values as the page
     mounts, before the menu is ever opened.
+
+    ``choices`` are drawn after the columns, each a checkbox remembered the
+    same way, under ``choice_checkbox_id``. The menu is named for columns,
+    so the columns come first.
     """
     return dmc.Popover(
         position="bottom-end",
@@ -156,14 +194,26 @@ def columns_menu(menu_id: str, columns: Sequence[MenuColumn]) -> dmc.Popover:
                         # of one table (a benchmark adds columns), so Dash
                         # would drop the stored choice on every move between
                         # them.
-                        dmc.Checkbox(
-                            id=_checkbox_id(menu_id, column.column_id),
-                            label=column.label,
-                            checked=column.shown_by_default,
-                            persistence=True,
-                            size="sm",
-                        )
-                        for column in columns
+                        *[
+                            dmc.Checkbox(
+                                id=_checkbox_id(menu_id, column.column_id),
+                                label=column.label,
+                                checked=column.shown_by_default,
+                                persistence=True,
+                                size="sm",
+                            )
+                            for column in columns
+                        ],
+                        *[
+                            dmc.Checkbox(
+                                id=choice_checkbox_id(menu_id, choice.choice_id),
+                                label=choice.label,
+                                checked=choice.checked_by_default,
+                                persistence=True,
+                                size="sm",
+                            )
+                            for choice in choices
+                        ],
                     ],
                 )
             ),

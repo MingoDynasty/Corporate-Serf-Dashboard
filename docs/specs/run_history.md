@@ -2,11 +2,11 @@
 
 The Run History page shows one scenario's runs three ways: a chart of every
 run in a range, a list of the runs grouped by session, and a card for the
-last run played. A run that lands reaches all three with no reload, and the
-page can follow the scenario just played. A check beside a run's score says
-the run met the score threshold and a star says it set a new personal best,
-each judged as of when the run was played. The browser remembers every
-control on the page, the chosen playlist and scenario included.
+last run played. A switch above the list turns it into a view of each session
+whole, across every scenario played in it. A run that lands reaches the page
+with no reload, and the page can follow the scenario just played. A check
+beside a run's score says it met the score threshold and a star says it set a
+new personal best, each judged as of when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -69,7 +69,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-09-19][query]).
 - A scenario that the Playlist filter does not list is still selected, and
   the filter is cleared in the same step. That holds for a `?scenario=` link,
-  for a run the page follows, and for the latest-run card's scenario button.
+  for a run the page follows, for the latest-run card's scenario button, and
+  for a scenario's name pressed in the run list's All scenarios view
+  ([2026-10-14][all-scenarios]).
   The scenario must have local runs: a link that names one with none leaves
   the filter alone and selects nothing. The filter empties in view with no
   toast, and the cleared filter is what the browser then remembers
@@ -414,16 +416,30 @@ of scope here, apart from its chart toolbar, noted under The chart.
 ## The run list
 
 - The list is a second column to the right of the chart, 500px wide and
-  always shown. It lists the selected scenario's runs on two levels:
-  sessions, newest first, and under each the scenario's runs in that session,
-  newest first. Only sessions that hold a run of the scenario are listed,
-  with one exception: the newest session is always the first row, in progress
-  or not, even when the scenario was not played in it
+  always shown ([2026-10-12][column]). It has two views, This scenario and
+  All scenarios ([2026-10-14][all-scenarios]).
+- Its header is a heading line, and under it a switch between the two views
+  at the left, with the "Expand all" button and the "Columns" menu at the
+  right. The switch is a segmented control whose accessible name is
+  `Run list view`. The list starts on This scenario, the browser remembers
+  the switch, and pressing it shows the other view from its top with keyboard
+  focus left on the switch. At the list's 500px the switch and both buttons
+  share one line; where they don't fit, the buttons wrap under the switch
+  ([2026-10-14][all-scenarios]).
+- Under This scenario the heading line reads `{scenario} · {n} runs`, or
+  `1 run`, where `{n}` counts every run of the scenario in the run store, the
+  figure Scenario Stats shows as Number of runs. Under All scenarios it reads
+  `All scenarios · {n} runs`, where `{n}` counts every run in the store
+  ([2026-10-14][all-scenarios]).
+
+### This scenario
+
+- The list shows the selected scenario's runs on two levels: sessions, newest
+  first, and under each the scenario's runs in that session, newest first.
+  Only sessions that hold a run of the scenario are listed, with one
+  exception: the newest session is always the first row, in progress or not,
+  even when the scenario was not played in it
   ([2026-10-12][column]).
-- Its heading line reads `{scenario} · {n} runs`, or `1 run`, where `{n}`
-  counts every run of the scenario in the run store, the figure Scenario
-  Stats shows as Number of runs. Under it are the "Expand all" button and the
-  "Columns" menu.
 - A session row is named by when the session started: `Oct 4, 9:45 PM`, or
   `Dec 30, 2025, 9:45 PM` in an earlier year. Its right side reads how many
   of the session's runs were on this scenario, such as `7 of 47 runs` or
@@ -434,8 +450,16 @@ of scope here, apart from its chart toolbar, noted under The chart.
   run." With the selected scenario not played in the first row's session, the
   row reads `0 of 47 runs` and, opened, "Not played in this session"
   ([2026-10-12][column]).
-- The first row stays in view under the column headers while the list
-  scrolls.
+- The count on every session row is a button drawn as a link, `0 of 47 runs`
+  included. Its hover reads "Show the whole session". A click on it does not
+  open or close the row: it switches the list to All scenarios, opens that
+  session and every scenario row of the selected scenario in it, scrolls the
+  session's row to just under the first row, and puts keyboard focus on that
+  row. Rows already open in the tree stay open. All scenarios then loads as
+  far back as the session if it had loaded fewer sessions, and the session is
+  the last one listed. The switch moves with the jump, so a reload afterwards
+  opens on All scenarios. A tree that does not hold the session shows from its
+  top, with focus on its first row ([2026-10-14][count-link]).
 - A run row has seven columns: `#`, the run's number among this scenario's
   runs in its session, counted in the order they were played, "Time", a time
   of day with no seconds, "Score", the marks, "Accuracy" to the whole
@@ -457,50 +481,134 @@ of scope here, apart from its chart toolbar, noted under The chart.
   midnight in a session that started before it, and a single run that started
   before midnight and ended after it. Where a header and a divider fall
   between the same two runs, the divider comes first.
-- A session row opens and closes on a click, with no request to the server.
-  "Expand all" opens every loaded session and reads "Collapse all" once they
-  are all open. On arrival the first row is open and the rest are closed, and
-  which rows are open is never remembered.
-- The "Columns" menu shows or hides Shots Fired and Sensitivity, both shown
-  to start, and the browser remembers each choice
-  ([2026-10-05][columns-menu]).
-- The list loads 30 sessions. A "Show older sessions" button at its end adds
-  30 more. A change of scenario keeps the number loaded, and a reload starts
-  from 30 again.
-- The list is rebuilt from the run store, never from a batch of new runs,
-  when a run lands on any scenario, when the selected scenario changes, when
-  the Score threshold percentage changes, when older sessions are asked for,
-  when the date moves on, and when the newest session stops being in
-  progress. So its "In progress" badge clears within 30 seconds of the
-  session ending, with no run landing
-  ([sessions.md](sessions.md#in-progress)).
-- A run that lands shows as a new row with nothing lost: opened rows stay
-  open, and keyboard focus stays on the same run. The first row opens for it,
-  once per run, whatever scenario it is on, so a row the player closed is not
-  reopened by a later change of scenario. With Follow on, the list scrolls
-  back to the top.
 - The row of the last run played, on any scenario, is highlighted. It is in
-  the list only while the selected scenario is the one that run was on, so
+  this view only while the selected scenario is the one that run was on, so
   the highlight follows the selection and not the chart's range: the row is
   highlighted where the range leaves the run's point, and its ring, off the
   chart. The highlight is a look alone and tells a screen reader nothing.
-- With no run in the store the list reads "No runs yet", and with runs and
-  no scenario selected it reads "No scenario selected". A selected scenario
-  with no local runs lists the newest session alone, under the heading
-  `{scenario} · 0 runs`.
+- With runs and no scenario selected, this view reads "No scenario selected"
+  with the switch still above it, and "Expand all" and "Columns" out of view.
+  A selected scenario with no local runs lists the newest session alone,
+  under the heading `{scenario} · 0 runs` ([2026-10-14][all-scenarios]).
+- The grid's accessible name is `Runs of {scenario}, by session`.
+
+### All scenarios
+
+- The list shows every session, newest first, whatever the Playlist filter
+  holds, on three levels: sessions, the scenarios played in each, and each
+  one's runs. The newest session is the first row
+  ([2026-10-14][all-scenarios]).
+- A session row reads its name, the "In progress" badge on the first row
+  while its session is in progress, then `{length} · {n} runs · {k}
+  scenarios`, such as `1 hr 6 min · 47 runs · 7 scenarios`, singular where a
+  count is one. `{k}` counts scenarios, not rows. Every session row gives its
+  length, and only the first row's length has the hover.
+- Under a session is a scenario row per visit, so a scenario that was left
+  and returned to has a second row. The rows are numbered in the order they
+  were played and listed newest first. A scenario row reads
+  `{number}. {scenario}`, its run count, such as `2 runs`, and a star where a
+  new PB was set in that visit, whose hover and accessible name are "New PB".
+  The name is cut short with an ellipsis before the count is, and the hover
+  on the part around it gives the whole name ([2026-10-14][all-scenarios]).
+- A scenario's name is a button drawn as a link, whose accessible name is
+  `Show {scenario}`. A click on it selects that scenario for the whole page,
+  clearing a Playlist filter that does not list it, and the view stays on All
+  scenarios. The row does not open or close, and the list does not scroll. A
+  press on the selected scenario's own name changes nothing. The live region
+  says `Selected scenario: {scenario}`, and keyboard focus stays on the
+  name's button ([2026-10-14][all-scenarios]).
+- Under a scenario row are its runs, newest first, in the seven columns of
+  This scenario with the same marks. `#` is the run's number among its
+  scenario's runs in the session and carries on into a second visit, so a run
+  has the same number in both views. Every listed scenario's runs are marked
+  ([2026-10-14][all-scenarios]).
+- There are no dividers. A date header under a scenario row follows This
+  scenario's rule asked of that row alone: once any of its runs is on another
+  date than the session began, each date among its runs gets a header. A
+  closed scenario row shows no date.
+- The selected scenario's rows carry a band down their left edge, its
+  scenario rows and the runs under them, and its names' buttons carry
+  `aria-current`. With no scenario selected, or one with no run in the listed
+  sessions, nothing is marked. The tree never scrolls to the selected
+  scenario or loads older sessions to reach it. The band is a look alone. The
+  last run's row keeps its highlight, and a row can carry both
+  ([2026-10-14][all-scenarios]).
+- An open session row carries a "Show all runs" button at the end of its
+  facts. It opens every scenario row of that session and reads "Hide all
+  runs" once they are all open, which closes them and leaves the session open.
+  A closed session row has none ([2026-10-14][count-link]).
+- With no scenario selected, this view lists every session and marks nothing.
+- The grid's accessible name is `Runs of all scenarios, by session`.
+
+### Both views
+
+- A session row and a scenario row open and close on a click, with no request
+  to the server. On arrival the first session is open, and under All
+  scenarios so is the scenario row of the last run played, unless the tree
+  first arrives for a session's count, when only what its jump opens is
+  open ([2026-10-14][count-link]). Each view keeps its own open rows, and
+  which rows are open is never remembered. A scenario
+  row keeps its state while its session is closed
+  ([2026-10-14][all-scenarios]).
+- "Expand all" opens every loaded session of the view on screen, down to its
+  scenario rows under All scenarios, and reads "Collapse all" once they are
+  all open. It opens no runs, and "Collapse all" leaves the scenario rows'
+  own state alone. Both buttons read what a press would do, following every
+  way a row can open or close.
+- The "Columns" menu shows or hides Shots Fired and Sensitivity, both shown
+  to start ([2026-10-05][columns-menu]), and after them has a "Median and
+  best" checkbox, off to start. The browser remembers each
+  ([2026-10-14][median-best]).
+- With "Median and best" on, a scenario row under All scenarios and a session
+  row under This scenario gain a second line, `Median {median} · Best
+  {best}`, over the runs under the row, or `Score {score}` over one run, and
+  no line over none. The median is the middle score, or the mean of the two
+  middle scores. Both count every run under the row at any sensitivity, are
+  formatted as a score is, and show whether the row is open or closed. A
+  session row under All scenarios has no second line. Turning the checkbox on
+  or off makes no request ([2026-10-14][median-best]).
+- Each view loads 30 sessions and counts its own. A "Show older sessions"
+  button at the end adds 30 to the view it is pressed in. A change of
+  scenario keeps both counts, and a reload starts both from 30
+  ([2026-10-14][all-scenarios]).
+- The list is rebuilt from the run store, never from a batch of new runs,
+  when a run lands on any scenario, when the view or the selected scenario
+  changes, when the Score threshold percentage changes, when older sessions
+  are asked for, when the date moves on, and when the newest session stops
+  being in progress. So its "In progress" badge clears within 30 seconds of
+  the session ending, with no run landing
+  ([sessions.md](sessions.md#in-progress)).
+- A run that lands shows as a new row with nothing lost: opened rows stay
+  open, and keyboard focus stays on the same run, and on the same button of
+  the same row. With Follow on, the list scrolls back to the top
+  ([2026-10-12][column]).
+- Each view opens the rows of every run newer than the newest run whose rows
+  it has opened: under This scenario the first row, and under All scenarios
+  each run's session row and scenario row. So a batch with runs on two
+  scenarios opens both scenario rows, and runs that land while the other view
+  is on screen open their rows when the view is next shown. The first time a
+  view's rows arrive in a visit, the rows of the run the visit began with
+  open too, unless they arrive for a session's count. A row the player
+  closed stays closed until a newer run lands in it. A run on a new scenario
+  adds a scenario row at the top of its session, with the next number
+  ([2026-10-14][all-scenarios]).
+- With no run in the store the list reads "No runs yet" in either view, with
+  no controls.
 - The list is the grid the app's other tables use, in its free edition, made
-  to read as a list of sessions: a session row is a full-width row drawn by
-  the app's own script, and opening a session is a filter over the rows. The
-  rows reach the grid as data, never as Dash components
+  to read as a tree: a session row and a scenario row are full-width rows
+  drawn by the app's own script, and opening one is a filter over the rows.
+  The rows reach the grid as data, never as Dash components
   ([2026-10-12][grid]).
-- On a session row, Enter and Space open or close it, Right opens it, and
-  Left closes it. A key that changes a row writes "Expanded" or "Collapsed"
-  to a live region, and so does "Expand all". The row holds a button whose
-  accessible name is "Session", which Tab reaches. The grid's accessible name
-  is `Runs of {scenario}, by session`. What NVDA says of the list, and what
-  still does not work well, is recorded in
+- On a session row or a scenario row, Enter and Space open or close it, Right
+  opens it, and Left closes it. A key that changes a row writes "Expanded" or
+  "Collapsed" to a live region, and so do "Expand all", "Show all runs", and
+  "Hide all runs". Tab from a group row walks its buttons: a session row's
+  toggle, whose accessible name is "Session", then its count or "Show all
+  runs"; a scenario row's toggle, "Scenario", then its name. A row's depth is
+  never announced. What NVDA says of the list, and what still does not work
+  well, is recorded in
   [run_history_list_nvda_walk.md](../research/run_history_list_nvda_walk.md)
-  ([2026-10-12][grid]).
+  ([2026-10-12][grid], [2026-10-14][all-scenarios]).
 - The grid draws only the rows in view, so a browser's find-in-page reaches
   only those.
 
@@ -741,8 +849,10 @@ of scope here, apart from its chart toolbar, noted under The chart.
 - One callback writes both dropdowns' values, with plain outputs. It reads
   the summary and lands on the scenario just played when Follow is on,
   clearing a Playlist filter that does not list it, and it is the callback
-  that applies a link's parameters and the card's scenario button
-  ([2026-10-12][clear-filter]).
+  that applies a link's parameters, the card's scenario button, and a
+  scenario's name pressed in the run list's tree. Which of the four called is
+  read from what triggered the call
+  ([2026-10-12][clear-filter], [2026-10-14][all-scenarios]).
   With Follow off the page stays on the selected scenario.
 - The chart rebuild consumes the summary, so a batch of several runs becomes
   one rebuild and one change of scenario rather than a replay
@@ -798,10 +908,11 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-08-08][rank-history]).
 - The browser remembers the Playlist filter, the Selected scenario, the
   Follow switch, the chart mode, the two ranges, the Chart options controls,
-  and the Columns menu's two checkboxes, each under the control's own id. It
-  does not remember whether Chart options is open, which session rows are
-  open, or how many sessions are loaded
-  ([2026-10-12][own-ids]).
+  the run list's switch, and the Columns menu's three checkboxes, each under
+  the control's own id. It does not remember whether Chart options is open,
+  which rows of the list are open in either view, or how many sessions either
+  view has loaded
+  ([2026-10-12][own-ids], [2026-10-14][all-scenarios]).
 - The chart-appearance preferences live only in the browser's local
   storage. Nothing the panel sets is written server-side
   ([2026-08-20][points]).
@@ -858,6 +969,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
 [run-setting]: ../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md
 [share]: ../decision_log/2026/2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md
 [columns-menu]: ../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md
+[all-scenarios]: ../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md
+[count-link]: ../decision_log/2026/2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md
+[median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
 [last-played]: ../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md
 [empty-states]: ../decision_log/2026/2026-06-30-model-home-last-played-empty-states-explicitly.md
 [score-aware]: ../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md

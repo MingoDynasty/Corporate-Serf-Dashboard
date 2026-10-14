@@ -2,7 +2,8 @@
 
 The page shows one scenario's runs: a chart of every run in a range, with
 the Chart options panel beside it, and a list of the runs grouped by session.
-A card in its top row reports the last run played, on whatever scenario.
+The list has a second view, All scenarios, of each session whole. A card in
+its top row reports the last run played, on whatever scenario.
 
 It never imports another page's module. Dash Pages loads each page file as
 ``pages.<name>``, so a second import path would make a second copy of that
@@ -61,12 +62,12 @@ from source.components.run_history_chart import (
     build_run_history_figure,
 )
 from source.components.run_history_list import (
-    RUN_LIST_CLASS,
-    RUN_LIST_NOTHING_CLASS,
     SESSIONS_PER_LOAD,
+    VIEW_ALL,
     RunListIds,
     is_session_in_progress,
     register_run_list,
+    run_list_class,
     run_list_from_store,
     run_list_panel,
     run_list_stores,
@@ -175,6 +176,7 @@ CHART_OPTIONS_IDS = ChartOptionsIds(
 RUN_LIST_IDS = RunListIds(
     panel="run-history-list",
     heading="run-history-list-heading",
+    view="run-history-list-view",
     expand_all="run-history-list-expand-all",
     columns_menu="run-history-list-columns",
     grid="run-history-list-grid",
@@ -182,8 +184,12 @@ RUN_LIST_IDS = RunListIds(
     announcer="run-history-list-announcer",
     model="run-history-list-model",
     session_limit="run-history-list-session-limit",
+    all_session_limit="run-history-list-all-session-limit",
+    jump="run-history-list-jump",
+    scenario_asked="run-history-list-scenario-asked",
     apply_sink="run-history-list-apply-sink",
     expand_all_sink="run-history-list-expand-all-sink",
+    figures_sink="run-history-list-figures-sink",
 )
 LATEST_RUN_CARD_IDS = LatestRunCardIds(
     heading="run-history-card-heading",
@@ -338,11 +344,16 @@ def track_session_in_progress(_n_intervals, _run_landed, held_answer):
     Output(RUN_LIST_IDS.heading, "children"),
     Output(RUN_LIST_IDS.empty, "children"),
     Output(RUN_LIST_IDS.panel, "className"),
+    # The view, and each view's count of loaded sessions. A jump writes the
+    # view and All scenarios' count in one answer, both plain outputs, so
+    # Dash holds this callback until both are in and builds the tree once.
+    Input(RUN_LIST_IDS.view, "value"),
     Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
     # Any run, on any scenario: a session row counts all of a session's runs.
     # The list is still built from the run store and never from the batch.
     Input(RUN_LANDED_STORE_ID, "data"),
     Input(RUN_LIST_IDS.session_limit, "data"),
+    Input(RUN_LIST_IDS.all_session_limit, "data"),
     # A change to the percentage marks every run again, at once.
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
     # The next two are read for nothing but their change. A session's name
@@ -352,31 +363,32 @@ def track_session_in_progress(_n_intervals, _run_landed, held_answer):
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
 )
 def build_run_list_rows(  # noqa: PLR0913
+    view,
     selected_scenario,
     _run_landed,
     session_limit,
+    all_session_limit,
     score_threshold_percentage,
     _held_date,
     _held_in_progress,
 ):
-    """Build the run list's rows for the selected scenario, from the run store.
+    """Build the run list's rows in the view on screen, from the run store.
 
-    Returns the rows and what the script needs with them, the heading line,
-    the text shown when there is nothing to list, and the list's class,
-    which is how that text takes the grid's place.
+    Under This scenario the rows are the selected scenario's. Under All
+    scenarios they are every session's, and the selected scenario's rows are
+    marked. Returns the rows and what the script needs with them, the
+    heading line, the text shown when there is nothing to list, and the
+    list's class, which is how that text takes the grid's place.
     """
+    limit = all_session_limit if view == VIEW_ALL else session_limit
     model = run_list_from_store(
+        view,
         selected_scenario,
-        session_limit or SESSIONS_PER_LOAD,
+        limit or SESSIONS_PER_LOAD,
         score_threshold_percentage,
         datetime.now(),
     )
-    return (
-        model,
-        model["heading"],
-        model["empty"],
-        RUN_LIST_NOTHING_CLASS if model["empty"] else RUN_LIST_CLASS,
-    )
+    return model, model["heading"], model["empty"], run_list_class(model)
 
 
 @callback(
@@ -578,6 +590,7 @@ register_scenario_selection_clearing_filter(
     follow_switch=FOLLOW_SWITCH_ID,
     run_landed=RUN_LANDED_STORE_ID,
     scenario_button=LATEST_RUN_CARD_IDS.scenario_button,
+    scenario_asked=RUN_LIST_IDS.scenario_asked,
 )
 
 

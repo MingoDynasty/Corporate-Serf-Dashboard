@@ -1,6 +1,15 @@
 # 2026-10-12: The Run List Is A Second Column Beside The Chart
 
-Status: Accepted
+Status: Superseded in part, 2026-10-14, by the
+[All scenarios entry](2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md),
+[the count's link](2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md), and
+[Median and best](2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md):
+"Version 1 has one view" no longer holds, and the list's two levels become
+three in the second view. A session row's count under This scenario is a link
+and no longer plain text. "The first row alone gives a session's length"
+holds under This scenario only. The Columns menu has three checkboxes. R3,
+the list as a second column 500px wide, and every rule of the list under This
+scenario stand.
 
 Run History lists the selected scenario's runs in a column of its own, to the
 right of the chart and always shown. The chart is narrower than the old

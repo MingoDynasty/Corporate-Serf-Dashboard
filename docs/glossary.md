@@ -105,7 +105,8 @@ later in the session starts a new one. The rules are in
 
 - Not a visit to a page, which the docs also say in the everyday sense.
 - In code: `scenario_visit`.
-- Not on screen yet.
+- Not on screen as a word. Under All scenarios each visit is a row, named by
+  its scenario and numbered by its place in the session.
 
 ### In session and between sessions
 
@@ -122,7 +123,8 @@ they're doing and ahead to what to train, usually with more attention to give.
 The page that shows one scenario's runs: a chart of its scores, a list of its
 runs grouped by session, and the latest run played. With Follow on, it
 follows the scenario being played
-([run_history.md](specs/run_history.md)).
+([run_history.md](specs/run_history.md)). The list has a second view, All
+scenarios, of each session across every scenario played in it.
 
 - In code: `run_history`.
 - Not Home, the page the app opens on.
@@ -142,6 +144,34 @@ whatever scenario, with its verdict
 
 - On screen it has no title. Its first line reads
   `Latest run · {time} · {scenario}`.
+
+### This scenario
+
+The run list's view of the selected scenario alone: the sessions that hold a
+run of it, and under each its runs. It is the view the list starts on
+([run_history.md](specs/run_history.md#this-scenario)).
+
+- In code: `VIEW_SCENARIO`, the switch's value `scenario`.
+
+### All scenarios
+
+The run list's view of each session whole: under a session the scenarios
+played in it, one row for each visit in the order they were played, and under
+each its runs ([run_history.md](specs/run_history.md#all-scenarios)).
+
+- Not the Playlist filter left empty, which is about the scenario dropdown.
+- In code: `VIEW_ALL`, the switch's value `all`, and `build_session_tree`.
+
+### Median and best
+
+Two figures the run list can show on a row that stands for several runs of
+one scenario: the middle score and the highest score of the runs under that
+row. They count every run under the row and compare nothing
+([run_history.md](specs/run_history.md#both-views)).
+
+- Not the typical run, which is what a player's recent runs usually score. A
+  later proposal defines that.
+- In code: `figures`, and the Columns menu's choice `median_best`.
 
 ## Playlists
 

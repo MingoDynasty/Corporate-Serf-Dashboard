@@ -161,6 +161,13 @@ grouping data doesn't line up with their scenario list.
 On the Run History page, the **Open scenario table** link under the
 **Playlist filter** opens the scenario table of the playlist selected there.
 
+The list beside the chart has a switch at its top. **This scenario** lists the
+selected scenario's runs by session, and **All scenarios** lists each session
+whole: the scenarios you played in it, in order, each with its runs under it.
+A session's run count, such as "7 of 47 runs", opens that session under
+**All scenarios**, and a scenario's name there shows that scenario on the
+chart.
+
 A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh, from the Playlists page
 or from that link, starts it in playlist order; to clear a sort, click a sorted

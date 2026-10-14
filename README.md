@@ -14,7 +14,7 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
 - **Scenario plots**: every run of a scenario as Score vs Run, Score vs Time, or Score vs
   Sensitivity, with PB, score-threshold, and benchmark-rank overlays.
 - **Run history**: a scenario's runs listed by session, with a check on each run that met your
-  score threshold and a star on each new personal best.
+  score threshold and a star on each new personal best, or each session whole across every scenario.
 - **Run notifications**: a toast on every page when a new run is detected, with a link to its
   scenario on Run History.
 - **Personal best celebration**: confetti, fireworks, cannons, or stars when a run beats your

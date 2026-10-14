@@ -1,6 +1,10 @@
 # 2026-10-05: A Columns Menu Shows And Hides Table Columns, And KovaaK's IDs Are Optional Ones
 
-Status: Accepted
+Status: Superseded in part, 2026-10-14, by
+[Median and best](2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md):
+"What the menu lists" gains, on Run History alone, a choice that is not a
+column, drawn after the columns with an id of its own shape. D1, D2, one
+remembered checkbox per choice, and both playlist tables' menus stand.
 
 The app knows the KovaaK's leaderboard ID of every scenario it has resolved
 and the benchmark ID of every bundled benchmark, but it showed neither, so
