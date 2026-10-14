@@ -17,7 +17,10 @@ from source.components.run_history_list import (  # noqa: E402
     NO_SCENARIO_TEXT,
     SESSION_LENGTH_HELP,
     SESSIONS_PER_LOAD,
+    VIEW_ALL,
+    VIEW_SCENARIO,
     build_run_list,
+    build_session_tree,
     is_session_in_progress,
     run_id,
     run_list_from_store,
@@ -112,6 +115,7 @@ def test_a_store_with_no_runs_lists_nothing_and_says_so():
     assert model["empty"] == NO_RUNS_TEXT
     assert model["newest_run"] is None
     assert model["forced_open"] == []
+    assert model["view"] == VIEW_SCENARIO
 
 
 def test_only_sessions_that_hold_a_run_of_the_scenario_are_listed_newest_first():
@@ -790,15 +794,20 @@ def store(monkeypatch):
 
 
 def test_an_empty_store_says_no_runs_yet_whatever_is_selected(store):
-    assert run_list_from_store(A, 30, 95, EVENING)["empty"] == NO_RUNS_TEXT
-    assert run_list_from_store(None, 30, 95, EVENING)["empty"] == NO_RUNS_TEXT
+    assert (
+        run_list_from_store(VIEW_SCENARIO, A, 30, 95, EVENING)["empty"] == NO_RUNS_TEXT
+    )
+    assert (
+        run_list_from_store(VIEW_SCENARIO, None, 30, 95, EVENING)["empty"]
+        == NO_RUNS_TEXT
+    )
 
 
 @pytest.mark.parametrize("scenario", [None, ""])
 def test_no_selection_says_no_scenario_selected(store, scenario):
     store.extend(_minutes(0))
 
-    model = run_list_from_store(scenario, 30, 95, EVENING)
+    model = run_list_from_store(VIEW_SCENARIO, scenario, 30, 95, EVENING)
 
     assert model["empty"] == NO_SCENARIO_TEXT
     assert model["rows"] == []
@@ -807,7 +816,9 @@ def test_no_selection_says_no_scenario_selected(store, scenario):
 def test_a_scenario_with_no_local_runs_lists_the_newest_session_alone(store):
     store.extend(_minutes(0, 2, scenario=B))
 
-    model = run_list_from_store(A, 30, 95, EVENING + timedelta(minutes=3))
+    model = run_list_from_store(
+        VIEW_SCENARIO, A, 30, 95, EVENING + timedelta(minutes=3)
+    )
 
     assert model["empty"] is None
     assert model["heading"] == "Scenario A · 0 runs"
@@ -823,9 +834,9 @@ def test_the_stores_runs_are_marked_by_the_percentage_field(store):
     )
     now = EVENING + timedelta(minutes=3)
 
-    at_95 = run_list_from_store(A, 30, 95, now)
-    at_99 = run_list_from_store(A, 30, 99, now)
-    cleared = run_list_from_store(A, 30, "", now)
+    at_95 = run_list_from_store(VIEW_SCENARIO, A, 30, 95, now)
+    at_99 = run_list_from_store(VIEW_SCENARIO, A, 30, 99, now)
+    cleared = run_list_from_store(VIEW_SCENARIO, A, 30, "", now)
 
     assert _check_cell(at_95, 2)[:2] == (True, "Threshold passed")
     assert _check_cell(at_99, 2)[:2] == (False, "Below threshold")
@@ -898,3 +909,638 @@ def test_a_run_that_lands_takes_the_mark_from_the_run_before_it():
 
     assert _latest_rows(before) == [f"r:{run_id(runs[-1])}"]
     assert _latest_rows(after) == [f"r:{run_id(landed)}"]
+
+
+# --- This scenario: what a session row's link and second line need --------------
+
+
+def test_a_session_row_gives_its_place_among_all_sessions_for_its_link():
+    """Counting back from the newest, sessions with no run of the scenario too.
+
+    It is how far back All scenarios loads to reach the session.
+    """
+    day = timedelta(days=1)
+    runs = [
+        *_minutes(0, start=EVENING - 3 * day),
+        *_minutes(0, scenario=B, start=EVENING - 2 * day),
+        *_minutes(0, scenario=B, start=EVENING - day),
+        *_minutes(0, scenario=B),
+    ]
+
+    model = _build(runs)
+
+    assert [(row["name"], row["place"]) for row in _of_kind(model, "session")] == [
+        ("Oct 4, 9:44 PM", 1),
+        ("Oct 1, 9:44 PM", 4),
+    ]
+
+
+def test_only_the_first_row_takes_the_lengths_hover():
+    day = timedelta(days=1)
+    runs = [*_minutes(0, start=EVENING - day), *_minutes(0, 2)]
+
+    first, older = _of_kind(_build(runs), "session")
+
+    assert (first["length_help"], older["length_help"]) == (True, False)
+
+
+FIGURES_CASES = [
+    ((3324.0,), "Score 3,324"),
+    ((3324.0, 3422.0), "Median 3,373 · Best 3,422"),
+    ((100.0, 120.5, 90.0), "Median 100 · Best 120.5"),
+    ((100.0, 101.0, 90.0, 130.0), "Median 100.5 · Best 130"),
+]
+FIGURES_IDS = ["one", "two", "odd", "even"]
+
+
+@pytest.mark.parametrize(("scores", "figures"), FIGURES_CASES, ids=FIGURES_IDS)
+def test_a_session_row_gives_the_median_and_best_of_the_scenarios_runs(scores, figures):
+    runs = [
+        *[
+            _run(A, EVENING + timedelta(minutes=2 * index), score=score)
+            for index, score in enumerate(scores)
+        ],
+        *_minutes(30, scenario=B),
+    ]
+
+    assert _build(runs)["rows"][0]["figures"] == figures
+
+
+def test_a_session_row_with_no_run_of_the_scenario_has_no_figures():
+    runs = [*_minutes(0, start=EVENING - timedelta(days=1)), *_minutes(0, scenario=B)]
+
+    first, older = _of_kind(_build(runs), "session")
+
+    assert first["counts"] == "0 of 1 run"
+    assert first["figures"] is None
+    assert older["figures"] == "Score 100"
+
+
+# --- All scenarios: the tree ---------------------------------------------------
+
+
+def _marks_for_every_scenario(runs: list[RunData]) -> dict:
+    marks: dict = {}
+    for scenario in {run.scenario for run in runs}:
+        marks.update(
+            mark_runs(
+                in_play_order(run for run in runs if run.scenario == scenario),
+                95.0,
+                lambda _version: None,
+            )
+        )
+    return marks
+
+
+def _tree(
+    runs: list[RunData],
+    selected: str | None = A,
+    *,
+    limit: int = SESSIONS_PER_LOAD,
+    now: datetime | None = None,
+):
+    """Build the tree as the page does, with every run of every scenario marked."""
+    if now is None:
+        now = max(run.datetime_object for run in runs)
+    return build_session_tree(
+        runs, selected, limit, now, _marks_for_every_scenario(runs)
+    )
+
+
+def _outline(model) -> list:
+    """Read the tree top to bottom, one short value per row."""
+    read = {
+        "session": lambda row: row["name"],
+        "scenario": lambda row: f"{row['number']}. {row['name']}",
+        "run": lambda row: row["n"],
+        "date": lambda row: row["text"],
+        "more": lambda row: row["text"],
+    }
+    return [read[row["kind"]](row) for row in model["rows"]]
+
+
+def test_a_return_gets_a_second_row_and_run_numbers_carry_on_across_visits():
+    runs = [
+        *_minutes(0, 2),
+        *_minutes(4, scenario=B),
+        *_minutes(6, 8, 10),
+    ]
+
+    model = _tree(runs)
+
+    assert _outline(model) == [
+        "Oct 4, 9:44 PM",
+        "3. Scenario A",
+        5,
+        4,
+        3,
+        "2. Scenario B",
+        1,
+        "1. Scenario A",
+        2,
+        1,
+    ]
+    assert model["view"] == VIEW_ALL
+    assert [row["counts"] for row in _of_kind(model, "scenario")] == [
+        "3 runs",
+        "1 run",
+        "2 runs",
+    ]
+
+
+def test_a_run_has_the_same_number_in_both_views():
+    runs = [*_minutes(0, 2), *_minutes(4, scenario=B), *_minutes(6, 8)]
+
+    in_the_tree = {
+        row["id"]: row["n"] for row in _of_kind(_tree(runs), "run") if row["sel"]
+    }
+    under_this_scenario = {row["id"]: row["n"] for row in _of_kind(_build(runs), "run")}
+
+    assert in_the_tree == under_this_scenario
+
+
+def test_the_tree_lists_every_session_newest_first_whatever_is_selected():
+    day = timedelta(days=1)
+    runs = [
+        *_minutes(0, start=EVENING - 2 * day),
+        *_minutes(0, scenario=B, start=EVENING - day),
+        *_minutes(0, scenario=C),
+    ]
+
+    for selected in (A, None):
+        assert [row["name"] for row in _of_kind(_tree(runs, selected), "session")] == [
+            "Oct 4, 9:44 PM",
+            "Oct 3, 9:44 PM",
+            "Oct 2, 9:44 PM",
+        ]
+
+
+@pytest.mark.parametrize(
+    ("runs", "counts"),
+    [
+        (_minutes(0), "1 run · 1 scenario"),
+        (_minutes(0, 2, 4), "3 runs · 1 scenario"),
+        ([*_minutes(0, 2), *_minutes(4, scenario=B)], "3 runs · 2 scenarios"),
+        # Scenarios, not rows: a return is one scenario.
+        (
+            [*_minutes(0), *_minutes(2, scenario=B), *_minutes(4)],
+            "3 runs · 2 scenarios",
+        ),
+    ],
+    ids=["one run", "one scenario", "two scenarios", "a return"],
+)
+def test_a_session_row_gives_its_length_its_runs_and_its_scenarios(runs, counts):
+    first = _tree(runs)["rows"][0]
+
+    assert first["counts"] == counts
+    assert first["length"]
+    assert "place" not in first
+
+
+def test_every_session_row_gives_its_length_and_only_the_first_its_hover():
+    day = timedelta(days=1)
+    runs = [*_minutes(0, 20, start=EVENING - day), *_minutes(0, 25, 50, 65)]
+
+    first, older = _of_kind(_tree(runs), "session")
+
+    assert (first["length"], first["length_help"], first["in_progress"]) == (
+        "1 hr 6 min",
+        True,
+        True,
+    )
+    assert (older["length"], older["length_help"], older["in_progress"]) == (
+        "21 min",
+        False,
+        False,
+    )
+
+
+def test_a_scenario_row_carries_its_star_where_a_new_pb_was_set():
+    runs = [
+        _run(A, EVENING, score=100.0),
+        _run(B, EVENING + timedelta(minutes=2), score=50.0),
+        _run(A, EVENING + timedelta(minutes=4), score=90.0),
+        _run(A, EVENING + timedelta(minutes=6), score=120.0),
+    ]
+
+    stars = {row["number"]: row["new_pb"] for row in _of_kind(_tree(runs), "scenario")}
+
+    # The second visit to A beat the first. A scenario's first run sets no
+    # star.
+    assert stars == {3: True, 2: False, 1: False}
+    later = [
+        *runs,
+        _run(B, EVENING + timedelta(minutes=8), score=40.0),
+        _run(A, EVENING + timedelta(minutes=10), score=110.0),
+    ]
+    stars = {row["number"]: row["new_pb"] for row in _of_kind(_tree(later), "scenario")}
+    assert (stars[5], stars[4]) == (False, False)
+
+
+def test_every_listed_scenario_is_marked_as_it_is_under_this_scenario():
+    day = timedelta(days=1)
+    runs = [
+        _run(B, EVENING - day, score=100.0),
+        _run(B, EVENING - day + timedelta(minutes=2), score=96.0),
+        _run(A, EVENING, score=100.0),
+        _run(B, EVENING + timedelta(minutes=2), score=97.0),
+        _run(A, EVENING + timedelta(minutes=4), score=99.0),
+        _run(B, EVENING + timedelta(minutes=6), score=120.0),
+    ]
+
+    def marks(model):
+        return {
+            row["id"]: (row["passed"], row["check_text"], row["new_pb"])
+            for row in _of_kind(model, "run")
+        }
+
+    tree = marks(_tree(runs))
+    for scenario in (A, B):
+        assert marks(_build(runs, scenario)).items() <= tree.items()
+    assert len(tree) == len(runs)
+
+
+@pytest.mark.parametrize(("scores", "figures"), FIGURES_CASES, ids=FIGURES_IDS)
+def test_a_scenario_row_gives_the_median_and_best_of_its_visits_runs(scores, figures):
+    runs = [
+        *_minutes(0, scenario=B, start=EVENING - timedelta(minutes=10)),
+        *[
+            _run(A, EVENING + timedelta(minutes=2 * index), score=score)
+            for index, score in enumerate(scores)
+        ],
+    ]
+
+    newest, older = _of_kind(_tree(runs), "scenario")
+
+    assert newest["figures"] == figures
+    assert older["figures"] == "Score 100"
+
+
+def test_a_scenario_rows_figures_count_its_own_visit_alone():
+    runs = [
+        _run(A, EVENING, score=10.0),
+        _run(A, EVENING + timedelta(minutes=2), score=20.0),
+        _run(B, EVENING + timedelta(minutes=4)),
+        _run(A, EVENING + timedelta(minutes=6), score=300.0),
+    ]
+
+    figures = [row["figures"] for row in _of_kind(_tree(runs), "scenario")]
+
+    assert figures == ["Score 300", "Score 100", "Median 15 · Best 20"]
+
+
+def test_the_selected_scenarios_rows_carry_the_band_and_no_other_rows_do():
+    runs = [*_minutes(0), *_minutes(2, scenario=B), *_minutes(4)]
+
+    model = _tree(runs, A)
+
+    assert [
+        (row["kind"], row["sel"])
+        for row in model["rows"]
+        if row["kind"] in ("scenario", "run")
+    ] == [
+        ("scenario", True),
+        ("run", True),
+        ("scenario", False),
+        ("run", False),
+        ("scenario", True),
+        ("run", True),
+    ]
+    assert not [row for row in _tree(runs, None)["rows"] if row.get("sel")]
+    assert not [row for row in _tree(runs, C)["rows"] if row.get("sel")]
+
+
+def test_a_scenario_rows_name_button_and_its_press_are_worded_as_the_copy_has_them():
+    (row,) = _of_kind(_tree(_minutes(0)), "scenario")
+
+    assert (row["name"], row["name_label"], row["selected_text"]) == (
+        "Scenario A",
+        "Show Scenario A",
+        "Selected scenario: Scenario A",
+    )
+
+
+def test_the_tree_has_no_dividers_and_no_note_for_a_scenario_not_played():
+    runs = [*_minutes(0), *_minutes(2, scenario=B), *_minutes(4)]
+
+    assert set(_kinds(_tree(runs, C))) == {"session", "scenario", "run"}
+
+
+def test_every_row_under_a_scenario_row_carries_its_id_and_its_sessions():
+    runs = [
+        *_minutes(0, start=LATE - timedelta(minutes=5)),
+        *_minutes(0, 10, scenario=B, start=LATE + timedelta(minutes=20)),
+    ]
+
+    model = _tree(runs)
+
+    session = model["rows"][0]
+    scenario_ids = {row["id"] for row in _of_kind(model, "scenario")}
+    for row in model["rows"][1:]:
+        assert row["sid"] == session["id"]
+        if row["kind"] != "scenario":
+            assert row["vid"] in scenario_ids
+    assert "vid" not in session
+    assert not [row for row in _of_kind(model, "scenario") if "vid" in row]
+    assert "date" in _kinds(model)
+
+
+def test_a_scenario_row_is_keyed_by_its_visits_first_run():
+    runs = [*_minutes(0, 2), *_minutes(4, scenario=B)]
+
+    newest, older = _of_kind(_tree(runs), "scenario")
+
+    assert (newest["id"], older["id"]) == (
+        f"v:{run_id(runs[2])}",
+        f"v:{run_id(runs[0])}",
+    )
+
+
+# --- All scenarios: date headers, asked of one scenario row at a time ------------
+
+
+def _tree_texts_under(model, number: int) -> list:
+    """Read one scenario row's runs and headers, top to bottom."""
+    (scenario,) = [
+        row for row in _of_kind(model, "scenario") if row["number"] == number
+    ]
+    return [
+        row["text"] if row["kind"] == "date" else row["n"]
+        for row in model["rows"]
+        if row.get("vid") == scenario["id"]
+    ]
+
+
+def test_a_scenario_row_on_the_sessions_start_date_has_no_header():
+    """The session's name already gives that date, though a later row crosses it."""
+    runs = [
+        *_minutes(0, 10, start=LATE),
+        *_minutes(0, scenario=B, start=LATE + timedelta(minutes=40)),
+    ]
+
+    model = _tree(runs)
+
+    assert _tree_texts_under(model, 1) == [2, 1]
+    assert _tree_texts_under(model, 2) == ["Oct 12", 1]
+
+
+def test_a_scenario_row_played_wholly_after_midnight_has_one_header():
+    runs = [
+        *_minutes(0, 20, start=LATE),
+        *_minutes(35, 40, scenario=B, start=LATE),
+    ]
+
+    assert _tree_texts_under(_tree(runs), 2) == ["Oct 12", 2, 1]
+
+
+def test_a_scenario_row_that_spans_midnight_has_a_header_for_each_date():
+    runs = _minutes(0, 10, 35, 40, start=LATE)
+
+    assert _tree_texts_under(_tree(runs), 1) == ["Oct 12", 4, 3, "Oct 11", 2, 1]
+
+
+def test_a_single_run_that_crosses_midnight_gets_the_header_of_its_end():
+    runs = [
+        _run(A, LATE + timedelta(minutes=35), length=timedelta(minutes=10)),
+        _run(B, LATE + timedelta(minutes=37)),
+    ]
+
+    model = _tree(runs, now=LATE + timedelta(minutes=38))
+
+    assert model["rows"][0]["name"] == "Oct 11, 11:55 PM"
+    assert _tree_texts_under(model, 1) == ["Oct 12", 1]
+    assert _tree_texts_under(model, 2) == ["Oct 12", 1]
+
+
+def test_a_scenario_row_in_a_session_that_crosses_a_year_names_the_other_year():
+    new_years_eve = datetime(2026, 12, 31, 23, 50)
+
+    model = _tree(_minutes(0, 20, start=new_years_eve), now=datetime(2027, 1, 1, 0, 11))
+
+    assert _tree_texts_under(model, 1) == ["Jan 1", 2, "Dec 31, 2026", 1]
+
+
+def test_a_date_header_under_a_scenario_row_is_keyed_by_that_row():
+    model = _tree(_minutes(0, 20, 35, start=LATE))
+
+    (scenario,) = _of_kind(model, "scenario")
+    assert [row["id"] for row in _of_kind(model, "date")] == [
+        f"d:{scenario['id']}:2026-10-12",
+        f"d:{scenario['id']}:2026-10-11",
+    ]
+
+
+# --- All scenarios: the newest run, and the rows it opens ------------------------
+
+
+def test_the_newest_run_opens_its_session_row_and_its_scenario_row():
+    runs = [*_minutes(0, start=EVENING - timedelta(days=1)), *_minutes(0, 2)]
+
+    model = _tree(runs)
+
+    assert model["newest_run"] == run_id(runs[-1])
+    session, scenario = model["rows"][:2]
+    assert model["forced_open"] == [session["id"], scenario["id"]]
+    assert scenario["kind"] == "scenario"
+
+
+def test_a_run_that_carries_on_a_visit_opens_the_same_scenario_row():
+    runs = _minutes(0, 2)
+    landed = _run(A, EVENING + timedelta(minutes=4))
+
+    before = _tree(runs)
+    after = _tree([*runs, landed])
+
+    assert after["newest_run"] == run_id(landed)
+    assert after["forced_open"] == before["forced_open"]
+
+
+def test_a_run_that_starts_a_new_visit_opens_a_new_scenario_row_numbered_next():
+    runs = [*_minutes(0, 2), *_minutes(4, scenario=B)]
+    landed = _run(A, EVENING + timedelta(minutes=6))
+
+    before = _tree(runs)
+    after = _tree([*runs, landed])
+
+    assert after["forced_open"] == [after["rows"][0]["id"], f"v:{run_id(landed)}"]
+    assert _of_kind(after, "scenario")[0]["number"] == 3
+    # The row before it stays as it was.
+    assert _of_kind(after, "scenario")[1] == _of_kind(before, "scenario")[0]
+
+
+def test_a_run_that_lands_older_than_the_newest_and_splits_a_visit():
+    """Its visit's runs either side of it become two rows, the newer under a new id."""
+    runs = _minutes(0, 2, 6)
+    late = _run(B, EVENING + timedelta(minutes=4))
+
+    before = _tree(runs)
+    after = _tree([*runs, late])
+
+    (whole,) = _of_kind(before, "scenario")
+    assert [row["id"] for row in _of_kind(after, "scenario")] == [
+        f"v:{run_id(runs[2])}",
+        f"v:{run_id(late)}",
+        whole["id"],
+    ]
+    assert after["newest_run"] == before["newest_run"] == run_id(runs[2])
+    assert after["forced_open"][1] == f"v:{run_id(runs[2])}"
+
+
+def test_the_last_run_played_is_marked_latest_in_the_tree_whatever_is_selected():
+    runs = [*_minutes(0, 2), *_minutes(4, scenario=B)]
+
+    for selected in (A, B, None):
+        model = _tree(runs, selected)
+        latest = [row["id"] for row in _of_kind(model, "run") if row["latest"]]
+        assert latest == [f"r:{run_id(runs[-1])}"]
+
+
+# --- All scenarios: thirty sessions at a time ------------------------------------
+
+
+def test_the_tree_loads_thirty_sessions_of_its_own_and_offers_the_older_ones():
+    runs = [
+        *_one_run_a_day(35),
+        # Five more sessions of another scenario: This scenario does not list
+        # them, and the tree counts them among its thirty.
+        *[
+            run
+            for back in range(5)
+            for run in _minutes(
+                30, scenario=B, start=EVENING - timedelta(days=back, hours=3)
+            )
+        ],
+    ]
+
+    tree = _tree(runs)
+    second_load = _tree(runs, limit=2 * SESSIONS_PER_LOAD)
+
+    assert len(_of_kind(tree, "session")) == 30
+    assert tree["session_limit"] == 30
+    assert _kinds(tree)[-1] == "more"
+    assert len(_of_kind(second_load, "session")) == 40
+    assert _of_kind(second_load, "more") == []
+    scenario_sessions = _of_kind(_build(runs), "session")
+    assert len(scenario_sessions) == 30
+    # Ten of the sessions newer than the thirtieth are the other scenario's.
+    assert scenario_sessions[-1]["place"] == 35
+
+
+def test_a_tree_loaded_up_to_a_sessions_place_lists_it_last():
+    runs = _one_run_a_day(40)
+    asked = _of_kind(_build(runs, limit=40), "session")[34]
+
+    tree = _tree(runs, limit=asked["place"])
+
+    assert asked["place"] == 35
+    assert _of_kind(tree, "session")[-1]["id"] == asked["id"]
+    assert _kinds(tree)[-1] == "more"
+
+
+# --- All scenarios: the heading and the grid's name ------------------------------
+
+
+@pytest.mark.parametrize(
+    ("offsets", "heading"),
+    [((0,), "All scenarios · 1 run"), ((0, 2), "All scenarios · 2 runs")],
+)
+def test_the_trees_heading_counts_every_run_in_the_store(offsets, heading):
+    assert _tree(_minutes(*offsets))["heading"] == heading
+
+
+def test_the_trees_heading_counts_runs_beyond_the_loaded_sessions():
+    assert _tree(_one_run_a_day(35))["heading"] == "All scenarios · 35 runs"
+
+
+def test_the_trees_grid_is_named_for_all_scenarios():
+    assert _tree(_minutes(0))["grid_name"] == "Runs of all scenarios, by session"
+
+
+def test_an_empty_store_builds_an_empty_tree():
+    model = build_session_tree([], A, SESSIONS_PER_LOAD, EVENING, {})
+
+    assert (model["rows"], model["empty"], model["view"]) == (
+        [],
+        NO_RUNS_TEXT,
+        VIEW_ALL,
+    )
+    assert model["newest_run"] is None
+
+
+# --- Both views, from the run store ---------------------------------------------
+
+
+def test_the_tree_from_the_store_needs_no_selected_scenario(store):
+    store.extend([*_minutes(0), *_minutes(2, scenario=B)])
+
+    model = run_list_from_store(VIEW_ALL, None, 30, 95, EVENING)
+
+    assert model["empty"] is None
+    assert model["view"] == VIEW_ALL
+    assert [row["name"] for row in _of_kind(model, "scenario")] == [B, A]
+
+
+def test_the_tree_from_the_store_marks_every_scenario_it_lists(store):
+    store.extend(
+        [
+            _run(A, EVENING, score=100.0),
+            _run(B, EVENING + timedelta(minutes=2), score=100.0),
+            _run(A, EVENING + timedelta(minutes=4), score=96.0),
+            _run(B, EVENING + timedelta(minutes=6), score=90.0),
+        ]
+    )
+
+    model = run_list_from_store(VIEW_ALL, A, 30, 95, EVENING + timedelta(minutes=7))
+
+    assert [(row["n"], row["passed"]) for row in _of_kind(model, "run")] == [
+        (2, False),
+        (2, True),
+        (1, False),
+        (1, False),
+    ]
+
+
+def test_the_tree_from_the_store_marks_only_the_scenarios_it_lists(store, monkeypatch):
+    day = timedelta(days=1)
+    store.extend([*_minutes(0, scenario=C, start=EVENING - day), *_minutes(0)])
+    marked = []
+    real = run_history_list._mark_scenario
+
+    def mark(runs, scenario, goal):
+        marked.append(scenario)
+        return real(runs, scenario, goal)
+
+    monkeypatch.setattr(run_history_list, "_mark_scenario", mark)
+
+    run_list_from_store(VIEW_ALL, A, 1, 95, EVENING)
+
+    assert marked == [A]
+
+
+@pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])
+def test_an_empty_store_says_no_runs_yet_in_either_view(store, view):
+    model = run_list_from_store(view, A, 30, 95, EVENING)
+
+    assert (model["empty"], model["view"], model["newest_run"]) == (
+        NO_RUNS_TEXT,
+        view,
+        None,
+    )
+
+
+def test_with_no_scenario_selected_the_model_still_names_the_newest_run(store):
+    """Each view's mark starts from the first model a visit draws."""
+    store.extend([*_minutes(0, 2), *_minutes(4, scenario=B)])
+
+    model = run_list_from_store(VIEW_SCENARIO, None, 30, 95, EVENING)
+
+    assert model["empty"] == NO_SCENARIO_TEXT
+    assert model["newest_run"] == run_id(store[-1])
+    assert (model["rows"], model["forced_open"]) == ([], [])
+
+
+def test_each_view_is_built_with_the_count_of_sessions_it_was_given(store):
+    store.extend(_one_run_a_day(35))
+
+    assert run_list_from_store(VIEW_ALL, A, 60, 95, EVENING)["session_limit"] == 60
+    assert run_list_from_store(VIEW_SCENARIO, A, 30, 95, EVENING)["session_limit"] == 30

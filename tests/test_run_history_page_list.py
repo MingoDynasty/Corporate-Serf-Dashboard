@@ -796,7 +796,7 @@ def test_the_rows_are_built_from_the_run_store_for_the_selection(monkeypatch):
         SCENARIO, "landed.csv", 60, 95, "2026-10-12", True
     )
 
-    assert asked == [(SCENARIO, 60, 95, datetime(2026, 10, 12, 22, 50))]
+    assert asked == [("scenario", SCENARIO, 60, 95, datetime(2026, 10, 12, 22, 50))]
     assert answer == (model, "Scenario A · 3 runs", None, RUN_LIST_CLASS)
 
 
@@ -839,7 +839,7 @@ def test_a_store_holding_no_limit_loads_the_first_thirty(monkeypatch):
 
     run_history.build_run_list_rows(SCENARIO, None, None, 95, "2026-10-12", False)
 
-    assert asked[0][1] == 30
+    assert asked[0][2] == 30
 
 
 def test_the_real_row_builder_answers_for_an_empty_store(monkeypatch):

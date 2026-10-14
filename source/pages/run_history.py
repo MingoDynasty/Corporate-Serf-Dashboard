@@ -64,6 +64,7 @@ from source.components.run_history_list import (
     RUN_LIST_CLASS,
     RUN_LIST_NOTHING_CLASS,
     SESSIONS_PER_LOAD,
+    VIEW_SCENARIO,
     RunListIds,
     is_session_in_progress,
     register_run_list,
@@ -366,6 +367,7 @@ def build_run_list_rows(  # noqa: PLR0913
     which is how that text takes the grid's place.
     """
     model = run_list_from_store(
+        VIEW_SCENARIO,
         selected_scenario,
         session_limit or SESSIONS_PER_LOAD,
         score_threshold_percentage,
