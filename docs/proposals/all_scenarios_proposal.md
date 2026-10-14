@@ -93,6 +93,16 @@ doesn't reopen them:
 Status: Open. The maintainer's agreement in chat, 2026-10-10: "Agree, tree
 click should take the same rule as Follow."
 
+**Why it is still a row, though R7 is ratified.** The ratified page
+proposal looked ahead to this click and sent it here by name: "The same
+rule will cover a click in the All scenarios tree (row A1 of that
+proposal)"
+([R7, at `53170d6`](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/53170d6/docs/proposals/run_history_proposal.md)).
+The outline the maintainer agreed on 2026-10-10 lists it as a row too. R7's
+ratification settles the rule. Whether it also settles this click is the
+maintainer's to say, and this proposal doesn't infer it. Accepting the
+recommendation confirms what R7 foresaw.
+
 The material consequence: a click on a scenario's name under All scenarios
 can empty the Playlist filter, and the browser then remembers the emptied
 filter.
@@ -125,7 +135,9 @@ enough. How often a session's scenarios fall outside the filtered playlist
 was not measured.
 
 **If the maintainer chooses differently:** the tree becomes the one
-exception to R7, in one of two ways.
+exception to R7, and R7's decision-log entry, which says a click in this
+view will follow the rule, has to be amended. The exception takes one of two
+forms.
 
 - **The click keeps the filter and does nothing for such a scenario.** Some
   names in the tree are then dead, and nothing tells which before a click.
@@ -806,6 +818,14 @@ What follows from A2's first half.
   row and its scenario row, once per run, as the first row opens today. So a
   row the player closed is not reopened by a later change of scenario or of
   view.
+- **Every run in a batch opens its rows, not only the newest.** The app
+  shell hands the page new runs in batches, one per poll, and a batch can
+  hold runs on two scenarios. The model names only the store's newest run,
+  as today. So the script opens the session row and the scenario row of
+  every run newer than the one it applied last, which it finds by walking
+  the tree's run rows from the top down to that run. Where it can't find
+  that run, as on arrival, it opens the newest run's rows alone. Which rows
+  are open still never reaches the server.
 - **A run opens its rows in both views, whichever is on screen.** A run that
   lands under This scenario has its scenario row open in the tree when the
   switch is next pressed.
@@ -996,7 +1016,9 @@ never promised screen-reader usability".
   headers. A run row carries its scenario row's id beside its session
   row's.
 - **The model names the newest run and the rows it opens,** as today. Under
-  All scenarios those are its session row and its scenario row.
+  All scenarios those are its session row and its scenario row. The script
+  opens the rows of any other run in the same batch itself
+  ([A run that lands](#a-run-that-lands)).
 - **The tree marks one scenario at a time,** by the function that marks the
   selected scenario today. For the newest 30 sessions that is 36 scenarios
   and 1,147 runs, and took 3.6 ms once the performance files were read, and
@@ -1008,7 +1030,7 @@ never promised screen-reader usability".
   It is sent again when a run lands and when the selected scenario changes.
   The implementing PR measures both.
 
-Of the script's nine pieces of grid-specific work, three change:
+Of the script's nine pieces of grid-specific work, four change:
 
 - **Item 1.** A scenario row is a second kind of full-width group row, with
   the `gridcell` role and the span the session row's has.
@@ -1016,6 +1038,10 @@ Of the script's nine pieces of grid-specific work, three change:
   shows only while its session row and its scenario row are both open. Every
   loaded row is still always in the grid.
 - **Item 5.** A scenario row takes the session row's four keys.
+- **Item 9.** Focus goes back to the same button in the row, and not only
+  to the same row. Today it goes to the row's first button, which in a
+  scenario row is the toggle. A press on the scenario's name rebuilds the
+  tree, so focus would land on the toggle and not stay on the name.
 
 Two things are new: a row's height follows the **Median and best**
 checkbox, so the grid measures its rows again when it changes, and the
@@ -1111,7 +1137,7 @@ note. It erases nothing.
 |---|---|---|
 | [2026-10-12, the second column][second-column] | "Version 1 has one view". The list's two levels become three in the second view. The count "as plain text" becomes a link. "The first row alone gives a session's length" holds under This scenario only. The Columns menu's two checkboxes become three, if A3 is taken | R3: the list is a second column, 500 px wide. Every rule of the list under This scenario |
 | [2026-10-12, the filter][clear-filter] | The click it foresaw arrives, as a fourth way in and the selection callback's fourth input | R7, and one callback as the only writer of both dropdowns |
-| [2026-10-12, the grid][grid] | Three of its nine pieces of work change, and the walk it requires is repeated with the tree's tasks | R4, the rule the check leaves, and "A failed task is the maintainer's to decide" |
+| [2026-10-12, the grid][grid] | Four of its nine pieces of work change, and the walk it requires is repeated with the tree's tasks | R4, the rule the check leaves, and "A failed task is the maintainer's to decide" |
 | [2026-10-12, the page's own ids][own-ids] | What the page remembers gains the switch and, if A3 is taken, one checkbox | The rule that a renamed id or a changed default resets a stored value |
 | [2026-10-05, the Columns menu][columns-menu] | "What the menu lists" gains, on Run History alone, a choice that is not a column, if A3 is taken | D1 and D2, one remembered checkbox per choice, and both playlist tables' menus |
 | [2026-10-11, sessions][sessions-entry] | Nothing. The word visit is still not on screen | S1 to S4 |
@@ -1342,7 +1368,10 @@ maintainer's main checkout.
     after a jump. Open rows are kept for each view and forgotten on a
     reload.
   - A run landing with rows open in the tree, with focus in a run row, with
-    Follow on and off, and on a new scenario.
+    Follow on and off, and on a new scenario. One batch that holds runs on
+    two scenarios opens both scenario rows.
+  - Focus on a scenario's name stays on that button after the name is
+    pressed and after a run lands.
   - **Median and best** turned on and off, with row heights and focus kept,
     and remembered across a reload.
   - The dropdown's visible text as well as its value after a name is
