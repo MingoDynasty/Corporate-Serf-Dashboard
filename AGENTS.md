@@ -85,6 +85,15 @@ Codex <codex@local>
 
 - PRs opened through the GitHub connector may still show as opened by
   `MingoDynasty` because the connector uses the user's GitHub authorization.
+- After opening a pull request that changes anything a user sees, start an
+  instance of its build and give the maintainer the address, so they can try
+  the change by hand. Serve it from the pull request's own checkout, on a
+  port that no other running instance holds, the maintainer's own included.
+  A scratch state root (`CSD_STATE_DIR`, holding its own `config.toml` and
+  `data/settings.json`) with no KovaaK's username keeps it off the network.
+  Start it after the last push, and restart it after every later one: it has
+  no reloader, and `/health` reports the commit it started on. Stop it when
+  the maintainer says they are done, or when the pull request merges.
 - On the **first** page load after a server start, the browser console shows a
   `handleClientside` "Cannot read properties of undefined (reading 'apply')"
   error and a flood of "ID not found in layout" entries. This is a known

@@ -406,8 +406,11 @@ flowchart LR
 
 ### Entry & shell
 - `source/app.py` — entry point (`main`): wiring described above.
-- `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
-  collapse applied by a clientside callback), theme toggle, Dash `page_container`,
+- `source/app_shell.py` — top-level layout (`layout`): navbar (one `nav_link`
+  per `NAVBAR_LINKS` entry; burger collapse applied by a clientside callback,
+  and the open page's link marked by another, which follows the shell's
+  read-only `navbar-location` `dcc.Location` and writes `aria-current` on the
+  links), theme toggle, Dash `page_container`,
   and the notification host — the one `dmc.NotificationContainer`, plus the
   `toast-channel-registry` `dcc.Store` beside it, holding each toast channel's
   current instance id so the next emission knows which one to hide,

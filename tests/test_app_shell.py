@@ -1,8 +1,13 @@
 from collections import deque
+from pathlib import Path
 
 import dash_mantine_components as dmc
+from dash import dcc
+from dash._callback import GLOBAL_CALLBACK_LIST
 
 from source import app_shell
+
+DMC_BUNDLE = Path(dmc.__file__).parent / "dash_mantine_components.js"
 
 
 def _find_component_by_id(root, component_id):
@@ -95,9 +100,10 @@ def test_index_string_declares_english_language():
 
 
 def test_nav_link_uses_single_mantine_anchor_for_dash_navigation():
-    link = app_shell.nav_link("Home", "/", "bi:house-door-fill")
+    link = app_shell.nav_link("navbar-home", "Home", "/", "bi:house-door-fill")
 
     assert isinstance(link, dmc.NavLink)
+    assert link.id == "navbar-home"
     assert link.href == "/"
     assert link.refresh is False
 
@@ -142,9 +148,96 @@ def test_every_navbar_icon_is_drawn_in_the_same_square():
 
 
 def test_a_navbar_icon_keeps_its_shape_inside_its_square():
-    link = app_shell.nav_link("Run History", "/run-history", "fontisto:line-chart")
+    link = app_shell.nav_link(
+        "navbar-run-history", "Run History", "/run-history", "fontisto:line-chart"
+    )
 
     assert "center / contain" in link.leftSection.children.style["mask"]
+
+
+# --- The navbar marks the open page ----------------------------------------------
+#
+# The matching itself runs in the browser, where no test here can run it. These
+# tests pin the joints it hangs on: which links the callback writes to, where it
+# reads the addresses from, and the stylesheet rule that draws the mark.
+
+
+def _navbar_links():
+    return [
+        component
+        for component in _walk_components(app_shell.layout())
+        if isinstance(component, dmc.NavLink)
+    ]
+
+
+def _open_page_callback():
+    (spec,) = [
+        spec for spec in GLOBAL_CALLBACK_LIST if "aria-current" in str(spec["output"])
+    ]
+    return spec
+
+
+def test_the_open_page_callback_writes_to_every_navbar_link():
+    """A link the callback does not write to is never marked, on any page."""
+    spec = _open_page_callback()
+
+    assert spec["output"].strip(".").split("...") == [
+        f"{link.id}.aria-current" for link in _navbar_links()
+    ]
+    assert spec["clientside_function"] is not None
+    # The first load has to be marked too, not only a later navigation.
+    assert spec["prevent_initial_call"] is False
+
+
+def test_the_open_page_callback_reads_each_address_from_its_link():
+    """The callback pairs addresses with links by position, and owns none.
+
+    An address written into the callback would be a second copy of the one
+    on the link, free to go stale when the link moves.
+    """
+    spec = _open_page_callback()
+
+    assert [(dep["id"], dep["property"]) for dep in spec["state"]] == [
+        (link.id, "href") for link in _navbar_links()
+    ]
+
+
+def test_the_open_page_callback_follows_the_address_from_the_shell():
+    spec = _open_page_callback()
+    location = _find_component_by_id(app_shell.layout(), app_shell.NAVBAR_LOCATION_ID)
+
+    assert [(dep["id"], dep["property"]) for dep in spec["inputs"]] == [
+        (app_shell.NAVBAR_LOCATION_ID, "pathname")
+    ]
+    assert isinstance(location, dcc.Location)
+    assert location.refresh is False
+
+
+def test_a_navbar_link_carries_no_mark_of_its_own():
+    """Leave the mark to the callback alone.
+
+    A fixed ``aria-current`` would mark the same link on every page. The
+    component's ``active`` would run a second matcher beside the callback's,
+    one that draws the mark and never sets the attribute.
+    """
+    for link in _navbar_links():
+        props = link.to_plotly_json()["props"]
+
+        assert "active" not in props
+        assert "aria-current" not in props
+
+
+def test_bundled_mantine_still_draws_a_link_that_carries_aria_current():
+    """Pin the stylesheet rule the mark on screen comes from.
+
+    The callback sets only the attribute. If an upgrade stops styling it, a
+    screen reader is still told which page is open and nothing on screen
+    shows it. A failure here means re-reading how the bundle draws an active
+    ``NavLink`` before touching the callback.
+    """
+    assert "where([data-active], [aria-current='page'])" in DMC_BUNDLE.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_navbar_defaults_to_open_on_a_first_run():

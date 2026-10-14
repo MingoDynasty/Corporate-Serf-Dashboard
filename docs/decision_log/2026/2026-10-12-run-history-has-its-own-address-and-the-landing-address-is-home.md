@@ -104,6 +104,9 @@ and neither was taken.
   active. Found while the page was made public. Marking the open page is
   left to a later change, on the maintainer's word of 2026-10-13: "let's
   keep the idea for a future PR."
+  **Superseded (2026-10-13).** That change is made: the navbar marks the
+  open page
+  ([2026-10-13](2026-10-13-the-navbar-marks-the-open-page.md)).
   Home keeps the house icon and Run History has one of its own.
 - **The header title still leads to `/`,** which is now Home. The navbar's
   Run History link leads to the page with no parameters.
