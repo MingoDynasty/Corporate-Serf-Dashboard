@@ -36,6 +36,9 @@ from source.app_shell import (
     CELEBRATION_STYLE_CONFETTI,
     CELEBRATION_STYLE_OFF,
     PB_CELEBRATION_STYLE_STORE_ID,
+    RUN_NOTIFICATIONS_OFF,
+    RUN_NOTIFICATIONS_ON,
+    RUN_NOTIFICATIONS_STORE_ID,
 )
 from source.components.control_name import control_name
 from source.components.local_icon import local_icon
@@ -178,6 +181,15 @@ DISCOVERY_FAILED_STATUS = (
     "have been missed. See data/logs/debug.log."
 )
 
+NOTIFICATIONS_HEADING = "Notifications"
+RUN_NOTIFICATIONS_LABEL = "Run notifications"
+# The last sentence is the celebration description's own, for its reason.
+RUN_NOTIFICATIONS_DESCRIPTION = (
+    "Shows a notification on every page when a new run is detected. Personal "
+    "best celebrations use their own setting. Takes effect right away."
+)
+RUN_NOTIFICATIONS_SWITCH_ID = "app-settings-run-notifications-switch"
+
 CELEBRATIONS_HEADING = "Celebrations"
 CELEBRATION_LABEL = "Personal best celebration"
 # The last sentence keeps this section's instant model from blurring into the
@@ -214,7 +226,8 @@ CELEBRATION_PREVIEW_SIGNAL_ID = "app-settings-celebration-preview-signal"
 # store cannot write to directly. The store is the authoritative value, so the
 # obvious pair -- store to select, select to store -- would be a dependency
 # cycle; reading the store as ``State`` behind a one-shot interval is the same
-# initialization without one.
+# initialization without one. The Run notifications switch is filled by the
+# same tick, from its own store.
 CELEBRATION_INIT_INTERVAL_ID = "app-settings-celebration-init-interval"
 
 
@@ -795,6 +808,48 @@ def _identity_detection() -> dmc.Stack:
 
 
 @callback(
+    Output(RUN_NOTIFICATIONS_STORE_ID, "data"),
+    Input(RUN_NOTIFICATIONS_SWITCH_ID, "checked"),
+    State(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
+    prevent_initial_call=True,
+)
+def set_run_notifications(checked, initialized):
+    """Write the switch's value to the browser-local Run notifications store.
+
+    The store is the setting and the switch is a view of it, as the
+    celebration select is of its store.
+
+    Nothing is written before the initializing tick, for the reason
+    ``set_celebration_style`` gives. Mounting the page fires this callback
+    with the switch's layout default, which is on, so without the gate every
+    visit to this page would turn run toasts back on.
+
+    Only a switch that is off writes the off value. The store fails towards
+    showing the toast, and so does this.
+    """
+    if not initialized:
+        return no_update
+    return RUN_NOTIFICATIONS_OFF if checked is False else RUN_NOTIFICATIONS_ON
+
+
+@callback(
+    Output(RUN_NOTIFICATIONS_SWITCH_ID, "checked"),
+    Input(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
+    State(RUN_NOTIFICATIONS_STORE_ID, "data"),
+    prevent_initial_call=True,
+)
+def show_stored_run_notifications(_n_intervals, stored):
+    """Show the stored setting once the browser has handed its value over.
+
+    Only the exact off value turns the switch off, as only that value
+    silences the toast. Any other leaves the switch on its layout default and
+    writes nothing back, so a value a later build wrote stays as that build
+    left it.
+    """
+    return False if stored == RUN_NOTIFICATIONS_OFF else no_update
+
+
+@callback(
     Output(PB_CELEBRATION_STYLE_STORE_ID, "data"),
     Input(CELEBRATION_SELECT_ID, "value"),
     State(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
@@ -888,6 +943,32 @@ clientside_callback(
     Output(CELEBRATION_PREVIEW_BUTTON_ID, "disabled"),
     Input(CELEBRATION_SELECT_ID, "value"),
 )
+
+
+def _notifications_section() -> dmc.Stack:
+    """Build the Notifications section: the Run notifications switch.
+
+    Outside the Save form, as the Celebrations section under it is and for
+    the same reasons: it applies the moment it is flipped and is stored in
+    this browser. The switch carries no persistence of its own. The store is
+    the setting, and a second remembered value could disagree with it.
+    """
+    return dmc.Stack(
+        children=[
+            dmc.Title(NOTIFICATIONS_HEADING, order=3),
+            dmc.Switch(
+                id=RUN_NOTIFICATIONS_SWITCH_ID,
+                label=RUN_NOTIFICATIONS_LABEL,
+                description=RUN_NOTIFICATIONS_DESCRIPTION,
+                # Mirrors the store's own default, so the only browser that
+                # sees this corrected a tick later is one that turned run
+                # notifications off.
+                checked=True,
+                maw=_FIELD_WIDTH,
+            ),
+        ],
+        gap="sm",
+    )
 
 
 def _celebrations_section() -> dmc.Stack:
@@ -1007,6 +1088,8 @@ def layout(**kwargs):  # noqa: ARG001
                 className=notice_class,
                 withBorder=True,
             ),
+            dmc.Divider(),
+            _notifications_section(),
             dmc.Divider(),
             _celebrations_section(),
             dmc.Divider(),

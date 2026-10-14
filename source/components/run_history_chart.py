@@ -115,7 +115,7 @@ def build_run_history_figure(  # noqa: PLR0913
 
     Returns the figure plus whether score overlays apply to it. The empty
     range and the unsupported mode return ``False``, so the caller skips
-    overlays and notifications. ``run_range`` and ``day_range`` are the two
+    the overlays. ``run_range`` and ``day_range`` are the two
     range selects' values, and the mode decides which one is read. ``today``
     is the app's own date: a range of days counts back from it.
 

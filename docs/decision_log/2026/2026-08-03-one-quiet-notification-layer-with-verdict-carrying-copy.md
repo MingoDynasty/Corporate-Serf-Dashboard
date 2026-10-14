@@ -156,3 +156,17 @@ conformant channel — a dedicated typed event queue or polled cache state, neve
 the run-specific `message_queue` — and the run-import-failure queue is the
 pattern to copy if it is ever wanted. It pairs with the unbuilt "rank improved"
 toast and should be decided with it, not piecemeal.
+
+**Superseded in part (2026-10-13).** A run's toast is plain: it says a run was
+detected, on every page, and carries no verdict. For run toasts these no
+longer hold: the title carrying the verdict, a run that earns neither a
+verdict nor a placement emitting nothing, the threshold verdict headlining
+with the placement trailing, a failing verdict naming its target, and
+sensitivity as a trailing qualifier. The "already visible somewhere" test
+gains the run toast as a named exception: it shows while Run History is open.
+What stands: the one delivery path, the routing policy for every other event,
+background threads never driving the UI, the four behaviors of the run toast's
+channel, and "The message leads with the scenario." See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)
+and
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).

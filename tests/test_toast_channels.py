@@ -8,7 +8,7 @@ which toast belongs to which lane -- live with the callbacks that emit them.
 from dash import no_update
 
 from source.utilities import notifications
-from source.utilities.notifications import channel_toast, toast
+from source.utilities.notifications import channel_toast, channel_toasts, toast
 
 
 def _registry_operations(patch) -> list[tuple[str, list, object]]:
@@ -171,6 +171,56 @@ def test_overlapping_emissions_of_one_channel_touch_only_that_key():
     assert set(_registry_writes(first_patch)) == {"import-failed"}
     assert set(_registry_writes(second_patch)) == {"import-failed"}
     assert registry["run-verdict"] == "run-verdict-old"
+
+
+def test_several_channels_go_out_as_one_emission_with_one_patch():
+    """What a response that toasts on two channels needs.
+
+    An output takes one value and two patches cannot be joined, so the one
+    patch assigns each channel's key. Each toast replaces its own channel's
+    instance, and a channel the emission does not name is left alone.
+    """
+    registry = {
+        "pb-celebration": "pb-celebration-old",
+        "run-verdict": "run-verdict-old",
+        "unrelated": "unrelated-1",
+    }
+
+    send, hide, patch = channel_toasts(
+        [
+            toast("pb-celebration", "T", "M", color="green", auto_close=False),
+            toast("run-verdict", "T", "M", color="blue"),
+        ],
+        registry,
+    )
+
+    assert [payload["id"].rsplit("-", 1)[0] for payload in send] == [
+        "pb-celebration",
+        "run-verdict",
+    ]
+    assert [payload["autoClose"] for payload in send] == [
+        False,
+        notifications.DEFAULT_AUTO_CLOSE_MS,
+    ]
+    assert hide == ["pb-celebration-old", "run-verdict-old"]
+    assert _registry_operations(patch) == [
+        ("Assign", ["pb-celebration"], send[0]["id"]),
+        ("Assign", ["run-verdict"], send[1]["id"]),
+    ]
+
+
+def test_one_toast_through_the_several_channel_helper_is_the_single_emission():
+    one = toast("import-successful-AAA", "Title", "Message", color="green")
+    registry = {"import-successful-AAA": "old", "import-failed": "failed-1"}
+
+    send, hide, patch = channel_toasts([one], registry, clears=("import-failed",))
+
+    assert len(send) == 1
+    assert hide == ["old", "failed-1"]
+    assert _registry_writes(patch) == {
+        "import-successful-AAA": send[0]["id"],
+        "import-failed": None,
+    }
 
 
 def test_a_missing_registry_reads_as_an_empty_one():

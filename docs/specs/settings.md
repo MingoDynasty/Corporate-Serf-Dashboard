@@ -7,10 +7,11 @@ desktop shortcut whether to open a browser tab. A number outside the range
 it can work with is refused as that file is read, with one line naming the
 file. Where the KovaaK's runs live and who the player is on the
 leaderboards live in a small file the app owns, shown and changed on a
-Settings page that also offers what the machine already knows and holds one
-preference the browser remembers instead, how a personal best celebrates. A
-setting the running app cannot pick up live is frozen at startup, and the
-page says when a restart is needed.
+Settings page that also offers what the machine already knows and holds two
+preferences the browser remembers instead, whether a new run shows a
+notification and how a personal best celebrates. A setting the running app
+cannot pick up live is frozen at startup, and the page says when a restart
+is needed.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -290,16 +291,53 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   guards on its trigger: Save and Detect on `n_clicks` and the triggering id,
   the picker on a chosen value and the triggering id
   ([2026-08-02](../decision_log/2026/2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page.md)).
-  The Celebrations select below is the one state-writing callback that does
-  neither, and deliberately: its write is browser-local, and the spurious call
-  it has to survive arrives *with* the select as the triggering id, so it gates
-  on the initialization tick instead
-  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
+  The Run notifications switch and the Celebrations select below are the two
+  state-writing callbacks that do neither, and deliberately: each write is
+  browser-local, and the spurious call it has to survive arrives *with* the
+  control as the triggering id, so each gates on the initialization tick
+  instead
+  ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md),
+  [2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
+
+## Notifications
+
+- A "Notifications" section sits between the Save form and the Celebrations
+  section, outside the form. It holds one switch, "Run notifications",
+  described as "Shows a notification on every page when a new run is
+  detected. Personal best celebrations use their own setting. Takes effect
+  right away." Nothing here goes through Save, and nothing here touches
+  the restart notice or the store alert, which speak for the form's three
+  keys
+  ([2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
+- The setting is the shell-hosted `dcc.Store(id="run-notifications",
+  storage_type="local")`, not the switch: one browser-local string, `"on"`
+  or `"off"`, starting on. The switch initializes from it and writes its
+  value straight back to it, and carries no Dash persistence of its own.
+  What the setting governs is in
+  [notifications.md](notifications.md#run-notifications)
+  ([2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
+- The value is per browser, is cleared with site data, and is never written
+  to `data/settings.json`; a browser that has never visited the page shows
+  run toasts. Anything but the exact `"off"` reads as on, so a value this
+  build does not know still shows them
+  ([2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
+- The one-shot `dcc.Interval` that initializes the Celebrations select
+  initializes this switch too, with the store read as `State`, and the same
+  tick gates the write. Mounting the page fires the write callback with the
+  switch's layout default, which is on, so without the gate every visit to
+  the page would turn run toasts back on. A stored value other than `"off"`
+  leaves the switch on its default and writes nothing back
+  ([2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
+- The switch replaced one in the Run History page's Chart options. That
+  switch's stored value is not read, so a browser that had turned run
+  toasts off under it started with them on again, once. The old value is
+  left in the browser, unused
+  ([2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
 
 ## Celebrations
 
-- A "Celebrations" section sits between the Save form and the version section,
-  outside the form: the select "Personal best celebration", described as
+- A "Celebrations" section sits between the Notifications section and the
+  version section, outside the form: the select "Personal best celebration", described as
   "Plays a short animation and shows a toast when a run beats your personal
   best in any scenario. Works on every page, and doesn't depend on **Run
   notifications**. Takes effect right away.", with a "Preview" button beside

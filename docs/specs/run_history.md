@@ -75,6 +75,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   toast, and the cleared filter is what the browser then remembers
   ([2026-10-12][clear-filter]).
 - The page accepts query parameters it does not name and reads none of them.
+  A run toast's link carries one, `run=` and the run's id, only so that
+  each run's link is an address the page is not already at
+  ([2026-10-13][run-toast]).
 
 ## The top row
 
@@ -182,10 +185,11 @@ of scope here, apart from its chart toolbar, noted under The chart.
   run that is not a new PB and is compared by score with a previous best of
   zero or less
   ([2026-10-12][check]).
-  The percentage has one decimal and the two display caps of the run toast
-  ([notifications.md](notifications.md#run-notifications)): a run below the
-  PB shows at most 99.9%, and a judged miss shows at most one tenth under
-  its goal.
+  The percentage has one decimal and the two display caps
+  ([Marks](#marks-the-check-and-the-star)): a run below the PB shows at
+  most 99.9%, and a judged miss shows at most one tenth under its goal.
+  The card is the one place a run's percentage of the PB is printed
+  ([2026-10-13][run-toast]).
 - The third line reads `Run {n} this session · {duration} on this scenario`
   while the run's session is in progress, and `Run {n} last session` once it
   has ended. `{n}` counts the session's runs on the run's scenario. The
@@ -245,7 +249,7 @@ of scope here, apart from its chart toolbar, noted under The chart.
   midnight N minus 1 days before today, so on October 11 the last 7 days are
   October 5 to 11. The last 12 months are 365 days, counted the same way. The
   date is the app's own, never the browser's. A chart left open past midnight
-  is redrawn within 30 seconds of the date moving on, with no toast
+  is redrawn within 30 seconds of the date moving on
   ([2026-10-12][every-run]).
 - The plot title is the scenario's name alone
   ([2026-10-12][every-run]).
@@ -539,6 +543,30 @@ of scope here, apart from its chart toolbar, noted under The chart.
   less, so there is no percentage to judge by.", or, for a judged miss,
   "Below threshold"
   ([2026-10-12][check]).
+- A judged run passes when `score × 100 >= PB × goal`, where `PB` is the PB
+  it was chasing and `goal` is the percentage. The two sides are compared
+  as decimals, so a run exactly at the goal passes: in floats
+  `20.6 × 95 / 100` is `19.570000000000004`, which would fail a 19.57 run
+  sitting exactly at 95% of a 20.60 PB
+  ([2026-07-08][previous-pb]).
+  The percentage a surface prints is `score / PB × 100`.
+- Compared by pace, with `C` the scenario's constant, a run passes when
+  `(C − PB) × 100 >= goal × (C − score)`, compared as decimals in the same
+  way, and the percentage is `(C − PB) / (C − score) × 100`. Pace needs
+  positive times only, so a time-scored PB of zero or less is still
+  judged. Where a time is zero or less the run is compared by score
+  ([2026-10-05][pace]).
+- Two display caps keep a printed percentage from contradicting the
+  verdict beside it. A judged miss prints at most one tenth below the goal
+  as printed, so a 94.98% miss of a 95% goal reads `94.9%`, never `95.0%`.
+  A run below the PB prints at most `99.9%` whether it passed or not, so a
+  run 0.03% short reads `99.9%`, never `100.0%`. Both hold by pace too,
+  since a run's pace is below the PB's exactly when its score is
+  ([2026-10-12][check]).
+- Nothing else judges a run. The run toast carries no verdict, and no
+  surface says where a run placed among the runs at its sensitivity
+  ([2026-10-13][run-toast],
+  [2026-10-13][retired]).
 - A past run is judged by pace under its own version of the scenario, the
   one its stats file names in `Hash:`, where the app measures pace on that
   version. Whether a version is time-scored, and its constant, is one answer
@@ -552,11 +580,11 @@ of scope here, apart from its chart toolbar, noted under The chart.
   that version's earlier runs to pace, and a later file of the same version
   that answers differently judges every run of that version again
   ([2026-10-12][check]).
-- The run toast judges a landed run against the run store's high score when
-  the run lands. The check and the card's badge judge it against the PB
-  before the run in the order the runs were played. The two differ only for a
-  run that lands older than the store's newest, such as a stats file copied
-  into the folder.
+- The personal best celebration compares a landed run with the run store's
+  high score when the run lands. The star and the card's badge compare it
+  with the PB before the run in the order the runs were played. The two
+  differ only for a run that lands older than the store's newest, such as
+  a stats file copied into the folder.
 
 ## Time-scored scenarios
 
@@ -565,14 +593,13 @@ of scope here, apart from its chart toolbar, noted under The chart.
   seconds. Wherever the app can measure pace on one, these surfaces divide
   times instead of scores: the Next Rank gap
   ([playlists.md](playlists.md#the-per-playlist-scenario-table)), the Score
-  threshold line (The chart), the threshold verdict and the New personal
-  best toast ([notifications.md](notifications.md#run-notifications)), and
-  the check and the latest-run card's badge and percentage
+  threshold line (The chart), the New personal best toast
+  ([notifications.md](notifications.md#run-notifications)), and the check
+  and the latest-run card's badge and percentage
   ([Marks](#marks-the-check-and-the-star)).
   Anything that orders or places scores is unchanged, because a higher score
   is always a faster finish: the chart's points and axis, the PB score line,
-  the rank lines, the Rank column, and top-N placement. No completion time is
-  shown anywhere
+  the rank lines, and the Rank column. No completion time is shown anywhere
   ([2026-10-05][pace]).
 - Pace applies to a comparison only when three things hold: the scenario is
   recognized as time-scored, every score in the comparison is eligible, and
@@ -641,18 +668,17 @@ of scope here, apart from its chart toolbar, noted under The chart.
   When the chart's own area, the page less the navbar and the run list,
   drops to 48em, the same panel stacks above the chart
   ([2026-10-12][column]).
-- Four groups in order: **Overlays** ("Rank thresholds" on, "Show all ranks"
-  off, "PB score" on), **Run Data Points** ("Point size" Default, "Point
-  color" empty), **Score Threshold** ("Score threshold overlay" on, "Score
-  threshold percentage" 95, minimum 1, placeholder "Percentage", "Score
-  threshold verdict" on), and **Notifications** ("Run notifications" on)
+- Three groups in order, holding seven controls: **Overlays** ("Rank
+  thresholds" on, "Show all ranks" off, "PB score" on), **Run Data
+  Points** ("Point size" Default, "Point color" empty), and **Score
+  Threshold** ("Score threshold overlay" on, "Score threshold percentage"
+  95, minimum 1, placeholder "Percentage")
   ([2026-08-09][panel],
   [2026-08-20][points],
-  [2026-08-21][master-switch];
+  [2026-10-13][retired];
   label casing as amended by [2026-09-14][copy]).
   A help text that names another control renders the name bold: "Needs
-  **Rank thresholds** turned on." and "Needs **Run notifications** turned
-  on."
+  **Rank thresholds** turned on."
   ([2026-09-14][copy]).
 - The Score threshold percentage help text reads the same on every scenario:
   "Sets the score goal as a percentage of your personal best. On a scenario
@@ -667,10 +693,15 @@ of scope here, apart from its chart toolbar, noted under The chart.
   local storage, so preferences are per browser and per origin, which is why
   every human-facing URL says `localhost`
   ([2026-08-09][localhost]).
-- What the two notification switches gate, the run-toast family, the verdict
-  sub-toggle, and their interaction, is specified in
-  [notifications.md](notifications.md#run-notifications). This page only
-  hosts them. Neither gates a check, a star, or the card.
+- The panel holds no notification control. The Run notifications switch is
+  on the Settings page ([settings.md](settings.md#notifications)), because
+  the run toast shows on every page
+  ([2026-10-13][run-setting]).
+  The Score threshold verdict switch is retired with the verdict it gated,
+  so an empty percentage is the one way to stop runs being judged
+  ([2026-10-13][retired]).
+  The values a browser stored for the two old switches are left behind,
+  unused.
 
 ## Scenario Stats
 
@@ -704,8 +735,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   scenario dropdown are `State` there, so flipping either forwards nothing on
   its own. The supported usage model is one active tab
   ([2026-07-06][coalesce]).
-  The drain semantics and the toasts the summary produces are specified in
-  [notifications.md](notifications.md#run-notifications).
+  The drain, and the run toast it sends on every page, are specified in
+  [notifications.md](notifications.md#run-notifications). The page builds
+  no toast for a run.
 - One callback writes both dropdowns' values, with plain outputs. It reads
   the summary and lands on the scenario just played when Follow is on,
   clearing a Playlist filter that does not list it, and it is the callback
@@ -770,8 +802,8 @@ of scope here, apart from its chart toolbar, noted under The chart.
   does not remember whether Chart options is open, which session rows are
   open, or how many sessions are loaded
   ([2026-10-12][own-ids]).
-- The chart-appearance and notification preferences live only in the
-  browser's local storage. Nothing the panel sets is written server-side
+- The chart-appearance preferences live only in the browser's local
+  storage. Nothing the panel sets is written server-side
   ([2026-08-20][points]).
 - Nothing about a mark is stored. A check and a star are worked out again
   each time something asks, from the runs, the percentage, and what the
@@ -821,7 +853,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
 [pre-hydration]: ../decision_log/2026/2026-07-16-keep-pre-hydration-states-honest.md
 [points]: ../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md
 [default-color]: ../decision_log/2026/2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme.md
-[master-switch]: ../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md
+[run-toast]: ../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md
+[retired]: ../decision_log/2026/2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md
+[run-setting]: ../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md
 [share]: ../decision_log/2026/2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md
 [columns-menu]: ../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md
 [last-played]: ../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md

@@ -84,3 +84,8 @@ and
 Shipped in PRs #209 and #215; design discussion in #206. Distilled with
 [the inspector entry](2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md)
 from `docs/chart_options_inspector_proposal.md`, now deleted.
+
+**Superseded in part (2026-10-13).** The Score Threshold group no longer holds
+the verdict switch this entry lists as "Score Threshold Notification". The
+group holds the overlay switch and the percentage. See
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).

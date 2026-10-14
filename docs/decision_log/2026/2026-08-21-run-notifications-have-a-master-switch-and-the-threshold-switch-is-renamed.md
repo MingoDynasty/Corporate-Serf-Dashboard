@@ -86,5 +86,18 @@ verdict". The verdict switch's help text names the master switch in bold,
 "Needs **Run notifications** turned on." What each switch gates is unchanged.
 See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
+**Superseded in part (2026-10-13).** The Score threshold verdict switch is
+gone, and its four combinations with it. The master switch gates one plain
+toast. It has left the Chart options panel, whose Notifications group is gone:
+the switch is on the Settings page, and its value is held by a browser-local
+store in the app shell and not by Dash persistence. This entry's deferral of
+app-wide run toasts is answered: the toast shows on every page. What stands:
+what the master switch does not gate, that flipping it rebuilds nothing, and
+that it is browser-local, with `settings.json` and `config.toml` rejected. See
+[Run Notifications Is A Browser-Local Setting, On The Settings Page](2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md),
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md),
+and
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md).
+
 Shipped in PR #245; design discussion in #240. Distilled from
 `docs/run_notifications_switch_proposal.md`, now deleted.

@@ -457,7 +457,7 @@ def played(monkeypatch, playlist_lists):
 
 def _landed_on(scenario_name: str) -> dict:
     """Build a page's run summary whose latest run is on a scenario."""
-    return {"latest": {"scenario_name": scenario_name}, "celebrated_run_id": None}
+    return {"latest": {"scenario_name": scenario_name}}
 
 
 @pytest.mark.parametrize(

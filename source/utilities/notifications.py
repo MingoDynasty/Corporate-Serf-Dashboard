@@ -16,10 +16,15 @@ NOTIFICATION_CONTAINER_ID = "notification-container"
 # still-visible toast with no id to replace it by.
 TOAST_CHANNEL_REGISTRY_STORE_ID = "toast-channel-registry"
 
-# The personal best celebration's own channel key, deliberately not the page's
-# run-verdict key: the celebration is an app-wide family with its own lifetime,
-# so it must survive the next ordinary run toast instead of being replaced by
-# it. Only a later celebration replaces a celebration.
+# The run toast's channel key. Every run toast shares it, so a newer one
+# replaces the one on screen instead of stacking. The toast carries no
+# verdict: the key keeps the name it had when it did.
+RUN_VERDICT_CHANNEL = "run-verdict"
+
+# The personal best celebration's own channel key, deliberately not the run
+# toast's: the celebration has its own lifetime, so it must survive the next
+# ordinary run toast instead of being replaced by it. Only a later celebration
+# replaces a celebration.
 CELEBRATION_CHANNEL = "pb-celebration"
 
 # The one nominal toast lifetime. Conditions that fire when nobody may be
@@ -104,19 +109,42 @@ def channel_toast(
     order could resurrect an obsolete instance id -- leaving two toasts of one
     channel on screen, or a failure toast beside the success that cleared it.
     """
-    channel_key = notification["id"]
-    instance_id = f"{channel_key}-{uuid.uuid4().hex}"
+    return channel_toasts([notification], registry, clears=clears)
+
+
+def channel_toasts(
+    notifications: Sequence[dict[str, Any]],
+    registry: Mapping[str, str | None] | None,
+    *,
+    clears: Sequence[str] = (),
+) -> ChannelEmission:
+    """Re-pop several toast channels in one response, as one emission.
+
+    Each of ``notifications`` is emitted as ``channel_toast`` emits one, on
+    its own channel, and ``clears`` applies to the emission as a whole.
+
+    A response that toasts on two channels has to build its outputs here. An
+    output takes one value, and two ``dash.Patch`` objects cannot be joined,
+    so two ``channel_toast`` calls would leave two registry patches and room
+    for one. Writing the registry as a whole dict to get round that is the
+    failure ``channel_toast`` describes.
+    """
     current = registry or {}
-    hide = [
-        instance
-        for key in (channel_key, *clears)
-        if (instance := current.get(key)) is not None
-    ]
+    send: list[dict[str, Any]] = []
+    hide: list[str] = []
     patch = Patch()
-    patch[channel_key] = instance_id
+    for notification in notifications:
+        channel_key = notification["id"]
+        instance_id = f"{channel_key}-{uuid.uuid4().hex}"
+        if (replaced := current.get(channel_key)) is not None:
+            hide.append(replaced)
+        patch[channel_key] = instance_id
+        send.append({**notification, "id": instance_id})
     for key in clears:
+        if (cleared := current.get(key)) is not None:
+            hide.append(cleared)
         # Assigned None rather than deleted: the key may never have been
         # written, and the registry only ever asks whether a channel has an
         # instance on screen.
         patch[key] = None
-    return ChannelEmission([{**notification, "id": instance_id}], hide, patch)
+    return ChannelEmission(send, hide, patch)

@@ -2,9 +2,8 @@
 
 The app shell drains new runs and publishes one batch per poll for every
 page. A page that charts one scenario forwards that batch to its own store as
-a summary: the latest run on the scenario it should show, and the shell's
-decision about which run it celebrated. The page registers its own callback
-for that. This module holds what such a callback works out.
+a summary: the latest run on the scenario it should show. The page registers
+its own callback for that. This module holds what such a callback works out.
 """
 
 from typing import TypedDict
@@ -16,7 +15,6 @@ class RunEventsPayload(TypedDict):
     """Summary passed from a page's batch consumer to its other callbacks."""
 
     latest: RunEventData
-    celebrated_run_id: str | None
 
 
 def summarize_run_events(
@@ -41,24 +39,6 @@ def summarize_run_events(
     if not matching_runs:
         return target_scenario, None
 
-    # Coalescing, as before: several runs rebuild the plot once and only the
-    # latest matching one is narrated. The drain's decision travels with it,
-    # because the celebrated run may belong to another scenario entirely.
-    return target_scenario, {
-        "latest": matching_runs[-1],
-        "celebrated_run_id": batch["celebrated_run_id"],
-    }
-
-
-def run_events_were_triggered(
-    triggered: list[dict[str, str]],
-    run_events_prop: str,
-) -> bool:
-    """Return whether a callback invocation was caused by new run events.
-
-    ``triggered`` is ``ctx.triggered``, and ``run_events_prop`` names the
-    page's summary store as a trigger does: its id, a dot, and ``data``. The
-    store replays its last summary to every later call, so the value alone
-    cannot say that a run has just landed.
-    """
-    return any(trigger["prop_id"] == run_events_prop for trigger in triggered)
+    # Coalescing: several runs rebuild the plot once, for the latest matching
+    # one.
+    return target_scenario, {"latest": matching_runs[-1]}

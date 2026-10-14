@@ -3,8 +3,8 @@
 The first half judges plain run records, the maintainer's worked example
 among them. The second half replays real files: stats files loaded through
 the real loader, performance files beside them, and runs landed through the
-real watchdog handler, so it would notice the list and the run toast giving
-one run two answers.
+real watchdog handler, so it would notice the run store and the message a
+landed run arrives in giving one run two answers.
 """
 
 from datetime import datetime, timedelta
@@ -17,7 +17,6 @@ from sortedcontainers import SortedList
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.app_shell import _run_event_data  # noqa: E402
 from source.components.run_marks import (  # noqa: E402
     Chased,
     RunMark,
@@ -29,7 +28,6 @@ from source.components.score_threshold import (  # noqa: E402
     Unjudged,
     judge_run,
     normalize_score_threshold_percentage,
-    threshold_verdict,
 )
 from source.kovaaks import data_service  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
@@ -591,16 +589,23 @@ def test_a_scenario_with_no_runs_has_no_marks(folders):
     assert _marks_from_store(95.0) == {}
 
 
-# --- The newest run's mark and the toast it got --------------------------------
+# --- The newest run's mark and the facts its message carried -------------------
+#
+# The watchdog works out three facts about a run as it lands and queues them:
+# the PB it was chasing, whether it was the first at its sensitivity, and the
+# constant to compare the two by pace with. The celebration words a new PB
+# from the first and the last. The run list and the card work the same three
+# out again from the run store. Judging the run from each must give one answer.
 
 
-def _toast_verdict(message, percentage: float) -> ThresholdVerdict | None:
-    """Judge a landed run the way its toast was, from its queued message."""
-    return threshold_verdict(
-        # Projected the way the app shell's drain does.
-        _run_event_data(message, message.datetime_created, 120.0),
+def _verdict_from_message(message, percentage: float) -> ThresholdVerdict | Unjudged:
+    """Judge a landed run from the facts its queued message carries."""
+    return judge_run(
+        message.score,
+        message.scenario_previous_best,
+        message.is_new_sensitivity,
+        message.pace_constant,
         percentage,
-        True,
     )
 
 
@@ -625,7 +630,7 @@ LANDINGS = {
 
 @pytest.mark.parametrize("landing", LANDINGS.values(), ids=LANDINGS.keys())
 @pytest.mark.parametrize("percentage", [90.0, 99.0])
-def test_the_newest_runs_mark_agrees_with_the_toast_it_got(
+def test_the_newest_runs_mark_agrees_with_the_facts_its_message_carried(
     folders, monkeypatch, landing, percentage
 ):
     folders.stats_file(FIRST, 884.41)
@@ -645,12 +650,9 @@ def test_the_newest_runs_mark_agrees_with_the_toast_it_got(
         ),
     )
 
-    toast = _toast_verdict(message, percentage)
-    mark = _newest_mark(percentage)
-    if toast is None:
-        assert isinstance(mark.verdict, Unjudged)
-    else:
-        assert mark.verdict == toast
+    assert _newest_mark(percentage).verdict == _verdict_from_message(
+        message, percentage
+    )
 
 
 def test_a_scenarios_first_landed_run_is_unjudged_by_both(folders, monkeypatch):
@@ -659,11 +661,13 @@ def test_a_scenarios_first_landed_run_is_unjudged_by_both(folders, monkeypatch):
 
     message = _land(monkeypatch, folders.stats_file(FIRST, 896.2))
 
-    assert _toast_verdict(message, 95.0) is None
+    assert _verdict_from_message(message, 95.0) is Unjudged.FIRST_RUN
     assert _newest_mark(95.0) == RunMark(verdict=Unjudged.FIRST_RUN, is_new_pb=False)
 
 
-def test_a_run_chasing_an_older_versions_pb_agrees_with_its_toast(folders, monkeypatch):
+def test_a_run_chasing_an_older_versions_pb_agrees_with_its_message(
+    folders, monkeypatch
+):
     """Both compare by score: the constant is not known to hold for that PB."""
     folders.stats_file(FIRST, 896.2, scenario_hash=OTHER_VERSION)
     folders.stats_file(SECOND, 884.41)
@@ -673,10 +677,10 @@ def test_a_run_chasing_an_older_versions_pb_agrees_with_its_toast(folders, monke
 
     message = _land(monkeypatch, folders.stats_file(THIRD, 883.02))
 
-    toast = _toast_verdict(message, 95.0)
-    assert toast is not None
-    assert not toast.by_pace
-    assert _newest_mark(95.0).verdict == toast
+    from_message = _verdict_from_message(message, 95.0)
+    assert isinstance(from_message, ThresholdVerdict)
+    assert not from_message.by_pace
+    assert _newest_mark(95.0).verdict == from_message
 
 
 # --- The star and the chart's --------------------------------------------------

@@ -1,8 +1,8 @@
 # Notifications
 
-The dashboard stays quiet during normal play and interrupts only for
-something the player did, a run worth celebrating, or a failure they would
-act on. A condition that stays true is explained where it happens instead of
+The app says when it has seen a new run, on whatever page is open, and
+otherwise interrupts only for something the player did, a run worth
+celebrating, or a failure they would act on. A condition that stays true is explained where it happens instead of
 popping up again on every trigger. A message answering something you did
 replaces its own previous copy and pops back onto the screen, so a retry
 always gets a visible answer, while messages about different things stack
@@ -77,7 +77,8 @@ their full behavior.
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
 - A payload carries `action: "show"`, the id, title, message, color, and
   `autoClose`, plus an optional icon. The message is a string or a children
-  list, which is how a toast body names a control in bold
+  list, which is how a toast body names a control in bold and how the run
+  toast holds a link
   ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)). Ids are semantic. DMC's `show` ignores a
   payload whose id is already on screen
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)), which is why every
@@ -104,6 +105,13 @@ their full behavior.
   celebration still replaces it. It is the only helper — there is no separate
   sticky pairing
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
+- `channel_toasts(notifications, registry, clears=())` is the same emission
+  for several channels at once: one send list, one hide list, and one
+  `dash.Patch` that assigns each channel's key. A response that toasts on
+  two channels needs it, because an output takes one value and two patches
+  cannot be joined. The drain is its one caller, for the celebration and
+  the run toast together
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
 - Toasts are built only inside Dash callbacks. A background thread publishes
   to typed shared state that an interval callback polls, and never writes
   `sendNotifications` itself
@@ -200,9 +208,17 @@ toasts under, and it applies to every toast the app adds from here on
   is stated in place at the point of impact, never toasted; an automatic
   failure during passive navigation gets no toast, the field state conveys it
   and a console `logger.warning` is kept; a user-initiated failure (Import,
-  manual Refresh, a run file that failed to import) gets an error toast; an
-  achievement or coaching verdict gets one toast per run; a diagnostic
-  (thread failures, timeouts with an automatic fallback) is console-only.
+  manual Refresh, a run file that failed to import) gets an error toast; a
+  diagnostic (thread failures, timeouts with an automatic fallback) is
+  console-only.
+- A new run gets at most one toast, the personal best celebration or the
+  plain run toast. Which run earns which is under
+  [Run notifications](#run-notifications). The run toast is the named
+  exception to stating a thing where it already shows: it appears while
+  Run History is open, where the run's row has just been drawn
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md),
+  superseding the coaching-verdict clause of
+  [2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
 - Two named exceptions to the persistent-condition rule, both conditions with
   no in-place home, each surfaced once per lifecycle rather than once per
   trigger and persistent until dismissed: the Steam ID mismatch, one toast per
@@ -236,13 +252,13 @@ toasts under, and it applies to every toast the app adds from here on
   [2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md));
   each outcome is specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
-- The title carries the verdict and never reads "Notification"; a run
-  verdict's message leads with the scenario, with sensitivity as a trailing
-  qualifier; a failing threshold verdict names the target it missed
+- A toast's title says what happened and never reads "Notification"
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
-  A new personal best is the one achievement with a toast of its own, in its
-  own family, amending that entry's rule that it earns nothing beyond the run
-  verdict.
+  A run's toast carries no verdict: its title says only that a run was
+  detected, and its message leads with the scenario
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+  A new personal best is the one achievement with a toast of its own, in
+  its own family.
 - A local validation problem is an inline field error, not a toast: an empty
   playlist import code sets "Enter a playlist code." on the field.
 - The playlist scenarios page's progressive fill reports degradation in the
@@ -262,18 +278,18 @@ toasts under, and it applies to every toast the app adds from here on
   stores, and only then appends a `NewFileMessage` to the process-wide
   `message_queue` deque
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
-  The message carries facts and no decision, so each consumer derives its own
-  verdict: `nth_score` is the run's 1-based place among the scenario's runs at
-  the same sensitivity, ties not counted as higher; `scenario_previous_best`
-  is the scenario's pre-run high score across all sensitivities, and is `None`
+  The message carries facts and no decision: `scenario_previous_best` is
+  the scenario's pre-run high score across all sensitivities, and is `None`
   only for a scenario's very first run
   ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md));
   `is_new_sensitivity` is true for a scenario's first run and for the first
-  run at a new sensitivity; `run_id` is the run CSV's file name. "The same
-  sensitivity" and "a new sensitivity" both mean the normalized
-  sensitivity-and-scale group, so a run recorded on a game's own scale is
-  judged against the runs its converted value lands beside
-  ([run_history.md](run_history.md#the-chart)).
+  run at a new sensitivity; `run_id` is the run CSV's file name. "A new
+  sensitivity" means the normalized sensitivity-and-scale group, so a run
+  recorded on a game's own scale joins the runs its converted value lands
+  beside
+  ([run_history.md](run_history.md#the-chart)). The message does not say
+  where the run placed among them
+  ([2026-10-13](../decision_log/2026/2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md)).
 - The message also carries `pace_constant`, the constant a time-scored
   scenario's score counts down from, as a fact like the previous best. The
   watchdog works it out before the message is queued, with the landed run
@@ -293,7 +309,8 @@ toasts under, and it applies to every toast the app adds from here on
   the drained runs in order, each stamped `is_live`, plus the batch's
   `celebrated_run_id` (or none) and a monotonic `animation_sequence`. An empty
   queue publishes nothing. The drain runs on every page, so a run is
-  delivered whatever page is open.
+  delivered whatever page is open, and the same response sends the run's
+  toast.
 - A run is stamped live when its `datetime_created` is within the freshness
   window of the drain, and stale otherwise. The window is a 120-second cap
   plus one poll period, so it is 121 seconds at the default 1000 ms interval:
@@ -315,8 +332,9 @@ toasts under, and it applies to every toast the app adds from here on
 - The drain reads the celebration setting as `State`
   ([settings.md](settings.md#celebrations)). With it off it names no run, so
   nothing is stamped, the sequence stands still, and no celebration toast goes
-  out; the batch still publishes every run with its liveness stamp, and the
-  page narrates it under the ordinary rules below. Only the exact value `off`
+  out; the batch still publishes every run with its liveness stamp, and a
+  personal best is then an ordinary run to the run toast below. Only the
+  exact value `off`
   silences the family: any other stored value, including one a later build
   wrote and a store the browser has lost, still celebrates
   ([2026-09-02](../decision_log/2026/2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page.md)).
@@ -326,8 +344,8 @@ toasts under, and it applies to every toast the app adds from here on
   rather than replacing it; only a later celebration replaces a celebration,
   showing a fresh instance and hiding the one before it. It goes out through
   `channel_toast` like every other replaceable toast, with `auto_close=False`
-  passed at the builder, and the shell writes exactly the one
-  `toast-channel-registry` key
+  passed at the builder, and a response that sends it alone writes exactly
+  the one `toast-channel-registry` key
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   With a positive previous best
   the message is
@@ -377,8 +395,8 @@ toasts under, and it applies to every toast the app adds from here on
   It summarizes the batch for the most recently played scenario when the
   Follow switch is on and for the selected scenario otherwise, ignores runs
   for any other scenario, and publishes one summary to the page's
-  `run-history-run-events` store — the latest matching run's stamped record
-  plus the batch's `celebrated_run_id`. With no scenario selected and the
+  `run-history-run-events` store, the latest matching run's stamped record.
+  With no scenario selected and the
   Follow switch off it forwards no summary
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   It writes neither dropdown: the page's one selection callback reads the
@@ -389,122 +407,109 @@ toasts under, and it applies to every toast the app adds from here on
   batch (`prevent_initial_call`).
 - The supported usage model is one active tab: `message_queue` is
   process-wide and each drain's payload reaches one client, so with two tabs
-  open a batch lands in whichever drain runs first. Extra tabs are crash-safe
-  but unsynchronized
+  open, on any pages, a batch and its toast land in whichever drain runs
+  first. Extra tabs are crash-safe but unsynchronized
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   `open_browser_on_launch` is how a user stops the installed launcher adding
   one tab per start
   ([2026-09-04](../decision_log/2026/2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable.md)).
   The interval keeps ticking while the tab is hidden
   ([2026-07-17](../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md)).
-- Run History's `generate_graph` builds the toast from the summary only when
-  the summary store triggered it, so a control change never re-toasts a stale
-  payload
-  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
-  A summary whose latest run belongs to another scenario earns nothing, and
-  a render that resolves to an empty-state plot skips the toast.
-- A run is judged only when Score threshold verdict is on, the threshold
-  percentage is a usable non-zero number, the run is not the first at its
-  sensitivity, and `scenario_previous_best` is positive. It passes when
-  `score >= scenario_previous_best × goal / 100`, compared as decimals so a
-  run exactly at the goal passes; the message shows
-  `score / scenario_previous_best × 100` and the goal, each to one decimal
-  ([2026-07-08](../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md)).
-  A failing percentage is capped one tenth below the goal as printed, so a
-  94.98% miss of a 95% goal reads `94.9%`, never `95.0%`.
-  A run below `scenario_previous_best` is capped at `99.9%` whether it passes
-  or fails, so a run 0.03% short reads `99.9%`, never `100.0%`.
-  A run is placed when `nth_score` is at most 5; first place is phrased
-  "best" and the rest "Nth-best". The 5 is fixed: the page plots every run
-  and has no Top N scores control
-  ([2026-10-12](../decision_log/2026/2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md)).
-- A run that carries a pace constant `C` is judged by pace wherever both
-  times are positive. It passes when
-  `(C − scenario_previous_best) × 100 >= goal × (C − score)`, compared as
-  decimals so a run exactly at the goal passes, and the message shows
-  `(C − scenario_previous_best) / (C − score) × 100`. The switch, the usable
-  goal, and the first-run-at-a-sensitivity rule gate it as above. The
-  positive previous best does not: pace needs positive times only, so a
-  time-scored previous best of zero or less is still judged. Both caps apply
-  unchanged, since a run's pace is below the previous best's exactly when
-  its score is. Where a time is zero or less, the run is judged by score as
-  above
-  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
-- The page narrates only the batch's latest matching run, and only when the
-  batch's decision does not name it and it is stamped live: a named run yields,
-  because the celebration toast is its one notification, and a stale run
-  narrates nothing. Otherwise the threshold verdict headlines and the placement
-  trails it; a run that is neither judged nor placed emits nothing
-  ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
-  Pass: green, "Threshold passed",
-  `{scenario}: {score:.2f}, {pct:.1f}% of PB. Also your {best|Nth-best} at {sensitivity}.`
-  when placed, else `{scenario}: {score:.2f}, {pct:.1f}% of PB.`, with no
-  coaching line after it
-  ([2026-10-04](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)).
-  Fail: yellow, "Below threshold",
-  `{scenario}: {score:.2f}, {pct:.1f}% of PB (need {goal:.1f}%). Still your {best|Nth-best} at {sensitivity}.`,
-  the "Still" sentence only when placed, and no coaching line after it.
-  Unjudged and placed: green, "New best score" or "New {Nth}-best score",
-  `{scenario}: {score:.2f} at {sensitivity}.`
-  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md))
-  A run judged by pace reads "% of PB pace" where these read "% of PB", and
-  is otherwise the same: `{scenario}: {score:.2f}, {pct:.1f}% of PB pace.`
-  on a pass, and
-  `{scenario}: {score:.2f}, {pct:.1f}% of PB pace (need {goal:.1f}%).` on a
-  miss, with the same placement sentences. The three titles are unchanged,
-  so the one word is what tells the player which measure judged the run
-  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
-- Every other run in a batch earns nothing; its new point on the plot is its
-  record. There is no catch-up digest: a batch of several runs rebuilds the
-  graph once, auto-switches once, and toasts exactly as a single run would
-  ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
+- The run toast is built by `publish_run_events`, in the response that
+  publishes the batch, so it shows on every page, Run History included
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+  It is blue with the chart icon and titled "New run detected". Its message
+  is the scenario's name on a line of its own, then the link "Open in Run
+  History" on the line below. Its lifetime is the nominal 8000 ms. It holds
+  no score, percentage, sensitivity, or goal: how a run went is on the Run
+  History page
+  ([run_history.md](run_history.md#marks-the-check-and-the-star)).
+- The batch's newest live run earns the run toast, unless it is the run
+  `celebrated_run_id` names, which keeps the celebration as its one toast.
+  A batch's other runs earn none, and their rows on the page are their
+  record: there is no catch-up digest and the title counts nothing. A batch
+  with no live run sends no toast
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+
+  | The batch's newest live run | Celebration setting | Run notifications | On screen |
+  | --- | --- | --- | --- |
+  | Set a new PB | On | On or off | The celebration |
+  | Set a new PB | Off | On | The run toast |
+  | Did not, and an earlier run in the batch did | On | On | Both, about different runs |
+  | Did not, and none did | Either | On | The run toast |
+  | Any | Either | Off | No run toast. The celebration follows its own setting |
+  | No live run in the batch | Either | Either | Nothing |
+
 - The one-notification guarantee is per run, not per batch, and one-sided:
   every run earns at most one notification and the celebrated run earns
-  exactly one. So one batch can put two toasts on screen — the celebration and
-  the page's narration — when they concern different runs, and a personal best
-  the drain did not celebrate has no guaranteed toast at all.
-- One run, one toast: every run-verdict shape shares the channel key
-  `run-verdict`, at most one is on screen once a response has been applied, a
-  later verdict replaces it with a full lifetime, and this holds per browser
-  client and survives page navigation
+  exactly one
+  ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
+  So one response can carry two toasts, the celebration and the run toast,
+  when they concern different runs. Its send list then holds both, its hide
+  list holds what each replaces, and `channel_toasts` builds the one
+  registry patch that assigns both channels' keys.
+- The link is a `dcc.Link` whose address is
+  `/run-history?scenario={scenario}&run={run id}`, each value encoded, built
+  by `scenario_run_history_href`, which builds every link to a scenario on
+  that page. It carries no `playlist_code`, because the shell does not know
+  what the page's Playlist filter holds, and the page clears a filter that
+  does not list the scenario
+  ([run_history.md](run_history.md#identity)). The page reads `scenario`
+  and not `run`. The run's id is there so that each run's toast links to an
+  address the page is not already at, because a link to the address the page
+  already holds does nothing. One case is left: the same toast's link, used
+  again after the selection was changed by hand, does nothing. A
+  `dmc.Anchor` would decode the address and cut a name holding `&` short,
+  and an `html.A` would reload the app and lose the toast
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+- Tab reaches the link while the toast is up, and Enter follows it. The
+  toast is an alert to assistive technology, as every Mantine toast is, and
+  it is the one toast that holds a control. No screen reader was run on it.
+  The navbar's Run History entry leads to the same page
+  ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+- Every run toast shares the channel key `run-verdict`: at most one is on
+  screen once a response has been applied, a later run's toast replaces it
+  with a full lifetime, and this holds per browser client and survives page
+  navigation
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
-  Each emission goes through `channel_toast`, so the newest verdict enters
-  under a fresh instance id while the one it replaces is hidden in the same
-  response; during that ~250 ms crossfade the outgoing instance is still
-  animating out
+  Each emission goes through the channel helper, so the newest toast enters
+  under a fresh instance id, with its entry animation, while the one it
+  replaces is hidden in the same response; during that ~250 ms crossfade the
+  outgoing instance is still animating out
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
+  So a second run is seen to arrive although the two toasts may read the
+  same. The drain is the channel's only producer.
   The celebration toast is the deliberate exception to
   replaces-*this* lane: its own channel key and no lifetime, so it sits beside
-  a run verdict and outlives it. It is not an exception to the mechanism —
+  a run toast and outlives it. It is not an exception to the mechanism —
   it replaces its own previous instance the same way
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
-- The Run notifications master switch (`run-history-run-notification-switch`,
-  on by
-  default; help text "Controls threshold verdict and placement notifications
-  for your runs. Personal best celebrations use their own setting.") gates the
-  page-built shapes through one early return at the top of the producing
-  function, ahead of the celebration yield, so master off is silent whether or
-  not the run was celebrated. It does not gate the celebration, which the
-  shell produces and which the Celebrations setting governs alone
-  ([settings.md](settings.md#celebrations)); the two are independent families,
-  so master off with celebrations on still celebrates a personal best on every
-  page while ordinary runs stay silent
+- The Run notifications setting is the shell-hosted
+  `dcc.Store(id="run-notifications", storage_type="local")`: one
+  browser-local string, `"on"` or `"off"`, starting on. The drain reads it
+  as `State`, so flipping it sends nothing and replays no run. Only the
+  exact `"off"` silences the run toast: any other stored value, including
+  one a later build wrote and a store the browser has lost, shows it
+  ([2026-10-13](../decision_log/2026/2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md)).
+  Its switch is on the Settings page
+  ([settings.md](settings.md#notifications)).
+- Run notifications off means no run toast on any page. It does not gate
+  the celebration, which the shell also produces and which the Celebrations
+  setting governs alone ([settings.md](settings.md#celebrations)); the two
+  are independent, so with run notifications off and celebrations on a
+  personal best still celebrates on every page while ordinary runs stay
+  silent
   ([2026-09-02](../decision_log/2026/2026-09-02-a-new-personal-best-celebrates-on-every-page.md)).
-  It does not gate the run-import failure toast, the plot update, scenario
-  auto-switching, or the rank, Steam ID, and playlist toast families either. It is
-  read as `State`, so flipping it never rebuilds the plot
+  It does not gate the run-import failure toast, the chart, the run list,
+  the latest-run card, following the scenario just played, or the rank,
+  Steam ID, and playlist toast families either
   ([2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
-- The Score threshold verdict switch
-  (`run-history-score-threshold-notification-switch`,
-  on by default; help text "Adds a pass or fail verdict to run notifications
-  when the run can be judged against the score threshold. Needs **Run
-  notifications** turned on.", the control name bold
-  ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md))) decides only whether a run is judged and is an
-  `Input` to the graph callback. Master off is silence whatever it says;
-  master on with it off gives placement toasts only
-  ([2026-08-21](../decision_log/2026/2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed.md)).
-  Where the switches sit and how their values persist is the Chart options
-  panel's concern, not specified here.
+- No toast judges a run, and nothing says where a run placed among the runs
+  at its sensitivity
+  ([2026-10-13](../decision_log/2026/2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md)).
+  When a run is judged against the score threshold, the comparison, and the
+  two display caps are specified in
+  [run_history.md](run_history.md#marks-the-check-and-the-star).
 
 ## Background threads and diagnostics
 
@@ -568,7 +573,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 
 | Key | Pattern | Title | Color | Clears | Produced by |
 | --- | --- | --- | --- | --- | --- |
-| `run-verdict` | channel | per verdict | green / yellow | — | Run History's `generate_graph`; this spec |
+| `run-verdict` | channel | "New run detected" | blue | — | `publish_run_events`; this spec |
 | `pb-celebration` | channel, persistent | "New personal best" | green, until dismissed | — | `publish_run_events`; this spec |
 | `run-import-failure` | burst, fixed id | "Run not recorded" | red | — | `flush_run_import_failures`; this spec |
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |

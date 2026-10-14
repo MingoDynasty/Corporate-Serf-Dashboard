@@ -70,7 +70,7 @@ group's average.
 Top N survives in one place for now. The run toast still places a run
 against the top scores at its sensitivity, against a fixed 5 with no
 control, until the
-[Run toasts proposal](../../proposals/run_toasts_proposal.md)'s change
+[Run toasts proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/2c5c072d0670c7c6d4873eb9e77f676dca1f6d43/docs/proposals/run_toasts_proposal.md)'s change
 retires placement.
 
 **If the maintainer had chosen otherwise.** With Top N and the Average score
@@ -275,6 +275,11 @@ dated note.
 **Evidence and its limits.** The counts above are from the maintainer's
 stats folder, one player's history: 8,937 runs over 866 scenarios on
 2026-10-05. Nothing was measured on other players' data.
+
+**Superseded in part (2026-10-13).** Top N no longer survives in the run
+toast. That toast is plain, nothing places a run, and `nth_score` has left the
+run message. See
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).
 
 Proposed in
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356),

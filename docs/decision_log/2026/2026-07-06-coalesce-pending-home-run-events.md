@@ -26,3 +26,10 @@ data. Mixed-scenario counts describe only the landing scenario. Nonmatching
 events are discarded when automatic switching is off, preserving the previous
 policy without wasting ticks. Coherent multi-tab delivery would require a
 broadcast or push transport and remains outside this local single-user design.
+
+**Superseded in part (2026-10-13).** The chart callback no longer creates a
+toast, and a backlog no longer yields a toast batch from the page. The app
+shell's drain sends one plain toast for the batch's newest live run, on every
+page. The rule for the plot and for landing on the scenario last played is
+unchanged. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md).

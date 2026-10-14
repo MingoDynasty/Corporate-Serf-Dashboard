@@ -6,7 +6,13 @@ from types import SimpleNamespace
 import pytest
 from sortedcontainers import SortedList
 
+from source.components.score_threshold import (
+    ThresholdVerdict,
+    judge_run,
+    shown_percentage,
+)
 from source.config import settings_service
+from source.kovaaks import data_service
 from source.kovaaks.data_models import RunData
 from source.my_queue.message_queue import NewFileMessage
 from source.my_watchdog import file_watchdog
@@ -179,41 +185,6 @@ def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
     assert len(messages) == 1
     assert loads == ["run.csv"]
     assert schedules == []
-
-
-@pytest.mark.parametrize(
-    ("new_score", "expected_nth"),
-    [
-        (115.0, 2),  # slots between 110 and 120
-        (120.0, 1),  # ties the top score; ties are not counted as higher
-        (90.0, 4),  # below every existing run
-    ],
-)
-def test_on_created_computes_nth_place_via_bisect(
-    monkeypatch,
-    new_score,
-    expected_nth,
-):
-    run_data = _run_data(score=new_score)
-    messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
-    monkeypatch.setattr(
-        file_watchdog,
-        "is_scenario_in_database",
-        lambda _scenario: True,
-    )
-    monkeypatch.setattr(file_watchdog, "get_high_score", lambda _scenario: 120.0)
-    monkeypatch.setattr(
-        file_watchdog,
-        "get_sensitivities_vs_runs",
-        lambda _scenario: {SENSITIVITY_KEY: _sorted_runs(100.0, 110.0, 120.0)},
-    )
-
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
-
-    assert len(messages) == 1
-    assert messages[0].nth_score == expected_nth
 
 
 def test_on_created_preserves_detection_log_for_non_csv(caplog):
@@ -444,7 +415,6 @@ def test_the_run_message_carries_no_decision_field():
     assert {field.name for field in dataclasses.fields(NewFileMessage)} == {
         "datetime_created",
         "is_new_sensitivity",
-        "nth_score",
         "pace_constant",
         "run_id",
         "scenario_name",
@@ -472,3 +442,147 @@ def test_a_new_sensitivity_run_that_is_a_personal_best_reports_both_facts(monkey
     (message,) = messages
     assert message.is_new_sensitivity is True
     assert message.scenario_previous_best == 90.0
+
+
+# --- Normalized sensitivity groups, from a real stats file -----------------
+#
+# These go through the real parser, where the tests above stand it in: what
+# they hold is that a run recorded on a game's own scale joins the group its
+# converted value lands in.
+
+NORMALIZED_SCENARIO = "Normalized Scenario"
+NORMALIZED_KEY = "40.8 cm/360"
+
+
+def _stats_file(tmp_path, name, *, sens_scale, horizontal_sens, score):
+    """Write one real stats file the parser will read, and return its path."""
+    file_path = tmp_path / f"{name} - Challenge - 2025.03.04-21.30.00 Stats.csv"
+    file_path.write_text(
+        "\n".join(
+            [
+                f"Score:,{score}",
+                f"Sens Scale:,{sens_scale}",
+                # 0.2 Valorant and 40.8 cm/360 are the same physical
+                # sensitivity at 1600 DPI, so both files record this increment.
+                "Sens Increment:,0.199886",
+                f"Horiz Sens:,{horizontal_sens}",
+                f"Vert Sens:,{horizontal_sens}",
+                "DPI:,1600",
+                f"Scenario:,{NORMALIZED_SCENARIO}",
+                data_service.POSSIBLE_SUB_CSV_HEADERS[0],
+                "Rifle,100,50,75,100,,Valorant,0.2,0.2,103,0,0,0,0,0,0,0,0",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    return file_path
+
+
+def _normalized_group(*scores):
+    """The score-ascending SortedKeyList the production stores hold."""
+    return SortedList(
+        [
+            RunData(
+                datetime_object=datetime.datetime(2025, 3, 1, 12)
+                + datetime.timedelta(minutes=index),
+                score=score,
+                sens_scale="cm/360",
+                horizontal_sens=40.8,
+                scenario=NORMALIZED_SCENARIO,
+                accuracy=0.5,
+            )
+            for index, score in enumerate(scores)
+        ],
+        key=lambda item: item.score,
+    )
+
+
+def _import_real_file(monkeypatch, file_path, *, group_scores, high_score):
+    """Import one real file and return the message the app would receive."""
+    messages = []
+    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
+    monkeypatch.setattr(
+        file_watchdog, "message_queue", SimpleNamespace(append=messages.append)
+    )
+    monkeypatch.setattr(
+        file_watchdog, "load_csv_file_into_database", lambda _file: True
+    )
+    monkeypatch.setattr(
+        file_watchdog, "schedule_rank_freshness_refresh", lambda *_args: None
+    )
+    monkeypatch.setattr(file_watchdog, "is_scenario_in_database", lambda _name: True)
+    monkeypatch.setattr(file_watchdog, "get_high_score", lambda _name: high_score)
+    monkeypatch.setattr(
+        file_watchdog,
+        "get_sensitivities_vs_runs",
+        lambda _name: {NORMALIZED_KEY: _normalized_group(*group_scores)},
+    )
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path=str(file_path))
+    )
+
+    (message,) = messages
+    return message
+
+
+def test_a_converted_run_joins_the_group_it_normalizes_into(
+    monkeypatch,
+    tmp_path,
+):
+    # The converted run joins a group that already holds native runs, so it is
+    # not the first at its sensitivity. Among the converted runs alone it
+    # would have been.
+    message = _import_real_file(
+        monkeypatch,
+        _stats_file(
+            tmp_path,
+            "converted-into-native-group",
+            sens_scale="Valorant",
+            horizontal_sens="0.2",
+            score=95,
+        ),
+        group_scores=(90, 100, 101, 102, 103, 104),
+        high_score=104,
+    )
+
+    assert message.sensitivity == NORMALIZED_KEY
+    assert message.is_new_sensitivity is False
+
+
+def test_a_native_run_at_a_converted_groups_value_is_not_a_new_sensitivity(
+    monkeypatch,
+    tmp_path,
+):
+    # The group exists only because converted runs landed on it, so this native
+    # run is not the scenario's first at 40.8 cm/360. It is therefore judged
+    # against the score threshold, where a first run at a sensitivity is not.
+    message = _import_real_file(
+        monkeypatch,
+        _stats_file(
+            tmp_path,
+            "native-into-converted-group",
+            sens_scale="cm/360",
+            horizontal_sens="40.8",
+            score=85,
+        ),
+        group_scores=(80, 85, 90),
+        high_score=90,
+    )
+
+    assert message.sensitivity == NORMALIZED_KEY
+    assert message.is_new_sensitivity is False
+    assert message.scenario_previous_best == 90
+
+    verdict = judge_run(
+        message.score,
+        message.scenario_previous_best,
+        message.is_new_sensitivity,
+        message.pace_constant,
+        95.0,
+    )
+
+    assert isinstance(verdict, ThresholdVerdict)
+    assert verdict.passed is False
+    assert f"{shown_percentage(verdict):.1f}" == "94.4"

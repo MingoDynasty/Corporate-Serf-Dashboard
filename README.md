@@ -15,7 +15,8 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
   Sensitivity, with PB, score-threshold, and benchmark-rank overlays.
 - **Run history**: a scenario's runs listed by session, with a check on each run that met your
   score threshold and a star on each new personal best.
-- **Run notifications**: a toast to compare your new run against your personal best.
+- **Run notifications**: a toast on every page when a new run is detected, with a link to its
+  scenario on Run History.
 - **Personal best celebration**: confetti, fireworks, cannons, or stars when a run beats your
   scenario best.
 - **Leaderboard standing**: your global position and percentile per scenario, refreshed after a new

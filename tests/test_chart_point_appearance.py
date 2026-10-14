@@ -2,8 +2,8 @@
 
 Point size and color are appearance, so they hang off the cheap callback that
 themes the figure the page already built and cached -- never off
-``generate_graph``, which rereads scenario data, rebuilds overlays, and decides
-notifications. These tests pin that split, the two controls' persisted layout
+``generate_graph``, which rereads scenario data and rebuilds overlays. These
+tests pin that split, the two controls' persisted layout
 defaults, and the fallbacks that keep an unrecognized preference from breaking
 the graph. The page is Run History, which hosts the Chart options panel.
 """
@@ -403,14 +403,13 @@ def test_appearance_preferences_never_reach_the_expensive_graph_callback():
     inputs = {
         key: {entry["id"] for entry in spec["inputs"]}
         for key, spec in GLOBAL_CALLBACK_MAP.items()
-        if key.startswith(f"..{IDS.cached_plot}.data...")
-        or key == f"{IDS.graph}.figure"
+        if key in {f"{IDS.cached_plot}.data", f"{IDS.graph}.figure"}
     }
 
     figure_inputs = inputs.pop(f"{IDS.graph}.figure")
     assert APPEARANCE_INPUT_IDS <= figure_inputs
 
-    # Whatever else it outputs, the callback that writes cached-plot is the one
-    # that rereads scenario data and decides notifications.
+    # The callback that writes cached-plot is the one that rereads scenario
+    # data and rebuilds the overlays.
     (generate_graph_inputs,) = inputs.values()
     assert not APPEARANCE_INPUT_IDS & generate_graph_inputs

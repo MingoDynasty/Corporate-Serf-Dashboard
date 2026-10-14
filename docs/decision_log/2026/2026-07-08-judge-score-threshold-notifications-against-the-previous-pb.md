@@ -29,3 +29,10 @@ previous PB, and still compares exactly rather than through the ratio it
 displays. Every other scenario keeps the formula as written. The
 [2026-10-05 entry](2026-10-05-time-scored-scenarios-are-measured-by-pace.md)
 holds the pace formula.
+
+**Superseded in part (2026-10-13).** No notification judges a run: the run
+toast is plain. The rule and its exact comparison stand, as the rule for the
+check beside a run's score and for the latest-run card. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)
+and
+[A Past Run's Check Is Judged Against The PB It Was Chasing, Under Its Own Version](2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md).
