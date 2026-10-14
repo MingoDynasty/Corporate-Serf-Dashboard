@@ -680,7 +680,9 @@ tree's rule is the same rule, asked of one scenario row at a time.
   no request to the server, as session rows do today.
 - **On arrival the first session is open, and so is the scenario row of the
   last run played.** Every other row is closed. That is the built rule, one
-  level deeper: the newest run opens the rows above it, once per run.
+  level deeper: the newest run opens the rows above it, once per run. How
+  that holds for a batch, and for runs that land while the other view is on
+  screen, is under [A run that lands](#a-run-that-lands).
 - **Each view keeps its own open rows.** Opening a session in the tree
   doesn't open it under This scenario. Neither set is remembered across a
   reload or a new visit to the page, as today.
@@ -819,20 +821,32 @@ What follows from A2's first half.
 - **The list is rebuilt from the run store, in either view,** on the
   triggers it has today and on a change of view.
 - **Under All scenarios the run's row always shows.** It opens its session
-  row and its scenario row, once per run, as the first row opens today. So a
-  row the player closed is not reopened by a later change of scenario or of
-  view.
-- **Every run in a batch opens its rows, not only the newest.** The app
-  shell hands the page new runs in batches, one per poll, and a batch can
-  hold runs on two scenarios. The model names only the store's newest run,
-  as today. So the script opens the session row and the scenario row of
-  every run newer than the one it applied last, which it finds by walking
-  the tree's run rows from the top down to that run. Where it can't find
-  that run, as on arrival, it opens the newest run's rows alone. Which rows
-  are open still never reaches the server.
-- **A run opens its rows in both views, whichever is on screen.** A run that
-  lands under This scenario has its scenario row open in the tree when the
-  switch is next pressed.
+  row and its scenario row, as the first row opens today. A row the player
+  closed is not opened again by a later change of scenario or of view.
+- **Each view keeps a mark: the newest run whose rows it has opened.** The
+  app shell hands the page new runs in batches, one per poll, and a batch
+  can hold runs on two scenarios. The model names only the store's newest
+  run, as today, and now names it even when it lists nothing because no
+  scenario is selected. Both marks start at the run that a visit's first
+  model names, whichever view is on screen.
+- **When a view's rows arrive, the script opens the rows of every run newer
+  than that view's mark, then moves the mark to the newest run.** Under All
+  scenarios those are each new run's session row and scenario row, found by
+  walking the tree's run rows from the top down to the mark. Under This
+  scenario it is the first row, as built. So a batch that holds runs on two
+  scenarios opens both scenario rows, and so do runs that landed while the
+  other view was on screen.
+- **The first time a view is shown in a visit to the page, it also opens the
+  rows of the run at its mark.** That is the arrival rule, for a page drawn
+  on either view. The first press of the switch is the other view's first
+  showing, so the tree then opens the rows of the run the page arrived with
+  and of every run since.
+- **A row the player closed stays closed until a newer run lands in it.**
+  Its run is at or below the view's mark, so pressing the switch, a change
+  of scenario, or the tree arriving again opens nothing a second time.
+- **Where the walk can't find the mark,** as when the store had no run when
+  the page was drawn, it opens the newest run's rows alone.
+- **Which rows are open still never reaches the server.**
 - **A run on a new scenario adds a scenario row** at the top of the session,
   with the next number. The row before it stays as it was.
 - **Opened scenario rows pile up over a long session.** Each visit opens
@@ -1019,10 +1033,11 @@ never promised screen-reader usability".
   scenarios it returns session rows, scenario rows, run rows, and date
   headers. A run row carries its scenario row's id beside its session
   row's.
-- **The model names the newest run and the rows it opens,** as today. Under
-  All scenarios those are its session row and its scenario row. The script
-  opens the rows of any other run in the same batch itself
-  ([A run that lands](#a-run-that-lands)).
+- **The model names the store's newest run and the rows it opens,** as
+  today, and names the run even when it lists nothing because no scenario is
+  selected. Under All scenarios the rows are its session row and its
+  scenario row. The script opens the rows of every other new run itself, by
+  each view's mark ([A run that lands](#a-run-that-lands)).
 - **The tree marks one scenario at a time,** by the function that marks the
   selected scenario today. For the newest 30 sessions that is 36 scenarios
   and 1,147 runs, and took 3.6 ms once the performance files were read, and
@@ -1049,7 +1064,7 @@ Of the script's nine pieces of grid-specific work, four change:
 
 Two things are new: a row's height follows the **Median and best**
 checkbox, so the grid measures its rows again when it changes, and the
-script keeps one set of open rows for each view.
+script keeps one set of open rows and one mark for each view.
 
 **The script still holds no copy.** Every string in [Copy](#copy) reaches it
 with the rows or in the grid's `context`.
@@ -1338,7 +1353,8 @@ maintainer's main checkout.
     newest and splits a visit.
   - A count of loaded sessions for each view, and the place among all
     sessions that a session row gives for its link.
-  - The empty states: no runs, and All scenarios with no scenario selected.
+  - The empty states: no runs, and no scenario selected, where the model
+    still names the store's newest run.
 - **The page,** in `tests/test_run_history_page_list.py`. Five tests there
   pin what this changes and are rewritten: the list's inputs, the Columns
   menu's checkboxes, the functions the grid names, what the list's layout
@@ -1370,6 +1386,12 @@ maintainer's main checkout.
   - A run landing with rows open in the tree, with focus in a run row, with
     Follow on and off, and on a new scenario. One batch that holds runs on
     two scenarios opens both scenario rows.
+  - Runs that land while This scenario is on screen: one batch with runs on
+    two scenarios before the tree's first showing, again after a return
+    from the tree, and both again with no scenario selected. Pressing the
+    switch opens both scenario rows each time, and a row the player closed
+    in the tree stays closed.
+  - A page drawn on All scenarios opens only the last run's rows.
   - Focus on a scenario's name stays on that button after the name is
     pressed and after a run lands.
   - **Median and best** turned on and off, with row heights and focus kept,
