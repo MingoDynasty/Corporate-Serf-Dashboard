@@ -63,7 +63,7 @@ their full behavior.
   that is blue in its identity state and yellow in its stats-folder and
   unusable-store states
   ([2026-08-30](../decision_log/2026/2026-08-30-one-severity-color-language-for-inline-notices.md));
-  the stats-folder hint (scenario-performance spec) and the Settings restart
+  the stats-folder hint (home spec) and the Settings restart
   notice (settings spec) are yellow `dmc.Paper` panels carrying the icon
   beside the sentence with no title
   ([2026-09-15](../decision_log/2026/2026-09-15-setup-hints-wear-the-notice-anatomy.md)).
