@@ -26,8 +26,9 @@ This is piece 5 of 5 of the Run History work, and the last to be proposed.
 The groundwork has merged. Sessions is ratified and built. The page is
 ratified and has been public since
 [PR #373](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/373).
-The [Run toasts proposal](run_toasts_proposal.md) is ratified and not yet
-built. That change and this one don't wait for each other.
+Run toasts is ratified and built, in
+[PR #376](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/376)
+([2026-10-13][run-toast]).
 
 **The view itself is not a row.** Its shape was leaned to on 2026-10-07,
 from a full-size mockup that replays the maintainer's own sessions, and the
@@ -350,6 +351,9 @@ way.
 ### Verified facts
 
 Read at `2c5c072`, `main` on 2026-10-13, unless a line says otherwise.
+Checked again after #374, #376, and #377 merged: every name below is still
+there, and of the files named, #376 changed only the marks module's
+comments and the page's chart callback, which no longer builds a toast.
 
 **Nothing in the code anticipates this view.** There is no reserved id, no
 spare parameter, and no TODO. `Show all runs`, `Median and best`, and `All
@@ -1228,10 +1232,7 @@ is noted in that PR's description.
 1. **The All scenarios view.** The switch, the tree's rows and their marks,
    the scenario name's click (A1), the count's link and **Show all runs**
    (A2), **Median and best** with the menu's extension (A3), and the docs.
-   - **Needs:** this proposal ratified. Nothing else has to merge first. The
-     Run toasts change may land before it or after it. Both edit
-     `source/pages/run_history.py` and the roadmap's Upcoming entry, in
-     different places, and whichever merges second merges `main`.
+   - **Needs:** this proposal ratified. Nothing else has to merge first.
    - **It changes a public page in one release.** The page proposal's four
      PRs were hidden until the last. This one is not: the list gains the
      switch and the link on the day it merges.
@@ -1303,8 +1304,7 @@ maintainer's main checkout.
   burden", and "to revisit after shipping".
 - **Time spent and activity across all scenarios.** The roadmap's Future
   list, "An overview".
-- **The run toast.** The [Run toasts proposal](run_toasts_proposal.md),
-  ratified.
+- **The run toast.** Built in PR #376 ([2026-10-13][run-toast]).
 - **Score vs Sensitivity's redesign.**
   `ignore/prompts/icebox/score-vs-sensitivity-redesign-prompt.md`.
 - **A browser's find-in-page reaching rows the grid has not drawn,** a phone
@@ -1392,3 +1392,4 @@ maintainer's main checkout.
 [columns-menu]: ../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md
 [principles]: ../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md
 [query]: ../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md
+[run-toast]: ../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md
