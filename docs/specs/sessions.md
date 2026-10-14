@@ -22,14 +22,20 @@ Two words are kept apart throughout. A **break** is time between runs. A
 
 - The Run History page is the one page that shows a session, in two places:
   its run list and its latest-run card.
-- The run list lists a scenario's runs under the session each was played
-  in, names a session by when it started, and counts the session's runs. It
-  gives the length of the newest session alone.
+- The run list has two views. Under This scenario it lists a scenario's runs
+  under the session each was played in, names a session by when it started,
+  and counts the session's runs, and it gives the length of the newest session
+  alone. Under All scenarios it lists every session whole, with its length,
+  its runs, and its scenarios, and under each session a row per visit, in the
+  order played, with that visit's runs under it
+  ([2026-10-14](../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md)).
 - What the list and the card show in full is in
   [run_history.md](run_history.md#the-run-list).
-- The list marks where a scenario was left and returned to within a session,
-  which is the boundary between two of its visits, and counts the runs
-  played on other scenarios between them. The word visit is not on screen.
+- Under This scenario the list marks where a scenario was left and returned
+  to within a session, which is the boundary between two of its visits, and
+  counts the runs played on other scenarios between them. Under All scenarios
+  each visit is a row, named by its scenario and numbered by its place in the
+  session. The word visit is not on screen.
 - The newest session is always the list's first row, whether or not it is in
   progress, and is marked while it is (see [In progress](#in-progress)).
 - The latest-run card reports the last run played, on whatever scenario. Its

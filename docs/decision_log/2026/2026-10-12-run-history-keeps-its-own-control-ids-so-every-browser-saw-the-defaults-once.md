@@ -1,6 +1,12 @@
 # 2026-10-12: Run History Keeps Its Own Control Ids, So Every Browser Saw The Defaults Once
 
-Status: Accepted
+Status: Superseded in part, 2026-10-14, by the
+[All scenarios entry](2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md) and
+[Median and best](2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md):
+what the page remembers gains the run list's switch,
+`run-history-list-view`, and one checkbox of the Columns menu. The rule that
+a renamed id or a changed default resets a stored value stands, and binds
+both.
 
 Run History's controls have ids of their own, where they could have taken
 over the old page's. A browser stores each remembered setting under its

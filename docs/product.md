@@ -39,8 +39,8 @@ designed for a moment as well as for a question.
   whether to push for speed or for accuracy), switch to another, or stop.
   What rank the scores are reaching, how long they've played, how many runs,
   and which scenarios are the evidence for that call. Run History's list
-  answers it for the scenario on screen, and not yet for the session across
-  scenarios.
+  answers it for the scenario on screen, and its All scenarios view for the
+  session across scenarios, the live session and the finished ones alike.
 - **Between sessions.** Before a session or after one. The user usually has
   more attention to give, though not always: just before a session they
   want to get playing. They look back (*am I improving?*, often starting
@@ -88,6 +88,16 @@ are one view or two is a design choice for the feature that builds them.
   session, and the app couldn't answer it. A finished run was a toast that
   disappeared, and a point on the chart only if it placed among the day's
   best.
+- **Each session whole** (Run History page, PR #378; design in #375). A
+  switch above the run list turns it to All scenarios: every session, and
+  under each the scenarios played in it in the order they were played, with
+  each one's runs under it, marked as they are under This scenario. A
+  session's run count, such as `7 of 47 runs`, jumps there, and a click on a
+  scenario's name in the tree puts it on the chart. An open session has Show
+  all runs, and the Columns menu's Median and best adds each row's median and
+  best score as a second line. *Problem solved:* what else was played in a
+  session was a count and a divider that named nothing, so the order of a
+  session, and how it went across scenarios, was nowhere on screen.
 - **The latest run, on a card** (Run History page, PR #372; design in #356).
   A card at the top of the page reports the last run played, whatever
   scenario is selected: its score, whether it passed your threshold or set a

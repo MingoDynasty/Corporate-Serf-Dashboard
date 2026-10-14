@@ -1,6 +1,11 @@
 # 2026-10-12: The Run List Is Built On AG Grid Community, And NVDA Is Run On The Built List
 
-Status: Accepted
+Status: Superseded in part, 2026-10-14, by the
+[All scenarios entry](2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md):
+four of the nine pieces of grid-specific work change (items 1, 2, 5, and 9),
+a tenth is added for row heights that follow a checkbox, and the NVDA walk
+this entry requires was run again with the tree's tasks. R4, the rule the
+walk leaves, and "A failed task is the maintainer's to decide" stand.
 
 The run list on Run History is built on the grid the app's other tables use,
 in its free edition, with session rows the app draws itself. The free edition

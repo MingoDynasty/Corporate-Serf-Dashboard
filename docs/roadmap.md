@@ -40,9 +40,11 @@ sequence.
   once. A new run now shows one plain toast on every page, with a link to
   its scenario on Run History, in place of a toast that judged the run
   while the page was open. The switch that turns it off is on the Settings
-  page. (PRs #370, #371, #372, #373, #376; design in #356; run toasts
-  design in #354; sessions in #359, design in #355) Design rationale
-  distilled into
+  page. A switch above the list then turns it into All scenarios, each
+  session whole, its scenarios in the order they were played with their runs
+  under them, and a session's run count links there. (PRs #370, #371, #372,
+  #373, #376, #378; design in #356 and #375; run toasts design in #354;
+  sessions in #359, design in #355) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
 - **Categories and subcategories on benchmarks** — a benchmark's scenario
   table now draws the groups its author sorted the scenarios into: two narrow
@@ -86,25 +88,8 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **Run History, the last piece: All scenarios** — the page is public, and
-  one piece of the work it was split into remains. All scenarios is a
-  second view of the run list: each session's scenarios in the order they
-  were played. Its [proposal](./proposals/all_scenarios_proposal.md) was
-  ratified on 2026-10-14, and one implementation PR builds it.
-
-  Version 1 of the page left out the typical run. Its definition moves to
-  a proposal of its own, which the sessions decision settled. Score vs
-  Sensitivity now plots every run at each sensitivity with nothing that
-  sums a sensitivity up, and its redesign is later work.
-
-  Why it's next:
-  - It is what the session review still lacks: the page shows one
-    scenario's runs in a session, and not yet the session across scenarios.
-  - It builds on what shipped: the sessions, the run list, and the page's
-    address.
-
-  The page's behavior is in
-  [`specs/run_history.md`](./specs/run_history.md).
+None queued. The next milestone is promoted from the Future list below when
+it is chosen.
 ---
 
 ## Future (briefly)

@@ -485,9 +485,11 @@ flowchart LR
   is drawn, moves the selection to the scenario just played while Follow is
   on, and in both cases clears a playlist filter that does not list the
   scenario. The latest-run card's scenario button is its third input, and a
-  click selects the scenario the button names under the same rule. It reads
-  which of the three called from what triggered the call, because the
-  summary store replays its last batch. `generate_graph` takes both dropdowns
+  click selects the scenario the button names under the same rule. A
+  scenario's name pressed in the run list's tree is its fourth, through the
+  store `run-history-list-scenario-asked`. It reads which of the four called
+  from what triggered the call, because the summary store replays its last
+  batch and the list's store its last name. `generate_graph` takes both dropdowns
   as `Input`, so Dash holds it until that callback has answered and the chart
   is rebuilt once per batch.
   `?scenario=` and `?playlist_code=` reach the two dropdowns through the
@@ -551,11 +553,18 @@ flowchart LR
   scenario's runs, and the summary store is not written for a run the page
   does not show. So `forward_run_events` writes a second store in the same
   answer, `run-history-run-landed`: the id of the batch's newest run, on
-  whatever scenario. `build_run_list_rows` takes that store, the scenario
-  dropdown, the list's session limit, the Score threshold percentage, the
-  date store, and `run-history-session-in-progress` as `Input`s. It builds
-  the rows from the run store, never from the batch, and writes them to a
-  store with the heading line and the text for nothing to list. Dash holds a
+  whatever scenario. `build_run_list_rows` takes that store, the list's
+  view switch, the scenario dropdown, each view's count of loaded sessions,
+  the Score threshold percentage, the date store, and
+  `run-history-session-in-progress` as `Input`s. It builds the rows of the
+  view on screen from the run store, never from the batch, and writes them to
+  a store with the heading line and the text for nothing to list. A session
+  count's jump is answered by the list's own server callback,
+  `jump_to_session`, registered by `register_run_list()`: it writes the view
+  switch and All scenarios' count of loaded sessions, both plain outputs, so
+  Dash holds `build_run_list_rows` until it has answered and the tree is
+  built once. A scenario's name pressed in the tree reaches the selection
+  callback through `run-history-list-scenario-asked`, its fourth input. Dash holds a
   callback back only for a writer that is already queued, which is why the
   two stores leave in one answer: `reach_scenario` is then queued for the
   summary when the list is queued for the run, and the list is built once
@@ -758,7 +767,11 @@ flowchart LR
   the Run History page's run list share.
   `columns_menu()` builds the button and a popover of one persisted checkbox
   per hideable column, from a page's list of `MenuColumn` entries (column ID,
-  label, default). `register_columns_menu()` registers one clientside callback
+  label, default), and after them one per `MenuChoice`, a choice that is not
+  a column. Only the run list offers one, Median and best. A choice's id is
+  `choice_checkbox_id()`, whose `type` is not the menu's, so the column
+  callback never sees it, and the table reads it with a callback of its own.
+  `register_columns_menu()` registers one clientside callback
   per grid, the app's only pattern-matching callback, which applies the
   checkboxes through the grid API as the page mounts and on every change: it
   sets visibility, clears the sort of every hidden column, re-runs the quick
@@ -806,7 +819,9 @@ flowchart LR
   playlist's scenario table.
   `register_scenario_selection_clearing_filter()` registers `select_playlist`
   and `reach_scenario_or_the_one_asked_for` for those ids, once per page, at
-  import. A layout calls `deep_link_selection()` for the store's data,
+  import. The second is a closure over the id of the page's store a script
+  writes a scenario's name to, and runs `reach_the_scenario_asked_for` with
+  what triggered the call. A layout calls `deep_link_selection()` for the store's data,
   `playlist_filter_options()` for the playlist filter's list, and
   `initial_scenario_options()` for the scenario list its first paint shows.
   `playlist_filter_options()` is the visible playlists plus the playlist the
@@ -906,29 +921,41 @@ flowchart LR
   `data_service.new_high_score_runs()`, the chart's rule over the chart's
   order. Nothing is stored: a mark is worked out again each time, from the
   runs, the percentage, and what the performance files say now.
-- `components/run_history_list.py` — the Run History page's run list.
-  `build_run_list()` is one pure function from a copy of the run store to a
-  flat list of row records: a row per session that holds a run of the
-  scenario, newest first, and under each that session's runs, with a divider
-  where the scenario was left and returned to and a date header where a run
-  is not on the date its session began. The newest session is always the
-  first row. Every value a row shows is formatted here, and the model also
-  names the store's newest run and the row it opens. That run's row
+- `components/run_history_list.py` — the Run History page's run list, in
+  both its views. `build_run_list()` is one pure function from a copy of the
+  run store to a flat list of row records for This scenario: a row per
+  session that holds a run of the scenario, newest first, and under each that
+  session's runs, with a divider where the scenario was left and returned to
+  and a date header where a run is not on the date its session began. The
+  newest session is always the first row, and each session row carries its
+  place among all sessions, which its count's jump loads All scenarios up to.
+  `build_session_tree()` is its sibling for All scenarios: every session,
+  under each a scenario row per visit numbered in play order, and under each
+  its runs, each carrying its scenario row's id as `vid` beside its session
+  row's `sid`. The selected scenario's rows carry `sel`, which a row class
+  rule draws as a band. A session row under This scenario and a scenario row
+  carry `figures`, the median and best of the runs under them. Every value a
+  row shows is formatted here, and every model names its view, the store's
+  newest run, even with nothing to list, and the rows that run opens. That
+  run's row
   carries `latest`, and a row class rule of the grid's highlights it: a rule
   and not part of the class `getRowClass` returns. The grid adds what that
   function returns again when a row is refreshed and never takes off a class
   it added before, where it both adds and removes a rule's class, and the run
   that was the latest stays in the list and has to lose the highlight.
   `run_list_from_store()` copies the store once and works the sessions and
-  the marks out from that one copy, and `is_session_in_progress()` answers
+  the marks out from that one copy, marking under All scenarios every
+  scenario the listed sessions hold, and `is_session_in_progress()` answers
   for the store's newest session. A page fills in a `RunListIds`, puts
   `run_list_stores()` and `run_list_panel()` in its layout, and calls
-  `register_run_list()` once, at import. The panel is an AG Grid given no
-  rows: the page's callback writes the model to a store, and a clientside
-  callback hands it to `assets/runHistoryList.js`, which puts the rows in
-  through the grid's API. The grid's options, its seven fixed-width columns,
-  and every string the script shows are set here, the strings through the
-  grid's `context`.
+  `register_run_list()` once, at import. The panel is the list's header,
+  with the view switch, Expand all, and the Columns menu, and an AG Grid
+  given no rows: the page's callback writes the model to a store, and a
+  clientside callback hands it to `assets/runHistoryList.js`, which puts the
+  rows in through the grid's API. A second clientside callback hands it the
+  Median and best checkbox. The grid's options, its seven fixed-width
+  columns, and every string the script shows are set here, the strings
+  through the grid's `context` and the rows.
 - `components/latest_run_card.py` — the Run History page's latest-run card.
   `latest_run()` is one pure function from a copy of the run store to the
   text the card shows for the store's newest run, on whatever scenario: its
@@ -1259,18 +1286,24 @@ flowchart LR
   AG Grid, which is given rows as data and no `rowData` prop. It registers
   the grid's option functions and its two renderers in the same two
   registries the playlist tables' scripts use, and holds what never leaves
-  the browser: the set of open session rows. A session row is a full-width
-  row, opening one is an external filter over that set, and the current
-  session is a pinned top row, so the pinned row and the body rows go in
-  together through `updateGridOptions`. After new rows are applied it puts
-  focus back on the cell of the same row id, since the grid holds focus by
+  the browser: for each view, the set of open rows and a mark, the newest
+  run whose rows the view has opened. A session row and a scenario row are
+  full-width rows, opening one is an external filter over the view's set,
+  and the current session is a pinned top row, so the pinned row and the
+  body rows go in together through `updateGridOptions`. When a view's rows
+  arrive it opens the rows of every run newer than its mark, walking the
+  tree's run rows down to it. It writes three stores from the browser: a
+  view's count of loaded sessions, a session count's jump, and a scenario's
+  name pressed in the tree; what to open, where to scroll, and where focus
+  goes after a jump stay here. After new rows are applied it puts focus back
+  on the same button of the same row id, since the grid holds focus by
   position. A row opened or closed from the keyboard, and a press of Expand
-  all, are said through the panel's live region, and each part of a session
-  row ends with a space that only a screen reader is given
+  all or Show all runs, are said through the panel's live region, and each
+  part of a session row ends with a space that only a screen reader is given
   ([what NVDA said](research/run_history_list_nvda_walk.md)). Its comment
-  lists the nine pieces of grid work, each a place an
-  AG Grid upgrade can break. It holds no copy: every string comes with the
-  rows or with the grid's `context`.
+  lists the ten pieces of grid work, each a place an AG Grid upgrade can
+  break. It holds no copy: every string comes with the rows or with the
+  grid's `context`.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Run History
   graph to the runs in view when
   the x axis is zoomed. It reads the x axis through plotly.js's own
@@ -1323,8 +1356,8 @@ flowchart LR
 | The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `my_queue/message_queue.py`; `components/run_delivery.py` for the summary a page makes of a batch; `pages/run_history.py` for that page's three callbacks |
 | The Run History page: its layout, its ids, or what its chart plots | `pages/run_history.py` for the layout, the ids, and the page's callbacks; `components/run_history_chart.py` for the modes, the ranges, and which runs are plotted; `plot/plot_service.py` for the three figure builders; `assets/stylesheet.css` for the columns and the two stacking rules; the rules are in `docs/specs/run_history.md` |
 | The Home page: what it shows, or its stats line | `pages/home.py` for the layout, `stats_line`, and the Skip callback; the rules are in `docs/specs/home.md` |
-| The Run History page's run list: its rows, when it is rebuilt, or how a grid is made to read as sessions | `components/run_history_list.py` for the rows (`build_run_list`), the grid, and its options; `assets/runHistoryList.js` for what the browser does with them; `pages/run_history.py` for `build_run_list_rows` and `track_session_in_progress`; `components/run_marks.py` for the check and the star |
-| The Run History page's latest-run card, the ring on the latest point, or the highlighted row | `components/latest_run_card.py` for what the card shows (`latest_run`) and how it is drawn; `pages/run_history.py` for `show_latest_run` and the `run-history-latest-run` store; `components/chart_options.py` (`apply_graph_appearance_ringing_latest_run`) and `plot/plot_service.py` (`show_latest_run_ring`) for the ring; `components/run_history_list.py` (`rowClassRules`) for the row; `components/scenario_selection.py` (`reach_scenario_or_the_one_asked_for`) for the card's scenario button |
+| The Run History page's run list: its rows, its two views, when it is rebuilt, or how a grid is made to read as a tree | `components/run_history_list.py` for the rows (`build_run_list`, `build_session_tree`), the grid, its options, and the jump (`jump_to_session`); `assets/runHistoryList.js` for what the browser does with them; `pages/run_history.py` for `build_run_list_rows` and `track_session_in_progress`; `components/run_marks.py` for the check and the star; `components/scenario_selection.py` (`reach_the_scenario_asked_for`) for a scenario's name pressed in the tree |
+| The Run History page's latest-run card, the ring on the latest point, or the highlighted row | `components/latest_run_card.py` for what the card shows (`latest_run`) and how it is drawn; `pages/run_history.py` for `show_latest_run` and the `run-history-latest-run` store; `components/chart_options.py` (`apply_graph_appearance_ringing_latest_run`) and `plot/plot_service.py` (`show_latest_run_ring`) for the ring; `components/run_history_list.py` (`rowClassRules`) for the row; `components/scenario_selection.py` (`reach_the_scenario_asked_for`) for the card's scenario button |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | What a session or a visit is, or how a run's start and length are read | `kovaaks/play_sessions.py` for the session limit and the three pure functions; `kovaaks/data_service.py` (`_run_start_and_length`) for the two fields; the rules are in `docs/specs/sessions.md` |
 | How a time-scored scenario is recognized, or the pace math | `kovaaks/performance_file.py` for the file reader and the countdown check; `kovaaks/time_scored_service.py` for which file decides and which scores are eligible; `kovaaks/pace.py` for the formulas; the rules are in `docs/specs/run_history.md` |
@@ -1342,7 +1375,7 @@ flowchart LR
 | How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `components/run_marks.py` for the run list's check, where a past run is judged under its own version of the scenario; `components/latest_run_card.py` for the card; the Run History page's `generate_graph` for the line |
 | The run toast: what it says, which run earns it, its link, or the switch that turns it off | `app_shell.py` for `publish_run_events`, `_run_toast`, and the `run-notifications` store; `utilities/notifications.py` for the channel helpers; `kovaaks/playlist_scenarios_service.py` for `scenario_run_history_href`; `pages/settings.py` for the switch; the rules are in `docs/specs/notifications.md` |
 | The setup card or the stats-folder hint | `components/setup_surfaces.py` for both builders and their copy; `pages/home.py` for the Skip callback and its toasts; each hosting page's layout for which states it asks for |
-| The Columns menu, or which columns a table can hide | `components/columns_menu.py` for the control and its callback; each playlist page's `MENU_COLUMNS` and `RUN_LIST_MENU_COLUMNS` in `components/run_history_list.py` for the entries |
+| The Columns menu, or which columns a table can hide | `components/columns_menu.py` for the control and its callback; each playlist page's `MENU_COLUMNS` and `RUN_LIST_MENU_COLUMNS` in `components/run_history_list.py` for the entries; `MEDIAN_AND_BEST_CHOICE` there for the run list's choice that is not a column |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |
 | Shared UI icons or vendored icon files | `components/local_icon.py` + `assets/icons/` |
