@@ -915,25 +915,41 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                     # takes off one it added before, where it both adds and
                     # removes a rule's class. The run that was the latest
                     # stays in the list, and has to lose the highlight.
-                    "rowClassRules": {LATEST_ROW_CLASS: "params.data.latest"},
+                    # The band on the selected scenario's rows in the tree is
+                    # a rule for the same reason: it moves with the selection.
+                    "rowClassRules": {
+                        LATEST_ROW_CLASS: "params.data.latest",
+                        SELECTED_ROW_CLASS: "params.data.sel",
+                    },
                     # The grid would say "No Matching Rows" over a list whose
                     # one session is closed, and "No Rows To Show" before the
                     # first rows arrive.
                     "suppressOverlays": ["loading", "noRows", "noMatchingRows"],
                     "context": {
                         "gridId": ids.grid,
-                        "limitStoreId": ids.session_limit,
+                        "limitStoreIds": {
+                            VIEW_SCENARIO: ids.session_limit,
+                            VIEW_ALL: ids.all_session_limit,
+                        },
+                        "jumpStoreId": ids.jump,
+                        "askStoreId": ids.scenario_asked,
                         "expandAllId": ids.expand_all,
                         "announcerId": ids.announcer,
                         "sessionsPerLoad": SESSIONS_PER_LOAD,
+                        "treeView": VIEW_ALL,
+                        "runRowIdPrefix": RUN_ROW_ID_PREFIX,
                         "labels": {
                             "expandAll": EXPAND_ALL_LABEL,
                             "collapseAll": COLLAPSE_ALL_LABEL,
+                            "showAllRuns": SHOW_ALL_RUNS_LABEL,
+                            "hideAllRuns": HIDE_ALL_RUNS_LABEL,
                             "session": SESSION_TOGGLE_LABEL,
+                            "scenario": SCENARIO_TOGGLE_LABEL,
                             "expanded": EXPANDED_ANNOUNCEMENT,
                             "collapsed": COLLAPSED_ANNOUNCEMENT,
                             "inProgress": IN_PROGRESS_LABEL,
                             "lengthHelp": SESSION_LENGTH_HELP,
+                            "wholeSession": WHOLE_SESSION_HELP,
                             "newPb": NEW_PB_TEXT,
                         },
                     },

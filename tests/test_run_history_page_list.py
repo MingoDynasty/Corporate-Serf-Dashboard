@@ -38,6 +38,7 @@ from source.components.run_history_list import (  # noqa: E402
     VIEW_ALL,
     VIEW_SCENARIO,
     build_run_list,
+    build_session_tree,
     empty_run_list,
     jump_to_session,
 )
@@ -411,14 +412,25 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
 
     assert context == {
         "gridId": IDS.grid,
-        "limitStoreId": IDS.session_limit,
+        # Show older sessions adds to the count of the view it is pressed in.
+        "limitStoreIds": {
+            "scenario": IDS.session_limit,
+            "all": IDS.all_session_limit,
+        },
+        "jumpStoreId": IDS.jump,
+        "askStoreId": IDS.scenario_asked,
         "expandAllId": IDS.expand_all,
         "announcerId": IDS.announcer,
         "sessionsPerLoad": 30,
+        "treeView": "all",
+        "runRowIdPrefix": "r:",
         "labels": {
             "expandAll": "Expand all",
             "collapseAll": "Collapse all",
+            "showAllRuns": "Show all runs",
+            "hideAllRuns": "Hide all runs",
             "session": "Session",
+            "scenario": "Scenario",
             "expanded": "Expanded",
             "collapsed": "Collapsed",
             "inProgress": "In progress",
@@ -426,9 +438,18 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
                 "The length runs from the first run to the last run. It doesn't "
                 "count the time since your last run."
             ),
+            "wholeSession": "Show the whole session",
             "newPb": "New PB",
         },
     }
+
+
+def test_a_run_rows_id_starts_with_the_prefix_the_script_finds_a_mark_by():
+    """The script finds the row of a view's mark by this prefix and the run's id."""
+    prefix = _options()["context"]["runRowIdPrefix"]
+
+    for kind in ("run", "tree_run"):
+        assert _sample_rows()[kind]["id"].startswith(prefix)
 
 
 def test_the_script_asks_the_grid_for_nothing_it_was_not_handed():
@@ -451,13 +472,26 @@ def test_the_script_holds_none_of_the_lists_copy():
         "Not judged",
         "No runs yet",
         "No scenario selected",
+        "This scenario",
+        "All scenarios",
+        "Run list view",
+        "Runs of",
+        "Show ",
+        "Selected scenario",
+        "Median",
+        "Best",
+        "Score ",
     ]
 
     assert not [text for text in copy if f'"{text}' in script]
 
 
 def _sample_rows() -> dict[str, dict]:
-    """Build lists that between them hold a row of every kind, and return one of each."""
+    """Build lists that between them hold a row of every kind, and return one of each.
+
+    The tree's run row and session row carry fields This scenario's do not,
+    so they are kept as ``tree_run`` and ``tree_session``.
+    """
     late = datetime(2026, 10, 11, 23, 30)
 
     def run(scenario: str, ended: datetime) -> RunData:
@@ -483,13 +517,24 @@ def _sample_rows() -> dict[str, dict]:
         run(SCENARIO, late + timedelta(minutes=40)),
     ]
     now = late + timedelta(minutes=41)
-    marks = mark_runs(
-        [r for r in runs if r.scenario == SCENARIO], 95.0, lambda _version: None
-    )
+    marks = {}
+    for scenario in (SCENARIO, "Scenario B"):
+        marks.update(
+            mark_runs(
+                [r for r in runs if r.scenario == scenario], 95.0, lambda _version: None
+            )
+        )
     listed = build_run_list(runs, SCENARIO, 2, now, marks)
     never_played = build_run_list(runs, "Scenario C", 2, now, {})
+    tree = build_session_tree(runs, SCENARIO, 2, now, marks)
     rows = {row["kind"]: row for row in [*listed["rows"], *never_played["rows"]]}
     assert set(rows) == {"session", "run", "divider", "date", "note", "more"}
+    tree_rows = {row["kind"]: row for row in tree["rows"]}
+    assert set(tree_rows) == {"session", "scenario", "run", "date", "more"}
+    rows["scenario"] = tree_rows["scenario"]
+    rows["tree_run"] = tree_rows["run"]
+    rows["tree_session"] = tree_rows["session"]
+    rows["tree_date"] = tree_rows["date"]
     return rows
 
 
@@ -497,13 +542,31 @@ def test_the_last_run_played_is_highlighted_by_a_rule_on_a_field_the_rows_carry(
     """A rule, because the grid works a row's class out only when it draws it.
 
     The run that was the latest stays in the list when the next one lands,
-    and a class given by ``getRowClass`` would stay on it.
+    and a class given by ``getRowClass`` would stay on it. The band on the
+    selected scenario's rows in the tree moves with the selection, so it is
+    a rule too.
     """
     rules = _options()["rowClassRules"]
 
-    assert rules == {"run-list-row-latest": "params.data.latest"}
+    assert rules == {
+        "run-list-row-latest": "params.data.latest",
+        "run-list-row-selected": "params.data.sel",
+    }
     assert "latest" in _sample_rows()["run"]
-    assert "latest" not in LIST_SCRIPT.read_text(encoding="utf-8")
+    assert "sel" in _sample_rows()["tree_run"]
+    assert "sel" in _sample_rows()["scenario"]
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    assert "latest" not in script
+    assert "run-list-row-selected" not in script
+
+
+def test_the_band_is_a_look_and_the_names_button_says_it_is_current():
+    css = STYLESHEET.read_text(encoding="utf-8")
+    rule = _css_block(css, ".run-history-list-grid .ag-row.run-list-row-selected")
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+
+    assert "box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);" in rule
+    assert '"aria-current": data.sel ? "true" : undefined,' in script
 
 
 def test_the_highlight_is_a_look_and_tells_a_screen_reader_nothing():
@@ -544,16 +607,38 @@ def test_the_pinned_row_and_the_body_rows_go_in_together_through_the_api():
     ) in script
 
 
-def test_a_closed_sessions_rows_are_filtered_out_by_the_set_of_open_ids():
+def test_a_closed_rows_rows_are_filtered_out_by_the_views_set_of_open_ids():
+    """A row under a scenario row shows while both its rows are open."""
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    filtering = script[script.index("dagfuncs.runListFilterPass = function") :]
+    filtering = filtering[: filtering.index("};")]
+
+    assert "if (data.kind === SESSION || data.kind === MORE) {" in filtering
+    assert "var open = openRows();" in filtering
+    assert (
+        "return open.has(data.sid) && (data.vid == null || open.has(data.vid));"
+        in filtering
+    )
+    assert "return viewState(state.view).open;" in script
+
+
+def test_what_is_open_never_leaves_the_browser():
+    """The script writes four things: a view's count, Expand all's label, and two asks."""
     script = LIST_SCRIPT.read_text(encoding="utf-8")
 
-    assert (
-        "return data.kind === SESSION || data.kind === MORE || "
-        "state.open.has(data.sid);"
-    ) in script
-    # What is open never leaves the browser.
-    assert "set_props(context.limitStoreId" in script
-    assert script.count("set_props(") == 2
+    targets = re.findall(r"set_props\(\s*([^,]+),", script)
+    assert sorted(targets) == sorted(
+        [
+            "(context.limitStoreIds || {})[state.view]",
+            "context.expandAllId",
+            "context.jumpStoreId",
+            "context.askStoreId",
+        ]
+    )
+    # The jump names how far back the session is, and the name what was
+    # pressed: neither says which rows are open.
+    assert "{ data: { place: data.place } }" in script
+    assert "{ data: data.name }" in script
 
 
 def test_a_full_width_row_is_given_its_gridcell_role_by_hand():
@@ -568,6 +653,8 @@ def test_enter_space_left_and_right_open_and_close_a_session_row():
 
     for key in ('"Enter"', '" "', '"ArrowRight"', '"ArrowLeft"'):
         assert f"key === {key}" in script
+    # A scenario row takes the session row's four keys.
+    assert "if (data.kind !== SESSION && data.kind !== SCENARIO) {" in script
     # A key pressed on a button inside the row is the button's own.
     assert 'event.target.closest("button")' in script
 
@@ -578,30 +665,57 @@ def test_tab_is_heard_before_the_grid_hears_it():
     assert 'gridElement.addEventListener("keydown", onTab, true);' in script
 
 
-def test_focus_goes_back_to_the_same_row_id_after_new_rows_are_applied():
+def test_focus_goes_back_to_the_same_row_id_and_button_after_new_rows_are_applied():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
     applying = script[script.index("state.apply = function") :]
 
     assert "id: node.data.id," in script
+    assert ('part: button ? button.getAttribute("data-part") || "" : null,') in script
     assert (
         "api.setFocusedCell(node.rowIndex, focus.column, node.rowPinned || undefined);"
     ) in script
+    assert ("""row.querySelector('button[data-part="' + focus.part + '"]')""") in script
+    # Each of a row's buttons names its part, which is how the same one is
+    # found again: a scenario row's first button is its toggle, not its name.
+    for part in ('"toggle"', '"name"', '"count"', '"all"'):
+        assert part in script
     # Read before the rows change, and put back after them.
     assert (
-        applying.index("var focus = focusedRow(api, gridElement);")
+        applying.index("var focus = changedView ? null : focusedRow(api, gridElement);")
         < applying.index("api.updateGridOptions(")
         < applying.index("restoreFocus(api, gridElement, focus);")
     )
 
 
-def test_the_current_session_opens_once_per_newest_run():
+def test_each_view_opens_the_rows_of_every_run_newer_than_its_own_mark():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
+    applying = script[script.index("state.apply = function") :]
 
+    # Every view's mark starts at the run the visit's first model names.
+    assert "state.firstRun = model.newest_run;" in applying
+    assert "mark: state.firstRun" in script
+    # A model with nothing to list is not the view's rows arriving.
+    assert "if (rows.length && model.newest_run != null) {" in applying
+    assert "if (!view.arrived || model.newest_run !== view.mark) {" in applying
+    assert "rowsToOpen(context, model, rows, view.mark, !view.arrived)" in applying
+    assert "view.mark = model.newest_run;" in applying
+
+
+def test_the_tree_walks_its_run_rows_down_to_the_views_mark():
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    walking = script[script.index("function rowsToOpen(") :]
+    walking = walking[: walking.index("\n  }\n")]
+
+    # This scenario opens its first row, as built.
+    assert "if (model.view !== context.treeView) {" in walking
     assert (
-        "if (model.newest_run != null && model.newest_run !== state.appliedRun) {"
-        in script
+        "var markRow = mark == null ? null : context.runRowIdPrefix + mark;" in walking
     )
-    assert "state.appliedRun = model.newest_run;" in script
+    assert "ids.push(row.sid, row.vid);" in walking
+    # The first time the view's rows arrive, the mark's own rows too.
+    assert "if (arriving) {" in walking
+    # Where the mark is not found, the newest run's rows alone.
+    assert walking.rstrip().endswith("return model.forced_open || [];")
 
 
 def test_with_follow_on_a_run_that_lands_scrolls_the_list_to_the_top():
@@ -615,15 +729,100 @@ def test_which_rows_are_open_is_forgotten_when_the_page_is_drawn_again():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
 
     assert "if (state.api !== api) {" in script
-    assert "state.open = new Set();" in script
+    assert "state.views = {};" in script
+    # Each view keeps its own open rows, its mark, and whether its rows have
+    # arrived yet.
+    assert (
+        "state.views[name] = { open: new Set(), mark: state.firstRun, arrived: false };"
+    ) in script
 
 
-def test_the_grid_is_named_and_a_session_rows_button_is_not_named_for_the_row():
+def test_the_grid_is_named_and_a_group_rows_toggle_is_named_for_its_kind():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
 
     assert 'grid.setAttribute("aria-label", model.grid_name);' in script
-    assert '"aria-label": labels.session,' in script
+    assert '"aria-label": label,' in script
     assert '"aria-expanded": open,' in script
+    assert "toggleButton(labels.session, open, toggle)" in script
+    assert "toggleButton(labels.scenario, open, toggle)" in script
+
+
+def test_a_scenarios_name_is_a_button_that_asks_for_it_and_says_so():
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    naming = script[script.index("function scenarioRow(") :]
+    naming = naming[: naming.index("function sessionRow(")]
+
+    assert (
+        "window.dash_clientside.set_props(context.askStoreId, { data: data.name });"
+        in naming
+    )
+    assert "announce(context, data.selected_text);" in naming
+    assert '"aria-label": data.name_label,' in naming
+    # The hover with the whole name is on the part around the button.
+    assert '{ className: "run-list-scenario-title", title: data.name },' in naming
+    # A click on the name, a count, or Show all runs is not a click on the row.
+    linking = script[script.index("function linkButton(") :]
+    assert "event.stopPropagation();" in linking[: linking.index("return h(")]
+
+
+def test_a_sessions_count_jumps_and_the_tree_places_the_session():
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    applying = script[script.index("state.apply = function") :]
+    placing = script[script.index("function placeJump(") :]
+    placing = placing[: placing.index("\n  }\n")]
+
+    assert "state.jump = { session: data.id };" in script
+    assert (
+        'linkButton("run-list-count", "count", { title: labels.wholeSession }, jump, data.counts)'
+        in script
+    )
+    assert (
+        "if (state.jump && model.view === context.treeView && rows.length) {"
+        in applying
+    )
+    assert (
+        "row.id === jump.session || (row.kind === SCENARIO && row.sid === jump.session && row.sel)"
+        in applying
+    )
+    assert 'api.ensureNodeVisible(node, "top");' in placing
+    assert (
+        "api.setFocusedCell(target.rowIndex, columns[0], target.rowPinned || undefined);"
+        in placing
+    )
+
+
+def test_show_all_runs_opens_one_sessions_scenario_rows_and_says_so():
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+
+    assert "if (isTree(context) && open && kids.length) {" in script
+    assert "setOpen(api, kids, !allKidsOpen);" in script
+    assert (
+        "announce(context, allKidsOpen ? labels.collapsed : labels.expanded);" in script
+    )
+    assert "allKidsOpen ? labels.hideAllRuns : labels.showAllRuns" in script
+
+
+def test_a_view_not_on_screen_shows_from_its_top_and_older_sessions_load_into_it():
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+
+    assert "var changedView = model.view !== state.view;" in script
+    assert (
+        "window.dash_clientside.set_props((context.limitStoreIds || {})[state.view], {"
+        in script
+    )
+
+
+def test_a_rows_height_follows_median_and_best_and_the_pinned_row_is_measured_too():
+    """Row heights that change with a checkbox, with a pinned top row."""
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    setting = script[script.index("state.setFigures = function") :]
+
+    assert (
+        "return state.figures && data.figures ? height + SECOND_LINE_HEIGHT : height;"
+        in script
+    )
+    assert "api.resetRowHeights();" in setting
+    assert "api.updateGridOptions({ pinnedTopRowData: [pinned.data] });" in setting
 
 
 def test_a_key_that_opens_or_closes_a_row_is_said_through_the_live_region():
@@ -893,19 +1092,43 @@ def test_with_nothing_to_list_the_text_takes_the_grids_place(
     assert RUN_LIST_UNSELECTED_CLASS == "run-history-list run-history-list-unselected"
 
 
-def test_the_text_for_nothing_to_list_hides_the_heading_line_and_the_grid():
+def test_the_text_for_nothing_to_list_hides_the_header_and_the_grid():
+    """With no runs, the whole header goes. With no scenario selected, the switch stays."""
     css = STYLESHEET.read_text(encoding="utf-8")
 
     assert "display: none;" in _css_block(css, ".run-history-list-empty")
     assert "display: none;" in _css_block(
         css,
         ".run-history-list-nothing > .run-history-list-header,\n"
-        ".run-history-list-nothing > .run-history-list-grid",
+        ".run-history-list-nothing > .run-history-list-grid,\n"
+        ".run-history-list-unselected > .run-history-list-grid,\n"
+        ".run-history-list-unselected .run-history-list-heading,\n"
+        ".run-history-list-unselected .run-history-list-actions",
     )
     assert "display: block;" in _css_block(
-        css, ".run-history-list-nothing > .run-history-list-empty"
+        css,
+        ".run-history-list-nothing > .run-history-list-empty,\n"
+        ".run-history-list-unselected > .run-history-list-empty",
     )
     assert RUN_LIST_NOTHING_CLASS == "run-history-list run-history-list-nothing"
+
+
+def test_the_switch_sits_at_the_left_and_the_buttons_at_the_right():
+    css = STYLESHEET.read_text(encoding="utf-8")
+
+    assert "justify-content: space-between;" in _css_block(
+        css, ".run-history-list-header"
+    )
+    assert "margin-left: auto;" in _css_block(css, ".run-history-list-actions")
+
+
+def test_a_scenarios_name_gives_before_its_count():
+    css = STYLESHEET.read_text(encoding="utf-8")
+    name = _css_block(css, ".run-list-scenario-name")
+
+    assert "text-overflow: ellipsis;" in name
+    assert "min-width: 0;" in name
+    assert "flex: none;" in _css_block(css, ".run-list-group-facts")
 
 
 @pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])

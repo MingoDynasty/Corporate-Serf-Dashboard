@@ -453,30 +453,43 @@ a.run-toast-link:hover {
     overflow: hidden;
 }
 
-/* The heading line, then the two buttons on a line of their own at the
-   right. Beside the buttons the heading had about 240px, which cut a
-   scenario's name short before its run count. */
+/* The heading line, then a line of its own with the switch between the
+   views at the left and the two buttons at the right. Beside the buttons the
+   heading had about 240px, which cut a scenario's name short before its run
+   count. The second line wraps on the list's own width, and where the three
+   do not fit, the buttons go under the switch. */
 .run-history-list-header {
     align-items: center;
     display: flex;
     flex: 0 0 auto;
     flex-wrap: wrap;
     gap: var(--mantine-spacing-xs);
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: var(--mantine-spacing-xs);
 }
 
-/* A whole line, which is what puts the buttons on the next one. min-width: 0
-   because a flex item's automatic minimum is its text, and a name longer
+/* A whole line, which is what puts the controls on the next one. min-width:
+   0 because a flex item's automatic minimum is its text, and a name longer
    than the line would push the list wider than its column. */
 .run-history-list-heading {
     flex: 1 0 100%;
     min-width: 0;
 }
 
+/* The left margin holds the buttons at the right when they wrap under the
+   switch. */
+.run-history-list-actions {
+    display: flex;
+    gap: var(--mantine-spacing-xs);
+    margin-left: auto;
+}
+
 /* With nothing to list, one line of text takes the place of the heading
    line and the grid. Both stay mounted: the grid keeps its columns and the
-   Columns menu keeps its choices for when there are rows again. */
+   Columns menu keeps its choices for when there are rows again. With runs
+   and no scenario selected, the switch stays above the text: the tree needs
+   no selection, and without the switch a player could not reach it. The
+   buttons have nothing to act on there. */
 .run-history-list-empty {
     color: var(--mantine-color-dimmed);
     display: none;
@@ -485,11 +498,15 @@ a.run-toast-link:hover {
 }
 
 .run-history-list-nothing > .run-history-list-header,
-.run-history-list-nothing > .run-history-list-grid {
+.run-history-list-nothing > .run-history-list-grid,
+.run-history-list-unselected > .run-history-list-grid,
+.run-history-list-unselected .run-history-list-heading,
+.run-history-list-unselected .run-history-list-actions {
     display: none;
 }
 
-.run-history-list-nothing > .run-history-list-empty {
+.run-history-list-nothing > .run-history-list-empty,
+.run-history-list-unselected > .run-history-list-empty {
     display: block;
 }
 
@@ -544,11 +561,18 @@ a.run-toast-link:hover {
     border-top: 1px solid var(--ag-border-color);
 }
 
-/* The last run played, while its scenario is the one shown: the run the
+/* The last run played, while its row is in the list: the run the
    latest-run card reports and the chart rings. */
 .run-history-list-grid .ag-row.run-list-row-latest {
     background-color: var(--mantine-color-blue-light);
     font-weight: 600;
+}
+
+/* Under All scenarios, the selected scenario's rows: a band down the left
+   edge of each of its scenario rows and of the runs under them. A shadow
+   and not a border, so it takes no room and moves no column. */
+.run-history-list-grid .ag-row.run-list-row-selected {
+    box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);
 }
 
 /* The current session, held under the column headings while the list
@@ -599,8 +623,8 @@ a.run-toast-link:hover {
 }
 
 /* What the list's script draws in a full-width row: a session row, a
-   divider, a date header, the note under a session the scenario was not
-   played in, and the button that loads older sessions. */
+   scenario row, a divider, a date header, the note under a session the
+   scenario was not played in, and the button that loads older sessions. */
 .run-list-wide {
     align-items: center;
     display: flex;
@@ -611,8 +635,34 @@ a.run-toast-link:hover {
     width: 100%;
 }
 
-.run-list-session {
+/* A session row or a scenario row: its first line, and under it the row's
+   figures while Median and best is on. */
+.run-list-group {
+    align-items: stretch;
     cursor: pointer;
+    flex-direction: column;
+    gap: 0;
+    justify-content: center;
+}
+
+.run-list-line {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* A scenario row sits one step in from its session row. Its toggle lines
+   up with the runs' numbers under it. */
+.run-list-scenario {
+    padding-left: 24px;
+}
+
+.run-list-figures {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .run-list-session-name {
@@ -627,10 +677,55 @@ a.run-toast-link:hover {
     white-space: pre;
 }
 
-.run-list-session-facts {
+/* A row's facts are never cut short: a scenario's name gives first. */
+.run-list-group-facts {
     color: var(--mantine-color-dimmed);
+    flex: none;
     font-size: 12px;
     margin-left: auto;
+    white-space: nowrap;
+}
+
+.run-list-scenario-title {
+    align-items: baseline;
+    display: flex;
+    min-width: 0;
+}
+
+.run-list-scenario-number {
+    flex: none;
+}
+
+/* Cut short with an ellipsis where the row has no room. The hover on the
+   part around it gives the whole name. */
+.run-list-scenario-name {
+    margin-left: 4px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* A scenario's name, a session's count, and Show all runs: buttons, since
+   each changes what the page shows and goes nowhere, drawn as the app draws
+   a link. */
+.run-list-link {
+    background: none;
+    border: 0;
+    color: var(--mantine-color-anchor);
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-align: left;
+}
+
+.run-list-link:hover {
+    text-decoration: underline;
+}
+
+.run-list-show-all {
+    flex: none;
+    font-size: 12px;
     white-space: nowrap;
 }
 
