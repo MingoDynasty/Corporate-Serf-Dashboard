@@ -10,7 +10,9 @@
 // from free parts, each of which an AG Grid upgrade can break:
 //   1. A session row and a scenario row are full-width rows with their own
 //      renderer. A full-width row has no cells, so its `gridcell` role is
-//      added here by hand.
+//      added here by hand, and the grid does not work its row class rules
+//      out again when its data changes, so a scenario row's band is drawn
+//      here too.
 //   2. Opening and closing is an external filter over a Set of open row ids,
 //      one Set for each view. A row under a scenario row shows while its
 //      session row and its scenario row are both open. Every row of every
@@ -408,7 +410,11 @@
     }
     return groupRow(
       props,
-      "run-list-scenario",
+      // The band is drawn here and not by the grid's row class rule, which
+      // the grid works out again when a row's data changes but not for a
+      // full-width row (AG Grid 35.3): the rule's band stayed on the
+      // scenario selected before. React redraws this class in place.
+      data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario",
       toggle,
       [
         toggleButton(labels.scenario, open, toggle),

@@ -915,11 +915,17 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                     # takes off one it added before, where it both adds and
                     # removes a rule's class. The run that was the latest
                     # stays in the list, and has to lose the highlight.
-                    # The band on the selected scenario's rows in the tree is
-                    # a rule for the same reason: it moves with the selection.
+                    # The band on the selected scenario's run rows in the tree
+                    # is a rule for the same reason: it moves with the
+                    # selection. A scenario row's band is drawn by the
+                    # script: the grid works the rules out again when a row's
+                    # data changes, but not for a full-width row, so a rule's
+                    # band stayed on the scenario selected before.
                     "rowClassRules": {
                         LATEST_ROW_CLASS: "params.data.latest",
-                        SELECTED_ROW_CLASS: "params.data.sel",
+                        SELECTED_ROW_CLASS: (
+                            f"params.data.sel && params.data.kind === '{RUN_ROW}'"
+                        ),
                     },
                     # The grid would say "No Matching Rows" over a list whose
                     # one session is closed, and "No Rows To Show" before the

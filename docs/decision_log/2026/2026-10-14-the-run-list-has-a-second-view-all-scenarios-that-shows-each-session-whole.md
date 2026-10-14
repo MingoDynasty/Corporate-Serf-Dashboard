@@ -164,9 +164,12 @@ while its session row and its scenario row are open (item 2); a scenario row
 takes the four keys (item 5); and focus goes back to the same button in the
 row, not only the same row, because a press on a name rebuilds the tree and
 the row's first button is its toggle (item 9). The script holds one set of
-open rows and one mark per view. The band is a row class rule, as the
-highlight is, because the grid never takes off a class it gave a row by
-function.
+open rows and one mark per view. On a run row the band is a row class rule,
+as the highlight is, because the grid never takes off a class it gave a row
+by function. On a scenario row the script draws it, as part of item 1: the
+grid does not work its row class rules out again when a full-width row's
+data changes, so the rule's band stayed on the scenario selected before.
+This was the Codex seat's must-fix F1 on PR #378.
 
 **A row's depth is never said.** The grid's root has the role `grid`, and a
 row's level belongs to a `treegrid`, which AG Grid sets only through its paid

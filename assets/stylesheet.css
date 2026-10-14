@@ -575,6 +575,12 @@ a.run-toast-link:hover {
     box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);
 }
 
+/* The same band on a scenario row, drawn by the list's script on what it
+   draws in the row, which fills it. */
+.run-history-list-grid .run-list-scenario-selected {
+    box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);
+}
+
 /* The current session, held under the column headings while the list
    scrolls. Beside it the grid keeps a scrollbar of the row's own, so its
    columns stay in line with the body's. It scrolls nothing, so it is drawn

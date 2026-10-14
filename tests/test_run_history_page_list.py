@@ -543,14 +543,16 @@ def test_the_last_run_played_is_highlighted_by_a_rule_on_a_field_the_rows_carry(
 
     The run that was the latest stays in the list when the next one lands,
     and a class given by ``getRowClass`` would stay on it. The band on the
-    selected scenario's rows in the tree moves with the selection, so it is
-    a rule too.
+    selected scenario's run rows in the tree moves with the selection, so it
+    is a rule too. A scenario row is a full-width row, which the grid does
+    not work the rules out for again when its data changes, so the rule
+    leaves it to the script.
     """
     rules = _options()["rowClassRules"]
 
     assert rules == {
         "run-list-row-latest": "params.data.latest",
-        "run-list-row-selected": "params.data.sel",
+        "run-list-row-selected": "params.data.sel && params.data.kind === 'run'",
     }
     assert "latest" in _sample_rows()["run"]
     assert "sel" in _sample_rows()["tree_run"]
@@ -562,11 +564,33 @@ def test_the_last_run_played_is_highlighted_by_a_rule_on_a_field_the_rows_carry(
 
 def test_the_band_is_a_look_and_the_names_button_says_it_is_current():
     css = STYLESHEET.read_text(encoding="utf-8")
-    rule = _css_block(css, ".run-history-list-grid .ag-row.run-list-row-selected")
+    band = "box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);"
     script = LIST_SCRIPT.read_text(encoding="utf-8")
 
-    assert "box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);" in rule
+    assert band in _css_block(
+        css, ".run-history-list-grid .ag-row.run-list-row-selected"
+    )
+    assert band in _css_block(css, ".run-history-list-grid .run-list-scenario-selected")
     assert '"aria-current": data.sel ? "true" : undefined,' in script
+
+
+def test_a_scenario_rows_band_follows_its_row_and_not_the_rows_it_was_drawn_with():
+    """The script draws a scenario row's band from the row's data, every time.
+
+    The grid works its row class rules out again when a row's data changes,
+    but not for a full-width row, so a rule's band stayed on the scenario that
+    was selected before. React redraws the renderer's class in place, and
+    keyboard focus is left where it is.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    naming = script[script.index("function scenarioRow(") :]
+    naming = naming[: naming.index("function sessionRow(")]
+
+    assert (
+        'data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario",'
+        in naming
+    )
+    assert "redrawRows" not in script
 
 
 def test_the_highlight_is_a_look_and_tells_a_screen_reader_nothing():

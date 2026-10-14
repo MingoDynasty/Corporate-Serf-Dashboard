@@ -932,8 +932,10 @@ flowchart LR
   `build_session_tree()` is its sibling for All scenarios: every session,
   under each a scenario row per visit numbered in play order, and under each
   its runs, each carrying its scenario row's id as `vid` beside its session
-  row's `sid`. The selected scenario's rows carry `sel`, which a row class
-  rule draws as a band. A session row under This scenario and a scenario row
+  row's `sid`. The selected scenario's rows carry `sel`, drawn as a band: by
+  a row class rule on a run row, and by the list's script on a scenario
+  row, a full-width row, whose class rules the grid does not work out again
+  when its data changes. A session row under This scenario and a scenario row
   carry `figures`, the median and best of the runs under them. Every value a
   row shows is formatted here, and every model names its view, the store's
   newest run, even with nothing to list, and the rows that run opens. That
