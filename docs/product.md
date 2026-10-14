@@ -443,6 +443,10 @@ are one view or two is a design choice for the feature that builds them.
   after setup is whether the app found their runs. Home stands in for an
   overview of all play, which is planned and not yet designed, so until then
   each start of the app is one click from Run History.
+- **The navbar marks the open page** (PR #377). The link of the page that is
+  open has a tinted background and a blue label, and a screen reader is told
+  which link it is. *Problem solved:* the navbar looked the same on every
+  page, so nothing but the page's own content said where the user was.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
   previously the old chart page's Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the

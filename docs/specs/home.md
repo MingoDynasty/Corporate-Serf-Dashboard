@@ -22,6 +22,11 @@ rationale in [product.md](../product.md).
 - The navbar's first entry and the header title both lead to it. The
   launcher opens `/`, so each start of the app lands here
   ([2026-10-12][address]).
+- The navbar marks its Home link on this page and on no other. The rule
+  that marks a link on the pages under its address does not make every page
+  Home's, although every address begins with `/`
+  ([2026-10-13][navbar-mark]). The rule is stated in
+  [run_history.md](run_history.md#identity).
 - The page reads no query parameter. A link of the shape `/?scenario=...` or
   `/?playlist_code=...&scenario=...`, which once opened a scenario on the
   page that lived at this address, draws Home and selects nothing. Nothing
@@ -118,6 +123,7 @@ rationale in [product.md](../product.md).
 - The page has no control the browser remembers, and stores nothing.
 
 [address]: ../decision_log/2026/2026-10-12-run-history-has-its-own-address-and-the-landing-address-is-home.md
+[navbar-mark]: ../decision_log/2026/2026-10-13-the-navbar-marks-the-open-page.md
 [schema-stamp]: ../decision_log/2026/2026-08-11-durable-json-stores-carry-a-schema_version-stamp.md
 [fresh-install]: ../decision_log/2026/2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence.md
 [copy]: ../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md

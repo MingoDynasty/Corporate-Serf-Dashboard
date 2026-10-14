@@ -28,6 +28,15 @@ of scope here, apart from its chart toolbar, noted under The chart.
   link leads to the page with no parameters, where a reload changes nothing.
   The header title leads to [Home](home.md), not to this page
   ([2026-10-12][address]).
+- The navbar marks the link of the open page. A link is marked when the
+  address is its own or lies under it, with or without a trailing slash,
+  and query parameters play no part. So this page's link is marked here
+  whatever scenario the address names, and Playlists is marked on a
+  playlist's scenario table as well as on the Playlists page. The marked
+  link has a tinted background and a blue label, and carries
+  `aria-current="page"`, which is what tells a screen reader. A page with
+  no navbar entry, such as the Aim Training Journey page, marks nothing
+  ([2026-10-13][navbar-mark]).
 - The preference panel and its disclosure button are named "Chart options",
   and the controls inside carry the vocabulary the app's own chart
   annotations and the aim-training community already use, "PB score" and
@@ -783,6 +792,7 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 [name]: ../decision_log/2026/2026-10-12-the-chart-page-is-named-run-history.md
 [address]: ../decision_log/2026/2026-10-12-run-history-has-its-own-address-and-the-landing-address-is-home.md
+[navbar-mark]: ../decision_log/2026/2026-10-13-the-navbar-marks-the-open-page.md
 [column]: ../decision_log/2026/2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md
 [grid]: ../decision_log/2026/2026-10-12-the-run-list-is-built-on-ag-grid-community-and-nvda-is-run-on-the-built-list.md
 [every-run]: ../decision_log/2026/2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md

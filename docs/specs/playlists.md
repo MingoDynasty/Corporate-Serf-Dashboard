@@ -57,6 +57,11 @@ and [product.md](../product.md). Leaderboard placement is worded
   ([2026-07-03](../decision_log/2026/2026-07-03-playlists-routes-are-stable-the-bare-route-selector-is-transitional.md)).
   `playlist_selector.py` is now only the shared props, a preset and a sizing
   rule, for the Run History and Aim Training Journey dropdowns.
+- The navbar's Playlists link is marked on both routes, so a playlist's
+  scenario table shows the section it belongs to
+  ([2026-10-13](../decision_log/2026/2026-10-13-the-navbar-marks-the-open-page.md)).
+  The rule that marks a link is stated in
+  [run_history.md](run_history.md#identity).
 - One cell in each row navigates, on both tables: a click anywhere in the
   Playlist name cell opens `/playlists/{code}`, and a click anywhere in the
   table's Scenario cell opens that scenario on the Run History page
