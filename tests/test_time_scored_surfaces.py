@@ -8,6 +8,7 @@ disagreeing about one scenario.
 """
 
 import logging
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -17,9 +18,8 @@ from sortedcontainers import SortedList
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.app_shell import _run_event_data  # noqa: E402
 from source.components import (  # noqa: E402
-    run_verdict_toast,
+    latest_run_card,
     score_threshold,
 )
 from source.kovaaks import data_service, playlist_scenarios_service  # noqa: E402
@@ -319,34 +319,22 @@ def test_a_landed_file_that_shows_no_countdown_turns_the_scenario_back(
     assert _threshold_line() == 851.39
 
 
-def test_the_landed_run_reaches_the_toast_as_a_percentage_of_pb_pace(
+def test_the_landed_run_reaches_the_card_as_a_percentage_of_pb_pace(
     folders, monkeypatch
 ):
+    """883.02 against 896.17 passes at 98.5% of the score, and is 88.8% of the pace."""
     folders.stats_file(FIRST, 884.41)
     folders.stats_file(SECOND, 896.17)
     folders.performance_file(SECOND)
     folders.start()
     folders.performance_file(THIRD)
 
-    message = _land(monkeypatch, folders.stats_file(THIRD, 883.02))
-    notification = run_verdict_toast.build_run_event_notification(
-        {
-            # Projected the way the app shell's drain does.
-            "latest": _run_event_data(message, message.datetime_created, 120.0),
-            "celebrated_run_id": None,
-        },
-        SCENARIO,
-        5,
-        95.0,
-        True,
-        True,
-    )
+    _land(monkeypatch, folders.stats_file(THIRD, 883.02))
+    shown = latest_run_card.latest_run_from_store(95, datetime(2026, 8, 3, 10, 0, 0))
 
-    assert notification["title"] == "Below threshold"
-    assert notification["message"] == (
-        f"{SCENARIO}: 883.02, 88.8% of PB pace (need 95.0%). "
-        "Still your 3rd-best at 40.8 cm/360."
-    )
+    assert shown is not None
+    assert shown.badge is latest_run_card.CardBadge.BELOW_THRESHOLD
+    assert shown.result.startswith("88.8% of PB pace · ")
 
 
 def test_a_landed_run_logs_no_verdict_of_its_own(folders, monkeypatch, caplog):
@@ -370,11 +358,14 @@ def test_a_landed_run_logs_no_verdict_of_its_own(folders, monkeypatch, caplog):
         if record.name == file_watchdog.logger.name
     ]
     # The import still logs what it found, so an empty log would prove nothing.
-    assert any("place score" in line for line in log)
+    assert any("Detected new file" in line for line in log)
+    # Nor does it place the run among the others at its sensitivity any more.
     assert not [
         line
         for line in log
-        if "threshold" in line.lower() or "high score" in line.lower()
+        if "threshold" in line.lower()
+        or "high score" in line.lower()
+        or "place score" in line.lower()
     ]
 
 

@@ -33,8 +33,8 @@ designed for a moment as well as for a question.
   the app between runs: an alt-tab, a second monitor, or a phone. Most looks
   are a glance, so an answer here has to work at a glance. Two questions
   come up that the three above don't cover. The first is *how did that run
-  go?*, which the latest-run card, the run toast, the personal best
-  celebration, and the chart answer today. The second is *how is this
+  go?*, which the latest-run card, the run list's check, the personal
+  best celebration, and the chart answer today. The second is *how is this
   session going?*, and it serves a decision: keep pushing this scenario (and
   whether to push for speed or for accuracy), switch to another, or stop.
   What rank the scores are reaching, how long they've played, how many runs,
@@ -109,33 +109,25 @@ are one view or two is a design choice for the feature that builds them.
   from the Valorant-scale era used to sort as `0.2` among centimeters and sit
   at the wrong end of the axis, so the history could not be compared across
   the switch. Runs too old to convert keep their original label.
-- **Run notifications.** A run earns at most one toast, and its title is the
-  verdict. A score-threshold pass or miss against the run's previous high
-  score headlines whenever the threshold switch is on and a previous high
-  score exists ("Threshold passed" / "Below threshold", the miss naming the
-  target percentage it fell short of); otherwise a top-N placement within the
-  run's sensitivity is the headline ("New 2nd-best score"). When a run earns
-  both, the threshold verdict leads and the placement trails it. The message
-  leads with the scenario, and the sensitivity is a trailing qualifier. The
-  overlay line for that same percentage tracks the current personal best. A
-  run that qualifies for neither is reported by its new point on the plot and
-  nothing else. A run that beats your personal best is not reported here at all
-  while the celebration below is on: it gets that instead of a verdict. Turn
-  celebrations off and it returns to this family, reported by whichever verdict
-  it earns like any other run. If runs accumulate
-  while no tab is open, the next visit rebuilds once from final state instead
-  of replaying stale toasts and selections; it narrates the most recent run if
-  you come back within a couple of minutes of playing it, and anything older
-  reaches the plot silently. The ordinary run toasts can be turned off with one Chart options
-  switch, Run notifications: with it off the chart still updates and nothing
-  toasts about a routine run, though a personal best still celebrates when
-  celebrations are on, and a run file that failed to import still says so. The threshold switch beside the
-  percentage decides only whether a run is judged, never whether it toasts.
-  *Problem solved:* immediate in-session feedback on whether the run you just
-  played met your bar, readable at a glance without leaning in, and without a
-  pile of toasts accumulating over a session — and, for a session where any
-  interruption is one too many, a way to quiet the routine feedback without
-  giving up the plot.
+- **Run notifications** (PR #376; design in #354). Every new run shows
+  one plain toast, on whatever page is open: "New run detected", the
+  scenario's name, and a link that opens that scenario on Run History. It
+  says nothing about how the run went, because the page shows that beside
+  the run for as long as the run exists. A run that beats your personal
+  best gets the celebration below instead, and runs detected together
+  share one toast, for the newest. The toast replaces itself rather than
+  stacking, and a run the app imported more than a couple of minutes
+  before a page could show it reaches the page silently. One switch on the
+  Settings page, Run notifications, turns the toast off: the page still
+  updates, a personal best still celebrates when celebrations are on, and
+  a run file that failed to import still says so. *Problem solved:* the
+  toast used to carry the verdict on a run, for eight seconds, and only
+  while the chart page was open on that run's scenario. On a playlist's
+  scenario table, picking what to play next, nothing said the app had
+  seen the run at all. Now a toast confirms it on every page, one click
+  from where the run is judged. It costs some quiet, and the toast no
+  longer says how the run went from across the room: that takes a look at
+  the latest-run card.
 - **Time-scored scenarios are measured by pace** (PR #343; design in #329).
   Some scenarios score the time left on a countdown when you finish the task.
   On those, the app measures by pace, how fast a run finishes compared with
@@ -443,6 +435,10 @@ are one view or two is a design choice for the feature that builds them.
   after setup is whether the app found their runs. Home stands in for an
   overview of all play, which is planned and not yet designed, so until then
   each start of the app is one click from Run History.
+- **The navbar marks the open page** (PR #377). The link of the page that is
+  open has a tinted background and a blue label, and a screen reader is told
+  which link it is. *Problem solved:* the navbar looked the same on every
+  page, so nothing but the page's own content said where the user was.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
   previously the old chart page's Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the

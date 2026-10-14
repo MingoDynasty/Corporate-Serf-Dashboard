@@ -94,7 +94,7 @@ could not wait for a later release:
 - **The chart changes.** A list of every run beside a chart of the top N
   would contradict each other.
 - **The card.** Once the run toast goes plain, under the
-  [Run toasts proposal](../../proposals/run_toasts_proposal.md), the card is
+  [Run toasts proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/2c5c072d0670c7c6d4873eb9e77f676dca1f6d43/docs/proposals/run_toasts_proposal.md), the card is
   the only place a run's percentage of the PB appears.
 
 **Decisions the page was held to.** The proposal reopened none of these:
@@ -140,6 +140,11 @@ author-owned part of its design that is a decision, has an entry:
 - [Run History Keeps Its Own Control Ids, So Every Browser Saw The Defaults Once](2026-10-12-run-history-keeps-its-own-control-ids-so-every-browser-saw-the-defaults-once.md).
 - [A Measured Time Rounds To The Nearest Minute](2026-10-13-a-measured-time-rounds-to-the-nearest-minute.md),
   ruled a day later.
+
+**Superseded in part (2026-10-13).** The run toast has gone plain. So "once
+the run toast goes plain" is now: the latest-run card is the only place a
+run's percentage of the PB appears. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md).
 
 Proposed in
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356),

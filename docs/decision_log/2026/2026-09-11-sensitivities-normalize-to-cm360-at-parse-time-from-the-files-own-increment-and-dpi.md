@@ -139,3 +139,9 @@ the paragraph "The rounding fix does not reach legacy runs" no longer holds. A
 legacy run keeps the sensitivity its file recorded, unrounded, so the 95
 `0.32 Valorant` runs read `0.32 Valorant`. cm/360 values still round to one
 decimal place, now fixed rather than configured. Everything else here stands.
+
+**Superseded in part (2026-10-13).** Nothing places a run within its
+normalized group any more: top-N placement is retired, and `nth_score` with
+it. The group is still the unit for first-sensitivity detection, which decides
+whether a run is judged against the score threshold. See
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).

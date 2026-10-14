@@ -22,7 +22,6 @@ class NewFileMessage:
     # sensitivity, which is exactly when the run cannot be judged against a
     # per-sensitivity history.
     is_new_sensitivity: bool
-    nth_score: int
     # The run CSV's file name: unique per run, and the identity a celebration
     # decision names.
     run_id: str

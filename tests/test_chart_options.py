@@ -75,8 +75,6 @@ CHART_OPTIONS_INPUT_DEFAULTS = {
     IDS.high_score_overlay: ("checked", True),
     IDS.score_threshold_overlay: ("checked", True),
     IDS.score_threshold_percentage: ("value", 95),
-    IDS.score_threshold_notification: ("checked", True),
-    IDS.run_notification: ("checked", True),
 }
 COLLAPSED_PANEL_CLASS = (
     f"{chart_options.CHART_OPTIONS_PANEL_CLASS} "
@@ -94,8 +92,6 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         IDS.high_score_overlay: "high-score-overlay",
         IDS.score_threshold_overlay: "score-threshold-overlay",
         IDS.score_threshold_percentage: "score-threshold-percentage",
-        IDS.score_threshold_notification: "score-threshold-notification",
-        IDS.run_notification: "run-notification",
     }
 
     for component_id, help_key in expected_settings.items():
@@ -131,11 +127,6 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
             "overlay line tracks your current personal best. A run is judged "
             "against the personal best you had before the run."
         ),
-        IDS.score_threshold_notification: (
-            "Adds a pass or fail verdict to run notifications when the run can be "
-            "judged against the score threshold. Needs **Run notifications** "
-            "turned on."
-        ),
     }
 
     for component_id, text in expected.items():
@@ -145,15 +136,6 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
             if isinstance(component, dmc.Tooltip)
         ]
         assert rendered_text(tooltip.label) == text
-
-
-def test_the_run_notifications_help_text_names_both_families():
-    # The switch's own family, then the one it deliberately does not reach: the
-    # celebration has its own setting, and the digest it once mentioned is gone.
-    assert chart_options.SETTINGS_HELP_TEXT["run-notification"] == (
-        "Controls threshold verdict and placement notifications for your runs. "
-        "Personal best celebrations use their own setting."
-    )
 
 
 def test_chart_options_inputs_keep_their_defaults(monkeypatch):
@@ -182,32 +164,53 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
         IDS.high_score_overlay: "PB score",
         IDS.score_threshold_overlay: "Score threshold overlay",
         IDS.score_threshold_percentage: "Score threshold percentage",
-        IDS.score_threshold_notification: "Score threshold verdict",
-        IDS.run_notification: "Run notifications",
     }
 
 
-def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
-    """Ordered relative to Score Threshold, not pinned to a group count.
+def test_the_panel_holds_three_groups_seven_controls_and_no_notification_control(
+    monkeypatch,
+):
+    """The run toast is app-wide, so its switch is on the Settings page.
 
-    Groups are added to this panel by parallel work; what this change owns is
-    that Notifications is the trailing group and holds the master switch.
+    The Score threshold verdict switch went with the verdict it gated. An
+    empty percentage is the one way left to stop runs being judged.
     """
     components = _layout_components(monkeypatch)
     panel = components[IDS.panel]
 
-    groups = [
-        (
-            group.children[0].children,
-            [getattr(control, "id", None) for control in group.children[1:]],
-        )
-        for group in panel.children
+    assert [group.children[0].children for group in panel.children] == [
+        "Overlays",
+        "Run Data Points",
+        "Score Threshold",
     ]
-    titles = [title for title, _control_ids in groups]
-
-    assert titles[-1] == "Notifications"
-    assert titles.index("Score Threshold") < titles.index("Notifications")
-    assert groups[-1][1] == [IDS.run_notification]
+    controls = {
+        component.id
+        for component in _walk_components(panel)
+        if isinstance(
+            component,
+            (dmc.Switch, dmc.NumberInput, dmc.SegmentedControl, dmc.ColorInput),
+        )
+    }
+    assert controls == {
+        IDS.rank_overlay,
+        IDS.show_all_ranks,
+        IDS.high_score_overlay,
+        IDS.point_size,
+        IDS.point_color,
+        IDS.score_threshold_overlay,
+        IDS.score_threshold_percentage,
+    }
+    drawn = rendered_text(run_history.layout())
+    for gone in ("Notifications", "Run notifications", "Score threshold verdict"):
+        assert gone not in drawn
+    # A browser's stored value for either is left behind, unused: no control
+    # is drawn under the old ids, and nothing clears them.
+    assert not {
+        "run-history-run-notification-switch",
+        "run-history-score-threshold-notification-switch",
+    } & set(components)
+    assert not hasattr(IDS, "run_notification")
+    assert not hasattr(IDS, "score_threshold_notification")
 
 
 def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypatch):

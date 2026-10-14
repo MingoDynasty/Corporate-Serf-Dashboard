@@ -55,6 +55,19 @@
     white-space: nowrap;
 }
 
+/* The link in a run toast, drawn as the app draws a link. It is a dcc.Link
+   and not a dmc.Anchor, which percent-decodes its href and would cut a
+   scenario name holding an ampersand short, so it gets Mantine's anchor
+   color from here. */
+a.run-toast-link {
+    color: var(--mantine-color-anchor);
+    text-decoration: none;
+}
+
+a.run-toast-link:hover {
+    text-decoration: underline;
+}
+
 /* Outer column for the grid pages (playlists overview, playlist scenarios).
    Pinning the column to the viewport minus the AppShell header offset and the
    shell's vertical padding leaves the grid to own its own scrolling, so the

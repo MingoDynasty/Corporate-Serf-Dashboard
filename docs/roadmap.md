@@ -37,8 +37,12 @@ sequence.
   above reports the last run played. The page has a new name and an address
   of its own, and the app now opens on a small Home page that holds
   first-time setup. Each browser's remembered chart settings started over
-  once. (PRs #370, #371, #372, #373; design in #356; sessions in #359,
-  design in #355) Design rationale distilled into
+  once. A new run now shows one plain toast on every page, with a link to
+  its scenario on Run History, in place of a toast that judged the run
+  while the page was open. The switch that turns it off is on the Settings
+  page. (PRs #370, #371, #372, #373, #376; design in #356; run toasts
+  design in #354; sessions in #359, design in #355) Design rationale
+  distilled into
   [`decision_log/`](./decision_log/README.md).
 - **Categories and subcategories on benchmarks** — a benchmark's scenario
   table now draws the groups its author sorted the scenarios into: two narrow
@@ -82,34 +86,21 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **Run History, the last two pieces** — the page is public, and two pieces
-  of the work it was split into remain. Each piece's proposal carries its own
-  decisions, and nothing below is ratified by being listed here.
-  1. **Run toasts** — what a run's toast says now that the page shows how
-     the run went: one plain toast on every page, which links to Run
-     History, in place of the verdict toast the page builds today. Its
-     [proposal](./proposals/run_toasts_proposal.md) was ratified on
-     2026-10-11 and waited for the page to go public. Until it lands, the
-     page builds today's toast, with placement fixed at the top 5 and both
-     notification switches still in Chart options.
-  2. **All scenarios** — a second view of the run list: each session's
-     scenarios in the order they were played. Its
-     [proposal](./proposals/all_scenarios_proposal.md) is written, and
-     nothing in it is ratified yet.
+- **Run History, the last piece: All scenarios** — the page is public, and
+  one piece of the work it was split into remains. All scenarios is a
+  second view of the run list: each session's scenarios in the order they
+  were played. Its [proposal](./proposals/all_scenarios_proposal.md) is in
+  review, and nothing here is ratified by being listed.
 
-  The two don't wait for each other. Version 1 of the page left out the
-  typical run. Its definition moves to a proposal of its own, which the
-  sessions decision settled. Score vs Sensitivity now plots every run at
-  each sensitivity with nothing that sums a sensitivity up, and its redesign
-  is later work.
+  Version 1 of the page left out the typical run. Its definition moves to
+  a proposal of its own, which the sessions decision settled. Score vs
+  Sensitivity now plots every run at each sensitivity with nothing that
+  sums a sensitivity up, and its redesign is later work.
 
   Why it's next:
-  - Run toasts finishes what going public started. The page now holds a
-    run's verdict, so the toast no longer has to carry it, and two switches
-    in Chart options exist only for the toast.
-  - All scenarios is what the session review still lacks: the page shows one
+  - It is what the session review still lacks: the page shows one
     scenario's runs in a session, and not yet the session across scenarios.
-  - Both build on what shipped: the sessions, the run list, and the page's
+  - It builds on what shipped: the sessions, the run list, and the page's
     address.
 
   The page's behavior is in

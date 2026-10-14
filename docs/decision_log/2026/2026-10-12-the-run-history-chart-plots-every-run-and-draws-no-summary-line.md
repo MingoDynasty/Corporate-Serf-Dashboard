@@ -70,7 +70,7 @@ group's average.
 Top N survives in one place for now. The run toast still places a run
 against the top scores at its sensitivity, against a fixed 5 with no
 control, until the
-[Run toasts proposal](../../proposals/run_toasts_proposal.md)'s change
+[Run toasts proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/2c5c072d0670c7c6d4873eb9e77f676dca1f6d43/docs/proposals/run_toasts_proposal.md)'s change
 retires placement.
 
 **If the maintainer had chosen otherwise.** With Top N and the Average score
@@ -261,8 +261,10 @@ a lean, and the ratification covered it.
 **What this changes in older entries.** Each keeps its text and gains a
 dated note.
 
-- The 2026-10-05 stars entry: its clauses about Top N, the oldest date, the
-  kept tie, and the Average score trace stop applying. The rest is in
+- The 2026-10-05 stars entry: its clauses about Top N, the oldest date, and
+  the Average score trace stop applying. Its kept tie keeps its rule, since
+  a range can still leave a new PB off the chart and keep a run that tied
+  it. The rest is in
   [the stars entry for Score vs Run](2026-10-12-score-vs-run-stars-each-new-pb.md).
 - [2026-09-12, Share chart](2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md):
   the figure shared holds every run in the range and no Average score line,
@@ -273,6 +275,11 @@ dated note.
 **Evidence and its limits.** The counts above are from the maintainer's
 stats folder, one player's history: 8,937 runs over 866 scenarios on
 2026-10-05. Nothing was measured on other players' data.
+
+**Superseded in part (2026-10-13).** Top N no longer survives in the run
+toast. That toast is plain, nothing places a run, and `nth_score` has left the
+run message. See
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).
 
 Proposed in
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356),

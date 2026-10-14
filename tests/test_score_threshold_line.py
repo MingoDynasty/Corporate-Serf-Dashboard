@@ -10,7 +10,6 @@ everywhere else. The same answers from real files on disk are
 
 import json
 from datetime import datetime
-from types import SimpleNamespace
 
 import dash
 import plotly.graph_objects as go
@@ -49,13 +48,8 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
         score_threshold, "get_personal_best_run", lambda _scenario: personal_best
     )
     monkeypatch.setattr(score_threshold, "get_pace_basis", lambda _scenario: basis)
-    monkeypatch.setattr(
-        run_history,
-        "ctx",
-        SimpleNamespace(triggered=[{"prop_id": f"{run_history.CHART_MODE_ID}.value"}]),
-    )
 
-    plot_json, *_outputs = run_history.generate_graph(
+    plot_json = run_history.generate_graph(
         None,
         "Scenario A",
         None,
@@ -68,9 +62,6 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
         False,
         True,
         95,
-        True,
-        True,
-        {},
     )
 
     plot = json.loads(plot_json)

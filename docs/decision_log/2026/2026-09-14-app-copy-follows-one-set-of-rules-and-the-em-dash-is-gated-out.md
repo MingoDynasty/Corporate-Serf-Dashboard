@@ -280,6 +280,14 @@ guide's position, question by question, is in the research note behind the
 proposal (`ignore/design-notes/copy-conventions-research.md`, main checkout
 only, untracked).
 
+**Superseded in part (2026-10-13).** The run-toast strings this entry set are
+gone with the verdict and the placement: the titles "Threshold passed", "Below
+threshold", "New best score" and "New {Nth}-best score", and the messages
+under them, the colon between scenario and score included. The run toast reads
+"New run detected", the scenario's name, and "Open in Run History". The rules
+stand. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md).
+
 Provenance: proposal
 [#247](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/247)
 (opened 2026-08-21; D4 ruled 2026-09-12, D8 ruled 2026-09-14, D1 to D3 and D5

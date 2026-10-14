@@ -88,18 +88,30 @@ class PlaylistScenarioFillDrain:
     consuming_terminal: bool
 
 
-def scenario_run_history_href(scenario_name: str, playlist_code: str) -> str:
-    """Build the address that opens a scenario on Run History, filtered to a playlist.
+def scenario_run_history_href(
+    scenario_name: str,
+    playlist_code: str | None = None,
+    *,
+    run_id: str | None = None,
+) -> str:
+    """Build the address that opens a scenario on Run History.
 
-    Every link from a playlist's table to a scenario is built here, so the
-    page's address and its two parameters are written in one place.
+    Every link to a scenario on that page is built here, so the page's
+    address and its parameters are written in one place. ``playlist_code``
+    filters the page to a playlist, and a link that names none leaves the
+    parameter out.
+
+    ``run_id`` is for a link that can be offered again for the same scenario,
+    as each run's toast offers one. The page does not read it. A link to the
+    address the page already holds changes nothing, so without it the second
+    such link would do nothing once the selection had been changed by hand.
     """
-    return "/run-history?" + urlencode(
-        {
-            "playlist_code": playlist_code,
-            "scenario": scenario_name,
-        }
-    )
+    parameters = {"scenario": scenario_name}
+    if playlist_code is not None:
+        parameters = {"playlist_code": playlist_code, **parameters}
+    if run_id is not None:
+        parameters["run"] = run_id
+    return "/run-history?" + urlencode(parameters)
 
 
 def _format_int(value: int | None) -> str:

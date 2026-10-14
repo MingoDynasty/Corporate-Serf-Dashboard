@@ -68,7 +68,7 @@ time-scored
 
 The mouse sensitivity a run was played at: a value on a scale, such as 34.6
 cm/360. The Score vs Sensitivity chart plots each run at its sensitivity, and
-top-N placement compares a run with the runs at the same one.
+the first run at a sensitivity isn't judged against the score threshold.
 
 ### cm/360
 
@@ -344,9 +344,8 @@ other run's time divided by this one's. A run at 95% of PB pace takes the PB's
 time divided by 0.95
 ([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 
-- On screen: PB pace in a verdict and on the latest-run card, and faster in
-  the Next Rank column, the New personal best toast, and the card's line for
-  a new PB.
+- On screen: PB pace on the latest-run card, and faster in the Next Rank
+  column, the New personal best toast, and the card's line for a new PB.
 
 ### Score threshold
 
@@ -354,34 +353,24 @@ A score goal set as a percentage of the PB, or of the PB's pace where the app
 measures a time-scored scenario by pace
 ([2026-07-08](decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md),
 [2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
-How a run toast judges a run against it is in
-[notifications.md](specs/notifications.md#run-notifications), and how a past
-run is judged for its check is in
+How a run is judged against it is in
 [run_history.md](specs/run_history.md#marks-the-check-and-the-star).
 
-- On screen, the verdict reads Threshold passed or Below threshold, and a
-  check beside a run's score in the run list says the run passed.
+- On screen, the latest-run card's badge reads Threshold passed or Below
+  threshold, and a check beside a run's score in the run list says the run
+  passed.
 - Not a rank's threshold, which comes from a benchmark file.
-
-### Top-N placement
-
-Where a new run's score places among the scenario's runs at the same
-sensitivity: first is best, and the rest are Nth-best, such as 2nd-best. A
-placement within the top 5 earns a run notification
-([notifications.md](specs/notifications.md#run-notifications)). The chart
-plots every run, whatever its placement.
-
-- On screen: toasts such as New 2nd-best score.
-- In code: `nth_score` and `top_n_scores`.
 
 ### Run notification
 
-The one toast a run can earn, carrying a score threshold verdict, a top-N
-placement, or both
-([2026-08-03](decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
+The toast that says the app detected a new run. It names the run's scenario
+and links to it on the Run History page, and it carries no verdict on the
+run
+([2026-10-13](decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
 When a run earns one is in
 [notifications.md](specs/notifications.md#run-notifications).
 
+- On screen: New run detected.
 - In code: `run-verdict`, the toast channel's name.
 - Not the personal best celebration, a separate response to a new PB.
 

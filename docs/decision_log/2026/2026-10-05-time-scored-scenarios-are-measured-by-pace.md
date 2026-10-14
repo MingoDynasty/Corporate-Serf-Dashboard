@@ -276,5 +276,14 @@ scenario, not under the version the scenario's newest run names, so a later
 run on another version changes no earlier check. The pace rule stands. See
 [A Past Run's Check Is Judged Against The PB It Was Chasing, Under Its Own Version](2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md).
 
+**Superseded in part (2026-10-13).** The threshold verdict's "% of PB pace" is
+no longer in a toast. The run toast carries no verdict, so that wording is the
+latest-run card's alone. Top-N placement leaves the list of things that order
+or place scores, because nothing places a run any more. Every formula, the
+detection, and the other surfaces stand. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)
+and
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).
+
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.

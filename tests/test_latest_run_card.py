@@ -25,10 +25,11 @@ from source.components.latest_run_card import (  # noqa: E402
 )
 from source.components.run_history_list import build_run_list, run_id  # noqa: E402
 from source.components.run_marks import mark_runs, what_runs_chased  # noqa: E402
-from source.components.run_verdict_toast import (  # noqa: E402
-    build_live_run_notification,
+from source.components.score_threshold import (  # noqa: E402
+    ThresholdVerdict,
+    judge_run,
+    shown_percentage,
 )
-from source.components.score_threshold import threshold_verdict  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.kovaaks.play_sessions import in_play_order  # noqa: E402
 from source.kovaaks.time_scored_service import PaceBasis  # noqa: E402
@@ -329,7 +330,7 @@ def test_accuracy_is_shown_to_the_whole_percent_a_half_rounding_up(accuracy, wor
     assert _shown(_scored(100.0, accuracy=accuracy)).result == f"Accuracy {worded}"
 
 
-def test_a_miss_is_held_one_tenth_under_its_goal_as_the_toast_holds_it():
+def test_a_miss_is_held_one_tenth_under_its_goal():
     """Rounding alone would print a 94.98% miss of a 95% goal as 95.0%."""
     runs = _scored(10000.0, 9498.0)
 
@@ -354,22 +355,27 @@ def test_a_run_that_ties_the_pb_reads_as_all_of_it():
     assert _shown(_scored(100.0, 100.0)).result == "100.0% of PB · Accuracy 50%"
 
 
-# --- The second line agrees with the toast the run got -------------------------
+# --- The second line agrees with the judging rule, and with the celebration ----
 
 
-def _event(runs: list[RunData], pace) -> dict:
-    """Build the run event the newest of one scenario's runs would arrive in."""
+def _chased(runs: list[RunData], pace):
+    """Work out what the newest of one scenario's runs was chasing."""
     newest = runs[-1]
 
     def basis(version: str | None) -> PaceBasis | None:
         return pace(newest.scenario, version)
 
-    chased = what_runs_chased(runs, basis)[newest]
+    return what_runs_chased(runs, basis)[newest]
+
+
+def _event(runs: list[RunData], pace) -> dict:
+    """Build the run event the newest of one scenario's runs would arrive in."""
+    newest = runs[-1]
+    chased = _chased(runs, pace)
     return {
         "run_id": run_id(newest),
         "scenario_name": newest.scenario,
         "sensitivity": "40.8 cm/360",
-        "nth_score": 99,
         "score": newest.score,
         "scenario_previous_best": chased.previous_best,
         "pace_constant": chased.pace_constant,
@@ -392,20 +398,29 @@ def _event(runs: list[RunData], pace) -> dict:
     ],
 )
 @pytest.mark.parametrize("percentage", [90.0, 95.0, 99.0])
-def test_the_percentage_is_the_one_the_runs_toast_printed(
+def test_the_percentage_is_the_judging_rules_own_at_every_goal(
     scores, pace, hashed, percentage
 ):
-    runs = _scored(*scores, scenario_hash=hashed)
-    event = _event(runs, pace)
-    verdict = threshold_verdict(event, percentage, True)
-    assert verdict is not None
-    toast = build_live_run_notification(event, A, 0, verdict)
-    assert toast is not None
+    """The card adds no rounding of its own to the rule's, by score or by pace.
 
-    printed = re.search(r"[\d.]+% of PB(?: pace)?", toast["message"])
-    assert printed is not None
+    The run is judged here from what it was chasing, apart from the marks the
+    card reads, and the two display caps are the rule's: a card that printed
+    its own percentage would differ on the runs that sit at a cap.
+    """
+    runs = _scored(*scores, scenario_hash=hashed)
+    chased = _chased(runs, pace)
+    verdict = judge_run(
+        runs[-1].score,
+        chased.previous_best,
+        chased.is_new_sensitivity,
+        chased.pace_constant,
+        percentage,
+    )
+    assert isinstance(verdict, ThresholdVerdict)
+
+    measure = "PB pace" if verdict.by_pace else "PB"
     assert _shown(runs, percentage=percentage, pace=pace).result == (
-        f"{printed.group()} · Accuracy 50%"
+        f"{shown_percentage(verdict):.1f}% of {measure} · Accuracy 50%"
     )
 
 

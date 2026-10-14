@@ -81,11 +81,12 @@ Edit this file only while the dashboard is stopped — it is read once per run.
 Saving from the Settings page while it runs is fine; the page tells you when a
 change needs a restart before it takes effect.
 
-One setting on that page is in neither file: the **Celebrations** choice, which
-picks the personal best celebration's animation or turns it off. It is
-remembered by the browser rather than written to disk, applies the moment you
-choose, and is not part of Save. A different browser, or one whose site data you
-have cleared, starts on Confetti.
+Two settings on that page are in neither file: the **Run notifications** switch,
+which turns the new-run notification on or off, and the **Celebrations** choice,
+which picks the personal best celebration's animation or turns it off. Both are
+remembered by the browser rather than written to disk, apply the moment you
+choose, and are not part of Save. A different browser, or one whose site data you
+have cleared, starts with run notifications on and on Confetti.
 
 ## Playlists and Benchmarks
 
@@ -123,9 +124,9 @@ finish compared with your personal best. **Next Rank** then reads "+2.8%
 faster to Lavender": finish 2.8% faster than your personal best and you earn
 Lavender. On the Run History page, the **Score threshold percentage**
 becomes a percentage of your personal best's pace, so the threshold line, the
-check beside a run's score, the latest-run card, and the run notification all
-judge by it, and the card and the notification say "% of PB pace". A new
-personal best says how much faster you finished.
+check beside a run's score, and the latest-run card all judge by it, and the
+card says "% of PB pace". A new personal best says how much faster you
+finished.
 
 The app works this out from the performance files KovaaK's writes next to
 your stats files, so it can measure pace on a scenario once you have played it
@@ -235,7 +236,7 @@ hand-edit surface.
 running anyway. Open <http://localhost:8050/> yourself — the console's "Dashboard running at"
 line names the exact address, including a configured port.
 
-**Notifications sometimes do not appear.** Keep one Run History tab open at a time.
+**Notifications sometimes do not appear.** Keep one tab of this app open at a time.
 Extra tabs are crash-safe, but a new run's notification goes to whichever tab asks first.
 
 **Where the logs are.** `%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`. `debug.log` is the

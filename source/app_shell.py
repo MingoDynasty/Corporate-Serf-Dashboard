@@ -6,24 +6,35 @@ from typing import Any, TypedDict
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, clientside_callback, dcc, no_update
+from dash import (
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    dcc,
+    html,
+    no_update,
+)
 from pydantic import ValidationError
 
 from source.components.local_icon import local_icon
 from source.config.config_service import ConfigData, get_config
 from source.kovaaks.pace import percent_faster
+from source.kovaaks.playlist_scenarios_service import scenario_run_history_href
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.notifications import (
     CELEBRATION_CHANNEL,
     NOTIFICATION_CONTAINER_ID,
+    RUN_VERDICT_CHANNEL,
     TOAST_CHANNEL_REGISTRY_STORE_ID,
-    channel_toast,
+    channel_toasts,
     toast,
 )
 
 # The batch the shell's drain publishes for every page, and the interval that
-# drives it. Both live in the shell because the drain is app-wide: a personal
-# best is worth announcing whatever page happens to be open.
+# drives it. Both live in the shell because the drain is app-wide: a run is
+# worth announcing whatever page happens to be open.
 RUN_EVENTS_BATCH_STORE_ID = "run-events-batch"
 PB_CELEBRATION_INTERVAL_ID = "pb-celebration-interval"
 
@@ -40,6 +51,19 @@ CELEBRATION_STYLE_CONFETTI = "confetti"
 # data -- falls through to celebrating, which is the direction browser-local
 # storage should fail in.
 DEFAULT_CELEBRATION_STYLE = CELEBRATION_STYLE_CONFETTI
+
+# The Run notifications setting: one browser-local string, on or off. Like
+# the celebration style it is the authoritative value and not a mirror of the
+# Settings switch, and it is here because the drain reads it on every page.
+# Only the exact off value silences the run toast, for the same reason. The
+# browser stores the value under this id, so changing the id or the off value
+# turns run toasts back on for everyone who had turned them off.
+RUN_NOTIFICATIONS_STORE_ID = "run-notifications"
+RUN_NOTIFICATIONS_ON = "on"
+RUN_NOTIFICATIONS_OFF = "off"
+
+# The stylesheet draws the link in a run toast as the app draws a link.
+RUN_TOAST_LINK_CLASS = "run-toast-link"
 
 # A clientside callback needs an output, and the animation has nothing to
 # write: this store is that output and never holds anything.
@@ -125,7 +149,6 @@ class RunEventData(TypedDict):
     run_id: str
     scenario_name: str
     sensitivity: str
-    nth_score: int
     score: float
     scenario_previous_best: float | None
     pace_constant: float | None
@@ -179,7 +202,6 @@ def _run_event_data(
         "run_id": message.run_id,
         "scenario_name": message.scenario_name,
         "sensitivity": message.sensitivity,
-        "nth_score": message.nth_score,
         "score": message.score,
         "scenario_previous_best": message.scenario_previous_best,
         "pace_constant": message.pace_constant,
@@ -266,6 +288,45 @@ def _celebration_toast(run: RunEventData) -> dict[str, Any]:
     )
 
 
+def _newest_live_run(runs: list[RunEventData]) -> RunEventData | None:
+    """Name the batch's newest live run, the one run its toast can be about.
+
+    A batch's other runs earn no toast of their own: one channel shows one
+    toast, so theirs would be replaced in the instant they were shown.
+    """
+    return next((run for run in reversed(runs) if run["is_live"]), None)
+
+
+def _run_toast(run: RunEventData) -> dict[str, Any]:
+    """Build the plain toast for a run: its scenario, and a link to it.
+
+    It says that the app saw the run and where to look. It carries no score
+    and no verdict, which Run History shows beside the run for as long as the
+    run exists.
+
+    The link is a ``dcc.Link``. A ``dmc.Anchor`` decodes its address, which
+    cuts a scenario name holding ``&`` short, and an ``html.A`` reloads the
+    app, which takes the toast with it. The address names the run as well as
+    the scenario, so that two runs of one scenario link to two addresses.
+    """
+    return toast(
+        RUN_VERDICT_CHANNEL,
+        "New run detected",
+        [
+            html.Div(run["scenario_name"]),
+            dcc.Link(
+                "Open in Run History",
+                href=scenario_run_history_href(
+                    run["scenario_name"], run_id=run["run_id"]
+                ),
+                className=RUN_TOAST_LINK_CLASS,
+            ),
+        ],
+        color="blue",
+        icon=local_icon("fontisto:line-chart"),
+    )
+
+
 def _next_animation_sequence(
     previous_batch: RunEventBatch | None,
     celebrated: RunEventData | None,
@@ -288,29 +349,38 @@ def _next_animation_sequence(
     State(RUN_EVENTS_BATCH_STORE_ID, "data"),
     State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    State(RUN_NOTIFICATIONS_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def publish_run_events(_n_intervals, previous_batch, toast_channels, celebration_style):
+def publish_run_events(
+    _n_intervals,
+    previous_batch,
+    toast_channels,
+    celebration_style,
+    run_notifications,
+):
     """Drain the run-event queue and publish one batch for the whole app.
 
-    The single consumer of ``message_queue``. Facts travel and only this
-    callback decides: it stamps each run's liveness and names at most one
-    celebrated run, and the pages read those stamps instead of re-deriving
-    them. A page callback triggered by the batch store necessarily runs after
-    this one wrote it, so there is no race to coordinate.
-    The celebration rides the same channel mechanism every other replaceable
-    toast uses: a second personal best shows a fresh instance and hides the one
-    it replaces, so the family keeps its ratified contract -- its own lane
-    beside the run verdict, the newest celebration replacing the previous one,
-    and no lifetime at all.
-    :param _n_intervals: poll tick. Its actual value is not used.
-    :param previous_batch: the batch this client last received, for its
-        animation sequence.
-    :param toast_channels: this client's toast channel instance registry.
-    :param celebration_style: this browser's celebration setting. Off stamps no
-        decision and sends no toast; the batch is published either way, because
-        the plot is every run's record whatever the setting says.
-    :return: the new batch, and the celebration emission when one is earned
+    The single consumer of ``message_queue``, and the one sender of both run
+    toasts. Facts travel and only this callback decides: it stamps each run's
+    liveness and names at most one celebrated run, and the pages read those
+    stamps instead of re-deriving them. A page callback triggered by the batch
+    store necessarily runs after this one wrote it, so there is no race to
+    coordinate.
+
+    The batch's newest live run gets the plain run toast, unless it is the
+    run the celebration announces: that run keeps the celebration as its one
+    toast. So one response can carry both toasts, about two different runs.
+    Each rides the channel mechanism every replaceable toast uses, on its own
+    channel, so a run toast lands beside a celebration and never replaces it.
+
+    ``previous_batch`` is the batch this client last received, read for its
+    animation sequence, and ``toast_channels`` is this client's channel
+    registry. The two settings are this browser's. Either one set to off
+    sends no toast of its kind and leaves the other alone, and the batch is
+    published either way, because the page is every run's record whatever
+    the settings say. Both are ``State``: changing a setting must not send a
+    toast for a batch already drained.
     """
     runs = _drain_message_queue(datetime.now(), _run_event_freshness_seconds())
     if not runs:
@@ -324,9 +394,15 @@ def publish_run_events(_n_intervals, previous_batch, toast_channels, celebration
         "celebrated_run_id": celebrated["run_id"] if celebrated else None,
         "animation_sequence": _next_animation_sequence(previous_batch, celebrated),
     }
-    if celebrated is None:
+    toasts = [] if celebrated is None else [_celebration_toast(celebrated)]
+    newest = (
+        None if run_notifications == RUN_NOTIFICATIONS_OFF else _newest_live_run(runs)
+    )
+    if newest is not None and newest["run_id"] != batch["celebrated_run_id"]:
+        toasts.append(_run_toast(newest))
+    if not toasts:
         return batch, no_update, no_update, no_update
-    return batch, *channel_toast(_celebration_toast(celebrated), toast_channels)
+    return batch, *channel_toasts(toasts, toast_channels)
 
 
 # The animation, driven entirely in the browser: the burst is a canvas effect
@@ -397,9 +473,24 @@ theme_switch_component = dmc.Tooltip(
 )
 
 
-def nav_link(label: str, href: str, icon: str) -> dmc.NavLink:
+# The navbar's entries, in order: id, label, address, icon. Kept as one list
+# because the callback that marks the open page writes to every link, so an
+# entry added here is marked with no second edit.
+NAVBAR_LINKS = (
+    ("navbar-home", "Home", "/", "bi:house-door-fill"),
+    ("navbar-run-history", "Run History", "/run-history", "fontisto:line-chart"),
+    ("navbar-playlists", "Playlists", "/playlists", "material-symbols:playlist-play"),
+    ("navbar-settings", "Settings", "/settings", "clarity:settings-line"),
+)
+
+# Read by the callback that marks the open page, and written by nothing.
+NAVBAR_LOCATION_ID = "navbar-location"
+
+
+def nav_link(link_id: str, label: str, href: str, icon: str) -> dmc.NavLink:
     """Build a single-anchor Dash-native navbar link."""
     return dmc.NavLink(
+        id=link_id,
         label=label,
         leftSection=dmc.ThemeIcon(
             # Both sizes, so a file that is wider than tall is scaled to fit
@@ -423,10 +514,11 @@ def layout(**kwargs):  # noqa: ARG001
             dmc.AppShell(
                 children=[
                     dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
+                    dcc.Location(id=NAVBAR_LOCATION_ID, refresh=False),
                     # Beside the container on purpose: a toast outlives the
                     # page that emitted it, so the registry that knows which
                     # instance to replace has to outlive it too. The shell's
-                    # own celebration channel is written from here as well.
+                    # own two channels are written from here as well.
                     dcc.Store(id=TOAST_CHANNEL_REGISTRY_STORE_ID, data={}),
                     # The app-wide run-event channel. The drain and its batch
                     # live here rather than on Run History so a run reaches
@@ -444,6 +536,13 @@ def layout(**kwargs):  # noqa: ARG001
                         data=DEFAULT_CELEBRATION_STYLE,
                     ),
                     dcc.Store(id=PB_CELEBRATION_SIGNAL_STORE_ID),
+                    # The Run notifications setting, browser-local for the
+                    # reason the celebration setting is.
+                    dcc.Store(
+                        id=RUN_NOTIFICATIONS_STORE_ID,
+                        storage_type="local",
+                        data=RUN_NOTIFICATIONS_ON,
+                    ),
                     dcc.Interval(
                         id=PB_CELEBRATION_INTERVAL_ID,
                         interval=_drain_interval_ms(),
@@ -506,24 +605,7 @@ def layout(**kwargs):  # noqa: ARG001
                     ),
                     dmc.AppShellNavbar(
                         id="navbar",
-                        children=[
-                            nav_link("Home", "/", "bi:house-door-fill"),
-                            nav_link(
-                                "Run History",
-                                "/run-history",
-                                "fontisto:line-chart",
-                            ),
-                            nav_link(
-                                "Playlists",
-                                "/playlists",
-                                "material-symbols:playlist-play",
-                            ),
-                            nav_link(
-                                "Settings",
-                                "/settings",
-                                "clarity:settings-line",
-                            ),
-                        ],
+                        children=[nav_link(*entry) for entry in NAVBAR_LINKS],
                         p="md",
                     ),
                     dmc.AppShellMain(dash.page_container),
@@ -561,4 +643,32 @@ clientside_callback(
     Output("appshell", "navbar"),
     Input("burger", "opened"),
     State("appshell", "navbar"),
+)
+
+
+# Marks the open page. ``aria-current`` is the whole mechanism: a screen
+# reader announces it, and the bundled Mantine stylesheet draws a link that
+# carries it exactly as it draws an active one. The component's own ``active``
+# matching looks like the simpler way and is left unset on purpose: it draws
+# the same mark but never sets the attribute, so a second matcher would be
+# needed for the attribute, and the two could disagree where nobody looking
+# at the screen would see it. A link is marked when the address is its own or
+# lies under it, which keeps Playlists marked on a playlist's scenario table.
+# The addresses come from the links themselves, so none is written twice.
+clientside_callback(
+    """
+    (pathname, ...hrefs) => {
+        // The router serves a page with or without a trailing slash.
+        const path =
+            pathname.length > 1 && pathname.endsWith("/")
+                ? pathname.slice(0, -1)
+                : pathname;
+        return hrefs.map((href) =>
+            path === href || path.startsWith(href + "/") ? "page" : null
+        );
+    }
+    """,
+    [Output(link_id, "aria-current") for link_id, *_ in NAVBAR_LINKS],
+    Input(NAVBAR_LOCATION_ID, "pathname"),
+    [State(link_id, "href") for link_id, *_ in NAVBAR_LINKS],
 )

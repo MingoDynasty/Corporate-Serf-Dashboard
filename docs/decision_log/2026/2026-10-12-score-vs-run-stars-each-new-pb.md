@@ -50,19 +50,21 @@ run:
 
 - **Only the range can leave a new PB off the chart.** Top N and the oldest
   date used to as well. Such a run still counts in the comparison.
-- **A tie is never plotted without the new PB it tied.** Under Top N the
-  day's filter could drop a new PB and keep a later run with the same score,
-  and that entry ruled the kept tie gets no star. No run is left out now, so
-  the case can't arise.
+- **A tie plotted without the new PB it tied still gets no star.** Under
+  Top N the day's filter could drop a new PB and keep a later run with the
+  same score, and that entry ruled the kept tie gets no star. Top N is gone,
+  and with it that way of losing the PB. A range can still leave the PB off
+  the chart and keep a later run that tied it, so the rule stands: a star
+  belongs to its run.
 - **The hover order at a shared position narrows from a same-day tie to a
   same-second one.** In Score vs Time only runs that ended in the same
   second with the same score share a position, and a new PB is still
   ordered last among them. Score vs Run gives every run its own position.
   Score vs Sensitivity still shares positions and has no stars.
 
-What stands: what a new PB is, no stars on Score vs Sensitivity, a new PB
-ordered last among points at one position, the look, Point size, and no
-control.
+What stands: what a new PB is, no star for a run that only tied one, no
+stars on Score vs Sensitivity, a new PB ordered last among points at one
+position, the look, Point size, and no control.
 
 **New PBs are judged in play order.** The rule's function is unchanged. The
 chart hands it the scenario's runs in the order sessions are split in, so

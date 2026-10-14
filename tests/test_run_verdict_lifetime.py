@@ -1,8 +1,8 @@
-"""Regression tests for D5's normative run-verdict replace behaviors.
+"""Regression tests for the run toast's replace-in-place behaviors.
 
 The contract these pin is about *elapsed time*, not payload contents: at most
-one run-verdict toast is on screen once a response has been applied, a later
-verdict replaces it, and the replacement gets a full lifetime rather than the
+one run toast is on screen once a response has been applied, a later run's
+toast replaces it, and the replacement gets a full lifetime rather than the
 remainder of the old timer.
 
 ``FakeNotificationContainer`` is a Python model of the DMC 2.8.0 notification
@@ -29,29 +29,29 @@ clock. Four behaviors are modelled, and all four were read out of
 If a DMC upgrade changes any of those, this model goes stale -- re-read the
 bundle before trusting a green run here.
 
-The verdicts are sent by the Run History page's chart callback, which is what
+The run toast is sent by the app shell's drain, on every page, which is what
 each test drives.
 """
 
-from types import SimpleNamespace
+from collections import deque
+from datetime import datetime
+from urllib.parse import parse_qs, urlsplit
 
 import dash
-import plotly.graph_objects as go
 import pytest
+from dash import dcc
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source import app_shell  # noqa: E402
-from source.components import (  # noqa: E402
-    run_verdict_toast,
-    scenario_selection,
-)
+from source.components import scenario_selection  # noqa: E402
+from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import run_history  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_CHANNEL,
     DEFAULT_AUTO_CLOSE_MS,
+    RUN_VERDICT_CHANNEL,
     TOAST_CHANNEL_REGISTRY_STORE_ID,
-    channel_toast,
 )
 
 # What dmc.NotificationContainer resolves autoClose to when a payload omits it.
@@ -133,36 +133,31 @@ def apply_registry_patch(registry: dict, patch) -> None:
         registry[key] = operation["params"]["value"]
 
 
-@pytest.fixture
-def plotting(monkeypatch):
-    """Stub out everything generate_graph needs that is not the toast."""
-    monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _scenario: True)
-    monkeypatch.setattr(
-        run_history, "build_run_history_figure", lambda *_a: (go.Figure(), True)
-    )
-    monkeypatch.setattr(run_history, "get_high_score", lambda _scenario: 830.0)
-    monkeypatch.setattr(
-        run_history,
-        "ctx",
-        SimpleNamespace(
-            triggered=[{"prop_id": f"{run_history.RUN_EVENTS_STORE_ID}.data"}]
-        ),
+@pytest.fixture(autouse=True)
+def run_queue(monkeypatch):
+    """Give each test a queue of its own for the drain to empty."""
+    monkeypatch.setattr(app_shell, "message_queue", deque())
+
+
+def _message(run_id: str, score: float) -> NewFileMessage:
+    """One run as the watchdog queues it, against a previous best of 800."""
+    return NewFileMessage(
+        datetime_created=datetime.now(),
+        is_new_sensitivity=False,
+        run_id=run_id,
+        scenario_name="Scenario A",
+        scenario_previous_best=800.0,
+        score=score,
+        sensitivity="34.64 cm/360",
+        pace_constant=None,
     )
 
 
-def _run_event(score: float) -> dict:
-    """One run as the shell's drain stamps it."""
-    return {
-        "run_id": f"run-{score}.csv",
-        "scenario_name": "Scenario A",
-        "sensitivity": "34.64 cm/360",
-        "nth_score": 2,
-        "score": score,
-        "scenario_previous_best": 800.0,
-        "pace_constant": None,
-        "is_new_sensitivity": False,
-        "is_live": True,
-    }
+def _named_run(run_toast: dict) -> str:
+    """The id of the run a run toast is about, read from its link."""
+    (link,) = [part for part in run_toast["message"] if isinstance(part, dcc.Link)]
+    (run_id,) = parse_qs(urlsplit(link.href).query)["run"]
+    return run_id
 
 
 class _Client:
@@ -175,31 +170,22 @@ class _Client:
         self.last_hidden: list[str] = []
 
     @property
-    def verdict_instance(self) -> str | None:
-        """The instance id the registry says this browser's verdict is under."""
-        return self.toast_channels.get(run_verdict_toast.RUN_VERDICT_CHANNEL)
+    def run_toast_instance(self) -> str | None:
+        """The instance id the registry says this browser's run toast is under."""
+        return self.toast_channels.get(RUN_VERDICT_CHANNEL)
 
-    def play(self, *, score: float) -> None:
-        payload = {
-            "latest": _run_event(score),
-            "celebrated_run_id": None,
-        }
-        _plot, notifications, hidden, registry_patch = run_history.generate_graph(
-            payload,
-            "Scenario A",
+    def play(self, *runs: tuple[str, float]) -> None:
+        """Land a batch of runs and apply the drain's answer as a browser does.
+
+        Each run is its id and its score. A score above 800 sets a new PB.
+        """
+        app_shell.message_queue.extend(_message(*run) for run in runs)
+        _batch, notifications, hidden, registry_patch = app_shell.publish_run_events(
+            1,
             None,
-            "score_vs_run",
-            "100",
-            "90",
-            "2026-07-06",
-            False,
-            False,
-            False,
-            False,
-            "",
-            True,
-            True,
             self.toast_channels,
+            app_shell.CELEBRATION_STYLE_CONFETTI,
+            app_shell.RUN_NOTIFICATIONS_ON,
         )
         self.last_shown = notifications
         self.last_hidden = hidden
@@ -208,45 +194,49 @@ class _Client:
         apply_registry_patch(self.toast_channels, registry_patch)
 
 
-def test_a_second_run_replaces_the_visible_toast_with_a_full_lifetime(plotting):
+def test_a_second_run_replaces_the_visible_toast_with_a_full_lifetime():
     client = _Client()
-    client.play(score=812.4)
+    client.play(("first.csv", 780.0))
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
 
-    client.play(score=901.7)
+    client.play(("second.csv", 790.0))
 
     visible = client.container.visible
     assert len(visible) == 1
-    assert "901.70" in visible[0]["message"]
+    assert _named_run(visible[0]) == "second.csv"
     # The point of the test: 500 ms short of expiry, the replacement starts its
     # own timer rather than flashing for what was left of the old one.
     assert (
-        client.container.remaining_lifetime(client.verdict_instance)
+        client.container.remaining_lifetime(client.run_toast_instance)
         >= DEFAULT_AUTO_CLOSE_MS
     )
 
 
-def test_each_verdict_shows_a_fresh_instance_and_hides_the_one_it_replaces(plotting):
-    """The mechanism itself: show a new id, hide the registered old one."""
+def test_each_run_toast_shows_a_fresh_instance_and_hides_the_one_it_replaces():
+    """The mechanism itself: show a new id, hide the registered old one.
+
+    A fresh id is also what makes the replacement play its entry animation, so
+    a second run is seen to arrive although the two toasts may read the same.
+    """
     client = _Client()
 
-    client.play(score=812.4)
-    first_instance = client.verdict_instance
+    client.play(("first.csv", 780.0))
+    first_instance = client.run_toast_instance
 
     assert [payload["id"] for payload in client.last_shown] == [first_instance]
-    assert first_instance.startswith(f"{run_verdict_toast.RUN_VERDICT_CHANNEL}-")
+    assert first_instance.startswith(f"{RUN_VERDICT_CHANNEL}-")
     # Nothing to replace on the first emission, so nothing is hidden.
     assert client.last_hidden == []
 
-    client.play(score=901.7)
-    second_instance = client.verdict_instance
+    client.play(("second.csv", 790.0))
+    second_instance = client.run_toast_instance
 
     assert second_instance != first_instance
     assert [payload["id"] for payload in client.last_shown] == [second_instance]
     assert client.last_hidden == [first_instance]
 
 
-def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plotting):
+def test_the_celebration_toast_sits_beside_a_run_toast_and_outlives_it():
     """The one deliberate exception to replaces-rather-than-stacks.
 
     The celebration is its own family with its own id and no lifetime, so an
@@ -254,21 +244,15 @@ def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plottin
     schedule, and leaves the celebration up until the user dismisses it.
     """
     client = _Client()
-    celebrated = _run_event(901.7)
-    celebrated["nth_score"] = 1
-    send, hide, patch = channel_toast(
-        app_shell._celebration_toast(celebrated), client.toast_channels
-    )
-    client.container.send(send)
-    client.container.hide(hide)
-    apply_registry_patch(client.toast_channels, patch)
+    client.play(("pb.csv", 901.7))
     celebration_instance = client.toast_channels[CELEBRATION_CHANNEL]
+    assert [entry["id"] for entry in client.container.visible] == [celebration_instance]
 
-    client.play(score=812.4)
+    client.play(("ordinary.csv", 780.0))
 
     assert {entry["id"] for entry in client.container.visible} == {
         celebration_instance,
-        client.verdict_instance,
+        client.run_toast_instance,
     }
 
     client.container.advance(DEFAULT_AUTO_CLOSE_MS + 1)
@@ -276,45 +260,60 @@ def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plottin
     assert [entry["id"] for entry in client.container.visible] == [celebration_instance]
 
 
-def test_a_verdict_after_navigating_away_and_back_gets_a_full_lifetime(
-    plotting, monkeypatch
-):
+def test_a_batch_that_sends_both_toasts_replaces_each_on_its_own_channel():
+    """Two toasts in one response, twice: two on screen, never four."""
+    client = _Client()
+    client.play(("pb-1.csv", 901.7), ("ordinary-1.csv", 780.0))
+    first = dict(client.toast_channels)
+    assert len(client.container.visible) == 2
+
+    client.play(("pb-2.csv", 950.0), ("ordinary-2.csv", 780.0))
+
+    assert {entry["id"] for entry in client.container.visible} == {
+        client.toast_channels[CELEBRATION_CHANNEL],
+        client.run_toast_instance,
+    }
+    assert sorted(client.last_hidden) == sorted(first.values())
+    assert client.toast_channels.keys() == {CELEBRATION_CHANNEL, RUN_VERDICT_CHANNEL}
+
+
+def test_a_run_toast_after_navigating_away_and_back_gets_a_full_lifetime(monkeypatch):
     monkeypatch.setattr(
         scenario_selection, "get_visible_playlist_selector_options", lambda: []
     )
     monkeypatch.setattr(scenario_selection, "get_scenario_names", lambda: [])
     client = _Client()
-    client.play(score=812.4)
+    client.play(("first.csv", 780.0))
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
 
-    # Navigate away and back: the page's layout is rebuilt from scratch, so
+    # Navigate away and back: a page's layout is rebuilt from scratch, so
     # every store it declares resets to its default. The container and the
-    # registry sit outside that layout, so the toast is still up and the
-    # registry still knows which instance it is showing.
+    # registry sit outside every page's layout, so the toast is still up and
+    # the registry still knows which instance it is showing.
     assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(run_history.layout())
     assert len(client.container.visible) == 1
 
-    client.play(score=901.7)
+    client.play(("second.csv", 790.0))
 
     assert len(client.container.visible) == 1
     assert (
-        client.container.remaining_lifetime(client.verdict_instance)
+        client.container.remaining_lifetime(client.run_toast_instance)
         >= DEFAULT_AUTO_CLOSE_MS
     )
 
 
-def test_a_page_scoped_registry_would_leave_two_verdicts_on_screen(plotting):
+def test_a_page_scoped_registry_would_leave_two_run_toasts_on_screen():
     # Why the store belongs in the shell: a page-layout store resets to its
     # default on remount, so the post-navigation emission would have no instance
     # id to hide and its fresh id would stack beside the toast already on
     # screen. This is the failure the test above is guarding against, asserted
     # directly.
     client = _Client()
-    client.play(score=812.4)
+    client.play(("first.csv", 780.0))
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
 
     client.toast_channels = {}  # what a remounted page-layout store would say
-    client.play(score=901.7)
+    client.play(("second.csv", 790.0))
 
     assert len(client.container.visible) == 2
 
@@ -344,15 +343,15 @@ def _component_ids(component) -> set[str]:
     return found
 
 
-def test_run_verdict_emissions_carry_the_one_nominal_lifetime(plotting):
+def test_run_toast_emissions_carry_the_one_nominal_lifetime():
     """No more duration alternation: a fresh id is what re-arms the timer."""
     client = _Client()
     durations = []
     instances = []
-    for score in (812.4, 901.7, 933.0):
-        client.play(score=score)
+    for run_id in ("first.csv", "second.csv", "third.csv"):
+        client.play((run_id, 780.0))
         durations.append(client.container.visible[0]["autoClose"])
-        instances.append(client.verdict_instance)
+        instances.append(client.run_toast_instance)
 
     assert durations == [DEFAULT_AUTO_CLOSE_MS] * 3
     assert len(set(instances)) == 3

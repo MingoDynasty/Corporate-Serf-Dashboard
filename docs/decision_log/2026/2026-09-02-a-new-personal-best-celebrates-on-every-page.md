@@ -163,6 +163,15 @@ calls Run Notifications is labelled "Run notifications", and the celebration
 description names it in bold: "…and doesn't depend on **Run notifications**."
 The decision is unchanged. See [App Copy Follows One Set Of Rules, And The Em Dash Is Gated Out](2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md).
 
+**Superseded in part (2026-10-13).** "Run toasts remain page-built and
+page-scoped" no longer holds, and the question that sentence deferred,
+app-wide run toasts, is answered: the app shell's drain builds the run toast,
+on every page, with no verdict. The page's part in the coalescing rule is gone
+with it: the shell picks the batch's newest live run, whatever its scenario.
+The celebration stands in full, as do one notification per run at most and the
+two settings staying independent. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md).
+
 Shipped in PRs #261 and #268; proposal and rulings in #248, toast mechanism
 reconciled in #263. Distilled from the personal best celebration proposal, now
 deleted.

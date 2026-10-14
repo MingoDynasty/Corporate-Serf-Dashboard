@@ -1,10 +1,9 @@
 """Mark a scenario's past runs: which passed the score threshold, which were new PBs.
 
-The run toast judges a run when it lands, from three facts the watchdog works
-out at that moment: the PB the run was chasing, whether the run was the first
-at its sensitivity, and the constant the two can be compared by pace with. A
-past run has no message to carry them, so they are worked out here from the
-run store, and the run is then judged by the function the toast judges with.
+A run is judged from three facts: the PB it was chasing, whether it was the
+first at its sensitivity, and the constant the two can be compared by pace
+with. No run carries them, so they are worked out here from the run store,
+and the run is then judged by ``judge_run``.
 
 Nothing here is stored. A mark is worked out again each time something asks,
 from the runs, the percentage, and what the performance files say now.
@@ -75,8 +74,9 @@ def what_runs_chased(
     run that missed by pace would be judged by score and pass, with no change
     to the run, to the PB it was chasing, or to the percentage.
 
-    On a tied score the earliest run holds the PB, as it does for the run
-    toast, so that run's version is the one a later run is compared under.
+    On a tied score the earliest run holds the PB, as it does in the message
+    a new run arrives in, so that run's version is the one a later run is
+    compared under.
     """
     chased: dict[RunData, Chased] = {}
     bases: dict[str | None, PaceBasis | None] = {}

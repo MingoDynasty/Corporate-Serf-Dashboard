@@ -104,6 +104,9 @@ and neither was taken.
   active. Found while the page was made public. Marking the open page is
   left to a later change, on the maintainer's word of 2026-10-13: "let's
   keep the idea for a future PR."
+  **Superseded (2026-10-13).** That change is made: the navbar marks the
+  open page
+  ([2026-10-13](2026-10-13-the-navbar-marks-the-open-page.md)).
   Home keeps the house icon and Run History has one of its own.
 - **The header title still leads to `/`,** which is now Home. The navbar's
   Run History link leads to the page with no parameters.
@@ -211,7 +214,7 @@ run on the built list and what it said was recorded
 ([the list's entry](2026-10-12-the-run-list-is-built-on-ag-grid-community-and-nvda-is-run-on-the-built-list.md)).
 
 **What the page carries until the Run toasts change lands.** The
-[Run toasts proposal](../../proposals/run_toasts_proposal.md) is ratified and
+[Run toasts proposal](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/blob/2c5c072d0670c7c6d4873eb9e77f676dca1f6d43/docs/proposals/run_toasts_proposal.md) is ratified and
 was not built when the page went public. Nothing here waited on it. Until it
 lands:
 
@@ -222,6 +225,15 @@ lands:
 - Chart options keeps its four groups and both notification switches,
   **Score threshold verdict** and **Run notifications**. After that change
   the panel has three groups and no notification control.
+
+**Superseded in part (2026-10-13).** The Run toasts change has landed, and the
+page carries none of those three any more. The app shell's drain builds a
+plain run toast on every page, nothing places a run, and Chart options has
+three groups and no notification control. See
+[A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md),
+[Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md),
+and
+[Run Notifications Is A Browser-Local Setting, On The Settings Page](2026-10-13-run-notifications-is-a-browser-local-setting-on-the-settings-page.md).
 
 Proposed in
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356),
