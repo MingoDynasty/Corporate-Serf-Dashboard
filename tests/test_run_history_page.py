@@ -228,8 +228,6 @@ def test_the_ids_are_the_ones_browsers_store_values_under():
         options.point_color,
         options.score_threshold_overlay,
         options.score_threshold_percentage,
-        options.score_threshold_notification,
-        options.run_notification,
     ) == (
         "run-history-rank-overlay-switch",
         "run-history-show-all-ranks-switch",
@@ -238,8 +236,6 @@ def test_the_ids_are_the_ones_browsers_store_values_under():
         "run-history-point-color",
         "run-history-score-threshold-overlay-switch",
         "run-history-score-threshold-percentage",
-        "run-history-score-threshold-notification-switch",
-        "run-history-run-notification-switch",
     )
 
 
@@ -314,7 +310,7 @@ def test_section_titles_keep_visual_size_with_accessible_heading_order():
     assert titles["Scenario Stats"].order == 2
     assert titles["Scenario Stats"].size == "h6"
     # The panel's groups sit under the page's h2 sections.
-    for group in ("Overlays", "Run Data Points", "Score Threshold", "Notifications"):
+    for group in ("Overlays", "Run Data Points", "Score Threshold"):
         assert titles[group].order == 3
         assert titles[group].size == "h6"
 
@@ -423,7 +419,7 @@ def test_a_remembered_controls_layout_default_never_varies(query):
         run_history.RUN_RANGE_ID: ("value", "100"),
         run_history.DAY_RANGE_ID: ("value", "90"),
         run_history.CHART_OPTIONS_IDS.score_threshold_percentage: ("value", 95),
-        run_history.CHART_OPTIONS_IDS.run_notification: ("checked", True),
+        run_history.CHART_OPTIONS_IDS.score_threshold_overlay: ("checked", True),
     }
     for component_id, (prop, default) in defaults.items():
         component = _by_id(page, component_id)
@@ -531,8 +527,6 @@ def test_each_help_text_has_one_wording():
         "high-score-overlay",
         "score-threshold-overlay",
         "score-threshold-percentage",
-        "score-threshold-notification",
-        "run-notification",
     }
     assert rendered_text(help_text["automatically-change-scenario"]).endswith(
         "If the **Playlist filter** doesn't list that scenario, the filter is cleared."

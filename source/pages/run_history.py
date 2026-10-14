@@ -169,8 +169,6 @@ CHART_OPTIONS_IDS = ChartOptionsIds(
     point_color_default="run-history-point-color-default",
     score_threshold_overlay="run-history-score-threshold-overlay-switch",
     score_threshold_percentage="run-history-score-threshold-percentage",
-    score_threshold_notification="run-history-score-threshold-notification-switch",
-    run_notification="run-history-run-notification-switch",
     graph="run-history-graph",
     cached_plot="run-history-cached-plot",
 )

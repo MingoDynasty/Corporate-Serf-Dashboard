@@ -61,16 +61,6 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         "overlay line tracks your current personal best. A run is judged "
         "against the personal best you had before the run."
     ),
-    "score-threshold-notification": [
-        "Adds a pass or fail verdict to run notifications when the run can be "
-        "judged against the score threshold. Needs ",
-        control_name("Run notifications"),
-        " turned on.",
-    ],
-    "run-notification": (
-        "Controls threshold verdict and placement notifications for your runs. "
-        "Personal best celebrations use their own setting."
-    ),
 }
 # The chart options inspector. Its collapsed class is the open state: hiding
 # with ``display: none`` takes the controls out of the tab order and the
@@ -136,8 +126,6 @@ class ChartOptionsIds(NamedTuple):
     point_color_default: str
     score_threshold_overlay: str
     score_threshold_percentage: str
-    score_threshold_notification: str
-    run_notification: str
     graph: str
     cached_plot: str
 
@@ -428,34 +416,6 @@ def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
                         # this value, and typing 90 over 95 passes through 9,
                         # so every mark would flicker through it.
                         debounce=True,
-                    ),
-                    # Stays in this group, beside the percentage it judges
-                    # against, even though the master switch it depends on
-                    # lives in Notifications.
-                    dmc.Switch(
-                        id=ids.score_threshold_notification,
-                        labelPosition="right",
-                        label=settings_help_label(
-                            "Score threshold verdict",
-                            SETTINGS_HELP_TEXT["score-threshold-notification"],
-                        ),
-                        checked=True,
-                        persistence=True,
-                    ),
-                ],
-            ),
-            _chart_options_group(
-                "Notifications",
-                [
-                    dmc.Switch(
-                        id=ids.run_notification,
-                        labelPosition="right",
-                        label=settings_help_label(
-                            "Run notifications",
-                            SETTINGS_HELP_TEXT["run-notification"],
-                        ),
-                        checked=True,
-                        persistence=True,
                     ),
                 ],
             ),

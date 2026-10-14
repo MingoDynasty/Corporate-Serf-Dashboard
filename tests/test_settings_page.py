@@ -1169,3 +1169,128 @@ def _titles(root):
         else:
             components.append(children)
     return found
+
+
+# --- the Notifications section -----------------------------------------
+
+
+def test_the_notifications_section_sits_directly_above_celebrations():
+    """One switch under its own heading, with the ratified description."""
+    layout = settings_page.layout()
+    switch = _component_by_id(layout, settings_page.RUN_NOTIFICATIONS_SWITCH_ID)
+    # Each section is a stack that opens with its heading, and a divider
+    # stands between two sections.
+    sections = [
+        section.children[0].children
+        if type(section).__name__ == "Stack"
+        and type(section.children[0]).__name__ == "Title"
+        else type(section).__name__
+        for section in layout.children
+    ]
+    notifications = sections.index("Notifications")
+
+    assert sections[notifications - 1 : notifications + 4] == [
+        "Divider",
+        "Notifications",
+        "Divider",
+        "Celebrations",
+        "Divider",
+    ]
+    # Below the Save form's restart notice, so outside the form.
+    assert sections[notifications - 2] == "Paper"
+    assert type(switch).__name__ == "Switch"
+    assert switch.label == "Run notifications"
+    assert switch.description == (
+        "Shows a notification on every page when a new run is detected. Personal "
+        "best celebrations use their own setting. Takes effect right away."
+    )
+
+
+def test_the_switch_writes_on_or_off_to_the_store():
+    assert settings_page.set_run_notifications(False, 1) == "off"
+    assert settings_page.set_run_notifications(True, 1) == "on"
+    # Only a switch that is off writes off. The store fails towards the toast.
+    assert settings_page.set_run_notifications(None, 1) == "on"
+
+
+def test_mounting_the_page_never_writes_the_switch_default_over_the_store():
+    """Opening Settings must not turn run notifications back on.
+
+    Mounting the page fires this callback with the switch's layout default
+    despite ``prevent_initial_call``, and the triggering id is the switch
+    itself, so the initializing tick is what tells the two apart: before it,
+    the switch is still showing a default nobody chose.
+    """
+    for checked in (True, False):
+        assert settings_page.set_run_notifications(checked, 0) is no_update
+        assert settings_page.set_run_notifications(checked, None) is no_update
+
+
+def test_the_switch_shows_a_stored_off():
+    assert settings_page.show_stored_run_notifications(1, "off") is False
+
+
+@pytest.mark.parametrize("stored", ["on", None, "", "quiet", True])
+def test_any_other_stored_value_leaves_the_switch_on_and_writes_nothing_back(stored):
+    """Leaving the switch alone is what keeps the stored value as it was.
+
+    A value that never changes cannot travel back through the write callback,
+    so a value a later build wrote survives a visit to this page.
+    """
+    assert settings_page.show_stored_run_notifications(1, stored) is no_update
+    assert (
+        _component_by_id(
+            settings_page.layout(), settings_page.RUN_NOTIFICATIONS_SWITCH_ID
+        ).checked
+        is True
+    )
+
+
+def test_the_switch_carries_no_persistence_of_its_own():
+    """The store is the setting; the switch is a view of it."""
+    switch = _component_by_id(
+        settings_page.layout(), settings_page.RUN_NOTIFICATIONS_SWITCH_ID
+    )
+
+    assert not hasattr(switch, "persistence")
+
+
+def test_the_switch_and_its_store_are_wired_through_the_tick_and_never_to_each_other():
+    """Store to switch and switch to store as inputs would be a cycle.
+
+    The renderer refuses one in the browser, not on the server, so the shape
+    is held here: the tick fills the switch with the store as ``State``, and
+    the same tick's count gates the write.
+    """
+    write = _callback_spec("run-notifications.data")
+    fill = _callback_spec(f"{settings_page.RUN_NOTIFICATIONS_SWITCH_ID}.checked")
+    tick = (settings_page.CELEBRATION_INIT_INTERVAL_ID, "n_intervals")
+
+    assert [(dep["id"], dep["property"]) for dep in write["inputs"]] == [
+        (settings_page.RUN_NOTIFICATIONS_SWITCH_ID, "checked")
+    ]
+    assert [(dep["id"], dep["property"]) for dep in write["state"]] == [tick]
+    assert [(dep["id"], dep["property"]) for dep in fill["inputs"]] == [tick]
+    assert [(dep["id"], dep["property"]) for dep in fill["state"]] == [
+        ("run-notifications", "data")
+    ]
+    # The page's one tick, which the celebration select is filled on too.
+    interval = _component_by_id(
+        settings_page.layout(), settings_page.CELEBRATION_INIT_INTERVAL_ID
+    )
+    assert (interval.interval, interval.max_intervals) == (1, 1)
+
+
+def test_the_notifications_section_stands_outside_the_save_form():
+    """It applies the moment it is flipped, and Save owns none of it."""
+    saved = _callback_output("app-settings-save-status.children")
+    notification_ids = (
+        settings_page.RUN_NOTIFICATIONS_SWITCH_ID,
+        "run-notifications",
+    )
+
+    for component_id in notification_ids:
+        assert component_id not in saved
+    for component_id in notification_ids:
+        written = _callback_output(f"{component_id}.")
+        assert not any(form_id in written for form_id in FORM_OUTPUT_IDS)
