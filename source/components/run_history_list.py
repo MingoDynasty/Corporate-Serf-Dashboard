@@ -27,11 +27,22 @@ from typing import Any, NamedTuple, TypedDict
 
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash import Input, Output, State, clientside_callback, dcc, html
+from dash import (
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    dcc,
+    html,
+    no_update,
+)
 
 from source.components.columns_menu import (
     COLUMNS_MENU_GRID_OPTIONS,
+    MenuChoice,
     MenuColumn,
+    choice_checkbox_id,
     columns_menu,
     columns_menu_sink,
     register_columns_menu,
@@ -217,6 +228,11 @@ def _figures(runs: Iterable[RunData]) -> str | None:
     )
 
 
+# A run row's id is this and the run's id. The script finds the row of a
+# view's mark by it.
+RUN_ROW_ID_PREFIX = "r:"
+
+
 def _run_row(
     run: RunData,
     number: int,
@@ -225,7 +241,7 @@ def _run_row(
     newest_run: str,
 ) -> dict:
     return {
-        "id": f"r:{run_id(run)}",
+        "id": f"{RUN_ROW_ID_PREFIX}{run_id(run)}",
         "kind": RUN_ROW,
         "sid": session_id,
         # The last run played, on any scenario: the row the list highlights.
@@ -651,10 +667,17 @@ def is_session_in_progress(now: datetime) -> bool:
 
 EXPAND_ALL_LABEL = "Expand all"
 COLLAPSE_ALL_LABEL = "Collapse all"
+SHOW_ALL_RUNS_LABEL = "Show all runs"
+HIDE_ALL_RUNS_LABEL = "Hide all runs"
 MARKS_HEADER = "Marks"
+LIST_VIEW_LABEL = "Run list view"
+# A session row's count under This scenario is a button that jumps to the
+# session under All scenarios. Its text is its name, and this its hover.
+WHOLE_SESSION_HELP = "Show the whole session"
 # What a screen reader is told that a sighted reader sees drawn: the name of
-# a session row's button, and what a key pressed on the row just did to it.
+# a group row's button, and what a key pressed on the row just did to it.
 SESSION_TOGGLE_LABEL = "Session"
+SCENARIO_TOGGLE_LABEL = "Scenario"
 EXPANDED_ANNOUNCEMENT = "Expanded"
 COLLAPSED_ANNOUNCEMENT = "Collapsed"
 
@@ -662,8 +685,13 @@ RUN_LIST_CLASS = "run-history-list"
 # The list with nothing to list: its text shows in place of its header and
 # its grid.
 RUN_LIST_NOTHING_CLASS = f"{RUN_LIST_CLASS} run-history-list-nothing"
+# The list with runs and no scenario selected, under This scenario: the text
+# shows in place of the grid, and the switch stays above it. The tree needs
+# no selection, and without the switch a player could not reach it.
+RUN_LIST_UNSELECTED_CLASS = f"{RUN_LIST_CLASS} run-history-list-unselected"
 RUN_LIST_GRID_CLASS = "run-history-list-grid"
 LATEST_ROW_CLASS = "run-list-row-latest"
+SELECTED_ROW_CLASS = "run-list-row-selected"
 
 # The two columns the Columns menu shows or hides. Both are shown to start,
 # and the browser remembers each choice under the checkbox's id.
@@ -671,6 +699,10 @@ RUN_LIST_MENU_COLUMNS = (
     MenuColumn("shots", "Shots Fired"),
     MenuColumn("sens", "Sensitivity"),
 )
+# The choice that is not a column: the second line of a row that stands for
+# one scenario's runs. Off to start, so the list looks as it did until
+# someone asks for more. The browser remembers it under its id.
+MEDIAN_AND_BEST_CHOICE = MenuChoice("median_best", "Median and best")
 
 
 class RunListIds(NamedTuple):
@@ -680,14 +712,23 @@ class RunListIds(NamedTuple):
     each of its checkboxes. The browser stores a checkbox's choice under its
     id, so changing it resets that choice for every user.
 
-    ``session_limit`` is the store holding how many sessions to load. The
-    list's script adds to it when older sessions are asked for, and the page
-    takes it as an input of the callback that builds the rows. ``model`` is
-    the store that callback writes the rows to.
+    ``view`` is the switch between the two views, which the browser
+    remembers under its id. ``session_limit`` and ``all_session_limit`` are
+    the stores holding how many sessions This scenario and All scenarios
+    load. The list's script adds to the view's own when older sessions are
+    asked for, and the page takes both as inputs of the callback that builds
+    the rows. ``model`` is the store that callback writes the rows to.
+
+    ``jump`` and ``scenario_asked`` are stores the script writes and the
+    server reads. ``jump`` names how far back a session asked for from its
+    count is, and ``scenario_asked`` the scenario whose name was pressed in
+    the tree. Each is always in the layout, because a page has to hold every
+    input of a callback whose output it holds.
     """
 
     panel: str
     heading: str
+    view: str
     expand_all: str
     columns_menu: str
     grid: str
@@ -695,8 +736,12 @@ class RunListIds(NamedTuple):
     announcer: str
     model: str
     session_limit: str
+    all_session_limit: str
+    jump: str
+    scenario_asked: str
     apply_sink: str
     expand_all_sink: str
+    figures_sink: str
 
 
 def _fixed_width(width: int) -> dict[str, int]:
@@ -759,16 +804,33 @@ def run_list_stores(ids: RunListIds) -> list[dcc.Store]:
     """Build the stores the list's callbacks read and write."""
     return [
         dcc.Store(id=ids.model),
-        # Not remembered: every visit starts from the first load.
+        # Not remembered: every visit starts each view from the first load.
         dcc.Store(id=ids.session_limit, data=SESSIONS_PER_LOAD),
+        dcc.Store(id=ids.all_session_limit, data=SESSIONS_PER_LOAD),
+        # Empty until the script asks: no input is ever missing.
+        dcc.Store(id=ids.jump),
+        dcc.Store(id=ids.scenario_asked),
         dcc.Store(id=ids.apply_sink),
         dcc.Store(id=ids.expand_all_sink),
+        dcc.Store(id=ids.figures_sink),
         columns_menu_sink(ids.columns_menu),
     ]
 
 
+def run_list_class(model: RunListModel) -> str:
+    """Name the list's class for a model: rows, nothing to list, or no scenario."""
+    if model["empty"] is None:
+        return RUN_LIST_CLASS
+    if model["empty"] == NO_SCENARIO_TEXT:
+        return RUN_LIST_UNSELECTED_CLASS
+    return RUN_LIST_NOTHING_CLASS
+
+
 def run_list_panel(ids: RunListIds) -> dmc.Box:
-    """Build the list: its heading line, the grid, and the text for nothing to list.
+    """Build the list: its header, the grid, and the text for nothing to list.
+
+    The header is the heading line, and under it the switch between the two
+    views at the left, with Expand all and the Columns menu at the right.
 
     The grid is given no rows. The page's callback writes them to
     ``ids.model``, and the script registered by ``register_run_list`` hands
@@ -788,8 +850,32 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                         fw=600,
                         truncate="end",
                     ),
-                    dmc.Button(EXPAND_ALL_LABEL, id=ids.expand_all, variant="default"),
-                    columns_menu(ids.columns_menu, RUN_LIST_MENU_COLUMNS),
+                    dmc.SegmentedControl(
+                        data=LIST_VIEW_OPTIONS,
+                        id=ids.view,
+                        className="run-history-list-view",
+                        persistence=True,
+                        radius="sm",
+                        size="sm",
+                        # The same on every visit. The browser stores the
+                        # choice against the value the layout was drawn with,
+                        # and discards it when a later visit draws another.
+                        value=LIST_VIEW_DEFAULT,
+                        **{"aria-label": LIST_VIEW_LABEL},
+                    ),
+                    dmc.Box(
+                        className="run-history-list-actions",
+                        children=[
+                            dmc.Button(
+                                EXPAND_ALL_LABEL, id=ids.expand_all, variant="default"
+                            ),
+                            columns_menu(
+                                ids.columns_menu,
+                                RUN_LIST_MENU_COLUMNS,
+                                (MEDIAN_AND_BEST_CHOICE,),
+                            ),
+                        ],
+                    ),
                 ],
             ),
             dag.AgGrid(
@@ -858,9 +944,10 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                 style={"flex": 1, "minHeight": 0, "width": "100%"},
             ),
             dmc.Text(id=ids.empty, className="run-history-list-empty"),
-            # Where a key pressed on a session row says what it did. In the
-            # page before anything is said: a live region added with its text
-            # already in it is not read out.
+            # Where a key pressed on a group row says what it did, and a
+            # press on a scenario's name what it selected. In the page before
+            # anything is said: a live region added with its text already in
+            # it is not read out.
             html.Div(
                 id=ids.announcer,
                 className="visually-hidden",
@@ -905,9 +992,57 @@ async (clicks) => {
 }
 """
 
+# The Median and best checkbox, handed to the script. It runs as the page
+# mounts, with the remembered value, and on every change. Only the newest
+# run applies, for the reason the rows' own script gives.
+_APPLY_FIGURES = """
+(() => {
+    let latestRun = 0;
+
+    return async (checked) => {
+        const noUpdate = window.dash_clientside.no_update;
+        if (!window.runHistoryList || !window.dash_ag_grid) {
+            return noUpdate;
+        }
+        latestRun += 1;
+        const run = latestRun;
+        const gridApi = await window.dash_ag_grid.getApiAsync(GRID_ID);
+        if (run === latestRun) {
+            window.runHistoryList.setFigures(gridApi, Boolean(checked));
+        }
+        return noUpdate;
+    };
+})()
+"""
+
+
+def jump_to_session(jump: dict | None, held_limit: int | None) -> tuple:
+    """Switch the list to All scenarios, loaded far enough back to hold a session.
+
+    ``jump`` is what the script wrote when a session's count was pressed:
+    the session's place among all sessions, counting back from the newest.
+    If All scenarios has loaded fewer sessions than that, it loads that many,
+    and the session is the last one listed.
+
+    The switch is written here, and not by the script, because a value a
+    callback writes to a remembered control is remembered: the view the jump
+    leaves on screen is the view a reload shows. Both outputs are plain, and
+    the callback that builds the rows takes both as inputs, so Dash holds it
+    until this answers and the tree is built once, already reaching the
+    session. What to open and where to scroll stay in the browser.
+    """
+    if not jump:
+        return no_update, no_update
+    place = jump.get("place")
+    loaded = held_limit or SESSIONS_PER_LOAD
+    return (
+        VIEW_ALL,
+        place if isinstance(place, int) and place > loaded else no_update,
+    )
+
 
 def register_run_list(ids: RunListIds, *, follow_switch: str) -> None:
-    """Register the scripts that draw the list, for one page's ids.
+    """Register the scripts that draw the list, and the jump, for one page's ids.
 
     Call once per page, at import. ``follow_switch`` is the id of the page's
     Follow switch: while it is on, a run that lands scrolls the list back to
@@ -915,7 +1050,8 @@ def register_run_list(ids: RunListIds, *, follow_switch: str) -> None:
 
     The rows reach the grid through its API and never as Dash components or
     through its ``rowData`` prop. Which rows are open is kept by the script
-    and never sent to the server.
+    and never sent to the server. The server hears only how far back a jump
+    reaches, from ``ids.jump``.
     """
     grid_id = json.dumps(ids.grid)
     clientside_callback(
@@ -930,4 +1066,21 @@ def register_run_list(ids: RunListIds, *, follow_switch: str) -> None:
         Input(ids.expand_all, "n_clicks"),
         prevent_initial_call=True,
     )
+    clientside_callback(
+        _APPLY_FIGURES.replace("GRID_ID", grid_id),
+        Output(ids.figures_sink, "data"),
+        Input(
+            choice_checkbox_id(ids.columns_menu, MEDIAN_AND_BEST_CHOICE.choice_id),
+            "checked",
+        ),
+    )
+    callback(
+        Output(ids.view, "value"),
+        Output(ids.all_session_limit, "data"),
+        Input(ids.jump, "data"),
+        State(ids.all_session_limit, "data"),
+        # The store is empty until a count is pressed, and a mount must not
+        # move the switch.
+        prevent_initial_call=True,
+    )(jump_to_session)
     register_columns_menu(ids.columns_menu, ids.grid)

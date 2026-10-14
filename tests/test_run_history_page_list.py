@@ -33,8 +33,13 @@ from source.components import (  # noqa: E402
 from source.components.run_history_list import (  # noqa: E402
     RUN_LIST_CLASS,
     RUN_LIST_NOTHING_CLASS,
+    RUN_LIST_UNSELECTED_CLASS,
+    SESSIONS_PER_LOAD,
+    VIEW_ALL,
+    VIEW_SCENARIO,
     build_run_list,
     empty_run_list,
+    jump_to_session,
 )
 from source.components.run_marks import mark_runs  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
@@ -105,18 +110,38 @@ def quiet_lists(monkeypatch):
 # --- The layout ----------------------------------------------------------------
 
 
-def test_the_list_holds_its_heading_line_the_grid_and_the_text_for_nothing_to_list():
+def test_the_list_holds_its_header_the_grid_and_the_text_for_nothing_to_list():
     panel = _by_id(run_history.layout(), IDS.panel)
 
     header, grid, empty, announcer = panel.children
     assert panel.className == RUN_LIST_CLASS
     assert header.className == "run-history-list-header"
-    assert [getattr(child, "id", None) for child in header.children][:2] == [
-        IDS.heading,
-        IDS.expand_all,
-    ]
-    assert isinstance(header.children[2], dmc.Popover)
+    heading, switch, actions = header.children
+    assert (heading.id, switch.id) == (IDS.heading, IDS.view)
+    # The switch at the left of the second line, the two buttons at its right.
+    assert actions.className == "run-history-list-actions"
+    expand_all, menu = actions.children
+    assert expand_all.id == IDS.expand_all
+    assert isinstance(menu, dmc.Popover)
     assert (grid.id, empty.id, announcer.id) == (IDS.grid, IDS.empty, IDS.announcer)
+
+
+def test_the_switch_chooses_between_the_two_views_and_starts_on_this_scenario():
+    switch = _by_id(run_history.layout(), IDS.view)
+
+    assert isinstance(switch, dmc.SegmentedControl)
+    assert switch.data == [
+        {"value": "scenario", "label": "This scenario"},
+        {"value": "all", "label": "All scenarios"},
+    ]
+    # Chosen once: a renamed id or a changed default resets the stored view
+    # in every browser.
+    assert (IDS.view, switch.value, switch.persistence) == (
+        "run-history-list-view",
+        "scenario",
+        True,
+    )
+    assert switch.to_plotly_json()["props"]["aria-label"] == "Run list view"
 
 
 def test_the_buttons_read_expand_all_and_columns():
@@ -299,12 +324,34 @@ def _menu_checkboxes(page=None) -> list[dmc.Checkbox]:
     ]
 
 
-def test_the_columns_menu_offers_shots_fired_and_sensitivity_both_shown():
+def _choice_checkboxes(page=None) -> list[dmc.Checkbox]:
+    return [
+        component
+        for component in _walk_components(page or run_history.layout())
+        if isinstance(component, dmc.Checkbox)
+        and isinstance(component.id, dict)
+        and component.id.get("type") == f"{IDS.columns_menu}-choice"
+    ]
+
+
+def test_the_columns_menu_offers_two_columns_both_shown_and_median_and_best_off():
     checkboxes = _menu_checkboxes()
 
     assert [(box.label, box.checked, box.persistence) for box in checkboxes] == [
         ("Shots Fired", True, True),
         ("Sensitivity", True, True),
+    ]
+    # Not a column, so not a checkbox the column callback hears.
+    assert [
+        (box.id, box.label, box.checked, box.persistence)
+        for box in _choice_checkboxes()
+    ] == [
+        (
+            {"type": "run-history-list-columns-choice", "choice": "median_best"},
+            "Median and best",
+            False,
+            True,
+        )
     ]
     # Each checkbox is named for the header of the column it shows.
     headers = {
@@ -335,10 +382,10 @@ def test_no_column_starts_hidden_so_the_menus_defaults_match_the_grid():
     ids=["plain", "deep_linked"],
 )
 def test_the_menus_layout_default_never_varies(query):
-    assert [box.checked for box in _menu_checkboxes(run_history.layout(**query))] == [
-        True,
-        True,
-    ]
+    page = run_history.layout(**query)
+
+    assert [box.checked for box in _menu_checkboxes(page)] == [True, True]
+    assert [box.checked for box in _choice_checkboxes(page)] == [False]
 
 
 def test_the_grid_is_built_with_the_options_the_columns_menu_needs():
@@ -662,8 +709,13 @@ def test_expand_all_is_a_script_and_makes_no_request():
 
 
 def test_nothing_on_the_server_hears_which_rows_are_open():
-    """No server callback takes the grid, or either script's sink, as an input."""
-    held_in_the_browser = {IDS.grid, IDS.apply_sink, IDS.expand_all_sink}
+    """No server callback takes the grid, or any script's sink, as an input."""
+    held_in_the_browser = {
+        IDS.grid,
+        IDS.apply_sink,
+        IDS.expand_all_sink,
+        IDS.figures_sink,
+    }
     listening = [
         entry["output"]
         for entry in GLOBAL_CALLBACK_LIST
@@ -682,11 +734,20 @@ def test_nothing_on_the_server_hears_which_rows_are_open():
 # --- The stores ----------------------------------------------------------------
 
 
-def test_the_list_starts_from_thirty_sessions_on_every_visit():
-    store = _by_id(run_history.layout(), IDS.session_limit)
+@pytest.mark.parametrize("store_id", [IDS.session_limit, IDS.all_session_limit])
+def test_each_view_starts_from_thirty_sessions_on_every_visit(store_id):
+    store = _by_id(run_history.layout(), store_id)
 
     assert store.data == 30
     assert getattr(store, "storage_type", "memory") == "memory"
+
+
+@pytest.mark.parametrize("store_id", [IDS.jump, IDS.scenario_asked])
+def test_the_stores_the_script_asks_through_are_in_the_layout_and_empty(store_id):
+    """A page has to hold every input of a callback whose output it holds."""
+    store = _by_id(run_history.layout(), store_id)
+
+    assert getattr(store, "data", None) is None
 
 
 def test_the_layout_holds_whether_a_session_is_in_progress(monkeypatch):
@@ -715,7 +776,7 @@ def _list_registration() -> dict:
     return _registration(f"{IDS.model}.data")
 
 
-def test_the_list_is_rebuilt_by_these_six_inputs_and_no_other():
+def test_the_list_is_rebuilt_by_these_eight_inputs_and_no_other():
     registration = _list_registration()
     options = run_history.CHART_OPTIONS_IDS
 
@@ -724,9 +785,11 @@ def test_the_list_is_rebuilt_by_these_six_inputs_and_no_other():
         f"...{IDS.empty}.children...{IDS.panel}.className.."
     )
     assert _keys(registration["inputs"]) == [
+        f"{IDS.view}.value",
         f"{run_history.SCENARIO_SELECTION_IDS.scenario_dropdown}.value",
         f"{run_history.RUN_LANDED_STORE_ID}.data",
         f"{IDS.session_limit}.data",
+        f"{IDS.all_session_limit}.data",
         f"{options.score_threshold_percentage}.value",
         f"{run_history.TODAY_STORE_ID}.data",
         f"{run_history.SESSION_IN_PROGRESS_STORE_ID}.data",
@@ -781,7 +844,13 @@ def _clock_at(*moment):
     return FixedDatetime
 
 
-def test_the_rows_are_built_from_the_run_store_for_the_selection(monkeypatch):
+@pytest.mark.parametrize(
+    ("view", "loaded"), [(VIEW_SCENARIO, 60), (VIEW_ALL, 90)], ids=["scenario", "all"]
+)
+def test_the_rows_are_built_from_the_run_store_in_the_view_on_screen(
+    monkeypatch, view, loaded
+):
+    """Each view is built with its own count of loaded sessions."""
     asked = []
     model = {**empty_run_list(None), "heading": "Scenario A · 3 runs"}
 
@@ -793,25 +862,35 @@ def test_the_rows_are_built_from_the_run_store_for_the_selection(monkeypatch):
     monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 22, 50))
 
     answer = run_history.build_run_list_rows(
-        SCENARIO, "landed.csv", 60, 95, "2026-10-12", True
+        view, SCENARIO, "landed.csv", 60, 90, 95, "2026-10-12", True
     )
 
-    assert asked == [("scenario", SCENARIO, 60, 95, datetime(2026, 10, 12, 22, 50))]
+    assert asked == [(view, SCENARIO, loaded, 95, datetime(2026, 10, 12, 22, 50))]
     assert answer == (model, "Scenario A · 3 runs", None, RUN_LIST_CLASS)
 
 
-@pytest.mark.parametrize("text", ["No scenario selected", "No runs yet"])
-def test_with_nothing_to_list_the_text_takes_the_grids_place(monkeypatch, text):
+@pytest.mark.parametrize(
+    ("text", "class_name"),
+    [
+        # The switch stays above the text: the tree needs no selection.
+        ("No scenario selected", RUN_LIST_UNSELECTED_CLASS),
+        ("No runs yet", RUN_LIST_NOTHING_CLASS),
+    ],
+)
+def test_with_nothing_to_list_the_text_takes_the_grids_place(
+    monkeypatch, text, class_name
+):
     monkeypatch.setattr(
         run_history, "run_list_from_store", lambda *_arguments: empty_run_list(text)
     )
 
-    model, heading, empty, class_name = run_history.build_run_list_rows(
-        None, None, 30, 95, "2026-10-12", False
+    model, heading, empty, panel_class = run_history.build_run_list_rows(
+        VIEW_SCENARIO, None, None, 30, 30, 95, "2026-10-12", False
     )
 
-    assert (heading, empty, class_name) == ("", text, RUN_LIST_NOTHING_CLASS)
+    assert (heading, empty, panel_class) == ("", text, class_name)
     assert model["rows"] == []
+    assert RUN_LIST_UNSELECTED_CLASS == "run-history-list run-history-list-unselected"
 
 
 def test_the_text_for_nothing_to_list_hides_the_heading_line_and_the_grid():
@@ -829,7 +908,8 @@ def test_the_text_for_nothing_to_list_hides_the_heading_line_and_the_grid():
     assert RUN_LIST_NOTHING_CLASS == "run-history-list run-history-list-nothing"
 
 
-def test_a_store_holding_no_limit_loads_the_first_thirty(monkeypatch):
+@pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])
+def test_a_store_holding_no_limit_loads_the_first_thirty(monkeypatch, view):
     asked = []
     monkeypatch.setattr(
         run_history,
@@ -837,7 +917,9 @@ def test_a_store_holding_no_limit_loads_the_first_thirty(monkeypatch):
         lambda *arguments: asked.append(arguments) or empty_run_list("No runs yet"),
     )
 
-    run_history.build_run_list_rows(SCENARIO, None, None, 95, "2026-10-12", False)
+    run_history.build_run_list_rows(
+        view, SCENARIO, None, None, None, 95, "2026-10-12", False
+    )
 
     assert asked[0][2] == 30
 
@@ -846,11 +928,130 @@ def test_the_real_row_builder_answers_for_an_empty_store(monkeypatch):
     monkeypatch.setattr(run_history_list, "get_all_runs", list)
 
     model, heading, empty, class_name = run_history.build_run_list_rows(
-        SCENARIO, None, 30, 95, "2026-10-12", False
+        VIEW_SCENARIO, SCENARIO, None, 30, 30, 95, "2026-10-12", False
     )
 
     assert (heading, empty, class_name) == ("", "No runs yet", RUN_LIST_NOTHING_CLASS)
     assert model == empty_run_list("No runs yet")
+
+
+# --- The jump from a session's count -------------------------------------------
+
+
+def _jump_registration() -> dict:
+    return _registration(f"{IDS.view}.value")
+
+
+def test_one_server_callback_answers_a_jump_with_the_view_and_the_trees_count():
+    registration = _jump_registration()
+
+    assert GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__ == (
+        "jump_to_session"
+    )
+    # Plain outputs, both: Dash holds a callback back for a plain output of
+    # one already queued, and not for a duplicate one.
+    assert registration["output"] == (
+        f"..{IDS.view}.value...{IDS.all_session_limit}.data.."
+    )
+    assert _keys(registration["inputs"]) == [f"{IDS.jump}.data"]
+    assert _keys(registration["state"]) == [f"{IDS.all_session_limit}.data"]
+    # The store is empty until a count is pressed, and a mount must not move
+    # the switch.
+    assert registration["prevent_initial_call"] is True
+
+
+def test_the_list_waits_for_the_jump_and_builds_the_tree_once():
+    """It takes both of the jump's outputs as inputs, and not the jump's store."""
+    list_inputs = _keys(_list_registration()["inputs"])
+
+    assert {f"{IDS.view}.value", f"{IDS.all_session_limit}.data"} <= set(list_inputs)
+    assert f"{IDS.jump}.data" not in list_inputs
+    assert f"{IDS.scenario_asked}.data" not in list_inputs
+
+
+def test_the_switch_and_the_trees_count_have_no_other_writer():
+    jump = _jump_registration()["output"]
+    writers = [
+        entry["output"]
+        for entry in GLOBAL_CALLBACK_LIST
+        if f"{IDS.view}.value" in entry["output"]
+        or f"{IDS.all_session_limit}.data" in entry["output"]
+    ]
+
+    assert writers == [jump]
+
+
+@pytest.mark.parametrize(
+    ("jump", "loaded", "written"),
+    [
+        # Nothing asked: a mount, or a call nothing triggered.
+        (None, 30, (no_update, no_update)),
+        ({}, 30, (no_update, no_update)),
+        # A session the tree already loads: the view alone.
+        ({"place": 5}, 30, (VIEW_ALL, no_update)),
+        ({"place": 30}, 30, (VIEW_ALL, no_update)),
+        ({"place": 31}, 60, (VIEW_ALL, no_update)),
+        # Further back: the tree loads up to it, and lists it last.
+        ({"place": 31}, 30, (VIEW_ALL, 31)),
+        ({"place": 234}, 30, (VIEW_ALL, 234)),
+        ({"place": 31}, None, (VIEW_ALL, 31)),
+        # A place that is not a number loads nothing more.
+        ({"place": "31"}, 30, (VIEW_ALL, no_update)),
+    ],
+)
+def test_a_jump_switches_to_all_scenarios_and_loads_as_far_back_as_the_session(
+    jump, loaded, written
+):
+    assert jump_to_session(jump, loaded) == written
+    assert SESSIONS_PER_LOAD == 30
+
+
+def test_no_callback_waits_only_on_what_the_jump_writes_now_and_then():
+    """The structural test of the 2026-09-19 entry, for the jump's callback.
+
+    It writes the switch and the tree's count only when a count is pressed.
+    A callback whose Inputs were all among those two would never make its
+    first call on a visit with no jump.
+    """
+    jump = _jump_registration()
+    written = {
+        output.split("@")[0] for output in jump["output"].strip(".").split("...")
+    }
+
+    starved = [
+        entry["output"]
+        for entry in GLOBAL_CALLBACK_LIST
+        if entry is not jump
+        and entry["inputs"]
+        and set(_keys(entry["inputs"])) <= written
+    ]
+
+    assert starved == []
+
+
+# --- Median and best -----------------------------------------------------------
+
+
+def test_median_and_best_reaches_the_script_by_a_callback_of_the_lists_own():
+    registration = _registration(f"{IDS.figures_sink}.data")
+    source = _inline_script(registration)
+
+    assert _keys(registration["inputs"]) == [
+        '{"choice":"median_best","type":"run-history-list-columns-choice"}.checked'
+    ]
+    # It runs as the page mounts, with the remembered value.
+    assert registration["prevent_initial_call"] is False
+    assert "window.runHistoryList.setFigures(gridApi, Boolean(checked));" in source
+    assert f'getApiAsync("{IDS.grid}")' in source
+    assert "if (run === latestRun) {" in source
+
+
+def test_the_column_callback_never_hears_median_and_best():
+    registration = _registration(f"{IDS.columns_menu}-sink.data")
+
+    assert _keys(registration["inputs"]) == [
+        '{"column":["ALL"],"type":"run-history-list-columns"}.checked'
+    ]
 
 
 # --- "In progress", on the tick ------------------------------------------------

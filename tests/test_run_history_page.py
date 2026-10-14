@@ -30,6 +30,7 @@ from source.components import (  # noqa: E402
     scenario_selection,
     setup_surfaces,
 )
+from source.components.columns_menu import choice_checkbox_id  # noqa: E402
 from source.config import settings_service  # noqa: E402
 from source.pages import home, run_history  # noqa: E402
 from tests.rendered_text import rendered_text  # noqa: E402
@@ -213,12 +214,18 @@ def test_the_ids_are_the_ones_browsers_store_values_under():
         run_history.CHART_MODE_ID,
         run_history.RUN_RANGE_ID,
         run_history.DAY_RANGE_ID,
+        run_history.RUN_LIST_IDS.view,
     ) == (
         "run-history-follow-switch",
         "run-history-chart-mode",
         "run-history-run-range",
         "run-history-day-range",
+        "run-history-list-view",
     )
+    assert choice_checkbox_id(run_history.RUN_LIST_IDS.columns_menu, "median_best") == {
+        "type": "run-history-list-columns-choice",
+        "choice": "median_best",
+    }
     options = run_history.CHART_OPTIONS_IDS
     assert (
         options.rank_overlay,
@@ -411,17 +418,23 @@ def test_a_remembered_controls_layout_default_never_varies(query):
     """
     page = run_history.layout(**query)
 
-    defaults = {
-        run_history.SCENARIO_SELECTION_IDS.playlist_filter: ("value", None),
-        run_history.SCENARIO_SELECTION_IDS.scenario_dropdown: ("value", None),
-        run_history.FOLLOW_SWITCH_ID: ("checked", True),
-        run_history.CHART_MODE_ID: ("value", "score_vs_run"),
-        run_history.RUN_RANGE_ID: ("value", "100"),
-        run_history.DAY_RANGE_ID: ("value", "90"),
-        run_history.CHART_OPTIONS_IDS.score_threshold_percentage: ("value", 95),
-        run_history.CHART_OPTIONS_IDS.score_threshold_overlay: ("checked", True),
-    }
-    for component_id, (prop, default) in defaults.items():
+    defaults = [
+        (run_history.SCENARIO_SELECTION_IDS.playlist_filter, "value", None),
+        (run_history.SCENARIO_SELECTION_IDS.scenario_dropdown, "value", None),
+        (run_history.FOLLOW_SWITCH_ID, "checked", True),
+        (run_history.CHART_MODE_ID, "value", "score_vs_run"),
+        (run_history.RUN_RANGE_ID, "value", "100"),
+        (run_history.DAY_RANGE_ID, "value", "90"),
+        (run_history.CHART_OPTIONS_IDS.score_threshold_percentage, "value", 95),
+        (run_history.CHART_OPTIONS_IDS.score_threshold_overlay, "checked", True),
+        (run_history.RUN_LIST_IDS.view, "value", "scenario"),
+        (
+            choice_checkbox_id(run_history.RUN_LIST_IDS.columns_menu, "median_best"),
+            "checked",
+            False,
+        ),
+    ]
+    for component_id, prop, default in defaults:
         component = _by_id(page, component_id)
         assert getattr(component, prop) == default, component_id
         assert component.persistence is True, component_id
@@ -813,6 +826,7 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
     ids = run_history.SCENARIO_SELECTION_IDS
 
     button = run_history.LATEST_RUN_CARD_IDS.scenario_button
+    asked_by_the_list = run_history.RUN_LIST_IDS.scenario_asked
 
     assert GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__ == (
         "reach_scenario_or_the_one_asked_for"
@@ -822,11 +836,13 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
     )
     assert "@" not in registration["output"]
     # The latest-run card's button is the third thing that reaches a
-    # scenario. It comes here and writes neither dropdown itself.
+    # scenario, and a name pressed in the run list's tree the fourth. Each
+    # comes here and writes neither dropdown itself.
     assert _keys(registration["inputs"]) == [
         f"{ids.deep_link}.data",
         f"{run_history.RUN_EVENTS_STORE_ID}.data",
         f"{button}.n_clicks",
+        f"{asked_by_the_list}.data",
     ]
     assert _keys(registration["state"]) == [
         f"{run_history.FOLLOW_SWITCH_ID}.checked",
@@ -843,6 +859,54 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
         or f"{ids.playlist_filter}.value" in _output_keys(entry)
     ]
     assert writers == [registration["output"]]
+
+
+def _press(triggered: list[dict], run_events, follow, list_scenario):
+    """Call the selection callback as Dash would, for a selected scenario of A."""
+    return scenario_selection.reach_the_scenario_asked_for(
+        triggered,
+        f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
+        {},
+        run_events,
+        0,
+        list_scenario,
+        follow,
+        None,
+        "Scenario A",
+        None,
+    )
+
+
+@pytest.mark.parametrize(
+    ("follow", "written"),
+    [(True, (no_update, "Scenario C")), (False, (no_update, no_update))],
+)
+def test_a_run_that_lands_after_a_name_was_pressed_is_answered_and_not_the_name(
+    follow, written
+):
+    """The list's store replays the name pressed into every later call.
+
+    Read from the values, a run that lands would select that name again.
+    """
+    landed = {"latest": {"scenario_name": "Scenario C"}}
+    triggered = [
+        {"prop_id": f"{run_history.RUN_EVENTS_STORE_ID}.data", "value": landed}
+    ]
+
+    assert _press(triggered, landed, follow, "Scenario B") == written
+
+
+def test_a_name_pressed_after_a_run_landed_selects_the_name():
+    """The summary store replays its last batch into the press's call."""
+    landed = {"latest": {"scenario_name": "Scenario C"}}
+    triggered = [
+        {
+            "prop_id": f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
+            "value": "Scenario B",
+        }
+    ]
+
+    assert _press(triggered, landed, True, "Scenario B") == (no_update, "Scenario B")
 
 
 def test_no_callback_depends_only_on_what_the_selection_callback_conditionally_writes():
