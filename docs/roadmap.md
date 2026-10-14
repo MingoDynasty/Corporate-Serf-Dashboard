@@ -89,8 +89,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
 - **Run History, the last piece: All scenarios** — the page is public, and
   one piece of the work it was split into remains. All scenarios is a
   second view of the run list: each session's scenarios in the order they
-  were played. It has a proposal of its own, not yet written, and nothing
-  here is ratified by being listed.
+  were played. Its [proposal](./proposals/all_scenarios_proposal.md) was
+  ratified on 2026-10-14, and one implementation PR builds it.
 
   Version 1 of the page left out the typical run. Its definition moves to
   a proposal of its own, which the sessions decision settled. Score vs
