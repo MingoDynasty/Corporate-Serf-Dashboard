@@ -93,8 +93,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
      page builds today's toast, with placement fixed at the top 5 and both
      notification switches still in Chart options.
   2. **All scenarios** — a second view of the run list: each session's
-     scenarios in the order they were played. It has a proposal of its own,
-     not yet written.
+     scenarios in the order they were played. Its
+     [proposal](./proposals/all_scenarios_proposal.md) is written, and
+     nothing in it is ratified yet.
 
   The two don't wait for each other. Version 1 of the page left out the
   typical run. Its definition moves to a proposal of its own, which the
