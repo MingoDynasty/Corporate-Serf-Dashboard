@@ -372,6 +372,13 @@ says nothing, and nothing names the view.
 | Down | `Scenario 1. Show VT DotTS Intermediate S5 9 runs New PB  row  row 50` | The same, with the name twice |
 | Down | `9  row 51  #  column 1` | The same |
 
+**Changed after this walk.** Here the jump was the tree's first arrival, and
+at `8ba57a2` that arrival also opened the newest session and its last visit,
+three rows above. A later fix leaves those closed, so the session's row is
+the 46th, where it was the 49th. That was read from the rehearsal without
+NVDA, and NVDA was not run again: the row's words, the keys, and where focus
+lands are unchanged.
+
 #### 6. Opening one session's runs with Show all runs, and hearing that they opened
 
 **It works.** On an open session row in the tree, Tab reaches its toggle,

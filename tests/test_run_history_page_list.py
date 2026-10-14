@@ -721,8 +721,26 @@ def test_each_view_opens_the_rows_of_every_run_newer_than_its_own_mark():
     # A model with nothing to list is not the view's rows arriving.
     assert "if (rows.length && model.newest_run != null) {" in applying
     assert "if (!view.arrived || model.newest_run !== view.mark) {" in applying
-    assert "rowsToOpen(context, model, rows, view.mark, !view.arrived)" in applying
+    assert "rowsToOpen(context, model, rows, view.mark, arriving)" in applying
     assert "view.mark = model.newest_run;" in applying
+
+
+def test_rows_that_first_arrive_for_a_jump_open_what_the_jump_opens():
+    """Not the mark's own rows, which may be another scenario's visit.
+
+    A session followed from `0 of 47 runs` opens nothing under it, and when
+    the jump is the tree's first arrival the mark's run can be in that very
+    session. Runs newer than the mark still open their rows.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    applying = script[script.index("state.apply = function") :]
+
+    assert (
+        "var arriving = !view.arrived && "
+        "!(state.jump && model.view === context.treeView);"
+    ) in applying
+    # Decided before the jump is taken from the state.
+    assert applying.index("var arriving =") < applying.index("jump = state.jump;")
 
 
 def test_the_tree_walks_its_run_rows_down_to_the_views_mark():

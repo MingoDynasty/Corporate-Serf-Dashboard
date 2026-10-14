@@ -613,10 +613,10 @@
   // Under This scenario, the first row, as built. Under All scenarios, the
   // session row and the scenario row of each run newer than the view's mark,
   // found by walking the run rows from the top, which are newest first, down
-  // to the mark. The first time the view's rows arrive, the rows of the run
-  // at the mark open too. Where the walk cannot find the mark, as when the
-  // store had no run when the page was drawn, the newest run's rows open
-  // alone.
+  // to the mark. The first time the view's rows arrive, unless they arrive
+  // for a jump, the rows of the run at the mark open too. Where the walk
+  // cannot find the mark, as when the store had no run when the page was
+  // drawn, the newest run's rows open alone.
   function rowsToOpen(context, model, rows, mark, arriving) {
     if (model.view !== context.treeView) {
       return model.forced_open || [];
@@ -699,8 +699,13 @@
     var view = viewState(model.view);
     // A model with nothing to list is not the view's rows arriving.
     if (rows.length && model.newest_run != null) {
+      // Rows that first arrive for a jump open what the jump opens, and the
+      // rows of runs newer than the mark, and not the mark's own: those would
+      // open another scenario's visit under a session followed from a count
+      // such as `0 of 47 runs`, which opens nothing under it.
+      var arriving = !view.arrived && !(state.jump && model.view === context.treeView);
       if (!view.arrived || model.newest_run !== view.mark) {
-        rowsToOpen(context, model, rows, view.mark, !view.arrived).forEach(function (id) {
+        rowsToOpen(context, model, rows, view.mark, arriving).forEach(function (id) {
           view.open.add(id);
         });
         view.mark = model.newest_run;

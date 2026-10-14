@@ -544,8 +544,10 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 - A session row and a scenario row open and close on a click, with no request
   to the server. On arrival the first session is open, and under All
-  scenarios so is the scenario row of the last run played. Each view keeps
-  its own open rows, and which rows are open is never remembered. A scenario
+  scenarios so is the scenario row of the last run played, unless the tree
+  first arrives for a session's count, when only what its jump opens is
+  open ([2026-10-14][count-link]). Each view keeps its own open rows, and
+  which rows are open is never remembered. A scenario
   row keeps its state while its session is closed
   ([2026-10-14][all-scenarios]).
 - "Expand all" opens every loaded session of the view on screen, down to its
@@ -586,9 +588,10 @@ of scope here, apart from its chart toolbar, noted under The chart.
   scenarios opens both scenario rows, and runs that land while the other view
   is on screen open their rows when the view is next shown. The first time a
   view's rows arrive in a visit, the rows of the run the visit began with
-  open too. A row the player closed stays closed until a newer run lands in
-  it. A run on a new scenario adds a scenario row at the top of its session,
-  with the next number ([2026-10-14][all-scenarios]).
+  open too, unless they arrive for a session's count. A row the player
+  closed stays closed until a newer run lands in it. A run on a new scenario
+  adds a scenario row at the top of its session, with the next number
+  ([2026-10-14][all-scenarios]).
 - With no run in the store the list reads "No runs yet" in either view, with
   no controls.
 - The list is the grid the app's other tables use, in its free edition, made

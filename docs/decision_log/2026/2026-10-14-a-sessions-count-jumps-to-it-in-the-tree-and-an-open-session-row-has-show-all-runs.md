@@ -33,6 +33,12 @@ and what the list does today is in
   session's row to the top of the list, just under the first row. Rows
   already open in the tree stay open. From `0 of 47 runs` it opens the
   session and nothing under it.
+- A jump that brings the tree's rows for the first time in a visit decides
+  what opens, and the tree's first arrival opens nothing of its own: only
+  runs that landed after the page was drawn open their rows beside the
+  jump's. Without that, the arrival would open the newest session and its
+  last visit, which under a session followed from `0 of 47 runs` is another
+  scenario's runs. This was the Codex seat's must-fix F2 on PR #378.
 - Keyboard focus goes to the session's row. The pressed count is not in the
   tree, because a session row's right side differs between the views, and
   focus would otherwise fall to the page.

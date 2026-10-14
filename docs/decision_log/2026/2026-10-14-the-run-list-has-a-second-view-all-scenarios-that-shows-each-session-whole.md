@@ -126,7 +126,8 @@ From the keyboard, focus stays on the name's button and the live region says
 - A session row and a scenario row each open and close on a click, with no
   request to the server, and take the same four keys.
 - On arrival the first session is open, and so is the scenario row of the
-  last run played. **Expand all** opens every loaded session down to its
+  last run played. A tree that first arrives for a session's count opens
+  only what the count's jump opens. **Expand all** opens every loaded session down to its
   scenario rows and opens no runs; **Collapse all** leaves the scenario rows'
   own state alone (reading 2).
 - Each view keeps its own open rows, and neither set is remembered across a
@@ -146,7 +147,10 @@ From the keyboard, focus stays on the name's button and the live region says
   names, and every model names the store's newest run, even one with nothing
   to list. A model with nothing to list is not that first time: with no
   scenario selected, This scenario's first row still arrives open once a
-  scenario is chosen.
+  scenario is chosen. Rows that first arrive for a session's count are the
+  other exception: the jump decides what opens, and runs newer than the
+  mark open beside it, so a session followed from `0 of 47 runs` shows
+  nothing under it. This was the Codex seat's must-fix F2 on PR #378.
 - A row the player closed stays closed until a newer run lands in it.
 
 **Sessions loaded.** Each view loads 30 and counts its own: This scenario the
