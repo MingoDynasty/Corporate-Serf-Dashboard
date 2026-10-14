@@ -16,11 +16,14 @@ their median and their best score, can be turned on from the Columns menu.
 
 ## Decisions needed
 
-Three rows: A1 to A3. **Nothing in this proposal is ratified.** Each row
-gives what the maintainer has said in chat, which is a lean or an agreement
-and not a ruling, then argues a recommendation and says what choosing
-differently would change. Reviewers are invited to challenge every row, and
-every author-owned choice in [Design](#design).
+Three rulings: A1 to A3. The maintainer ratified this proposal on
+2026-10-14: "I ratify the proposal." That settles each row as its
+recommendation. Both review seats had endorsed all three rows, and no row
+was contested. Each row keeps what the maintainer said in chat, its
+argument, and what the alternatives would have changed, for the record.
+Everything else is author-owned, in [Design](#design), and the ratification
+covers it too. The four optional items at the end of Design are not
+covered.
 
 This is piece 5 of 5 of the Run History work, and the last to be proposed.
 The groundwork has merged. Sessions is ratified and built. The page is
@@ -38,8 +41,9 @@ argued in Design, each item with the date of its lean.
 
 **Four readings of the view were agreed on 2026-10-13.** They were put to
 the maintainer as a numbered list, and the answer was: "1-4: agree with all
-four". That is agreement in chat with no ruling word, so each is a lean and
-stays open to reviewers. None is a row. Design states each where it applies:
+four". That was agreement in chat with no ruling word, so each was a lean
+until the ratification, which covers them with the rest of Design. None is
+a row. Design states each where it applies:
 
 1. A row under a session is a visit, so a scenario that is left and returned
    to within a session gets a second row
@@ -91,7 +95,8 @@ doesn't reopen them:
 
 ### A1. A click on a scenario's name in the tree selects it, and clears a Playlist filter that does not list it
 
-Status: Open. The maintainer's agreement in chat, 2026-10-10: "Agree, tree
+Status: Ratified (user), 2026-10-14: accept the recommendation below.
+Before that, the maintainer's agreement in chat, 2026-10-10: "Agree, tree
 click should take the same rule as Follow."
 
 **Why it is still a row, though R7 is ratified.** The ratified page
@@ -150,8 +155,9 @@ forms.
 
 ### A2. A session's run count links into the tree, and a session row there has Show all runs
 
-Status: Open. No words of the maintainer's are on record for either half
-beyond the design they leaned to on 2026-10-07. The design note of that day
+Status: Ratified (user), 2026-10-14: accept the recommendation below, both
+halves. Before that, no words of the maintainer's were on record for either
+half beyond the design they leaned to on 2026-10-07. The design note of that day
 records the count's wording, "7 of 47 runs", as the author's, "not objected
 to", and the link as a lean: "that text is a link that jumps to the whole
 session under All scenarios". **Show all runs** is on record as one line of
@@ -214,10 +220,11 @@ runs** each scenario row is opened by hand. Neither half needs the other.
 
 ### A3. The Columns menu gains Median and best, off to start
 
-Status: Open. The design note of 2026-10-07 records the lean: "Median and
+Status: Ratified (user), 2026-10-14: accept the recommendation below.
+Before that, the design note of 2026-10-07 recorded the lean: "Median and
 best are off to start, to avoid overload." On 2026-10-13 the maintainer was
 asked whether this row belongs here or with the typical score's own
-proposal, and answered: "okay let's keep it in." That is a lean on scope.
+proposal, and answered: "okay let's keep it in." That was a lean on scope.
 The reading they accepted with it was the kickoff author's and not theirs:
 the figure is a plain fact about the runs under one row, with no comparison,
 and it is never worded as typical or usual.
@@ -482,7 +489,8 @@ From earlier work, for comparison:
 ## Design
 
 Every choice in this section is author-owned unless it names a row. A choice
-the maintainer agreed to on 2026-10-13 says so, and is a lean. The mockup's
+the maintainer agreed to on 2026-10-13 says so. The ratification of
+2026-10-14 covers every choice here but the optional items at the end. The mockup's
 strings were placeholders, and none is agreed copy: the strings are in
 [Copy](#copy).
 
@@ -1224,7 +1232,8 @@ sentence "The word visit is not on screen" stays true.
 
 ### Optional, beyond the outline
 
-None of these is proposed. Each is a small addition a reviewer or the
+None of these is proposed, and the ratification does not cover them.
+Each is a small addition a reviewer or the
 maintainer may want, with what it would cost.
 
 - **Left on a closed scenario row moves focus to its session row.** It is
@@ -1250,7 +1259,8 @@ is noted in that PR's description.
 1. **The All scenarios view.** The switch, the tree's rows and their marks,
    the scenario name's click (A1), the count's link and **Show all runs**
    (A2), **Median and best** with the menu's extension (A3), and the docs.
-   - **Needs:** this proposal ratified. Nothing else has to merge first.
+   - **Unblocked:** this proposal was ratified on 2026-10-14, and nothing
+     else has to merge first.
    - **It changes a public page in one release.** The page proposal's four
      PRs were hidden until the last. This one is not: the list gains the
      switch and the link on the day it merges.
