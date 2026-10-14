@@ -836,10 +836,13 @@ What follows from A2's first half.
   scenario it is the first row, as built. So a batch that holds runs on two
   scenarios opens both scenario rows, and so do runs that landed while the
   other view was on screen.
-- **The first time a view is shown in a visit to the page, it also opens the
-  rows of the run at its mark.** That is the arrival rule, for a page drawn
-  on either view. The first press of the switch is the other view's first
-  showing, so the tree then opens the rows of the run the page arrived with
+- **The first time a view's rows arrive in a visit to the page, it also
+  opens the rows of the run at its mark.** That is the arrival rule, for a
+  page drawn on either view. A model with nothing to list sets the marks
+  and is not that first time: with no scenario selected, This scenario's
+  rows first arrive when a scenario is chosen, and its first row then opens,
+  as built. The first press of the switch is when the tree's rows first
+  arrive, so the tree then opens the rows of the run the page arrived with
   and of every run since.
 - **A row the player closed stays closed until a newer run lands in it.**
   Its run is at or below the view's mark, so pressing the switch, a change
@@ -1387,10 +1390,12 @@ maintainer's main checkout.
     Follow on and off, and on a new scenario. One batch that holds runs on
     two scenarios opens both scenario rows.
   - Runs that land while This scenario is on screen: one batch with runs on
-    two scenarios before the tree's first showing, again after a return
+    two scenarios before the tree's rows first arrive, again after a return
     from the tree, and both again with no scenario selected. Pressing the
     switch opens both scenario rows each time, and a row the player closed
     in the tree stays closed.
+  - A page drawn with no scenario selected, then a scenario chosen: the
+    first row arrives open.
   - A page drawn on All scenarios opens only the last run's rows.
   - Focus on a scenario's name stays on that button after the name is
     pressed and after a run lands.
