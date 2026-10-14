@@ -53,8 +53,9 @@ the two moments share: both read the same record. A session the user
 watched live stays reviewable once it ends. Between sessions the user may
 start from a recent session, a scenario's history over weeks, or their
 playlists' weak spots, and the question decides the starting point and how
-much history the answer needs. Whether the live and the finished session
-are one view or two is a design choice for the feature that builds them.
+much history the answer needs. The live and the finished session are one
+view: Run History's run list shows the live session as its first row, in
+the same form as the finished ones under it.
 
 ## What the app does today
 

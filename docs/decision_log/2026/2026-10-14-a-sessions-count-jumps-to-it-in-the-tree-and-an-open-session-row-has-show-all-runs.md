@@ -49,8 +49,8 @@ and what the list does today is in
 **Why a link, and why it reaches back.** The count raises the question the
 tree answers. For a session that isn't recent, the switch alone doesn't get
 there: the tree loads 30 sessions at a time, and on the maintainer's history
-the 30th session This scenario lists for the most-played scenario is the
-233rd session back. Without the link, reaching it meant remembering its date,
+on 2026-10-14 the 30th session This scenario lists for the most-played
+scenario is the 233rd session back. Without the link, reaching it meant remembering its date,
 pressing the switch, and pressing **Show older sessions** seven times.
 
 **How it is built.**
