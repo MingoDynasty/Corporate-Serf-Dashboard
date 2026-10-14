@@ -54,6 +54,11 @@ def _judged(
         pytest.param(
             9873.0, 10000.0, 98.74, False, "98.6", id="a_goal_that_prints_rounded_down"
         ),
+        # 407 / 500 is 81.39999999999999 in floats. The caps hold a percentage
+        # under a line with ``min``, where flooring it would print 81.3%.
+        pytest.param(
+            407.0, 500.0, 95, False, "81.4", id="a_miss_that_flooring_would_print_low"
+        ),
         # A goal above 100: the run beat the old PB and still missed the bar.
         pytest.param(
             820.0, 800.0, 105.0, False, "102.5", id="a_new_pb_short_of_a_stretch_goal"
