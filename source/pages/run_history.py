@@ -13,19 +13,15 @@ surfaces and the queued notices, lives under ``source/components/``.
 import json
 import logging
 from datetime import datetime
-from typing import Any
 
 import dash
 import dash_mantine_components as dmc
 from dash import (
     Input,
-    NoUpdate,
     Output,
-    Patch,
     State,
     callback,
     clientside_callback,
-    ctx,
     dcc,
     no_update,
 )
@@ -49,10 +45,7 @@ from source.components.queued_notices import (
     register_run_import_failure_flush,
     register_startup_playlist_warning_flush,
 )
-from source.components.run_delivery import (
-    run_events_were_triggered,
-    summarize_run_events,
-)
+from source.components.run_delivery import summarize_run_events
 from source.components.run_history_chart import (
     CHART_MODE_DEFAULT,
     CHART_MODE_OPTIONS,
@@ -78,7 +71,6 @@ from source.components.run_history_list import (
     run_list_panel,
     run_list_stores,
 )
-from source.components.run_verdict_toast import build_run_event_notification
 from source.components.scenario_selection import (
     SELECT_HIGHLIGHT_ON_OPEN_CLASS,
     ScenarioSelectionIds,
@@ -110,10 +102,6 @@ from source.plot.plot_service import (
     add_score_threshold_overlay,
     generate_empty_plot,
     generate_placeholder_plot,
-)
-from source.utilities.notifications import (
-    TOAST_CHANNEL_REGISTRY_STORE_ID,
-    channel_toast,
 )
 
 logger = logging.getLogger(__name__)
@@ -220,11 +208,6 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 
-# The Top N this page's run toast places a run against. The page plots every
-# run, so it has no control for it, and the toast places a run against a
-# fixed 5 until the plain run toast replaces it.
-RUN_TOAST_TOP_N_SCORES = 5
-
 # The class the resize script and the zoom fit script find a graph by
 # (``assets/homeGraphResize.js``, ``assets/homeGraphZoomFit.js``).
 GRAPH_CLASS = "home-graph"
@@ -235,8 +218,6 @@ RANGE_FIELD_HIDDEN_CLASS = f"{RANGE_FIELD_CLASS} run-history-range-field-hidden"
 # latest-run card's slot beside it. A row with room to spare gives it to the
 # scenario's name and the Follow switch's label before the card.
 DROPDOWN_FIELD_SIZING = {**PLAYLIST_SELECTOR_SIZING, "flex": "2 1 200px"}
-
-_RUN_EVENTS_PROP = f"{RUN_EVENTS_STORE_ID}.data"
 
 dash.register_page(
     __name__,
@@ -450,11 +431,8 @@ def show_latest_run(  # noqa: PLR0913
 
 @callback(
     Output(CHART_OPTIONS_IDS.cached_plot, "data"),
-    # ``allow_duplicate``: the shell's run-event drain writes the same three
-    # shell-hosted props, and so does every other callback that sends a toast.
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Output("notification-container", "hideNotifications", allow_duplicate=True),
-    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
+    # Read for nothing but its change: a run that lands on the scenario the
+    # page shows is what redraws the chart with it.
     Input(RUN_EVENTS_STORE_ID, "data"),
     Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
     # An Input, so the rank lines follow the filter at once. A playlist's
@@ -473,19 +451,9 @@ def show_latest_run(  # noqa: PLR0913
     Input(CHART_OPTIONS_IDS.high_score_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.score_threshold_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
-    Input(CHART_OPTIONS_IDS.score_threshold_notification, "checked"),
-    # State, not Input: this preference only decides whether a run event that
-    # already triggered the callback gets to toast. Flipping it must not
-    # rebuild the plot or reread the scenario's runs.
-    State(CHART_OPTIONS_IDS.run_notification, "checked"),
-    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
-    # Not ``True``: this callback draws the first chart, so the page load
-    # must still run it, but Dash refuses an ``allow_duplicate`` output
-    # without one of the ``prevent_initial_call`` forms.
-    prevent_initial_call="initial_duplicate",
 )
 def generate_graph(  # noqa: PLR0913
-    run_events,
+    _run_events,
     selected_scenario,
     selected_playlist,
     chart_mode,
@@ -497,34 +465,17 @@ def generate_graph(  # noqa: PLR0913
     high_score_overlay_switch,
     score_threshold_overlay_switch,
     score_threshold_percentage,
-    score_threshold_notification_switch,
-    run_notification_switch,
-    toast_channels,
 ):
-    """Build the chart, and the toast a run that just landed earned.
+    """Build the chart, and return the figure serialized to JSON.
 
-    Returns the figure serialized to JSON, the toasts to show, the toast
-    instances to hide, and the channel registry patch that records the swap.
-    ``run_events`` is the summary of newly landed runs when this call has
-    one. A toast is built only on a call that summary triggered, so neither a
-    control change nor the date moving on repeats the last run's toast.
+    The page load runs it, which is what draws the first chart.
     """
     if not selected_scenario:
-        return (
-            _empty_plot_json(NO_SCENARIO_PLOT_TITLE, NO_SCENARIO_PLOT_MESSAGE),
-            no_update,
-            no_update,
-            no_update,
-        )
+        return _empty_plot_json(NO_SCENARIO_PLOT_TITLE, NO_SCENARIO_PLOT_MESSAGE)
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning('No scenario data found for: "%s"', selected_scenario)
-        return (
-            _empty_plot_json(NO_LOCAL_RUNS_PLOT_TITLE, NO_LOCAL_RUNS_PLOT_MESSAGE),
-            no_update,
-            no_update,
-            no_update,
-        )
+        return _empty_plot_json(NO_LOCAL_RUNS_PLOT_TITLE, NO_LOCAL_RUNS_PLOT_MESSAGE)
 
     plot, supports_overlays = build_run_history_figure(
         chart_mode,
@@ -537,9 +488,6 @@ def generate_graph(  # noqa: PLR0913
         datetime.now().date(),
     )
 
-    notifications: list[dict[str, Any]] | NoUpdate = no_update
-    hide_notifications: list[str] | NoUpdate = no_update
-    next_toast_channels: Patch | NoUpdate = no_update
     if supports_overlays:
         high_score = get_high_score(selected_scenario)
         if high_score_overlay_switch:
@@ -555,23 +503,7 @@ def generate_graph(  # noqa: PLR0913
                 score_threshold_goal_percentage,
             )
             plot = add_score_threshold_overlay(plot, score_threshold)
-
-        notifications = []
-        hide_notifications = []
-        if run_events_were_triggered(ctx.triggered, _RUN_EVENTS_PROP):
-            run_verdict = build_run_event_notification(
-                run_events,
-                selected_scenario,
-                RUN_TOAST_TOP_N_SCORES,
-                score_threshold_percentage,
-                score_threshold_notification_switch,
-                run_notification_switch,
-            )
-            if run_verdict is not None:
-                notifications, hide_notifications, next_toast_channels = channel_toast(
-                    run_verdict, toast_channels
-                )
-    return plot.to_json(), notifications, hide_notifications, next_toast_channels
+    return plot.to_json()
 
 
 # Which range select shows: the one in runs under Score vs Run, and the one

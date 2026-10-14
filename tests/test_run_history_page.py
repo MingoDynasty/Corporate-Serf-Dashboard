@@ -12,7 +12,6 @@ import json
 import re
 from datetime import date, datetime
 from pathlib import Path
-from types import SimpleNamespace
 
 import dash
 import dash_mantine_components as dmc
@@ -33,7 +32,6 @@ from source.components import (  # noqa: E402
 )
 from source.config import settings_service  # noqa: E402
 from source.pages import home, run_history  # noqa: E402
-from source.utilities.notifications import TOAST_CHANNEL_REGISTRY_STORE_ID  # noqa: E402
 from tests.rendered_text import rendered_text  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -501,7 +499,7 @@ def test_the_follow_help_says_a_filter_in_the_way_is_cleared():
 
 
 def test_the_percentage_help_says_a_run_is_judged_whatever_judges_it():
-    """On this page a toast is no longer the only thing that judges a run."""
+    """The sentence names no surface: the check and the card judge a run."""
     field = _by_id(
         run_history.layout(), run_history.CHART_OPTIONS_IDS.score_threshold_percentage
     )
@@ -716,7 +714,7 @@ def _batch(*runs, celebrated_run_id=None):
 
 
 def _payload(scenario_name: str = SCENARIO, **fields):
-    return {"latest": _run(scenario_name, **fields), "celebrated_run_id": None}
+    return {"latest": _run(scenario_name, **fields)}
 
 
 def _registration(output_fragment: str) -> dict:
@@ -769,10 +767,7 @@ def test_with_follow_on_the_summary_is_for_the_scenario_just_played():
         SCENARIO,
     )
 
-    assert summary == {
-        "latest": _run("Scenario B", run_id="b.csv"),
-        "celebrated_run_id": None,
-    }
+    assert summary == {"latest": _run("Scenario B", run_id="b.csv")}
     assert run_landed == "b.csv"
 
 
@@ -790,7 +785,7 @@ def test_with_follow_off_a_run_on_another_scenario_forwards_no_summary():
         False,
         SCENARIO,
     ) == (
-        {"latest": _run(SCENARIO, run_id="a.csv"), "celebrated_run_id": None},
+        {"latest": _run(SCENARIO, run_id="a.csv")},
         # The batch's newest run, whatever scenario the summary is for.
         "b.csv",
     )
@@ -987,28 +982,22 @@ def test_the_chart_rebuilds_on_the_mode_both_ranges_the_date_and_the_playlist_fi
         f"{options.high_score_overlay}.checked",
         f"{options.score_threshold_overlay}.checked",
         f"{options.score_threshold_percentage}.value",
-        f"{options.score_threshold_notification}.checked",
     ]
-    # Flipping the master switch must not rebuild the plot.
-    assert _keys(registration["state"]) == [
-        f"{options.run_notification}.checked",
-        f"{TOAST_CHANNEL_REGISTRY_STORE_ID}.data",
-    ]
+    # It reads no notification setting and no toast registry: the shell sends
+    # the run toast.
+    assert registration["state"] == []
 
 
-def test_the_chart_shares_the_shells_toast_outputs_as_duplicates_and_still_loads():
-    """The shell's run-event drain writes the same three, as every toast's sender does."""
+def test_the_chart_writes_its_figure_and_nothing_else_and_the_page_load_draws_it():
+    """The run toast's channel has one producer, the shell's drain.
+
+    With the figure as its one plain output the callback needs none of the
+    ``prevent_initial_call`` forms, so the page load runs it, which is what
+    draws the first chart.
+    """
     registration = _chart_registration()
-    outputs = registration["output"].strip(".").split("...")
 
-    assert outputs[0] == f"{run_history.CHART_OPTIONS_IDS.cached_plot}.data"
-    assert [output.split("@")[0] for output in outputs[1:]] == [
-        "notification-container.sendNotifications",
-        "notification-container.hideNotifications",
-        f"{TOAST_CHANNEL_REGISTRY_STORE_ID}.data",
-    ]
-    assert all("@" in output for output in outputs[1:])
-    # What Dash stores for "initial_duplicate": the page load still draws it.
+    assert registration["output"] == f"{run_history.CHART_OPTIONS_IDS.cached_plot}.data"
     assert registration["prevent_initial_call"] is False
 
 
@@ -1024,9 +1013,6 @@ def _graph(
     high_score_overlay=False,
     threshold_overlay=False,
     percentage=95,
-    verdict_switch=True,
-    run_notifications=True,
-    triggered=None,
     supports_overlays=True,
 ):
     """Call the chart callback with the data layer stood in for."""
@@ -1039,16 +1025,7 @@ def _graph(
     monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _name: True)
     monkeypatch.setattr(run_history, "build_run_history_figure", build)
     monkeypatch.setattr(run_history, "get_high_score", lambda _name: 830.0)
-    monkeypatch.setattr(
-        run_history,
-        "ctx",
-        SimpleNamespace(
-            triggered=[
-                {"prop_id": triggered or f"{run_history.RUN_EVENTS_STORE_ID}.data"}
-            ]
-        ),
-    )
-    result = run_history.generate_graph(
+    plot = run_history.generate_graph(
         run_events,
         scenario,
         playlist,
@@ -1061,11 +1038,8 @@ def _graph(
         high_score_overlay,
         threshold_overlay,
         percentage,
-        verdict_switch,
-        run_notifications,
-        {},
     )
-    return result, built
+    return plot, built
 
 
 def _annotations(plot_json: str) -> list[str]:
@@ -1076,31 +1050,29 @@ def _annotations(plot_json: str) -> list[str]:
 
 
 def test_with_no_scenario_selected_the_chart_says_so():
-    plot, notifications, hidden, channels = run_history.generate_graph(
+    plot = run_history.generate_graph(
         None, None, None, "score_vs_run", "100", "90", "2026-10-12", True, False,
-        True, True, 95, True, True, {},
+        True, True, 95,
     )  # fmt: skip
 
     assert _annotations(plot) == [
         "<b>No scenario selected</b>",
         "Select a scenario to see your score history.",
     ]
-    assert (notifications, hidden, channels) == (no_update, no_update, no_update)
 
 
 def test_a_scenario_with_no_local_runs_says_so(monkeypatch):
     monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _name: False)
 
-    plot, notifications, _hidden, _channels = run_history.generate_graph(
+    plot = run_history.generate_graph(
         None, "Never Played", None, "score_vs_run", "100", "90", "2026-10-12",
-        True, False, True, True, 95, True, True, {},
+        True, False, True, True, 95,
     )  # fmt: skip
 
     assert _annotations(plot) == [
         "<b>No local runs found</b>",
         "Play this scenario once and the graph will fill in.",
     ]
-    assert notifications is no_update
 
 
 def test_the_chart_asks_for_the_figure_with_every_control_and_todays_date(monkeypatch):
@@ -1111,13 +1083,12 @@ def test_the_chart_asks_for_the_figure_with_every_control_and_todays_date(monkey
 
     monkeypatch.setattr(run_history, "datetime", _FrozenDatetime)
 
-    (plot, *_rest), built = _graph(
+    plot, built = _graph(
         monkeypatch,
         playlist="KovaaKsTestCode",
         mode="score_vs_time",
         run_range="50",
         day_range="30",
-        triggered=f"{run_history.DAY_RANGE_ID}.value",
     )
 
     assert built == [
@@ -1138,9 +1109,7 @@ def test_the_chart_asks_for_the_figure_with_every_control_and_todays_date(monkey
 def test_the_pb_score_and_score_threshold_lines_are_drawn_on_the_figure(monkeypatch):
     monkeypatch.setattr(run_history, "score_threshold_line", lambda *_args: 788.5)
 
-    (plot, *_rest), _built = _graph(
-        monkeypatch, high_score_overlay=True, threshold_overlay=True
-    )
+    plot, _built = _graph(monkeypatch, high_score_overlay=True, threshold_overlay=True)
 
     assert _annotations(plot) == ["PB score (830.00)", "Score threshold (788.50)"]
 
@@ -1154,7 +1123,7 @@ def test_an_empty_percentage_draws_no_threshold_line(monkeypatch, empty_percenta
         lambda *_args: pytest.fail("placed a threshold line with no percentage"),
     )
 
-    (plot, *_rest), _built = _graph(
+    plot, _built = _graph(
         monkeypatch,
         high_score_overlay=True,
         threshold_overlay=True,
@@ -1164,24 +1133,8 @@ def test_an_empty_percentage_draws_no_threshold_line(monkeypatch, empty_percenta
     assert _annotations(plot) == ["PB score (830.00)"]
 
 
-@pytest.mark.parametrize("empty_percentage", [None, ""])
-def test_a_run_no_percentage_can_judge_is_still_placed(monkeypatch, empty_percentage):
-    """The run goes unjudged, and its placement still earns the toast."""
-    (_plot, notifications, hidden, channels), _built = _graph(
-        monkeypatch,
-        run_events=_payload(score=780.0),
-        threshold_overlay=True,
-        percentage=empty_percentage,
-    )
-
-    assert [toast["action"] for toast in notifications] == ["show"]
-    assert [toast["title"] for toast in notifications] == ["New 2nd-best score"]
-    assert hidden == []
-    assert channels is not no_update
-
-
-def test_an_empty_range_takes_no_overlay_and_sends_no_toast(monkeypatch):
-    (plot, notifications, hidden, channels), _built = _graph(
+def test_an_empty_range_takes_no_overlay(monkeypatch):
+    plot, _built = _graph(
         monkeypatch,
         run_events=_payload(score=830.0),
         high_score_overlay=True,
@@ -1189,67 +1142,24 @@ def test_an_empty_range_takes_no_overlay_and_sends_no_toast(monkeypatch):
     )
 
     assert _annotations(plot) == []
-    assert (notifications, hidden, channels) == (no_update, no_update, no_update)
 
 
-def test_a_run_that_just_landed_gets_todays_toast(monkeypatch):
-    """The page builds today's run toast until the plain run toast replaces it."""
-    (_plot, notifications, hidden, channels), _built = _graph(
-        monkeypatch, run_events=_payload(score=830.0)
-    )
+def test_a_run_that_lands_redraws_the_chart_and_the_page_sends_no_toast(monkeypatch):
+    """The answer is the figure alone. The shell's drain sends the run's toast."""
+    plot, built = _graph(monkeypatch, run_events=_payload(score=830.0))
 
-    (toast,) = notifications
-    assert toast["title"] == "Threshold passed"
-    assert toast["message"] == (
-        f"{SCENARIO}: 830.00, 103.8% of PB. Also your 2nd-best at 34.64 cm/360."
-    )
-    assert hidden == []
-    assert channels is not no_update
+    assert isinstance(plot, str)
+    assert json.loads(plot)["layout"]["title"]["text"] == "built"
+    assert len(built) == 1
 
 
-@pytest.mark.parametrize(("nth_score", "placed"), [(5, True), (6, False)])
-def test_the_toast_places_a_run_against_a_top_n_fixed_at_five(
-    monkeypatch, nth_score, placed
-):
-    """The page plots every run and has no control for it, so the five is fixed."""
-    (_plot, notifications, _hidden, _channels), _built = _graph(
-        monkeypatch,
-        run_events=_payload(nth_score=nth_score, is_new_sensitivity=True),
-    )
+def test_the_page_builds_no_toast_of_its_own():
+    """Each toast channel keeps one producer, and the run toast's is the shell."""
+    source = (SOURCE_ROOT / "pages" / "run_history.py").read_text(encoding="utf-8")
 
-    assert run_history.RUN_TOAST_TOP_N_SCORES == 5
-    assert [toast["title"] for toast in notifications] == (
-        ["New 5th-best score"] if placed else []
-    )
-
-
-def test_a_control_change_does_not_repeat_the_last_runs_toast(monkeypatch):
-    """The store replays its summary to every later call."""
-    (_plot, notifications, hidden, channels), _built = _graph(
-        monkeypatch,
-        run_events=_payload(score=830.0),
-        triggered=f"{run_history.CHART_MODE_ID}.value",
-    )
-
-    assert (notifications, hidden) == ([], [])
-    assert channels is no_update
-
-
-def test_run_notifications_off_sends_no_toast(monkeypatch):
-    (_plot, notifications, _hidden, channels), _built = _graph(
-        monkeypatch, run_events=_payload(score=830.0), run_notifications=False
-    )
-
-    assert notifications == []
-    assert channels is no_update
-
-
-def test_the_verdict_switch_off_leaves_only_a_placement_to_report(monkeypatch):
-    (_plot, notifications, _hidden, _channels), _built = _graph(
-        monkeypatch, run_events=_payload(score=830.0), verdict_switch=False
-    )
-
-    assert [toast["title"] for toast in notifications] == ["New 2nd-best score"]
+    assert "channel_toast" not in source
+    assert "sendNotifications" not in source
+    assert not (SOURCE_ROOT / "components" / "run_verdict_toast.py").exists()
 
 
 # --- The date the ranges of days count back from ---------------------------------------
@@ -1317,24 +1227,17 @@ def test_a_page_holding_no_date_is_given_todays(monkeypatch, held):
 
 
 def test_a_chart_left_open_past_midnight_is_rebuilt_for_the_new_date(monkeypatch):
-    """The date's write calls the chart, which reads the clock for itself.
-
-    The last run's summary is still in its store on that call, and it earns
-    no second toast.
-    """
+    """The date's write calls the chart, which reads the clock for itself."""
     monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 13, 0, 0, 20))
 
-    (_plot, notifications, hidden, channels), built = _graph(
+    _plot, built = _graph(
         monkeypatch,
         run_events=_payload(score=830.0),
         mode="score_vs_time",
         day_range="7",
-        triggered=f"{run_history.TODAY_STORE_ID}.data",
     )
 
     assert [arguments[-1] for arguments in built] == [date(2026, 10, 13)]
-    assert (notifications, hidden) == ([], [])
-    assert channels is no_update
 
 
 # --- The stylesheet --------------------------------------------------------------------
@@ -1680,7 +1583,7 @@ def test_the_graph_takes_the_latest_run_and_waits_for_both_of_its_writers():
         f"{run_history.LATEST_RUN_STORE_ID}.data",
     ]
     assert graph["state"] == []
-    assert f"..{options.cached_plot}.data..." in chart["output"]
+    assert chart["output"] == f"{options.cached_plot}.data"
     assert card["output"].endswith(f"...{run_history.LATEST_RUN_STORE_ID}.data..")
     # Neither write is a duplicate one, which Dash would not hold the graph
     # back for.

@@ -1,13 +1,11 @@
 """The summary a page's batch consumer makes of the shell's run-event batch.
 
 ``summarize_run_events`` picks the scenario the page should show and the one
-run it narrates. The callbacks that forward the summary are each page's own,
-and are tested with their page.
+run its summary names. The callbacks that forward the summary are each page's
+own, and are tested with their page.
 """
 
 import json
-
-from dash._callback_context import falsy_triggered
 
 from source.app_shell import RunEventBatch, RunEventData
 from source.components import run_delivery
@@ -50,16 +48,8 @@ def _batch(
     }
 
 
-def _payload(
-    scenario_name: str = "Scenario A",
-    *,
-    celebrated_run_id: str | None = None,
-    **run_fields,
-) -> RunEventsPayload:
-    return {
-        "latest": _run(scenario_name, **run_fields),
-        "celebrated_run_id": celebrated_run_id,
-    }
+def _payload(scenario_name: str = "Scenario A", **run_fields) -> RunEventsPayload:
+    return {"latest": _run(scenario_name, **run_fields)}
 
 
 def test_summarize_run_events_coalesces_a_single_scenario_backlog():
@@ -116,10 +106,9 @@ def test_summarize_run_events_returns_no_payload_when_nothing_relevant():
     )
 
 
-def test_the_decision_travels_even_when_it_names_another_scenarios_run():
-    # The celebration is app-wide, so the run it names need not be one this
-    # page is showing. Forwarding it unconditionally is what lets the page
-    # recognize the celebrated run when it *is* the one being narrated.
+def test_the_summary_names_the_run_and_carries_no_decision():
+    # The shell sends both run toasts itself, so no page needs to know which
+    # run the batch celebrated. The batch still says, for the animation.
     _target, payload = run_delivery.summarize_run_events(
         _batch(
             _run("Scenario B", run_id="pb.csv", score=900.0),
@@ -130,29 +119,4 @@ def test_the_decision_travels_even_when_it_names_another_scenarios_run():
         False,
     )
 
-    assert payload["celebrated_run_id"] == "pb.csv"
-    assert payload["latest"]["run_id"] == "ordinary.csv"
-
-
-def test_run_events_were_triggered_reads_the_trigger_and_not_the_value():
-    """The store replays its last summary, so only the trigger says a run landed."""
-    prop = "page-run-events.data"
-
-    assert run_delivery.run_events_were_triggered([{"prop_id": prop}], prop)
-    assert run_delivery.run_events_were_triggered(
-        [{"prop_id": "page-scenario.value"}, {"prop_id": prop}], prop
-    )
-    assert not run_delivery.run_events_were_triggered(
-        [{"prop_id": "page-scenario.value"}], prop
-    )
-    # Another page's store is not this page's.
-    assert not run_delivery.run_events_were_triggered(
-        [{"prop_id": "run-events.data"}], prop
-    )
-
-
-def test_a_call_nothing_triggered_is_not_a_landed_run():
-    """Dash hands an untriggered call a falsy list that still holds one item."""
-    assert not run_delivery.run_events_were_triggered(
-        falsy_triggered, "page-run-events.data"
-    )
+    assert payload == {"latest": _run("Scenario A", run_id="ordinary.csv")}

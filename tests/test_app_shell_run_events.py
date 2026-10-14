@@ -2,15 +2,19 @@
 
 Facts travel and only this callback decides. Every assertion below is about
 that invariant: the drain stamps liveness, names at most one celebrated run,
-and publishes both so the pages never re-derive either.
+and publishes both so the pages never re-derive either. It also sends both
+run toasts, the celebration and the plain one, and the section "which run
+earns which toast" holds the table that says which run gets which.
 """
 
 from collections import deque
 from datetime import datetime, timedelta
+from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 import dash
 import pytest
-from dash import no_update
+from dash import dcc, html, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -19,19 +23,20 @@ from source import app_shell  # noqa: E402
 from source.app_shell import (  # noqa: E402
     CELEBRATION_STYLE_CONFETTI,
     CELEBRATION_STYLE_OFF,
+    RUN_NOTIFICATIONS_OFF,
+    RUN_NOTIFICATIONS_ON,
 )
-from source.components import (  # noqa: E402
-    run_delivery,
-    run_verdict_toast,
-    scenario_selection,
-)
+from source.components import scenario_selection  # noqa: E402
 from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import run_history  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_CHANNEL,
+    DEFAULT_AUTO_CLOSE_MS,
+    RUN_VERDICT_CHANNEL,
     TOAST_CHANNEL_REGISTRY_STORE_ID,
 )
 
+SOURCE_ROOT = Path(__file__).resolve().parents[1] / "source"
 _NOW = datetime(2026, 8, 29, 12, 0, 0)
 
 
@@ -82,11 +87,16 @@ def _drain_emission(
     previous_batch=None,
     toast_channels=None,
     celebration_style=CELEBRATION_STYLE_CONFETTI,
+    run_notifications=RUN_NOTIFICATIONS_ON,
 ):
     """Run one drain and return all four outputs, registry patch included."""
     monkeypatch.setattr(app_shell, "message_queue", deque(messages))
     return app_shell.publish_run_events(
-        1, previous_batch, toast_channels or {}, celebration_style
+        1,
+        previous_batch,
+        toast_channels or {},
+        celebration_style,
+        run_notifications,
     )
 
 
@@ -95,20 +105,49 @@ def _drain(
     *messages,
     previous_batch=None,
     celebration_style=CELEBRATION_STYLE_CONFETTI,
+    run_notifications=RUN_NOTIFICATIONS_ON,
 ):
     """Run one drain over a queue holding exactly these messages.
 
     Returns the batch and the toasts to show. The hide list and the registry
-    patch are the celebration channel's business, asserted through
-    ``_drain_emission`` in the channel tests below.
+    patch are the channels' business, asserted through ``_drain_emission`` in
+    the channel tests below.
     """
     batch, send, _hide, _patch = _drain_emission(
         monkeypatch,
         *messages,
         previous_batch=previous_batch,
         celebration_style=celebration_style,
+        run_notifications=run_notifications,
     )
     return batch, send
+
+
+def _on_channel(send, channel: str) -> list[dict]:
+    """Pick one channel's toasts out of what a drain sent."""
+    if send is no_update:
+        return []
+    return [toast for toast in send if toast["id"].startswith(f"{channel}-")]
+
+
+def _celebrations(send) -> list[dict]:
+    return _on_channel(send, CELEBRATION_CHANNEL)
+
+
+def _run_toasts(send) -> list[dict]:
+    return _on_channel(send, RUN_VERDICT_CHANNEL)
+
+
+def _link(run_toast: dict) -> dcc.Link:
+    """The one link in a run toast's message."""
+    (link,) = [part for part in run_toast["message"] if isinstance(part, dcc.Link)]
+    return link
+
+
+def _named_run(run_toast: dict) -> str:
+    """The id of the run a run toast is about, read from its link."""
+    (run_id,) = parse_qs(urlsplit(_link(run_toast).href).query)["run"]
+    return run_id
 
 
 def _registry_writes(patch) -> dict[str, str | None]:
@@ -181,7 +220,7 @@ def test_a_tie_with_the_previous_best_is_never_celebrated(monkeypatch, frozen_cl
     )
 
     assert batch["celebrated_run_id"] is None
-    assert notifications is no_update
+    assert _celebrations(notifications) == []
 
 
 def test_a_scenarios_first_run_only_sets_the_baseline(monkeypatch, frozen_clock):
@@ -196,7 +235,7 @@ def test_a_scenarios_first_run_only_sets_the_baseline(monkeypatch, frozen_clock)
     )
 
     assert batch["celebrated_run_id"] is None
-    assert notifications is no_update
+    assert _celebrations(notifications) == []
 
 
 def test_a_new_sensitivity_run_can_still_win_the_celebration(monkeypatch, frozen_clock):
@@ -233,8 +272,8 @@ def test_the_animation_sequence_advances_only_on_a_celebration(
 def test_the_celebration_toast_is_emitted_exactly_when_a_run_is_named(
     monkeypatch, frozen_clock
 ):
-    _batch, silent = _drain(monkeypatch, _message(score=700.0))
-    assert silent is no_update
+    _batch, uncelebrated = _drain(monkeypatch, _message(score=700.0))
+    assert _celebrations(uncelebrated) == []
 
     _batch, notifications = _drain(monkeypatch, _message(score=830.0))
     assert [payload["action"] for payload in notifications] == ["show"]
@@ -260,7 +299,7 @@ def test_the_celebration_toast_has_its_own_channel(monkeypatch, frozen_clock):
 
     assert notifications[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
     assert set(_registry_writes(patch)) == {CELEBRATION_CHANNEL}
-    assert CELEBRATION_CHANNEL != run_verdict_toast.RUN_VERDICT_CHANNEL
+    assert CELEBRATION_CHANNEL != RUN_VERDICT_CHANNEL
 
 
 def test_a_later_celebration_replaces_the_one_on_screen(monkeypatch, frozen_clock):
@@ -289,12 +328,12 @@ def test_a_later_celebration_replaces_the_one_on_screen(monkeypatch, frozen_cloc
     assert second[0]["autoClose"] is False
 
 
-def test_the_shell_writes_only_the_celebration_channel(monkeypatch, frozen_clock):
+def test_a_celebration_alone_writes_only_its_own_channel(monkeypatch, frozen_clock):
     """The two toast families stay in separate lanes.
 
-    The shell declares the registry and hide outputs it needs for its own
-    channel, and its emission assigns exactly one key. A whole-dict write here
-    would let the shell clobber the page's run-verdict entry.
+    The shell declares the registry and hide outputs both of its channels
+    need, and an emission assigns only the keys it emits on. A whole-dict
+    write here would carry a stale run-toast entry back over a newer one.
     """
     (spec,) = [
         spec
@@ -306,17 +345,23 @@ def test_the_shell_writes_only_the_celebration_channel(monkeypatch, frozen_clock
     assert "hideNotifications" in str(spec["output"])
     assert spec["prevent_initial_call"] is True
 
-    _batch, _send, _hide, patch = _drain_emission(
-        monkeypatch, _message(score=830.0), toast_channels={"run-verdict": "verdict-1"}
+    _batch, _send, hide, patch = _drain_emission(
+        monkeypatch,
+        _message(score=830.0),
+        toast_channels={RUN_VERDICT_CHANNEL: "run-verdict-1"},
     )
 
     assert set(_registry_writes(patch)) == {CELEBRATION_CHANNEL}
+    # The run toast on screen is about another run, and it stays.
+    assert hide == []
 
 
-def test_a_quiet_drain_touches_neither_the_hide_list_nor_the_registry(
+def test_a_drain_that_toasts_nothing_touches_neither_the_hide_list_nor_the_registry(
     monkeypatch, frozen_clock
 ):
-    _batch, send, hide, patch = _drain_emission(monkeypatch, _message(score=700.0))
+    _batch, send, hide, patch = _drain_emission(
+        monkeypatch, _message(score=700.0), run_notifications=RUN_NOTIFICATIONS_OFF
+    )
 
     assert (send, hide, patch) == (no_update, no_update, no_update)
 
@@ -327,11 +372,11 @@ def test_a_quiet_drain_touches_neither_the_hide_list_nor_the_registry(
 def test_off_publishes_the_batch_but_stamps_no_celebration(monkeypatch, frozen_clock):
     """Off silences the family, not the delivery.
 
-    The batch still carries every run and its liveness stamp, because the plot
-    is every run's record whatever the setting says, and the page then narrates
-    the run under its ordinary rules.
+    The batch still carries every run and its liveness stamp, because the page
+    is every run's record whatever the setting says. The run is then an
+    ordinary one, which the table's second row holds.
     """
-    batch, notifications, hide, patch = _drain_emission(
+    batch, notifications, _hide, patch = _drain_emission(
         monkeypatch,
         _message(score=830.0),
         celebration_style=CELEBRATION_STYLE_OFF,
@@ -340,7 +385,8 @@ def test_off_publishes_the_batch_but_stamps_no_celebration(monkeypatch, frozen_c
     assert [run["run_id"] for run in batch["runs"]] == ["run-1.csv"]
     assert batch["runs"][0]["is_live"] is True
     assert batch["celebrated_run_id"] is None
-    assert (notifications, hide, patch) == (no_update, no_update, no_update)
+    assert _celebrations(notifications) == []
+    assert CELEBRATION_CHANNEL not in _registry_writes(patch)
 
 
 def test_off_holds_the_animation_sequence_where_it_was(monkeypatch, frozen_clock):
@@ -365,7 +411,7 @@ def test_an_unknown_stored_style_still_celebrates(monkeypatch, frozen_clock):
     )
 
     assert batch["celebrated_run_id"] == "run-1.csv"
-    assert notifications is not no_update
+    assert len(_celebrations(notifications)) == 1
 
 
 def test_the_style_store_is_browser_local_and_defaults_to_confetti():
@@ -387,6 +433,36 @@ def test_the_drain_reads_the_style_store_as_state():
         dep["id"] for dep in spec["inputs"]
     }
     assert (app_shell.PB_CELEBRATION_STYLE_STORE_ID, "data") in {
+        (dep["id"], dep["property"]) for dep in spec["state"]
+    }
+
+
+def test_the_run_notifications_store_is_browser_local_and_starts_on():
+    """The id and the off value are what a browser holds.
+
+    Changing either turns run toasts back on for everyone who turned them
+    off, so both are spelled out here and not read from the constants.
+    """
+    store = _component(app_shell.layout(), "run-notifications")
+
+    assert app_shell.RUN_NOTIFICATIONS_STORE_ID == "run-notifications"
+    assert RUN_NOTIFICATIONS_OFF == "off"
+    assert store.storage_type == "local"
+    assert store.data == RUN_NOTIFICATIONS_ON == "on"
+
+
+def test_the_drain_reads_the_run_notifications_store_as_state():
+    """State, not Input: flipping the setting must not toast a drained batch."""
+    (spec,) = [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if "run-events-batch.data" in str(spec["output"])
+    ]
+
+    assert [(dep["id"], dep["property"]) for dep in spec["inputs"]] == [
+        (app_shell.PB_CELEBRATION_INTERVAL_ID, "n_intervals")
+    ]
+    assert (app_shell.RUN_NOTIFICATIONS_STORE_ID, "data") in {
         (dep["id"], dep["property"]) for dep in spec["state"]
     }
 
@@ -497,7 +573,7 @@ def test_the_window_is_never_shorter_than_one_poll_period(monkeypatch, frozen_cl
     old by the time the drain sees it.
     A fixed cap below that period would then mark all of them stale and
     silently retire every toast liveness gates -- the celebration and the
-    page's ordinary run toasts alike -- while the plot kept updating.
+    plain run toast alike -- while the plot kept updating.
     """
     monkeypatch.setattr(app_shell, "_drain_interval_ms", lambda: 300_000)
 
@@ -574,7 +650,7 @@ def test_a_message_appended_mid_drain_is_seen_exactly_once(monkeypatch, frozen_c
     )
 
     batch, *_emission = app_shell.publish_run_events(
-        1, None, {}, CELEBRATION_STYLE_CONFETTI
+        1, None, {}, CELEBRATION_STYLE_CONFETTI, RUN_NOTIFICATIONS_ON
     )
 
     assert [run["run_id"] for run in batch["runs"]] == ["early.csv", "late.csv"]
@@ -668,16 +744,60 @@ def test_a_nonpositive_previous_best_drops_the_percentage(previous_best):
     )
 
 
-def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
+# --- which run earns which toast -----------------------------------------
+#
+# The six rows of the table under "A new personal best" in the Run toasts
+# decision, one test per row, each named for its row. A row is the batch's
+# newest live run, the celebration setting, the Run notifications setting, and
+# what is on screen. ``_message``'s default previous best is 800.0, so a score
+# of 830.0 sets a new PB and 780.0 does not.
+
+_BOTH_STYLES = [CELEBRATION_STYLE_CONFETTI, CELEBRATION_STYLE_OFF]
+_BOTH_NOTIFICATION_VALUES = [RUN_NOTIFICATIONS_ON, RUN_NOTIFICATIONS_OFF]
+
+
+@pytest.mark.parametrize("run_notifications", _BOTH_NOTIFICATION_VALUES)
+def test_row_1_a_new_pb_with_the_celebration_on_shows_the_celebration_alone(
+    monkeypatch, frozen_clock, run_notifications
+):
+    """A run the celebration announces keeps the celebration as its one toast."""
+    batch, send, _hide, patch = _drain_emission(
+        monkeypatch,
+        _message(run_id="pb.csv", score=830.0),
+        run_notifications=run_notifications,
+    )
+
+    assert batch["celebrated_run_id"] == "pb.csv"
+    assert [toast["title"] for toast in send] == ["New personal best"]
+    assert _run_toasts(send) == []
+    assert set(_registry_writes(patch)) == {CELEBRATION_CHANNEL}
+
+
+def test_row_2_a_new_pb_with_the_celebration_off_shows_the_plain_toast(
     monkeypatch, frozen_clock
 ):
-    """Up to two toasts per batch, one per run, and never a digest.
+    batch, send, _hide, patch = _drain_emission(
+        monkeypatch,
+        _message(run_id="pb.csv", score=830.0),
+        celebration_style=CELEBRATION_STYLE_OFF,
+    )
 
-    A personal best in one scenario beside an ordinary live run in the selected
-    one: each toast reports its own run exactly once. The contract is per run,
-    not per batch, which is why two toasts here is correct.
+    assert batch["celebrated_run_id"] is None
+    assert [toast["title"] for toast in send] == ["New run detected"]
+    assert _named_run(send[0]) == "pb.csv"
+    assert set(_registry_writes(patch)) == {RUN_VERDICT_CHANNEL}
+
+
+def test_row_3_an_earlier_pb_in_the_batch_shows_both_toasts_about_different_runs(
+    monkeypatch, frozen_clock
+):
+    """Two toasts in one response, and one registry patch that assigns both keys.
+
+    An output takes one value and two patches cannot be joined, so the one
+    patch has to carry both channels' assignments. Each is still a per-key
+    write: the registry is never sent back whole.
     """
-    batch, celebration = _drain(
+    batch, send, hide, patch = _drain_emission(
         monkeypatch,
         _message(
             "Scenario B",
@@ -685,22 +805,249 @@ def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
             score=900.0,
             scenario_previous_best=700.0,
         ),
-        # Below its own previous best, so the batch has exactly one
-        # personal best and the newest-qualifying rule cannot pick this one.
+        # Below its own previous best, so the batch has exactly one personal
+        # best and the newest-qualifying rule cannot pick this one.
         _message("Scenario A", run_id="ordinary.csv", score=780.0),
-    )
-    _target, payload = run_delivery.summarize_run_events(batch, "Scenario A", False)
-    verdict = run_verdict_toast.build_run_event_notification(
-        payload,
-        "Scenario A",
-        5,
-        95.0,
-        True,
-        True,
+        toast_channels={
+            CELEBRATION_CHANNEL: "pb-celebration-old",
+            RUN_VERDICT_CHANNEL: "run-verdict-old",
+            "unrelated": "unrelated-1",
+        },
     )
 
+    (celebration,) = _celebrations(send)
+    (run_toast,) = _run_toasts(send)
+    assert len(send) == 2
     assert batch["celebrated_run_id"] == "pb.csv"
-    assert celebration[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
-    assert celebration[0]["message"].startswith("Scenario B: 900.00.")
-    assert verdict["id"] == run_verdict_toast.RUN_VERDICT_CHANNEL
-    assert verdict["message"].startswith("Scenario A: 780.00")
+    assert celebration["message"].startswith("Scenario B: 900.00.")
+    assert _named_run(run_toast) == "ordinary.csv"
+    assert [operation["operation"] for operation in patch._operations] == [
+        "Assign",
+        "Assign",
+    ]
+    assert _registry_writes(patch) == {
+        CELEBRATION_CHANNEL: celebration["id"],
+        RUN_VERDICT_CHANNEL: run_toast["id"],
+    }
+    # Each replaces its own channel's instance, and nothing else is hidden.
+    assert sorted(hide) == ["pb-celebration-old", "run-verdict-old"]
+
+
+def test_row_3_holds_when_both_runs_are_on_one_scenario(monkeypatch, frozen_clock):
+    """The shell picks the batch's newest run, whatever its scenario."""
+    _batch, send = _drain(
+        monkeypatch,
+        _message(run_id="pb.csv", score=830.0),
+        _message(run_id="after-it.csv", score=780.0, scenario_previous_best=830.0),
+    )
+
+    assert [toast["title"] for toast in send] == [
+        "New personal best",
+        "New run detected",
+    ]
+    assert _named_run(send[1]) == "after-it.csv"
+
+
+@pytest.mark.parametrize("celebration_style", _BOTH_STYLES)
+def test_row_4_a_run_that_set_no_pb_shows_the_plain_toast(
+    monkeypatch, frozen_clock, celebration_style
+):
+    batch, send, hide, patch = _drain_emission(
+        monkeypatch,
+        _message(run_id="ordinary.csv", score=780.0),
+        celebration_style=celebration_style,
+    )
+
+    assert batch["celebrated_run_id"] is None
+    assert [toast["title"] for toast in send] == ["New run detected"]
+    assert _named_run(send[0]) == "ordinary.csv"
+    assert hide == []
+    assert set(_registry_writes(patch)) == {RUN_VERDICT_CHANNEL}
+
+
+@pytest.mark.parametrize(
+    ("scores", "celebration_style", "titles"),
+    [
+        ([780.0], CELEBRATION_STYLE_CONFETTI, []),
+        ([780.0], CELEBRATION_STYLE_OFF, []),
+        ([830.0], CELEBRATION_STYLE_CONFETTI, ["New personal best"]),
+        ([830.0], CELEBRATION_STYLE_OFF, []),
+        # An earlier run set the PB: with the plain toast off, row 3's pair is
+        # the celebration alone.
+        ([830.0, 780.0], CELEBRATION_STYLE_CONFETTI, ["New personal best"]),
+    ],
+)
+def test_row_5_run_notifications_off_sends_no_plain_toast_and_the_celebration_follows_its_own_setting(  # noqa: E501
+    monkeypatch, frozen_clock, scores, celebration_style, titles
+):
+    batch, send, _hide, patch = _drain_emission(
+        monkeypatch,
+        *[
+            _message(run_id=f"run-{index}.csv", score=score)
+            for index, score in enumerate(scores)
+        ],
+        celebration_style=celebration_style,
+        run_notifications=RUN_NOTIFICATIONS_OFF,
+    )
+
+    assert len(batch["runs"]) == len(scores)
+    assert _run_toasts(send) == []
+    assert [toast["title"] for toast in _celebrations(send)] == titles
+    assert RUN_VERDICT_CHANNEL not in _registry_writes(patch)
+
+
+@pytest.mark.parametrize("celebration_style", _BOTH_STYLES)
+@pytest.mark.parametrize("run_notifications", _BOTH_NOTIFICATION_VALUES)
+def test_row_6_a_batch_with_no_live_run_shows_nothing(
+    monkeypatch, frozen_clock, celebration_style, run_notifications
+):
+    """Still published, because the page is every run's record."""
+    batch, send, hide, patch = _drain_emission(
+        monkeypatch,
+        _message(run_id="a.csv", score=830.0, age_seconds=_window() + 60),
+        _message(run_id="b.csv", score=780.0, age_seconds=_window() + 1),
+        celebration_style=celebration_style,
+        run_notifications=run_notifications,
+    )
+
+    assert [(run["run_id"], run["is_live"]) for run in batch["runs"]] == [
+        ("a.csv", False),
+        ("b.csv", False),
+    ]
+    assert (send, hide, patch) == (no_update, no_update, no_update)
+
+
+# --- the plain toast -------------------------------------------------------
+
+
+def test_a_batch_of_several_runs_gets_one_toast_for_its_newest_run(
+    monkeypatch, frozen_clock
+):
+    """The other runs earn none, and the title does not count them."""
+    _batch, send = _drain(
+        monkeypatch,
+        _message("Scenario A", run_id="a.csv", score=700.0),
+        _message("Scenario B", run_id="b.csv", score=760.0),
+        _message("Scenario C", run_id="c.csv", score=780.0),
+    )
+
+    (run_toast,) = send
+    assert run_toast["title"] == "New run detected"
+    assert _named_run(run_toast) == "c.csv"
+    assert run_toast["message"][0].children == "Scenario C"
+
+
+def test_the_runs_before_a_celebrated_newest_run_earn_no_toast(
+    monkeypatch, frozen_clock
+):
+    _batch, send = _drain(
+        monkeypatch,
+        _message("Scenario B", run_id="ordinary.csv", score=780.0),
+        _message("Scenario A", run_id="pb.csv", score=830.0),
+    )
+
+    assert [toast["title"] for toast in send] == ["New personal best"]
+
+
+def test_the_run_toast_is_blue_and_holds_the_scenario_and_a_link_and_nothing_else(
+    monkeypatch, frozen_clock
+):
+    """No score, percentage, sensitivity, or goal: the page holds the verdict."""
+    _batch, send = _drain(
+        monkeypatch,
+        _message("Scenario A", score=780.0, pace_constant=1000.0),
+    )
+
+    (run_toast,) = send
+    assert run_toast["action"] == "show"
+    assert run_toast["title"] == "New run detected"
+    assert run_toast["color"] == "blue"
+    assert run_toast["autoClose"] == DEFAULT_AUTO_CLOSE_MS
+    assert "fontisto-line-chart.svg" in str(run_toast["icon"].to_plotly_json())
+
+    scenario_line, link = run_toast["message"]
+    # A line of its own: a block, so the link starts on the line below.
+    assert isinstance(scenario_line, html.Div)
+    assert scenario_line.children == "Scenario A"
+    assert link.children == "Open in Run History"
+    assert link.className == app_shell.RUN_TOAST_LINK_CLASS
+
+
+def test_the_link_is_a_dcc_link_to_run_history_with_the_encoded_name_and_the_run(
+    monkeypatch, frozen_clock
+):
+    """A ``dmc.Anchor`` would decode the name, and an ``html.A`` reload the app."""
+    name = "Whisphere Small & Slow 70% +#? x/y"
+    run_id = f"{name} - Challenge - 2026.10.13-18.00.00 Stats.csv"
+
+    _batch, send = _drain(monkeypatch, _message(name, run_id=run_id, score=780.0))
+    link = _link(send[0])
+
+    assert type(link) is dcc.Link
+    # Unset is dcc.Link's own default: the page changes with no reload.
+    assert getattr(link, "refresh", False) is False
+    address = urlsplit(link.href)
+    assert address.path == "/run-history"
+    assert parse_qs(address.query) == {"scenario": [name], "run": [run_id]}
+    for encoded in ("%26", "%25", "%2B", "%23"):
+        assert encoded in link.href
+    # The one function that builds a scenario's address built it, and it
+    # carries no playlist: the shell does not know the page's filter.
+    assert link.href == app_shell.scenario_run_history_href(name, run_id=run_id)
+    assert "playlist_code" not in link.href
+
+
+def test_two_runs_of_one_scenario_link_to_two_addresses(monkeypatch, frozen_clock):
+    """A link to the address the page already holds would do nothing."""
+    _batch, first = _drain(monkeypatch, _message(run_id="first.csv", score=780.0))
+    _batch, second = _drain(monkeypatch, _message(run_id="second.csv", score=780.0))
+
+    assert _link(first[0]).href != _link(second[0]).href
+    assert (
+        parse_qs(urlsplit(_link(first[0]).href).query)["scenario"]
+        == parse_qs(urlsplit(_link(second[0]).href).query)["scenario"]
+        == ["Scenario A"]
+    )
+
+
+@pytest.mark.parametrize("stored", [None, "", "quiet", "OFF", True, False, 0])
+def test_only_the_exact_off_value_silences_the_run_toast(
+    monkeypatch, frozen_clock, stored
+):
+    """A value this build does not know, or a store the browser lost, shows it."""
+    _batch, send = _drain(monkeypatch, _message(score=780.0), run_notifications=stored)
+
+    assert [toast["title"] for toast in send] == ["New run detected"]
+
+
+def test_a_run_toast_replaces_the_one_on_screen_and_leaves_a_celebration_up(
+    monkeypatch, frozen_clock
+):
+    _batch, send, hide, patch = _drain_emission(
+        monkeypatch,
+        _message(score=780.0),
+        toast_channels={
+            CELEBRATION_CHANNEL: "pb-celebration-1",
+            RUN_VERDICT_CHANNEL: "run-verdict-1",
+        },
+    )
+
+    assert hide == ["run-verdict-1"]
+    assert _registry_writes(patch) == {RUN_VERDICT_CHANNEL: send[0]["id"]}
+    assert send[0]["id"] != "run-verdict-1"
+
+
+def test_the_shell_is_the_only_code_that_names_the_run_toasts_channel():
+    """Each channel has exactly one producing callback, and this one's is the drain.
+
+    Replace-in-place relies on it: a second producer would read a registry the
+    first had not yet written, and leave two run toasts on screen.
+    """
+    naming = sorted(
+        path.relative_to(SOURCE_ROOT).as_posix()
+        for path in SOURCE_ROOT.rglob("*.py")
+        if "RUN_VERDICT_CHANNEL" in (text := path.read_text(encoding="utf-8"))
+        or '"run-verdict"' in text
+    )
+
+    assert naming == ["app_shell.py", "utilities/notifications.py"]

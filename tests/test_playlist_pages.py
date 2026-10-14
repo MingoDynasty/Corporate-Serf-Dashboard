@@ -2118,6 +2118,30 @@ def test_playlist_scenarios_scenario_run_history_href_url_encodes_values():
     assert href == "/run-history?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
 
 
+def test_a_link_that_names_no_playlist_leaves_the_parameter_out():
+    """A run toast's link: the shell does not know the page's Playlist filter."""
+    href = playlist_scenarios.scenario_run_history_href(
+        "VT Pasu & Friends",
+        run_id="VT Pasu & Friends - Challenge - 2026.10.13-18.00.00 Stats.csv",
+    )
+
+    assert href == (
+        "/run-history?scenario=VT+Pasu+%26+Friends"
+        "&run=VT+Pasu+%26+Friends+-+Challenge+-+2026.10.13-18.00.00+Stats.csv"
+    )
+    assert playlist_scenarios.scenario_run_history_href("Plain") == (
+        "/run-history?scenario=Plain"
+    )
+
+
+def test_a_link_can_name_a_playlist_and_a_run():
+    href = playlist_scenarios.scenario_run_history_href(
+        "Plain", "Code/One", run_id="run.csv"
+    )
+
+    assert href == "/run-history?playlist_code=Code%2FOne&scenario=Plain&run=run.csv"
+
+
 def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():
     column = next(
         column

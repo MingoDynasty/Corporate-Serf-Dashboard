@@ -154,7 +154,7 @@ def _comparison(
         # Nothing judges the run, so it is measured here against a goal of
         # 100 only for the percentage that comes back: the judging function
         # is the one place a percentage of a PB is worked out, by pace or by
-        # score. Of the toast's two display caps, the one that holds a miss
+        # score. Of the two display caps, the one that holds a miss
         # under its goal has no goal to hold it under. The other still
         # applies, and against 100 the two are the same cap: a run below the
         # PB shows at most 99.9%.

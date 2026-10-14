@@ -179,7 +179,7 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
 
     Everything here is presentation over the figure the page's chart callback
     already built and cached, which is what keeps a size or color change from
-    rereading scenario data, rebuilding overlays, or firing notifications.
+    rereading scenario data or rebuilding overlays.
     ``plot_json`` is that cached figure, and ``point_color`` is an explicit
     color or empty for Default.
     """

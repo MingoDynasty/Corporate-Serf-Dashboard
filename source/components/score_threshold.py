@@ -4,7 +4,6 @@ from decimal import Decimal
 from enum import Enum
 from typing import NamedTuple
 
-from source.app_shell import RunEventData
 from source.kovaaks.data_service import get_personal_best_run
 from source.kovaaks.pace import pace_goal_met, pace_percent, pace_threshold_score
 from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
@@ -72,9 +71,8 @@ def judge_run(
     needs positive times and not a positive previous best. Where it is
     undefined, the run is judged by score as any other.
 
-    The run toast and the run list's check both judge through this, so a run
-    that just landed and the same run read back from the run store cannot get
-    two answers from the same facts.
+    The run list's check and the latest-run card both judge through this, so
+    the two cannot give one run two answers.
     """
     if not goal_percentage:
         return Unjudged.NO_PERCENTAGE_SET
@@ -110,34 +108,11 @@ def judge_run(
     )
 
 
-def threshold_verdict(
-    latest: RunEventData,
-    score_threshold_percentage: float | str | None,
-    score_threshold_notification_switch: bool,
-) -> ThresholdVerdict | None:
-    """Judge a run that just landed, or return None when nothing judges it.
-
-    A run goes unjudged when the switch is off, and for each reason
-    ``judge_run`` gives. The message carries the facts and this derives the
-    gate; the two used to be bundled into one nullable field that meant both.
-    """
-    if not score_threshold_notification_switch:
-        return None
-    judged = judge_run(
-        latest["score"],
-        latest["scenario_previous_best"],
-        latest["is_new_sensitivity"],
-        latest["pace_constant"],
-        normalize_score_threshold_percentage(score_threshold_percentage),
-    )
-    return judged if isinstance(judged, ThresholdVerdict) else None
-
-
 def shown_percentage(verdict: ThresholdVerdict) -> float:
     """Return the percentage of PB to print, held below each line the run missed.
 
-    Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB (need
-    95.0%)" and a run 0.03% short of the PB as "100.0% of PB". So a miss shows
+    Rounding alone prints a 94.98% miss of a 95% goal as "95.0% of PB", and a
+    run 0.03% short of the PB as "100.0% of PB". So a miss shows
     at most one tenth below the goal as printed, and a run below the PB shows
     at most 99.9% whether it passed or not. Flooring would not do: float error
     prints 407 / 500 as 81.3%.

@@ -196,7 +196,8 @@ class NewFileHandler(FileSystemEventHandler):
         high_score = get_high_score(run_data.scenario)
         is_new_high_score = run_data.score > high_score
         # Worked out here, before the run is stored and its message queued, so
-        # the toast agrees with the chart that rebuilds once the run lands.
+        # the celebration toast agrees with the page that is redrawn once the
+        # run lands.
         pace_constant = _pace_constant_for_landed_run(
             run_data,
             get_personal_best_run(run_data.scenario),
