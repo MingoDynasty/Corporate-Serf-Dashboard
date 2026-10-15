@@ -79,8 +79,8 @@ and [product.md](../product.md). Leaderboard placement is worded
   tab, and with Shift or Alt alone it opens nothing
   ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 - The Run History page links back to the table: while its Playlist
-  filter holds a loaded playlist, the "Open scenario table" link under the
-  filter leads to `/playlists/{code}`. The link carries no `?sort=`, so the
+  filter holds a loaded playlist, the "Open scenario table" link on the
+  filter's label line leads to `/playlists/{code}`. The link carries no `?sort=`, so the
   table opens unsorted, in playlist order. A plain click navigates inside the
   app and a modified click keeps the native anchor. The link's own states are
   specified in

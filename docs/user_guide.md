@@ -158,8 +158,9 @@ in the **Columns** menu, as **Category** and **Subcategory**. A playlist you
 imported by share code has no groups, and neither do a few benchmarks whose
 grouping data doesn't line up with their scenario list.
 
-On the Run History page, the **Open scenario table** link under the
-**Playlist filter** opens the scenario table of the playlist selected there.
+On the Run History page, the **Open scenario table** link beside the
+**Playlist filter** label opens the scenario table of the playlist selected
+there.
 
 The list beside the chart has a switch at its top. **This scenario** lists the
 selected scenario's runs by session, and **All scenarios** lists each session

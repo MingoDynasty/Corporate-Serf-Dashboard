@@ -138,12 +138,12 @@ need. Score vs Time plots the same runs by when they were played
 
 ### Latest-run card
 
-The panel at the top of Run History that reports the last run played, on
-whatever scenario, with its verdict
+The card at the right end of Run History's top row, over the run list, that
+reports the last run played, on whatever scenario, with its verdict
 ([run_history.md](specs/run_history.md#the-latest-run-card)).
 
 - On screen it has no title. Its first line reads
-  `Latest run · {time} · {scenario}`.
+  `Latest run · {age} · {scenario}`.
 
 ### This scenario
 
