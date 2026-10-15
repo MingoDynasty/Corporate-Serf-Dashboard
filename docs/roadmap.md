@@ -88,8 +88,25 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-None queued. The next milestone is promoted from the Future list below when
-it is chosen.
+- **Run History top row cards** — the top row gets one card per kind of
+  information: the scenario, its personal best, and the latest run, with the
+  latest-run card lined up over the run list. The PB card shows the PB, the
+  gap to the next rank, the leaderboard percentile, and the PB run's cm/360,
+  and the Scenario Stats card gains the benchmark category. Its
+  [proposal](./proposals/top_row_cards_proposal.md) is written, and three
+  implementation PRs build it.
+
+  A second proposal follows once it ships: the latest-run card following the
+  selected scenario, and the run list losing its heading line. Notes on a
+  scenario, which the row keeps space for, are a proposal of their own.
+
+  Why it's next:
+  - The page never shows the target a player is chasing: the PB is only a
+    line on the chart, and the next rank is on the benchmark table.
+  - The latest-run card is mostly empty space at the maintainer's width.
+
+  The page's behavior is in
+  [`specs/run_history.md`](./specs/run_history.md).
 
 ---
 
