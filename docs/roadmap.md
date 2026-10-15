@@ -152,8 +152,10 @@ next.
   that rank weakness by the typical run instead of the personal best. They
   wait on a re-check, due around 2026-10-09, of the evidence that the typical
   run orders weaknesses better.
-- **An overview** — time spent and activity across all scenarios. No design
-  yet. Home, the page the app opens on, holds its place.
+- **An overview** — time spent and activity across all scenarios. Its first
+  part, two heatmaps on Home, is in the
+  [Home heatmaps proposal](proposals/home_heatmaps_proposal.md); the rest has
+  no design yet. Home, the page the app opens on, holds its place.
 - **KovaaK's own log** — the game's log records what stats files usually
   don't: restarts, freeplay, and how long the game was open, which could give
   time spent an upper bound. A local archive outside the app is already
