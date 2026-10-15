@@ -411,10 +411,17 @@ a.run-toast-link:hover {
 }
 
 /* Kept whole, with the space it ends on: a flex container drops a space
-   between two items, and the label would run into the name. */
+   between two items, and the label would run into the name. It sets no
+   display of its own, because with no run its hidden attribute removes it. */
 .run-history-card-label {
     flex: 0 0 auto;
     white-space: pre;
+}
+
+/* The box dmc wraps the run's age in, for its tooltip. A block there would
+   break the label round the age. */
+.run-history-card-time-target {
+    display: inline;
 }
 
 .run-history-card-scenario {

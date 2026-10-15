@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 
 import dash
 import pytest
+from dash import dcc
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -38,7 +39,7 @@ from tests.rendered_text import rendered_text  # noqa: E402
 A, B = "Scenario A", "Scenario B"
 EVENING = datetime(2026, 10, 4, 21, 45, 0)
 VERSION = "0123456789abcdef0123456789abcdef"
-IDS = LatestRunCardIds(heading="heading", scenario_button="button", body="body")
+IDS = LatestRunCardIds(*LatestRunCardIds._fields)
 
 
 def _run(  # noqa: PLR0913
@@ -148,22 +149,23 @@ def test_the_cards_run_is_the_one_the_run_list_names_as_the_newest():
 
 
 @pytest.mark.parametrize(
-    ("ended", "now", "time"),
+    ("ended", "now"),
     [
-        # Played today: the date would be noise.
-        (datetime(2026, 10, 4, 22, 50), datetime(2026, 10, 4, 23, 59), "10:50 PM"),
-        (datetime(2026, 10, 4, 0, 5), datetime(2026, 10, 4, 0, 6), "12:05 AM"),
-        # An earlier day carries the date, without this year's year.
-        (datetime(2026, 10, 4, 22, 50), datetime(2026, 10, 5, 0, 1), "Oct 4, 10:50 PM"),
-        (
-            datetime(2025, 12, 30, 22, 50),
-            datetime(2026, 1, 2, 9, 0),
-            "Dec 30, 2025, 10:50 PM",
-        ),
+        (datetime(2026, 10, 4, 22, 50), datetime(2026, 10, 4, 22, 50, 30)),
+        (datetime(2026, 10, 4, 22, 50), datetime(2026, 10, 5, 0, 1)),
+        (datetime(2025, 12, 30, 22, 50), datetime(2026, 1, 2, 9, 0)),
     ],
 )
-def test_the_time_is_a_time_of_day_for_a_run_played_today(ended, now, time):
-    assert _shown([_run(A, ended)], now=now).time == time
+def test_the_card_holds_when_the_run_ended_whatever_the_clock_reads(ended, now):
+    """The browser words the age, so the clock decides nothing about the time.
+
+    The card hands the browser the moment itself, in epoch seconds, as Last
+    played's store does.
+    """
+    shown = _shown([_run(A, ended)], now=now)
+
+    assert shown.played_at == ended
+    assert latest_run_card_content(shown, A).played_at == ended.timestamp()
 
 
 def test_the_score_is_formatted_as_the_playlist_scenario_table_formats_pb_score():
@@ -607,7 +609,7 @@ def _walk(component):
 LATEST = LatestRun(
     run_id="a.csv",
     scenario=A,
-    time="10:50 PM",
+    played_at=datetime(2026, 10, 4, 22, 50),
     score="3,324",
     badge=CardBadge.THRESHOLD_PASSED,
     result="96.4% of PB · Accuracy 55%",
@@ -628,14 +630,61 @@ def test_the_card_starts_with_nothing_in_it_and_always_holds_its_button():
     assert card.className == "run-history-card"
     assert held[IDS.heading].children is None
     assert held[IDS.body].children is None
+    assert isinstance(held[IDS.played_at], dcc.Store)
+    assert getattr(held[IDS.played_at], "data", None) is None
     button = held[IDS.scenario_button]
     assert (button.children, button.n_clicks, button.type) == (None, 0, "button")
+
+
+def test_the_first_lines_words_and_the_age_are_drawn_once_and_hidden_until_a_run():
+    """A script writes the age, so it is never part of the server's answer.
+
+    The words, the age and the dots between are one item of the heading, so
+    the spaces either side of the age reach a screen reader: the heading is a
+    flex container, which drops a space between its items.
+    """
+    card = latest_run_card.latest_run_card(IDS)
+    held = {
+        component.id: component
+        for component in _walk(card)
+        if getattr(component, "id", None)
+    }
+    heading = next(
+        component
+        for component in _walk(card)
+        if getattr(component, "className", None) == latest_run_card.HEADING_CLASS
+    )
+
+    label = held[IDS.label]
+    assert heading.children[0] is label
+    assert label.className == latest_run_card.HEADING_LABEL_CLASS
+    assert label.hidden is True
+    lead, tooltip, trail = label.children
+    assert (lead, trail) == ("Latest run · ", " · ")
+    assert tooltip.id == IDS.time_tooltip
+    assert tooltip.events == {"hover": True, "focus": True, "touch": True}
+    # dmc wraps the target in a block box; the stylesheet makes it inline.
+    assert tooltip.boxWrapperProps == {"className": "run-history-card-time-target"}
+    age = tooltip.children
+    assert age.id == IDS.time
+    # Focusable, with the hover affordance Last played's has, and in the
+    # heading's own size and color.
+    assert (age.className, age.tabIndex, age.inherit, age.span) == (
+        "cell-tooltip-affordance",
+        0,
+        True,
+        True,
+    )
+    assert getattr(age, "children", None) is None
 
 
 def test_while_its_scenario_is_selected_the_name_is_plain_text():
     content = latest_run_card_content(LATEST, A)
 
-    assert rendered_text(content.heading) == f"Latest run · 10:50 PM · {A}"
+    assert rendered_text(content.heading) == A
+    # The title gives the whole name where the card cuts it short.
+    assert content.heading.title == A
+    assert content.played_at == LATEST.played_at.timestamp()
     assert (
         content.scenario_button,
         content.scenario_button_value,
@@ -647,8 +696,8 @@ def test_while_its_scenario_is_selected_the_name_is_plain_text():
 def test_while_another_scenario_is_selected_the_name_is_the_button(selected):
     content = latest_run_card_content(LATEST, selected)
 
-    # The label keeps the space it ends on, which the button follows.
-    assert rendered_text(content.heading) == "Latest run · 10:50 PM · "
+    assert content.heading is None
+    assert content.played_at == LATEST.played_at.timestamp()
     assert content.scenario_button == A
     assert content.scenario_button_value == A
     assert content.scenario_button_label == f"Show {A}"
@@ -697,6 +746,8 @@ def test_a_run_with_no_badge_shows_its_score_alone():
 def test_with_no_run_in_the_store_the_card_says_so(selected):
     content = latest_run_card_content(None, selected)
 
+    # Nothing to word, so the script hides the first line's words.
+    assert content.played_at is None
     assert content.heading is None
     assert content.scenario_button is None
     assert [rendered_text(line) for line in content.body] == [

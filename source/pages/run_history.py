@@ -189,6 +189,10 @@ RUN_LIST_IDS = RunListIds(
     figures_sink="run-history-list-figures-sink",
 )
 LATEST_RUN_CARD_IDS = LatestRunCardIds(
+    played_at="run-history-card-played-at",
+    label="run-history-card-lead",
+    time="run-history-card-time",
+    time_tooltip="run-history-card-time-tooltip",
     heading="run-history-card-heading",
     scenario_button="run-history-card-scenario-button",
     body="run-history-card-body",
@@ -384,6 +388,7 @@ def build_run_list_rows(  # noqa: PLR0913
 
 
 @callback(
+    Output(LATEST_RUN_CARD_IDS.played_at, "data"),
     Output(LATEST_RUN_CARD_IDS.heading, "children"),
     Output(LATEST_RUN_CARD_IDS.scenario_button, "children"),
     Output(LATEST_RUN_CARD_IDS.scenario_button, "value"),
@@ -397,18 +402,15 @@ def build_run_list_rows(  # noqa: PLR0913
     Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
     # The percentage decides the badge of a run that is not a new PB.
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
-    # The next two are read for nothing but their change. The run's time is a
-    # time of day only on the day it was played, and "this session" becomes
-    # "last session" with no run landing.
-    Input(TODAY_STORE_ID, "data"),
+    # Read for nothing but its change: "this session" becomes "last session"
+    # with no run landing.
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
     State(LATEST_RUN_STORE_ID, "data"),
 )
-def show_latest_run(  # noqa: PLR0913
+def show_latest_run(
     _run_landed,
     selected_scenario,
     score_threshold_percentage,
-    _held_date,
     _held_in_progress,
     held_latest_run,
 ):
@@ -419,9 +421,10 @@ def show_latest_run(  # noqa: PLR0913
     run that lands also calls, so it waits for them and writes the card once
     per batch, for the scenario the page ends up on.
 
-    The last output is the run's id, written only when it is another run
-    than the one held. The graph takes that store as an input, so writing
-    the same id again would restyle a chart that nothing had changed.
+    The first output is when the run ended, which a script words as its age.
+    The last is the run's id, written only when it is another run than the
+    one held. The graph takes that store as an input, so writing the same id
+    again would restyle a chart that nothing had changed.
     """
     shown = latest_run_from_store(score_threshold_percentage, datetime.now())
     latest_run_id = None if shown is None else shown.run_id
@@ -429,6 +432,34 @@ def show_latest_run(  # noqa: PLR0913
         *latest_run_card_content(shown, selected_scenario),
         no_update if latest_run_id == held_latest_run else latest_run_id,
     )
+
+
+# The latest-run card's age is worded in the browser, when the card is written
+# and on every 30-second tick, as Last played is, so it stays current on a page
+# left open: during play it doubles as a break timer. The hover is the exact
+# time in the shared format. With no run the words before the name are hidden.
+_LATEST_RUN_TIME_SCRIPT = """
+    (seconds, _nIntervals) => {
+        if (seconds === null || seconds === undefined) {
+            return [true, "", ""];
+        }
+        const dagfuncs = window.dashAgGridFunctions;
+        return [
+            false,
+            dagfuncs.relativeTime(seconds, ""),
+            dagfuncs.absoluteTime(seconds, ""),
+        ];
+    }
+    """
+
+clientside_callback(
+    _LATEST_RUN_TIME_SCRIPT,
+    Output(LATEST_RUN_CARD_IDS.label, "hidden"),
+    Output(LATEST_RUN_CARD_IDS.time, "children"),
+    Output(LATEST_RUN_CARD_IDS.time_tooltip, "label"),
+    Input(LATEST_RUN_CARD_IDS.played_at, "data"),
+    Input(RELATIVE_TIME_INTERVAL_ID, "n_intervals"),
+)
 
 
 @callback(
@@ -831,9 +862,9 @@ def layout(
                 interval=config.polling_interval,
                 n_intervals=0,
             ),
-            # A 30-second tick of its own for the relative "Last played"
-            # text, so how often it is reworded never depends on how often
-            # the page polls for data.
+            # A 30-second tick of its own for the relative times, Last played
+            # and the latest-run card's age, so how often they are reworded
+            # never depends on how often the page polls for data.
             dcc.Interval(
                 id=RELATIVE_TIME_INTERVAL_ID,
                 interval=30_000,

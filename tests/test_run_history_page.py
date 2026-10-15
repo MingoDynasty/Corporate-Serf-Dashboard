@@ -1543,6 +1543,10 @@ def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
     # The label is kept whole, with the space it ends on.
     assert "flex: 0 0 auto;" in label
     assert "white-space: pre;" in label
+    # The run's age stays in the label's line, though dmc wraps it in a box.
+    assert "display: inline;" in _css_block(css, ".run-history-card-time-target")
+    # Hidden by its attribute with no run, so nothing may set its display.
+    assert "display" not in label
     assert "min-width: 0;" in scenario
     assert "text-overflow: ellipsis;" in scenario
     assert "white-space: nowrap;" in scenario
@@ -1564,12 +1568,14 @@ def _card_registration() -> dict:
     return _registration(f"{run_history.LATEST_RUN_CARD_IDS.body}.children")
 
 
-def test_the_card_is_written_by_these_five_inputs_and_on_load():
+def test_the_card_is_written_by_these_four_inputs_and_on_load():
+    """Not by the date: the browser words the run's age, so midnight changes nothing."""
     registration = _card_registration()
     card = run_history.LATEST_RUN_CARD_IDS
 
     assert registration["output"] == (
-        f"..{card.heading}.children...{card.scenario_button}.children"
+        f"..{card.played_at}.data...{card.heading}.children"
+        f"...{card.scenario_button}.children"
         f"...{card.scenario_button}.value...{card.scenario_button}.aria-label"
         f"...{card.body}.children...{run_history.LATEST_RUN_STORE_ID}.data.."
     )
@@ -1577,12 +1583,39 @@ def test_the_card_is_written_by_these_five_inputs_and_on_load():
         f"{run_history.RUN_LANDED_STORE_ID}.data",
         f"{run_history.SCENARIO_SELECTION_IDS.scenario_dropdown}.value",
         f"{run_history.CHART_OPTIONS_IDS.score_threshold_percentage}.value",
-        f"{run_history.TODAY_STORE_ID}.data",
         f"{run_history.SESSION_IN_PROGRESS_STORE_ID}.data",
     ]
     assert _keys(registration["state"]) == [f"{run_history.LATEST_RUN_STORE_ID}.data"]
     # The page load runs it, so the card is right with no new run.
     assert registration["prevent_initial_call"] is False
+
+
+def test_the_cards_age_is_reworded_in_the_browser_on_the_30_second_tick():
+    """As Last played is, so the age stays current on a page left open.
+
+    The script words the run's end as an age, gives the hover the exact time
+    in the shared format, and hides the first line's words with no run. It
+    runs on the page load too, when the card's store is first written.
+    """
+    card = run_history.LATEST_RUN_CARD_IDS
+    registration = _registration(f"{card.time}.children")
+    interval = _by_id(run_history.layout(), run_history.RELATIVE_TIME_INTERVAL_ID)
+
+    assert registration["clientside_function"] is not None
+    assert registration["output"] == (
+        f"..{card.label}.hidden...{card.time}.children...{card.time_tooltip}.label.."
+    )
+    assert _keys(registration["inputs"]) == [
+        f"{card.played_at}.data",
+        f"{run_history.RELATIVE_TIME_INTERVAL_ID}.n_intervals",
+    ]
+    assert registration["prevent_initial_call"] is False
+    assert interval.interval == 30_000
+    script = run_history._LATEST_RUN_TIME_SCRIPT
+    assert "seconds === null || seconds === undefined" in script
+    assert 'return [true, "", ""];' in script
+    assert 'dagfuncs.relativeTime(seconds, "")' in script
+    assert 'dagfuncs.absoluteTime(seconds, "")' in script
 
 
 def test_the_card_is_not_written_by_the_charts_summary_store():
@@ -1621,7 +1654,7 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     shown = latest_run_card.LatestRun(
         run_id="landed.csv",
         scenario="Scenario B",
-        time="10:50 PM",
+        played_at=datetime(2026, 10, 12, 22, 49),
         score="812.4",
         badge=None,
         result="Accuracy 55%",
@@ -1635,15 +1668,15 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     monkeypatch.setattr(run_history, "latest_run_from_store", from_store)
     monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 22, 50))
 
-    answer = run_history.show_latest_run(
-        "landed.csv", SCENARIO, 95, "2026-10-12", True, "held.csv"
-    )
+    answer = run_history.show_latest_run("landed.csv", SCENARIO, 95, True, "held.csv")
 
     # The batch only calls it: nothing of the run is read from the store that
     # names it.
     assert asked == [(95, datetime(2026, 10, 12, 22, 50))]
-    heading, button, button_value, button_label, body, latest_run_id = answer
-    assert rendered_text(heading) == "Latest run · 10:50 PM · "
+    played_at, heading, button, button_value, button_label, body, latest_run_id = answer
+    assert played_at == datetime(2026, 10, 12, 22, 49).timestamp()
+    # The name is the button, so the server writes nothing beside the words.
+    assert heading is None
     assert (button, button_value, button_label) == (
         "Scenario B",
         "Scenario B",
@@ -1662,10 +1695,11 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
 def test_with_no_run_in_the_store_the_card_says_so(monkeypatch):
     monkeypatch.setattr(run_history, "latest_run_from_store", lambda *_arguments: None)
 
-    heading, button, _value, _label, body, latest_run_id = run_history.show_latest_run(
-        None, None, 95, "2026-10-12", False, None
+    played_at, heading, button, _value, _label, body, latest_run_id = (
+        run_history.show_latest_run(None, None, 95, False, None)
     )
 
+    assert played_at is None
     assert heading is None
     assert button is None
     assert [rendered_text(line) for line in body] == [
@@ -1739,7 +1773,7 @@ def _shown_run(run_id: str) -> latest_run_card.LatestRun:
     return latest_run_card.LatestRun(
         run_id=run_id,
         scenario=SCENARIO,
-        time="10:50 PM",
+        played_at=datetime(2026, 10, 12, 22, 50),
         score="812.4",
         badge=None,
         result="Accuracy 55%",
@@ -1753,7 +1787,8 @@ def _shown_run(run_id: str) -> latest_run_card.LatestRun:
         # Another run than the one held: on load, and when a run lands.
         (None, "a.csv", "a.csv"),
         ("a.csv", "b.csv", "b.csv"),
-        # The same run: a change of scenario, of the percentage, of the date.
+        # The same run: a change of scenario, of the percentage, of the
+        # session's state.
         ("a.csv", "a.csv", no_update),
     ],
 )
@@ -1765,9 +1800,7 @@ def test_the_latest_runs_id_is_written_only_when_it_is_another_run(
         run_history, "latest_run_from_store", lambda *_arguments: _shown_run(shown)
     )
 
-    *_card, latest_run_id = run_history.show_latest_run(
-        None, SCENARIO, 95, "2026-10-12", True, held
-    )
+    *_card, latest_run_id = run_history.show_latest_run(None, SCENARIO, 95, True, held)
 
     assert latest_run_id == written or latest_run_id is written
 
@@ -1776,7 +1809,7 @@ def test_a_run_store_emptied_of_runs_takes_the_held_id_away(monkeypatch):
     monkeypatch.setattr(run_history, "latest_run_from_store", lambda *_arguments: None)
 
     *_card, latest_run_id = run_history.show_latest_run(
-        None, SCENARIO, 95, "2026-10-12", False, "a.csv"
+        None, SCENARIO, 95, False, "a.csv"
     )
 
     assert latest_run_id is None
