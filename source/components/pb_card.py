@@ -103,6 +103,7 @@ FADED_CLASS = "pb-card-faded"
 SCORE_HOVER_CLASS = f"{SCORE_CLASS} {TIME_CLASS}"
 LEADERBOARD_CLASS = f"{RESULT_CLASS} pb-card-leaderboard"
 FLEX_TARGET_CLASS = "pb-card-flex-target"
+WORD_END_CLASS = "pb-card-word-end"
 POSITION_LABEL_CLASS = "pb-card-position-label"
 POSITION_TOOLTIP_CLASS = "pb-card-position-tooltip"
 _ARIA_HIDDEN: dict[str, Any] = {"aria-hidden": "true"}
@@ -1059,11 +1060,17 @@ def pb_card(ids: PbCardIds) -> dmc.Box:
 
 
 def _score(shown: PersonalBest) -> Any:
-    """Draw the PB score, with its hover where it beat a previous best."""
+    """Draw the PB score, with its hover where it beat a previous best.
+
+    The score ends on a space a screen reader reads and the eye does not see:
+    the score row is a flex container, which drops the space between the
+    score and the badge, and the two would be handed over as one word.
+    """
+    text = [shown.score, html.Span(" ", className=WORD_END_CLASS)]
     if shown.score_hover is None:
-        return html.Span(shown.score, className=SCORE_CLASS)
+        return html.Span(text, className=SCORE_CLASS)
     return dmc.Tooltip(
-        html.Span(shown.score, className=SCORE_HOVER_CLASS, tabIndex=0),
+        html.Span(text, className=SCORE_HOVER_CLASS, tabIndex=0),
         # dmc wraps the target in a block box, whose line would make the row
         # 2px taller with a hover than without one.
         boxWrapperProps={"className": FLEX_TARGET_CLASS},

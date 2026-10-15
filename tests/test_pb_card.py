@@ -389,8 +389,10 @@ def test_a_pb_is_its_score_and_badge_then_the_next_rank_then_the_faded_line():
     assert content.set_at == SHOWN.set_at.timestamp()
     # A local PB, so the leaderboard line shows under it.
     assert content.leaderboard_hidden is False
+    # The score ends on a space a screen reader reads: the row is a flex
+    # container, which would hand over "3,653Cerulean" as one word.
     assert [rendered_text(part) for part in score_row.children] == [
-        "3,653",
+        "3,653 ",
         "Cerulean",
     ]
     assert rendered_text(next_rank) == "3,700 Lavender · +1.3% · 47 to go"
@@ -403,7 +405,9 @@ def test_the_score_with_a_hover_takes_focus_and_shows_it_as_last_played_does():
 
     assert tooltip.label == "Up 1.0% on your previous best of 3,617"
     assert tooltip.events == {"hover": True, "focus": True, "touch": True}
-    assert score.children == "3,653"
+    value, word_end = score.children
+    assert value == "3,653"
+    assert (word_end.children, word_end.className) == (" ", "pb-card-word-end")
     assert score.className == "run-history-card-score cell-tooltip-affordance"
     assert score.tabIndex == 0
 
@@ -442,7 +446,7 @@ def test_a_pb_with_no_badge_and_no_next_rank_is_its_score_alone():
 
     content = pb_card_content(shown, SCENARIO)
 
-    assert [rendered_text(line) for line in content.body] == ["3,653"]
+    assert [rendered_text(line) for line in content.body] == ["3,653 "]
 
 
 def test_at_the_top_rank_the_line_under_the_score_says_so():
@@ -453,7 +457,7 @@ def test_at_the_top_rank_the_line_under_the_score_says_so():
     content = pb_card_content(shown, SCENARIO)
 
     assert [rendered_text(line) for line in content.body] == [
-        "3,653Lavender",
+        "3,653 Lavender",
         "Top rank",
     ]
 
@@ -535,17 +539,17 @@ def test_with_no_scenario_or_no_runs_the_store_has_no_pb(store):
         pytest.param(
             BENCHMARK.code,
             SCENARIO,
-            ["3,653Cerulean", "3,700 Lavender · +1.3% · 47 to go"],
+            ["3,653 Cerulean", "3,700 Lavender · +1.3% · 47 to go"],
             id="a-benchmark",
         ),
-        pytest.param(BENCHMARK.code, "Unranked Scenario", ["3,653"], id="no-ladder"),
-        pytest.param(PLAYLIST.code, SCENARIO, ["3,653"], id="a-playlist"),
-        pytest.param(None, SCENARIO, ["3,653"], id="no-filter"),
-        pytest.param("KovaaKsGoneCode", SCENARIO, ["3,653"], id="an-unknown-code"),
+        pytest.param(BENCHMARK.code, "Unranked Scenario", ["3,653 "], id="no-ladder"),
+        pytest.param(PLAYLIST.code, SCENARIO, ["3,653 "], id="a-playlist"),
+        pytest.param(None, SCENARIO, ["3,653 "], id="no-filter"),
+        pytest.param("KovaaKsGoneCode", SCENARIO, ["3,653 "], id="an-unknown-code"),
         pytest.param(
             BENCHMARK.code,
             "Not In The Benchmark",
-            ["3,653"],
+            ["3,653 "],
             id="a-benchmark-that-does-not-list-it",
         ),
     ],

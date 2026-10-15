@@ -1574,6 +1574,10 @@ def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     assert "display" not in _css_block(css, ".pb-card-heading")
     # dmc's boxes round the score and Refresh add no line of their own.
     assert "display: flex;" in _css_block(css, ".pb-card-flex-target")
+    # The score's last space reaches a screen reader and takes no room.
+    word_end = _css_block(css, ".pb-card-word-end")
+    assert "font-size: 0;" in word_end
+    assert "white-space: pre;" in word_end
 
 
 def test_the_pb_cards_quiet_lines_and_its_badge_use_the_themes_tokens():

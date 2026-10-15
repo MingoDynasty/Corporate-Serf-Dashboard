@@ -559,6 +559,15 @@ a.run-toast-link:hover {
     font-weight: 700;
 }
 
+/* The space that ends the PB score, for a screen reader: the score row is a
+   flex container, which drops the space between the score and the badge.
+   Kept, or the browser would drop a space at the end of a line, and sized to
+   nothing, so the score looks as it would without it. */
+.pb-card-word-end {
+    font-size: 0;
+    white-space: pre;
+}
+
 /* The box dmc wraps the score and Refresh in, for their tooltips. As a block
    its line is taller than what it holds: the score row would be 2px taller
    with the score's hover than without it, and the leaderboard line taller
