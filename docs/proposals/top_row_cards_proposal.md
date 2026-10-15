@@ -616,7 +616,7 @@ New entries:
   next rank and its threshold, and the PB run's sensitivity and accuracy.
   Under it, sourced apart from the local record, the player's leaderboard
   standing, shown with or without a local PB.
-  - On screen it has no title. Its first line reads `PB · set {time}`.
+  - On screen it has no title. Its first line reads `PB · set {age}`.
 - **Scenario Stats.** The card in Run History's top row about the selected
   scenario: its benchmark category, when it was last played, and how many runs
   it has.
