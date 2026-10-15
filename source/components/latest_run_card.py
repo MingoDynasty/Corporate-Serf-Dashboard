@@ -27,7 +27,7 @@ from source.components.run_history_list import (
     THRESHOLD_PASSED_TEXT,
     run_id,
 )
-from source.components.run_marks import Chased, what_runs_chased
+from source.components.run_marks import Chased, new_pb_gain, what_runs_chased
 from source.components.score_threshold import (
     ThresholdVerdict,
     Unjudged,
@@ -37,7 +37,6 @@ from source.components.score_threshold import (
 )
 from source.kovaaks.data_models import RunData
 from source.kovaaks.data_service import get_all_runs, new_high_score_runs
-from source.kovaaks.pace import percent_faster
 from source.kovaaks.play_sessions import (
     PlaySession,
     find_play_session_in_progress,
@@ -118,23 +117,6 @@ def _badge(verdict: ThresholdVerdict | Unjudged, is_new_pb: bool) -> CardBadge |
     return None
 
 
-def _new_pb_gain(score: float, previous_best: float, chased: Chased) -> str:
-    """Word how far a new PB beat the previous best, as its toast does."""
-    previous = format_score(previous_best)
-    gain_by_pace = (
-        percent_faster(chased.pace_constant, previous_best, score)
-        if chased.pace_constant is not None
-        else None
-    )
-    if gain_by_pace is not None:
-        return f"{gain_by_pace:.1f}% faster than your previous best of {previous}"
-    if previous_best > 0:
-        gain = (score / previous_best - 1) * 100
-        return f"Up {gain:.1f}% on your previous best of {previous}"
-    # Zero has no percentage to give, and a negative one would read backwards.
-    return f"Your previous best was {previous}"
-
-
 def _comparison(
     score: float,
     chased: Chased,
@@ -152,7 +134,7 @@ def _comparison(
     if previous_best is None:
         return None
     if is_new_pb:
-        return _new_pb_gain(score, previous_best, chased)
+        return new_pb_gain(score, previous_best, chased)
     measured = verdict
     if not isinstance(measured, ThresholdVerdict):
         # Nothing judges the run, so it is measured here against a goal of

@@ -193,6 +193,102 @@ def scenario_group_fields(group: ScenarioGroup) -> PlaylistScenarioRow:
     }
 
 
+@dataclass(frozen=True)
+class NextRankGap:
+    """How far a PB is from the next rank on its ladder, in the table's figures.
+
+    ``gap`` is the unrounded percentage the Next Rank column sorts by, and
+    ``gap_text`` the cell's figure: ``+1.3%``, or ``+2.8% faster`` where the
+    gap is measured by pace. ``threshold_text`` and ``points_text`` are the
+    figures of the cell's tooltip, the rank's threshold and the points still
+    to go, each formatted as PB Score.
+    """
+
+    rank: Rank
+    gap: float
+    gap_text: str
+    threshold_text: str
+    points_text: str
+
+
+@dataclass(frozen=True)
+class LadderStanding:
+    """Where a PB stands on its scenario's ladder.
+
+    ``passed`` counts the ranks the PB has reached, and ``reached`` is the
+    highest of them, ``None`` below the first. ``next_gap`` is ``None`` at the
+    top rank, and wherever the gap is undefined, where the Next Rank cell
+    reads ``N/A``.
+    """
+
+    passed: int
+    reached: Rank | None
+    at_top: bool
+    next_gap: NextRankGap | None
+
+
+def ladder_standing(
+    ladder: list[Rank],
+    high_score: float | None,
+    pace_constant: float | None = None,
+) -> LadderStanding | None:
+    """Walk a PB up its ladder, or return ``None`` with no PB or no ladder.
+
+    The benchmark table and Run History's PB card both read a PB's rank and
+    its gap to the next one from here, so the card's figures are the table's
+    and the two can never disagree about one scenario.
+
+    The walk starts at the bottom of the ladder and stops at the first
+    threshold above the PB, so a PB equal to a threshold has reached it. The
+    ladder keeps its stored order: a few upstream ladders tie or dip, and the
+    walk still never grants a rank past an unmet threshold, which also keeps
+    every gap positive. The figures round up, so a gap that remains never
+    reads as reached.
+
+    ``pace_constant`` is the constant of a time-scored scenario whose PB is
+    eligible for a pace comparison, and ``None`` for every other row. With it
+    the gap is how much faster the PB run has to finish, and the figure reads
+    "faster". A pace gap needs only positive times, so it is defined for a PB
+    of zero or less. Where it is undefined, the gap falls back to a
+    percentage of the PB. The walk is the same either way, because a higher
+    score is always a faster finish.
+    """
+    if high_score is None or not ladder:
+        return None
+    passed = 0
+    for rank in ladder:
+        if rank.threshold > high_score:
+            break
+        passed += 1
+    reached = ladder[passed - 1] if passed else None
+    if passed == len(ladder):
+        return LadderStanding(passed, reached, at_top=True, next_gap=None)
+    next_rank = ladder[passed]
+    points = next_rank.threshold - high_score
+    gap = None
+    if pace_constant is not None:
+        gap = percent_faster(pace_constant, high_score, next_rank.threshold)
+    if gap is not None:
+        gap_text = f"+{_round_up(gap, 1):,.1f}% faster"
+    elif high_score > 0:
+        gap = points / high_score * 100
+        gap_text = f"+{_round_up(gap, 1):,.1f}%"
+    else:
+        return LadderStanding(passed, reached, at_top=False, next_gap=None)
+    return LadderStanding(
+        passed,
+        reached,
+        at_top=False,
+        next_gap=NextRankGap(
+            rank=next_rank,
+            gap=gap,
+            gap_text=gap_text,
+            threshold_text=_format_score(next_rank.threshold),
+            points_text=_format_score(_round_up(points, 2)),
+        ),
+    )
+
+
 def benchmark_rank_fields(
     ladder: list[Rank],
     high_score: float | None,
@@ -200,21 +296,9 @@ def benchmark_rank_fields(
 ) -> PlaylistScenarioRow:
     """Compute a benchmark row's Rank and Next Rank fields from its PB.
 
-    The walk starts at the bottom of the ladder and stops at the first
-    threshold above the PB, so a PB equal to a threshold has reached it. The
-    ladder keeps its stored order: a few upstream ladders tie or dip, and the
-    walk still never grants a rank past an unmet threshold, which also keeps
-    every gap positive. ``tier_sort`` counts the ranks passed, so No rank is 0.
-    ``next_tier_sort`` is the unrounded gap, and Top rank and ``N/A`` sort as
-    null. The display rounds up, so a gap that remains never reads as reached.
-
-    ``pace_constant`` is the constant of a time-scored scenario whose PB is
-    eligible for a pace comparison, and ``None`` for every other row. With it
-    the gap is how much faster the PB run has to finish, and the cell reads
-    "faster". A pace gap needs only positive times, so it is defined for a PB
-    of zero or less. Where it is undefined, the row falls back to the gap as a
-    percentage of the PB. The walk and the Rank are the same either way,
-    because a higher score is always a faster finish.
+    The figures are ``ladder_standing``'s. ``tier_sort`` counts the ranks
+    passed, so No rank is 0. ``next_tier_sort`` is the unrounded gap, and Top
+    rank and ``N/A`` sort as null.
     """
     fields: PlaylistScenarioRow = {
         "tier_display": "N/A",
@@ -223,35 +307,22 @@ def benchmark_rank_fields(
         "next_tier_sort": None,
         "next_tier_tooltip": None,
     }
-    if high_score is None or not ladder:
+    standing = ladder_standing(ladder, high_score, pace_constant)
+    if standing is None:
         return fields
-    passed = 0
-    for rank in ladder:
-        if rank.threshold > high_score:
-            break
-        passed += 1
-    fields["tier_display"] = ladder[passed - 1].name if passed else "No rank"
-    fields["tier_sort"] = passed
-    if passed == len(ladder):
+    fields["tier_display"] = (
+        "No rank" if standing.reached is None else standing.reached.name
+    )
+    fields["tier_sort"] = standing.passed
+    if standing.at_top:
         fields["next_tier_display"] = "Top rank"
-        return fields
-    next_rank = ladder[passed]
-    points = next_rank.threshold - high_score
-    gap = None
-    if pace_constant is not None:
-        gap = percent_faster(pace_constant, high_score, next_rank.threshold)
-    if gap is not None:
-        fields["next_tier_display"] = (
-            f"+{_round_up(gap, 1):,.1f}% faster to {next_rank.name}"
-        )
-    elif high_score > 0:
-        gap = points / high_score * 100
-        fields["next_tier_display"] = f"+{_round_up(gap, 1):,.1f}% to {next_rank.name}"
-    if gap is not None:
-        fields["next_tier_sort"] = gap
+    elif standing.next_gap is not None:
+        next_gap = standing.next_gap
+        fields["next_tier_display"] = f"{next_gap.gap_text} to {next_gap.rank.name}"
+        fields["next_tier_sort"] = next_gap.gap
         fields["next_tier_tooltip"] = (
-            f"{next_rank.name} at {_format_score(next_rank.threshold)} · "
-            f"{_format_score(_round_up(points, 2))} to go"
+            f"{next_gap.rank.name} at {next_gap.threshold_text} · "
+            f"{next_gap.points_text} to go"
         )
     return fields
 
@@ -268,11 +339,14 @@ def _get_personal_best_run(scenario_name: str) -> RunData | None:
     return get_personal_best_run(scenario_name)
 
 
-def _personal_best_cm360(run_data: RunData | None) -> float | None:
-    # A run's sensitivity is cm/360 either natively or by the parser's
-    # conversion from the file's own increment and DPI. It stays unknown only
-    # for a legacy run that carries neither field, and those stay unknown
-    # instead of mislabeled.
+def personal_best_cm360(run_data: RunData | None) -> float | None:
+    """Return a PB run's sensitivity in cm/360, as the PB cm/360 column shows it.
+
+    A run's sensitivity is cm/360 either natively or by the parser's
+    conversion from the file's own increment and DPI. It stays unknown only
+    for a legacy run that carries neither field, and those stay unknown
+    instead of mislabeled.
+    """
     if run_data is None or run_data.sens_scale != "cm/360":
         return None
     return run_data.horizontal_sens
@@ -324,7 +398,7 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         number_of_runs = scenario_stats.number_of_runs
         high_score = scenario_stats.high_score
 
-    personal_best_cm360 = _personal_best_cm360(personal_best_run)
+    pb_cm360 = personal_best_cm360(personal_best_run)
     personal_best_accuracy = _personal_best_accuracy(personal_best_run)
     row: PlaylistScenarioRow = {
         "scenario": scenario_name,
@@ -349,8 +423,8 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
             if personal_best_run is not None
             else None
         ),
-        "pb_cm360_display": _format_score(personal_best_cm360),
-        "pb_cm360_sort": personal_best_cm360,
+        "pb_cm360_display": _format_score(pb_cm360),
+        "pb_cm360_sort": pb_cm360,
         "pb_accuracy_display": _format_accuracy(personal_best_accuracy),
         "pb_accuracy_sort": personal_best_accuracy,
     }

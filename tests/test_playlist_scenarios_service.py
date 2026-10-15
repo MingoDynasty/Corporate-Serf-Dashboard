@@ -1399,6 +1399,84 @@ def test_the_rank_column_is_the_same_with_and_without_a_constant():
     assert benchmark_rank_fields([], 896.2, 1000.0)["next_tier_display"] == "N/A"
 
 
+_CONTROLSPHERE_LADDER = [
+    Rank(name="Cerulean", color="#4fc3f7", threshold=3500),
+    Rank(name="Lavender", color="#b39ddb", threshold=3700),
+]
+
+
+@pytest.mark.parametrize(
+    ("ladder", "pb", "pace_constant", "parts"),
+    [
+        pytest.param(
+            _CONTROLSPHERE_LADDER,
+            3653,
+            None,
+            ("Cerulean", "Lavender", "+1.3%", "3,700", "47"),
+            id="by-score",
+        ),
+        pytest.param(
+            _VISCOSE_LADDER,
+            896.2,
+            1000.0,
+            ("Cerulean", "Lavender", "+2.8% faster", "899", "2.8"),
+            id="by-pace",
+        ),
+        pytest.param(
+            _CONTROLSPHERE_LADDER,
+            3400,
+            None,
+            (None, "Cerulean", "+3.0%", "3,500", "100"),
+            id="below-the-first-rank",
+        ),
+    ],
+)
+def test_ladder_standing_gives_the_parts_the_next_rank_cell_is_made_of(
+    ladder, pb, pace_constant, parts
+):
+    """The PB card reads these parts, so they must be the cell's own figures."""
+    standing = playlist_scenarios_service.ladder_standing(ladder, pb, pace_constant)
+    fields = benchmark_rank_fields(ladder, pb, pace_constant)
+
+    reached, next_name, gap_text, threshold_text, points_text = parts
+    next_gap = standing.next_gap
+    assert (standing.reached.name if standing.reached else None) == reached
+    assert standing.at_top is False
+    assert (
+        next_gap.rank.name,
+        next_gap.gap_text,
+        next_gap.threshold_text,
+        next_gap.points_text,
+    ) == (next_name, gap_text, threshold_text, points_text)
+    assert fields["next_tier_display"] == f"{gap_text} to {next_name}"
+    assert fields["next_tier_tooltip"] == (
+        f"{next_name} at {threshold_text} · {points_text} to go"
+    )
+    assert fields["next_tier_sort"] == next_gap.gap
+
+
+def test_ladder_standing_at_the_top_and_where_the_cell_reads_na():
+    ladder = _ladder(100, 200)
+
+    top = playlist_scenarios_service.ladder_standing(ladder, 250)
+    assert (top.passed, top.reached.name, top.at_top, top.next_gap) == (
+        2,
+        "Bronze",
+        True,
+        None,
+    )
+    # A PB of zero compared by score has no gap, and the cell reads N/A.
+    no_gap = playlist_scenarios_service.ladder_standing(ladder, 0)
+    assert (no_gap.passed, no_gap.reached, no_gap.at_top, no_gap.next_gap) == (
+        0,
+        None,
+        False,
+        None,
+    )
+    assert playlist_scenarios_service.ladder_standing(ladder, None) is None
+    assert playlist_scenarios_service.ladder_standing([], 150) is None
+
+
 def test_format_playlist_scenario_rank_row_adds_rank_fields_for_a_ladder():
     scenario_stats = ScenarioStats(
         date_last_played=datetime(2026, 5, 1, 8, 15, 0),
