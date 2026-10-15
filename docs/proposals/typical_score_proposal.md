@@ -24,7 +24,10 @@ and 2026-10-15, worked out over five measurements and six versions of a live
 prototype on their own stats, and each quotes what they said. A lean is not a
 ruling: reviewers are invited to challenge any row, and any author-owned
 choice in [Design](#design). **TS2 is the row the maintainer asked to be
-scrutinized hardest**, and it gives the alternative its strongest case.
+scrutinized hardest**, and it gives the alternative its strongest case. The
+first review wave endorsed TS2 to TS5 and contested one point of TS1: whether
+runs of different versions of a scenario count together, set out under TS1
+as the version question.
 
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
@@ -104,11 +107,14 @@ and warm-up runs. The numbers are fixed constants, not settings.**
 - **Every sensitivity counts.** PR #351 measured runs at the session's own
   sensitivity alone at 2.8% from the session's level, against 2.6% for all
   of them.
-- **Every version counts, as the PB counts them.** The version rule of the
+- **Every version counts, treated as comparable,** as the PB line, the New
+  PB stars and the rank lines treat a scenario's versions. A run whose stats
+  file has no `Hash:` counts too, as it does for the PB. The version rule of
+  the
   [2026-10-12 marks entry](../decision_log/2026/2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md)
-  covers a time-scored run's pace only. A reworked scenario clears out of a
-  20-run, 30-day window on its own. PR #351's row H4 kept the current version
-  alone; this departs from it.
+  covers a time-scored run's pace only. The assumption has a cost if a rework
+  changes the scoring, set out in the version question below. PR #351's row
+  H4 kept the current version alone; this departs from it.
 - **Warm-up runs count in version 1,** as the maintainer chose, so the
   figure will shift if a warm-up rule ships.
 - **Fixed constants,** as the 30-minute session limit is (S2): a setting
@@ -121,6 +127,47 @@ and warm-up runs. The numbers are fixed constants, not settings.**
 Changed from the maintainer's September hand method: the window runs up to the
 run itself, not "the 14 days before the most recent session"; it is 30 days,
 not 14; 10 runs from two sessions replace 8 runs; and warm-up runs count.
+
+**The version question, contested in the first review wave.** KovaaK's names
+a scenario's version in each stats file's `Hash:`, and a rework can change
+the scoring. If it does, pooling versions has two costs:
+
+- **A fresh value can blend two versions,** for up to 19 runs within 30
+  days. A worked example: 10 runs scoring 40 on a 100-second clock, then 10
+  scoring 140 on a 200-second clock, every one a 60-second finish, give a
+  fresh value of 90, which neither version's runs scored.
+- **A carried value can be another version's.** After a break, the first run
+  on a new version carries the old version's value, labelled "as of" its old
+  dates, until the new version's runs meet the minimum.
+
+On the maintainer's history: 17 version changes in 9,135 runs, 15 of them
+after breaks of 63 days or more, which the window had already cleared; 19
+runs whose window holds two versions (0.21%), 7 of them fresh, all in one
+scenario in October 2025 and none in 2026. No version change in it shows a
+change of scale, though a hash change alone can't say either way. Three
+answers:
+
+1. **Pool every version, the assumption stated (recommended).** The cost is
+   the two above. The hash is a poor proxy for a scoring change: it changes
+   with any edit to the scenario, so scoping by it would have reset the value
+   17 times on this history to guard against something that never happened.
+   Every other surface on the chart treats the scenario as its name across
+   versions. And nothing is stored, so moving to either answer below later
+   recomputes the whole history at once.
+2. **Scope by hash.** No value is worked out from runs of two versions, no
+   value is carried into a new version, and a run with no `Hash:` gets a
+   stated rule. After any version change the value is unknown until the new
+   version's runs meet the minimum, the carried value is dropped at the
+   boundary, and the line breaks there while the PB line runs on. It serves
+   D2's requirement that the runs be comparable most strictly, at that cost
+   in coverage.
+3. **Break only where the app knows the scale changed:** a time-scored
+   scenario whose countdown differs between versions, which the app already
+   reads per version for pace. It catches the case of the worked example and
+   no other, and it couples a pure definition to the performance files.
+
+If the maintainer chooses 2 or 3, the definition, the chart's joins, the Copy
+and Terms blocks and the tests change with it.
 
 This answers the two comments on PR #351 that S4 handed to this proposal. The
 figure
@@ -635,9 +682,13 @@ Overlays
   run ended more than 30 days before the time asked about. Its date is the
   date of the newest run behind the value.
 - **Every run counts,** at every sensitivity and on every version of the
-  scenario, warm-up runs included. A time-scored scenario needs no special
-  case: a higher score is always a faster finish, so medians and percentiles
-  order correctly, and nothing here is a percentage.
+  scenario, warm-up runs included, and runs of every version are treated as
+  comparable (TS1, the version question). A run with no `Hash:` counts.
+- **A time-scored scenario needs no special case within one version:** there
+  a higher score is always a faster finish, so medians and percentiles order
+  correctly, and nothing here is a percentage. Across versions whose
+  countdowns differ that no longer holds, and the definition makes no
+  comparability claim beyond TS1's assumption.
 - **The constants** are 20 runs, 10 runs, 2 sessions, and 30 days, named
   once in the code.
 
@@ -920,7 +971,8 @@ Each was drawn in a prototype or measured, on the maintainer's stats.
   above it the hover says how many runs and sessions are behind the value.
 - **Two sessions only until a scenario is established,** the maintainer's own
   variant. TS1.
-- **Runs at the current sensitivity, or on the current version, only.** TS1.
+- **Runs at the current sensitivity only.** TS1. Runs on the current version
+  only is still open, as TS1's version question.
 - **Holding the newest value until now on Score vs Time,** as the prototype
   did. [Score vs Time](#score-vs-time).
 - **The traces first in the figure,** as the prototype put them. It moves
