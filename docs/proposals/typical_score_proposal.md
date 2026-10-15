@@ -968,8 +968,9 @@ The last of them to merge ships the proposal, by the
 [Shipping a proposal](../../AGENTS.md#shipping-a-proposal-docs-definition-of-done)
 checklist: a decision-log entry for each row, the notes in
 [Decisions this changes](#decisions-this-changes), the specs, the glossary's
-entries in [Terms](#terms), the user guide, the roadmap, `product.md`, and this
-file deleted.
+entries in [Terms](#terms), the user guide, the roadmap, `product.md`, the
+vault Backlog bullet named in [Out of scope](#out-of-scope), and this file
+deleted.
 
 **Recommended:** `claude-opus-5-5`, at high for PRs 1 and 3 and at xhigh for
 PR 2, which walks each state through two chart modes, the themes, the zoom fit
@@ -1001,8 +1002,10 @@ Each with where it is tracked.
 - **A consistency number,** such as the gap between P25 and P75 as a figure.
   The Backlog's Features item 2.3; the band shows it for now.
 - **The PB card's use of the figure,** such as the typical score beside the
-  PB. Not tracked yet: the top row cards proposal doesn't include it, and the
-  maintainer chose to carry that dependency.
+  PB. The top row cards proposal doesn't include it, and the maintainer chose
+  to carry that dependency. The roadmap's Typical score entry names it, and
+  the PR that ships this proposal adds it to the vault Backlog as a one-line
+  bullet, so it outlives this file.
 - **Score vs Sensitivity's redesign,** which might draw a typical score per
   sensitivity. Recorded as lost in the 2026-10-12 chart entry.
 

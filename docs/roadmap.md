@@ -116,7 +116,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
   or fill all 20. Run History's chart would draw it after every run, as a
   gray line with the middle half of the runs shaded around it, and Scenario
   Stats would show it. Three implementation PRs build it: the definition,
-  the chart, and the Scenario Stats line.
+  the chart, and the Scenario Stats line. Showing it in the top row's PB
+  card, beside the PB, is a later change that neither proposal makes.
 
   Why it's next:
   - The guiding principles judge skill by the typical run, and no page shows
