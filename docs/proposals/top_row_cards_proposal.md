@@ -85,9 +85,10 @@ the card gains a Category row while a benchmark is selected.
 
 **Recommendation: the Scenario Stats card is about the scenario itself and
 the player's history with it. It holds, in order, Category, Last played, and
-Number of runs. Category reads the selected scenario's category and
-subcategory in the benchmark the Playlist filter holds, and the row is
-hidden when the filter holds no benchmark or the benchmark has no groups.**
+Number of runs, at one weight. Category reads the selected scenario's
+category and subcategory in the benchmark the Playlist filter holds, and the
+row is hidden when the filter holds no benchmark or the benchmark has no
+groups.**
 
 - **The Playlist filter makes the category exact.** Of the 3,240 scenarios in
   the bundled benchmarks, 688 are in more than one benchmark, one of them in
@@ -175,31 +176,44 @@ and open to challenge. The order rule is their idea: "within a card, the
 information should be displayed by order of importance. For example: '50
 cm/360' is low priority, so it should probably go towards the bottom of the
 card and/or even slightly faded." The tiers it rests on are theirs, from the
-Run History brainstorm. Neither is a ruling.
+Run History brainstorm. Neither is a ruling. Amended after the first review
+wave: a fact's role in the player's next action decides its order and its
+weight, and how often it changes decides neither.
 
 The material consequence: a rule later cards in this row follow too,
 including the note card.
 
 **Recommendation: in the top row's cards,**
 
-- **lines go in order of importance,** the most important first;
-- **a fact the player needs often but that rarely changes is shown, faded,
-  at the bottom,** not hidden behind a hover, as cm/360 and the PB's accuracy
-  are;
-- **a fact needed only now and then goes on hover or focus,** as the position,
-  the previous best and the next rank's points are;
-- **only a score is large:** the PB card's and the latest-run card's, one
-  each. Nothing else in the row is.
+- **lines go in order of their role in the player's next action,** the most
+  important first;
+- **a fact needed at a glance, with no hand on the mouse, is on screen;**
+  optional explanation and history go on hover and focus, as the position,
+  the previous best, and the next rank's points do;
+- **a fact that supports another comes after it, in a quieter but readable
+  style,** as cm/360 and the accuracy support the PB;
+- **a card with no lead fact lists its facts at one weight,** in order of
+  importance, as Scenario Stats does;
+- **in this layout only the two scores are large,** the PB card's and the
+  latest-run card's. That is this layout's choice, not a rule for later
+  cards.
 
-- **Two separate questions decide a fact's place.** How often it is needed
-  decides whether it is on screen or on hover. How often it changes decides
-  how much it stands out. cm/360 is needed before nearly every run and almost
-  never changes, so it is on screen and faded.
-- **Two big numbers make the row's one comparison obvious:** the result
-  against the target.
+- **How often a fact changes decides neither its order nor its weight.** The
+  rule holds against four cases. A training note can stay the same for weeks
+  and still be the reason to look at the page, so it is on screen at full
+  weight. A next-rank threshold can stay the same for weeks and is the goal,
+  so it is on screen near the top of the PB card. A time that changes with
+  every run, such as when the latest run was played, is context, so it sits
+  in a card's quiet first line. Scenario Stats has no lead fact, so its three
+  lines are at one weight, Category first.
+- **cm/360 and the accuracy are quiet because they support the PB,** not
+  because they rarely change.
+- **Two large scores make the row's comparison obvious** while both cards are
+  about the same scenario, as during play with Follow on. During a lookup the
+  latest-run card can show another scenario, as it does today.
 
-Rejected: every fact at the same weight, as the Scenario Stats block has
-today; static facts on hover.
+Rejected: how often a fact changes setting its emphasis; static facts on
+hover; one large score as a rule for every later card.
 
 ## Problem
 
@@ -342,7 +356,8 @@ card is as tall as the row.
 ### The Scenario Stats card
 
 - **Its heading stays `Scenario Stats`**, now at the top of a card drawn as
-  the latest-run card is.
+  the latest-run card is. It has no lead fact, so its lines are at one
+  weight, as today's rows are (T4).
 - **Category** (T2) reads `Category: {category} · {subcategory}`, or
   `Category: {category}` for a benchmark with one level, the names as the
   benchmark table labels its groups. It is the first row, and it is there
