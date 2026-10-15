@@ -62,7 +62,9 @@ directly over the run list.**
   line has room. At 2560 px and 3840 px the row is 132 px, exactly as today.
 - **The PB card sits at the right end of the left column,** beside the
   latest-run card: they hold the two numbers a player compares after every
-  run, the target and the result.
+  run, the target and the result, while both are about the same scenario, as
+  during play with Follow on. During a lookup the latest-run card can show
+  another scenario, as it does today.
 - **The space between the Scenario Stats card and the PB card is kept for
   notes,** a later proposal. Until then it is empty, with no element in it.
   The maintainer: "gap is fine."
@@ -116,7 +118,9 @@ least include cm/360 since I often refer to it when I am training";
 "Position belongs with PB Card"; the percentile at a glance ("percentile
 mostly, but position sometimes"), at two decimals as today; the next rank as
 a percentage, "so it matches how it is displayed on Playlist Scenarios
-page"; accuracy on the faded line ("Accuracy line confirmed").
+page"; accuracy on the faded line ("Accuracy line confirmed"). Amended after
+the first review wave: the next rank shows its score threshold at a glance,
+after the table's gap.
 
 The material consequence: the personal best gets its own card in the top
 row, and the leaderboard position moves into it, out of the Scenario Stats
@@ -130,10 +134,11 @@ order:**
    benchmark is selected. Hovering or focusing the score gives the line the
    latest-run card showed when this PB landed, such as `Up 2.5% on your
    previous best of 11,934`.
-3. **The next rank, worded as the benchmark table's Next Rank cell:**
-   `+1.3% to Lavender`, or `+2.8% faster to Lavender` on a time-scored
-   scenario, or `Top rank`. Hovering gives the cell's own tooltip, `Lavender
-   at 3,700 · 47 to go`. Shown only while a benchmark is selected.
+3. **The next rank, with its score threshold:** `+1.3% to Lavender at
+   3,700`, or `+2.8% faster to Lavender at 899` on a time-scored scenario, or
+   `Top rank`. The gap is the benchmark table's Next Rank cell, word for
+   word, and the threshold follows it. Hovering gives the points still to go,
+   `47 to go`. Shown only while a benchmark is selected.
 4. **The percentile, `81.13% percentile`,** with **Refresh** right after it.
    Hovering gives `Position 5,400 of 28,614` over the existing `Last updated
    {age} · {timestamp}`. Without a percentile, the line is today's Position
@@ -142,8 +147,11 @@ order:**
 5. **`50 cm/360 · Accuracy 61%`, faded:** the PB run's sensitivity and
    accuracy.
 
-- **It answers the target question at a glance.** The score, the rank it
-  holds, and how far the next rank is are the first three lines.
+- **It shows the record and the milestone, both as scores, at a glance.** The
+  PB is the personal record to beat. The next rank's threshold is the
+  benchmark's milestone, often the real goal while grinding, and a player
+  reads it without a hover or arithmetic. The card reports both and chooses
+  no training goal; the Score threshold stays the chart's configured line.
 - **Position is where the PB ranks.** The leaderboard places a player's best
   score, so the position belongs with the PB. It already updates on its own
   after every new PB.
@@ -153,7 +161,9 @@ order:**
 - **The next rank's percentage is the only honest gap on a time-scored
   scenario.** On Ground Plaza Sparky V3, points would read `2.83 to go`, which
   is seconds, while the table already reads `+2.8% faster to Lavender`. One
-  fact gets one wording across the app.
+  fact gets one wording across the app. The threshold after it is a score, as
+  everywhere: on a time-scored scenario the gap is pace and the threshold is
+  still a score.
 - **cm/360 answers "what sens should I use".** In each of the 11 recent
   scenarios the maintainer has played at two or more sensitivities, the PB's
   sensitivity is also the one they play most and the one with their best
@@ -165,7 +175,8 @@ order:**
 
 Rejected: PB rows in the Scenario Stats block (layout A); the PB as the
 Scenario Stats card's big number with the note inside (layout B); the next
-rank in points at a glance; the PB's accuracy on hover; Refresh in the card's
+rank in points at a glance; the next rank as a gap alone, with its threshold
+on hover; the PB's accuracy on hover; Refresh in the card's
 heading; a wider card to hold `Position: 639 of 12,190 (94.76% percentile)`
 and Refresh on one line.
 
@@ -323,7 +334,7 @@ headless Edge at the widths named.
 ```
 | Playlist filter    Open scenario table | Scenario Stats   |  (space kept   | PB · set Oct 9, 5:24 PM | Latest run · Oct 9, 10:03 PM · ... |
 | [Viscose Benchmark S2 - Medium      ]  | Category: ...    |   for notes)   | 3,653  [Cerulean]       | 103  [New PB]                      |
-| Selected scenario  (o) Follow newly... | Last played: ... |                | +1.3% to Lavender       | Up 1.0% on your previous best ...  |
+| Selected scenario  (o) Follow newly... | Last played: ... |                | +1.3% to Lavender at 3,700 | Up 1.0% on your previous best ... |
 | [VT Controlsphere Viscose           ]  | Number of runs:  |                | 94.76% percentile  Refresh | Run 1 last session · 1 min ...   |
 |                                        |                  |                | 50 cm/360 · Accuracy 61%|                                    |
 ```
@@ -379,7 +390,7 @@ that exists today, so the card computes nothing new:
 |---|---|---|
 | `PB · set {time}` | The PB run, as `get_personal_best_run` finds it (the earliest run to reach the high score) | The time as the latest-run card words it: `10:50 PM` today, `Oct 4, 10:50 PM`, `Dec 30, 2025, 10:50 PM` |
 | The score and badge | `format_score`; the badge is the Rank the table would show | No badge below the first threshold, with no benchmark selected, or for a scenario the benchmark has no ladder for |
-| The next rank | `benchmark_rank_fields(ladder, PB, pace constant)`, the table's own function, with the pace constant as the table chooses it | Hidden with no benchmark selected, with no ladder, and where the cell would read `N/A` |
+| The next rank | `benchmark_rank_fields(ladder, PB, pace constant)`, the table's own function, with the pace constant as the table chooses it: the cell's text, then ` at {threshold}` formatted as PB Score; the hover is the points half of the cell's tooltip | Hidden with no benchmark selected, with no ladder, and where the cell would read `N/A`; `Top rank` has no threshold and no hover |
 | The percentile | The Position field's `ScenarioRankInfo`, as today | See below |
 | cm/360 and accuracy | The PB run's normalized sensitivity string, as the run list's Sensitivity column; `format_whole_percent` of its accuracy | Always shown while there is a PB |
 
@@ -449,7 +460,7 @@ the row's, which is 132 px at 2560 px as today; its lines stay centered.
   the pace constant follows the scenario's newest version and the first
   performance file that can tell, so a run of a new version, or the first
   file that recognizes a time-scored scenario, turns `+2.8% faster to
-  Lavender` into the score's `+0.4% to Lavender`, or back. The position
+  Lavender at 899` into the score's `+0.4% to Lavender at 899`, or back. The position
   follows when the background refresh it already triggers stores a new one.
 - **A new scenario or playlist** rebuilds both cards. The Playlist filter
   alone changes Category, the badge, and the next rank.
@@ -517,8 +528,8 @@ today and this proposal does not name is unchanged.
 | Scenario Stats card, Category row | `Category:` then `{category} · {subcategory}`, or `{category}` | A label as `Last played:` is; the two names chained as a readout, as the table's group labels write them. |
 | PB card, first line | `PB · set {time}` | A readout, as the latest-run card's first line. "Set" says what the time is. |
 | PB card, rank badge | `{rank name}` | The ladder's own name, as the table's Rank column. |
-| PB card, next rank | `+{gap}% to {rank name}`, `+{gap}% faster to {rank name}`, `Top rank` | The table's Next Rank cell, word for word. |
-| PB card, next rank hover | `{rank name} at {threshold} · {points} to go` | The cell's tooltip, word for word. |
+| PB card, next rank | `+{gap}% to {rank name} at {threshold}`, `+{gap}% faster to {rank name} at {threshold}`, `Top rank` | The table's Next Rank cell, word for word, then the rank's threshold, formatted as PB Score, so the milestone reads without a hover. |
+| PB card, next rank hover | `{points} to go` | The second half of the cell's tooltip; its first half is on screen. |
 | PB card, percentile | `{percentile}% percentile` | Today's value without its parentheses, now leading the line. |
 | PB card, percentile hover, first line | `Position {position} of {total}` | The position as a readout, over the existing `Last updated` line. |
 | PB card, the line without a percentile | `Position: {value}`, with today's values and hints | Today's field and its label, unchanged. |
