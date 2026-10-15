@@ -292,8 +292,8 @@ def test_the_link_and_the_switch_follow_their_dropdowns_and_are_never_in_a_label
     """A label names its input, so anything in it would join the dropdown's name.
 
     Each Select's label is its plain name, and the link and the switch are
-    the Select's siblings, after it, as they were when they sat under it.
-    The stylesheet places them on the label's line.
+    the Select's siblings, after it. The stylesheet places the link on the
+    label's line and the switch under the dropdown.
     """
     page = run_history.layout()
     playlist_field = _by_class(page, "run-history-playlist-field")
@@ -1404,7 +1404,7 @@ def test_the_dropdowns_column_grows_from_260px_to_420px():
     assert "flex-direction: column;" in column
 
 
-def test_the_link_and_the_switch_are_placed_on_the_labels_line():
+def test_the_link_is_placed_on_the_labels_line():
     """The Select's own box lays out nothing, so its label is the field's item."""
     css = STYLESHEET.read_text(encoding="utf-8")
     fields = (".run-history-playlist-field", ".run-history-scenario-field")
@@ -1423,22 +1423,32 @@ def test_the_link_and_the_switch_are_placed_on_the_labels_line():
     assert "grid-row: 1;" in link
 
 
-def test_the_follow_switch_measures_the_dropdowns_column_and_never_the_window():
-    """Under the dropdown, unless the column holds the label and the switch."""
-    css = STYLESHEET.read_text(encoding="utf-8")
+def test_the_follow_switch_sits_under_the_scenario_dropdown_on_a_16px_line():
+    """The maintainer's choice on PR #380: under the dropdown, and small.
 
-    assert "container: run-history-dropdown-column / inline-size;" in _css_block(
-        css, ".run-history-dropdown-column"
-    )
+    On the label's line it sat between the two dropdowns. Under the dropdown
+    at its full size it made the top row 148px; small, with its text at the
+    dropdown labels' 14px and a 16px help icon, the row is 141px.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    page = run_history.layout()
+    follow = _by_id(page, run_history.FOLLOW_SWITCH_ID)
+    _text, tooltip = follow.label.children
+
     below = _css_block(css, ".run-history-follow-switch")
     assert "grid-column: 1 / -1;" in below
     assert "grid-row: 3;" in below
-    assert re.findall(r"@container run-history-dropdown-column \(([^)]+)\)", css) == [
-        "min-width: 414px"
-    ]
-    beside = _container_block(css, "run-history-dropdown-column (min-width: 414px)")
-    assert "grid-column: 2;" in beside
-    assert "grid-row: 1;" in beside
+    assert "@container run-history-dropdown-column" not in css
+    assert follow.size == "xs"
+    assert tooltip.children.size == 16
+    assert "font-size: var(--mantine-font-size-sm);" in _css_block(
+        css, ".run-history-follow-switch .mantine-Switch-label"
+    )
+    # dmc's box round the help icon, a block whose line would be 3px taller.
+    assert tooltip.boxWrapperProps == {"className": "settings-help-target"}
+    assert "display: flex;" in _css_block(
+        css, ".run-history-follow-switch .settings-help-target"
+    )
 
 
 def test_chart_options_stacks_on_the_charts_own_area_at_48em():

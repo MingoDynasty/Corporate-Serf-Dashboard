@@ -29,6 +29,7 @@ from source.plot.plot_service import (
 
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
+SETTINGS_HELP_TARGET_CLASS = "settings-help-target"
 SETTINGS_HELP_TEXT: dict[str, str | list] = {
     "automatically-change-scenario": [
         "Automatically selects the scenario you just played when a new run is "
@@ -130,8 +131,13 @@ class ChartOptionsIds(NamedTuple):
     cached_plot: str
 
 
-def settings_help_label(label: str, help_text: str | list) -> dmc.Group:
-    """Build a control's label with a help icon that shows the text on hover."""
+def settings_help_label(
+    label: str, help_text: str | list, *, icon_size: str | int = "sm"
+) -> dmc.Group:
+    """Build a control's label with a help icon that shows the text on hover.
+
+    ``icon_size`` is the icon button's Mantine size, or its side in px.
+    """
     return dmc.Group(
         [
             # `inherit` so the label text takes the enclosing <label>'s font
@@ -145,10 +151,14 @@ def settings_help_label(label: str, help_text: str | list) -> dmc.Group:
                     className="settings-help-icon",
                     color="gray",
                     radius="xl",
-                    size="sm",
+                    size=icon_size,
                     variant="subtle",
                     **{"aria-label": f"{label} help"},
                 ),
+                # dmc wraps the icon in a box of its own, a block whose line
+                # is taller than a small icon; the class lets a page lay it
+                # out.
+                boxWrapperProps={"className": SETTINGS_HELP_TARGET_CLASS},
                 label=help_text,
                 events=TOOLTIP_EVENTS,
                 multiline=True,

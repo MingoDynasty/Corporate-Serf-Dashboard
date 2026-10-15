@@ -704,7 +704,9 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
                     ),
                     # Selection behavior, not chart presentation: it decides
                     # what the selector does when a new run lands, so it sits
-                    # with the selector and not in the Chart options panel.
+                    # under the selector and not in the Chart options panel.
+                    # Small, with a 16px help icon, so the line it adds to
+                    # the dropdowns' column is 16px tall.
                     dmc.Switch(
                         className="run-history-follow-switch",
                         id=FOLLOW_SWITCH_ID,
@@ -712,9 +714,11 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
                         label=settings_help_label(
                             "Follow newly played scenario",
                             SETTINGS_HELP_TEXT["automatically-change-scenario"],
+                            icon_size=16,
                         ),
                         checked=True,
                         persistence=True,
+                        size="xs",
                     ),
                 ],
                 className="run-history-scenario-field",

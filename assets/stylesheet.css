@@ -276,11 +276,10 @@ a.run-toast-link:hover {
     min-width: 0;
 }
 
-/* The playlist filter over the scenario dropdown. The column joins a line at
-   260px and grows to 420px with the room the row has. It is also the box the
-   Follow switch's rule measures. */
+/* The playlist filter over the scenario dropdown, and the Follow switch under
+   both. The column joins a line at 260px and grows to 420px with the room the
+   row has. */
 .run-history-dropdown-column {
-    container: run-history-dropdown-column / inline-size;
     display: flex;
     flex: 1 1 260px;
     flex-direction: column;
@@ -289,12 +288,14 @@ a.run-toast-link:hover {
     min-width: min(260px, 100%);
 }
 
-/* A dropdown's field: the Select's label, with the link or the switch at the
-   right end of the label's line, over the Select's input. The Select's own
-   box lays out nothing, so its label and its input are the field's items.
-   The link and the switch are the Select's siblings, after it, and never in
-   its label: a label names its input, and anything inside it would join the
-   name a screen reader gives the dropdown. */
+/* A dropdown's field: the Select's label over its input, then, in the
+   playlist filter's, the link at the right end of the label's line, and in
+   the scenario dropdown's, the Follow switch under the input. The Select's
+   own box lays out nothing, so its label and its input are the field's items:
+   its label is otherwise an inline box in a line taller than itself. The link
+   and the switch are the Select's siblings, after it, and never in its label:
+   a label names its input, and anything inside it would join the name a
+   screen reader gives the dropdown. */
 .run-history-playlist-field,
 .run-history-scenario-field {
     align-items: center;
@@ -326,27 +327,23 @@ a.run-toast-link:hover {
     grid-row: 1;
 }
 
-/* The Follow switch: under the scenario dropdown, unless the dropdowns'
-   column holds the label and the switch on one line, and then at the right
-   end of the label's line. The column's own width decides, never the
-   window's, because the navbar and the cards beside the column take their
-   room first. A container query cannot match the element that declares the
-   container, which is why the column declares it and the switch is inside.
-   The threshold is the label, the gap, and the switch with its help icon:
-   413px in Edge 155 and Firefox 158, measured 2026-10-15, and a pixel
-   more. */
+/* The Follow switch under the scenario dropdown, on one 16px line: the
+   switch's xs track, its text at the dropdown labels' 14px (a switch's label
+   otherwise takes the page's 16px), and the 16px help icon. */
 .run-history-follow-switch {
     grid-column: 1 / -1;
     grid-row: 3;
     margin-top: calc(var(--mantine-spacing-xs) / 2);
 }
 
-@container run-history-dropdown-column (min-width: 414px) {
-    .run-history-follow-switch {
-        grid-column: 2;
-        grid-row: 1;
-        margin-top: 0;
-    }
+.run-history-follow-switch .mantine-Switch-label {
+    font-size: var(--mantine-font-size-sm);
+}
+
+/* The box dmc wraps the help icon in. As a block its line is taller than
+   the icon, and the switch's line would grow by 3px. */
+.run-history-follow-switch .settings-help-target {
+    display: flex;
 }
 
 /* The frame every card in the row has, in the theme's tokens. */
