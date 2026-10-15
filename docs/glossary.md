@@ -145,6 +145,17 @@ reports the last run played, on whatever scenario, with its verdict
 - On screen it has no title. Its first line reads
   `Latest run · {age} · {scenario}`.
 
+### PB card
+
+The card in Run History's top row about the selected scenario's personal best
+as this app records it: its score and rank, the next rank and its threshold,
+and the PB run's sensitivity and accuracy. Under it, sourced apart from the
+local record, the player's leaderboard standing, shown while there is a local
+PB ([run_history.md](specs/run_history.md#the-pb-card)).
+
+- On screen it has no title. Its first line reads `PB · set {age}`.
+- In code: `pb_card`.
+
 ### This scenario
 
 The run list's view of the selected scenario alone: the sessions that hold a
@@ -242,6 +253,8 @@ The player's placement on a scenario's global KovaaK's leaderboard, such as
 word
 ([2026-07-06](decision_log/2026/2026-07-06-one-word-per-concept-in-leaderboard-verbiage.md)).
 How it is fetched and cached is in [scenario_rank.md](specs/scenario_rank.md).
+On Run History it is in the PB card's leaderboard line: under the percentile
+when a percentile exists, and on the line itself otherwise.
 
 - In code: `rank`, except in the scenario table's row fields, which say
   `position`.
