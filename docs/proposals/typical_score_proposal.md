@@ -537,10 +537,9 @@ changed none of what is listed here except that Scenario Stats is now a card.
   `LATEST_RUN_TRACE_NAME`).
 - **The run points' color depends on the run trace coming first.**
   `generated_point_color` reads the template's first colorway entry, the one
-  plotly gives the first trace that sets no color. Four test files read the
+  plotly gives the first trace that sets no color. Three test files read the
   run trace as `figure.data[0]`: `test_plot_service.py`,
-  `test_plot_service_run_history.py`, `test_chart_options.py`,
-  `test_chart_point_appearance.py`.
+  `test_chart_options.py`, `test_chart_point_appearance.py`.
 - **Theme and appearance are a cheap presentation step.**
   `apply_graph_appearance` in `source/components/chart_options.py` applies the
   template, then the point size and color by trace name, and
@@ -803,9 +802,12 @@ fit; the line is a median of runs and almost always sits among them.
 
 A shown value is rounded to the most decimal places any run in its window
 scored, at most two, with a half rounding up, then formatted as a score is.
-So a window of whole-number scores shows whole numbers (`2,140`, never
-`2,140.5`), a scenario scored to one decimal shows one, and a tracking
-scenario's six decimals show two. A median or a percentile is shown no more
+So a window of whole-number scores whose median is 2,140.5 shows `2,141`,
+never `2,140.5`, a scenario scored to one decimal shows one, and a tracking
+scenario's six decimals show two. The half-up step is a `Decimal` quantize
+with `ROUND_HALF_UP`, as `format_whole_percent` rounds: `round()` and
+`format_score`'s format spec both round a half to even, so `round(2140.5)`
+is 2140. A median or a percentile is shown no more
 precisely than the runs it comes from, as the roadmap's honesty principle
 asks. Rounding is for display only: the definition keeps the exact values.
 
@@ -896,8 +898,9 @@ in.
   - On screen: `Middle 80%`, and `Middle 80% (P10 to P90)` in the chart's
     hover.
 - **As of.** The state of a typical score that no longer rests on recent
-  runs, shown with the date of the newest run behind it: the runs since it
-  fell short of the minimum, or more than 30 days have passed with no run.
+  runs, shown with the date of the newest run behind it, because the runs
+  since have fallen short of the minimum, or because more than 30 days have
+  passed with no run.
   - On screen: `as of {date}` in Scenario Stats, and a faded stretch on the
     chart.
   - In code: a value kept after its window fell short is `carried`.
@@ -940,6 +943,10 @@ Statements in the specs that go untrue, which the same PRs rewrite:
   the list of surfaces that order or place scores, unchanged on a
   time-scored scenario, gains the typical score.
 - [glossary.md, Median and best](../glossary.md#median-and-best), as above.
+- [sessions.md, Where sessions show](../specs/sessions.md#where-sessions-show):
+  "The Run History page is the one page that shows a session, in two places:
+  its run list and its latest-run card." The typical score's hovers count the
+  sessions behind a value, a third place.
 
 Untouched: the 2026-10-14 Median and best entry, whose label rule this keeps,
 and the 2026-08-20 points entry (see Traces, order and color).
