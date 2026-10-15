@@ -17,13 +17,17 @@ maintainer's width the row stays exactly as tall as it is today.
 
 ## Decisions needed
 
-Four rows: T1 to T4. **Nothing is ratified.** The one ruling that binds this
-design is the maintainer's resolution priority of 2026-10-14, which it treats
-as a constraint (see [What the maintainer needs](#what-the-maintainer-needs)).
-Each row is the maintainer's lean from the design discussion of 2026-10-14,
-worked out on ten versions of a full-size mockup built from their own stats.
-A lean is not a ruling: every row, and every premise in Problem, is open to
-challenge. Everything else is author-owned, in [Design](#design).
+Four rulings: T1 to T4. The maintainer ratified this proposal on
+2026-10-14: "I ratify Proposal 1, rows T1 to T4, as amended at 7329c23."
+That settles each row as its recommendation, as amended in review. Before
+that, each row was the maintainer's lean from the design discussion of
+2026-10-14, worked out on a full-size mockup built from their own stats.
+Each keeps what the maintainer said in chat, its argument, and what the
+alternatives would have changed, for the record. The other ruling that
+binds this design is the maintainer's resolution priority of 2026-10-14,
+which it treats as a constraint (see
+[What the maintainer needs](#what-the-maintainer-needs)). Everything else
+is author-owned, in [Design](#design), and the ratification covers it too.
 
 This is the first of two proposals from that discussion. The second, the
 latest-run card following the selected scenario and the run list losing its
@@ -32,7 +36,8 @@ T1's alignment.
 
 ### T1. The row's layout: stacked dropdowns, a card per group, the latest-run card over the run list
 
-Status: Proposed. The maintainer's lean, 2026-10-14. The stacking and the
+Status: Ratified (user), 2026-10-14: accept the recommendation below.
+Before that, the maintainer's lean, 2026-10-14. The stacking and the
 alignment are their ideas: "Stacking the selects does seem to free up a ton
 of space", and the latest-run card "should be aligned with the Run History
 panel on the right", which "isn't necessarily a requirement". Of the layouts
@@ -76,7 +81,8 @@ beside the latest-run card (layouts C and D).
 
 ### T2. The Scenario Stats card: Category, Last played, Number of runs
 
-Status: Proposed. The maintainer's lean, 2026-10-14. They asked for the
+Status: Ratified (user), 2026-10-14: accept the recommendation below.
+Before that, the maintainer's lean, 2026-10-14. They asked for the
 category ("when I'm grinding a benchmark, it sometimes helps to know the name
 of the category and subcategory that this scenario is in") and kept Last
 played: "The Run History page also serves as a tool to get information about
@@ -111,7 +117,8 @@ height; a "No benchmark selected" row.
 
 ### T3. The PB card
 
-Status: Proposed. The maintainer's lean, 2026-10-14, built up over the
+Status: Ratified (user), 2026-10-14: accept the recommendation below, as
+amended. Before that, the maintainer's lean, 2026-10-14, built up over the
 discussion: the original ask ("PB score, PB accuracy, etc. Make it
 immediately clear what our target is at all times"); "PB Stats should at
 least include cm/360 since I often refer to it when I am training";
@@ -208,14 +215,16 @@ and Refresh on one line.
 
 ### T4. How a card orders and weights its lines
 
-Status: Proposed. The maintainer's lean, 2026-10-14, like every row here,
-and open to challenge. The order rule is their idea: "within a card, the
+Status: Ratified (user), 2026-10-14: accept the recommendation below, as
+amended. Before that, the maintainer's lean, 2026-10-14, like every row
+here. The order rule is their idea: "within a card, the
 information should be displayed by order of importance. For example: '50
 cm/360' is low priority, so it should probably go towards the bottom of the
 card and/or even slightly faded." The tiers it rests on are theirs, from the
-Run History brainstorm. Neither is a ruling. Amended after the first review
+Run History brainstorm. Neither was a ruling until the ratification.
+Amended after the first review
 wave: a fact's role in the player's next action decides its order and its
-weight, and how often it changes decides neither. The time rule is the
+weight, and how often it changes decides neither. The time rule was the
 maintainer's lean of 2026-10-14, given while the first review wave ran: "yes,
 I'm leaning toward this rule", and for the latest-run card, "During play this
 also indirectly helps measure how long of a break I've been taking since the
@@ -352,8 +361,11 @@ headless Edge at the widths named.
   At 2560 px every state holds 132 px, light and dark: a PB with a rank, a
   time-scored PB, a PB at the top rank, no benchmark selected, no scenario
   selected, and a scenario with no local runs. The setup state without a
-  username is taller, as today's is: 175 px with a PB and 148 px without
-  one, against today's 150 px.
+  username is taller with a local PB, as today's is: 175 px, against
+  today's 150 px. Without a local PB the card has no leaderboard line, so
+  no username hint, and the row stays 132 px. The eleventh mockup, which
+  has the ladder line, measures the same at 3840, 2560, 2048, 1920, 1707,
+  and 1536 px.
 
 - **Categories:** 265 bundled benchmarks, 3,240 distinct scenario names, 688
   in more than one benchmark (at most 11), none twice in one benchmark.
@@ -477,10 +489,10 @@ percentile leading:
   toasts, its loading delay, and every rule in
   [scenario_rank.md](../specs/scenario_rank.md) unchanged.
 - **The username hint takes two lines** in a 300 px card, so in that state
-  the card, and the row, are taller: 175 px with a PB and 148 px without one,
-  as mocked, against today's 150 px in the same state. It is a setup state,
-  not a change between runs; the implementation measures it and reports the
-  height.
+  the card, and the row, are taller: 175 px, as mocked, against today's
+  150 px in the same state. It is a setup state, not a change between runs;
+  the implementation measures it and reports the height. Without a local PB
+  there is no leaderboard line, so no hint, and the row stays 132 px.
 
 **The score's hover** repeats the latest-run card's line for a new PB, word
 for word: `Up {pct}% on your previous best of {previous}`, `{pct}% faster than
@@ -691,7 +703,7 @@ maintainer's stats, in light and dark.
 
 Three implementation PRs. This is intent, not a contract: a boundary that
 moves is noted in that PR's description. Each PR changes a public page in its
-release.
+release. The proposal was ratified on 2026-10-14, so PR 1 is unblocked.
 
 1. **The layout.** The two-column row, the dropdown column with the link and
    the switch on the labels' lines, the Scenario Stats block as a card with its
@@ -727,9 +739,6 @@ maintainer looks at each in their own Firefox before it merges.
 
 - **PR 2 grows too large.** Move Position into the PB card first, then add the
   PB's own facts.
-- **T3 is not settled when T1 is.** PR 1 ships alone; the row then has the
-  Scenario Stats card, the note space, and the latest-run card until the PB
-  card follows.
 
 ## Out of scope
 

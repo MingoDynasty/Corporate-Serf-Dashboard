@@ -93,8 +93,8 @@ What we plan to do now or very soon, each with the reasons it comes next.
   latest-run card lined up over the run list. The PB card shows the PB, the
   gap to the next rank, the leaderboard percentile, and the PB run's cm/360,
   and the Scenario Stats card gains the benchmark category. Its
-  [proposal](./proposals/top_row_cards_proposal.md) is written, and three
-  implementation PRs build it.
+  [proposal](./proposals/top_row_cards_proposal.md) was ratified on
+  2026-10-14, and three implementation PRs build it.
 
   A second proposal follows once it ships: the latest-run card following the
   selected scenario, and the run list losing its heading line. Notes on a
