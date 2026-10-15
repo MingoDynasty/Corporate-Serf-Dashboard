@@ -221,16 +221,13 @@ the 30-day figure did.
 
 **The case for 30 days, faded.**
 
-1. **One answer to "is this current?" for every reader.** The roadmap's
-   later judgments read this figure: weakness by the typical run, and the
-   rank-up chance, which weighs recent form. Each needs to know whether the
-   value is recent. With a window in the definition, they share one answer
-   with the chart and the stats line. With no limit, each one writes its own
-   recency rule, and the chart and a weakness column can disagree about
-   whether the same scenario is known. That is the "second definition of the
-   typical run" the
-   [2026-10-12 chart entry](../decision_log/2026/2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md)
-   refused, repeated once per feature.
+1. **"Fresh" means recent.** With a window in the definition, the chart, the
+   stats line and later readers share one meaning of fresh and of "as of".
+   A no-limit value served by one helper with its dates and counts would
+   still be one definition, but its "fresh" would say nothing about how
+   recent its runs are, so no page could say whether a value is current
+   without a rule of its own. The window licenses no later judgment either:
+   each later feature still sets the evidence it needs, as S4 said.
 2. **It doesn't call old runs current after a break.** No limit never says
    "as of". After a break of 21 days or more, its first value back is built
    mostly from pre-break runs, every time: in all 133 returns to an
@@ -285,17 +282,17 @@ the 30-day figure did.
    faded drawing, and no joins.
 
 **Weighing them.** Point 4 is the alternative's strongest, and it is the
-reason the window must be argued and not assumed. It loses on two counts.
-First, a reader can always ask for more recency than the definition's, but a
-reader of a no-limit figure must add a rule before it can trust any value, so
-every reader restates one, and the typical run means something different on
-each page. Second, a display rule that says "as of" over a no-limit value,
-which the alternative's point 3 relies on, is itself a second definition of
-"current": the stats would call a value old while the chart drew it at full
-strength. The coverage in the alternative's point 1 is real, but the runs it
-adds are the values the measurement found weakest: months-old medians
-labelled current. So the recommendation stands,
-and the faded style is how it keeps the picture whole.
+reason the window must be argued and not assumed. A no-limit value is not a
+second definition by itself: each reader would add an eligibility rule to
+one shared value. What decides it is that without a window "fresh" says
+nothing about recency, so no page could say whether a value is current, and
+the stats line's "as of", which the alternative's point 3 relies on, would
+be a second rule after all, calling a value old while the chart drew it at
+full strength. The coverage in the alternative's point 1 is real, but the
+runs it adds are the values the measurement found weakest: months-old
+medians labelled current. So the recommendation stands, and the faded style
+is how it keeps the picture whole. The window is a descriptive rule for
+"recent", not proof that 30 days predicts best.
 
 **Is the line worth showing at all?** The honest case against: the previous
 session's median predicts the next session as well as the typical score does
