@@ -170,11 +170,12 @@ and Refresh on one line.
 
 ### T4. How a card orders and weights its lines
 
-Status: Proposed. The maintainer set the order rule, 2026-10-14: "within a
-card, the information should be displayed by order of importance. For
-example: '50 cm/360' is low priority, so it should probably go towards the
-bottom of the card and/or even slightly faded." The tiers it rests on are
-theirs, from the Run History brainstorm.
+Status: Proposed. The maintainer's lean, 2026-10-14, like every row here,
+and open to challenge. The order rule is their idea: "within a card, the
+information should be displayed by order of importance. For example: '50
+cm/360' is low priority, so it should probably go towards the bottom of the
+card and/or even slightly faded." The tiers it rests on are theirs, from the
+Run History brainstorm. Neither is a ruling.
 
 The material consequence: a rule later cards in this row follow too,
 including the note card.
