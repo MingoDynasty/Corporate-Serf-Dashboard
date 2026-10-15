@@ -108,6 +108,22 @@ What we plan to do now or very soon, each with the reasons it comes next.
   The page's behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
 
+- **Typical score** — what a player's recent runs on a scenario usually
+  score, defined once for every later judgment of skill. Its
+  [proposal](./proposals/typical_score_proposal.md), in review with nothing
+  ratified yet, recommends the median of a scenario's last 20 runs from the
+  30 days up to each run, known once those runs number 10 from two sessions
+  or fill all 20. Run History's chart would draw it after every run, as a
+  gray line with the middle half of the runs shaded around it, and Scenario
+  Stats would show it. Three implementation PRs build it: the definition,
+  the chart, and the Scenario Stats line.
+
+  Why it's next:
+  - The guiding principles judge skill by the typical run, and no page shows
+    it: the chart draws no line for it, and nothing names it.
+  - Three Future entries wait on its definition: the score trend verdict,
+    weakness by the typical run, and the rank-up chance.
+
 ---
 
 ## Future (briefly)
