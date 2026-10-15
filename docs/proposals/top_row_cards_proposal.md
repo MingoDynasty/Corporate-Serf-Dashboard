@@ -146,8 +146,10 @@ order:**
    `Position: N/A · set your KovaaK's username in Settings`. It does not need
    a local PB: a scenario with no local runs reads `No local PB yet` over
    `Play this scenario to record one in this app.`, then this line.
-5. **`50 cm/360 · Accuracy 61%`, faded:** the PB run's sensitivity and
-   accuracy.
+5. **`50 cm/360 · Accuracy 61%`, faded:** the PB run's cm/360 as the
+   scenario table's PB cm/360 column has it, trailing zeros dropped, and its
+   hit accuracy to the whole percent, as Run History shows accuracy. Where
+   the table's PB cm/360 is unknown, the line reads `Accuracy 61%` alone.
 
 - **It shows the record and the milestone, both as scores, at a glance.** The
   PB is the personal record to beat. The next rank's threshold is the
@@ -169,10 +171,12 @@ order:**
   fact gets one wording across the app. The threshold after it is a score, as
   everywhere: on a time-scored scenario the gap is pace and the threshold is
   still a score.
-- **cm/360 answers "what sens should I use".** In each of the 11 recent
-  scenarios the maintainer has played at two or more sensitivities, the PB's
-  sensitivity is also the one they play most and the one with their best
-  three scores (see [Verified facts](#verified-facts)).
+- **cm/360 is the sensitivity the PB was set at.** It answers "what sens
+  should I use" as a reference, not a recommendation: in each of the 11
+  recent scenarios the maintainer has played at two or more sensitivities,
+  the PB's sensitivity is also the one they play most and the one with their
+  best three scores (see [Verified facts](#verified-facts)), which shows it is
+  familiar, not that it is best.
 - **Refresh stays beside the value it refreshes.** In the card's heading it
   would read as refreshing the whole card, and the card does not widen for it:
   the percentile line with Refresh is about 229 px in a card with 274 px of
@@ -397,7 +401,7 @@ that exists today, so the card computes nothing new:
 | The score and badge | `format_score`; the badge is the Rank the table would show | No badge below the first threshold, with no benchmark selected, or for a scenario the benchmark has no ladder for |
 | The next rank | `benchmark_rank_fields(ladder, PB, pace constant)`, the table's own function, with the pace constant as the table chooses it: the cell's text, then ` at {threshold}` formatted as PB Score; the hover is the points half of the cell's tooltip | Hidden with no benchmark selected, with no ladder, and where the cell would read `N/A`; `Top rank` has no threshold and no hover |
 | The leaderboard line | The Position field's `ScenarioRankInfo`, as today | See below; shown with or without a local PB |
-| cm/360 and accuracy | The PB run's normalized sensitivity string, as the run list's Sensitivity column; `format_whole_percent` of its accuracy | Always shown while there is a PB |
+| cm/360 and accuracy | The PB run's cm/360 as the scenario table's PB cm/360 column takes it (`_personal_best_cm360`), formatted by `format_score`, so `50.0` reads `50` ([2026-09-27](../decision_log/2026/2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)); `format_whole_percent` of the run's hit accuracy, as the latest-run card and the run list show accuracy | The sensitivity is left out where the table's PB cm/360 is unknown. The accuracy can differ from the table's PB Accuracy, which prefers damage accuracy, to two decimals |
 
 **The leaderboard line.** It is today's Position field, moved, with the
 percentile leading:
@@ -547,7 +551,7 @@ today and this proposal does not name is unchanged.
 | PB card, percentile | `{percentile}% percentile` | Today's value without its parentheses, now leading the line. |
 | PB card, percentile hover, first line | `Position {position} of {total}` | The position as a readout, over the existing `Last updated` line. |
 | PB card, the line without a percentile | `Position: {value}`, with today's values and hints, such as `Position: 900 of 500` | Today's field and its label, unchanged. |
-| PB card, faded line | `{sensitivity} · Accuracy {accuracy}%` | The run list's sensitivity string and the latest-run card's accuracy, chained. |
+| PB card, faded line | `{cm/360} cm/360 · Accuracy {accuracy}%`, or `Accuracy {accuracy}%` where the cm/360 is unknown | The table's PB cm/360 with its trailing zeros dropped, and the hit accuracy as the latest-run card shows it, chained. |
 | PB card, score hover | `Up {pct}% on your previous best of {previous}`, `{pct}% faster than your previous best of {previous}`, `Your previous best was {previous}` | The latest-run card's new-PB lines, word for word. |
 | PB card, no scenario | `No scenario selected` | The page's words for that state, as the chart's title and the run list's; a title, as the latest-run card's empty state has one. |
 | PB card, no local runs | `No local PB yet` over `Play this scenario to record one in this app.` | A title over one sentence, as the latest-run card's empty state. Local, because KovaaK's server can hold a record from another computer; the leaderboard line follows it. |
@@ -676,7 +680,8 @@ maintainer looks at each in their own Firefox before it merges.
   by the first run; no scenario; each Position state, including served
   from cache, the unset username, and a cached total below the position
   (`900 of 500`, no percentile); and no local runs with each of those
-  leaderboard states.
+  leaderboard states; a PB run whose cm/360 is unknown; a PB run whose hit
+  and damage accuracy differ.
 - **Unit, Category:** a benchmark with two levels, one level, no groups, on
   the exclusion list; a playlist that is not a benchmark; a scenario the
   playlist does not list.
