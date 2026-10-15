@@ -427,10 +427,15 @@ the row's, which is 132 px at 2560 px as today; its lines stay centered.
 
 ### When the cards change
 
-- **A run landing** rebuilds the PB card when it sets a new PB, as it
-  rebuilds the chart: the score, the badge, the next rank, the time, the
-  faded line, and the hover all move together. The position follows when the
-  background refresh it already triggers stores a new one.
+- **Every run that lands on the selected scenario** rebuilds the PB card, as
+  it rebuilds the chart, whether or not it sets a new PB. A new PB moves the
+  score, the badge, the next rank, the time, the faded line, and the hover
+  together. A run that sets none can still change the next rank's wording:
+  the pace constant follows the scenario's newest version and the first
+  performance file that can tell, so a run of a new version, or the first
+  file that recognizes a time-scored scenario, turns `+2.8% faster to
+  Lavender` into the score's `+0.4% to Lavender`, or back. The position
+  follows when the background refresh it already triggers stores a new one.
 - **A new scenario or playlist** rebuilds both cards. The Playlist filter
   alone changes Category, the badge, and the next rank.
 - **The position's poll and Refresh** write the percentile line, as they write
@@ -630,9 +635,12 @@ maintainer looks at each in their own Firefox before it merges.
 - **Unit, Category:** a benchmark with two levels, one level, no groups, on
   the exclusion list; a playlist that is not a benchmark; a scenario the
   playlist does not list.
-- **Callbacks:** a run that sets a new PB rebuilds the PB card; one that does
-  not leaves it; a scenario change and a filter change rebuild both cards; the
-  position's poll and Refresh write the percentile line.
+- **Callbacks:** every run on the selected scenario rebuilds the PB card; a
+  run that sets no PB but is of a new version of a time-scored scenario
+  switches the next rank from the pace wording to the score wording; a run on
+  another scenario leaves the card; a scenario change and a filter change
+  rebuild both cards; the position's poll and Refresh write the percentile
+  line.
 - **Live, each PR:** headless Edge at 3840, 2560, 1920, and 1536 px and at 110%
   and 125% zoom, in light and dark: the row's height against today's, the
   latest-run card's edges against the run list's, nothing overlapping. The
