@@ -122,8 +122,11 @@ page"; accuracy on the faded line ("Accuracy line confirmed"). Amended after
 the first review wave: the next rank shows its score threshold at a glance.
 In the discussion after the wave the maintainer chose to set the two scores
 next to each other: "Putting the PB Score and Target Rank Score adjacent
-looks much better." The card's time is relative, by the maintainer's time
-rule in T4.
+looks much better." With no local PB the card shows no leaderboard line,
+and a record KovaaK's holds from another computer is left to the remote
+personal best reconciliation work, as the maintainer chose: "I agree to
+defer to 'Remote personal best reconciliation'." The card's time is
+relative, by the maintainer's time rule in T4.
 
 The material consequence: the personal best gets its own card in the top
 row, and the leaderboard position moves into it, out of the Scenario Stats
@@ -148,9 +151,9 @@ order:**
    **Refresh** right after it. Hovering gives `Position 5,400 of 28,614` over
    the existing `Last updated {age} · {timestamp}`. Without a percentile, the
    line is today's Position field: `Position: Unranked (12,345 players)`, or
-   `Position: N/A · set your KovaaK's username in Settings`. It does not need
-   a local PB: a scenario with no local runs reads `No local PB yet` over
-   `Play this scenario to record one in this app.`, then this line.
+   `Position: N/A · set your KovaaK's username in Settings`. It follows the
+   local PB: a scenario with no local runs reads `No local PB yet` over `Play
+   this scenario to record one in this app.`, with no leaderboard line.
 5. **`50 cm/360 · Accuracy 61%`, faded:** the PB run's cm/360 as the
    scenario table's PB cm/360 column has it, trailing zeros dropped, and its
    hit accuracy to the whole percent, as Run History shows accuracy. Where
@@ -163,10 +166,12 @@ order:**
   no training goal; the Score threshold stays the chart's configured line.
 - **The leaderboard line sits with the PB but is sourced apart from it.**
   KovaaK's places the best score its server holds, which is usually this
-  app's PB. A record set on another computer can make the two differ, and a
-  scenario with no local runs can still have a position, so the line stays
-  whether or not there is a local PB, as the Position field works today. It
-  already updates on its own after every new PB.
+  app's PB, and a record set on another computer can make the two differ. A
+  scenario with no local runs shows no line: in the maintainer's cache all
+  408 positions for such scenarios are Unranked, so there the line would only
+  ever read Unranked. A record from another computer, with no local runs, is
+  the remote personal best reconciliation work's to show. The line already
+  updates on its own after every new PB.
 - **The percentile is what the maintainer checks against the game.** KovaaK's
   shows `Percentile: 81.1` for a position of 5,400 among 28,614 entries; the
   app works it out with the same formula and shows `81.13`.
@@ -195,7 +200,9 @@ Rejected: PB rows in the Scenario Stats block (layout A); the PB as the
 Scenario Stats card's big number with the note inside (layout B); the next
 rank in points at a glance; the next rank as a gap alone, with its threshold
 on hover; the table's sortable wording with the threshold after it (`+1.3% to
-Lavender at 3,700`); the points as `pts`; the PB's accuracy on hover; Refresh in the card's
+Lavender at 3,700`); the points as `pts`; the leaderboard line on a scenario
+with no local runs, in every state or only with a position; the PB's accuracy
+on hover; Refresh in the card's
 heading; a wider card to hold `Position: 639 of 12,190 (94.76% percentile)`
 and Refresh on one line.
 
@@ -364,6 +371,10 @@ headless Edge at the widths named.
   the game shows 81.1.
 - **The position updates itself** after a new PB, with a bounded background
   refresh ([scenario_rank.md](../specs/scenario_rank.md#refresh-behavior)).
+- **Positions with no local runs:** of the 1,179 positions in the
+  maintainer's cache, the 408 for scenarios with no local runs are all
+  Unranked. 12 of the 757 ranked scenarios that do have local runs hold a
+  server score above the local PB, so records from elsewhere exist.
 
 ### Not checked
 
@@ -437,7 +448,7 @@ that exists today, so the card computes nothing new:
 | `PB · set {age}` | The PB run, as `get_personal_best_run` finds it (the earliest run to reach the high score) | The age as Last played words it (`just now`, `5 minutes ago`, `5 days ago`), re-worded every 30 seconds; the exact time on hover and focus, in the shared format with no seconds, `Oct 9, 2026, 5:24 PM` |
 | The score and badge | `format_score`; the badge is the Rank the table would show | No badge below the first threshold, with no benchmark selected, or for a scenario the benchmark has no ladder for |
 | The next rank | `benchmark_rank_fields(ladder, PB, pace constant)`, the table's own function, with the pace constant as the table chooses it: the threshold formatted as PB Score, the rank's name, the cell's gap (`+1.3%`, `+2.8% faster`), and the points from the cell's tooltip (`47 to go`) | Hidden with no benchmark selected, with no ladder, and where the cell would read `N/A`; `Top rank` alone once every rank is reached |
-| The leaderboard line | The Position field's `ScenarioRankInfo`, as today | See below; shown with or without a local PB |
+| The leaderboard line | The Position field's `ScenarioRankInfo`, as today | See below; shown while there is a local PB |
 | cm/360 and accuracy | The PB run's cm/360 as the scenario table's PB cm/360 column takes it (`_personal_best_cm360`), formatted by `format_score`, so `50.0` reads `50` ([2026-09-27](../decision_log/2026/2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)); `format_whole_percent` of the run's hit accuracy, as the latest-run card and the run list show accuracy | The sensitivity is left out where the table's PB cm/360 is unknown. The accuracy can differ from the table's PB Accuracy, which prefers damage accuracy, to two decimals |
 
 **The leaderboard line.** It is today's Position field, moved, with the
@@ -455,9 +466,13 @@ percentile leading:
   percentile, `Position: Unranked ({n} players)`, `Position: N/A · set your
   KovaaK's username in Settings`, `Position: N/A · lookup failed`
   ([scenario_rank.md](../specs/scenario_rank.md#failure-handling)).
-- **It does not depend on a local PB.** A scenario with no local runs shows
-  it, with Refresh, in every state above, as the Position field does today
-  (`test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario`).
+- **It follows the local PB.** A scenario with no local runs shows no
+  leaderboard line and no Refresh. Today's Position field reads such a
+  scenario too
+  (`test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario`); the
+  PR that moves the field changes that behavior and its test, and the spec
+  says so. Showing a record KovaaK's holds from another computer, with no
+  local runs, is deferred to the remote personal best reconciliation work.
 - **Refresh follows the value on the same line,** with its tooltip, its
   toasts, its loading delay, and every rule in
   [scenario_rank.md](../specs/scenario_rank.md) unchanged.
@@ -480,9 +495,9 @@ selected`, the page's words for that state, as the chart's title and the run
 list's, and has no leaderboard line: there is nothing to rank, and Refresh,
 which today sets `N/A` with no scenario selected, has nothing to do. A
 scenario with no local runs reads `No local PB yet` over `Play this scenario
-to record one in this app.`, then the leaderboard line with Refresh: KovaaK's
-server can hold a record from another computer, so the copy says local. Both
-keep the card's height.
+to record one in this app.`, with no leaderboard line. The copy says local
+because KovaaK's server can hold a record from another computer. Both keep
+the card's height.
 
 **A time-scored scenario** shows its PB as a score, as everywhere: no
 completion time is shown anywhere
@@ -604,7 +619,7 @@ today and this proposal does not name is unchanged.
 | PB card, faded line | `{cm/360} cm/360 · Accuracy {accuracy}%`, or `Accuracy {accuracy}%` where the cm/360 is unknown | The table's PB cm/360 with its trailing zeros dropped, and the hit accuracy as the latest-run card shows it, chained. |
 | PB card, score hover | `Up {pct}% on your previous best of {previous}`, `{pct}% faster than your previous best of {previous}`, `Your previous best was {previous}` | The latest-run card's new-PB lines, word for word. |
 | PB card, no scenario | `No scenario selected` | The page's words for that state, as the chart's title and the run list's; a title, as the latest-run card's empty state has one. |
-| PB card, no local runs | `No local PB yet` over `Play this scenario to record one in this app.` | A title over one sentence, as the latest-run card's empty state. Local, because KovaaK's server can hold a record from another computer; the leaderboard line follows it. |
+| PB card, no local runs | `No local PB yet` over `Play this scenario to record one in this app.` | A title over one sentence, as the latest-run card's empty state. Local, because KovaaK's server can hold a record from another computer. |
 
 Kept as today, word for word: `Playlist filter`, `Open scenario table`,
 `Selected scenario`, `Select a scenario`, `Follow newly played scenario` and
@@ -623,7 +638,7 @@ New entries:
   scenario's personal best as this app records it: its score and rank, the
   next rank and its threshold, and the PB run's sensitivity and accuracy.
   Under it, sourced apart from the local record, the player's leaderboard
-  standing, shown with or without a local PB.
+  standing, shown while there is a local PB.
   - On screen it has no title. Its first line reads `PB · set {age}`.
 - **Scenario Stats.** The card in Run History's top row about the selected
   scenario: its benchmark category, when it was last played, and how many runs
@@ -725,6 +740,9 @@ maintainer looks at each in their own Firefox before it merges.
   editor. This one keeps their space.
 - **A jump from the PB card to the PB run in the list.** Its own proposal or a
   small PR, once the PB card exists.
+- **A position with no local runs.** Showing a record KovaaK's holds from
+  another computer, for a scenario with no local runs, is deferred to the
+  remote personal best reconciliation work, a shelved work item.
 - **Time played on a scenario.** How runs become time is decided once for
   every page, Home included (Backlog).
 - **Detecting restarts,** which write no stats file (Backlog).
@@ -739,9 +757,9 @@ maintainer looks at each in their own Firefox before it merges.
   time-scored PB with a pace gap and with none; a PB of zero or less; a PB set
   by the first run; no scenario; each Position state, including served
   from cache, the unset username, and a cached total below the position
-  (`900 of 500`, no percentile); and no local runs with each of those
-  leaderboard states; a PB run whose cm/360 is unknown; a PB run whose hit
-  and damage accuracy differ.
+  (`900 of 500`, no percentile); and no local runs, which shows no
+  leaderboard line in any of those states; a PB run whose cm/360 is
+  unknown; a PB run whose hit and damage accuracy differ.
 - **Unit, Category:** a benchmark with two levels, one level, no groups, on
   the exclusion list; a playlist that is not a benchmark; a scenario the
   playlist does not list.
