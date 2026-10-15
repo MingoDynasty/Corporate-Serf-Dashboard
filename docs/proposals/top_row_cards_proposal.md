@@ -120,7 +120,8 @@ mostly, but position sometimes"), at two decimals as today; the next rank as
 a percentage, "so it matches how it is displayed on Playlist Scenarios
 page"; accuracy on the faded line ("Accuracy line confirmed"). Amended after
 the first review wave: the next rank shows its score threshold at a glance,
-after the table's gap.
+after the table's gap. The card's time is relative, by the maintainer's time
+rule in T4.
 
 The material consequence: the personal best gets its own card in the top
 row, and the leaderboard position moves into it, out of the Scenario Stats
@@ -129,7 +130,8 @@ card.
 **Recommendation: a PB card for the selected scenario, its lines in this
 order:**
 
-1. **`PB · set {time}`,** the time the PB was set.
+1. **`PB · set {age}`,** how long ago the PB was set, such as `PB · set 5
+   days ago`, with the exact time on hover and focus.
 2. **The PB score, large,** with the current rank as a badge while a
    benchmark is selected. Hovering or focusing the score gives the line the
    latest-run card showed when this PB landed, such as `Up 2.5% on your
@@ -198,10 +200,14 @@ cm/360' is low priority, so it should probably go towards the bottom of the
 card and/or even slightly faded." The tiers it rests on are theirs, from the
 Run History brainstorm. Neither is a ruling. Amended after the first review
 wave: a fact's role in the player's next action decides its order and its
-weight, and how often it changes decides neither.
+weight, and how often it changes decides neither. The time rule is the
+maintainer's lean of 2026-10-14, given while the first review wave ran: "yes,
+I'm leaning toward this rule", and for the latest-run card, "During play this
+also indirectly helps measure how long of a break I've been taking since the
+last run I played in my current session."
 
 The material consequence: a rule later cards in this row follow too,
-including the note card.
+including the note card, and the latest-run card's time becomes relative.
 
 **Recommendation: in the top row's cards,**
 
@@ -214,6 +220,11 @@ including the note card.
   style,** as cm/360 and the accuracy support the PB;
 - **a card with no lead fact lists its facts at one weight,** in order of
   importance, as Scenario Stats does;
+- **a time that says how old something is reads relative,** with the exact
+  time on hover and focus, and a time that names or orders something reads
+  absolute. So the PB card's `PB · set 5 days ago` and the latest-run card's
+  `Latest run · 2 minutes ago` are relative, as Last played is, while session
+  names, run rows, and the chart stay absolute;
 - **in this layout only the two scores are large,** the PB card's and the
   latest-run card's. That is this layout's choice, not a rule for later
   cards.
@@ -232,8 +243,18 @@ including the note card.
   about the same scenario, as during play with Follow on. During a lookup the
   latest-run card can show another scenario, as it does today.
 
+- **An age answers "how long ago", and relative words say it at a glance.**
+  Last played is relative for that reason, "a staleness gauge, not a
+  reference date"
+  ([2026-06-21](../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md)),
+  and so is the scenario table's PB Date. During play the latest-run card's
+  time doubles as a break timer: `just now` when the next run follows at once,
+  `5 minutes ago` after a break. A session's name or a run's time of day
+  names it, and reads absolute.
+
 Rejected: how often a fact changes setting its emphasis; static facts on
-hover; one large score as a rule for every later card.
+hover; one large score as a rule for every later card; absolute times for
+the PB card and the latest-run card.
 
 ## Problem
 
@@ -341,7 +362,7 @@ headless Edge at the widths named.
 ### The row at a glance
 
 ```
-| Playlist filter    Open scenario table | Scenario Stats   |  (space kept   | PB · set Oct 9, 5:24 PM | Latest run · Oct 9, 10:03 PM · ... |
+| Playlist filter    Open scenario table | Scenario Stats   |  (space kept   | PB · set 5 days ago     | Latest run · 2 minutes ago · ...   |
 | [Viscose Benchmark S2 - Medium      ]  | Category: ...    |   for notes)   | 3,653  [Cerulean]       | 103  [New PB]                      |
 | Selected scenario  (o) Follow newly... | Last played: ... |                | +1.3% to Lavender at 3,700 | Up 1.0% on your previous best ... |
 | [VT Controlsphere Viscose           ]  | Number of runs:  |                | 94.76% percentile  Refresh | Run 1 last session · 1 min ...   |
@@ -397,7 +418,7 @@ that exists today, so the card computes nothing new:
 
 | Line | Source | States |
 |---|---|---|
-| `PB · set {time}` | The PB run, as `get_personal_best_run` finds it (the earliest run to reach the high score) | The time as the latest-run card words it: `10:50 PM` today, `Oct 4, 10:50 PM`, `Dec 30, 2025, 10:50 PM` |
+| `PB · set {age}` | The PB run, as `get_personal_best_run` finds it (the earliest run to reach the high score) | The age as Last played words it (`just now`, `5 minutes ago`, `5 days ago`), re-worded every 30 seconds; the exact time on hover and focus, in the shared format with no seconds, `Oct 9, 2026, 5:24 PM` |
 | The score and badge | `format_score`; the badge is the Rank the table would show | No badge below the first threshold, with no benchmark selected, or for a scenario the benchmark has no ladder for |
 | The next rank | `benchmark_rank_fields(ladder, PB, pace constant)`, the table's own function, with the pace constant as the table chooses it: the cell's text, then ` at {threshold}` formatted as PB Score; the hover is the points half of the cell's tooltip | Hidden with no benchmark selected, with no ladder, and where the cell would read `N/A`; `Top rank` has no threshold and no hover |
 | The leaderboard line | The Position field's `ScenarioRankInfo`, as today | See below; shown with or without a local PB |
@@ -464,8 +485,11 @@ it.
 
 ### The latest-run card
 
-Its place and width change (T1); nothing it says does. It reports the last run
-played on whatever scenario, with its **Show {scenario}** button, as the
+Its place and width change (T1), and its time becomes relative (T4):
+`Latest run · 2 minutes ago · VoxTS Click Medium`, with the exact time on
+hover and focus, re-worded every 30 seconds. Nothing else it says changes. It
+reports the last run played on whatever scenario, with its **Show
+{scenario}** button, as the
 [spec](../specs/run_history.md#the-latest-run-card) says. Its height becomes
 the row's, which is 132 px at 2560 px as today; its lines stay centered.
 
@@ -505,8 +529,8 @@ only have to not break.
 - **The cards are not landmarks or buttons.** `Scenario Stats` stays a
   heading. The PB card's first line is text, as the latest-run card's is.
 - **Every hover is also a focus,** as Last played's and Position's are today:
-  the dotted score, the next rank, and the percentile take focus and show their
-  tooltips, with the existing tooltip events.
+  the dotted score, the next rank, the percentile, and the two relative times
+  take focus and show their tooltips, with the existing tooltip events.
 - **The order a screen reader reads** is the visual order: dropdowns, Scenario
   Stats, PB, latest run, then the chart's controls.
 - **The rank badge** keeps the page's text color on a tint of the rank's color,
@@ -534,6 +558,9 @@ above keeps them legible.
   scenario's place in that playlist.
 - **The two-column row** reuses the run list's column width, so one constant
   sets both.
+- **The relative times reuse the app's helpers,** `relativeTime` and
+  `absoluteTime` in `assets/dashAgGridFunctions.js`, on the 30-second
+  interval Last played already ticks on.
 
 ### Copy
 
@@ -544,7 +571,9 @@ today and this proposal does not name is unchanged.
 | Where | String | Why |
 |---|---|---|
 | Scenario Stats card, Category row | `Category:` then `{category} · {subcategory}`, or `{category}` | A label as `Last played:` is; the two names chained as a readout, as the table's group labels write them. |
-| PB card, first line | `PB · set {time}` | A readout, as the latest-run card's first line. "Set" says what the time is. |
+| PB card, first line | `PB · set {age}`, such as `PB · set 5 days ago` | A readout, as the latest-run card's first line. "Set" says what the time is; relative, as an age (T4). |
+| PB card and latest-run card, a relative time's hover | `{timestamp}`, such as `Oct 9, 2026, 5:24 PM` | The shared absolute format with no seconds, as Last played's hover. |
+| Latest-run card, first line | `Latest run · {age} · {scenario}`, such as `Latest run · 2 minutes ago · VoxTS Click Medium` | Today's line with its time as an age (T4); `just now` in the first minute, as Last played words it. |
 | PB card, rank badge | `{rank name}` | The ladder's own name, as the table's Rank column. |
 | PB card, next rank | `+{gap}% to {rank name} at {threshold}`, `+{gap}% faster to {rank name} at {threshold}`, `Top rank` | The table's Next Rank cell, word for word, then the rank's threshold, formatted as PB Score, so the milestone reads without a hover. |
 | PB card, next rank hover | `{points} to go` | The second half of the cell's tooltip; its first half is on screen. |
@@ -559,8 +588,8 @@ today and this proposal does not name is unchanged.
 Kept as today, word for word: `Playlist filter`, `Open scenario table`,
 `Selected scenario`, `Select a scenario`, `Follow newly played scenario` and
 its help tooltip, `Scenario Stats`, `Last played:`, `Number of runs:`,
-`Refresh` and its tooltip, every Position value and hint, and every string of
-the latest-run card.
+`Refresh` and its tooltip, every Position value and hint, and every other
+string of the latest-run card.
 
 ### Terms
 
@@ -596,6 +625,11 @@ note. They erase nothing.
 - [2026-10-12, the run list is a second column](../decision_log/2026/2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md)
   set the top row's order with the latest-run card filling the rest of the
   row. T1 replaces that order.
+- [2026-10-12, a past run's check](../decision_log/2026/2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md)
+  set the latest-run card's time as a time of day, or a date for an older run.
+  T4 makes it relative, with the exact time on hover. The note of 2026-10-12
+  on [2026-07-11, the absolute format](../decision_log/2026/2026-07-11-humanize-the-absolute-timestamp-format.md),
+  which lists that time among the page's absolute uses, gets the same note.
 
 ### Alternatives rejected
 
@@ -626,8 +660,8 @@ release.
 1. **The layout.** The two-column row, the dropdown column with the link and
    the switch on the labels' lines, the Scenario Stats block as a card with its
    content unchanged (Position still in it), the latest-run card over the run
-   list, the note space, and the narrow-window rules (T1, and T4 for the
-   cards' frame).
+   list with its time relative, the note space, and the narrow-window rules
+   (T1, and T4 for the cards' frame and the latest-run card's time).
    - **Measures and reports** the row's height at 3840, 2560, 1920, and 1536 px,
      in light and dark, and that the card's edges meet the run list's.
 2. **The PB card** (T3, T4). The new card, with Position, its hints, its
@@ -690,7 +724,8 @@ maintainer looks at each in their own Firefox before it merges.
   switches the next rank from the pace wording to the score wording; a run on
   another scenario leaves the card; a scenario change and a filter change
   rebuild both cards; the position's poll and Refresh write the percentile
-  line.
+  line; the 30-second tick re-words the PB card's and the latest-run card's
+  relative times.
 - **Live, each PR:** headless Edge at 3840, 2560, 1920, and 1536 px and at 110%
   and 125% zoom, in light and dark: the row's height against today's, the
   latest-run card's edges against the run list's, nothing overlapping. The
