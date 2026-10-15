@@ -139,11 +139,13 @@ order:**
    `Top rank`. The gap is the benchmark table's Next Rank cell, word for
    word, and the threshold follows it. Hovering gives the points still to go,
    `47 to go`. Shown only while a benchmark is selected.
-4. **The percentile, `81.13% percentile`,** with **Refresh** right after it.
-   Hovering gives `Position 5,400 of 28,614` over the existing `Last updated
-   {age} · {timestamp}`. Without a percentile, the line is today's Position
-   field: `Position: Unranked (12,345 players)`, or `Position: N/A · set your
-   KovaaK's username in Settings`.
+4. **The leaderboard line: the percentile, `81.13% percentile`,** with
+   **Refresh** right after it. Hovering gives `Position 5,400 of 28,614` over
+   the existing `Last updated {age} · {timestamp}`. Without a percentile, the
+   line is today's Position field: `Position: Unranked (12,345 players)`, or
+   `Position: N/A · set your KovaaK's username in Settings`. It does not need
+   a local PB: a scenario with no local runs reads `No local PB yet` over
+   `Play this scenario to record one in this app.`, then this line.
 5. **`50 cm/360 · Accuracy 61%`, faded:** the PB run's sensitivity and
    accuracy.
 
@@ -152,9 +154,12 @@ order:**
   benchmark's milestone, often the real goal while grinding, and a player
   reads it without a hover or arithmetic. The card reports both and chooses
   no training goal; the Score threshold stays the chart's configured line.
-- **Position is where the PB ranks.** The leaderboard places a player's best
-  score, so the position belongs with the PB. It already updates on its own
-  after every new PB.
+- **The leaderboard line sits with the PB but is sourced apart from it.**
+  KovaaK's places the best score its server holds, which is usually this
+  app's PB. A record set on another computer can make the two differ, and a
+  scenario with no local runs can still have a position, so the line stays
+  whether or not there is a local PB, as the Position field works today. It
+  already updates on its own after every new PB.
 - **The percentile is what the maintainer checks against the game.** KovaaK's
   shows `Percentile: 81.1` for a position of 5,400 among 28,614 entries; the
   app works it out with the same formula and shows `81.13`.
@@ -391,22 +396,26 @@ that exists today, so the card computes nothing new:
 | `PB · set {time}` | The PB run, as `get_personal_best_run` finds it (the earliest run to reach the high score) | The time as the latest-run card words it: `10:50 PM` today, `Oct 4, 10:50 PM`, `Dec 30, 2025, 10:50 PM` |
 | The score and badge | `format_score`; the badge is the Rank the table would show | No badge below the first threshold, with no benchmark selected, or for a scenario the benchmark has no ladder for |
 | The next rank | `benchmark_rank_fields(ladder, PB, pace constant)`, the table's own function, with the pace constant as the table chooses it: the cell's text, then ` at {threshold}` formatted as PB Score; the hover is the points half of the cell's tooltip | Hidden with no benchmark selected, with no ladder, and where the cell would read `N/A`; `Top rank` has no threshold and no hover |
-| The percentile | The Position field's `ScenarioRankInfo`, as today | See below |
+| The leaderboard line | The Position field's `ScenarioRankInfo`, as today | See below; shown with or without a local PB |
 | cm/360 and accuracy | The PB run's normalized sensitivity string, as the run list's Sensitivity column; `format_whole_percent` of its accuracy | Always shown while there is a PB |
 
-**The percentile line.** It is today's Position field, moved, with the
+**The leaderboard line.** It is today's Position field, moved, with the
 percentile leading:
 
-- **Ranked with a total:** `{percentile}% percentile`, two decimals, with the
-  dotted underline. Hovering or focusing it gives `Position {position} of
-  {total}` over today's `Last updated {age} · {timestamp}`
+- **When a percentile is available:** `{percentile}% percentile`, two
+  decimals, with the dotted underline. Hovering or focusing it gives
+  `Position {position} of {total}` over today's `Last updated {age} · {timestamp}`
   ([2026-10-04](../decision_log/2026/2026-10-04-the-position-value-says-when-it-was-last-updated.md)).
   A value served from cache keeps its ` · from cache` hint.
 - **Every other state reads as the Position field does today,** with its
-  label: `Position: {position}` with no total, `Position: Unranked
-  ({n} players)`, `Position: N/A · set your KovaaK's username in Settings`,
-  `Position: N/A · lookup failed`
+  label: `Position: {position}` with no total, `Position: {position} of
+  {total}` when a cached total is below the position and gives no
+  percentile, `Position: Unranked ({n} players)`, `Position: N/A · set your
+  KovaaK's username in Settings`, `Position: N/A · lookup failed`
   ([scenario_rank.md](../specs/scenario_rank.md#failure-handling)).
+- **It does not depend on a local PB.** A scenario with no local runs shows
+  it, with Refresh, in every state above, as the Position field does today
+  (`test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario`).
 - **Refresh follows the value on the same line,** with its tooltip, its
   toasts, its loading delay, and every rule in
   [scenario_rank.md](../specs/scenario_rank.md) unchanged.
@@ -422,10 +431,14 @@ your previous best of {previous}` by pace, or `Your previous best was
 A PB set by the scenario's first run has no previous best, so the score has
 no hover and no dotted underline.
 
-**Empty states.** With no scenario selected the card reads `Select a
-scenario to see its PB.` A scenario with no runs reads `No PB yet` over
-`Your first run on it sets one.`, as the latest-run card shows its own empty
-state. Both keep the card's height.
+**Empty states.** With no scenario selected the card reads `No scenario
+selected`, the page's words for that state, as the chart's title and the run
+list's, and has no leaderboard line: there is nothing to rank, and Refresh,
+which today sets `N/A` with no scenario selected, has nothing to do. A
+scenario with no local runs reads `No local PB yet` over `Play this scenario
+to record one in this app.`, then the leaderboard line with Refresh: KovaaK's
+server can hold a record from another computer, so the copy says local. Both
+keep the card's height.
 
 **A time-scored scenario** shows its PB as a score, as everywhere: no
 completion time is shown anywhere
@@ -436,7 +449,8 @@ latest-run card do.
 **A mismatch with the leaderboard is accepted.** KovaaK's ranks the best
 score its server holds, which can differ from the local PB, for example after
 runs on another computer. Position already rests on cached reads, and
-reconciling the two is a shelved item. The spec says so.
+reconciling the two is a shelved item. The card keeps the two apart, the
+local record above and the leaderboard line under it, and the spec says so.
 
 ### The note space
 
@@ -532,11 +546,11 @@ today and this proposal does not name is unchanged.
 | PB card, next rank hover | `{points} to go` | The second half of the cell's tooltip; its first half is on screen. |
 | PB card, percentile | `{percentile}% percentile` | Today's value without its parentheses, now leading the line. |
 | PB card, percentile hover, first line | `Position {position} of {total}` | The position as a readout, over the existing `Last updated` line. |
-| PB card, the line without a percentile | `Position: {value}`, with today's values and hints | Today's field and its label, unchanged. |
+| PB card, the line without a percentile | `Position: {value}`, with today's values and hints, such as `Position: 900 of 500` | Today's field and its label, unchanged. |
 | PB card, faded line | `{sensitivity} · Accuracy {accuracy}%` | The run list's sensitivity string and the latest-run card's accuracy, chained. |
 | PB card, score hover | `Up {pct}% on your previous best of {previous}`, `{pct}% faster than your previous best of {previous}`, `Your previous best was {previous}` | The latest-run card's new-PB lines, word for word. |
-| PB card, no scenario | `Select a scenario to see its PB.` | A sentence saying what to do. |
-| PB card, no runs | `No PB yet` over `Your first run on it sets one.` | A title over one sentence, as the latest-run card's empty state. |
+| PB card, no scenario | `No scenario selected` | The page's words for that state, as the chart's title and the run list's; a title, as the latest-run card's empty state has one. |
+| PB card, no local runs | `No local PB yet` over `Play this scenario to record one in this app.` | A title over one sentence, as the latest-run card's empty state. Local, because KovaaK's server can hold a record from another computer; the leaderboard line follows it. |
 
 Kept as today, word for word: `Playlist filter`, `Open scenario table`,
 `Selected scenario`, `Select a scenario`, `Follow newly played scenario` and
@@ -552,8 +566,10 @@ under "The Run History page". The implementing PRs move them in.
 New entries:
 
 - **PB card.** The card in Run History's top row about the selected
-  scenario's personal best: its score and rank, the gap to the next rank, the
-  player's leaderboard percentile, and the PB run's sensitivity and accuracy.
+  scenario's personal best as this app records it: its score and rank, the
+  next rank and its threshold, and the PB run's sensitivity and accuracy.
+  Under it, sourced apart from the local record, the player's leaderboard
+  standing, shown with or without a local PB.
   - On screen it has no title. Its first line reads `PB · set {time}`.
 - **Scenario Stats.** The card in Run History's top row about the selected
   scenario: its benchmark category, when it was last played, and how many runs
@@ -564,8 +580,9 @@ Entries the same PRs correct:
 - **Latest-run card** calls it "The panel at the top of Run History". It
   becomes "The card at the right end of Run History's top row, over the run
   list".
-- **Position** gains: "On Run History it is in the PB card, under the
-  percentile."
+- **Position** gains: "On Run History it is in the PB card's leaderboard
+  line: under the percentile when a percentile exists, and on the line
+  itself otherwise."
 
 ### Decisions this changes
 
@@ -656,8 +673,10 @@ maintainer looks at each in their own Firefox before it merges.
 - **Unit, the PB card's text:** a table of cases through the pure function:
   a PB with and without a benchmark; below the first rank; at the top rank; a
   time-scored PB with a pace gap and with none; a PB of zero or less; a PB set
-  by the first run; no runs; no scenario; each Position state, including
-  served from cache and the unset username.
+  by the first run; no scenario; each Position state, including served
+  from cache, the unset username, and a cached total below the position
+  (`900 of 500`, no percentile); and no local runs with each of those
+  leaderboard states.
 - **Unit, Category:** a benchmark with two levels, one level, no groups, on
   the exclusion list; a playlist that is not a benchmark; a scenario the
   playlist does not list.
