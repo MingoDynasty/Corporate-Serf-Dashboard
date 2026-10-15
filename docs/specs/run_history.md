@@ -83,13 +83,25 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 ## The top row
 
-- The row holds, in order: the "Playlist filter" select, with the "Open
-  scenario table" link beneath it while a playlist is selected, the "Selected
-  scenario" searchable select (placeholder "Select a scenario") with the
-  "Follow newly played scenario" switch beneath it, the Scenario Stats block,
-  and the latest-run card, which fills the rest of the row
-  ([2026-10-12][column]).
-  The two dropdowns and the Follow switch persist in the browser. The Follow
+- The row takes the two columns of the chart and the run list under it, with
+  the same gap, and one value sets the list's 500px width for both. The
+  second column holds the latest-run card alone, so the card sits over the
+  run list and its edges are the list's at every zoom level. The first holds,
+  in order, the dropdowns' column, the Scenario Stats card, and the room left
+  after them, which is kept for notes and holds nothing. Every card is as
+  tall as the row.
+- The dropdowns' column holds the "Playlist filter" select over the "Selected
+  scenario" searchable select (placeholder "Select a scenario"), each the
+  column's full width, and the "Follow newly played scenario" switch under
+  the scenario select. The column joins a line at 260px and grows to 420px
+  with the room the row has. It sets the row's height: 141px at 2560px.
+- The "Open scenario table" link sits at the right end of the Playlist
+  filter label's line while a playlist is selected. The Follow switch is
+  small, its text at the dropdown labels' 14px with a 16px help icon, on a
+  16px line. Neither is inside a label: each dropdown's accessible name is
+  its label alone, and keyboard focus and a screen reader reach the link and
+  the switch after their dropdown.
+- The two dropdowns and the Follow switch persist in the browser. The Follow
   switch carries a help tooltip: "Automatically selects the scenario you just
   played when a new run is detected. If the **Playlist filter** doesn't list
   that scenario, the filter is cleared."
@@ -105,7 +117,7 @@ of scope here, apart from its chart toolbar, noted under The chart.
   fresh search, and a right-click there highlights it when the field shows
   only a cursor
   ([2026-10-12][highlight]).
-- The Follow switch sits under the scenario selector, not in the panel: it
+- The Follow switch sits with the scenario selector, not in the panel: it
   governs selection, not presentation
   ([2026-08-09][panel]).
 - The playlist filter lists the visible playlists
@@ -120,7 +132,7 @@ of scope here, apart from its chart toolbar, noted under The chart.
   the playlist's scenarios, so its name appears just after the page paints
   ([2026-10-12][hidden-filter]).
 - While the playlist filter holds a loaded playlist, the "Open scenario
-  table" link under it leads to that playlist's scenario table at
+  table" link on its label's line leads to that playlist's scenario table at
   `/playlists/{code}`, which opens in playlist order
   ([playlists.md](playlists.md#routes-and-navigation)). There is no link, and
   no room held for one, while the filter is empty. The callback that lists the
@@ -132,11 +144,11 @@ of scope here, apart from its chart toolbar, noted under The chart.
   nothing is remembered: the list the filter is given has no such playlist,
   and the Select drops a value its new options lack
   ([2026-10-12][hidden-filter]).
-- The row wraps on its own width and never on the window's
-  ([2026-08-03][content-area]).
-  Each dropdown joins a line at 200px and grows back toward a 400px target,
-  twice as fast as the card beside it, so a row with room to spare gives it
-  to the scenario's name first. The card is 380px wide at least.
+- The first column wraps its pieces on its own width and never on the
+  window's ([2026-08-03][content-area]).
+  Where they don't fit on one line, the Scenario Stats card goes to a second
+  line of the column, and the latest-run card stays in the second column, as
+  tall as the row.
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
   directory, named by each file's own `Scenario:` field
@@ -154,10 +166,14 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-10-12][check]).
   The last run played is the last run of the newest session, in the order
   [sessions.md](sessions.md#sessions) sets.
-- Its first line reads `Latest run · {time} · {scenario}`. The time is a
-  time of day for a run played today, such as `10:50 PM`, and carries the
-  date otherwise: `Oct 4, 10:50 PM`, or `Dec 30, 2025, 10:50 PM` in an
-  earlier year. While the run's scenario is the selected one its name is
+- Its first line reads `Latest run · {age} · {scenario}`. The age is how
+  long ago the run ended, worded as Last played words it, such as `just now`
+  or `5 minutes ago`, and worded again every 30 seconds, so during play it
+  reads as the length of the break since the last run. Hovering or focusing
+  the age shows the exact time, in the shared format with no seconds, such as
+  `Oct 9, 2026, 5:24 PM`
+  ([2026-07-11][timestamps]).
+  While the run's scenario is the selected one its name is
   plain text, with the whole name as its tooltip where the card cuts it
   short. While another scenario is selected the name is a button, drawn as
   the app draws a link, whose accessible name is `Show {scenario}`. Pressing
@@ -205,14 +221,17 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-10-13][nearest-minute]).
   A time that rounds to zero reads `<1 min`, so that form means under 30
   seconds.
-- The card is one height in every state, so the page doesn't jump. With no
-  run in the store it reads "No runs yet" over "Play a scenario in KovaaK's
-  and your latest run will show here.", at the same height
+- The card is 500px wide, the run list's width, and as tall as the top row,
+  and never less than 132px, which holds its tallest state. So nothing that
+  changes between runs changes its height, and the page doesn't jump. Its
+  lines are centered in that height. With no run in the store it reads "No
+  runs yet" over "Play a scenario in KovaaK's and your latest run will show
+  here.", at the same height, and its first line has no words
   ([2026-10-12][check]).
 - The card is rewritten when a run lands on any scenario, when the selected
-  scenario changes, when the Score threshold percentage changes, when the
-  date moves on, and when the newest session stops being in progress. A run
-  that lands older than the run store's newest leaves the card as it was.
+  scenario changes, when the Score threshold percentage changes, and when
+  the newest session stops being in progress. A run that lands older than
+  the run store's newest leaves the card as it was.
 
 ## The chart
 
@@ -813,9 +832,16 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 ## Scenario Stats
 
-- The block shows "Last played:", "Number of runs:", and "Position:" for the
-  selected scenario. The personal best appears on the chart as the PB score
-  overlay, not as a stats row.
+- A card in the top row, framed as the latest-run card is, in the theme's
+  tokens. Its heading, "Scenario Stats", is an h2 drawn as the card's quiet
+  first line, and under it, at one weight, are "Last played:", "Number of
+  runs:", and "Position:" for the selected scenario. The personal best
+  appears on the chart as the PB score overlay, not as a stats row.
+- Its text is 300px wide, and its frame adds only a border to its height.
+  The card fits in the row the dropdowns' column sets, its lines centered,
+  unless the Position field's hint takes a line of its own, as it does with
+  no KovaaK's username or with a position served from cache. The card then
+  makes the row about 150px tall.
 - "Last played" is a relative, single-unit humanized string ("5 minutes
   ago"), self-updating on its own 30-second interval
   ([2026-06-21][last-played]).
@@ -887,6 +913,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   at up to 600px tall, and the page scrolls. The order is then the top row,
   the list, and the chart
   ([2026-10-12][column]).
+  The top row is then one wrapping line, in order: the dropdowns' column,
+  the Scenario Stats card, and the latest-run card, which joins a line at
+  380px and takes the room left on it.
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side

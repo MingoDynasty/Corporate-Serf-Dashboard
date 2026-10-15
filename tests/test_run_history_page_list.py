@@ -301,8 +301,13 @@ def test_the_columns_leave_room_for_the_scrollbar():
     narrowest = sum(column.get("width", column.get("minWidth")) for column in columns)
 
     assert narrowest <= LIST_COLUMN_PX - BORDER_PX - SCROLLBAR_PX
-    assert "grid-template-columns: minmax(0, 1fr) 500px;" in _css_block(
-        STYLESHEET.read_text(encoding="utf-8"), ".run-history-columns"
+    css = STYLESHEET.read_text(encoding="utf-8")
+    assert f"--run-history-list-width: {LIST_COLUMN_PX}px;" in _css_block(
+        css, ".run-history-page"
+    )
+    assert (
+        "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
+        in _css_block(css, ".run-history-columns")
     )
 
 

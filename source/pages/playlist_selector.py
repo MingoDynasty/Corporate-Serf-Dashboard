@@ -3,10 +3,11 @@
 Run History's ``dmc.Select`` filter and the Aim Training Journey
 ``dmc.MultiSelect``
 comparison picker stay distinct components with role-specific behavior
-(clearable/persistence/value semantics), but should share the same search,
-sizing, and scroll conventions so the two dropdowns look and behave
-consistently. This module holds only the role-agnostic props; each call site
-splats them and adds its own role-specific props.
+(clearable/persistence/value semantics), but should share the same search
+and scroll conventions so the two dropdowns look and behave consistently.
+This module holds only the role-agnostic props; each call site splats them
+and adds its own role-specific props. Run History's filter is sized by the
+column it is stacked in, so only the picker takes the shared sizing.
 """
 
 # Splatted into both playlist dropdowns. Only props valid on both

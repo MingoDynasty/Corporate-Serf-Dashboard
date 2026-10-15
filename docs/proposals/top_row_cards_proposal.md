@@ -43,6 +43,15 @@ of space", and the latest-run card "should be aligned with the Run History
 panel on the right", which "isn't necessarily a requirement". Of the layouts
 mocked: "I think F looks the best", then "v8 is looking the best so far".
 
+Amended by the maintainer's ruling, 2026-10-15, after looking at PR #380 in
+Firefox: the **Follow newly played scenario** switch does not sit on the
+Selected scenario label's line. "It doesn't look very good between
+sandwiched between two dropdown menus." It goes under the scenario
+dropdown, "accepting the taller row", and small: "Use the smaller switch
+with the gaps kept (141 px row): xs track, 14 px text, 16 px help icon." So
+the row is 141 px at 2560 px, not 132 px. The statements below that put the
+switch on the label's line, or the row at 132 px, are superseded by this.
+
 The material consequence: the top row is rebuilt. The two dropdowns move
 into one column, the latest-run card changes width and place, and the
 Scenario Stats block becomes a card.
@@ -422,7 +431,9 @@ card is as tall as the row.
 - **Open scenario table sits on the Playlist filter label's line,** at its
   right end, while a playlist is selected. Its rule is unchanged: there is no
   link, and no room held for one, with the filter empty.
-- **The Follow switch sits on the Selected scenario label's line,** at its
+- **Superseded, 2026-10-15 (see T1):** the Follow switch sits under the
+  scenario dropdown, small, at every width. As ratified: **The Follow switch
+  sits on the Selected scenario label's line,** at its
   right end, when the column is wide enough to hold the label and the switch
   on one line, and under the dropdown when it is not. The column's own width
   decides, not the window's

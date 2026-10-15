@@ -107,6 +107,13 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         assert tooltips[0].events == chart_options.TOOLTIP_EVENTS
         assert tooltips[0].withArrow is True
         assert tooltips[0].multiline is True
+        # The panel's icons keep Mantine's sm; the Follow switch's is small to
+        # keep its line short under the scenario dropdown.
+        small = component_id == run_history.FOLLOW_SWITCH_ID
+        assert tooltips[0].children.size == (16 if small else "sm")
+        assert tooltips[0].boxWrapperProps == {
+            "className": chart_options.SETTINGS_HELP_TARGET_CLASS
+        }
 
     score_threshold_percentage = components[IDS.score_threshold_percentage]
     assert score_threshold_percentage.min == 1

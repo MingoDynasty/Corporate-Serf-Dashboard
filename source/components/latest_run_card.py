@@ -17,8 +17,9 @@ from enum import Enum
 from typing import Any, NamedTuple
 
 import dash_mantine_components as dmc
-from dash import html
+from dash import dcc, html
 
+from source.components.chart_options import TOOLTIP_EVENTS
 from source.components.run_history_list import (
     BELOW_THRESHOLD_TEXT,
     NEW_PB_TEXT,
@@ -48,8 +49,6 @@ from source.kovaaks.time_scored_service import PaceBasis, get_version_pace_basis
 from source.utilities.utilities import (
     format_elapsed_duration,
     format_score,
-    format_short_timestamp,
-    format_time_of_day,
     format_whole_percent,
 )
 
@@ -60,6 +59,9 @@ CARD_CLASS = "run-history-card"
 HEADING_CLASS = "run-history-card-heading"
 HEADING_TEXT_CLASS = "run-history-card-heading-text"
 HEADING_LABEL_CLASS = "run-history-card-label"
+# The run's age, with the hover affordance Last played's has.
+TIME_CLASS = "cell-tooltip-affordance"
+TIME_TARGET_CLASS = "run-history-card-time-target"
 SCENARIO_CLASS = "run-history-card-scenario"
 SCENARIO_BUTTON_CLASS = f"{SCENARIO_CLASS} run-history-card-scenario-button"
 BODY_CLASS = "run-history-card-body"
@@ -91,12 +93,14 @@ class LatestRun:
     """What the card says about the last run played, as the text it shows.
 
     ``run_id`` is the run's id as the run list keys its row and a run event
-    names it. ``result`` is the card's second line and ``session`` its third.
+    names it. ``played_at`` is when the run ended, as the run's file names it,
+    which the browser words as an age. ``result`` is the card's second line
+    and ``session`` its third.
     """
 
     run_id: str
     scenario: str
-    time: str
+    played_at: datetime
     score: str
     badge: CardBadge | None
     result: str
@@ -205,8 +209,8 @@ def latest_run(
     ``all_runs`` is a copy of every run in the run store, on every scenario.
     ``goal_percentage`` is ``None`` while the percentage is empty. ``now`` is
     the app's own clock, which decides whether the run's session is in
-    progress and whether its time needs a date. ``version_pace_basis``
-    answers for one version of one scenario. ``None`` with no runs.
+    progress. ``version_pace_basis`` answers for one version of one
+    scenario. ``None`` with no runs.
 
     The newest run is the last run of the newest session, the run the run
     list names as the newest. It is judged as the list judges it: against
@@ -234,19 +238,12 @@ def latest_run(
     )
     is_new_pb = run in new_high_score_runs(scenario_runs)
 
-    today = now.date()
-    ended = run.datetime_object
     accuracy = f"Accuracy {format_whole_percent(run.accuracy)}"
     comparison = _comparison(run.score, chased, verdict, is_new_pb)
     return LatestRun(
         run_id=run_id(run),
         scenario=scenario,
-        # The date would be noise on a run played today.
-        time=(
-            format_time_of_day(ended)
-            if ended.date() == today
-            else format_short_timestamp(ended, today)
-        ),
+        played_at=run.datetime_object,
         score=format_score(run.score),
         badge=_badge(verdict, is_new_pb),
         result=accuracy if comparison is None else f"{comparison} · {accuracy}",
@@ -282,12 +279,20 @@ def latest_run_from_store(
 class LatestRunCardIds(NamedTuple):
     """The component ids one page gives its latest-run card.
 
-    ``heading`` holds the first line's text and ``body`` the lines under it.
-    ``scenario_button`` is the scenario's name while another scenario is
-    selected: a button whose ``value`` is the name and whose click asks the
-    page for that scenario.
+    ``played_at`` is a store holding when the run ended, in epoch seconds, or
+    nothing with no run. A script on the page words it into ``label``, the
+    first line's words before the scenario's name, hidden with no run:
+    ``time`` is the run's age in it and ``time_tooltip`` the age's hover.
+    ``heading`` holds the scenario's name while it is the one selected, and
+    ``body`` the lines under the first. ``scenario_button`` is the
+    scenario's name while another scenario is selected: a button whose
+    ``value`` is the name and whose click asks the page for that scenario.
     """
 
+    played_at: str
+    label: str
+    time: str
+    time_tooltip: str
     heading: str
     scenario_button: str
     body: str
@@ -296,7 +301,8 @@ class LatestRunCardIds(NamedTuple):
 class CardContent(NamedTuple):
     """What a page writes to its card, one field per prop it writes."""
 
-    heading: list[html.Span] | None
+    played_at: float | None
+    heading: html.Span | None
     scenario_button: str | None
     scenario_button_value: str | None
     scenario_button_label: str | None
@@ -306,18 +312,48 @@ class CardContent(NamedTuple):
 def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
     """Build the card with nothing in it yet.
 
-    The page's callback writes what it shows. The scenario button is in the
-    layout from the start and is never drawn again: a page must hold every
-    input of a callback whose output it holds, and a button that came and
-    went with the card's text would call the callback it feeds each time it
-    was put back.
+    The page's callbacks write what it shows. What they write is in the
+    layout from the start and is never drawn again. A page must hold every
+    input of a callback whose output it holds, so a scenario button that came
+    and went with the card's text would call the callback it feeds each time
+    it was put back. And the run's age, which a script writes, would come
+    and go under the script if the server's answer drew it.
     """
     return dmc.Box(
         className=CARD_CLASS,
         children=[
+            dcc.Store(id=ids.played_at),
             html.Div(
                 className=HEADING_CLASS,
                 children=[
+                    # One item of the heading, with the age inline in it. The
+                    # heading is a flex container, which drops a space between
+                    # its items, and a screen reader would be handed the words
+                    # on either side of the age run together.
+                    html.Span(
+                        [
+                            f"{LATEST_RUN_LABEL} · ",
+                            dmc.Tooltip(
+                                dmc.Text(
+                                    className=TIME_CLASS,
+                                    id=ids.time,
+                                    inherit=True,
+                                    span=True,
+                                    tabIndex=0,
+                                ),
+                                # dmc wraps the tooltip's target in a block
+                                # box, which would break the line round it.
+                                boxWrapperProps={"className": TIME_TARGET_CLASS},
+                                events=TOOLTIP_EVENTS,
+                                id=ids.time_tooltip,
+                                label="",
+                            ),
+                            " · ",
+                        ],
+                        className=HEADING_LABEL_CLASS,
+                        hidden=True,
+                        id=ids.label,
+                    ),
                     html.Span(id=ids.heading, className=HEADING_TEXT_CLASS),
                     html.Button(
                         id=ids.scenario_button,
@@ -344,6 +380,7 @@ def latest_run_card_content(
     """
     if shown is None:
         return CardContent(
+            played_at=None,
             heading=None,
             scenario_button=None,
             scenario_button_value=None,
@@ -354,20 +391,7 @@ def latest_run_card_content(
             ],
         )
 
-    # The label ends with a space that the stylesheet keeps. The heading is
-    # a flex container, which drops a space between its items, and a screen
-    # reader would be handed the label and the name joined up.
-    heading = [
-        html.Span(
-            f"{LATEST_RUN_LABEL} · {shown.time} · ", className=HEADING_LABEL_CLASS
-        )
-    ]
     is_selected = shown.scenario == selected_scenario
-    if is_selected:
-        heading.append(
-            # The title gives the whole name where the card cuts it short.
-            html.Span(shown.scenario, className=SCENARIO_CLASS, title=shown.scenario)
-        )
     score_row: list[Any] = [html.Span(shown.score, className=SCORE_CLASS)]
     if shown.badge is not None:
         score_row.append(
@@ -381,7 +405,13 @@ def latest_run_card_content(
             )
         )
     return CardContent(
-        heading=heading,
+        played_at=shown.played_at.timestamp(),
+        heading=(
+            # The title gives the whole name where the card cuts it short.
+            html.Span(shown.scenario, className=SCENARIO_CLASS, title=shown.scenario)
+            if is_selected
+            else None
+        ),
         scenario_button=None if is_selected else shown.scenario,
         scenario_button_value=None if is_selected else shown.scenario,
         scenario_button_label=None if is_selected else f"Show {shown.scenario}",
