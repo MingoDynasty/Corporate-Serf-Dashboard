@@ -471,11 +471,12 @@ flowchart LR
   sits over the list. The first column (`_top_row`, `_dropdown_column`) is a
   wrapping row of the dropdowns' column and the Scenario Stats card, the room
   after them kept for notes. Each dropdown's field is a grid in which the
-  Select's own box lays out nothing, so the stylesheet places the link and
-  the Follow switch, the Select's siblings, on its label's line and never in
-  the label; a container query on the dropdowns' column moves the switch
-  under the dropdown when the column is under 414px. It never imports another
-  page's module: what it shares with Home is under `components/`.
+  Select's own box lays out nothing, so the stylesheet places the Select's
+  siblings, never in its label: the link on the playlist filter label's line,
+  and the Follow switch under the scenario dropdown, small
+  (`settings_help_label`'s `icon_size`) so the row is 141px at 2560px. It
+  never imports another page's module: what it shares with Home is under
+  `components/`.
   Every id it draws is its own (`SCENARIO_SELECTION_IDS`, `CHART_OPTIONS_IDS`,
   `SCENARIO_STATS_IDS`, and the constants beside them), its stores and
   intervals included, because a page that holds one output of a callback has

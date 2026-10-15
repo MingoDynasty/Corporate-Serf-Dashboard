@@ -92,18 +92,15 @@ of scope here, apart from its chart toolbar, noted under The chart.
   tall as the row.
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
-  column's full width. The column joins a line at 260px and grows to 420px
-  with the room the row has.
+  column's full width, and the "Follow newly played scenario" switch under
+  the scenario select. The column joins a line at 260px and grows to 420px
+  with the room the row has. It sets the row's height: 141px at 2560px.
 - The "Open scenario table" link sits at the right end of the Playlist
-  filter label's line while a playlist is selected. The "Follow newly played
-  scenario" switch sits at the right end of the Selected scenario label's
-  line while the dropdowns' column is 414px or wider, the room the label and
-  the switch need on one line, and under the dropdown otherwise. The
-  column's own width decides, never the window's
-  ([2026-08-03][content-area]).
-  Neither is inside a label: each dropdown's accessible name is its label
-  alone, and keyboard focus and a screen reader reach the link and the switch
-  after their dropdown.
+  filter label's line while a playlist is selected. The Follow switch is
+  small, its text at the dropdown labels' 14px with a 16px help icon, on a
+  16px line. Neither is inside a label: each dropdown's accessible name is
+  its label alone, and keyboard focus and a screen reader reach the link and
+  the switch after their dropdown.
 - The two dropdowns and the Follow switch persist in the browser. The Follow
   switch carries a help tooltip: "Automatically selects the scenario you just
   played when a new run is detected. If the **Playlist filter** doesn't list
@@ -841,10 +838,10 @@ of scope here, apart from its chart toolbar, noted under The chart.
   runs:", and "Position:" for the selected scenario. The personal best
   appears on the chart as the PB score overlay, not as a stats row.
 - Its text is 300px wide, and its frame adds only a border to its height.
-  The card fits in the row's 132px, its lines centered, unless the Position
-  field's hint takes a line of its own, as it does with no KovaaK's username
-  or with a position served from cache. The card then makes the row about
-  150px tall.
+  The card fits in the row the dropdowns' column sets, its lines centered,
+  unless the Position field's hint takes a line of its own, as it does with
+  no KovaaK's username or with a position served from cache. The card then
+  makes the row about 150px tall.
 - "Last played" is a relative, single-unit humanized string ("5 minutes
   ago"), self-updating on its own 30-second interval
   ([2026-06-21][last-played]).
