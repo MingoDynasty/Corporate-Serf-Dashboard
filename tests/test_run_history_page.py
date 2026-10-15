@@ -1574,9 +1574,12 @@ def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     assert "display" not in _css_block(css, ".pb-card-heading")
     # dmc's boxes round the score and Refresh add no line of their own.
     assert "display: flex;" in _css_block(css, ".pb-card-flex-target")
-    # The score's last space reaches a screen reader and takes no room.
+    # The score's last space reaches a screen reader and takes no room, its
+    # line height included: the score's 33px would otherwise make the row
+    # 12px taller, measured in Edge and Firefox.
     word_end = _css_block(css, ".pb-card-word-end")
     assert "font-size: 0;" in word_end
+    assert "line-height: 0;" in word_end
     assert "white-space: pre;" in word_end
 
 
