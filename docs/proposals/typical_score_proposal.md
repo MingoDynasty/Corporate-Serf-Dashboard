@@ -817,6 +817,7 @@ drafts and are redone here.
 | Line hover, faded stretch | `As of {date}` | The newest run's date, as in Scenario Stats. |
 | Chart options switch, label | `Middle 80%` | The legend's words, as the PB score switch takes its line's. |
 | Chart options switch, help | `Shades the middle 80% of the runs behind your typical score, from the 10th to the 90th percentile, in a lighter shade than the middle 50%. **Score vs Sensitivity** draws no typical score.` | What it adds and where it doesn't apply. The mode is bold through `control_name()`, as the empty state bolds the modes. |
+| Chart options switch, help icon's accessible name | `Middle 80% help` | `settings_help_label` names every help icon `{label} help`, as `PB score help`; plain text, as an accessible name stays. |
 
 ### Terms
 
