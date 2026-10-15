@@ -38,6 +38,7 @@ from dash import (
     html,
     no_update,
 )
+from dash.development.base_component import Component
 
 from source.components.chart_options import (
     SETTINGS_HELP_TOOLTIP_WIDTH,
@@ -1066,7 +1067,10 @@ def _score(shown: PersonalBest) -> Any:
     the score row is a flex container, which drops the space between the
     score and the badge, and the two would be handed over as one word.
     """
-    text = [shown.score, html.Span(" ", className=WORD_END_CLASS)]
+    text: list[str | Component] = [
+        shown.score,
+        html.Span(" ", className=WORD_END_CLASS),
+    ]
     if shown.score_hover is None:
         return html.Span(text, className=SCORE_CLASS)
     return dmc.Tooltip(
