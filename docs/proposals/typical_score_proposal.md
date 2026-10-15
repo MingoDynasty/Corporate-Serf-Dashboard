@@ -873,8 +873,9 @@ drafts and are redone here.
 ### Terms
 
 Each entry is written as [docs/glossary.md](../glossary.md) would hold it,
-under "Scores and notifications", beside PB. The PRs that ship this move them
-in.
+under "Scores and notifications", beside PB. Each implementation PR moves in
+the entries for the terms it ships: PR 1 Typical score and As of, with the
+Median and best correction, and PR 2 Middle 50% and Middle 80%.
 
 - **Typical score.** What a player's recent runs on a scenario usually score:
   the median of the scenario's last 20 runs or fewer from the 30 days up to a
@@ -942,11 +943,11 @@ Statements in the specs that go untrue, which the same PRs rewrite:
 - [run_history.md, Time-scored scenarios](../specs/run_history.md#time-scored-scenarios):
   the list of surfaces that order or place scores, unchanged on a
   time-scored scenario, gains the typical score.
-- [glossary.md, Median and best](../glossary.md#median-and-best), as above.
 - [sessions.md, Where sessions show](../specs/sessions.md#where-sessions-show):
   "The Run History page is the one page that shows a session, in two places:
   its run list and its latest-run card." The typical score's hovers count the
   sessions behind a value, a third place.
+- [glossary.md, Median and best](../glossary.md#median-and-best), as above.
 
 Untouched: the 2026-10-14 Median and best entry, whose label rule this keeps,
 and the 2026-08-20 points entry (see Traces, order and color).
@@ -1021,13 +1022,14 @@ ships on its own, to be ordered with them, while the chart need not wait. If the
 maintainer prefers fewer PRs, PR 1 can fold into PR 2, at the cost of one
 larger review.
 
-The last of them to merge ships the proposal, by the
+Each PR updates the specs and the glossary entries its own behavior changes,
+as it ships ([Terms](#terms) says which entry goes with which PR). The last
+of them to merge ships the proposal, by the
 [Shipping a proposal](../../AGENTS.md#shipping-a-proposal-docs-definition-of-done)
 checklist: a decision-log entry for each row, the notes in
-[Decisions this changes](#decisions-this-changes), the specs, the glossary's
-entries in [Terms](#terms), the user guide, the roadmap, `product.md`, the
-vault Backlog bullet named in [Out of scope](#out-of-scope), and this file
-deleted.
+[Decisions this changes](#decisions-this-changes), the user guide, the
+roadmap, `product.md`, the vault Backlog bullet named in
+[Out of scope](#out-of-scope), and this file deleted.
 
 **Recommended:** `claude-opus-5-5`, at high for PRs 1 and 3 and at xhigh for
 PR 2, which walks each state through two chart modes, the themes, the zoom fit
