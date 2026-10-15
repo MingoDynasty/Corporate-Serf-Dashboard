@@ -14,6 +14,7 @@ import dash
 import pytest
 from dash import dcc, html
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_INLINE_SCRIPTS
+from sortedcontainers import SortedList
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -25,6 +26,7 @@ from source.components.pb_card import (  # noqa: E402
     pb_card_content,
     personal_best,
 )
+from source.kovaaks import data_service  # noqa: E402
 from source.kovaaks.data_models import PlaylistData, Rank, RunData, Scenario  # noqa: E402
 from source.kovaaks.time_scored_service import PaceBasis  # noqa: E402
 from source.pages import run_history  # noqa: E402
@@ -204,6 +206,68 @@ def test_the_pb_was_set_by_the_earliest_run_to_reach_the_high_score():
     shown = _shown(runs)
 
     assert shown.set_at == runs[1].datetime_object
+    assert shown.score_hover == "Up 21.8% on your previous best of 3,000"
+
+
+@pytest.fixture
+def load_runs(monkeypatch):
+    """Load runs through the real CSV loader, so the store keeps its own order."""
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
+    monkeypatch.setattr(
+        data_service, "run_database", SortedList(key=lambda run: run.datetime_object)
+    )
+    monkeypatch.setattr(pb_card, "get_version_pace_basis", lambda _s, _v: None)
+
+    def load(*runs: RunData) -> None:
+        pending = iter(runs)
+        monkeypatch.setattr(
+            data_service, "extract_data_from_file", lambda _file: next(pending)
+        )
+        for index in range(len(runs)):
+            assert data_service.load_csv_file_into_database(f"run-{index}.csv")
+
+    return load
+
+
+@pytest.mark.parametrize(
+    ("stored_first", "faded"),
+    [
+        pytest.param("began_first", "50 cm/360 · Accuracy 55%", id="as-played"),
+        pytest.param("began_second", "50 cm/360 · Accuracy 65%", id="against-play"),
+    ],
+)
+def test_a_tie_that_ended_in_one_second_is_the_tables_pb_run(
+    load_runs, stored_first, faded
+):
+    """Two runs of the high score that ended in the same second.
+
+    The store keeps such a pair as it was loaded, and ``get_personal_best_run``
+    takes the first. Play order puts the one that began first first. The
+    card's PB is the table's either way, and its hover is still the line the
+    high score landed with, never a gain over the PB's own score.
+    """
+    tie = []
+    for accuracy, seconds in ((0.55, 90), (0.65, 30)):
+        run = _run(3653, 5, accuracy=accuracy)
+        length = timedelta(seconds=seconds)
+        tie.append(
+            RunData(
+                **{
+                    **run.__dict__,
+                    "run_start": run.datetime_object - length,
+                    "run_length": length,
+                }
+            )
+        )
+    if stored_first == "began_second":
+        tie.reverse()
+    load_runs(_run(3000), *tie)
+
+    shown = pb_card.personal_best_from_store(SCENARIO, None)
+
+    assert data_service.get_personal_best_run(SCENARIO) == tie[0]
+    assert shown is not None
+    assert shown.faded == faded
     assert shown.score_hover == "Up 21.8% on your previous best of 3,000"
 
 
@@ -515,8 +579,11 @@ def store(monkeypatch):
             raise held["pace_basis"]
         return held["pace_basis"]
 
+    # ``held["runs"]`` holds each scenario's runs oldest first.
     monkeypatch.setattr(
-        pb_card, "get_runs_in_play_order", lambda s: list(held["runs"].get(s, []))
+        pb_card,
+        "get_runs_newest_first",
+        lambda s: list(reversed(held["runs"].get(s, []))),
     )
     monkeypatch.setattr(pb_card, "get_playlist_by_code", playlists.get)
     monkeypatch.setattr(pb_card, "get_pace_basis", pace_basis)

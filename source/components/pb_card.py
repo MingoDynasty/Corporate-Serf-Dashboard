@@ -64,10 +64,11 @@ from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch
 from source.kovaaks.data_models import Rank, RunData
 from source.kovaaks.data_service import (
     get_playlist_by_code,
-    get_runs_in_play_order,
+    get_runs_newest_first,
     is_benchmark_playlist,
     is_scenario_in_database,
 )
+from source.kovaaks.play_sessions import in_play_order
 from source.kovaaks.playlist_scenarios_service import (
     ladder_standing,
     personal_best_cm360,
@@ -208,24 +209,30 @@ def personal_best(
 ) -> PersonalBest | None:
     """Work out what the card says about the PB among ``runs``.
 
-    ``runs`` is one scenario's whole history in the order it was played, and
-    ``None`` comes back when it is empty. ``ladder`` is the scenario's ladder
-    in the benchmark the Playlist filter holds, ``None`` with no benchmark
-    selected. ``pace_basis`` is what the scenario's newest run says of its
-    pace, which is how the benchmark table chooses whether the next rank's
-    gap is by pace. ``version_pace_basis`` answers for one version of the
-    scenario, which is how the latest-run card measured the PB when it
-    landed.
+    ``runs`` is one scenario's whole history, oldest first in the order the
+    run store keeps it, and ``None`` comes back when it is empty. ``ladder``
+    is the scenario's ladder in the benchmark the Playlist filter holds,
+    ``None`` with no benchmark selected. ``pace_basis`` is what the
+    scenario's newest run says of its pace, which is how the benchmark table
+    chooses whether the next rank's gap is by pace. ``version_pace_basis``
+    answers for one version of the scenario, which is how the latest-run card
+    measured the PB when it landed.
 
-    The PB run is the earliest run to reach the high score, the run
-    ``get_personal_best_run`` finds, taken from this one copy of the runs so
-    that it is always among them.
+    The PB run is the earliest run in that order to reach the high score, the
+    run ``get_personal_best_run`` finds, so the card describes the run the
+    scenario table does. Taken from this one copy of the runs, it is always
+    among them.
     """
     if not runs:
         return None
     # ``max`` keeps the first of equal scores, so the earliest run holds a tie.
     run = max(runs, key=lambda each: each.score)
-    chased = what_runs_chased(runs, version_pace_basis)[run]
+    # The hover is worded in play order, as the latest-run card worded it.
+    # Play order can put a tie that ended in the same second first, and the
+    # PB run's own line would then be a gain of nothing over its own score.
+    played = in_play_order(runs)
+    first_to_reach = next(each for each in played if each.score == run.score)
+    chased = what_runs_chased(played, version_pace_basis)[first_to_reach]
     score_hover = (
         None
         if chased.previous_best is None
@@ -284,7 +291,9 @@ def personal_best_from_store(
     """
     if not selected_scenario:
         return None
-    runs = get_runs_in_play_order(selected_scenario)
+    # Oldest first in the store's own order, which ``get_personal_best_run``
+    # takes the PB in: play order can swap two runs that ended in one second.
+    runs = get_runs_newest_first(selected_scenario)[::-1]
     if not runs:
         return None
     ladder = _ladder(playlist_code, selected_scenario)

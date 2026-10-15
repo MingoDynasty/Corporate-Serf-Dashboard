@@ -906,10 +906,11 @@ flowchart LR
   [run_history.md](specs/run_history.md#scenario-stats).
 - `components/pb_card.py` — the Run History page's PB card, with the
   leaderboard position as its leaderboard line. `personal_best()` is one
-  pure function from a scenario's runs in play order to the text the card
-  shows: when the PB was set, its score, the latest-run card's new-PB line
-  for it (`run_marks.new_pb_gain()` over `what_runs_chased()`), the rank
-  it has reached and the next rank's parts from
+  pure function from a scenario's runs in the store's order, the order
+  `get_personal_best_run()` takes the PB in, to the text the card shows:
+  when the PB was set, its score, the latest-run card's new-PB line for it
+  (`run_marks.new_pb_gain()` over `what_runs_chased()` in play order), the
+  rank it has reached and the next rank's parts from
   `playlist_scenarios_service.ladder_standing()`, the table's own walk, and
   the PB run's cm/360 and hit accuracy. `personal_best_from_store()` copies
   the store once, finds the ladder in the benchmark the Playlist filter
