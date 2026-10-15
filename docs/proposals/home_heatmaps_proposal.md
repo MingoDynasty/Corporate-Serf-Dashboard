@@ -76,8 +76,9 @@ where it isn't. Both heatmaps and the summary follow the dropdown.**
   summary stops matching the calendar under it.
 - **"Last 12 months" means what it means on Run History.** It is the 365
   dates that end today, the range Run History's `Last 12 months` covers. The
-  mockup drew the 52 weeks back to a Sunday instead, which on 2026-10-15 was
-  four more days: 4,929 runs on 87 days, against 4,748 runs on 85.
+  fourth mockup drew the 52 weeks back to a Sunday instead, which on
+  2026-10-15 was four more days: 4,929 runs on 87 days, against 4,748 runs
+  on 85.
 - **The current year is listed as well.** LeetCode lists only "Current" and
   earlier years. Monkeytype offers the last 12 months and the years back to
   the account's creation, and GitHub lists every year. A year answers "how is
@@ -179,8 +180,8 @@ and a line under it says why.**
   before every time on the card, down to each day's hover. If reviewers read
   the rule that way, only the copy changes. The cost would be a hedge on
   every number, including the ones that are exact for their label.
-- **The whole card switches, never one day.** The mockup switched to runs
-  only when a day with runs had no time at all. That keeps the maintainer's
+- **The whole card switches, never one day.** The fourth mockup switched to
+  runs only when a day with runs had no time at all. That keeps the maintainer's
   2021 shaded by time, although 46 of its 87 runs have no run length,
   because every one of its seven days has at least one run with a length.
   Three of its days would be shaded by part of their runs. Switching on any
@@ -219,8 +220,8 @@ Choosing otherwise:
 - **By session time:** known in every year. It counts breaks as play, a
   session across midnight has to be split between two dates, and it means
   something different from time in runs.
-- **Switching per day, as the mockup did:** shades the maintainer's 2021 by
-  part of its runs.
+- **Switching per day, as the fourth mockup did:** shades the maintainer's
+  2021 by part of its runs.
 - **"At least" on every time:** honest under the literal reading of the
   minimum rule, and a hedge on every figure.
 
@@ -256,7 +257,8 @@ The rule, exactly:
 - **The legend** gives each shade's range, from the least to the most a day
   in it holds, and `none` for a shade that holds no day.
 
-The four rules the mockup compares, on the maintainer's last 12 months: 85
+The four rules the fourth mockup compares, on the maintainer's last 12
+months: 85
 days with runs, 78 hr 12 min in runs, from 1 minute to 3 hr 10 min a day.
 
 | Rule | Where the shades end | Days per shade, palest first |
@@ -324,15 +326,26 @@ Why quartiles over fixed minutes, the strongest alternative:
   minutes, and the summary gives the period's totals, so a year compares
   with another by its numbers.
 
-**A fifth rule, not mocked: quartiles of every day in the player's history.**
-One set of cut points serves every period, so years compare by color, and
-the scale still adapts to the player. On this history the cut points are 22
-minutes, 44 minutes and 1 hr 19 min, over the 150 days whose runs all have a
-length. The last 12 months would read 17, 26, 24 and 18 days per shade, and
-2025 18, 18, 19 and 23. Its costs: the cut points move as the history grows, so an old year
-can change its look, and the years that count runs need a lifetime scale of
-their own. The author leans against it for those costs, and offers it for
-the debate.
+**A fifth rule: quartiles of every day in the player's history,** drawn in
+the fifth mockup. One set of cut points serves every period shaded by time,
+so those years compare by color, and the scale still adapts to the player.
+On this history the cut points are 22 minutes, 44 minutes and 1 hr 19 min,
+over the 150 days whose runs all have a length, every one of them from 2024
+to 2026. So the periods shaded by time barely change: the last 12 months
+read 17, 26, 24 and 18 days per shade against quartiles' 22, 21, 21 and 21,
+and 2025 reads 18, 18, 19 and 23 against 20, 20, 19 and 19. The rule leaves
+two things undefined:
+
+- **The years that count runs need a lifetime scale of their own.** The
+  mockup used runs per day over all 177 days with runs, cut at 17, 39 and 73
+  runs, which puts 2020 at 16, 4, 3 and 1 days per shade, mostly the palest.
+- **The hour grid has no lifetime scale,** because each hour adds up the
+  whole period. The mockup keeps the period's quartiles there, so the card
+  ends up with two rules.
+
+Its other cost: the cut points move as the history grows, so an old year can
+change its look. The author leans against it for these costs, and offers it
+for the debate.
 
 Choosing otherwise:
 
@@ -342,8 +355,9 @@ Choosing otherwise:
 - **Relative to the mean:** much as quartiles, with uneven shades and a rule
   that needs explaining.
 - **An even split:** most days in the two palest shades.
-- **Lifetime quartiles:** years compare by color, at the cost of cut points
-  that drift and a second scale for the years that count runs.
+- **Lifetime quartiles:** the years shaded by time compare by color, at the
+  cost of cut points that drift, a second scale for the years that count
+  runs, and the period's quartiles kept for the hour grid.
 
 ### HM4. Green
 
@@ -383,9 +397,11 @@ Contrast, by the WCAG formula:
 - **GitHub's dark steps can't be used as they are.** They are tuned for
   GitHub's `#0d1117` page. On this app's dark card their first step is
   1.05:1 against the empty tile, which makes a day with runs look like a day
-  without. Against a lighter empty tile, `#3b3b3b`, it is darker than the
-  tile. So both themes are tuned, as the palette research tuned the app's
-  blue. The steps are picked in GitHub's green family. Apart from `#2da44e`,
+  without. The fifth mockup shows it: the 22 palest days of the last 12
+  months draw as near-black squares, told from the days without runs by hue
+  alone, where the tuned step draws a dim green. Against a lighter empty
+  tile, `#3b3b3b`, GitHub's first step is darker than the tile. So both
+  themes are tuned, as the palette research tuned the app's blue. The steps are picked in GitHub's green family. Apart from `#2da44e`,
   they are not GitHub's chart steps.
 - **The faintest step is stronger than GitHub's** because under quartiles a
   quarter of the days with runs take it: 22 days in the last 12 months. A
@@ -541,11 +557,15 @@ Their words in the Home design discussion, 2026-10-13 to 15. All are leans.
 - **An ideas consult,** 2026-10-13 and 14, answered by `claude-fable-5-1` and
   `gpt-6.1-sol`, each writing its own list before seeing the candidates.
   Neither put the heatmaps first (HM1).
-- **Four versions of a full-size mockup,** built from the maintainer's stats
+- **Five versions of a full-size mockup,** built from the maintainer's stats
   with the app's own parser and session rule, in light and dark, with
   switches for the colors, the shading rule and the day start. The
-  maintainer judged the heatmaps on it. The mockups are local scratch, not in
-  the repo.
+  maintainer judged the heatmaps on the first four. The fifth, built after
+  this proposal, draws its rules: the Activity card alone under the stats
+  line, the tuned greens beside GitHub's, the last 12 months as 365 dates,
+  the switch to runs for the whole card, nearest-rank quartiles, and the
+  fifth shading rule. Its figures match this proposal's. The mockups are
+  local scratch, not in the repo.
 - **Three research passes** by research subagents, on palettes, on heatmap
   UX, and on calendar and week heatmaps in other apps, plus a check of
   LeetCode's calendar in a browser. Each report marks what was read at a
@@ -599,11 +619,9 @@ with the app's own parser (`extract_data_from_file`) and session rule
 
 - **Other players' histories.** Every figure is one player's. How often a run
   lacks a length in another player's recent years is not known (HM2).
-- **The proposed greens on screen.** The fourth mockup draws GitHub's chart
-  steps. The tuned steps in HM4 are computed, not yet seen.
-- **The fifth shading rule** in HM3 is computed, not mocked.
 - **Firefox,** which the maintainer reads the app in. The mockups were
-  checked in headless Edge.
+  checked in headless Edge, the fifth across 214 views with no script error
+  and no sideways scroll.
 - **A screen reader,** on anything: nothing is built.
 
 ## Design
@@ -619,7 +637,7 @@ Found 9,135 runs across 866 scenarios in your stats folder.
 | Last 12 months · 4,748 runs on 85 days · 78 hr 12 min in runs                                                       |
 |                                                                                                                      |
 | By day                                                              By hour of the week                              |
-|      Oct  Nov  Dec  Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct     12 AM   3 AM   6 AM ...  6 PM   9 PM       |
+|           Nov  Dec  Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct     12 AM   3 AM   6 AM ...  6 PM   9 PM       |
 |      . . # . . . . . . . . . . . . . . . . . # # . . . . . . . . . .  Sun  # # # .  . . . ...  # # # # # #          |
 | Mon  # . . . . # . . . . . . . . . . . . . . # . . . . . . . . # .   Mon  # # # .  . . . ...  # # # # # #          |
 |      ...                                                             ...                                             |
@@ -671,7 +689,9 @@ How a player meets it:
   square. In the current year, the dates after today have no square either,
   and their columns are kept, so a year is always as wide as a full year.
   Month names sit over the column where each month begins; weekday names
-  label the Mon, Wed and Fri rows.
+  label the Mon, Wed and Fri rows. When a partial first month leaves no room
+  for its name before the next month's, its name is left out, as the fifth
+  mockup does with October in the last 12 months.
 - **The hour grid.** Seven rows, Sunday first, each labelled. 24 columns,
   each one hour from 12 AM, labelled every three hours: `12 AM`, `3 AM`,
   through `9 PM`. Squares of 24 px with a 3 px gap.
@@ -932,7 +952,8 @@ each in their own Firefox before it merges.
   and hour it ended, including one that crossed midnight; two runs in a
   repeated hour landing in one square; the current year with no squares
   after today; a leap year starting on a Saturday taking 54 columns; Sunday
-  in the first row.
+  in the first row; a partial first month left unnamed when its name would
+  collide with the next month's.
 - **The script holds no copy:** a test that every string it shows comes from
   Python, as the run list's does.
 - **Callbacks:** the card is drawn only with a usable stats folder and a run;
