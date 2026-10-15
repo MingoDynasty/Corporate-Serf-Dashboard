@@ -204,27 +204,32 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
     last_played="run-history-last-played",
     last_played_tooltip="run-history-last-played-tooltip",
     num_runs="run-history-num-runs",
-    rank="run-history-position",
-    rank_updated_tooltip="run-history-position-updated-tooltip",
-    rank_refresh_button="run-history-position-refresh-button",
     last_played_ts="run-history-last-played-ts",
     last_played_empty_value="run-history-last-played-empty-value",
-    rank_updated_ts="run-history-position-updated-ts",
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
-    polling_interval=POLLING_INTERVAL_ID,
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
+# The position's ids are the ones it had in the Scenario Stats card. No browser
+# remembers a value under any of them.
 PB_CARD_IDS = PbCardIds(
     set_at="run-history-pb-set-at",
     label="run-history-pb-label",
     time="run-history-pb-time",
     time_tooltip="run-history-pb-time-tooltip",
     body="run-history-pb-body",
+    leaderboard="run-history-pb-leaderboard",
+    rank_label="run-history-position-label",
+    rank="run-history-position",
+    rank_updated_tooltip="run-history-position-updated-tooltip",
+    rank_refresh_button="run-history-position-refresh-button",
+    rank_updated_ts="run-history-position-updated-ts",
+    rank_of_total="run-history-position-of-total",
     faded="run-history-pb-faded",
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
+    polling_interval=POLLING_INTERVAL_ID,
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 

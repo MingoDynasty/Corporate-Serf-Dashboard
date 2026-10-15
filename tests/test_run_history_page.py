@@ -276,10 +276,12 @@ def test_the_top_row_holds_the_dropdowns_stats_and_pb_then_the_latest_run_card()
     dropdowns, stats, pb = left.children
     assert dropdowns.className == "run-history-dropdown-column"
     assert stats.className == "scenario-stats-card"
-    assert run_history.SCENARIO_STATS_IDS.rank in _ids(stats)
+    # Position is the PB card's now.
+    assert run_history.PB_CARD_IDS.rank in _ids(pb)
+    assert run_history.PB_CARD_IDS.rank not in _ids(stats)
     assert pb.className == pb_card.CARD_CLASS
     page_owned = {"run_events", "scenario_dropdown", "playlist_filter"}
-    page_owned.add("relative_time_interval")
+    page_owned |= {"polling_interval", "relative_time_interval"}
     assert _ids(pb) == {
         component_id
         for field, component_id in run_history.PB_CARD_IDS._asdict().items()
@@ -1526,8 +1528,8 @@ def test_every_card_in_the_row_has_the_same_frame():
 def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
     """132px holds the card's tallest state, so its height never follows a run.
 
-    A minimum and not a height: the card is as tall as the row, which the
-    Scenario Stats card makes taller in its tallest states.
+    A minimum and not a height: the card is as tall as the row, which the PB
+    card makes taller in its setup state, with no KovaaK's username.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".run-history-card")
@@ -1540,10 +1542,7 @@ def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
 
 
 def test_the_stats_card_keeps_300px_for_its_text_and_adds_only_its_border():
-    """Every line breaks where it did, and the frame adds no height but its border.
-
-    Its tallest states, with the Position hint on its own line, fill the row.
-    """
+    """Every line breaks where it did, and the frame adds no height but its border."""
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".scenario-stats-card")
 
@@ -1555,6 +1554,50 @@ def test_the_stats_card_keeps_300px_for_its_text_and_adds_only_its_border():
     assert "font-size: 12px;" in heading
     assert "line-height: 18px;" in heading
     assert "color: var(--mantine-color-dimmed);" in heading
+
+
+def test_the_pb_card_is_300px_at_the_first_columns_right_end():
+    """Beside the latest-run card, with the room before it kept for notes.
+
+    Its frame adds only its border to its height, so the row stays the height
+    the dropdowns' column sets in every state that changes between runs.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    card = _css_block(css, ".pb-card")
+
+    assert "flex: 0 0 300px;" in card
+    assert "margin-left: auto;" in card
+    assert "padding: 0 var(--mantine-spacing-sm);" in card
+    assert "justify-content: center;" in card
+    assert "max-width: 100%;" in card
+    # The age stays in its line: not a flex container, which drops spaces.
+    assert "display" not in _css_block(css, ".pb-card-heading")
+    # dmc's boxes round the score and Refresh add no line of their own.
+    assert "display: flex;" in _css_block(css, ".pb-card-flex-target")
+
+
+def test_the_pb_cards_quiet_lines_and_its_badge_use_the_themes_tokens():
+    """The rank colors from the benchmark files are the only fixed colors."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    badge = _css_block(css, ".pb-card .pb-card-rank-badge")
+
+    assert "color: var(--mantine-color-text);" in badge
+    assert "border: 1px solid var(--pb-card-rank-color);" in badge
+    assert (
+        "background: color-mix(in srgb, var(--pb-card-rank-color) 20%, transparent);"
+        in badge
+    )
+    assert "background: var(--pb-card-rank-color);" in _css_block(
+        css, ".pb-card-rank-dot"
+    )
+    for quiet in (".pb-card-heading", ".pb-card-faded"):
+        assert "color: var(--mantine-color-dimmed);" in _css_block(css, quiet)
+    # With no PB the faded line is empty and out of the card.
+    assert "display: none;" in _css_block(css, ".pb-card-faded:empty")
+    # Its hidden attribute takes the leaderboard line out with no local PB,
+    # which the line's own display would otherwise undo.
+    assert "display: flex;" in _css_block(css, ".pb-card-leaderboard")
+    assert "display: none;" in _css_block(css, ".pb-card-leaderboard[hidden]")
 
 
 def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():

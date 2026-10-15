@@ -355,9 +355,8 @@ a.run-toast-link:hover {
 }
 
 /* The Scenario Stats card. Its text is 300px wide inside the frame, which
-   adds only its border to the height: the card's tallest states, with the
-   Position hint on its own line, fill the row with no room to spare. Its
-   lines are centered in the row's height, as the latest-run card's are. */
+   adds only its border to the height. Its lines are centered in the row's
+   height, as the latest-run card's are. */
 .scenario-stats-card {
     display: flex;
     flex: 0 0 auto;
@@ -416,8 +415,9 @@ a.run-toast-link:hover {
     white-space: pre;
 }
 
-/* The box dmc wraps the run's age in, for its tooltip. A block there would
-   break the label round the age. */
+/* The box dmc wraps a tooltip's target in, where the target sits in a line of
+   text: the run's age, the PB's age, and the position. A block there would
+   break the line round the target. */
 .run-history-card-time-target {
     display: inline;
 }
@@ -539,6 +539,39 @@ a.run-toast-link:hover {
 /* The next rank's threshold, the score it sets under the PB score. */
 .pb-card-threshold {
     font-weight: 600;
+}
+
+/* The leaderboard line: the position, led by its percentile when there is one,
+   then Refresh, on the same line where it fits. With no local PB its hidden
+   attribute takes it out, which the display below would otherwise undo. */
+.pb-card-leaderboard {
+    align-items: center;
+    column-gap: var(--mantine-spacing-xs);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.pb-card-leaderboard[hidden] {
+    display: none;
+}
+
+.pb-card-position-label {
+    font-weight: 700;
+}
+
+/* The box dmc wraps the score and Refresh in, for their tooltips. As a block
+   its line is taller than what it holds: the score row would be 2px taller
+   with the score's hover than without it, and the leaderboard line taller
+   than its button. */
+.pb-card-flex-target {
+    display: flex;
+}
+
+/* The position's hover, two lines where the percentile leads: the position
+   and the total, then when it was stored. Two classes, to outrank the
+   tooltip's own rule against breaking a line. */
+.mantine-Tooltip-tooltip.pb-card-position-tooltip {
+    white-space: pre-line;
 }
 
 /* The PB run's sensitivity and accuracy: quieter than the lines above it,

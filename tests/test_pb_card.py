@@ -321,14 +321,32 @@ def test_the_card_starts_with_nothing_in_it_and_holds_every_id():
         IDS.run_events,
         IDS.scenario_dropdown,
         IDS.playlist_filter,
+        IDS.polling_interval,
         IDS.relative_time_interval,
     }
     assert set(held) == set(IDS) - page_owned
     assert card.className == "pb-card"
-    assert isinstance(held[IDS.set_at], dcc.Store)
-    assert getattr(held[IDS.set_at], "data", None) is None
+    for store in (IDS.set_at, IDS.rank_updated_ts, IDS.rank_of_total):
+        assert isinstance(held[store], dcc.Store)
+        assert getattr(held[store], "data", None) is None
     assert getattr(held[IDS.body], "children", None) is None
     assert getattr(held[IDS.faded], "children", None) is None
+
+
+def test_the_lines_are_the_first_then_the_pb_then_the_leaderboard_then_the_faded():
+    """The leaderboard line sits under the PB, which it is sourced apart from."""
+    lines = [
+        child
+        for child in pb_card.pb_card(IDS).children
+        if not isinstance(child, dcc.Store)
+    ]
+
+    assert [getattr(line, "id", None) or line.className for line in lines] == [
+        "pb-card-heading",
+        IDS.body,
+        IDS.leaderboard,
+        IDS.faded,
+    ]
 
 
 def test_the_first_line_reads_pb_and_the_age_is_drawn_once_hidden_until_a_pb():
@@ -338,7 +356,11 @@ def test_the_first_line_reads_pb_and_the_age_is_drawn_once_hidden_until_a_pb():
     reach a screen reader.
     """
     card = pb_card.pb_card(IDS)
-    heading = card.children[1]
+    (heading,) = [
+        child
+        for child in card.children
+        if getattr(child, "className", None) == "pb-card-heading"
+    ]
     label = _held(card)[IDS.label]
 
     assert heading.className == "pb-card-heading"
@@ -365,6 +387,8 @@ def test_a_pb_is_its_score_and_badge_then_the_next_rank_then_the_faded_line():
     score_row, next_rank = content.body
 
     assert content.set_at == SHOWN.set_at.timestamp()
+    # A local PB, so the leaderboard line shows under it.
+    assert content.leaderboard_hidden is False
     assert [rendered_text(part) for part in score_row.children] == [
         "3,653",
         "Cerulean",
@@ -440,6 +464,8 @@ def test_with_no_scenario_selected_the_card_says_so(selected):
 
     assert content.set_at is None
     assert [rendered_text(line) for line in content.body] == ["No scenario selected"]
+    # Nothing to rank, and Refresh would have nothing to do.
+    assert content.leaderboard_hidden is True
     assert content.faded is None
 
 
@@ -451,6 +477,8 @@ def test_a_scenario_with_no_local_runs_has_no_local_pb_yet():
         "No local PB yet",
         "Play this scenario to record one in this app.",
     ]
+    # The line follows the local PB, so there is none.
+    assert content.leaderboard_hidden is True
     assert content.faded is None
 
 
@@ -597,13 +625,15 @@ def _keys(dependencies) -> list[str]:
 def test_the_card_is_rebuilt_by_a_run_on_its_scenario_the_scenario_and_the_filter():
     """Not by a run on another scenario: the run-events store names only this one.
 
-    The page load runs it too, so the card is right with no new run.
+    The page load runs it too, so the card is right with no new run. It shows
+    and hides the leaderboard line, which follows the local PB.
     """
     ids = run_history.PB_CARD_IDS
     registration = _registration(f"{ids.body}.children")
 
     assert registration["output"] == (
-        f"..{ids.set_at}.data...{ids.body}.children...{ids.faded}.children.."
+        f"..{ids.set_at}.data...{ids.body}.children"
+        f"...{ids.leaderboard}.hidden...{ids.faded}.children.."
     )
     assert _keys(registration["inputs"]) == [
         f"{run_history.RUN_EVENTS_STORE_ID}.data",
