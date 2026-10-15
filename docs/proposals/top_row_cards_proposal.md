@@ -21,7 +21,7 @@ Four rows: T1 to T4. **Nothing is ratified.** The one ruling that binds this
 design is the maintainer's resolution priority of 2026-10-14, which it treats
 as a constraint (see [What the maintainer needs](#what-the-maintainer-needs)).
 Each row is the maintainer's lean from the design discussion of 2026-10-14,
-worked out on nine versions of a full-size mockup built from their own stats.
+worked out on ten versions of a full-size mockup built from their own stats.
 A lean is not a ruling: every row, and every premise in Problem, is open to
 challenge. Everything else is author-owned, in [Design](#design).
 
@@ -59,7 +59,7 @@ directly over the run list.**
   it fits in today's 132 px because the **Open scenario table** link moves up
   onto the **Playlist filter** label's line, and the **Follow newly played
   scenario** switch onto the **Selected scenario** label's line, where that
-  line has room. At 2560 px and 3840 px the row is 132 px, exactly as today.
+  line has room. From 1920 px to 3840 px the row is 132 px, exactly as today.
 - **The PB card sits at the right end of the left column,** beside the
   latest-run card: they hold the two numbers a player compares after every
   run, the target and the result, while both are about the same scenario, as
@@ -318,19 +318,27 @@ headless Edge at the widths named.
   is the latest-run card's 132 px, as the mockup's copy of today's row
   measures. The latest-run card is 425 px wide at 1600 px and 1,167 px at
   2560 px.
-- **The proposed row, as mocked** (layout H of the ninth mockup, with nothing
-  in the note space; the top row's height in px, so the chart starts that
-  much lower than today):
+- **The proposed row, as mocked** (layout P of the tenth mockup, this
+  proposal as amended after its first review wave, with no element in the
+  note space; the top row's height in px, so the chart starts that much lower
+  than today). The ninth mockup's layout H drew a note card in that space,
+  which made the row taller between 1707 px and 2048 px:
 
   | Width | Today | Proposed |
   |---|---|---|
   | 3840 | 132 | 132 |
   | 2560 | 132 | 132 |
   | 2327 (2560 at 110% zoom) | 132 | 132 |
-  | 2048 (2560 at 125% zoom) | 132 | 149 |
-  | 1920 | 132 | 149 |
+  | 2048 (2560 at 125% zoom) | 132 | 132 |
+  | 1920 | 132 | 132 |
   | 1707 (2560 at 150% zoom) | 132 | 149 |
   | 1536 | 132 | 267 |
+
+  At 2560 px every state holds 132 px, light and dark: a PB with a rank, a
+  time-scored PB, a PB at the top rank, no benchmark selected, no scenario
+  selected, and a scenario with no local runs. The setup state without a
+  username is taller, as today's is: 175 px with a PB and 148 px without
+  one, against today's 150 px.
 
 - **Categories:** 265 bundled benchmarks, 3,240 distinct scenario names, 688
   in more than one benchmark (at most 11), none twice in one benchmark.
@@ -429,7 +437,8 @@ percentile leading:
 
 - **When a percentile is available:** `{percentile}% percentile`, two
   decimals, with the dotted underline. Hovering or focusing it gives
-  `Position {position} of {total}` over today's `Last updated {age} · {timestamp}`
+  `Position {position} of {total}` over today's `Last updated {age} ·
+  {timestamp}`
   ([2026-10-04](../decision_log/2026/2026-10-04-the-position-value-says-when-it-was-last-updated.md)).
   A value served from cache keeps its ` · from cache` hint.
 - **Every other state reads as the Position field does today,** with its
@@ -445,8 +454,10 @@ percentile leading:
   toasts, its loading delay, and every rule in
   [scenario_rank.md](../specs/scenario_rank.md) unchanged.
 - **The username hint takes two lines** in a 300 px card, so in that state
-  the card, and the row, are a line taller. It is a setup state, not a
-  change between runs; the implementation measures it and reports the height.
+  the card, and the row, are taller: 175 px with a PB and 148 px without one,
+  as mocked, against today's 150 px in the same state. It is a setup state,
+  not a change between runs; the implementation measures it and reports the
+  height.
 
 **The score's hover** repeats the latest-run card's line for a new PB, word
 for word: `Up {pct}% on your previous best of {previous}`, `{pct}% faster than
@@ -502,8 +513,9 @@ the row's, which is 132 px at 2560 px as today; its lines stay centered.
   the pace constant follows the scenario's newest version and the first
   performance file that can tell, so a run of a new version, or the first
   file that recognizes a time-scored scenario, turns `+2.8% faster to
-  Lavender at 899` into the score's `+0.4% to Lavender at 899`, or back. The position
-  follows when the background refresh it already triggers stores a new one.
+  Lavender at 899` into the score's `+0.4% to Lavender at 899`, or back.
+  The position follows when the background refresh it already triggers
+  stores a new one.
 - **A new scenario or playlist** rebuilds both cards. The Playlist filter
   alone changes Category, the badge, and the next rank.
 - **The position's poll and Refresh** write the percentile line, as they write
@@ -521,8 +533,9 @@ only have to not break.
   chart ([narrow windows](../specs/run_history.md#narrow-windows)), the row
   becomes one wrapping line again, in order: dropdowns, Scenario Stats, PB,
   latest run.
-- **Zooming in is a narrower window.** At 110% the row is unchanged; at 125%
-  and 150% the Follow switch drops under the dropdown and the row is 149 px.
+- **Zooming in is a narrower window.** At 110% and 125% the row is
+  unchanged; at 150% the Follow switch drops under the dropdown and the row
+  is 149 px.
 
 ### Keyboard and screen reader
 
@@ -662,6 +675,10 @@ release.
    content unchanged (Position still in it), the latest-run card over the run
    list with its time relative, the note space, and the narrow-window rules
    (T1, and T4 for the cards' frame and the latest-run card's time).
+   - **Its Scenario Stats card keeps Position,** so it is about 300 px,
+     today's block's width, until PR 2 moves Position out; at 2560 px the
+     note space absorbs the difference. Without a username the hint still
+     takes two lines and the row is 150 px, as today.
    - **Measures and reports** the row's height at 3840, 2560, 1920, and 1536 px,
      in light and dark, and that the card's edges meet the run list's.
 2. **The PB card** (T3, T4). The new card, with Position, its hints, its
@@ -670,8 +687,9 @@ release.
      field it moves.
 3. **Category** in the Scenario Stats card (T2).
 
-PR 1 goes first. PRs 2 and 3 each need PR 1 and not each other. The last of
-them to merge ships the proposal, by the
+PR 1 goes first. PRs 2 and 3 each need PR 1 and not each other. Each PR
+updates the spec and glossary entries its own behavior changes, as it ships.
+The last of them to merge ships the proposal, by the
 [Shipping a proposal](../../AGENTS.md#shipping-a-proposal-docs-definition-of-done)
 checklist: a decision-log entry for each row, the note in
 [Decisions this changes](#decisions-this-changes), the Run History and
