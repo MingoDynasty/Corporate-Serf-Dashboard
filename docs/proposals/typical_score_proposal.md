@@ -437,9 +437,10 @@ a username, simulated as a one-line Position, the card fits in it, and a
 fourth line of the same style makes the card and the row 145 px, 4 px taller.
 Without a username, Position's hint takes a line of its own and the row goes
 from 149 px to 169 px. The card's text is 300 px wide, and every value in
-[Copy](#copy) fits on one line in it, the longest being
-`Too few recent runs · 16 of 20`. The prototype's `Not enough recent runs`
-wraps there with a two-digit count.
+[Copy](#copy) fits on one line in it: `Too few recent runs · 16 of 20`, one
+character longer than the longest unknown value, `Too few recent runs · 19
+runs`, measured on one line. The prototype's `Not enough recent runs` wraps
+there with a two-digit count.
 
 **Ordered against the top row cards' PRs 2 and 3: neither waits for the
 other.** Asked whether the line ships before or after them, the maintainer,
@@ -594,7 +595,7 @@ The Scenario Stats card, as it is at the base, in each state:
 | Scenario Stats              |  | Scenario Stats                      |  | Scenario Stats                      |
 | Last played: 2 minutes ago  |  | Last played: 2 months ago           |  | Last played: 5 minutes ago          |
 | Number of runs: 463         |  | Number of runs: 169                 |  | Number of runs: 6                   |
-| Typical score: 1,179        |  | Typical score: 1,390 · as of Apr 12 |  | Typical score: Too few recent runs · 6 of 20 |
+| Typical score: 1,179        |  | Typical score: 1,390 · as of Apr 12 |  | Typical score: Too few recent runs · 6 runs |
 | Position: ...   Refresh     |  | Position: ...   Refresh             |  | Position: ...   Refresh             |
          fresh                              as of                                  unknown
 ```
@@ -853,11 +854,11 @@ drafts and are redone here.
 | Scenario Stats, label | `Typical score:` | A label as `Last played:` is. "Typical score" and not "Median score": the run list's Median and best already shows a plain median labelled `Median`, KovaaK's own leaderboard shows a third median (the median player's PB), and "median" alone reads as the median of every run. |
 | Scenario Stats, fresh value | `{score}`, such as `1,179` | Rounded as [Rounding](#rounding) says, formatted as a score is. |
 | Scenario Stats, "as of" value | `{score} · as of {date}`, such as `1,390 · as of Apr 12` or `2,140 · as of Mar 3, 2020` | A readout chain. The date is the short date the run list uses, with the year only when it isn't this year's, and has no age limit (TS5). |
-| Scenario Stats, unknown value | `Too few recent runs · {n} of 10` while the window's runs come from two sessions or more, and `Too few recent runs · {n} of 20` while they come from one | Says why, then how far, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did. The count is the window's runs against the number that would make the value fresh if play went on in the same way: 10 once two sessions are in the window, 20 while one sitting is. "Too few" and not the prototype's "Not enough", which wraps in the card's 300 px with a two-digit count. A runs-and-sessions readout (`6 runs · 1 session`) is truer to the rule in one form, and wraps too. |
+| Scenario Stats, unknown value | `Too few recent runs · {n} runs`, or `· 1 run` | Says why, then how many, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did, without its target: the number that would make the value fresh depends on the sessions, so `9 of 20` reads as eleven to go when the first run of a second session would do. The hover gives the rule and the session count. "Too few" and not the prototype's "Not enough", which wraps in the card's 300 px with a two-digit count. A runs-and-sessions readout (`6 runs · 1 session`) wraps too. |
 | Scenario Stats, no scenario | `N/A` | As Position reads with no scenario selected. |
 | Scenario Stats, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
 | Scenario Stats hover, fresh | `The median of {n} runs in {k} sessions, from {first} to {last}. The middle 50% scored {q1} to {q3}, and the middle 80% scored {p10} to {p90}.` | What the figure is, from what, and its spread. `on {date}` in place of `from {first} to {last}` when both are one date; `1 session` in the singular. |
-| Scenario Stats hover, carried | The fresh text, then `It's your last known typical score. Since then, the 30 days up to your newest run hold {n} runs in {k} sessions. A new one needs 10 runs from at least 2 sessions, or 20 runs.` | Why it is "as of", and what would make it current, as a fact, not advice. `1 run`, `1 session` in the singular. |
+| Scenario Stats hover, carried | The fresh text, then `It's your last known typical score. The 30 days up to your newest run hold {n} runs in {k} sessions. A new one needs 10 runs from at least 2 sessions, or 20 runs.` | Why it is "as of", and what would make it current, as a fact, not advice. No "since then": the 30 days up to the newest run can reach back past the carried value's own newest run. `1 run`, `1 session` in the singular. |
 | Scenario Stats hover, fresh but old | The fresh text, then `It's been more than 30 days since you played this scenario.` | Why it is "as of". |
 | Scenario Stats hover, unknown | `A typical score needs 10 runs from at least 2 sessions, or 20 runs, within 30 days. The 30 days up to your newest run hold {n} runs in {k} sessions.` | The rule and the count behind the readout. |
 | Chart legend | `Typical score`, `Middle 50%`, `Middle 80%` | Sentence case. "Middle 50%" and "Middle 80%" say what share of the runs each band holds; the percentile names go in the hover for the player who reads them. |
