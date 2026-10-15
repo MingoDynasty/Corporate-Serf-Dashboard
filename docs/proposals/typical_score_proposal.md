@@ -394,10 +394,10 @@ from 149 px to 169 px. The card's text is 300 px wide, and every value in
 `Too few recent runs · 16 of 20`. The prototype's `Not enough recent runs`
 wraps there with a two-digit count.
 
-**A question for the maintainer: does the Scenario Stats line ship before or
-after the top row cards' PRs 2 and 3?** The author's recommendation is to hold
-neither for the other. Shipping first, as the lean said, costs the row 4 px
-with a username until the cards' PR 2 frees room. The cards' PR 2 will likely
+**Ordered against the top row cards' PRs 2 and 3: neither waits for the
+other.** Asked whether the line ships before or after them, the maintainer,
+2026-10-15: "I'll go with your recommendation." Shipping first, as the lean
+said, costs the row 4 px with a username until the cards' PR 2 frees room. The cards' PR 2 will likely
 land first anyway, because this line waits for the definition's PR. Both edit
 the Scenario Stats module, so whichever lands second rebases onto the
 other's. The definition and the chart don't touch the top row and wait for
@@ -952,9 +952,9 @@ moves is noted in that PR's description.
    sections. Needs PR 1. It doesn't touch the top row, so it needn't wait for
    the cards work.
 3. **The Scenario Stats line.** The line, its hover, its updates, and the
-   spec's Scenario Stats section. Needs PR 1. Its order against the top row
-   cards' PRs 2 and 3 is the maintainer's answer to the question under TS5;
-   the recommendation is to hold neither, and whichever lands second rebases.
+   spec's Scenario Stats section. Needs PR 1. It waits for neither of the top
+   row cards' PRs 2 and 3, as the maintainer chose under TS5, and whichever
+   lands second rebases.
 
 **Why three.** The definition is the contract later features read, and a PR
 of its own keeps its review on the boundaries rather than on plotly. The
