@@ -26,6 +26,7 @@ from source import app_shell  # noqa: E402
 from source.components import (  # noqa: E402
     chart_options,
     latest_run_card,
+    pb_card,
     run_history_chart,
     scenario_selection,
     setup_surfaces,
@@ -190,6 +191,7 @@ def test_the_layout_builds_every_id_the_blocks_are_registered_for():
         run_history.SESSION_IN_PROGRESS_STORE_ID,
     } <= mounted
     assert set(run_history.LATEST_RUN_CARD_IDS) <= mounted
+    assert set(run_history.PB_CARD_IDS) <= mounted
     # The Columns menu's own id is part of its checkboxes' ids and is no
     # component's id by itself.
     list_ids = run_history.RUN_LIST_IDS._asdict()
@@ -258,12 +260,12 @@ def test_the_layout_takes_a_query_parameter_it_does_not_name():
     }
 
 
-def test_the_top_row_holds_the_dropdowns_and_stats_then_the_latest_run_card():
-    """Two columns: the first holds the dropdowns and the Scenario Stats card.
+def test_the_top_row_holds_the_dropdowns_stats_and_pb_then_the_latest_run_card():
+    """Two columns: the first holds the dropdowns, Scenario Stats and the PB card.
 
     The latest-run card is the second column on its own, so it sits over
-    the run list. Nothing else is in the first column: the room after the
-    stats card is kept for notes.
+    the run list, and the PB card is last in the first, beside it. Nothing
+    is between the stats card and the PB card: that room is kept for notes.
     """
     row = _by_class(run_history.layout(), "run-history-top-row")
 
@@ -271,10 +273,18 @@ def test_the_top_row_holds_the_dropdowns_and_stats_then_the_latest_run_card():
     assert left.className == "run-history-top-row-left"
     assert card.className == latest_run_card.CARD_CLASS
     assert _ids(card) == set(run_history.LATEST_RUN_CARD_IDS)
-    dropdowns, stats = left.children
+    dropdowns, stats, pb = left.children
     assert dropdowns.className == "run-history-dropdown-column"
     assert stats.className == "scenario-stats-card"
     assert run_history.SCENARIO_STATS_IDS.rank in _ids(stats)
+    assert pb.className == pb_card.CARD_CLASS
+    page_owned = {"run_events", "scenario_dropdown", "playlist_filter"}
+    page_owned.add("relative_time_interval")
+    assert _ids(pb) == {
+        component_id
+        for field, component_id in run_history.PB_CARD_IDS._asdict().items()
+        if field not in page_owned
+    }
     playlist_field, scenario_field = dropdowns.children
     assert playlist_field.className == "run-history-playlist-field"
     assert scenario_field.className == "run-history-scenario-field"
@@ -1482,10 +1492,11 @@ def test_the_columns_stack_when_the_page_itself_is_900px_or_narrower():
 
 
 def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
-    """The dropdowns, Scenario Stats, then the latest-run card, in the page's order.
+    """The dropdowns, Scenario Stats, PB, then the latest-run card, in the page's order.
 
     With the list above the chart there is nothing for the card to line up
-    with, so the first column's pieces and the card share one line.
+    with, so the first column's pieces and the card share one line, packed
+    from its start: the PB card no longer keeps to the column's right end.
     """
     narrow = _container_block(
         STYLESHEET.read_text(encoding="utf-8"), "run-history-page (max-width: 900px)"
@@ -1493,17 +1504,19 @@ def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
 
     row = re.search(r"\.run-history-top-row \{(.*?)\}", narrow, re.DOTALL)
     left = re.search(r"\.run-history-top-row-left \{(.*?)\}", narrow, re.DOTALL)
+    pb = re.search(r"\.pb-card \{(.*?)\}", narrow, re.DOTALL)
     card = re.search(r"\.run-history-card \{(.*?)\}", narrow, re.DOTALL)
     assert row and "display: flex;" in row.group(1)
     assert "flex-wrap: wrap;" in row.group(1)
     assert left and "display: contents;" in left.group(1)
+    assert pb and "margin-left: 0;" in pb.group(1)
     assert card and "flex: 1 1 380px;" in card.group(1)
 
 
 def test_every_card_in_the_row_has_the_same_frame():
     frame = _css_block(
         STYLESHEET.read_text(encoding="utf-8"),
-        ".run-history-card,\n.scenario-stats-card",
+        ".run-history-card,\n.scenario-stats-card,\n.pb-card",
     )
 
     assert "border: 1px solid var(--mantine-color-default-border);" in frame
@@ -1621,7 +1634,7 @@ def test_the_cards_age_is_reworded_in_the_browser_on_the_30_second_tick():
     ]
     assert registration["prevent_initial_call"] is False
     assert interval.interval == 30_000
-    script = run_history._LATEST_RUN_TIME_SCRIPT
+    script = latest_run_card.AGE_SCRIPT
     assert "seconds === null || seconds === undefined" in script
     assert 'return [true, "", ""];' in script
     assert 'dagfuncs.relativeTime(seconds, "")' in script

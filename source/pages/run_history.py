@@ -2,8 +2,9 @@
 
 The page shows one scenario's runs: a chart of every run in a range, with
 the Chart options panel beside it, and a list of the runs grouped by session.
-The list has a second view, All scenarios, of each session whole. A card in
-its top row reports the last run played, on whatever scenario.
+The list has a second view, All scenarios, of each session whole. Cards in
+its top row report the selected scenario's personal best and the last run
+played, on whatever scenario.
 
 It never imports another page's module. Dash Pages loads each page file as
 ``pages.<name>``, so a second import path would make a second copy of that
@@ -37,11 +38,13 @@ from source.components.chart_options import (
     settings_help_label,
 )
 from source.components.latest_run_card import (
+    AGE_SCRIPT,
     LatestRunCardIds,
     latest_run_card,
     latest_run_card_content,
     latest_run_from_store,
 )
+from source.components.pb_card import PbCardIds, pb_card, register_pb_card
 from source.components.queued_notices import (
     register_run_import_failure_flush,
     register_startup_playlist_warning_flush,
@@ -212,6 +215,18 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
     polling_interval=POLLING_INTERVAL_ID,
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
+PB_CARD_IDS = PbCardIds(
+    set_at="run-history-pb-set-at",
+    label="run-history-pb-label",
+    time="run-history-pb-time",
+    time_tooltip="run-history-pb-time-tooltip",
+    body="run-history-pb-body",
+    faded="run-history-pb-faded",
+    run_events=RUN_EVENTS_STORE_ID,
+    scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
+    relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
+)
 
 # The class the resize script and the zoom fit script find a graph by
 # (``assets/homeGraphResize.js``, ``assets/homeGraphZoomFit.js``).
@@ -275,6 +290,7 @@ def forward_run_events(batch, follow_newly_played, selected_scenario):
 
 register_run_import_failure_flush(POLLING_INTERVAL_ID)
 register_scenario_stats(SCENARIO_STATS_IDS)
+register_pb_card(PB_CARD_IDS)
 
 
 def _today_text() -> str:
@@ -434,26 +450,8 @@ def show_latest_run(
     )
 
 
-# The latest-run card's age is worded in the browser, when the card is written
-# and on every 30-second tick, as Last played is, so it stays current on a page
-# left open: during play it doubles as a break timer. The hover is the exact
-# time in the shared format. With no run the words before the name are hidden.
-_LATEST_RUN_TIME_SCRIPT = """
-    (seconds, _nIntervals) => {
-        if (seconds === null || seconds === undefined) {
-            return [true, "", ""];
-        }
-        const dagfuncs = window.dashAgGridFunctions;
-        return [
-            false,
-            dagfuncs.relativeTime(seconds, ""),
-            dagfuncs.absoluteTime(seconds, ""),
-        ];
-    }
-    """
-
 clientside_callback(
-    _LATEST_RUN_TIME_SCRIPT,
+    AGE_SCRIPT,
     Output(LATEST_RUN_CARD_IDS.label, "hidden"),
     Output(LATEST_RUN_CARD_IDS.time, "children"),
     Output(LATEST_RUN_CARD_IDS.time_tooltip, "label"),
@@ -730,9 +728,9 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
 def _top_row(playlist_code: str | None) -> dmc.Box:
     """Build the row above the chart, in the columns of the chart and the run list.
 
-    The first column holds the dropdowns and the Scenario Stats card, and
-    the room left after them. The second holds the latest-run card, over the
-    run list.
+    The first column holds the dropdowns, the Scenario Stats card, the room
+    kept for notes, and the PB card at its right end. The second holds the
+    latest-run card, over the run list, so the PB card sits beside it.
     """
     return dmc.Box(
         className="run-history-top-row",
@@ -741,6 +739,7 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                 [
                     _dropdown_column(playlist_code),
                     scenario_stats_panel(SCENARIO_STATS_IDS),
+                    pb_card(PB_CARD_IDS),
                 ],
                 className="run-history-top-row-left",
             ),
@@ -867,8 +866,8 @@ def layout(
                 n_intervals=0,
             ),
             # A 30-second tick of its own for the relative times, Last played
-            # and the latest-run card's age, so how often they are reworded
-            # never depends on how often the page polls for data.
+            # and the two cards' ages, so how often they are reworded never
+            # depends on how often the page polls for data.
             dcc.Interval(
                 id=RELATIVE_TIME_INTERVAL_ID,
                 interval=30_000,

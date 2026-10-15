@@ -266,9 +266,9 @@ a.run-toast-link:hover {
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* The first column: the dropdowns, the Scenario Stats card, and the room left
-   after them, which is kept for notes. It wraps on its own width, so it needs
-   no breakpoint. */
+/* The first column: the dropdowns, the Scenario Stats card, the room kept for
+   notes, and the PB card at its right end. It wraps on its own width, so it
+   needs no breakpoint, and the PB card is the first piece to wrap. */
 .run-history-top-row-left {
     display: flex;
     flex-wrap: wrap;
@@ -348,7 +348,8 @@ a.run-toast-link:hover {
 
 /* The frame every card in the row has, in the theme's tokens. */
 .run-history-card,
-.scenario-stats-card {
+.scenario-stats-card,
+.pb-card {
     border: 1px solid var(--mantine-color-default-border);
     border-radius: var(--mantine-radius-sm);
 }
@@ -489,6 +490,67 @@ a.run-toast-link:hover {
 .run-history-card-empty-message {
     color: var(--mantine-color-dimmed);
     font-size: 13px;
+}
+
+/* The PB card, 300px wide at the first column's right end, so it sits beside
+   the latest-run card, and the room before it is kept for notes. Its frame
+   adds only its border to its height, as the Scenario Stats card's does, and
+   its lines are centered in the row's height. It shares the latest-run
+   card's lines: the score row, the line under it, and the empty state. */
+.pb-card {
+    display: flex;
+    flex: 0 0 300px;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    margin-left: auto;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0 var(--mantine-spacing-sm);
+}
+
+/* "PB · set" and the PB's age, as the latest-run card's first line is drawn.
+   Not a flex container: that would drop the spaces either side of the age. */
+.pb-card-heading {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+/* The rank the PB has reached: the page's text on a tint of the rank's color,
+   bordered in that color, so a pale rank stays legible in both themes. The
+   two classes outrank the badge's own, whose colors are its variant's. */
+.pb-card .pb-card-rank-badge {
+    background: color-mix(in srgb, var(--pb-card-rank-color) 20%, transparent);
+    border: 1px solid var(--pb-card-rank-color);
+    color: var(--mantine-color-text);
+}
+
+/* The next rank's color, before its threshold. */
+.pb-card-rank-dot {
+    background: var(--pb-card-rank-color);
+    border-radius: 50%;
+    display: inline-block;
+    height: 9px;
+    margin-right: 4px;
+    width: 9px;
+}
+
+/* The next rank's threshold, the score it sets under the PB score. */
+.pb-card-threshold {
+    font-weight: 600;
+}
+
+/* The PB run's sensitivity and accuracy: quieter than the lines above it,
+   because they support the PB. With no PB it is empty and out of the card. */
+.pb-card-faded {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.pb-card-faded:empty {
+    display: none;
 }
 
 /* The chart beside the run list. The list's column is as wide as its seven
@@ -943,7 +1005,7 @@ a.run-toast-link:hover {
    column to fill any more, so it takes a height of its own, short enough
    that the chart under it is still in reach. The top row has no list to line
    up with either, so it is one wrapping line: the dropdowns, Scenario Stats,
-   and the latest-run card. */
+   the PB card, and the latest-run card, packed from the line's start. */
 @container run-history-page (max-width: 900px) {
     .run-history-top-row {
         display: flex;
@@ -953,6 +1015,10 @@ a.run-toast-link:hover {
 
     .run-history-top-row-left {
         display: contents;
+    }
+
+    .pb-card {
+        margin-left: 0;
     }
 
     .run-history-card {

@@ -72,6 +72,26 @@ EMPTY_TITLE_CLASS = "run-history-card-empty-title"
 EMPTY_MESSAGE_CLASS = "run-history-card-empty-message"
 
 
+# A card's age is worded in the browser, when the card is written and on every
+# 30-second tick, as Last played is, so it stays current on a page left open:
+# during play the latest-run card's doubles as a break timer. The hover is the
+# exact time in the shared format. With nothing to date, the words before the
+# age are hidden. The latest-run card and the PB card both register it.
+AGE_SCRIPT = """
+    (seconds, _nIntervals) => {
+        if (seconds === null || seconds === undefined) {
+            return [true, "", ""];
+        }
+        const dagfuncs = window.dashAgGridFunctions;
+        return [
+            false,
+            dagfuncs.relativeTime(seconds, ""),
+            dagfuncs.absoluteTime(seconds, ""),
+        ];
+    }
+    """
+
+
 class CardBadge(Enum):
     """The one badge beside the card's score. The value is its Mantine color."""
 
