@@ -57,7 +57,8 @@ stats line, and its first control.
 **Recommendation: an Activity card directly under the stats line, as wide as
 the page. Its title row holds `Activity` and a Range dropdown, which offers
 `Last 12 months` and then every calendar year that has runs, newest first,
-the current year included. The card opens on `Last 12 months` at every load,
+the current year included once it has a run. The card opens on
+`Last 12 months` at every load,
 and the browser doesn't remember the choice. A summary line for the period
 sits under the title. Under it are the calendar of days and the grid of the
 hours of the week, side by side where the card is wide enough and stacked
@@ -79,14 +80,18 @@ where it isn't. Both heatmaps and the summary follow the dropdown.**
   fourth mockup drew the 52 weeks back to a Sunday instead, which on
   2026-10-15 was four more days: 4,929 runs on 87 days, against 4,748 runs
   on 85.
-- **The current year is listed as well.** LeetCode lists only "Current" and
-  earlier years. Monkeytype offers the last 12 months and the years back to
-  the account's creation, and GitHub lists every year. A year answers "how is
-  this year going", which the rolling window doesn't: in October the two
-  differ by more than two months of play. The cost is one more entry.
-- **Only years with runs are listed,** as LeetCode does. On 2026-10-15 the
-  maintainer's dropdown would read `Last 12 months`, `2026`, `2025`, `2024`,
-  `2021`, `2020`, `2019`: they recorded no runs in 2022 or 2023.
+- **The current year is listed as well, once it has a run.** LeetCode lists
+  only "Current" and earlier years. Monkeytype offers the last 12 months and
+  the years back to the account's creation, and GitHub lists every year. A
+  year answers "how is this year going", which the rolling window doesn't:
+  in October the two differ by more than two months of play. The cost is
+  one more entry.
+- **Only years with runs are listed,** as LeetCode does, and the current
+  year follows the same rule: from January 1 until the year's first run,
+  the dropdown has no entry for it, and `Last 12 months` covers the days
+  since. On 2026-10-15 the maintainer's dropdown would read
+  `Last 12 months`, `2026`, `2025`, `2024`, `2021`, `2020`, `2019`: they
+  recorded no runs in 2022 or 2023.
 - **It opens on the last 12 months, and forgets.** The maintainer looks at
   Home "primarily at app start, sometimes after a session" (2026-10-13). A
   remembered 2020 would open the app on old history. Home's spec already
@@ -876,6 +881,14 @@ The shipping PR moves them in.
   the last 12 months, or a year with runs.
   - On screen its title is `Activity`.
 
+The two entries move in over the two PRs of the
+[Delivery plan](#delivery-plan), so the glossary is never ahead of the app.
+PR 1 ships the card with the calendar alone, so it moves in Time in runs and
+an interim Activity card entry: "The card on Home with a calendar of when
+and how much the player played, for a period they pick: the last 12 months,
+or a year with runs." PR 2 adds the hour grid and replaces that entry with
+the one above.
+
 The glossary's Run History entry already says it is "Not Home, the page the
 app opens on." No other entry becomes untrue.
 
@@ -902,10 +915,13 @@ page in its release. Neither starts before the rows it builds are ratified.
    function that builds every period's data, the script that draws the
    calendar, the legend, the accessible table and its keyboard path, the
    greens in both themes, the narrow-window rules, the NVDA walk, and the
-   `home.md` statements and glossary entries for what it ships.
+   `home.md` statements for what it ships. In the glossary it moves in Time
+   in runs and the interim, calendar-only Activity card entry
+   ([Terms](#terms)).
 2. **The hour grid** (HM1's second heatmap, with HM2 to HM6 applied to it).
    It adds the grid to the same function, script and card, and the
-   side-by-side layout. As the last PR, it ships the proposal by the
+   side-by-side layout, and replaces the interim Activity card entry with
+   the full one. As the last PR, it ships the proposal by the
    [Shipping a proposal](../../AGENTS.md#shipping-a-proposal-docs-definition-of-done)
    checklist: a decision-log entry per row, the note in
    [Decisions this changes](#decisions-this-changes), `home.md`, the
