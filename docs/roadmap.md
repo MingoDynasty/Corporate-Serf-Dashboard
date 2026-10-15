@@ -108,6 +108,23 @@ What we plan to do now or very soon, each with the reasons it comes next.
   The page's behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
 
+- **Typical score** — what a player's recent runs on a scenario usually
+  score, defined once for every later judgment of skill. Its
+  [proposal](./proposals/typical_score_proposal.md), in review with nothing
+  ratified yet, recommends the median of a scenario's last 20 runs from the
+  30 days up to each run, known once those runs number 10 from two sessions
+  or fill all 20. Run History's chart would draw it after every run, as a
+  gray line with the middle half of the runs shaded around it, and Scenario
+  Stats would show it. Three implementation PRs build it: the definition,
+  the chart, and the Scenario Stats line. Showing it in the top row's PB
+  card, beside the PB, is a later change that neither proposal makes.
+
+  Why it's next:
+  - The guiding principles judge skill by the typical run, and no page shows
+    it: the chart draws no line for it, and nothing names it.
+  - Three Future entries wait on its definition: the score trend verdict,
+    weakness by the typical run, and the rank-up chance.
+
 ---
 
 ## Future (briefly)
@@ -133,7 +150,9 @@ next.
   per scenario, answering "is my current training working?" It's built on
   session medians, the middle of a scenario's runs in each session, and shown
   with a chart of the typical run over time. A scenario without enough
-  sessions gets no verdict rather than a guess.
+  sessions gets no verdict rather than a guess. That chart, and the
+  definition of the typical run, are in the
+  [typical score proposal](./proposals/typical_score_proposal.md).
 - **Difficulty measured against the player's own runs** — the shipped
   next-rank gap counts every percent as equal. Two scenarios can both need
   +5%, but if one's runs vary by 8% and the other's by 2%, only the first is
@@ -142,7 +161,8 @@ next.
   and by recent form rather than the all-time personal best, and so rank
   "closest" by what the player can actually reach. The app holds every local
   run, which external tools don't, so this could beat them rather than match
-  them.
+  them. The recent spread it reads is proposed in the
+  [typical score proposal](./proposals/typical_score_proposal.md).
 - **Scenarios page** — scenario-first navigation for scenarios that live in
   several playlists or in none, parked from the playlist-overview design. The
   overview → scenario table → Run History drill chain covers
@@ -151,7 +171,8 @@ next.
 - **Weakness by the typical run** — columns on the playlist scenario table
   that rank weakness by the typical run instead of the personal best. They
   wait on a re-check, due around 2026-10-09, of the evidence that the typical
-  run orders weaknesses better.
+  run orders weaknesses better. The typical run they read is defined in the
+  [typical score proposal](./proposals/typical_score_proposal.md).
 - **An overview** — time spent and activity across all scenarios. No design
   yet. Home, the page the app opens on, holds its place.
 - **KovaaK's own log** — the game's log records what stats files usually
