@@ -351,7 +351,8 @@ cards proposal can move it later."; "keep as no limit. '2,140 · as of Mar 3,
 2020' is still useful information, even if it is outdated."
 
 The material consequence: Scenario Stats gains a line, and the top row grows
-by one line's height until the cards work makes room.
+4 px with a KovaaK's username set, 20 px without one, until the cards work
+makes room.
 
 **Recommendation: a "Typical score" line in Scenario Stats, showing the value
 after the scenario's newest run, with "as of {date}" when that value is
@@ -365,38 +366,42 @@ carried or its newest run is more than 30 days old, and no limit on how old an
 - **The unknown state names its count,** so a player grinding a new scenario
   sees how far it is from known (see [Copy](#copy)).
 
-**Written against today's Scenario Stats block,** the one at this proposal's
-base (`1799df0`): Last played, Number of runs, Position. The line goes after
-Number of runs. The top row cards proposal was ratified and merged after the
-maintainer's lean. It rebuilds the block into a card holding Category, Last
-played and Number of runs (its T2), moves Position to a PB card, and orders a
-card's lines by importance (its T4); it doesn't mention the typical score. The
-maintainer chose to carry that dependency, and this proposal does not edit
-that one. What the cards work changes here:
+**Written against the Scenario Stats card at this proposal's base**
+(`ccce6c6`): the top row cards' PR 1 (#380) made the block a card with its
+content unchanged, Last played, Number of runs and Position, so the line goes
+after Number of runs. The top row cards proposal was ratified and merged after
+the maintainer's lean. Its card holds Category, Last played and Number of runs
+(its T2), its PB card takes Position, and a card orders its lines by
+importance (its T4); it doesn't mention the typical score. The maintainer
+chose to carry that dependency, and this proposal does not edit that one.
+What the rest of the cards work changes here:
 
-- **Its PR 1** turns the block into a card "with its content unchanged", so a
-  typical score line already shipped moves with it, and that PR's row-height
-  measurement includes it.
-- **Its PR 2** moves Position and Refresh out, which frees about two lines.
+- **Its PR 2** moves Position and Refresh out of the card, which frees the
+  room of about two lines.
+- **Its PR 3** adds Category as the card's first line, while a benchmark is
+  selected.
 - **Its T4** decides where the line sits among Category, Last played and
   Number of runs; a later move to the PB card, beside the PB, is that work's
   call too.
 
-**The cost, measured at the base** (headless Edge, the maintainer's stats, a
-username simulated as a one-line Position): today's block is 126 px tall,
-under the latest-run card's 132 px, which sets the row. A fourth line of the
-same style makes the block 146 px, so the row grows 14 px. Without a username
-the row goes from 150 px to 170 px. The block is 300 px wide at 2560, 1920 and
-1536 px, and the longest value measured, `Not enough recent runs · 6 of 20`,
-fits on one line in it; a two-digit count is one character longer, which
-PR 3 measures.
+**The cost, measured at the base** (headless Edge at 2560, 1920 and 1536 px,
+the maintainer's stats): the row is 141 px, set by the dropdowns' column. With
+a username, simulated as a one-line Position, the card fits in it, and a
+fourth line of the same style makes the card and the row 145 px, 4 px taller.
+Without a username, Position's hint takes a line of its own and the row goes
+from 149 px to 169 px. The card's text is 300 px wide, and every value in
+[Copy](#copy) fits on one line in it, the longest being
+`Too few recent runs · 16 of 20`. The prototype's `Not enough recent runs`
+wraps there with a two-digit count.
 
 **A question for the maintainer: does the Scenario Stats line ship before or
-after the top row cards PRs?** The author's recommendation is after the cards
-PR 2, so the line lands in a card with room and the row keeps its 132 px. The
-definition and the chart don't touch the top row and need not wait. Shipping
-first, as the lean said, costs the 14 px until the cards PR 2 lands, and that
-PR series then carries the line.
+after the top row cards' PRs 2 and 3?** The author's recommendation is to hold
+neither for the other. Shipping first, as the lean said, costs the row 4 px
+with a username until the cards' PR 2 frees room. The cards' PR 2 will likely
+land first anyway, because this line waits for the definition's PR. Both edit
+the Scenario Stats module, so whichever lands second rebases onto the
+other's. The definition and the chart don't touch the top row and wait for
+nothing.
 
 ## Problem
 
@@ -474,7 +479,9 @@ sessions.
 
 ### Verified facts
 
-Checked at `1799df0`, this proposal's base, on 2026-10-15.
+Checked at `ccce6c6`, this proposal's base, on 2026-10-15. They were first
+checked at `1799df0`; the top row cards' PR 1 (#380) merged between, and
+changed none of what is listed here except that Scenario Stats is now a card.
 
 - **The chart's builders.** `build_run_history_figure` in
   `source/components/run_history_chart.py` reads the scenario's runs in play
@@ -513,7 +520,8 @@ Checked at `1799df0`, this proposal's base, on 2026-10-15.
 - **Scores' precision.** Of the 9,135 runs, 7,137 scored a whole number, and
   1,611 carry five or six decimals.
 
-Measured at the base, 2026-10-15:
+Measured on 2026-10-15, the cost, the size and the draw order at `1799df0`,
+whose chart code the base leaves unchanged, and the row at the base:
 
 - **Cost.** The largest scenario is VT DotTS Intermediate S5, 463 runs.
   Working out the value after each of its runs takes 3.9 ms, of which 2.9 ms
@@ -533,15 +541,15 @@ Measured at the base, 2026-10-15:
 
 ### What the player sees
 
-Scenario Stats, in today's block, in each state:
+The Scenario Stats card, as it is at the base, in each state:
 
 ```
-Scenario Stats                   Scenario Stats                       Scenario Stats
-Last played: 2 minutes ago       Last played: 2 months ago            Last played: 5 minutes ago
-Number of runs: 463              Number of runs: 169                  Number of runs: 6
-Typical score: 1,179             Typical score: 1,390 · as of Apr 12  Typical score: Not enough recent runs · 6 of 20
-Position: ...                    Position: ...                        Position: ...
-     fresh                            as of                                unknown
+| Scenario Stats              |  | Scenario Stats                      |  | Scenario Stats                      |
+| Last played: 2 minutes ago  |  | Last played: 2 months ago           |  | Last played: 5 minutes ago          |
+| Number of runs: 463         |  | Number of runs: 169                 |  | Number of runs: 6                   |
+| Typical score: 1,179        |  | Typical score: 1,390 · as of Apr 12 |  | Typical score: Too few recent runs · 6 of 20 |
+| Position: ...   Refresh     |  | Position: ...   Refresh             |  | Position: ...   Refresh             |
+         fresh                              as of                                  unknown
 ```
 
 The value has a dotted underline and a hover that says how it was worked out
@@ -734,7 +742,7 @@ fit; the line is a median of runs and almost always sits among them.
 
 ### The Scenario Stats line
 
-- **`Typical score:`** after Number of runs, in the block's label style, with
+- **`Typical score:`** after Number of runs, in the card's label style, with
   the value and hover in [Copy](#copy).
 - **It is worked out again when a run lands on the selected scenario, when
   the scenario changes, and on the page's 30-second tick,** so "as of"
@@ -794,7 +802,7 @@ drafts and are redone here.
 | Scenario Stats, label | `Typical score:` | A label as `Last played:` is. "Typical score" and not "Median score": the run list's Median and best already shows a plain median labelled `Median`, KovaaK's own leaderboard shows a third median (the median player's PB), and "median" alone reads as the median of every run. |
 | Scenario Stats, fresh value | `{score}`, such as `1,179` | Rounded as [Rounding](#rounding) says, formatted as a score is. |
 | Scenario Stats, "as of" value | `{score} · as of {date}`, such as `1,390 · as of Apr 12` or `2,140 · as of Mar 3, 2020` | A readout chain. The date is the short date the run list uses, with the year only when it isn't this year's, and has no age limit (TS5). |
-| Scenario Stats, unknown value | `Not enough recent runs · {n} of 10` while the window's runs come from two sessions or more, and `Not enough recent runs · {n} of 20` while they come from one | Says why, then how far, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did. The count is the window's runs against the number that would make the value fresh if play went on in the same way: 10 once two sessions are in the window, 20 while one sitting is. A runs-and-sessions readout (`6 runs · 1 session`) is truer to the rule in one form, but it wraps in the block's 300 px. |
+| Scenario Stats, unknown value | `Too few recent runs · {n} of 10` while the window's runs come from two sessions or more, and `Too few recent runs · {n} of 20` while they come from one | Says why, then how far, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did. The count is the window's runs against the number that would make the value fresh if play went on in the same way: 10 once two sessions are in the window, 20 while one sitting is. "Too few" and not the prototype's "Not enough", which wraps in the card's 300 px with a two-digit count. A runs-and-sessions readout (`6 runs · 1 session`) is truer to the rule in one form, and wraps too. |
 | Scenario Stats, no scenario | `N/A` | As Position reads with no scenario selected. |
 | Scenario Stats, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
 | Scenario Stats hover, fresh | `The median of {n} runs in {k} sessions, from {first} to {last}. The middle 50% scored {q1} to {q3}, and the middle 80% scored {p10} to {p90}.` | What the figure is, from what, and its spread. `on {date}` in place of `from {first} to {last}` when both are one date; `1 session` in the singular. |
@@ -875,7 +883,9 @@ Statements in the specs that go untrue, which the same PRs rewrite:
   "Three groups in order, holding seven controls" becomes eight, with
   `Middle 80%` off in Overlays.
 - [run_history.md, Scenario Stats](../specs/run_history.md#scenario-stats):
-  "The block shows 'Last played:', 'Number of runs:', and 'Position:'".
+  "under it, at one weight, are 'Last played:', 'Number of runs:', and
+  'Position:'", and the card's height in the row, which a fourth line raises
+  by 4 px.
 - [run_history.md, Time-scored scenarios](../specs/run_history.md#time-scored-scenarios):
   the list of surfaces that order or place scores, unchanged on a
   time-scored scenario, gains the typical score.
@@ -942,14 +952,14 @@ moves is noted in that PR's description.
    sections. Needs PR 1. It doesn't touch the top row, so it needn't wait for
    the cards work.
 3. **The Scenario Stats line.** The line, its hover, its updates, and the
-   spec's Scenario Stats section. Needs PR 1, and is ordered against the top
-   row cards PRs by the maintainer's answer to the question under TS5: after
-   the cards PR 2, as recommended, or before it.
+   spec's Scenario Stats section. Needs PR 1. Its order against the top row
+   cards' PRs 2 and 3 is the maintainer's answer to the question under TS5;
+   the recommendation is to hold neither, and whichever lands second rebases.
 
 **Why three.** The definition is the contract later features read, and a PR
 of its own keeps its review on the boundaries rather than on plotly. The
-Scenario Stats line edits the module the cards PRs rebuild, so it ships on
-its own to be sequenced with them, while the chart need not wait. If the
+Scenario Stats line edits the module the cards' PRs 2 and 3 also edit, so it
+ships on its own, to be ordered with them, while the chart need not wait. If the
 maintainer prefers fewer PRs, PR 1 can fold into PR 2, at the cost of one
 larger review.
 
