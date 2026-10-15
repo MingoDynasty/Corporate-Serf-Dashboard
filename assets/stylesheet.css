@@ -235,8 +235,14 @@ a.run-toast-link:hover {
    window made the rows above it wrap taller. The page is also the box its
    own column rule measures. The AppShell navbar is fixed-position and 225px
    wide, so it narrows the page without touching the viewport, and a media
-   query would keep two columns in a page too narrow for them. */
+   query would keep two columns in a page too narrow for them.
+
+   The run list's column width is one value, which the top row's second
+   column takes too, so the latest-run card's edges are the list's at every
+   zoom level. */
 .run-history-page {
+    --run-history-list-width: 500px;
+
     container: run-history-page / inline-size;
     display: flex;
     flex-direction: column;
@@ -247,41 +253,143 @@ a.run-toast-link:hover {
     );
 }
 
-/* The two dropdowns, the Scenario Stats block, and the latest-run card's
-   slot. It wraps on its own width, so it needs no breakpoint: each dropdown
-   joins the line at 200px and grows back toward 400px with the room left
-   over. Spaced off the chart with a margin and not a gap on the page, because
-   the page's column also holds the setup card's container, which is empty on
-   a configured install and would still be given a gap. */
+/* The row above the chart, in the same two columns as the chart and the run
+   list under it, with the same gap. Both columns are as tall as the row, and
+   so is every card in it. Spaced off the chart with a margin and not a gap on
+   the page, because the page's column also holds the setup card's container,
+   which is empty on a configured install and would still be given a gap. */
 .run-history-top-row {
-    align-items: flex-start;
-    display: flex;
+    display: grid;
     flex: 0 0 auto;
-    flex-wrap: wrap;
-    gap: var(--mantine-spacing-sm);
+    gap: var(--mantine-spacing-md);
+    grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* The room the latest-run card takes: the rest of the row, at one height in
-   every state so the chart under it never jumps. */
-.run-history-card-slot {
-    flex: 1 1 380px;
-    min-height: 132px;
-    min-width: min(380px, 100%);
+/* The first column: the dropdowns, the Scenario Stats card, and the room left
+   after them, which is kept for notes. It wraps on its own width, so it needs
+   no breakpoint. */
+.run-history-top-row-left {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-sm);
+    min-width: 0;
 }
 
-/* The latest-run card. Its height is fixed, and not a minimum, at the slot's
-   own: its second line can take two lines in a narrow card, and a card that
-   grew for it would move the chart. The lines are centered in that height,
-   and the tallest state, with the second line on two lines, still fits. */
-.run-history-card {
+/* The playlist filter over the scenario dropdown. The column joins a line at
+   260px and grows to 420px with the room the row has. It is also the box the
+   Follow switch's rule measures. */
+.run-history-dropdown-column {
+    container: run-history-dropdown-column / inline-size;
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    gap: calc(var(--mantine-spacing-xs) / 2);
+    max-width: 420px;
+    min-width: min(260px, 100%);
+}
+
+/* A dropdown's field: the Select's label, with the link or the switch at the
+   right end of the label's line, over the Select's input. The Select's own
+   box lays out nothing, so its label and its input are the field's items.
+   The link and the switch are the Select's siblings, after it, and never in
+   its label: a label names its input, and anything inside it would join the
+   name a screen reader gives the dropdown. */
+.run-history-playlist-field,
+.run-history-scenario-field {
+    align-items: center;
+    column-gap: var(--mantine-spacing-sm);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.run-history-playlist-field > .mantine-Select-root,
+.run-history-scenario-field > .mantine-Select-root {
+    display: contents;
+}
+
+.run-history-playlist-field .mantine-Select-label,
+.run-history-scenario-field .mantine-Select-label {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.run-history-playlist-field .mantine-Select-wrapper,
+.run-history-scenario-field .mantine-Select-wrapper {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+/* Empty while the filter is, and then it takes no room. */
+.run-history-playlist-table-link {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* The Follow switch: under the scenario dropdown, unless the dropdowns'
+   column holds the label and the switch on one line, and then at the right
+   end of the label's line. The column's own width decides, never the
+   window's, because the navbar and the cards beside the column take their
+   room first. A container query cannot match the element that declares the
+   container, which is why the column declares it and the switch is inside.
+   The threshold is the label, the gap, and the switch with its help icon:
+   413px in Edge 155 and Firefox 158, measured 2026-10-15, and a pixel
+   more. */
+.run-history-follow-switch {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: calc(var(--mantine-spacing-xs) / 2);
+}
+
+@container run-history-dropdown-column (min-width: 414px) {
+    .run-history-follow-switch {
+        grid-column: 2;
+        grid-row: 1;
+        margin-top: 0;
+    }
+}
+
+/* The frame every card in the row has, in the theme's tokens. */
+.run-history-card,
+.scenario-stats-card {
     border: 1px solid var(--mantine-color-default-border);
     border-radius: var(--mantine-radius-sm);
+}
+
+/* The Scenario Stats card. Its text is 300px wide inside the frame, which
+   adds only its border to the height: the card's tallest states, with the
+   Position hint on its own line, fill the row with no room to spare. Its
+   lines are centered in the row's height, as the latest-run card's are. */
+.scenario-stats-card {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 100%;
+    padding: 0 var(--mantine-spacing-sm);
+    width: calc(300px + 2 * var(--mantine-spacing-sm) + 2px);
+}
+
+/* The card's heading, drawn as the latest-run card's first line. */
+.scenario-stats-card > .scenario-stats-heading {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+/* The latest-run card, over the run list. It is as tall as the row, and
+   never less than 132px, which holds its tallest state: its second line on
+   two lines in a narrow card. What it shows changes between runs and its
+   height never follows it, so the chart under it never jumps. The lines are
+   centered in that height. */
+.run-history-card {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    height: 132px;
     justify-content: center;
+    min-height: 132px;
+    min-width: 0;
     overflow: hidden;
     padding: 0 var(--mantine-spacing-sm);
 }
@@ -385,7 +493,7 @@ a.run-toast-link:hover {
     display: grid;
     flex: 1 1 0;
     gap: var(--mantine-spacing-md);
-    grid-template-columns: minmax(0, 1fr) 500px;
+    grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);
     min-height: 0;
 }
 
@@ -829,8 +937,24 @@ a.run-toast-link:hover {
    it goes above it and the page scrolls. The chart's column stops shrinking
    there: it would otherwise give all its height to the list. The list has no
    column to fill any more, so it takes a height of its own, short enough
-   that the chart under it is still in reach. */
+   that the chart under it is still in reach. The top row has no list to line
+   up with either, so it is one wrapping line: the dropdowns, Scenario Stats,
+   and the latest-run card. */
 @container run-history-page (max-width: 900px) {
+    .run-history-top-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mantine-spacing-sm);
+    }
+
+    .run-history-top-row-left {
+        display: contents;
+    }
+
+    .run-history-card {
+        flex: 1 1 380px;
+    }
+
     .run-history-columns {
         display: flex;
         flex-direction: column;

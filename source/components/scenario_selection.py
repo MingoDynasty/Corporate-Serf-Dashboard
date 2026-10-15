@@ -54,8 +54,8 @@ class ScenarioSelectionIds(NamedTuple):
     then this store triggers exactly one write, which keeps the deep link out
     of the router's own callback graph.
 
-    ``playlist_table_link`` is the holder under the playlist filter for the
-    link to that playlist's scenario table. It is always in the layout so
+    ``playlist_table_link`` is the holder beside the playlist filter's label
+    for the link to that playlist's scenario table. It is always in the layout so
     ``select_playlist`` has an output to write to; the link itself comes and
     goes with the selection.
     """
@@ -89,9 +89,6 @@ def _playlist_table_link(playlist_code: str) -> dmc.Text:
             inherit=True,
             refresh=False,
         ),
-        # The spacing rides on the link, not on a gap in the column, so the
-        # holder takes no room while it is empty.
-        mt="xs",
         size="sm",
     )
 

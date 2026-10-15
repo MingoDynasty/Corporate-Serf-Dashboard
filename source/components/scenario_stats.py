@@ -1,6 +1,6 @@
-"""Build the Scenario Stats block and wire its callbacks to a page's ids.
+"""Build the Scenario Stats card and wire its callbacks to a page's ids.
 
-The block is what sits under the Scenario Stats heading: Last played,
+The card holds the Scenario Stats heading and, under it, Last played,
 Number of runs, and Position with its Refresh button. A page that hosts it
 fills in a ``ScenarioStatsIds``, puts ``scenario_stats_stores`` and
 ``scenario_stats_panel`` in its layout, and calls
@@ -91,16 +91,16 @@ _last_rank_hints: dict[str, tuple[str, str | None]] = {}
 
 
 class ScenarioStatsIds(NamedTuple):
-    """The component ids one page gives its Scenario Stats block.
+    """The component ids one page gives its Scenario Stats card.
 
     Two pages need two sets: the callbacks are registered once per set, and
     Dash allows one callback per output.
 
     ``scenario_stats_stores`` builds the stores, whose ids here end in
     ``_ts`` or ``_empty_value``, and ``scenario_stats_panel`` builds the
-    rest of the block. ``run_events``, ``scenario_dropdown``,
+    rest of the card. ``run_events``, ``scenario_dropdown``,
     ``polling_interval`` and ``relative_time_interval`` are the page's own.
-    The block reads them and builds none of them:
+    The card reads them and builds none of them:
 
     - ``run_events`` is the store the page's run delivery writes when new
       runs land on the scenario it shows.
@@ -666,13 +666,15 @@ def scenario_stats_stores(ids: ScenarioStatsIds) -> list[dcc.Store]:
 
 
 def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
-    """Build the Scenario Stats heading and the rows under it."""
+    """Build the Scenario Stats card: its heading and the rows under it."""
     return dmc.Box(
         [
+            # An h2 for the page's outline, drawn as the card's quiet first
+            # line, as the latest-run card's is.
             dmc.Title(
                 "Scenario Stats",
+                className="scenario-stats-heading",
                 order=2,
-                size="h6",
             ),
             dmc.Group(
                 [
@@ -765,8 +767,7 @@ def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
                 align="center",
             ),
         ],
-        w=300,
-        maw="100%",
+        className="scenario-stats-card",
     )
 
 

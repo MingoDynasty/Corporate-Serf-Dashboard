@@ -94,10 +94,7 @@ from source.components.setup_surfaces import setup_card_children, stats_dir_hint
 from source.config.config_service import get_config
 from source.kovaaks.data_service import get_high_score, is_scenario_in_database
 from source.pages.page_title import page_title
-from source.pages.playlist_selector import (
-    PLAYLIST_SELECTOR_PRESET,
-    PLAYLIST_SELECTOR_SIZING,
-)
+from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
@@ -217,11 +214,6 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
 GRAPH_CLASS = "home-graph"
 RANGE_FIELD_CLASS = "run-history-range-field"
 RANGE_FIELD_HIDDEN_CLASS = f"{RANGE_FIELD_CLASS} run-history-range-field-hidden"
-# How wide each dropdown's column is in the top row: the shared sizing, which
-# joins a line at 200px and stops at 400px, growing twice as fast as the
-# latest-run card's slot beside it. A row with room to spare gives it to the
-# scenario's name and the Follow switch's label before the card.
-DROPDOWN_FIELD_SIZING = {**PLAYLIST_SELECTOR_SIZING, "flex": "2 1 200px"}
 
 dash.register_page(
     __name__,
@@ -619,10 +611,16 @@ def _range_select(
     )
 
 
-def _top_row(playlist_code: str | None) -> dmc.Box:
-    """Build the row above the chart: both dropdowns, the stats, the latest-run card."""
+def _dropdown_column(playlist_code: str | None) -> dmc.Box:
+    """Build the playlist filter over the scenario dropdown.
+
+    Each Select keeps its own label, which names its input. The link and the
+    switch come after the Select, and the stylesheet places them on the
+    label's line, beside the label. Inside the label they would join the
+    name a screen reader gives the dropdown.
+    """
     return dmc.Box(
-        className="run-history-top-row",
+        className="run-history-dropdown-column",
         children=[
             dmc.Box(
                 [
@@ -647,14 +645,14 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                         # already stored.
                         value=None,
                     ),
-                    dmc.Box(id=SCENARIO_SELECTION_IDS.playlist_table_link),
+                    dmc.Box(
+                        className="run-history-playlist-table-link",
+                        id=SCENARIO_SELECTION_IDS.playlist_table_link,
+                    ),
                 ],
                 className="run-history-playlist-field",
-                # The column, not the Select inside it, is the flex item the
-                # row breaks lines on.
-                **DROPDOWN_FIELD_SIZING,
             ),
-            dmc.Stack(
+            dmc.Box(
                 [
                     dmc.Select(
                         allowDeselect=False,
@@ -675,8 +673,9 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                     ),
                     # Selection behavior, not chart presentation: it decides
                     # what the selector does when a new run lands, so it sits
-                    # under the selector and not in the Chart options panel.
+                    # with the selector and not in the Chart options panel.
                     dmc.Switch(
+                        className="run-history-follow-switch",
                         id=FOLLOW_SWITCH_ID,
                         labelPosition="right",
                         label=settings_help_label(
@@ -688,15 +687,29 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                     ),
                 ],
                 className="run-history-scenario-field",
-                gap="xs",
-                # Sized as the playlist filter beside it is.
-                **DROPDOWN_FIELD_SIZING,
             ),
-            scenario_stats_panel(SCENARIO_STATS_IDS),
+        ],
+    )
+
+
+def _top_row(playlist_code: str | None) -> dmc.Box:
+    """Build the row above the chart, in the columns of the chart and the run list.
+
+    The first column holds the dropdowns and the Scenario Stats card, and
+    the room left after them. The second holds the latest-run card, over the
+    run list.
+    """
+    return dmc.Box(
+        className="run-history-top-row",
+        children=[
             dmc.Box(
-                latest_run_card(LATEST_RUN_CARD_IDS),
-                className="run-history-card-slot",
+                [
+                    _dropdown_column(playlist_code),
+                    scenario_stats_panel(SCENARIO_STATS_IDS),
+                ],
+                className="run-history-top-row-left",
             ),
+            latest_run_card(LATEST_RUN_CARD_IDS),
         ],
     )
 

@@ -258,16 +258,26 @@ def test_the_layout_takes_a_query_parameter_it_does_not_name():
     }
 
 
-def test_the_top_row_holds_the_dropdowns_the_stats_and_the_latest_run_card():
+def test_the_top_row_holds_the_dropdowns_and_stats_then_the_latest_run_card():
+    """Two columns: the first holds the dropdowns and the Scenario Stats card.
+
+    The latest-run card is the second column on its own, so it sits over
+    the run list. Nothing else is in the first column: the room after the
+    stats card is kept for notes.
+    """
     row = _by_class(run_history.layout(), "run-history-top-row")
 
-    assert [getattr(child, "className", None) for child in row.children] == [
-        "run-history-playlist-field",
-        "run-history-scenario-field",
-        None,
-        "run-history-card-slot",
-    ]
-    playlist_field, scenario_field, stats, card_slot = row.children
+    left, card = row.children
+    assert left.className == "run-history-top-row-left"
+    assert card.className == latest_run_card.CARD_CLASS
+    assert _ids(card) == set(run_history.LATEST_RUN_CARD_IDS)
+    dropdowns, stats = left.children
+    assert dropdowns.className == "run-history-dropdown-column"
+    assert stats.className == "scenario-stats-card"
+    assert run_history.SCENARIO_STATS_IDS.rank in _ids(stats)
+    playlist_field, scenario_field = dropdowns.children
+    assert playlist_field.className == "run-history-playlist-field"
+    assert scenario_field.className == "run-history-scenario-field"
     assert [getattr(child, "id", None) for child in playlist_field.children] == [
         run_history.SCENARIO_SELECTION_IDS.playlist_filter,
         run_history.SCENARIO_SELECTION_IDS.playlist_table_link,
@@ -276,9 +286,25 @@ def test_the_top_row_holds_the_dropdowns_the_stats_and_the_latest_run_card():
         run_history.SCENARIO_SELECTION_IDS.scenario_dropdown,
         run_history.FOLLOW_SWITCH_ID,
     ]
-    assert run_history.SCENARIO_STATS_IDS.rank in _ids(stats)
-    assert card_slot.children.className == latest_run_card.CARD_CLASS
-    assert _ids(card_slot) == set(run_history.LATEST_RUN_CARD_IDS)
+
+
+def test_the_link_and_the_switch_follow_their_dropdowns_and_are_never_in_a_label():
+    """A label names its input, so anything in it would join the dropdown's name.
+
+    Each Select's label is its plain name, and the link and the switch are
+    the Select's siblings, after it, as they were when they sat under it.
+    The stylesheet places them on the label's line.
+    """
+    page = run_history.layout()
+    playlist_field = _by_class(page, "run-history-playlist-field")
+    scenario_field = _by_class(page, "run-history-scenario-field")
+
+    playlist_filter, link_holder = playlist_field.children
+    scenario, follow = scenario_field.children
+    assert playlist_filter.label == "Playlist filter"
+    assert scenario.label == "Selected scenario"
+    assert link_holder.className == "run-history-playlist-table-link"
+    assert follow.className == "run-history-follow-switch"
 
 
 def test_the_playlist_filters_scrollbar_is_always_visible():
@@ -294,7 +320,7 @@ def test_the_playlist_link_holder_starts_empty_and_takes_no_room():
     """The holder is a callback's output, so it is in the layout on every visit.
 
     It starts empty because the layout cannot know the remembered selection,
-    and an empty holder must take no room under the filter.
+    and an empty holder must take no room beside the filter's label.
     """
     field = _by_class(run_history.layout(), "run-history-playlist-field")
     holder = field.children[1]
@@ -314,8 +340,9 @@ def test_section_titles_keep_visual_size_with_accessible_heading_order():
         if isinstance(component, dmc.Title)
     }
 
+    # An h2, drawn as the card's first line by the stylesheet.
     assert titles["Scenario Stats"].order == 2
-    assert titles["Scenario Stats"].size == "h6"
+    assert titles["Scenario Stats"].className == "scenario-stats-heading"
     # The panel's groups sit under the page's h2 sections.
     for group in ("Overlays", "Run Data Points", "Score Threshold"):
         assert titles[group].order == 3
@@ -1301,16 +1328,117 @@ def test_a_chart_left_open_past_midnight_is_rebuilt_for_the_new_date(monkeypatch
 
 
 def _css_block(css, selector):
-    match = re.search(rf"(?m)^{re.escape(selector)} \{{(.*?)^\}}", css, re.DOTALL)
+    """Return the body of the top-level rule for ``selector`` alone.
+
+    A selector list's later lines are not a rule of their own, so a line
+    after one ending in a comma never matches.
+    """
+    match = re.search(
+        rf"(?m)(?<!,\n)^{re.escape(selector)} \{{(.*?)^\}}", css, re.DOTALL
+    )
     assert match, f"no {selector} rule in the stylesheet"
     return match.group(1)
 
 
-def test_the_list_takes_a_column_of_500px_beside_the_chart():
-    columns = _css_block(STYLESHEET.read_text(encoding="utf-8"), ".run-history-columns")
+def _container_block(css, query):
+    """Return the body of the ``@container`` rule for ``query``."""
+    match = re.search(
+        rf"(?m)^@container {re.escape(query)} \{{(.*?)^\}}", css, re.DOTALL
+    )
+    assert match, f"no @container {query} rule in the stylesheet"
+    return match.group(1)
 
-    assert "grid-template-columns: minmax(0, 1fr) 500px;" in columns
+
+def test_the_list_takes_a_column_of_500px_beside_the_chart():
+    css = STYLESHEET.read_text(encoding="utf-8")
+    columns = _css_block(css, ".run-history-columns")
+
+    assert "--run-history-list-width: 500px;" in _css_block(css, ".run-history-page")
+    assert (
+        "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
+        in columns
+    )
     assert "flex: 1 1 0;" in columns
+
+
+def test_the_top_row_takes_the_columns_and_the_gap_of_the_chart_and_the_list():
+    """So the latest-run card's edges are the run list's at every zoom level.
+
+    One value sets the list's width for both, and the row stretches each
+    column, and every card in it, to its own height.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    row = _css_block(css, ".run-history-top-row")
+    columns = _css_block(css, ".run-history-columns")
+
+    for rule in (row, columns):
+        assert (
+            "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
+            in rule
+        )
+        assert "    gap: var(--mantine-spacing-md);" in rule
+    assert "display: grid;" in row
+    assert "align-items" not in row
+    assert "500px" not in row
+    assert css.count("--run-history-list-width: ") == 1
+
+
+def test_the_first_column_wraps_its_pieces_on_its_own_width():
+    left = _css_block(
+        STYLESHEET.read_text(encoding="utf-8"), ".run-history-top-row-left"
+    )
+
+    assert "flex-wrap: wrap;" in left
+    assert "min-width: 0;" in left
+    assert "align-items" not in left
+
+
+def test_the_dropdowns_column_grows_from_260px_to_420px():
+    column = _css_block(
+        STYLESHEET.read_text(encoding="utf-8"), ".run-history-dropdown-column"
+    )
+
+    assert "flex: 1 1 260px;" in column
+    assert "max-width: 420px;" in column
+    assert "min-width: min(260px, 100%);" in column
+    assert "flex-direction: column;" in column
+
+
+def test_the_link_and_the_switch_are_placed_on_the_labels_line():
+    """The Select's own box lays out nothing, so its label is the field's item."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    fields = (".run-history-playlist-field", ".run-history-scenario-field")
+
+    assert "display: grid;" in _css_block(
+        css, ".run-history-playlist-field,\n.run-history-scenario-field"
+    )
+    roots = ",\n".join(f"{field} > .mantine-Select-root" for field in fields)
+    assert "display: contents;" in _css_block(css, roots)
+    labels = _css_block(css, ",\n".join(f"{f} .mantine-Select-label" for f in fields))
+    assert "grid-row: 1;" in labels
+    inputs = _css_block(css, ",\n".join(f"{f} .mantine-Select-wrapper" for f in fields))
+    assert "grid-row: 2;" in inputs
+    link = _css_block(css, ".run-history-playlist-table-link")
+    assert "grid-column: 2;" in link
+    assert "grid-row: 1;" in link
+
+
+def test_the_follow_switch_measures_the_dropdowns_column_and_never_the_window():
+    """Under the dropdown, unless the column holds the label and the switch."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+
+    assert "container: run-history-dropdown-column / inline-size;" in _css_block(
+        css, ".run-history-dropdown-column"
+    )
+    below = _css_block(css, ".run-history-follow-switch")
+    assert "grid-column: 1 / -1;" in below
+    assert "grid-row: 3;" in below
+    assert re.findall(r"@container run-history-dropdown-column \(([^)]+)\)", css) == [
+        "min-width: 414px"
+    ]
+    beside = _container_block(css, "run-history-dropdown-column (min-width: 414px)")
+    assert "grid-column: 2;" in beside
+    assert "grid-row: 1;" in beside
 
 
 def test_chart_options_stacks_on_the_charts_own_area_at_48em():
@@ -1343,22 +1471,67 @@ def test_the_columns_stack_when_the_page_itself_is_900px_or_narrower():
     ]
 
 
-def test_the_cards_slot_is_reserved_at_one_height():
-    slot = _css_block(STYLESHEET.read_text(encoding="utf-8"), ".run-history-card-slot")
+def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
+    """The dropdowns, Scenario Stats, then the latest-run card, in the page's order.
 
-    assert "min-height: 132px;" in slot
-    assert "min-width: min(380px, 100%);" in slot
+    With the list above the chart there is nothing for the card to line up
+    with, so the first column's pieces and the card share one line.
+    """
+    narrow = _container_block(
+        STYLESHEET.read_text(encoding="utf-8"), "run-history-page (max-width: 900px)"
+    )
+
+    row = re.search(r"\.run-history-top-row \{(.*?)\}", narrow, re.DOTALL)
+    left = re.search(r"\.run-history-top-row-left \{(.*?)\}", narrow, re.DOTALL)
+    card = re.search(r"\.run-history-card \{(.*?)\}", narrow, re.DOTALL)
+    assert row and "display: flex;" in row.group(1)
+    assert "flex-wrap: wrap;" in row.group(1)
+    assert left and "display: contents;" in left.group(1)
+    assert card and "flex: 1 1 380px;" in card.group(1)
 
 
-def test_the_card_is_one_height_in_every_state():
-    """A height, and not a minimum: a card that grew would move the chart."""
+def test_every_card_in_the_row_has_the_same_frame():
+    frame = _css_block(
+        STYLESHEET.read_text(encoding="utf-8"),
+        ".run-history-card,\n.scenario-stats-card",
+    )
+
+    assert "border: 1px solid var(--mantine-color-default-border);" in frame
+    assert "border-radius: var(--mantine-radius-sm);" in frame
+
+
+def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
+    """132px holds the card's tallest state, so its height never follows a run.
+
+    A minimum and not a height: the card is as tall as the row, which the
+    Scenario Stats card makes taller in its tallest states.
+    """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".run-history-card")
 
-    assert "    height: 132px;" in card
-    assert "min-height" not in card
+    assert "min-height: 132px;" in card
+    assert re.search(r"(?m)^    height:", card) is None
+    assert "min-width: 0;" in card
     assert "overflow: hidden;" in card
     assert "justify-content: center;" in card
+
+
+def test_the_stats_card_keeps_300px_for_its_text_and_adds_only_its_border():
+    """Every line breaks where it did, and the frame adds no height but its border.
+
+    Its tallest states, with the Position hint on its own line, fill the row.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    card = _css_block(css, ".scenario-stats-card")
+
+    assert "width: calc(300px + 2 * var(--mantine-spacing-sm) + 2px);" in card
+    assert "padding: 0 var(--mantine-spacing-sm);" in card
+    assert "flex: 0 0 auto;" in card
+    assert "justify-content: center;" in card
+    heading = _css_block(css, ".scenario-stats-card > .scenario-stats-heading")
+    assert "font-size: 12px;" in heading
+    assert "line-height: 18px;" in heading
+    assert "color: var(--mantine-color-dimmed);" in heading
 
 
 def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
