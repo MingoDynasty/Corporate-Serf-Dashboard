@@ -88,6 +88,24 @@ remembered by the browser rather than written to disk, apply the moment you
 choose, and are not part of Save. A different browser, or one whose site data you
 have cleared, starts with run notifications on and on Confetti.
 
+## Run History
+
+Run History's top row puts the selected scenario's history beside its
+personal best and the latest run. The **Playlist filter** sets the benchmark
+context: Scenario Stats shows that benchmark's category and subcategory
+above Last played and Number of runs. Category disappears when the filter
+is empty, holds an ordinary playlist, or has no grouping for the scenario.
+
+The PB card shows the local record, its rank and the next rank's score, then
+the leaderboard standing and the PB run's cm/360 and hit accuracy. The next
+rank's figures are the benchmark table's own. Hover or focus the PB score
+for its improvement over the previous best, the age for the exact time,
+and the percentile for the position and when it was updated. **Refresh**
+updates only the leaderboard standing. A scenario with no local runs reads
+"No local PB yet" and has no leaderboard lookup, even if KovaaK's holds a
+record from another computer. The latest-run card still reports the last
+run played, including when you are looking at another scenario.
+
 ## Playlists and Benchmarks
 
 Benchmarks are playlists with rank data attached. The app ships with a bundled

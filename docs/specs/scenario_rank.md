@@ -7,10 +7,10 @@ automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
 no username configured it makes no network calls at all. During normal play
-the field explains its own state beside the value instead of popping up a
-notification, and only two things still interrupt: a Refresh the player
+the leaderboard line explains its own state beside the value instead of
+popping up a notification, and only two things still interrupt: a Refresh the player
 clicked, and a Steam ID that disagrees with the account KovaaK's found, said
-once per app session because the field has nowhere to put it.
+once per app session because the line has nowhere to put it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -106,7 +106,7 @@ benchmark tier) — see the
 
 - The position is the leaderboard line of Run History's
   [PB card](run_history.md#the-pb-card), under the PB and sourced apart from
-  it.
+  it ([T3](../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md)).
 - With a percentile, the line leads with it: `{percentile}% percentile`, two
   decimals, such as `81.13% percentile`, and the position and the total are
   the first line of its hover, `Position {position} of {total}`. In every
@@ -119,7 +119,8 @@ benchmark tier) — see the
 - The line follows the local PB: with no scenario selected, or a scenario
   with no local runs, the card shows no line and the app looks nothing up for
   it, even with a username set. A record KovaaK's holds from another
-  computer, for a scenario with no local runs, is not shown.
+  computer, for a scenario with no local runs, is not shown
+  ([T3](../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md)).
 
 ## Caching
 

@@ -28,6 +28,13 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Run History top row cards** — the dropdowns are stacked, Scenario Stats
+  shows the selected benchmark's category, and a PB card puts the local
+  record and next rank's score beside the latest run. The leaderboard line
+  lives with the PB, the latest-run card aligns over the run list, and both
+  cards show relative ages with exact times on hover and focus. (PRs #380,
+  #383 and the Category shipping PR; design in #379) Design rationale
+  distilled into [`decision_log/`](./decision_log/README.md).
 - **The Run History page** — the page that charts a scenario's scores now
   shows every run, and where each run fits in a session. Its chart plots
   every run in a range, in the order the runs were played, by time, or by
@@ -73,39 +80,21 @@ sequence.
   how much faster it finished. A scenario the app can't recognize reads as it
   did before. (PR #343; design in #329) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
-- **New PB stars on the Score vs Time chart** — the chart now draws a gold
-  star on each plotted run that beat the scenario's personal best when it was
-  played, so it shows when each best was reached, including the ones a later
-  run the same day beat. The rule is the personal best celebration's, judged
-  over the scenario's whole history at every sensitivity. There is no
-  setting: the stars follow Point size, and the Score vs Sensitivity chart is
-  unchanged. The stars record achievements, and whether the player is
-  improving stays the trend verdict's question. (PR #346; design in #337)
-  Design rationale distilled into [`decision_log/`](./decision_log/README.md).
+
 ---
 
 ## Upcoming milestones
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **Run History top row cards** — the top row gets one card per kind of
-  information: the scenario, its personal best, and the latest run, with the
-  latest-run card lined up over the run list. The PB card shows the PB, the
-  gap to the next rank, the leaderboard percentile, and the PB run's cm/360,
-  and the Scenario Stats card gains the benchmark category. Its
-  [proposal](./proposals/top_row_cards_proposal.md) was ratified on
-  2026-10-14, and three implementation PRs build it.
+- **The latest-run card follows the selection** — write Proposal 2 now that
+  the top row cards have shipped. It will consider making the latest-run
+  card follow the selected scenario and removing the run list's heading
+  line. Its argument rests on the card's alignment over the list. This is
+  upcoming design work, not a change to the card's current scope.
 
-  A second proposal follows once it ships: the latest-run card following the
-  selected scenario, and the run list losing its heading line. Notes on a
-  scenario, which the row keeps space for, are a proposal of their own.
-
-  Why it's next:
-  - The page never shows the target a player is chasing: the PB is only a
-    line on the chart, and the next rank is on the benchmark table.
-  - The latest-run card is mostly empty space at the maintainer's width.
-
-  The page's behavior is in
+  Notes on a scenario remain a separate proposal for the room kept in the
+  first column. Current behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
 
 ---

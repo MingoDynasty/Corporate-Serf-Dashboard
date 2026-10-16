@@ -3,8 +3,8 @@
 The Run History page shows one scenario's runs three ways: a chart of every
 run in a range, a list of the runs grouped by session, and a card for the
 last run played, beside a card for the scenario's personal best and its
-leaderboard position. A switch above the list turns it into a view of each
-session whole, across every scenario played in it. A run that lands reaches
+leaderboard position, with the benchmark category beside it. A switch above
+the list turns it into a view of each session whole, across every scenario played in it. A run that lands reaches
 the page with no reload, and the page can follow the scenario just played. A
 check beside a run's score says it met the score threshold and a star says it
 set a new personal best, each judged as of when the run was played.
@@ -83,6 +83,13 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-10-13][run-toast]).
 
 ## The top row
+
+The layout follows [T1, including the Follow switch ruling][top-row]. The
+cards order and weight facts by their role in the player's next action,
+keep facts needed at a glance on screen, and put supporting context after
+them in a quieter readable style. Change frequency decides neither order
+nor weight; ages read relative with exact times on hover and focus, while
+times that name or order runs remain absolute ([T4][card-order]).
 
 - The row takes the two columns of the chart and the run list under it, with
   the same gap, and one value sets the list's 500px width for both. The
@@ -173,7 +180,7 @@ of scope here, apart from its chart toolbar, noted under The chart.
   reads as the length of the break since the last run. Hovering or focusing
   the age shows the exact time, in the shared format with no seconds, such as
   `Oct 9, 2026, 5:24 PM`
-  ([2026-07-11][timestamps]).
+  ([2026-07-11][timestamps], [T4][card-order]).
   While the run's scenario is the selected one its name is
   plain text, with the whole name as its tooltip where the card cuts it
   short. While another scenario is selected the name is a button, drawn as
@@ -236,6 +243,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 ## The PB card
 
+The card's lines, local-record scope and leaderboard presentation follow
+[T3][pb-card]; their ordering and relative ages follow [T4][card-order].
+
 - The card reports the selected scenario's personal best as this app
   records it, worked out from the run store each time, as the latest-run
   card is. The PB is the earliest run to reach the scenario's high score,
@@ -258,6 +268,10 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-10-12][check]).
   A PB set by the scenario's first run beat nothing, so its score has no
   hover and no dotted underline.
+  The PB run follows the store's order, which keeps runs ending in the same
+  second as loaded. On a tie in that second, the hover instead describes the
+  first run in play order to reach the score, preserving the comparison
+  shown when that score landed ([T3][pb-card]).
 - While the Playlist filter holds a benchmark that gives the scenario a
   ladder, a badge beside the score names the rank the PB has reached, as the
   benchmark table's Rank column does, in the page's text color on a tint of
@@ -910,10 +924,19 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 - A card in the top row, framed as the latest-run card is, in the theme's
   tokens. Its heading, "Scenario Stats", is an h2 drawn as the card's quiet
-  first line, and under it, at one weight, are "Last played:" and "Number of
-  runs:" for the selected scenario. The personal best and the leaderboard
-  position are [the PB card's](#the-pb-card).
-- Its text is 300px wide, and its frame adds only a border to its height.
+  first line, and under it, at one weight, are "Category:", "Last played:"
+  and "Number of runs:" for the selected scenario ([T2][category],
+  [T4][card-order]). The personal best and the leaderboard position are
+  [the PB card's](#the-pb-card).
+- Category is `{category} · {subcategory}`, or `{category}` with one level,
+  using the selected benchmark table's own group labels and length guard.
+  It is shown only while the Playlist filter holds a benchmark with groups
+  that lists the selected scenario. No filter, an ordinary playlist, an
+  unknown code, no matching scenario, absent or mismatched groups, or a
+  benchmark on the grouping exclusion list hides the entire row with no
+  placeholder. A scenario or filter change rewrites it, including a filter
+  change alone ([T2][category]).
+- Its frame is 270px wide and adds only a border to its height.
   The card fits in the row the dropdowns' column sets, its lines centered.
 - "Last played" is a relative, single-unit humanized string ("5 minutes
   ago"), self-updating on its own 30-second interval
@@ -1077,3 +1100,7 @@ of scope here, apart from its chart toolbar, noted under The chart.
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md
 [threads]: ../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md
 [rank-history]: ../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md
+[top-row]: ../decision_log/2026/2026-10-14-run-historys-top-row-has-one-card-per-kind-of-information.md
+[category]: ../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md
+[pb-card]: ../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md
+[card-order]: ../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md

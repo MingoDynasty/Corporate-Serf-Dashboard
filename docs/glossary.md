@@ -145,6 +145,14 @@ reports the last run played, on whatever scenario, with its verdict
 - On screen it has no title. Its first line reads
   `Latest run · {age} · {scenario}`.
 
+### Scenario Stats
+
+The card in Run History's top row about the selected scenario: its benchmark
+category, when it was last played, and how many runs it has
+([run_history.md](specs/run_history.md#scenario-stats)).
+
+- In code: `scenario_stats`.
+
 ### PB card
 
 The card in Run History's top row about the selected scenario's personal best

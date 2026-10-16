@@ -137,14 +137,6 @@ commands becomes burdensome.
 
 ## UI/UX
 
-### Watch for `is_scenario_in_database` early-return pattern
-
-The rank callback, now in `source/components/scenario_stats.py`, previously had a bug where it short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.
-
-When building new UI features that consume `get_scenario_rank_info(...)`, grep for similar "is this in the local database" guards and confirm they do not inadvertently block lookups for unplayed scenarios.
-
-This is not a current bug; it is a code-pattern reminder so the same mistake does not recur.
-
 ### A stored column choice can apply after the scenario table's first rows
 
 On a machine a quarter to a half slower than the maintainer's, a playlist's
