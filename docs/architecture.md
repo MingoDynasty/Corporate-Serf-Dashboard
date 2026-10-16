@@ -265,6 +265,7 @@ flowchart LR
         QueuedNotices["components/<br/>queued_notices.py"]
         ScoreThreshold["components/<br/>score_threshold.py"]
         ScenarioStats["components/<br/>scenario_stats.py"]
+        PbCard["components/<br/>pb_card.py"]
         SetupSurfaces["components/<br/>setup_surfaces.py"]
         RunDelivery["components/<br/>run_delivery.py"]
         RunHistoryChart["components/<br/>run_history_chart.py"]
@@ -320,9 +321,15 @@ flowchart LR
     ScoreThreshold --> TimeScored
     ScoreThreshold --> Pace
     ScenarioStats --> ChartOptions
-    ScenarioStats --> LocalIcon
     ScenarioStats --> DataService
-    ScenarioStats --> ApiService
+    PbCard --> ChartOptions
+    PbCard --> LocalIcon
+    PbCard --> LatestRunCard
+    PbCard --> RunMarks
+    PbCard --> DataService
+    PbCard --> ApiService
+    PbCard --> PlaylistService
+    PbCard --> TimeScored
     SetupSurfaces --> LocalIcon
     RunDelivery --> Shell
     RunHistory --> DataService
@@ -332,6 +339,7 @@ flowchart LR
     RunHistory --> QueuedNotices
     RunHistory --> ScoreThreshold
     RunHistory --> ScenarioStats
+    RunHistory --> PbCard
     RunHistory --> SetupSurfaces
     RunHistory --> RunDelivery
     RunHistory --> RunHistoryChart
@@ -348,13 +356,13 @@ flowchart LR
     RunMarks --> ScoreThreshold
     RunMarks --> DataService
     RunMarks --> TimeScored
+    RunMarks --> Pace
     LatestRunCard --> RunHistoryList
     LatestRunCard --> RunMarks
     LatestRunCard --> ScoreThreshold
     LatestRunCard --> DataService
     LatestRunCard --> PlaySessions
     LatestRunCard --> TimeScored
-    LatestRunCard --> Pace
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -469,8 +477,9 @@ flowchart LR
   chart and the list, one CSS value (`--run-history-list-width`) setting the
   list's width for both, so the latest-run card, alone in the second column,
   sits over the list. The first column (`_top_row`, `_dropdown_column`) is a
-  wrapping row of the dropdowns' column and the Scenario Stats card, the room
-  after them kept for notes. Each dropdown's field is a grid in which the
+  wrapping row of the dropdowns' column, the Scenario Stats card, the room
+  kept for notes, and the PB card, which a left margin of `auto` pins to the
+  column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
   Select's own box lays out nothing, so the stylesheet places the Select's
   siblings, never in its label: the link on the playlist filter label's line,
   and the Follow switch under the scenario dropdown, small
@@ -550,13 +559,15 @@ flowchart LR
   read or the overlays. That function restyles
   traces selected by name: the size and color go to the run trace, and the
   size alone to the New PB stars and the latest run's ring.
-  The Scenario Stats card (Last played, Number of runs, and Position with
-  its Refresh button) is built by `components/scenario_stats.py` from this
-  page's `SCENARIO_STATS_IDS`, and `register_scenario_stats` wires that
-  module's callbacks to the same ids. `get_scenario_num_runs`,
-  `get_scenario_rank`, and `refresh_rank` are defined there. The page builds
-  what the card only reads: the summary store, the scenario dropdown, the
-  polling interval, and the 30-second interval that keeps the relative times
+  The Scenario Stats card (Last played and Number of runs) is built by
+  `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
+  `register_scenario_stats` wires that module's callbacks to the same ids.
+  The PB card, with Position as its leaderboard line, is built the same way
+  by `components/pb_card.py` from `PB_CARD_IDS`, wired by
+  `register_pb_card`. The position's ids are the ones it had in the
+  Scenario Stats card. The page builds what the two cards only read: the
+  summary store, the scenario dropdown, the playlist filter, the polling
+  interval, and the 30-second interval that keeps the relative times
   current.
   The run list is `components/run_history_list.py`'s, and the page holds the
   two callbacks that decide when it is rebuilt. A session row counts every
@@ -595,7 +606,8 @@ flowchart LR
   selection as the list does. It works the card out from the run store and
   writes when the run ended, in epoch seconds, to the card's
   `run-history-card-played-at` store. A clientside callback
-  (`_LATEST_RUN_TIME_SCRIPT`) words that as the run's age with the shared
+  (`latest_run_card.AGE_SCRIPT`, which the PB card registers for its own
+  age too) words that as the run's age with the shared
   `relativeTime` and `absoluteTime`, on the store's change and on the
   30-second tick, as Last played's does, and hides the first line's words
   with no run. `show_latest_run` also writes `run-history-latest-run`, the
@@ -883,30 +895,51 @@ flowchart LR
   threshold line is drawn at, from the current personal best.
   `normalize_score_threshold_percentage()` reads the percentage input, which
   is empty while the user is clearing it.
-- `components/scenario_stats.py` — the Scenario Stats card: Last played,
-  Number of runs, and Position with its Refresh button. A page fills in a
-  `ScenarioStatsIds`: an id for each component the card builds, plus the
-  page's own run-events store, scenario dropdown, polling interval, and
-  30-second interval, which the card only reads. It puts
+- `components/scenario_stats.py` — the Scenario Stats card: Last played and
+  Number of runs. A page fills in a `ScenarioStatsIds`: an id for each
+  component the card builds, plus the page's own run-events store, scenario
+  dropdown, and 30-second interval, which the card only reads. It puts
   `scenario_stats_stores()` and `scenario_stats_panel()` in its layout and
   calls `register_scenario_stats()` with the ids once, at import, which
-  registers `get_scenario_num_runs`, `get_scenario_rank`, `refresh_rank`,
-  and the clientside callbacks that word the Last played text and the age
-  in the Position hover. `get_scenario_rank` is the passive read. A tick of
-  the polling interval alone reads caches only, and the tick is told by its
+  registers `get_scenario_num_runs` and the clientside callback that words
+  the Last played text. What the card shows is specified in
+  [run_history.md](specs/run_history.md#scenario-stats).
+- `components/pb_card.py` — the Run History page's PB card, with the
+  leaderboard position as its leaderboard line. `personal_best()` is one
+  pure function from a scenario's runs in the store's order, the order
+  `get_personal_best_run()` takes the PB in, to the text the card shows:
+  when the PB was set, its score, the latest-run card's new-PB line for it
+  (`run_marks.new_pb_gain()` over `what_runs_chased()` in play order), the
+  rank it has reached and the next rank's parts from
+  `playlist_scenarios_service.ladder_standing()`, the table's own walk, and
+  the PB run's cm/360 and hit accuracy. `personal_best_from_store()` copies
+  the store once, finds the ladder in the benchmark the Playlist filter
+  holds, and reads the pace basis as the table does. A page fills in a
+  `PbCardIds`: an id for each component the card builds, plus the page's
+  own run-events store, scenario dropdown, playlist filter, polling
+  interval, and 30-second interval, which the card only reads. It puts
+  `pb_card()` in its layout and calls `register_pb_card()` with the ids
+  once, at import, which registers `show_pb`, the clientside callback that
+  words the PB's age, and the leaderboard line's three: `get_scenario_rank`,
+  the passive read, `refresh_rank`, the click, and the clientside callback
+  that words the line's hover. `show_pb` writes the card and shows the
+  leaderboard line only while the scenario has local runs, and the two
+  server callbacks look up no scenario without them. A tick of the polling
+  interval alone reads caches only, and the tick is told by its
   `n_intervals` property and not by one id, so the rule holds for each
-  page's interval. `refresh_rank` is the click: a board-authoritative fetch
-  that answers every outcome with a channel toast.
-  The module holds what the Position field remembers between calls:
-  `_last_rank_hints`, what each scenario's last network read concluded, so
-  that a cache-only tick can repeat the hint, and `_session_notices_sent`,
-  which lets the Steam ID mismatch toast fire once per run of the server.
-  Every page that registers the block reads and writes the same objects.
-  That depends on the module being imported once, which is the reason given
-  under `components/chart_options.py` for living outside `source/pages/`.
-  It takes `TOOLTIP_EVENTS` and `SETTINGS_HELP_TOOLTIP_WIDTH` from
-  `components/chart_options.py`. What the block shows is specified in
-  [run_history.md](specs/run_history.md#scenario-stats) and
+  page's interval. `refresh_rank` is a board-authoritative fetch that
+  answers every outcome with a channel toast. With a percentile, the line's
+  value is the percentile and its label is hidden, and the position and the
+  total go to `rank_of_total`, the hover's first line.
+  The module holds what the leaderboard line remembers between calls:
+  `_last_rank_hints`, what each scenario's last network read concluded and
+  what the line showed then, so that a cache-only tick can repeat the hint,
+  and `_session_notices_sent`, which lets the Steam ID mismatch toast fire
+  once per run of the server. Every page that registers the card reads and
+  writes the same objects. That depends on the module being imported once,
+  which is the reason given under `components/chart_options.py` for living
+  outside `source/pages/`. What the card shows is specified in
+  [run_history.md](specs/run_history.md#the-pb-card) and
   [scenario_rank.md](specs/scenario_rank.md).
 - `components/setup_surfaces.py` — the setup card and the stats-folder hint,
   as layout builders with no callback. `stats_dir_hint()` takes the id the
@@ -932,7 +965,9 @@ flowchart LR
   `what_runs_chased()` works the same three out from a scenario's runs in
   play order: the PB the run was chasing, whether it was the first at its
   sensitivity, and the constant of the run's own version of the scenario when
-  that PB was set on the same version. `mark_runs()` judges each run with
+  that PB was set on the same version. `new_pb_gain()` words how far a new
+  PB beat the previous best, for the latest-run card and the PB card's score
+  alike. `mark_runs()` judges each run with
   `score_threshold.judge_run()` and stars it with
   `data_service.new_high_score_runs()`, the chart's rule over the chart's
   order. Nothing is stored: a mark is worked out again each time, from the
@@ -989,6 +1024,8 @@ flowchart LR
   `latest_run_from_store()` copies the store once. A page fills in a
   `LatestRunCardIds`, puts `latest_run_card()` in its layout, and writes
   what `latest_run_card_content()` returns to it from a callback of its own.
+  `AGE_SCRIPT` is the clientside script that words a card's age, which the
+  page registers for this card and `pb_card.py` for its own.
   The card's scenario button, its store, and the first line's words with the
   age in them are built once, with the card, and never by that callback.
 
@@ -1068,7 +1105,8 @@ flowchart LR
   freshly read local stats with rank info and, on a benchmark, the Rank and
   Next Rank fields that `benchmark_rank_fields`, a pure function of the
   scenario's ladder, its local PB, and an optional pace constant, computes on
-  every path. The constant is `None` for the gap as a percentage of the PB,
+  every path, from the walk `ladder_standing` makes. The PB card reads the
+  same walk, so its next rank is the table's by construction. The constant is `None` for the gap as a percentage of the PB,
   and `_build_row` supplies it, on a row with a ladder and a PB, when the
   scenario is time-scored and the PB run is eligible. Every row also carries
   the scenario's leaderboard ID, read from the name-to-ID mapping on every
@@ -1390,7 +1428,8 @@ flowchart LR
 | The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/run_history.py`) for the component ids |
 | What `?scenario=` and `?playlist_code=` select, what the two dropdowns list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the layout helpers, `reach_scenario` and `reach_scenario_or_the_one_asked_for` there for the rule that clears a filter in the way of a scenario; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/run_history.py`) for the component ids |
 | How a failed run import or a startup playlist warning reaches the screen | `components/queued_notices.py` for the two flushes; `my_watchdog/file_watchdog.py` and `kovaaks/data_service.py` for the queues; the hosting page for the interval each flush is registered on |
-| The Scenario Stats card, the Position value and its hints, or what a click on Refresh answers | `components/scenario_stats.py` for the card and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/run_history.py`) for the component ids; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
+| The Scenario Stats card | `components/scenario_stats.py` for the card and its callbacks; the hosting page's `ScenarioStatsIds` (`SCENARIO_STATS_IDS` in `pages/run_history.py`) for the component ids |
+| The PB card, its next rank, the Position value and its hints, or what a click on Refresh answers | `components/pb_card.py` for the card (`personal_best`) and its callbacks, the leaderboard line's included; the hosting page's `PbCardIds` (`PB_CARD_IDS` in `pages/run_history.py`) for the component ids; `kovaaks/playlist_scenarios_service.py` (`ladder_standing`) for the next rank's figures; `kovaaks/api_service.py` for the lookup and its caches; the rules are in `docs/specs/scenario_rank.md` |
 | How a run is judged against the score threshold, or where the threshold line sits | `components/score_threshold.py`; `kovaaks/pace.py` for the pace formulas; `components/run_marks.py` for the run list's check, where a past run is judged under its own version of the scenario; `components/latest_run_card.py` for the card; the Run History page's `generate_graph` for the line |
 | The run toast: what it says, which run earns it, its link, or the switch that turns it off | `app_shell.py` for `publish_run_events`, `_run_toast`, and the `run-notifications` store; `utilities/notifications.py` for the channel helpers; `kovaaks/playlist_scenarios_service.py` for `scenario_run_history_href`; `pages/settings.py` for the switch; the rules are in `docs/specs/notifications.md` |
 | The setup card or the stats-folder hint | `components/setup_surfaces.py` for both builders and their copy; `pages/home.py` for the Skip callback and its toasts; each hosting page's layout for which states it asks for |

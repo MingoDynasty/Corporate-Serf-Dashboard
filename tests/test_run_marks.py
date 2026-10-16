@@ -21,6 +21,7 @@ from source.components.run_marks import (  # noqa: E402
     Chased,
     RunMark,
     mark_runs,
+    new_pb_gain,
     what_runs_chased,
 )
 from source.components.score_threshold import (  # noqa: E402
@@ -391,6 +392,27 @@ def test_each_version_is_asked_about_once():
     what_runs_chased(runs, basis)
 
     assert asked == [DEFAULT_HASH, OTHER_VERSION]
+
+
+@pytest.mark.parametrize(
+    ("score", "previous_best", "pace_constant", "expected"),
+    [
+        (3324.0, 3000.0, None, "Up 10.8% on your previous best of 3,000"),
+        (980.0, 960.0, 1000.0, "100.0% faster than your previous best of 960"),
+        (12.0, 0.0, None, "Your previous best was 0"),
+        (12.0, -4.5, None, "Your previous best was -4.5"),
+    ],
+)
+def test_new_pb_gain_words_the_gain_by_score_by_pace_or_not_at_all(
+    score, previous_best, pace_constant, expected
+):
+    chased = Chased(
+        previous_best=previous_best,
+        is_new_sensitivity=False,
+        pace_constant=pace_constant,
+    )
+
+    assert new_pb_gain(score, previous_best, chased) == expected
 
 
 # --- A replay on real stats and performance files ------------------------------

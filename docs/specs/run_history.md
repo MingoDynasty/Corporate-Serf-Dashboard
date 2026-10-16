@@ -2,11 +2,12 @@
 
 The Run History page shows one scenario's runs three ways: a chart of every
 run in a range, a list of the runs grouped by session, and a card for the
-last run played. A switch above the list turns it into a view of each session
-whole, across every scenario played in it. A run that lands reaches the page
-with no reload, and the page can follow the scenario just played. A check
-beside a run's score says it met the score threshold and a star says it set a
-new personal best, each judged as of when the run was played.
+last run played, beside a card for the scenario's personal best and its
+leaderboard position. A switch above the list turns it into a view of each
+session whole, across every scenario played in it. A run that lands reaches
+the page with no reload, and the page can follow the scenario just played. A
+check beside a run's score says it met the score threshold and a star says it
+set a new personal best, each judged as of when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -87,9 +88,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   the same gap, and one value sets the list's 500px width for both. The
   second column holds the latest-run card alone, so the card sits over the
   run list and its edges are the list's at every zoom level. The first holds,
-  in order, the dropdowns' column, the Scenario Stats card, and the room left
-  after them, which is kept for notes and holds nothing. Every card is as
-  tall as the row.
+  in order, the dropdowns' column, the Scenario Stats card, the room kept for
+  notes, which holds nothing, and the PB card at its right end, beside the
+  latest-run card. Every card is as tall as the row.
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under
@@ -146,9 +147,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-10-12][hidden-filter]).
 - The first column wraps its pieces on its own width and never on the
   window's ([2026-08-03][content-area]).
-  Where they don't fit on one line, the Scenario Stats card goes to a second
-  line of the column, and the latest-run card stays in the second column, as
-  tall as the row.
+  Where they don't fit on one line, the PB card goes to a second line of the
+  column first, at that line's right end, and then the Scenario Stats card.
+  The latest-run card stays in the second column, as tall as the row.
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
   directory, named by each file's own `Scenario:` field
@@ -232,6 +233,81 @@ of scope here, apart from its chart toolbar, noted under The chart.
   scenario changes, when the Score threshold percentage changes, and when
   the newest session stops being in progress. A run that lands older than
   the run store's newest leaves the card as it was.
+
+## The PB card
+
+- The card reports the selected scenario's personal best as this app
+  records it, worked out from the run store each time, as the latest-run
+  card is. The PB is the earliest run to reach the scenario's high score,
+  the run the playlist scenario table's PB columns read
+  ([2026-10-05][stars]).
+- It is 300px wide, at the right end of the top row's first column, beside
+  the latest-run card, and as tall as the row. Its frame is the other cards'
+  and adds only its border to its height, and its lines are centered in that
+  height.
+- Its first line reads `PB · set {age}`: how long ago the PB run ended,
+  worded as Last played words it, such as `5 days ago`, and worded again
+  every 30 seconds. Hovering or focusing the age shows the exact time, in the
+  shared format with no seconds, such as `Oct 9, 2026, 5:24 PM`
+  ([2026-07-11][timestamps]).
+- The score is large, formatted as the playlist scenario table formats PB
+  Score. Hovering or focusing it shows the line the latest-run card showed
+  when this PB landed: `Up {pct}% on your previous best of {previous}`,
+  `{pct}% faster than your previous best of {previous}` by pace, or
+  `Your previous best was {previous}` over a previous best of zero or less
+  ([2026-10-12][check]).
+  A PB set by the scenario's first run beat nothing, so its score has no
+  hover and no dotted underline.
+- While the Playlist filter holds a benchmark that gives the scenario a
+  ladder, a badge beside the score names the rank the PB has reached, as the
+  benchmark table's Rank column does, in the page's text color on a tint of
+  the rank's color with a border in that color, so a pale rank stays legible
+  in both themes. There is no badge below the first threshold, with no
+  benchmark selected, or for a scenario the benchmark has no ladder for.
+- Under the score is the next rank: `{threshold} {rank} · {gap} · {points}
+  to go`, such as `3,700 Lavender · +1.3% · 47 to go`, or `899 Lavender ·
+  +2.8% faster · 2.83 to go` where the gap is by pace. A dot of the rank's
+  color leads it, and the threshold, a score formatted as PB Score, is bold.
+  The gap is the benchmark table's Next Rank figure and the points its
+  tooltip's, both from the table's own walk of the ladder, with the pace
+  constant chosen as the table chooses it
+  ([2026-09-27][next-rank], [2026-10-05][pace]).
+  Once every rank is reached the line reads `Top rank`. It is hidden with
+  no benchmark selected, with no ladder, and wherever the table's Next Rank
+  cell reads `N/A`.
+- Under the next rank is the leaderboard line, the player's position on
+  KovaaK's board, which [scenario_rank.md](scenario_rank.md) specifies in
+  full: its states, its hints, its hover, and what **Refresh** answers.
+  With a percentile it reads `{percentile}% percentile`, two decimals, and
+  the position and the total are the first line of its hover. In every
+  other state it reads `Position: {value}`, as the Scenario Stats card's
+  Position field did. **Refresh** follows on the same line where it fits.
+- The leaderboard line follows the local PB: a scenario with no local runs
+  has no line, and nothing looks it up. KovaaK's places the best score its
+  server holds, which can differ from the local PB, for example after runs
+  on another computer, and the card shows both as they are.
+- The last line is the PB run's sensitivity and accuracy, in the quieter
+  style of the card's first line: `{cm/360} cm/360 · Accuracy {accuracy}%`.
+  The sensitivity is the scenario table's PB cm/360, trailing zeros dropped
+  ([2026-09-27][trailing-zeros]), and the accuracy is the hit accuracy to the
+  whole percent, as the latest-run card shows a run's. Where the table's PB
+  cm/360 is unknown the line reads `Accuracy {accuracy}%` alone.
+- With no scenario selected the card reads `No scenario selected`, and for
+  a scenario with no local runs `No local PB yet` over `Play this scenario
+  to record one in this app.`. Its first line then reads `PB`, and it has no
+  leaderboard line.
+- The card is rebuilt by every run that lands on the selected scenario,
+  whether or not it sets a new PB: whether the next rank's gap is by pace
+  follows the scenario's newest version, so a run that beats nothing can
+  change it. A new scenario rebuilds it, and the Playlist filter, which
+  decides the badge and the next rank. A run on another scenario leaves it.
+  The position's own reads write the leaderboard line.
+- In every state that can change between runs, the card fits in the row the
+  dropdowns' column sets: 141px at 2560px. With no KovaaK's username the
+  line's hint takes two lines and the row is about 164px.
+- The card is not a landmark or a button, and its first line is text. The
+  dotted score, the percentile, and the age take keyboard focus and show
+  their tooltips, as Last played's does.
 
 ## The chart
 
@@ -834,14 +910,11 @@ of scope here, apart from its chart toolbar, noted under The chart.
 
 - A card in the top row, framed as the latest-run card is, in the theme's
   tokens. Its heading, "Scenario Stats", is an h2 drawn as the card's quiet
-  first line, and under it, at one weight, are "Last played:", "Number of
-  runs:", and "Position:" for the selected scenario. The personal best
-  appears on the chart as the PB score overlay, not as a stats row.
+  first line, and under it, at one weight, are "Last played:" and "Number of
+  runs:" for the selected scenario. The personal best and the leaderboard
+  position are [the PB card's](#the-pb-card).
 - Its text is 300px wide, and its frame adds only a border to its height.
-  The card fits in the row the dropdowns' column sets, its lines centered,
-  unless the Position field's hint takes a line of its own, as it does with
-  no KovaaK's username or with a position served from cache. The card then
-  makes the row about 150px tall.
+  The card fits in the row the dropdowns' column sets, its lines centered.
 - "Last played" is a relative, single-unit humanized string ("5 minutes
   ago"), self-updating on its own 30-second interval
   ([2026-06-21][last-played]).
@@ -853,10 +926,6 @@ of scope here, apart from its chart toolbar, noted under The chart.
   GitHub-shaped format whose JS and Python implementations are kept in sync
   by hand
   ([2026-07-11][timestamps]).
-- The Position field, its inline hints, and its Refresh button are fully
-  specified in [scenario_rank.md](scenario_rank.md#failure-handling). On
-  interval ticks the field re-reads caches only and makes no network calls
-  ([2026-07-01][score-aware]).
 
 ## Run delivery
 
@@ -914,8 +983,8 @@ of scope here, apart from its chart toolbar, noted under The chart.
   the list, and the chart
   ([2026-10-12][column]).
   The top row is then one wrapping line, in order: the dropdowns' column,
-  the Scenario Stats card, and the latest-run card, which joins a line at
-  380px and takes the room left on it.
+  the Scenario Stats card, the PB card, and the latest-run card, which joins
+  a line at 380px and takes the room left on it.
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side
@@ -989,6 +1058,8 @@ of scope here, apart from its chart toolbar, noted under The chart.
 [precision]: ../decision_log/2026/2026-09-27-sensitivity-precision-is-fixed-per-scale-and-its-config-knob-is-retired.md
 [recorded]: ../decision_log/2026/2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md
 [timestamps]: ../decision_log/2026/2026-07-11-humanize-the-absolute-timestamp-format.md
+[next-rank]: ../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md
+[trailing-zeros]: ../decision_log/2026/2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md
 [previous-pb]: ../decision_log/2026/2026-07-08-judge-score-threshold-notifications-against-the-previous-pb.md
 [pre-hydration]: ../decision_log/2026/2026-07-16-keep-pre-hydration-states-honest.md
 [points]: ../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md
@@ -1003,7 +1074,6 @@ of scope here, apart from its chart toolbar, noted under The chart.
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
 [last-played]: ../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md
 [empty-states]: ../decision_log/2026/2026-06-30-model-home-last-played-empty-states-explicitly.md
-[score-aware]: ../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md
 [threads]: ../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md
 [rank-history]: ../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md
