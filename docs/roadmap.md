@@ -33,7 +33,7 @@ sequence.
   record and next rank's score beside the latest run. The leaderboard line
   lives with the PB, the latest-run card aligns over the run list, and both
   cards show relative ages with exact times on hover and focus. (PRs #380,
-  #383 and the Category shipping PR; design in #379) Design rationale
+  #383 and #384; design in #379) Design rationale
   distilled into [`decision_log/`](./decision_log/README.md).
 - **The Run History page** — the page that charts a scenario's scores now
   shows every run, and where each run fits in a session. Its chart plots

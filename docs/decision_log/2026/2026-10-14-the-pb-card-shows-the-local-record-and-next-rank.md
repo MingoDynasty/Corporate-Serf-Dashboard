@@ -6,8 +6,8 @@ Run History gives the selected scenario's personal best a card beside the
 latest run, making the record to beat visible without a chart overlay. The
 next rank's score sits under the PB score, with the gap and amount still
 needed, so the benchmark milestone is visible without arithmetic or a hover.
-The leaderboard standing follows underneath, and the PB run's sensitivity
-and accuracy give quieter context for that record.
+The leaderboard standing follows underneath. The PB run's sensitivity and
+accuracy give quieter context for that record.
 
 **Ruling and delivery.** T3 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`, as amended after review

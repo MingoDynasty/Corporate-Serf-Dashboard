@@ -2,11 +2,11 @@
 
 Status: Accepted
 
-Run History stacks its two dropdowns and gives the scenario, its personal
-best, and the latest run their own cards. The latest-run card sits directly
-over the run list, so the target and result are close without spending the
-row on empty space. A small Follow switch sits under the scenario dropdown,
-and the row keeps room for a later notes feature.
+Run History stacks its dropdowns to give each kind of information its own
+card. The personal best sits beside the latest run so the record and result
+compare at a glance. The latest-run card aligns over the run list instead
+of filling the remaining width. The Follow switch sits under the scenario
+dropdown, accepting a slightly taller row.
 
 **Rulings and delivery.** T1 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`: "I ratify Proposal 1,

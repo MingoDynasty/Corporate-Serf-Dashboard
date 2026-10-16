@@ -2,8 +2,8 @@
 
 Status: Accepted
 
-Scenario Stats puts the selected scenario's benchmark category before Last
-played and Number of runs. The Playlist filter determines which benchmark's
+Scenario Stats names the selected scenario's benchmark category above its
+history. The Playlist filter determines which benchmark's
 category it names, because a scenario can belong to several benchmarks.
 When that benchmark has no groups or does not list the scenario, the row
 disappears so the card holds only useful facts.

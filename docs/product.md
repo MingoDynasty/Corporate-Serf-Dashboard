@@ -286,8 +286,8 @@ the same form as the finished ones under it.
 
 ### Standing: where do I rank
 
-- **The target and result together on Run History** (PRs #380, #383 and the
-  Category shipping PR; design in #379). The top row gives the selected
+- **The target and result together on Run History** (PRs #380, #383 and #384;
+  design in #379). The top row gives the selected
   scenario's personal best and its next rank's score a card beside the latest
   run. The benchmark category, Last played and Number of runs stay together
   in Scenario Stats, and the leaderboard percentile moves beside the PB.
