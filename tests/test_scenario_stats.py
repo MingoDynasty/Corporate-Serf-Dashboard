@@ -19,6 +19,9 @@ from dash._callback import (
 )
 
 from source.components import chart_options, scenario_selection, scenario_stats
+from source.kovaaks import data_service, playlist_scenarios_service
+from source.kovaaks.data_models import PlaylistData, Rank, Scenario
+from source.kovaaks.scenario_groups import GROUP_EXCLUDED_PLAYLIST_CODES, ScenarioGroup
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -153,6 +156,7 @@ SECOND_PAGE_IDS = scenario_stats.ScenarioStatsIds(
 PAGE_BUILT_FIELDS = (
     "run_events",
     "scenario_dropdown",
+    "playlist_filter",
     "relative_time_interval",
 )
 
@@ -181,6 +185,15 @@ def _card_registrations(ids) -> list[tuple]:
 def _expected_registrations(ids) -> list[tuple]:
     """List what ``register_scenario_stats`` registers for ``ids``, in order."""
     return [
+        (
+            scenario_stats.get_scenario_category,
+            [
+                f"{ids.run_events}.data",
+                f"{ids.scenario_dropdown}.value",
+                f"{ids.playlist_filter}.value",
+            ],
+            [],
+        ),
         (
             scenario_stats.get_scenario_num_runs,
             [f"{ids.run_events}.data", f"{ids.scenario_dropdown}.value"],
@@ -226,7 +239,10 @@ def test_the_card_holds_last_played_and_the_run_count_and_no_position(monkeypatc
         if isinstance(child, str) and child
     ]
 
-    assert texts == ["Scenario Stats", "Last played:", "Number of runs: "]
+    assert texts == ["Scenario Stats", "Category: ", "Last played:", "Number of runs: "]
+    assert components[IDS.category_row].hidden is True
+    assert components[IDS.category_row].children.children[0].fw == 700
+    assert components[IDS.category_row].children.size == "sm"
     assert run_history.PB_CARD_IDS.rank in components
     assert run_history.PB_CARD_IDS.rank not in {
         getattr(component, "id", None) for component in _walk_components(card)
@@ -276,6 +292,8 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
     assert {
         key.rpartition(".")[0] for entry in added for key in _output_keys(entry)
     } == {
+        "second-category",
+        "second-category_row",
         "second-num_runs",
         "second-last_played",
         "second-last_played_tooltip",
@@ -283,3 +301,86 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "second-last_played_empty_value",
     }
     assert _card_registrations(IDS) == first_page
+
+
+@pytest.fixture
+def grouped_playlists(monkeypatch):
+    rank = Rank(name="Gold", color="#ffcc00", threshold=100)
+    playlists = {
+        code: PlaylistData(
+            name=code,
+            code=code,
+            scenarios=[
+                Scenario(name=name, ranks=[rank]) for name in ("Other", "Shared")
+            ],
+        )
+        for code in ("Two", "One", "Ungrouped", "WrongLength")
+    }
+    playlists["Plain"] = PlaylistData(
+        name="Plain", code="Plain", scenarios=[Scenario(name="Shared")]
+    )
+    group = ScenarioGroup("Control Tracking", None, 0, "Arm", None, 0)
+    one = ScenarioGroup("Clicking", None, 0, "", None, 0)
+    monkeypatch.setattr(data_service, "playlist_database", playlists)
+    monkeypatch.setattr(
+        data_service,
+        "_bundled_scenario_groups",
+        {"Two": (one, group), "One": (group, one), "WrongLength": (group,)},
+    )
+    return playlists
+
+
+@pytest.mark.parametrize(
+    ("scenario", "code", "expected"),
+    [
+        ("Shared", "Two", ("Control Tracking · Arm", False)),
+        ("Shared", "One", ("Clicking", False)),
+        ("Other", "Two", ("Clicking", False)),
+        ("Shared", "Ungrouped", ("", True)),
+        ("Shared", "Plain", ("", True)),
+        ("Absent", "Two", ("", True)),
+        ("Shared", "WrongLength", ("", True)),
+        ("Shared", "Unknown", ("", True)),
+        ("Shared", None, ("", True)),
+        (None, "Two", ("", True)),
+    ],
+)
+def test_category_reads_the_selected_benchmarks_own_table_group(
+    grouped_playlists, scenario, code, expected
+):
+    assert scenario_stats.get_scenario_category(None, scenario, code) == expected
+    if code in grouped_playlists:
+        groups = playlist_scenarios_service.playlist_scenario_groups(
+            grouped_playlists[code]
+        )
+        if code == "WrongLength":
+            assert groups == (None, None)
+
+
+def test_a_filter_change_alone_rewrites_category(grouped_playlists):
+    assert scenario_stats.get_scenario_category(None, "Shared", "Two") == (
+        "Control Tracking · Arm",
+        False,
+    )
+    assert scenario_stats.get_scenario_category(None, "Shared", "One") == (
+        "Clicking",
+        False,
+    )
+    assert scenario_stats.get_scenario_category(None, "Shared", None) == ("", True)
+
+
+def test_an_excluded_bundled_benchmark_has_no_category(monkeypatch):
+    monkeypatch.setattr(data_service, "playlist_database", {})
+    monkeypatch.setattr(data_service, "_bundled_scenario_groups", {})
+    data_service.load_playlists()
+    code = next(iter(GROUP_EXCLUDED_PLAYLIST_CODES))
+    playlist = data_service.get_playlist_by_code(code)
+    assert playlist is not None
+    assert data_service.is_benchmark_playlist(playlist)
+    assert data_service.get_scenario_groups(code) is None
+    assert scenario_stats.get_scenario_category(
+        None, playlist.scenarios[0].name, code
+    ) == (
+        "",
+        True,
+    )

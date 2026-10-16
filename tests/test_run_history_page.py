@@ -1541,12 +1541,12 @@ def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
     assert "justify-content: center;" in card
 
 
-def test_the_stats_card_keeps_300px_for_its_text_and_adds_only_its_border():
-    """Every line breaks where it did, and the frame adds no height but its border."""
+def test_the_stats_card_is_270px_and_adds_only_its_border_to_the_height():
+    """Category fits beside the PB card without padding raising the row."""
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".scenario-stats-card")
 
-    assert "width: calc(300px + 2 * var(--mantine-spacing-sm) + 2px);" in card
+    assert "width: 270px;" in card
     assert "padding: 0 var(--mantine-spacing-sm);" in card
     assert "flex: 0 0 auto;" in card
     assert "justify-content: center;" in card

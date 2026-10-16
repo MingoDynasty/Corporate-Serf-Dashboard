@@ -201,6 +201,8 @@ LATEST_RUN_CARD_IDS = LatestRunCardIds(
     body="run-history-card-body",
 )
 SCENARIO_STATS_IDS = ScenarioStatsIds(
+    category_row="run-history-category-row",
+    category="run-history-category",
     last_played="run-history-last-played",
     last_played_tooltip="run-history-last-played-tooltip",
     num_runs="run-history-num-runs",
@@ -208,6 +210,7 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
     last_played_empty_value="run-history-last-played-empty-value",
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 # The position's ids are the ones it had in the Scenario Stats card. No browser

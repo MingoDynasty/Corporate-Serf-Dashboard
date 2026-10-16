@@ -1,7 +1,7 @@
 """Build the Scenario Stats card and wire its callbacks to a page's ids.
 
-The card holds the Scenario Stats heading and, under it, Last played and
-Number of runs. A page that hosts it fills in a ``ScenarioStatsIds``, puts
+The card holds Category, Last played and Number of runs under its heading.
+A page that hosts it fills in a ``ScenarioStatsIds``, puts
 ``scenario_stats_stores`` and ``scenario_stats_panel`` in its layout, and
 calls ``register_scenario_stats`` with the ids once, at import. The callbacks
 are plain functions here and are registered once per page.
@@ -16,10 +16,17 @@ from dash import (
     callback,
     clientside_callback,
     dcc,
+    html,
 )
 
 from source.components.chart_options import TOOLTIP_EVENTS
-from source.kovaaks.data_service import get_scenario_stats, is_scenario_in_database
+from source.kovaaks.data_service import (
+    get_playlist_by_code,
+    get_scenario_stats,
+    is_benchmark_playlist,
+    is_scenario_in_database,
+)
+from source.kovaaks.playlist_scenarios_service import playlist_scenario_groups
 from source.utilities.utilities import format_absolute_timestamp
 
 
@@ -31,7 +38,7 @@ class ScenarioStatsIds(NamedTuple):
 
     ``scenario_stats_stores`` builds the stores, whose ids here end in
     ``_ts`` or ``_empty_value``, and ``scenario_stats_panel`` builds the
-    rest of the card. ``run_events``, ``scenario_dropdown`` and
+    rest of the card. ``run_events``, ``scenario_dropdown``, ``playlist_filter`` and
     ``relative_time_interval`` are the page's own. The card reads them and
     builds none of them:
 
@@ -41,6 +48,8 @@ class ScenarioStatsIds(NamedTuple):
       seconds, so the Last played text stays current on a page left open.
     """
 
+    category_row: str
+    category: str
     last_played: str
     last_played_tooltip: str
     num_runs: str
@@ -48,7 +57,29 @@ class ScenarioStatsIds(NamedTuple):
     last_played_empty_value: str
     run_events: str
     scenario_dropdown: str
+    playlist_filter: str
     relative_time_interval: str
+
+
+def get_scenario_category(
+    _, selected_scenario: str | None, playlist_code: str | None
+) -> tuple[str, bool]:
+    """Read the selected benchmark's table group and whether to hide its row."""
+    if not selected_scenario or not playlist_code:
+        return "", True
+    playlist = get_playlist_by_code(playlist_code)
+    if playlist is None or not is_benchmark_playlist(playlist):
+        return "", True
+    groups = playlist_scenario_groups(playlist)
+    for scenario, group in zip(playlist.scenarios, groups, strict=True):
+        if scenario.name == selected_scenario and group is not None:
+            return (
+                f"{group.category} · {group.subcategory}"
+                if group.subcategory
+                else group.category,
+                False,
+            )
+    return "", True
 
 
 def get_scenario_num_runs(
@@ -112,6 +143,17 @@ def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
                 className="scenario-stats-heading",
                 order=2,
             ),
+            html.Div(
+                dmc.Text(
+                    [
+                        dmc.Text("Category: ", fw=700, span=True),
+                        dmc.Text(id=ids.category, span=True),
+                    ],
+                    size="sm",
+                ),
+                id=ids.category_row,
+                hidden=True,
+            ),
             dmc.Group(
                 [
                     dmc.Text(
@@ -159,6 +201,16 @@ def register_scenario_stats(ids: ScenarioStatsIds) -> None:
 
     Call once per page, at import, with the ids its layout is built from.
     """
+    callback(
+        Output(ids.category, "children"),
+        Output(ids.category_row, "hidden"),
+        # On a visit without query parameters the selection callback writes
+        # neither dropdown. An independent Input keeps Dash from pruning
+        # this initial call, so a remembered benchmark still gets its row.
+        Input(ids.run_events, "data"),
+        Input(ids.scenario_dropdown, "value"),
+        Input(ids.playlist_filter, "value"),
+    )(get_scenario_category)
     callback(
         Output(ids.num_runs, "children"),
         Output(ids.last_played_ts, "data"),
