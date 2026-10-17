@@ -18,6 +18,13 @@ The list and the panel are not stacked in one column because the panel is
 opened now and then to tune something, while the list is what the page is
 for. In a narrow window the list drops under the top row, above the chart.
 
+**Superseded in part (2026-10-15).** [T1 of the top-row cards](2026-10-14-run-historys-top-row-has-one-card-per-kind-of-information.md)
+replaces the top row's order and the latest-run card filling its remaining
+width: the dropdowns are stacked, Scenario Stats and PB occupy the first
+column, and the latest-run card sits over the run list in their shared
+500px column. The amended Follow switch sits under the scenario dropdown.
+The list's width, its relation to the chart, and the rest of this entry stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." This entry is row R3, ratified as recommended.
