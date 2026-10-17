@@ -137,6 +137,21 @@ commands becomes burdensome.
 
 ## UI/UX
 
+### Watch for `is_scenario_in_database` early-return pattern
+
+Run History's PB card deliberately skips leaderboard lookups without local
+runs, by [T3's local-PB contract](decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md).
+That exception does not apply to the playlist scenario table: its Position,
+Total Players and Percentile can describe a record KovaaK's holds even when
+this app has no local runs for the scenario.
+
+Keep the table's `playlist_scenarios_service._lookup_rank_info` independent
+of local run data. An `is_scenario_in_database` guard there would restore
+the PR #9 regression, hiding remote positions for unplayed local scenarios.
+The overview's percentile aggregates remain
+[played-only](specs/playlists.md#the-overview); that aggregate scope is
+separate from the table's per-scenario lookup scope.
+
 ### A stored column choice can apply after the scenario table's first rows
 
 On a machine a quarter to a half slower than the maintainer's, a playlist's

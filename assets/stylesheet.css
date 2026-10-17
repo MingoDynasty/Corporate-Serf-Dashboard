@@ -354,8 +354,9 @@ a.run-toast-link:hover {
     border-radius: var(--mantine-radius-sm);
 }
 
-/* The frame adds only its border to the height. Centering the lines keeps
-   Category appearing or disappearing from moving the cards beside it. */
+/* The frame adds only its border to the height, so with Category's line the
+   card still fits in the row the dropdown column sets. Its lines are
+   centered in that height, as the latest-run card's are. */
 .scenario-stats-card {
     display: flex;
     flex: 0 0 auto;

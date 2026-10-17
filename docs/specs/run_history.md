@@ -1,13 +1,11 @@
 # Run History
 
-The Run History page shows one scenario's runs three ways: a chart of every
-run in a range, a list of the runs grouped by session, and a card for the
-last run played, beside a card for the scenario's personal best and its
-leaderboard position, with the benchmark category beside it. A switch above
-the list turns it into a view of each session whole, across every scenario played in it. A run that lands reaches
-the page with no reload, and the page can follow the scenario just played. A
-check beside a run's score says it met the score threshold and a star says it
-set a new personal best, each judged as of when the run was played.
+Run History charts one scenario's runs beside a list grouped by session.
+Its top row gives the scenario's benchmark category and history their own
+card alongside the personal best and latest run. The page receives new runs
+without a reload and can follow the scenario just played. A check marks a
+run that met its score threshold and a star marks a new personal best, each
+judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale

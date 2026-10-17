@@ -339,7 +339,6 @@ def grouped_playlists(monkeypatch):
         ("Shared", "Ungrouped", ("", True)),
         ("Shared", "Plain", ("", True)),
         ("Absent", "Two", ("", True)),
-        ("Shared", "WrongLength", ("", True)),
         ("Shared", "Unknown", ("", True)),
         ("Shared", None, ("", True)),
         (None, "Two", ("", True)),
@@ -349,12 +348,16 @@ def test_category_reads_the_selected_benchmarks_own_table_group(
     grouped_playlists, scenario, code, expected
 ):
     assert scenario_stats.get_scenario_category(None, scenario, code) == expected
-    if code in grouped_playlists:
-        groups = playlist_scenarios_service.playlist_scenario_groups(
-            grouped_playlists[code]
-        )
-        if code == "WrongLength":
-            assert groups == (None, None)
+
+
+def test_category_and_table_omit_misaligned_groups(grouped_playlists):
+    assert playlist_scenarios_service.playlist_scenario_groups(
+        grouped_playlists["WrongLength"]
+    ) == (None, None)
+    assert scenario_stats.get_scenario_category(None, "Shared", "WrongLength") == (
+        "",
+        True,
+    )
 
 
 def test_a_filter_change_alone_rewrites_category(grouped_playlists):
@@ -369,9 +372,22 @@ def test_a_filter_change_alone_rewrites_category(grouped_playlists):
     assert scenario_stats.get_scenario_category(None, "Shared", None) == ("", True)
 
 
-def test_an_excluded_bundled_benchmark_has_no_category(monkeypatch):
-    monkeypatch.setattr(data_service, "playlist_database", {})
-    monkeypatch.setattr(data_service, "_bundled_scenario_groups", {})
+def test_an_excluded_bundled_benchmark_has_no_category(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        data_service, "USER_PLAYLIST_DIRECTORY_PATH", tmp_path / "playlists"
+    )
+    for name, empty in (
+        ("playlist_database", {}),
+        ("playlist_startup_warning_queue", []),
+        ("_user_root_playlist_codes", set()),
+        ("_user_root_playlist_files", {}),
+        ("_superseded_user_playlist_files", []),
+        ("_bundled_seed_pairs", []),
+        ("_bundled_benchmark_ids", {}),
+        ("_bundled_scenario_groups", {}),
+        ("_bundled_corpus_load_complete", True),
+    ):
+        monkeypatch.setattr(data_service, name, empty)
     data_service.load_playlists()
     code = next(iter(GROUP_EXCLUDED_PLAYLIST_CODES))
     playlist = data_service.get_playlist_by_code(code)

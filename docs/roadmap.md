@@ -93,6 +93,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
   line. Its argument rests on the card's alignment over the list. This is
   upcoming design work, not a change to the card's current scope.
 
+  Why it's next: the top row now puts two large scores side by side, but
+  during a lookup they can refer to different scenarios.
+
   Notes on a scenario remain a separate proposal for the room kept in the
   first column. Current behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
