@@ -30,10 +30,10 @@ challenge any of it.
 This proposal builds on the top row cards (Proposal 1, rows T1 to T4,
 ratified on 2026-10-14 in #379), which are not reopened here. T1 kept the
 room this proposal fills, and T4 set how a card orders its lines and that an
-age reads relative with the exact time on hover. It runs in parallel with
-Proposal 2, the latest-run card following the selection (#388). The two meet
-in one place, the callback that selects a scenario
-([Proposal 2](#proposal-2)).
+age reads relative with the exact time on hover. Proposal 2, the latest-run
+card following the selection (#388), was ratified on 2026-10-18 and is not
+built yet. The two implementations meet in the callback that selects a
+scenario ([Proposal 2](#proposal-2)).
 
 ### SN1. A note is one plain-text note per scenario, rewritten in place
 
@@ -698,16 +698,17 @@ the tick rewrites only the age, which shows only while reading.
 
 ### Proposal 2
 
-Proposal 2 (#388) is in review in parallel, and both can be implemented in
-parallel. They meet in two places:
+Proposal 2 (#388) was ratified and merged on 2026-10-18; its one
+implementation PR is not built yet. That PR and this proposal's can be built
+in parallel. They meet in two places:
 
 - **The selection callback.** This proposal adds inputs to it: the dialog's
   answers and the editor's unsaved state. Proposal 2's R1 removes one, the
   latest-run card's **Show {scenario}** button, which this proposal names as a
   route "while it exists". Whichever implementation merges second rebases
   onto the first and re-checks the whole selection flow.
-- **The Run History spec and the roadmap.** Both edit the top row and the
-  selection statements, and both edit the roadmap's Upcoming entry.
+- **The Run History spec.** Both edit the top row and the selection
+  statements.
 
 While Follow waits on a note, today's latest-run card moves to the newest run
 on any scenario. Under R1 it would stay on the edited scenario, which agrees
