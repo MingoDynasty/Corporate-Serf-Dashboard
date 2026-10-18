@@ -52,7 +52,6 @@ class RunData:
     horizontal_sens: float
     scenario: str
     accuracy: float
-    damage_accuracy: float | None = None
     recorded_sensitivity: RecordedSensitivity | None = None
     scenario_hash: str | None = None
     stats_file_name: str | None = None

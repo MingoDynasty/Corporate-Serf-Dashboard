@@ -96,7 +96,6 @@ def test_format_playlist_scenario_rank_row_ranked():
         horizontal_sens=45,
         scenario="VT Pasu Intermediate S5",
         accuracy=0.67,
-        damage_accuracy=0.7615,
     )
 
     row = format_playlist_scenario_rank_row(
@@ -223,7 +222,6 @@ def test_pb_accuracy_is_the_hit_accuracy_as_run_history_shows_it(accuracy, shown
         horizontal_sens=50,
         scenario="VoxTS Click Medium",
         accuracy=accuracy,
-        damage_accuracy=accuracy / 2,
     )
 
     row = format_playlist_scenario_rank_row(
@@ -345,7 +343,6 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
             horizontal_sens=42.5,
             scenario="First",
             accuracy=0.65,
-            damage_accuracy=0.8125,
         ),
         "Third": RunData(
             datetime_object=datetime(2026, 4, 3, 12, 0, 0),
@@ -354,7 +351,6 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
             horizontal_sens=45,
             scenario="Third",
             accuracy=0.72,
-            damage_accuracy=0.8234,
         ),
     }
     monkeypatch.setattr(

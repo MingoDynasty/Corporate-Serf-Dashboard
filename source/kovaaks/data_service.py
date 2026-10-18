@@ -746,7 +746,6 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     """
     accuracy = None
     shots_fired = None
-    damage_accuracy = None
     horizontal_sens = None
     scenario = None
     score = None
@@ -782,18 +781,6 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                         # from another row: a file can list several weapons,
                         # and the two must describe the same one.
                         shots_fired = shots
-
-                # Damage columns are useful for PB metadata, but keep them
-                # optional so older/shorter CSV rows still parse hit accuracy.
-                if len(values) >= 5:
-                    try:
-                        damage_done = float(values[3])
-                        damage_possible = float(values[4])
-                    except ValueError:
-                        pass
-                    else:
-                        if damage_possible > 0:
-                            damage_accuracy = damage_done / damage_possible
                 sub_csv_line = False
                 continue
 
@@ -883,7 +870,6 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         horizontal_sens=horizontal_sens,
         scenario=scenario,
         accuracy=accuracy,
-        damage_accuracy=damage_accuracy,
         recorded_sensitivity=recorded_sensitivity,
         # An empty ``Hash:`` reads as no hash: it names no version of the
         # scenario, so the run's score must never join a pace comparison.
