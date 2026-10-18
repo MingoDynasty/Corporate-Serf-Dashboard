@@ -805,7 +805,7 @@ scored, at most two, with a half rounding up, then formatted as a score is.
 So a window of whole-number scores whose median is 2,140.5 shows `2,141`,
 never `2,140.5`, a scenario scored to one decimal shows one, and a tracking
 scenario's six decimals show two. The half-up step is a `Decimal` quantize
-with `ROUND_HALF_UP`, as `format_whole_percent` rounds: `round()` and
+with `ROUND_HALF_UP`: `round()` and
 `format_score`'s format spec both round a half to even, so `round(2140.5)`
 is 2140. A median or a percentile is shown no more
 precisely than the runs it comes from, as the roadmap's honesty principle
