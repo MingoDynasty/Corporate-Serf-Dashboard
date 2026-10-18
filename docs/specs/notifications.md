@@ -15,7 +15,7 @@ in those entries, not here. A statement with no link is an implementation
 fact that no decision-log entry governs. Runtime structure, including the
 thread-to-UI channels, is mapped in [architecture.md](../architecture.md);
 the user-facing rationale is in [product.md](../product.md). Toasts that
-belong to another capability — the Position field's hints, the manual
+belong to another capability — the PB card's leaderboard hints, the manual
 Refresh outcomes, the Steam ID mismatch, the playlist outcome toasts — are
 named here only as instances of the routing policy; their owning spec keeps
 their full behavior.
@@ -228,7 +228,8 @@ toasts under, and it applies to every toast the app adds from here on
   The mismatch toast itself is specified in
   [scenario_rank.md](scenario_rank.md#data-sources-and-identity).
 - An unset KovaaK's username is persistent configuration state, never a
-  failure: the Position field and both playlist pages state it in place, and
+  failure: the PB card's leaderboard line and both playlist pages state it in
+  place, and
   the only toast it earns is the blue answer to a Refresh click, on its own
   standing-condition channel
   ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)

@@ -11,6 +11,12 @@ under its own version of the scenario and never under the version a newer run
 names. Changing the threshold percentage re-marks every run at once, because
 the percentage in force when an old run was played was never recorded.
 
+**Superseded in part (2026-10-15).** [T4's age rule](2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md)
+makes the latest-run card's time relative, with its exact time on hover and
+focus. Its time-of-day or date display below is historical. The card still
+reports the last run played on whatever scenario, and every rule of its
+marks and comparisons stands.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." Nothing here was a numbered row. It is the

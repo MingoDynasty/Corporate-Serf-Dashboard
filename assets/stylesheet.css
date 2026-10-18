@@ -354,9 +354,9 @@ a.run-toast-link:hover {
     border-radius: var(--mantine-radius-sm);
 }
 
-/* The Scenario Stats card. Its text is 300px wide inside the frame, which
-   adds only its border to the height. Its lines are centered in the row's
-   height, as the latest-run card's are. */
+/* The frame adds only its border to the height, so with Category's line the
+   card still fits in the row the dropdown column sets. Its lines are
+   centered in that height, as the latest-run card's are. */
 .scenario-stats-card {
     display: flex;
     flex: 0 0 auto;
@@ -364,7 +364,7 @@ a.run-toast-link:hover {
     justify-content: center;
     max-width: 100%;
     padding: 0 var(--mantine-spacing-sm);
-    width: calc(300px + 2 * var(--mantine-spacing-sm) + 2px);
+    width: 270px;
 }
 
 /* The card's heading, drawn as the latest-run card's first line. */

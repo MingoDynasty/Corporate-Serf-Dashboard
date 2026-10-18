@@ -139,11 +139,18 @@ commands becomes burdensome.
 
 ### Watch for `is_scenario_in_database` early-return pattern
 
-The rank callback, now in `source/components/scenario_stats.py`, previously had a bug where it short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.
+Run History's PB card deliberately skips leaderboard lookups without local
+runs, by [T3's local-PB contract](decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md).
+That exception does not apply to the playlist scenario table: its Position,
+Total Players and Percentile can describe a record KovaaK's holds even when
+this app has no local runs for the scenario.
 
-When building new UI features that consume `get_scenario_rank_info(...)`, grep for similar "is this in the local database" guards and confirm they do not inadvertently block lookups for unplayed scenarios.
-
-This is not a current bug; it is a code-pattern reminder so the same mistake does not recur.
+Keep the table's `playlist_scenarios_service._lookup_rank_info` independent
+of local run data. An `is_scenario_in_database` guard there would restore
+the PR #9 regression, hiding remote positions for unplayed local scenarios.
+The overview's percentile aggregates remain
+[played-only](specs/playlists.md#the-overview); that aggregate scope is
+separate from the table's per-scenario lookup scope.
 
 ### A stored column choice can apply after the scenario table's first rows
 

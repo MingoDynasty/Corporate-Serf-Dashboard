@@ -166,7 +166,9 @@ def _scenario_ladders(playlist: PlaylistData) -> tuple[list[Rank] | None, ...]:
     return tuple(scenario.ranks or [] for scenario in playlist.scenarios)
 
 
-def _scenario_groups(playlist: PlaylistData) -> tuple[ScenarioGroup | None, ...]:
+def playlist_scenario_groups(
+    playlist: PlaylistData,
+) -> tuple[ScenarioGroup | None, ...]:
     """Pick each row's group: ``None`` wherever the playlist has no groups."""
     groups = get_scenario_groups(playlist.code)
     # The join sizes the groups to the scenario list it was given. A list of
@@ -621,7 +623,7 @@ def build_playlist_scenario_rank_rows(
 
     rows = []
     ladders = _scenario_ladders(playlist)
-    groups = _scenario_groups(playlist)
+    groups = playlist_scenario_groups(playlist)
     for index, (scenario, ladder, group) in enumerate(
         zip(playlist.scenarios, ladders, groups, strict=True)
     ):
@@ -699,7 +701,7 @@ def start_playlist_scenario_fill(
         playlist_code=playlist_code,
         scenario_names=scenario_names,
         scenario_ladders=_scenario_ladders(playlist),
-        scenario_groups=_scenario_groups(playlist),
+        scenario_groups=playlist_scenario_groups(playlist),
         total=len(scenario_names),
         unresolved_indices=set(range(len(scenario_names))),
     )

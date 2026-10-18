@@ -559,8 +559,8 @@ flowchart LR
   read or the overlays. That function restyles
   traces selected by name: the size and color go to the run trace, and the
   size alone to the New PB stars and the latest run's ring.
-  The Scenario Stats card (Last played and Number of runs) is built by
-  `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
+  The Scenario Stats card (Category, Last played and Number of runs) is built
+  by `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
   `register_scenario_stats` wires that module's callbacks to the same ids.
   The PB card, with Position as its leaderboard line, is built the same way
   by `components/pb_card.py` from `PB_CARD_IDS`, wired by
@@ -895,14 +895,17 @@ flowchart LR
   threshold line is drawn at, from the current personal best.
   `normalize_score_threshold_percentage()` reads the percentage input, which
   is empty while the user is clearing it.
-- `components/scenario_stats.py` — the Scenario Stats card: Last played and
-  Number of runs. A page fills in a `ScenarioStatsIds`: an id for each
-  component the card builds, plus the page's own run-events store, scenario
-  dropdown, and 30-second interval, which the card only reads. It puts
+- `components/scenario_stats.py` — the Scenario Stats card: Category, Last
+  played and Number of runs. A page fills in a `ScenarioStatsIds`: an id for
+  each component the card builds, plus the page's own run-events store, scenario
+  dropdown, playlist filter, and 30-second interval, which the card only
+  reads. It puts
   `scenario_stats_stores()` and `scenario_stats_panel()` in its layout and
   calls `register_scenario_stats()` with the ids once, at import, which
-  registers `get_scenario_num_runs` and the clientside callback that words
-  the Last played text. What the card shows is specified in
+  registers `get_scenario_category`, `get_scenario_num_runs` and the clientside
+  callback that words the Last played text. Category reads the selected
+  benchmark's group through the table's `playlist_scenario_groups` length
+  guard. What the card shows is specified in
   [run_history.md](specs/run_history.md#scenario-stats).
 - `components/pb_card.py` — the Run History page's PB card, with the
   leaderboard position as its leaderboard line. `personal_best()` is one
@@ -1112,8 +1115,9 @@ flowchart LR
   the scenario's leaderboard ID, read from the name-to-ID mapping on every
   path. A row of a benchmark that has groups carries six more fields from
   `scenario_group_fields`: the category's and the subcategory's name, color,
-  and run number. The fill state captures the groups at registration, beside
-  the ladders, so all three row paths carry them.
+  and run number. `playlist_scenario_groups` shares the length guard with
+  Scenario Stats so both omit misaligned groups. The fill state captures the
+  groups at registration, beside the ladders, so all three row paths carry them.
 - `performance_file.py` — pure reader for a KovaaK's performance file and the
   countdown check (`read_performance_file`): bytes in, one of three answers
   out (`Scoring`: time-scored, not time-scored, can't answer), with the

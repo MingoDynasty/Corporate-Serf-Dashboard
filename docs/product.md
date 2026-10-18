@@ -286,6 +286,17 @@ the same form as the finished ones under it.
 
 ### Standing: where do I rank
 
+- **The target and result together on Run History** (PRs #380, #383 and #384;
+  design in #379). The top row gives the selected
+  scenario's personal best and its next rank's score a card beside the latest
+  run. The benchmark category, Last played and Number of runs stay together
+  in Scenario Stats, and the leaderboard percentile moves beside the PB.
+  *Problem solved:* the record to beat used to be only a chart line that
+  could be hidden, the next rank was on another page, and the latest-run
+  card spent most of its width on empty space. The two scores now compare
+  at a glance, with the benchmark's category explaining what is being
+  practiced. Relative ages also show the break since the last run without
+  calculating it from a clock time.
 - **Scenario rank and percentile** (PRs #8–#10). The Run History page
   shows your global leaderboard standing for the selected scenario, led by
   its percentile — `82.33% percentile`, with `Position 11,290 of 63,892` on
