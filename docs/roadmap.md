@@ -161,9 +161,9 @@ next.
   playlist-first navigation; this would answer "show me this scenario
   regardless of playlist."
 - **Weakness by the typical run** — columns on the playlist scenario table
-  that rank weakness by the typical run instead of the personal best. They
-  wait on a re-check, due around 2026-10-09, of the evidence that the typical
-  run orders weaknesses better. The typical run they read is defined in the
+  that rank weakness by the typical run instead of the personal best. A
+  re-check on 2026-10-14 still found the typical run ordering weaknesses
+  better, on thin evidence. They wait on its definition, in the
   [typical score proposal](./proposals/typical_score_proposal.md).
 - **An overview** — time spent and activity across all scenarios. No design
   yet. Home, the page the app opens on, holds its place.
