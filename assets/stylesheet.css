@@ -639,8 +639,8 @@ a.run-toast-link:hover {
     min-width: 0;
 }
 
-/* The run list fills its column: the heading line, then the grid, which
-   scrolls inside its own box so the chart beside it never moves. */
+/* The run list fills its column: the header, then the grid, which scrolls
+   inside its own box so the chart beside it never moves. */
 .run-history-list {
     border: 1px solid var(--mantine-color-default-border);
     border-radius: var(--mantine-radius-sm);
@@ -651,11 +651,11 @@ a.run-toast-link:hover {
     overflow: hidden;
 }
 
-/* The heading line, then a line of its own with the switch between the
-   views at the left and the two buttons at the right. Beside the buttons the
-   heading had about 240px, which cut a scenario's name short before its run
-   count. The second line wraps on the list's own width, and where the three
-   do not fit, the buttons go under the switch. */
+/* The switch between the views at the left and the two buttons at the right,
+   on one line. The heading line is in the header for a screen reader only,
+   and its absolute position takes it out of the line. The line wraps on the
+   list's own width, and where the three do not fit, the buttons go under the
+   switch. */
 .run-history-list-header {
     align-items: center;
     display: flex;
@@ -664,14 +664,6 @@ a.run-toast-link:hover {
     gap: var(--mantine-spacing-xs);
     justify-content: space-between;
     padding: var(--mantine-spacing-xs);
-}
-
-/* A whole line, which is what puts the controls on the next one. min-width:
-   0 because a flex item's automatic minimum is its text, and a name longer
-   than the line would push the list wider than its column. */
-.run-history-list-heading {
-    flex: 1 0 100%;
-    min-width: 0;
 }
 
 /* The left margin holds the buttons at the right when they wrap under the
@@ -708,9 +700,9 @@ a.run-toast-link:hover {
     display: block;
 }
 
-/* In the page for a screen reader and for nothing else: the name of the
-   list's marks column, the reason a run has no check, and the line that
-   says a row was opened or closed. */
+/* In the page for a screen reader and for nothing else: the run list's
+   heading line, the name of its marks column, the reason a run has no check,
+   and the line that says a row was opened or closed. */
 .visually-hidden {
     clip-path: inset(50%);
     height: 1px;

@@ -829,8 +829,10 @@ def run_list_class(model: RunListModel) -> str:
 def run_list_panel(ids: RunListIds) -> dmc.Box:
     """Build the list: its header, the grid, and the text for nothing to list.
 
-    The header is the heading line, and under it the switch between the two
-    views at the left, with Expand all and the Columns menu at the right.
+    The header is the switch between the two views at the left, with Expand
+    all and the Columns menu at the right. The heading line is in it too, in
+    its place before the switch, for a screen reader only: the latest-run
+    card above the list names its scenario on screen.
 
     The grid is given no rows. The page's callback writes them to
     ``ids.model``, and the script registered by ``register_run_list`` hands
@@ -844,11 +846,12 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
             dmc.Box(
                 className="run-history-list-header",
                 children=[
+                    # A line of text, and not an HTML heading, so a screen
+                    # reader hears what it heard while the line was on
+                    # screen.
                     dmc.Text(
                         id=ids.heading,
-                        className="run-history-list-heading",
-                        fw=600,
-                        truncate="end",
+                        className="run-history-list-heading visually-hidden",
                     ),
                     dmc.SegmentedControl(
                         data=LIST_VIEW_OPTIONS,
