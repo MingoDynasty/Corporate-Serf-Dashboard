@@ -104,9 +104,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
   [`proposals/scenario_notes_proposal.md`](./proposals/scenario_notes_proposal.md).
   It proposes one plain-text note per scenario, shown in the room the top row
   kept between Scenario Stats and the PB card and edited in place, with
-  Follow waiting while a note has unsaved changes. It is designed and built
-  in parallel with the latest-run card's proposal; the two meet in the
-  callback that selects a scenario.
+  Follow waiting while a note has unsaved changes. Its implementation runs
+  beside the latest-run card's; the two meet in the callback that selects a
+  scenario.
 
   Why it's next: the top row kept that room for notes, and a reminder about
   technique is read just before the next run, beside the target and the
