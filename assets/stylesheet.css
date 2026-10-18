@@ -408,8 +408,9 @@ a.run-toast-link:hover {
 }
 
 /* Kept whole, with the space it ends on: a flex container drops a space
-   between two items, and the label would run into the name. It sets no
-   display of its own, because with no run its hidden attribute removes it. */
+   between two items, and the label would run into the name. With no run
+   "Latest run" stays, and the words inside it that hold the age are hidden
+   by their own attribute, which a display set on them would undo. */
 .run-history-card-label {
     flex: 0 0 auto;
     white-space: pre;
@@ -481,8 +482,8 @@ a.run-toast-link:hover {
     line-height: 18px;
 }
 
-/* With no run in the store: a title over one sentence, as the chart's empty
-   states have them. */
+/* With no run to report: a title, over one sentence where there is
+   something to do, as the chart's empty states have them. */
 .run-history-card-empty-title {
     font-weight: 600;
 }
