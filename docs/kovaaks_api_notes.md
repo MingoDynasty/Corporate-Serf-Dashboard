@@ -98,10 +98,11 @@ Observed, not yet relied on:
   (82.3077%) is stored as `82307`, which the game shows as `82.31` in the
   "Accuracy/Damage Efficiency" row of a leaderboard entry. Despite its name
   it is not damage done over damage possible, which the stats file's
-  per-kill columns call Efficiency. Probed on 12 of the maintainer's PBs on
+  per-kill columns call Efficiency. Probed on 17 of the maintainer's PBs on
   2026-10-18, click and tracking scenarios alike, each matching the local
-  stats file's first weapon row. None covered a scenario with headshot
-  multipliers, falloff or splash damage
+  stats file's first weapon row, including two whose hits do less than their
+  full possible damage. None was chosen for a known headshot multiplier,
+  falloff or splash damage
   ([decision log](decision_log/2026/2026-10-18-pb-accuracy-shows-hit-accuracy-as-the-game-does.md)).
 
 Failure handling:

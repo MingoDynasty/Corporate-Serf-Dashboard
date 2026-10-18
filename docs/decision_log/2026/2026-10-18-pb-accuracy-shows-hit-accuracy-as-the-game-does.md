@@ -26,9 +26,10 @@ and [the PB card entry](2026-10-14-the-pb-card-shows-the-local-record-and-next-r
 - **What KovaaK's stores.** `accuracyDamage` holds hits over shots, as a
   percentage times 1,000, truncated
   ([kovaaks_api_notes.md](../../kovaaks_api_notes.md#leaderboardscoresglobal)).
-  All 12 of the maintainer's PBs probed on 2026-10-18 matched the local
+  All 17 of the maintainer's PBs probed on 2026-10-18 matched the local
   file's hits over shots and none matched the damage figure, across click and
-  tracking scenarios. The VoxTS Click Medium PB hit 107 of 130 shots and did
+  tracking scenarios whose damage figure ran from near zero to equal to the
+  hit figure. The VoxTS Click Medium PB hit 107 of 130 shots and did
   10,700 of 26,000 possible damage: KovaaK's stores 82307 and shows 82.31,
   where the table showed 41.15%. The stats file's per-kill columns name the
   two figures Accuracy and Efficiency.
@@ -47,8 +48,11 @@ and [the PB card entry](2026-10-14-the-pb-card-shows-the-local-record-and-next-r
   9,212 files record damage possible above zero. Efficiency, if it is ever
   wanted, returns as a field and a column of its own, under KovaaK's name.
 - **Left open.** No probe found a scenario whose "Accuracy/Damage
-  Efficiency" row holds efficiency, and none covered headshot multipliers,
-  falloff or splash damage. If one turns up, the rule is still to show what
-  the game shows. No run has two weapons that both fired: in all 123
+  Efficiency" row holds efficiency. Two probed scenarios have hits that do
+  less than their full possible damage, Pistol Strafe Gallery Sparky and VT
+  Pasu Intermediate S5 Multi, with damage figures at 0.95 and 0.98 of the
+  hit figure, and both store hit accuracy. None was chosen for a known
+  headshot multiplier, falloff or splash damage. If such a scenario turns
+  out to hold efficiency, the rule is still to show what the game shows. No run has two weapons that both fired: in all 123
   two-weapon files the second fired no shots, so the first weapon row, the
   summary hit and miss counts, and the sum over weapons agree.
