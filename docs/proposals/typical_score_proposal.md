@@ -18,11 +18,11 @@ the scenario's newest run, dated when it is old.
 
 ## Decisions needed
 
-Five rows, TS1 to TS5. **Nothing in this proposal is ratified.** Each row is
-the maintainer's lean or agreement from the design discussion of 2026-10-14
-and 2026-10-15, worked out over five measurements and six versions of a live
-prototype on their own stats, and each quotes what they said. A lean is not a
-ruling: reviewers are invited to challenge any row, and any author-owned
+Five rows, TS1 to TS5. **TS1 is ruled; TS2 to TS5 are not ratified.** Each
+row began as the maintainer's lean or agreement from the design discussion of
+2026-10-14 and 2026-10-15, worked out over five measurements and six versions
+of a live prototype on their own stats, and each quotes what they said. A
+lean is not a ruling: reviewers are invited to challenge any row, and any author-owned
 choice in [Design](#design). **TS2 is the row the maintainer asked to be
 scrutinized hardest**, and it gives the alternative its strongest case. The
 first review wave endorsed TS2 to TS5 and contested one point of TS1, whether
