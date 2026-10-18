@@ -248,6 +248,13 @@ heading were edited on the captured page, not in the app.
   an older session's name leaves its year out only while it is this year's,
   as the run list's rows do: a page left open over New Year's would otherwise
   keep `Dec 31, 2:00 PM session` with no year.
+- **Whether a late run reaches the card is decided per scenario,** by the
+  selected scenario's latest run, not the store's newest. The spec says today
+  that a run landing older than the store's newest leaves the card as it was.
+  Under R1, a run on the selected scenario that is newer than its latest run
+  becomes the card's run, even when it is older than the store's newest, such
+  as one copied into the stats folder late. A run older than the scenario's
+  latest leaves the card's run as it is.
 - **The scenario's name on the first line is always plain text,** with the
   whole name as its tooltip where the card cuts it short, as today while it
   is selected.
@@ -496,8 +503,10 @@ merges.
   played in an older session the same day as the newest; never played; no
   scenario selected; a store with no runs, with and without a scenario
   selected, which read the empty store's sentence and "Play this scenario"
-  respectively. Each checks the run, the third line's two parts, and the
-  empty state's words.
+  respectively; a late run on the selected scenario, newer than its latest
+  run and older than the store's newest, which becomes the card's run, and
+  one older than its latest, which doesn't. Each checks the run, the third
+  line's two parts, and the empty state's words.
 - **Unit, the older session's name:** this year and an earlier year, matching
   the run list's row for the same session; a visit with no usable start.
 - **Callbacks:** a change of scenario rewrites the card; with Follow off, a run
