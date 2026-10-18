@@ -66,11 +66,11 @@ from source.kovaaks.play_sessions import (
 from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.utilities.utilities import (
     format_elapsed_duration,
+    format_percent,
     format_score,
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
-    format_whole_percent,
 )
 
 # How many sessions each view loads at first, and how many more each press of
@@ -252,7 +252,7 @@ def _run_row(
         "passed": mark.passed,
         "check_text": _check_text(mark),
         "new_pb": mark.is_new_pb,
-        "accuracy": format_whole_percent(run.accuracy),
+        "accuracy": format_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "sens": f"{run.horizontal_sens} {run.sens_scale}",
     }

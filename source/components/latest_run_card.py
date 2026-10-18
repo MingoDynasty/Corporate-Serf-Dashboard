@@ -47,8 +47,8 @@ from source.kovaaks.play_sessions import (
 from source.kovaaks.time_scored_service import PaceBasis, get_version_pace_basis
 from source.utilities.utilities import (
     format_elapsed_duration,
+    format_percent,
     format_score,
-    format_whole_percent,
 )
 
 LATEST_RUN_LABEL = "Latest run"
@@ -240,7 +240,7 @@ def latest_run(
     )
     is_new_pb = run in new_high_score_runs(scenario_runs)
 
-    accuracy = f"Accuracy {format_whole_percent(run.accuracy)}"
+    accuracy = f"Accuracy {format_percent(run.accuracy)}"
     comparison = _comparison(run.score, chased, verdict, is_new_pb)
     return LatestRun(
         run_id=run_id(run),

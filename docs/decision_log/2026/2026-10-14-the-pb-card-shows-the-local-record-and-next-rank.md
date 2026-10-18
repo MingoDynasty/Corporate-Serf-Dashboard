@@ -36,7 +36,9 @@ card. Its lines are, in order:
 5. The quieter `{cm/360} cm/360 · Accuracy {accuracy}%`, or accuracy alone
    when sensitivity is unknown. Sensitivity is the table's PB cm/360 with
    trailing zeros dropped; accuracy is hit accuracy to the whole percent,
-   which can differ from the table's damage accuracy.
+   which can differ from the table's damage accuracy. *(Superseded
+   2026-10-18: the accuracy shows two decimals. See
+   [A Run's Accuracy Shows Two Decimals](2026-10-18-a-runs-accuracy-shows-two-decimals.md).)*
 
 Use the table's own ladder computation and eligible pace constant. Its
 sortable wording differs from a card's wording, but its threshold, gap and

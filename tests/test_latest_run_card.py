@@ -245,7 +245,7 @@ def test_a_run_shows_its_percentage_of_the_pb_it_was_chasing_and_its_accuracy():
     runs = _scored(100.0, 120.0, 96.0, accuracy=0.57)
 
     # Against 120, the PB before it, and not against the first run's 100.
-    assert _shown(runs).result == "80.0% of PB · Accuracy 57%"
+    assert _shown(runs).result == "80.0% of PB · Accuracy 57.00%"
 
 
 def test_the_percentage_shows_whether_or_not_the_run_was_judged():
@@ -256,9 +256,9 @@ def test_the_percentage_shows_whether_or_not_the_run_was_judged():
         _run(A, EVENING + timedelta(minutes=1), score=96.0, sensitivity=30.0),
     ]
 
-    assert _shown(runs).result == "96.0% of PB · Accuracy 50%"
-    assert _shown(runs, percentage=None).result == "96.0% of PB · Accuracy 50%"
-    assert _shown(first_at_its_sensitivity).result == "96.0% of PB · Accuracy 50%"
+    assert _shown(runs).result == "96.0% of PB · Accuracy 50.00%"
+    assert _shown(runs, percentage=None).result == "96.0% of PB · Accuracy 50.00%"
+    assert _shown(first_at_its_sensitivity).result == "96.0% of PB · Accuracy 50.00%"
 
 
 def test_a_time_scored_run_shows_its_percentage_of_the_pbs_pace():
@@ -266,10 +266,10 @@ def test_a_time_scored_run_shows_its_percentage_of_the_pbs_pace():
     runs = _scored(50.0, 40.0, scenario_hash=VERSION)
 
     assert _shown(runs, pace=_pace_of(100.0)).result == (
-        "83.3% of PB pace · Accuracy 50%"
+        "83.3% of PB pace · Accuracy 50.00%"
     )
     assert _shown(runs, percentage=None, pace=_pace_of(100.0)).result == (
-        "83.3% of PB pace · Accuracy 50%"
+        "83.3% of PB pace · Accuracy 50.00%"
     )
 
 
@@ -278,7 +278,7 @@ def test_a_time_scored_pb_of_zero_or_less_still_has_a_percentage_of_pace():
     runs = _scored(-10.0, -20.0, scenario_hash=VERSION)
 
     assert _shown(runs, pace=_pace_of(100.0)).result == (
-        "91.7% of PB pace · Accuracy 50%"
+        "91.7% of PB pace · Accuracy 50.00%"
     )
 
 
@@ -286,7 +286,7 @@ def test_a_new_pb_says_how_far_it_beat_the_previous_best():
     runs = _scored(3000.0, 3324.0)
 
     assert _shown(runs).result == (
-        "Up 10.8% on your previous best of 3,000 · Accuracy 50%"
+        "Up 10.8% on your previous best of 3,000 · Accuracy 50.00%"
     )
     # Judged or not, it reads the same.
     assert _shown(runs, percentage=None).result == _shown(runs).result
@@ -297,7 +297,7 @@ def test_a_new_pb_by_pace_says_how_much_faster_it_finished():
     runs = _scored(40.0, 50.0, scenario_hash=VERSION)
 
     assert _shown(runs, pace=_pace_of(100.0)).result == (
-        "20.0% faster than your previous best of 40 · Accuracy 50%"
+        "20.0% faster than your previous best of 40 · Accuracy 50.00%"
     )
 
 
@@ -305,7 +305,7 @@ def test_a_new_pb_by_pace_says_how_much_faster_it_finished():
 def test_a_new_pb_over_a_previous_best_of_zero_or_less_names_it(previous, worded):
     runs = _scored(previous, 12.0)
 
-    assert _shown(runs).result == f"Your previous best was {worded} · Accuracy 50%"
+    assert _shown(runs).result == f"Your previous best was {worded} · Accuracy 50.00%"
 
 
 @pytest.mark.parametrize(
@@ -320,15 +320,15 @@ def test_a_new_pb_over_a_previous_best_of_zero_or_less_names_it(previous, worded
     ],
 )
 def test_a_run_with_no_percentage_shows_its_accuracy_alone(runs):
-    assert _shown(runs).result == "Accuracy 50%"
-    assert _shown(runs, percentage=None).result == "Accuracy 50%"
+    assert _shown(runs).result == "Accuracy 50.00%"
+    assert _shown(runs, percentage=None).result == "Accuracy 50.00%"
 
 
 @pytest.mark.parametrize(
     ("accuracy", "worded"),
-    [(0.544, "54%"), (0.545, "55%"), (0.555, "56%"), (1.0, "100%"), (0.0, "0%")],
+    [(107 / 130, "82.31%"), (1 / 32, "3.13%"), (1.0, "100.00%"), (0.0, "0.00%")],
 )
-def test_accuracy_is_shown_to_the_whole_percent_a_half_rounding_up(accuracy, worded):
+def test_accuracy_is_shown_to_two_decimals_a_half_rounding_up(accuracy, worded):
     assert _shown(_scored(100.0, accuracy=accuracy)).result == f"Accuracy {worded}"
 
 
@@ -337,24 +337,24 @@ def test_a_miss_is_held_one_tenth_under_its_goal():
     runs = _scored(10000.0, 9498.0)
 
     assert _shown(runs).badge is CardBadge.BELOW_THRESHOLD
-    assert _shown(runs).result == "94.9% of PB · Accuracy 50%"
+    assert _shown(runs).result == "94.9% of PB · Accuracy 50.00%"
 
 
 def test_a_run_below_the_pb_never_reads_as_all_of_it():
     """Rounding alone would print a run 0.03% short of the PB as 100.0%."""
     runs = _scored(10000.0, 9997.0)
 
-    assert _shown(runs).result == "99.9% of PB · Accuracy 50%"
+    assert _shown(runs).result == "99.9% of PB · Accuracy 50.00%"
     # With nothing judging the run, this is the one cap left: there is no
     # goal to hold a miss under.
-    assert _shown(runs, percentage=None).result == "99.9% of PB · Accuracy 50%"
+    assert _shown(runs, percentage=None).result == "99.9% of PB · Accuracy 50.00%"
     assert _shown(_scored(10000.0, 9498.0), percentage=None).result == (
-        "95.0% of PB · Accuracy 50%"
+        "95.0% of PB · Accuracy 50.00%"
     )
 
 
 def test_a_run_that_ties_the_pb_reads_as_all_of_it():
-    assert _shown(_scored(100.0, 100.0)).result == "100.0% of PB · Accuracy 50%"
+    assert _shown(_scored(100.0, 100.0)).result == "100.0% of PB · Accuracy 50.00%"
 
 
 # --- The second line agrees with the judging rule, and with the celebration ----
@@ -422,7 +422,7 @@ def test_the_percentage_is_the_judging_rules_own_at_every_goal(
 
     measure = "PB pace" if verdict.by_pace else "PB"
     assert _shown(runs, percentage=percentage, pace=pace).result == (
-        f"{shown_percentage(verdict):.1f}% of {measure} · Accuracy 50%"
+        f"{shown_percentage(verdict):.1f}% of {measure} · Accuracy 50.00%"
     )
 
 
@@ -612,7 +612,7 @@ LATEST = LatestRun(
     played_at=datetime(2026, 10, 4, 22, 50),
     score="3,324",
     badge=CardBadge.THRESHOLD_PASSED,
-    result="96.4% of PB · Accuracy 55%",
+    result="96.4% of PB · Accuracy 55.00%",
     session="Run 7 this session · 1 hr 6 min on this scenario",
 )
 
@@ -710,7 +710,7 @@ def test_the_body_is_the_score_with_its_badge_then_the_two_lines():
         "3,324",
         "Threshold passed",
     ]
-    assert rendered_text(result) == "96.4% of PB · Accuracy 55%"
+    assert rendered_text(result) == "96.4% of PB · Accuracy 55.00%"
     assert rendered_text(session) == (
         "Run 7 this session · 1 hr 6 min on this scenario"
     )

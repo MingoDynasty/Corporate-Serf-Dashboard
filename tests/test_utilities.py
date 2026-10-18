@@ -9,11 +9,11 @@ from source.utilities.utilities import (
     format_approximate_duration,
     format_decimal,
     format_elapsed_duration,
+    format_percent,
     format_score,
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
-    format_whole_percent,
 )
 
 
@@ -127,17 +127,22 @@ def test_format_elapsed_duration_rounds_to_the_nearest_minute(
 @pytest.mark.parametrize(
     ("fraction", "expected"),
     [
-        (0.0, "0%"),
-        (0.544, "54%"),
-        # A half rounds up, where ``round`` would send these two to 54 and 56.
-        (0.545, "55%"),
-        (0.555, "56%"),
-        (0.999, "100%"),
-        (1.0, "100%"),
+        (0.0, "0.00%"),
+        (107 / 130, "82.31%"),
+        (0.825, "82.50%"),
+        # A half rounds up, where ``round`` would send these two to 3.12 and
+        # 15.62.
+        (1 / 32, "3.13%"),
+        (5 / 32, "15.63%"),
+        # A half that float noise puts just under its rounding point.
+        (57 / 800, "7.13%"),
+        (19_998 / 20_000, "99.99%"),
+        (19_999 / 20_000, "100.00%"),
+        (1.0, "100.00%"),
     ],
 )
-def test_format_whole_percent_rounds_a_half_up(fraction: float, expected: str) -> None:
-    assert format_whole_percent(fraction) == expected
+def test_format_percent_rounds_a_half_up(fraction: float, expected: str) -> None:
+    assert format_percent(fraction) == expected
 
 
 @pytest.mark.parametrize(

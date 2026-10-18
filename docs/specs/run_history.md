@@ -197,7 +197,8 @@ times that name or order runs remain absolute ([T4][card-order]).
   ([2026-10-12][check]).
   The badges are yellow, green, and gray in that order.
 - The second line compares the run with the PB it was chasing, then gives
-  its accuracy to the whole percent: `{pct}% of PB · Accuracy {accuracy}%`,
+  its accuracy to two decimals ([2026-10-18][accuracy]):
+  `{pct}% of PB · Accuracy {accuracy}%`,
   or `{pct}% of PB pace` where the comparison is by pace. A new PB says how
   far it beat the previous best instead:
   `Up {pct}% on your previous best of {previous}`,
@@ -301,9 +302,10 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The last line is the PB run's sensitivity and accuracy, in the quieter
   style of the card's first line: `{cm/360} cm/360 · Accuracy {accuracy}%`.
   The sensitivity is the scenario table's PB cm/360, trailing zeros dropped
-  ([2026-09-27][trailing-zeros]), and the accuracy is the hit accuracy to the
-  whole percent, as the latest-run card shows a run's. Where the table's PB
-  cm/360 is unknown the line reads `Accuracy {accuracy}%` alone.
+  ([2026-09-27][trailing-zeros]), and the accuracy is the hit accuracy to two
+  decimals, as the latest-run card shows a run's ([2026-10-18][accuracy]).
+  Where the table's PB cm/360 is unknown the line reads
+  `Accuracy {accuracy}%` alone.
 - With no scenario selected the card reads `No scenario selected`, and for
   a scenario with no local runs `No local PB yet` over `Play this scenario
   to record one in this app.`. Its first line then reads `PB`, and it has no
@@ -569,12 +571,13 @@ The card's lines, local-record scope and leaderboard presentation follow
   top, with focus on its first row ([2026-10-14][count-link]).
 - A run row has seven columns: `#`, the run's number among this scenario's
   runs in its session, counted in the order they were played, "Time", a time
-  of day with no seconds, "Score", the marks, "Accuracy" to the whole
-  percent, "Shots Fired", and "Sensitivity". The marks column has no visible
-  header, and its accessible name is "Marks". Shots Fired is shown on every
-  scenario and counts the shots of the first weapon the stats file lists.
-  Sensitivity is the run's normalized sensitivity-and-scale string, as on the
-  chart's axis. Columns don't sort
+  of day with no seconds, "Score", the marks, "Accuracy" to two decimals
+  with trailing zeros kept, such as `82.31%` or `100.00%`
+  ([2026-10-18][accuracy]), "Shots Fired", and "Sensitivity". The marks
+  column has no visible header, and its accessible name is "Marks". Shots
+  Fired is shown on every scenario and counts the shots of the first weapon
+  the stats file lists. Sensitivity is the run's normalized
+  sensitivity-and-scale string, as on the chart's axis. Columns don't sort
   ([2026-10-12][column]).
 - A divider marks where the scenario was left and returned to within a
   session, and counts what was played between: `10 runs on 3 other
@@ -1102,3 +1105,4 @@ The card's lines, local-record scope and leaderboard presentation follow
 [category]: ../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md
 [pb-card]: ../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md
 [card-order]: ../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md
+[accuracy]: ../decision_log/2026/2026-10-18-a-runs-accuracy-shows-two-decimals.md

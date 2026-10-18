@@ -232,8 +232,8 @@ def load_runs(monkeypatch):
 @pytest.mark.parametrize(
     ("stored_first", "faded"),
     [
-        pytest.param("began_first", "50 cm/360 · Accuracy 55%", id="as-played"),
-        pytest.param("began_second", "50 cm/360 · Accuracy 65%", id="against-play"),
+        pytest.param("began_first", "50 cm/360 · Accuracy 55.00%", id="as-played"),
+        pytest.param("began_second", "50 cm/360 · Accuracy 65.00%", id="against-play"),
     ],
 )
 def test_a_tie_that_ended_in_one_second_is_the_tables_pb_run(
@@ -320,18 +320,20 @@ def test_the_scores_hover_is_measured_under_the_pbs_own_version():
 @pytest.mark.parametrize(
     ("fields", "faded"),
     [
-        pytest.param({}, "50 cm/360 · Accuracy 61%", id="trailing-zeros-dropped"),
+        pytest.param({}, "50 cm/360 · Accuracy 61.00%", id="trailing-zeros-dropped"),
         pytest.param(
-            {"sensitivity": 34.6375}, "34.64 cm/360 · Accuracy 61%", id="two-decimals"
+            {"sensitivity": 34.6375},
+            "34.64 cm/360 · Accuracy 61.00%",
+            id="two-decimals",
         ),
         pytest.param(
             {"scale": "Valorant", "sensitivity": 0.35},
-            "Accuracy 61%",
+            "Accuracy 61.00%",
             id="cm360-unknown",
         ),
         pytest.param(
             {"accuracy": 0.545, "damage_accuracy": 0.9},
-            "50 cm/360 · Accuracy 55%",
+            "50 cm/360 · Accuracy 54.50%",
             id="hit-accuracy-not-damage",
         ),
     ],
@@ -355,7 +357,7 @@ SHOWN = PersonalBest(
     next_rank=NextRank(
         name="Lavender", color="#b39ddb", threshold="3,700", gap="+1.3%", points="47"
     ),
-    faded="50 cm/360 · Accuracy 61%",
+    faded="50 cm/360 · Accuracy 61.00%",
 )
 
 
@@ -460,7 +462,7 @@ def test_a_pb_is_its_score_and_badge_then_the_next_rank_then_the_faded_line():
         "Cerulean",
     ]
     assert rendered_text(next_rank) == "3,700 Lavender · +1.3% · 47 to go"
-    assert content.faded == "50 cm/360 · Accuracy 61%"
+    assert content.faded == "50 cm/360 · Accuracy 61.00%"
 
 
 def test_the_score_with_a_hover_takes_focus_and_shows_it_as_last_played_does():

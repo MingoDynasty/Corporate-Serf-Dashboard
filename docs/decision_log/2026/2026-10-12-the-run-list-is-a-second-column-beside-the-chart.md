@@ -246,7 +246,10 @@ later proposal, All scenarios.
 - **A run's time has no date and no seconds,** as `10:50 PM`. The session's
   name carries the date, and the chart's hover stays the one place that
   keeps seconds. Accuracy is shown to the whole percent, where the chart's
-  hover keeps two decimals. A score is formatted as the playlist scenario
+  hover keeps two decimals. *(Superseded 2026-10-18: the list shows accuracy
+  to two decimals. See
+  [A Run's Accuracy Shows Two Decimals](2026-10-18-a-runs-accuracy-shows-two-decimals.md).)*
+  A score is formatted as the playlist scenario
   table formats PB Score
   ([2026-09-27](2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)),
   by one function both now call.
