@@ -39,6 +39,9 @@ card. Its lines are, in order:
    which can differ from the table's damage accuracy. *(Superseded
    2026-10-18: the accuracy shows two decimals. See
    [A Run's Accuracy Shows Two Decimals](2026-10-18-a-runs-accuracy-shows-two-decimals.md).)*
+   *(Superseded again 2026-10-18: the table's PB Accuracy shows the hit
+   accuracy too, so the two no longer differ. See
+   [PB Accuracy Shows Hit Accuracy, As The Game Does](2026-10-18-pb-accuracy-shows-hit-accuracy-as-the-game-does.md).)*
 
 Use the table's own ladder computation and eligible pace constant. Its
 sortable wording differs from a card's wording, but its threshold, gap and

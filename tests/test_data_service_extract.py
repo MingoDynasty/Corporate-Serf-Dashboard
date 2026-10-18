@@ -151,7 +151,6 @@ def test_extract_data_from_file_parses_valid_file() -> None:
         assert run.scenario == "1w4ts"
         assert run.accuracy == 0.5
         assert run.shots_fired == 100
-        assert run.damage_accuracy == 0.75
     finally:
         file_path.unlink(missing_ok=True)
 
@@ -460,7 +459,6 @@ def test_extract_data_from_file_tolerates_missing_damage_columns() -> None:
 
         assert run is not None
         assert run.accuracy == 0.5
-        assert run.damage_accuracy is None
     finally:
         file_path.unlink(missing_ok=True)
 

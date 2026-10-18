@@ -19,7 +19,9 @@ which the latest-run card followed, and in
 - **What is measured is unchanged.** It is the hit accuracy, hits over shots
   of the first weapon row the stats file lists. The scenario table's PB
   Accuracy still prefers the damage accuracy, so one run can still show two
-  accuracies.
+  accuracies. *(Superseded 2026-10-18: PB Accuracy shows the hit accuracy
+  too. See
+  [PB Accuracy Shows Hit Accuracy, As The Game Does](2026-10-18-pb-accuracy-shows-hit-accuracy-as-the-game-does.md).)*
 - **The precision is the app's choice, not the file's.** The stats file
   records shot and hit counts, not a percentage (`Track Master 100,6000,3866,`
   on the maintainer's files, 2026-10-18), so the accuracy is exact and only

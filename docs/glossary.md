@@ -383,10 +383,12 @@ the latest-run card mark them is in
 
 ### Accuracy
 
-The share of a run's shots that hit. PB Accuracy on a scenario table means
-damage accuracy instead, the share of possible damage done, when the run
-records it, so one run can show two different accuracies
-([playlists.md](specs/playlists.md#the-per-playlist-scenario-table)).
+The share of a run's shots that hit, the figure KovaaK's shows for a run.
+Every place this app shows a run's accuracy shows this one, PB Accuracy on a
+scenario table included
+([playlists.md](specs/playlists.md#the-per-playlist-scenario-table)). It is
+not the share of possible damage done, which KovaaK's stats file calls
+Efficiency and this app does not show.
 
 ### Pace
 

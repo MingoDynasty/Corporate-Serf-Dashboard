@@ -55,7 +55,6 @@ def _run(  # noqa: PLR0913
     sensitivity: float = 50.0,
     scale: str = "cm/360",
     accuracy: float = 0.61,
-    damage_accuracy: float | None = None,
     scenario_hash: str | None = VERSION,
 ) -> RunData:
     """Build one run of the scenario, ``minute`` minutes into the evening."""
@@ -67,7 +66,6 @@ def _run(  # noqa: PLR0913
         horizontal_sens=sensitivity,
         scenario=SCENARIO,
         accuracy=accuracy,
-        damage_accuracy=damage_accuracy,
         scenario_hash=scenario_hash,
         stats_file_name=f"{SCENARIO} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv",
         run_start=ended - timedelta(seconds=60),
@@ -332,9 +330,9 @@ def test_the_scores_hover_is_measured_under_the_pbs_own_version():
             id="cm360-unknown",
         ),
         pytest.param(
-            {"accuracy": 0.545, "damage_accuracy": 0.9},
-            "50 cm/360 · Accuracy 54.50%",
-            id="hit-accuracy-not-damage",
+            {"accuracy": 57 / 800},
+            "50 cm/360 · Accuracy 7.13%",
+            id="a-half-rounds-up",
         ),
     ],
 )
