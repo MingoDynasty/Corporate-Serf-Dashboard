@@ -58,6 +58,9 @@ SCENARIO = "Scenario A"
 LIST_COLUMN_PX = 500
 BORDER_PX = 2
 SCROLLBAR_PX = 17
+# A scrollbar drawn over the rows, as Firefox draws it on Windows 11 by
+# default, is 12px wide with the pointer on it in Firefox 158.
+OVERLAY_SCROLLBAR_PX = 12
 
 
 def _walk_components(component):
@@ -309,6 +312,28 @@ def test_the_columns_leave_room_for_the_scrollbar():
         "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
         in _css_block(css, ".run-history-columns")
     )
+
+
+def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
+    """A scrollbar that takes no room of its own covered the last column.
+
+    The grid marks such a scrollbar invisible. Keyed on that mark, the body
+    and the pinned row both keep its width free, so the two stay in line, and
+    the marks column gives the room up without going under its minimum.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    room = _css_block(
+        css,
+        ".run-history-list-grid:has(.ag-body-vertical-scroll.ag-scrollbar-invisible)\n"
+        "    :is(.ag-center-cols-viewport, .ag-floating-top-viewport)",
+    )
+
+    assert f"padding-right: {OVERLAY_SCROLLBAR_PX}px;" in room
+    columns = _grid().columnDefs
+    fixed = sum(column["width"] for column in columns if "width" in column)
+    (marks,) = [c for c in columns if c.get("colId") == "marks"]
+    marks_room = LIST_COLUMN_PX - BORDER_PX - OVERLAY_SCROLLBAR_PX - fixed
+    assert marks_room >= marks["minWidth"]
 
 
 def test_each_column_shows_a_field_the_rows_carry():
