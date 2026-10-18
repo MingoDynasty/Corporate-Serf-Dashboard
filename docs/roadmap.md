@@ -87,11 +87,12 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **The latest-run card follows the selection** — write Proposal 2 now that
-  the top row cards have shipped. It will consider making the latest-run
-  card follow the selected scenario and removing the run list's heading
-  line. Its argument rests on the card's alignment over the list. This is
-  upcoming design work, not a change to the card's current scope.
+- **The latest-run card follows the selection** — proposed in
+  [`proposals/latest_run_card_follows_selection_proposal.md`](./proposals/latest_run_card_follows_selection_proposal.md),
+  with nothing ratified. The card would report the selected scenario's latest
+  run, Last played would leave Scenario Stats, and the run list would lose its
+  heading line. Its argument rests on the card's alignment over the list.
+  One implementation PR follows ratification.
 
   Why it's next: the top row now puts two large scores side by side, but
   during a lookup they can refer to different scenarios.
