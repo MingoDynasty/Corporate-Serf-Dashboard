@@ -401,8 +401,8 @@ a.run-toast-link:hover {
     min-width: 0;
 }
 
-/* Not a box of its own: the label and the name inside it are laid out as the
-   heading's own items, beside the scenario button. */
+/* Not a box of its own: the name inside it is laid out as the heading's own
+   item, beside the label, so it is the part that is cut short. */
 .run-history-card-heading-text {
     display: contents;
 }
@@ -429,28 +429,6 @@ a.run-toast-link:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-/* The scenario's name while another scenario is selected: a button, since it
-   changes what the page shows and goes nowhere, drawn as the app draws a
-   link. With no name to show it is out of the page, and out of the tab
-   order with it. */
-.run-history-card-scenario-button {
-    background: none;
-    border: 0;
-    color: var(--mantine-color-anchor);
-    cursor: pointer;
-    font: inherit;
-    padding: 0;
-    text-align: left;
-}
-
-.run-history-card-scenario-button:hover {
-    text-decoration: underline;
-}
-
-.run-history-card-scenario-button:empty {
-    display: none;
 }
 
 /* Not a box of its own either, so the heading and the lines under it are

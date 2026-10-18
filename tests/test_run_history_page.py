@@ -866,7 +866,6 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
     registration = _selection_registration()
     ids = run_history.SCENARIO_SELECTION_IDS
 
-    button = run_history.LATEST_RUN_CARD_IDS.scenario_button
     asked_by_the_list = run_history.RUN_LIST_IDS.scenario_asked
 
     assert GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__ == (
@@ -876,21 +875,23 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
         f"..{ids.playlist_filter}.value...{ids.scenario_dropdown}.value.."
     )
     assert "@" not in registration["output"]
-    # The latest-run card's button is the third thing that reaches a
-    # scenario, and a name pressed in the run list's tree the fourth. Each
-    # comes here and writes neither dropdown itself.
+    # A name pressed in the run list's tree is the third thing that reaches a
+    # scenario. It comes here and writes neither dropdown itself. The
+    # latest-run card follows the selection and has no input here.
     assert _keys(registration["inputs"]) == [
         f"{ids.deep_link}.data",
         f"{run_history.RUN_EVENTS_STORE_ID}.data",
-        f"{button}.n_clicks",
         f"{asked_by_the_list}.data",
     ]
     assert _keys(registration["state"]) == [
         f"{run_history.FOLLOW_SWITCH_ID}.checked",
         f"{ids.playlist_filter}.value",
         f"{ids.scenario_dropdown}.value",
-        f"{button}.value",
     ]
+    card_ids = set(run_history.LATEST_RUN_CARD_IDS)
+    assert not card_ids & {
+        dep["id"] for dep in registration["inputs"] + registration["state"]
+    }
     # It applies this visit's query parameters, so the page load runs it.
     assert registration["prevent_initial_call"] is False
     writers = [
@@ -909,12 +910,10 @@ def _press(triggered: list[dict], run_events, follow, list_scenario):
         f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
         {},
         run_events,
-        0,
         list_scenario,
         follow,
         None,
         "Scenario A",
-        None,
     )
 
 
@@ -1625,15 +1624,6 @@ def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
     assert "white-space: nowrap;" in scenario
 
 
-def test_the_scenario_button_is_out_of_the_page_while_it_names_no_scenario():
-    """It is always in the layout, so it is hidden, and not removed."""
-    css = STYLESHEET.read_text(encoding="utf-8")
-
-    assert "display: none;" in _css_block(
-        css, ".run-history-card-scenario-button:empty"
-    )
-
-
 # --- The latest-run card ---------------------------------------------------------------
 
 
@@ -1651,8 +1641,6 @@ def test_the_card_is_written_by_these_five_inputs_and_on_load():
 
     assert registration["output"] == (
         f"..{card.played_at}.data...{card.heading}.children"
-        f"...{card.scenario_button}.children"
-        f"...{card.scenario_button}.value...{card.scenario_button}.aria-label"
         f"...{card.body}.children...{run_history.LATEST_RUN_STORE_ID}.data.."
     )
     assert _keys(registration["inputs"]) == [
@@ -1753,10 +1741,9 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     # The batch only calls it: nothing of the run is read from the store that
     # names it.
     assert asked == [(SCENARIO, 95, datetime(2026, 10, 12, 22, 50))]
-    played_at, heading, button, button_value, button_label, body, latest_run_id = answer
+    played_at, heading, body, latest_run_id = answer
     assert played_at == datetime(2026, 10, 12, 22, 49).timestamp()
     assert rendered_text(heading) == SCENARIO
-    assert (button, button_value, button_label) == (None, None, None)
     assert [rendered_text(line) for line in body] == [
         "812.4",
         "Accuracy 55.00%",
@@ -1809,13 +1796,12 @@ def test_with_no_run_to_report_the_card_says_why(
         lambda *_arguments: latest_run_card.StoreRuns(None, newest_run_id),
     )
 
-    played_at, heading, button, _value, _label, body, _latest_run_id = (
-        run_history.show_latest_run(None, selected, 95, False, "2026-10-12", None)
+    played_at, heading, body, _latest_run_id = run_history.show_latest_run(
+        None, selected, 95, False, "2026-10-12", None
     )
 
     assert played_at is None
     assert heading is None
-    assert button is None
     assert [rendered_text(line) for line in body] == said
 
 
@@ -1855,10 +1841,8 @@ def _card_at(monkeypatch, moment: datetime, selected, held_latest_run=None):
     every line under it, and the ring store's write.
     """
     monkeypatch.setattr(run_history, "datetime", _clock_at(*moment.timetuple()[:6]))
-    _played_at, heading, _button, _value, _label, body, latest_run_id = (
-        run_history.show_latest_run(
-            None, selected, 95, True, moment.date().isoformat(), held_latest_run
-        )
+    _played_at, heading, body, latest_run_id = run_history.show_latest_run(
+        None, selected, 95, True, moment.date().isoformat(), held_latest_run
     )
     return rendered_text(heading), [rendered_text(line) for line in body], latest_run_id
 
@@ -1975,12 +1959,10 @@ def _first_run_lands(monkeypatch, follow: bool, selected: str | None):
             f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
             {},
             summary,
-            0,
             None,
             follow,
             PLAYLIST_CODE if selected else None,
             selected,
-            None,
         )
         if moved_to is not no_update:
             selected = moved_to
@@ -2041,53 +2023,26 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
 
     assert _by_id(page, card.heading).children is None
     assert _by_id(page, card.body).children is None
-    assert _by_id(page, card.scenario_button).children is None
+    assert _by_id(page, card.body).children is None
 
 
-def test_pressing_the_cards_button_hands_focus_on_from_a_script_of_its_own():
-    """The button leaves the page once its scenario is selected.
+def test_the_page_holds_no_scenario_button_and_no_script_to_hand_focus_on():
+    """The card follows the selection, so it has no scenario of its own to offer.
 
-    Keyboard focus would go with it, so a script takes the press as its one
-    input. It writes a store nothing reads, and no page load calls it.
+    The button's keyboard focus script and the store it wrote went with it.
     """
-    registration = _registration(f"{run_history.CARD_FOCUS_SINK_ID}.data")
-    button = run_history.LATEST_RUN_CARD_IDS.scenario_button
+    page = run_history.layout()
 
-    assert _keys(registration["inputs"]) == [f"{button}.n_clicks"]
-    assert registration["state"] == []
-    assert registration["prevent_initial_call"] is True
-    assert registration["clientside_function"] is not None
-    assert isinstance(
-        _by_id(run_history.layout(), run_history.CARD_FOCUS_SINK_ID), dcc.Store
-    )
-    # Nothing reads the store it writes.
+    assert not hasattr(run_history, "CARD_FOCUS_SINK_ID")
+    assert not hasattr(run_history, "_HAND_FOCUS_TO_SCENARIO_SCRIPT")
+    assert "run-history-card-focus-sink" not in _ids(page)
+    assert "run-history-card-scenario-button" not in _ids(page)
     assert not [
         entry
         for entry in GLOBAL_CALLBACK_LIST
-        if run_history.CARD_FOCUS_SINK_ID
+        if "run-history-card-scenario-button"
         in {dep["id"] for dep in entry["inputs"] + entry["state"]}
     ]
-
-
-def test_the_focus_script_waits_for_the_button_to_go_and_then_focuses_the_dropdown():
-    """The script is not run here, so its text is held.
-
-    It acts only on a press from the keyboard: a click with the mouse loses
-    nothing by losing focus, and focus on the dropdown opens its list. It
-    leaves focus alone once the user has moved it somewhere else.
-    """
-    script = run_history._HAND_FOCUS_TO_SCENARIO_SCRIPT
-    card = run_history.LATEST_RUN_CARD_IDS
-    selection = run_history.SCENARIO_SELECTION_IDS
-
-    assert f'document.getElementById("{card.scenario_button}")' in script
-    assert f'document.getElementById("{selection.scenario_dropdown}")' in script
-    assert 'button.matches(":focus-visible")' in script
-    assert "button.offsetParent !== null" in script
-    assert "held === button || held === document.body" in script
-    assert "field.focus();" in script
-    assert "BUTTON_ID" not in script
-    assert "SCENARIO_ID" not in script
 
 
 # --- The latest run's id, and the ring ------------------------------------------------

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 import dash
 import pytest
-from dash import dcc
+from dash import dcc, html
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -810,8 +810,8 @@ LATEST = LatestRun(
 )
 
 
-def test_the_card_starts_with_nothing_in_it_and_always_holds_its_button():
-    """The selection callback takes the button, so it is never drawn again."""
+def test_the_card_starts_with_nothing_in_it_and_holds_no_button():
+    """The card follows the selection, so it has no scenario of its own to offer."""
     card = latest_run_card.latest_run_card(IDS)
 
     held = {
@@ -825,8 +825,9 @@ def test_the_card_starts_with_nothing_in_it_and_always_holds_its_button():
     assert held[IDS.body].children is None
     assert isinstance(held[IDS.played_at], dcc.Store)
     assert getattr(held[IDS.played_at], "data", None) is None
-    button = held[IDS.scenario_button]
-    assert (button.children, button.n_clicks, button.type) == (None, 0, "button")
+    assert not [
+        component for component in _walk(card) if isinstance(component, html.Button)
+    ]
 
 
 def test_the_first_lines_words_and_the_age_are_drawn_once_and_hidden_until_a_run():
@@ -883,11 +884,6 @@ def test_the_runs_scenario_is_plain_text_with_its_whole_name_as_its_title():
     # The title gives the whole name where the card cuts it short.
     assert content.heading.title == A
     assert content.played_at == LATEST.played_at.timestamp()
-    assert (
-        content.scenario_button,
-        content.scenario_button_value,
-        content.scenario_button_label,
-    ) == (None, None, None)
 
 
 def test_the_body_is_the_score_with_its_badge_then_three_lines():
@@ -981,7 +977,6 @@ def test_with_no_run_to_report_the_card_says_why(selected, store_has_runs, said)
     # Nothing to word, so the script hides the age, and "Latest run" stays.
     assert content.played_at is None
     assert content.heading is None
-    assert content.scenario_button is None
     assert [rendered_text(line) for line in content.body] == said
     # A title, then the sentence in the quieter style, as the PB card's.
     assert content.body[0].className == latest_run_card.EMPTY_TITLE_CLASS

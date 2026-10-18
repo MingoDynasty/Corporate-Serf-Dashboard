@@ -112,8 +112,8 @@ SESSION_LENGTH_HELP = (
 )
 ALL_SCENARIOS_HEADING = "All scenarios"
 ALL_SCENARIOS_GRID_NAME = "Runs of all scenarios, by session"
-# A scenario row's name is a button that selects the scenario. Its name is the
-# latest-run card's button's, and a press says what the dropdown now holds.
+# A scenario row's name is a button that selects the scenario, and a press says
+# what the dropdown now holds.
 SHOW_SCENARIO_LABEL = "Show {scenario}"
 SELECTED_SCENARIO_TEXT = "Selected scenario: {scenario}"
 # The second line of a row that stands for one scenario's runs, while Median

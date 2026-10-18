@@ -70,7 +70,6 @@ HEADING_LABEL_CLASS = "run-history-card-label"
 TIME_CLASS = "cell-tooltip-affordance"
 TIME_TARGET_CLASS = "run-history-card-time-target"
 SCENARIO_CLASS = "run-history-card-scenario"
-SCENARIO_BUTTON_CLASS = f"{SCENARIO_CLASS} run-history-card-scenario-button"
 BODY_CLASS = "run-history-card-body"
 SCORE_ROW_CLASS = "run-history-card-score-row"
 SCORE_CLASS = "run-history-card-score"
@@ -345,8 +344,6 @@ class LatestRunCardIds(NamedTuple):
     with no run: ``time`` is the run's age in it and ``time_tooltip`` the
     age's hover. ``heading`` holds the run's scenario's name, and ``body``
     the lines under the first, or the card's empty state.
-    ``scenario_button`` is always empty: a button whose ``value`` would name
-    a scenario and whose click would ask the page for it.
     """
 
     played_at: str
@@ -354,7 +351,6 @@ class LatestRunCardIds(NamedTuple):
     time: str
     time_tooltip: str
     heading: str
-    scenario_button: str
     body: str
 
 
@@ -363,21 +359,15 @@ class CardContent(NamedTuple):
 
     played_at: float | None
     heading: html.Span | None
-    scenario_button: str | None
-    scenario_button_value: str | None
-    scenario_button_label: str | None
     body: list[Any]
 
 
 def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
     """Build the card with nothing in it yet.
 
-    The page's callbacks write what it shows. What they write is in the
-    layout from the start and is never drawn again. A page must hold every
-    input of a callback whose output it holds, so a scenario button that came
-    and went with the card's text would call the callback it feeds each time
-    it was put back. And the run's age, which a script writes, would come
-    and go under the script if the server's answer drew it.
+    The page's callbacks write what it shows. The run's age, which a script
+    writes, is in the layout from the start: it would come and go under the
+    script if the server's answer drew it.
     """
     return dmc.Box(
         className=CARD_CLASS,
@@ -425,12 +415,6 @@ def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
                         className=HEADING_LABEL_CLASS,
                     ),
                     html.Span(id=ids.heading, className=HEADING_TEXT_CLASS),
-                    html.Button(
-                        id=ids.scenario_button,
-                        className=SCENARIO_BUTTON_CLASS,
-                        n_clicks=0,
-                        type="button",
-                    ),
                 ],
             ),
             html.Div(id=ids.body, className=BODY_CLASS),
@@ -472,9 +456,6 @@ def latest_run_card_content(
         return CardContent(
             played_at=None,
             heading=None,
-            scenario_button=None,
-            scenario_button_value=None,
-            scenario_button_label=None,
             body=_empty_body(selected_scenario, store_has_runs),
         )
 
@@ -496,9 +477,6 @@ def latest_run_card_content(
         heading=html.Span(
             shown.scenario, className=SCENARIO_CLASS, title=shown.scenario
         ),
-        scenario_button=None,
-        scenario_button_value=None,
-        scenario_button_label=None,
         body=[
             html.Div(score_row, className=SCORE_ROW_CLASS),
             html.Div(shown.result, className=RESULT_CLASS),
