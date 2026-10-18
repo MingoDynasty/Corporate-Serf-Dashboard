@@ -658,7 +658,7 @@ def test_a_run_row_formats_each_value_for_its_column():
         "passed": True,
         "check_text": "Threshold passed",
         "new_pb": True,
-        "accuracy": "55%",
+        "accuracy": "54.50%",
         "shots": "1,234",
         "sens": "40.8 cm/360",
     }
@@ -666,9 +666,9 @@ def test_a_run_row_formats_each_value_for_its_column():
 
 @pytest.mark.parametrize(
     ("accuracy", "shown"),
-    [(0.544, "54%"), (0.545, "55%"), (0.555, "56%"), (1.0, "100%"), (0.004, "0%")],
+    [(107 / 130, "82.31%"), (1 / 32, "3.13%"), (1.0, "100.00%"), (0.0, "0.00%")],
 )
-def test_accuracy_is_shown_to_the_whole_percent_a_half_rounding_up(accuracy, shown):
+def test_accuracy_is_shown_to_two_decimals_a_half_rounding_up(accuracy, shown):
     run = _run(A, EVENING, accuracy=accuracy)
 
     assert _of_kind(_build([run]), "run")[0]["accuracy"] == shown

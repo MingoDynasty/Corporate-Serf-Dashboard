@@ -84,7 +84,7 @@ from source.utilities.notifications import (
     channel_toast,
     toast,
 )
-from source.utilities.utilities import format_score, format_whole_percent
+from source.utilities.utilities import format_percent, format_score
 
 logger = logging.getLogger(__name__)
 
@@ -194,7 +194,7 @@ def _faded_line(run: RunData) -> str:
     card and the run list show a run's, which can differ from the table's PB
     Accuracy: that column prefers the damage accuracy.
     """
-    accuracy = f"Accuracy {format_whole_percent(run.accuracy)}"
+    accuracy = f"Accuracy {format_percent(run.accuracy)}"
     cm360 = personal_best_cm360(run)
     if cm360 is None:
         return accuracy

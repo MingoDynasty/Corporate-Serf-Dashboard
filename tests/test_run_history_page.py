@@ -1730,7 +1730,7 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
         played_at=datetime(2026, 10, 12, 22, 49),
         score="812.4",
         badge=None,
-        result="Accuracy 55%",
+        result="Accuracy 55.00%",
         session="Run 1 this session · 4 min on this scenario",
     )
 
@@ -1757,7 +1757,7 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     )
     assert [rendered_text(line) for line in body] == [
         "812.4",
-        "Accuracy 55%",
+        "Accuracy 55.00%",
         "Run 1 this session · 4 min on this scenario",
     ]
     assert latest_run_id == "landed.csv"
@@ -1849,7 +1849,7 @@ def _shown_run(run_id: str) -> latest_run_card.LatestRun:
         played_at=datetime(2026, 10, 12, 22, 50),
         score="812.4",
         badge=None,
-        result="Accuracy 55%",
+        result="Accuracy 55.00%",
         session="Run 1 this session · 4 min on this scenario",
     )
 
