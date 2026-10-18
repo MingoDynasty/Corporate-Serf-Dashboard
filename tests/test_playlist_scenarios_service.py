@@ -126,8 +126,8 @@ def test_format_playlist_scenario_rank_row_ranked():
         "pb_timestamp_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
         "pb_cm360_display": "45",
         "pb_cm360_sort": 45,
-        "pb_accuracy_display": "76.15%",
-        "pb_accuracy_sort": 76.15,
+        "pb_accuracy_display": "67.00%",
+        "pb_accuracy_sort": 67.0,
     }
 
 
@@ -203,7 +203,38 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["pb_accuracy_sort"] is None
 
 
-def test_format_playlist_scenario_rank_row_uses_hit_accuracy_fallback():
+@pytest.mark.parametrize(
+    ("accuracy", "shown"),
+    [
+        # The maintainer's VoxTS Click Medium PB: 107 hits of 130 shots, which
+        # KovaaK's shows as 82.31 where its damage figure is 41.15%.
+        (107 / 130, "82.31%"),
+        # A half rounds up, as on Run History, where a ``.2f`` format reads
+        # 7.12%.
+        (57 / 800, "7.13%"),
+    ],
+)
+def test_pb_accuracy_is_the_hit_accuracy_as_run_history_shows_it(accuracy, shown):
+    rank_info = ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN)
+    personal_best_run = RunData(
+        datetime_object=datetime(2026, 10, 16, 19, 30, 30),
+        score=107,
+        sens_scale="cm/360",
+        horizontal_sens=50,
+        scenario="VoxTS Click Medium",
+        accuracy=accuracy,
+        damage_accuracy=accuracy / 2,
+    )
+
+    row = format_playlist_scenario_rank_row(
+        "VoxTS Click Medium", 0, rank_info, personal_best_run=personal_best_run
+    )
+
+    assert row["pb_accuracy_display"] == shown
+    assert row["pb_accuracy_sort"] == pytest.approx(accuracy * 100)
+
+
+def test_format_playlist_scenario_rank_row_shows_no_cm360_for_a_game_scale_pb():
     rank_info = ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN)
     personal_best_run = RunData(
         datetime_object=datetime(2026, 4, 28, 21, 30, 0),
@@ -358,7 +389,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert rows[2]["runs_display"] == "30"
     assert rows[2]["pb_score_display"] == "3,000.5"
     assert rows[2]["pb_cm360_display"] == "45"
-    assert rows[2]["pb_accuracy_display"] == "82.34%"
+    assert rows[2]["pb_accuracy_display"] == "72.00%"
     assert all(row["generation_token"] == "generation-1" for row in rows)
 
 

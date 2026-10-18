@@ -190,9 +190,8 @@ def _faded_line(run: RunData) -> str:
     """Word the PB run's sensitivity and its hit accuracy.
 
     The sensitivity is the scenario table's PB cm/360, formatted as that
-    column formats it. The accuracy is the hit accuracy, as the latest-run
-    card and the run list show a run's, which can differ from the table's PB
-    Accuracy: that column prefers the damage accuracy.
+    column formats it. The accuracy is the hit accuracy, as the table's PB
+    Accuracy, the latest-run card and the run list show a run's.
     """
     accuracy = f"Accuracy {format_percent(run.accuracy)}"
     cm360 = personal_best_cm360(run)

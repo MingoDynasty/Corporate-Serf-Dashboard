@@ -34,7 +34,7 @@ from source.kovaaks.request_logging import request_exception_summary
 from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
 from source.utilities.stopwatch import Stopwatch
-from source.utilities.utilities import format_score
+from source.utilities.utilities import format_percent, format_score
 
 PLAYLIST_RANK_MAX_WORKERS = 4
 FILL_TOMBSTONE_LIMIT = 8
@@ -140,10 +140,10 @@ def _format_score(value: float | None) -> str:
     return format_score(value)
 
 
-def _format_accuracy(value: float | None) -> str:
-    if value is None:
+def _format_accuracy(fraction: float | None) -> str:
+    if fraction is None:
         return "N/A"
-    return f"{value:.2f}%"
+    return format_percent(fraction)
 
 
 def _round_up(value: float, decimals: int) -> float:
@@ -354,19 +354,6 @@ def personal_best_cm360(run_data: RunData | None) -> float | None:
     return run_data.horizontal_sens
 
 
-def _personal_best_accuracy(run_data: RunData | None) -> float | None:
-    if run_data is None:
-        return None
-    # Prefer damage accuracy because it most closely matches KovaaK's
-    # leaderboard metadata; fall back to hit accuracy for older/incomplete CSVs.
-    accuracy = (
-        run_data.damage_accuracy
-        if run_data.damage_accuracy is not None
-        else run_data.accuracy
-    )
-    return round(accuracy * 100, 2)
-
-
 def format_playlist_scenario_rank_row(  # noqa: PLR0913
     scenario_name: str,
     playlist_order: int,
@@ -401,7 +388,10 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         high_score = scenario_stats.high_score
 
     pb_cm360 = personal_best_cm360(personal_best_run)
-    personal_best_accuracy = _personal_best_accuracy(personal_best_run)
+    # Hit accuracy, the figure KovaaK's shows for the run. Not damage done over
+    # damage possible: the leaderboard field named ``accuracyDamage`` holds
+    # hits over shots too (docs/kovaaks_api_notes.md).
+    pb_accuracy = None if personal_best_run is None else personal_best_run.accuracy
     row: PlaylistScenarioRow = {
         "scenario": scenario_name,
         "leaderboard_id": _format_id(leaderboard_id),
@@ -427,8 +417,9 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         ),
         "pb_cm360_display": _format_score(pb_cm360),
         "pb_cm360_sort": pb_cm360,
-        "pb_accuracy_display": _format_accuracy(personal_best_accuracy),
-        "pb_accuracy_sort": personal_best_accuracy,
+        "pb_accuracy_display": _format_accuracy(pb_accuracy),
+        # Unrounded, so the order never disagrees with the rounded display.
+        "pb_accuracy_sort": None if pb_accuracy is None else pb_accuracy * 100,
     }
     if ladder is not None:
         row.update(benchmark_rank_fields(ladder, high_score, pace_constant))
