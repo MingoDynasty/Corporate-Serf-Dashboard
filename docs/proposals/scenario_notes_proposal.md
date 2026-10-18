@@ -17,9 +17,12 @@ its own, named from the scenario's exact name.
 
 Eight rows, SN1 to SN8. **Nothing is ratified.** SN1 to SN6 are the
 maintainer's agreement from the design discussion of 2026-10-18, held on four
-full-size mockups built from their own stats. None was said in a ruling word,
-so each stays open to review, and where a point only met no objection rather
-than an explicit yes, its row says so. SN7 and SN8 are open: the maintainer
+full-size mockups built from their own stats. None was said in a ruling word.
+In this project's workflow a ruling is the maintainer's explicit "decided",
+"ruled", "locked" or "ratified". An agreement in a design discussion is a
+lean: it records where the maintainer stands, and it stays open to review
+until they ratify it. Where a point only met no objection rather than an
+explicit yes, its row says so. SN7 and SN8 are open: the maintainer
 has no lean on either. Everything else is author-owned and is in
 [Design](#design), including every string in [Copy](#copy); reviewers may
 challenge any of it.
