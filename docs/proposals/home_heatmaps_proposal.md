@@ -8,10 +8,10 @@ Date: 2026-10-15
 Home, the page the app opens on, shows first-time setup and one line of
 counts, and nothing about when or how much the player has played. This
 proposal adds an Activity card under that line with two heatmaps: a calendar
-of days shaded by time in runs, and a grid of the hours of the week. One
-dropdown picks the period for both, either the last 12 months or a year with
-runs. Nothing here is ratified, and the shading rule is left for the
-reviewers to debate, as the maintainer asked.
+of days shaded by fixed bands of time in runs, and a grid of the hours of
+the week shaded relative to the period. One dropdown picks the period for
+both, either the last 12 months or a year with runs. Nothing here is
+ratified.
 
 ## Decisions needed
 
@@ -109,11 +109,16 @@ where it isn't. Both heatmaps and the summary follow the dropdown.**
   hour grid out as "static trivia, interesting once" and put the calendar
   later. `gpt-6.1-sol` put both later, the hour grid as "occasional habit
   curiosity, weak everyday value". Both warned that an activity chart can
-  turn into a consistency score. The maintainer chose both heatmaps after seeing them
-  drawn from their own stats. The design answers the warning with facts
-  only: no streak, no goal, no count of days missed, and no line that
-  compares one period with another. A reviewer who still judges the hour
-  grid not worth its place can contest it here.
+  turn into a consistency score. The maintainer chose both heatmaps after
+  seeing them drawn from their own stats. The card promises a factual
+  presentation, not a reaction: no streak, no goal, no count of days
+  missed, and no line that compares one period with another.
+- **Both views open, not the hour grid behind a disclosure.** The hour grid
+  answers an occasional question, when in the week the player plays, and a
+  disclosure closed on load would keep the calendar alone at a glance. The
+  maintainer named both views as the ones they like, so both are on screen.
+  The hour grid ships in the second PR, so it can still move behind a
+  disclosure once the calendar has been lived with, at little cost.
 
 Choosing otherwise:
 
@@ -125,6 +130,10 @@ Choosing otherwise:
 - **Remembering the choice** stores a value, and can open the app on an old
   year.
 - **The calendar alone** drops the hour grid and its layout work.
+- **The hour grid behind a disclosure,** titled `By hour of the week`,
+  closed on load and under the same Range: the calendar and the summary are
+  the glance, and the hour grid is one action away. The cost is hiding one
+  of the two views the maintainer chose on sight.
 
 Rejected in the design discussion: weekly bars (the maintainer: "ugly"), and
 the consult's 12-week strip.
@@ -150,9 +159,12 @@ its last run's end
 [run lengths](../glossary.md#run-length) of the runs in a day, or in an hour
 of the week. A run counts toward the date and the hour it ended in. The
 summary line gives the period's runs, its days with runs, and its time in
-runs. When any run in the period has no run length, the whole card counts
-runs instead: both heatmaps shade by runs, the summary leaves the time out,
-and a line under it says why.**
+runs, and a visible line under it says the time is a minimum of the time
+played and how runs are placed. When any run in the period has no run
+length, the whole card counts runs instead: both heatmaps shade by runs, the
+summary leaves the time out, and the line under it says why. The ruling on
+this row authorizes this recorded-run measure for the card, and leaves the
+app-wide definition of time played open.**
 
 - **Time, not a count, for the maintainer's reason.** A day of two-minute
   scenarios is twice the play of the same number of one-minute runs. On the
@@ -167,28 +179,34 @@ and a line under it says why.**
   maintainer's session length overall, and 48% in 2026. Time in runs is the
   practice itself. Session time does one thing better: it is known for 2019
   to 2021, when run lengths mostly aren't.
-- **What the figure is.** Time in runs is exact for what it counts: the runs
-  the stats folder records, each from its start to its end less its pauses.
-  It reads about half a second short per run, about 1%, because a run's end
-  is written to the whole second. It is not the time played. It leaves out
-  the time between runs, and any attempt that wrote no stats file, such as a
-  restart. The card writes it as `{time} in runs`, and a hover on the
-  summary's time says what it leaves out.
-- **How this reads the ratified minimum rule.** The guiding principle
+- **What the figure is.** Time in runs is a rounded measure of the runs the
+  stats folder records, each from its start to its end less its pauses. It
+  reads about half a second short per run, about 1%, because a run's end is
+  written to the whole second, and the card rounds it to the minute. It is
+  not the time played. It leaves out the time between runs, and any attempt
+  that wrote no stats file, such as a restart. The card writes it as
+  `{time} in runs`.
+- **The card says it is a minimum, in plain view.** The guiding principle
   [Be honest about uncertainty](../roadmap.md#guiding-principles) says "A
   figure that can only be a minimum is labelled one, such as time spent in
   runs, which leaves out the time between runs and any attempt that wrote no
-  stats file." This proposal reads it as met by a name that says what is
-  counted, "in runs", and a hover that says what is not. By the glossary a
-  run is an attempt that wrote a stats file, so the figure is exact for runs
-  and a minimum only of the time played. The literal reading puts "at least"
-  before every time on the card, down to each day's hover. If reviewers read
-  the rule that way, only the copy changes. The cost would be a hedge on
-  every number, including the ones that are exact for their label.
+  stats file." A player who sees the card need not know that a run means a
+  recorded one, so a hover alone would leave the label where few read it.
+  One visible line under the summary meets the rule:
+  `Recorded time in runs is a minimum of time played.` It goes into each
+  heatmap's accessible description too, and the summary's hover keeps the
+  longer explanation. The line covers every time on the card, so no single
+  figure carries "at least".
+- **Where a run's time lands is said too.** The same line goes on: `Each run
+  counts on the date and hour it ended.` A run that ends at 1:01 PM puts all
+  of its minutes in the 1 PM hour, so an hour's readout says `runs ended`
+  and `in those runs` rather than implying the minutes all fell inside that
+  clock hour.
 - **The whole card switches, never one day.** The fourth mockup switched to
-  runs only when a day with runs had no time at all. That keeps the maintainer's
-  2021 shaded by time, although 46 of its 87 runs have no run length,
-  because every one of its seven days has at least one run with a length.
+  runs only when a day with runs had no time at all. That keeps the
+  maintainer's 2021 shaded by time, although 46 of its 87 runs have no run
+  length, because every one of its seven days has at least one run with a
+  length.
   Three of its days would be shaded by part of their runs. Switching on any
   run without a length never shades by a partial time. It switches three of
   the maintainer's periods: 2019, where 12 of 12 runs have no run length,
@@ -199,10 +217,13 @@ and a line under it says why.**
   seconds, such as a run across a clock change or a file that looks like a
   reset ([sessions.md](../specs/sessions.md#run-start-and-run-length)). No
   run of the maintainer's since 2021 has lost its length. Another player may
-  see it more often. The alternative is a share: shade by
-  time while no more than 1% of the period's runs lack a length, and write
-  the times as minimums. It is a second rule and a constant to defend, so it
-  is not recommended.
+  see it more often, and the cost is accepted for them too: the switch is
+  predictable, and the line under the summary says why it happened. The
+  alternative is a share: shade by time while no more than 1% of the
+  period's runs lack a length, and write the times as minimums. It is a
+  second rule and a constant to defend, so it is not recommended. A period
+  counted in runs and one counted in time never share a scale, so their
+  shades are never compared as one unit.
 - **The hour grid shades by time too.** The design note had it shaded by
   runs. With both heatmaps on one measure, the card has one unit, both
   legends read in minutes, and the switch moves both heatmaps together.
@@ -213,10 +234,13 @@ and a line under it says why.**
 - **The Backlog's "Time definitions across the app."** On 2026-10-14 the
   maintainer deferred a scenario's time played on Run History so that "the
   concept of time stays consistent throughout the app", noting that Home
-  faces the same question. This row decides only the heatmaps' measure, and
-  names it time in runs, a figure distinct from a time played. If the
-  maintainer would rather settle the app-wide definition first, the
-  alternative is to ship the heatmaps shaded by runs and revisit them then.
+  faces the same question. Naming the figure narrowly does not by itself
+  lift that deferral, so the ruling on this row has to: it authorizes
+  recorded time in runs on this card, as a minimum of time played, and
+  leaves open what the app calls time played. Time in runs is a primitive
+  any app-wide definition keeps. If the maintainer wants the deferral to
+  cover every new time figure, the card ships shaded by runs until the
+  app-wide definition is settled.
 
 Choosing otherwise:
 
@@ -229,47 +253,60 @@ Choosing otherwise:
   2021 by part of its runs.
 - **"At least" on every time:** honest under the literal reading of the
   minimum rule, and a hedge on every figure.
+- **The hover alone,** this proposal's first recommendation: a quieter
+  card, with the minimum stated where few read it and where a touch screen
+  can't reach it.
 
 ### HM3. The shading rule
 
 Status: Open. The maintainer, 2026-10-15: "I don't have any strong lean on
-shading. Perhaps leave it up for Fable/Sol/Astra to debate." The author
-recommends one rule below, and each reviewer is asked for a stance of their
-own.
+shading. Perhaps leave it up for Fable/Sol/Astra to debate." The proposal
+first recommended quartiles of the period's days. The first review wave
+argued for fixed daily bands, and this revision recommends them; quartiles
+are set out below as the strongest alternative.
 
 The material consequence: what a shade means. Either the same shade means
 the same amount in every period and for every player, or it means "among
 your bigger days in this period".
 
-**Recommendation: quartiles of the days with runs in the period, with each
-shade's range written in the legend. The hour grid uses the same rule over
-its hours with runs.**
+**Recommendation: the calendar shades each day by fixed bands of time in
+runs, the same in every period, and the legend names the bands. The hour
+grid, whose squares add up a whole period, shades by quartiles of the
+period's hours with runs, and its legend says it is relative within the
+period.**
 
 The rule, exactly:
 
-- **The values.** Each day's time in runs in whole minutes, rounded as its
-  hover writes it, so a day's hover and its shade's range never disagree. On
-  a period that counts runs, each day's runs.
-- **Who counts.** A day with no runs takes the empty tile and is not
-  counted. A day with runs always takes a shade, even one that rounds to
-  `<1 min`.
-- **The cut points,** by nearest rank: the values at positions ⌈n/4⌉, ⌈n/2⌉
-  and ⌈3n/4⌉ of the n days with runs, smallest first. A day at or under the
-  first cut takes the palest shade, and so on up; a day over the third takes
-  the darkest. Equal values always share a shade.
-- **Fewer than four days with runs** can't be split into quarters, so every
-  day with runs takes the second shade.
-- **The legend** gives each shade's range, from the least to the most a day
-  in it holds, and `none` for a shade that holds no day.
+- **The values.** Each day's, or each hour's, time in runs in whole minutes,
+  rounded as its hover writes it, so a square's hover and its shade's range
+  never disagree. A value that rounds to `<1 min` counts as 0. On a period
+  that counts runs, each square's runs.
+- **Who counts.** A square with no runs takes the empty tile. A square with
+  runs always takes a shade, even one at 0 minutes.
+- **The calendar's bands.** Up to 15 minutes, the palest shade; 16 to 30;
+  31 to 60; over 60, the darkest. A period that counts runs uses 1 to 15
+  runs, 16 to 30, 31 to 60, and over 60. The bands are round numbers to read
+  a day's amount by, not amounts to aim for.
+- **The hour grid's quartiles,** by nearest rank: the values at positions
+  ⌈n/4⌉, ⌈n/2⌉ and ⌈3n/4⌉ of the n hours with runs, smallest first. An hour
+  at or under the first cut takes the palest shade, and so on up; an hour
+  over the third takes the darkest. Equal values always share a shade, so
+  ties can leave a shade empty. Fewer than four hours with runs can't be
+  split into quarters, so every one takes the second shade.
+- **The legends.** The calendar's names its four bands, the same in every
+  period. The hour grid's says `Relative within this period` and gives each
+  shade's range, from the least to the most an hour in it holds, with
+  `none` for a shade that holds no hour. An hour at 0 minutes reads as
+  `<1 min` at the bottom of its shade's range.
 
 The four rules the fourth mockup compares, on the maintainer's last 12
-months: 85
-days with runs, 78 hr 12 min in runs, from 1 minute to 3 hr 10 min a day.
+months: 85 days with runs, 78 hr 12 min in runs, from 1 minute to 3 hr 10
+min a day.
 
 | Rule | Where the shades end | Days per shade, palest first |
 |---|---|---|
-| Quartiles of the days with runs (KovaaK's, Refleks) | 26 min, 44 min, 1 hr 16 min | 22, 21, 21, 21 |
 | Fixed minutes | 15 min, 30 min, 1 hr | 11, 14, 27, 33 |
+| Quartiles of the days with runs (KovaaK's, Refleks) | 26 min, 44 min, 1 hr 16 min | 22, 21, 21, 21 |
 | Relative to a 10%-trimmed mean, at half, once and one and a half times it (Monkeytype) | 25 min, 50 min, 1 hr 16 min | 21, 26, 17, 21 |
 | An even split of the range (Mantine's Heatmap default) | 48 min, 1 hr 36 min, 2 hr 23 min | 46, 29, 6, 4 |
 
@@ -277,59 +314,69 @@ How each reads across the dropdown, as days per shade, palest first. 2019 to
 2021 count runs (HM2), so fixed minutes become fixed runs there, at 15, 30
 and 60:
 
-| Period | Days | Quartiles | Fixed | Relative to the mean | Even split |
+| Period | Days | Fixed | Quartiles | Relative to the mean | Even split |
 |---|---|---|---|---|---|
-| Last 12 months | 85 | 22, 21, 21, 21 | 11, 14, 27, 33 | 21, 26, 17, 21 | 46, 29, 6, 4 |
-| 2026 | 64 | 16, 16, 17, 15 | 9, 10, 21, 24 | 16, 20, 11, 17 | 32, 23, 7, 2 |
-| 2025 | 78 | 20, 20, 19, 19 | 12, 11, 22, 33 | 22, 22, 13, 21 | 40, 23, 11, 4 |
-| 2024 | 1 | 0, 1, 0, 0 | 0, 0, 1, 0 | 0, 1, 0, 0 | 1, 0, 0, 0 |
-| 2021, by runs | 7 | 2, 2, 2, 1 | 5, 1, 1, 0 | 2, 3, 0, 2 | 5, 1, 0, 1 |
-| 2020, by runs | 24 | 7, 5, 6, 6 | 14, 5, 3, 2 | 9, 6, 3, 6 | 17, 3, 1, 3 |
-| 2019, by runs | 3 | 0, 3, 0, 0 | 3, 0, 0, 0 | 1, 0, 2, 0 | 1, 0, 0, 2 |
+| Last 12 months | 85 | 11, 14, 27, 33 | 22, 21, 21, 21 | 21, 26, 17, 21 | 46, 29, 6, 4 |
+| 2026 | 64 | 9, 10, 21, 24 | 16, 16, 17, 15 | 16, 20, 11, 17 | 32, 23, 7, 2 |
+| 2025 | 78 | 12, 11, 22, 33 | 20, 20, 19, 19 | 22, 22, 13, 21 | 40, 23, 11, 4 |
+| 2024 | 1 | 0, 0, 1, 0 | 0, 1, 0, 0 | 0, 1, 0, 0 | 1, 0, 0, 0 |
+| 2021, by runs | 7 | 5, 1, 1, 0 | 2, 2, 2, 1 | 2, 3, 0, 2 | 5, 1, 0, 1 |
+| 2020, by runs | 24 | 14, 5, 3, 2 | 7, 5, 6, 6 | 9, 6, 3, 6 | 17, 3, 1, 3 |
+| 2019, by runs | 3 | 3, 0, 0, 0 | 0, 3, 0, 0 | 1, 0, 2, 0 | 1, 0, 0, 2 |
 
-- **Quartiles** fill every shade evenly in every period with enough days, so
-  every shade tells the player something: which days were the big ones, and
-  how the period was spread. They adapt to every player with no number to
-  defend, and one rule serves both heatmaps and both measures. The cost is
-  that color doesn't compare periods: a light year looks as dark as a heavy
-  one, and only the legend's ranges and the summary tell them apart. On this
-  history 2025 and 2026 look alike and are alike, with median days of 51 and
-  45 minutes.
-- **Fixed minutes** mean one amount everywhere. Years compare at a glance and
-  the legend never changes. On the last 12 months they put 60 of 85 days in
-  the two darkest shades. A player who plays two hours a day would see nearly
-  every day darkest, and one who plays ten minutes nearly every day palest.
-  The 15, 30 and 60 are one player's scale, and the app would have to defend
-  them. A period that counts runs needs fixed run counts as well, which put
-  14 of 2020's 24 days in the palest shade. The rule can't serve the hour
-  grid: a cell adds up a whole period, so its values grow with the period's
-  length. The busiest hour holds 2 hr 15 min over the last 12 months and 29
-  minutes in 2024.
-- **Relative to the mean** behaves much as quartiles do, with uneven shades
-  and one empty in 2021. Its cuts have a meaning, half your usual day and so
-  on, but the trimmed mean behind them needs explaining.
-- **An even split** lets a few long days push most days into the palest two
-  shades: 75 of 85 over the last 12 months. It is Mantine's default, which is
-  one reason not to take its Heatmap as is.
+Why fixed bands for the calendar:
 
-Why quartiles over fixed minutes, the strongest alternative:
+- **A day keeps its shade when the player changes the period.** The Range
+  dropdown is the card's one control, and under period quartiles the same
+  day can change shade as the player moves between a year and the last 12
+  months. On 2026-10-15, November 6 and November 19, 2025 read in the second
+  shade under 2025 and in the palest under the last 12 months, with no
+  change to their play. The rolling window also moves its cut points from
+  one load to the next. Under fixed bands a day's shade changes only when
+  its play does.
+- **It answers "how much" at a glance.** The card's question is how much,
+  and when. A band says a day held over an hour, where a quartile says it
+  was among the period's bigger days, which only the legend's numbers turn
+  into an amount.
+- **Years compare by color,** and the legend never changes, so it can be
+  learned once.
+- **The spread is still useful.** On the last 12 months the bands hold 11,
+  14, 27 and 33 days, and evenly filled shades are no proof that a chart
+  answers its question better. Quantile classes read most accurately in
+  Brewer and Pickle's map tasks (2002), but the same study found maps with
+  matched legends easier to compare, and neither result settles a
+  calendar's question.
 
-- **The calendar's first job is the shape of the period:** which days had
-  play and which were the big ones. Quartiles use all four shades for that in
-  every period; fixed minutes use mostly two on this history.
-- **No constant to defend.** Fixed minutes fit players near the maintainer's
-  scale, and the app ships to others.
-- **One rule for the whole card.** Fixed minutes would need a second rule for
-  the hour grid, and fixed run counts for the years without lengths.
-- **Precedent and evidence.** KovaaK's, the game this app reads, shades its
-  own overview by quartiles of the days with runs (measured from a
-  screenshot), and Refleks does in its source. GitHub's staff describe
-  per-user quartiles after removing outliers. In map-reading tasks quantile
-  classes were read most accurately (Brewer and Pickle, 2002), on
-  choropleths rather than calendars.
-- **The numbers stay on screen.** The legend gives each shade's range in
-  minutes, and the summary gives the period's totals, so a year compares
-  with another by its numbers.
+What fixed bands cost:
+
+- **The bands are a scale the app picks.** 15, 30 and 60 minutes are round
+  numbers chosen to read by, not targets, and the darkest band does not say
+  an hour is enough. Still, a darkest shade at "over 1 hr" can read as a
+  standard, in an app that states facts and gives no advice.
+- **Resolution where the player doesn't live.** A player who plays two hours
+  most days sees a calendar of the darkest shade, and one who plays ten
+  minutes a calendar of the palest. Their hovers still give each day's
+  minutes. On this history 60 of the last 12 months' 85 days take the two
+  darkest bands.
+- **Two rules on one card.** An hour's square adds up every such hour in the
+  period, so its values grow with the period's length: the busiest hour
+  holds 2 hr 15 min over the last 12 months and 29 minutes in 2024. Fixed
+  bands can't serve it, so it keeps quartiles and says so in its legend.
+  The years counted in runs need bands of their own as well, which put 14
+  of 2020's 24 days in the palest.
+
+**The strongest alternative: quartiles of the period's days on the
+calendar too,** this proposal's first recommendation, by the same
+nearest-rank rule as the hour grid. They fill every shade in every period
+with enough days, so each shade tells the player which days were the big
+ones. They adapt to every player with no number to defend, one rule serves
+both heatmaps and both measures, and they are what KovaaK's, the game this
+app reads, shades its own overview by (measured from a screenshot), as
+Refleks does in its source. Their cost is the reverse of the bands' gain: a
+day's shade can change with the period, a light year looks as dark as a
+heavy one, and only the legend's ranges and the summary tell them apart.
+Ties can leave shades empty under them too. If the maintainer chooses them,
+both legends say `Relative within this period`.
 
 **A fifth rule: quartiles of every day in the player's history,** drawn in
 the fifth mockup. One set of cut points serves every period shaded by time,
@@ -337,9 +384,9 @@ so those years compare by color, and the scale still adapts to the player.
 On this history the cut points are 22 minutes, 44 minutes and 1 hr 19 min,
 over the 150 days whose runs all have a length, every one of them from 2024
 to 2026. So the periods shaded by time barely change: the last 12 months
-read 17, 26, 24 and 18 days per shade against quartiles' 22, 21, 21 and 21,
-and 2025 reads 18, 18, 19 and 23 against 20, 20, 19 and 19. The rule leaves
-two things undefined:
+read 17, 26, 24 and 18 days per shade against period quartiles' 22, 21, 21
+and 21, and 2025 reads 18, 18, 19 and 23 against 20, 20, 19 and 19. The rule
+leaves two things undefined:
 
 - **The years that count runs need a lifetime scale of their own.** The
   mockup used runs per day over all 177 days with runs, cut at 17, 39 and 73
@@ -349,14 +396,13 @@ two things undefined:
   ends up with two rules.
 
 Its other cost: the cut points move as the history grows, so an old year can
-change its look. The author leans against it for these costs, and offers it
-for the debate.
+change its look. It is not recommended.
 
 Choosing otherwise:
 
-- **Fixed minutes:** years compare by color, at the cost of most days in two
-  shades on this history, a constant to defend, and a second rule for the
-  hour grid.
+- **Period quartiles on both heatmaps:** every shade used in every period,
+  one rule, no constant to defend, at the cost of a day's shade changing
+  with the period and a light year looking as dark as a heavy one.
 - **Relative to the mean:** much as quartiles, with uneven shades and a rule
   that needs explaining.
 - **An even split:** most days in the two palest shades.
@@ -408,9 +454,10 @@ Contrast, by the WCAG formula:
   tile, `#3b3b3b`, GitHub's first step is darker than the tile. So both
   themes are tuned, as the palette research tuned the app's blue. The steps are picked in GitHub's green family. Apart from `#2da44e`,
   they are not GitHub's chart steps.
-- **The faintest step is stronger than GitHub's** because under quartiles a
-  quarter of the days with runs take it: 22 days in the last 12 months. A
-  faint first step makes a quarter of the days played look unplayed. It is
+- **The faintest step is stronger than GitHub's** because every short day
+  takes it: the 11 days of 15 minutes or less in the last 12 months, and a
+  quarter of the hour grid's hours with runs. A faint first step makes those
+  days look unplayed. It is
   still under the 3:1 that WCAG 1.4.11 asks of graphics needed to understand
   content. Each day's hover and accessible name carry its value, and no
   product surveyed clears 3:1.
@@ -495,7 +542,7 @@ grid's first column is 12 AM.**
   manual gives the reason, so that studying around midnight doesn't count as
   two days.
 - **The cost, measured.** 22 of the maintainer's 325 sessions span midnight,
-  and 480 runs land on the date after their session began. 68 sessions start
+  and 480 runs land on the date after their session began. 65 sessions start
   between midnight and 5 AM. Each such session shows as two days in the
   calendar. In the hour grid, its runs after midnight land on the next
   weekday's row, at the left edge, apart from the evening they continue. The
@@ -521,9 +568,10 @@ stand-in for an Overview page that is planned and not designed. The roadmap's
 Future list has that page as "An overview — time spent and activity across
 all scenarios", and says Home holds its place.
 
-No page shows when or how much the player has played. Run History shows one
-scenario's runs, grouped by session, and its All scenarios view shows each
-session whole. Neither shows a day, a week, or a year at a glance.
+No page sums up recorded play across calendar dates or across the hours of
+the week. Run History shows one scenario's runs, grouped by session, with
+each session's date, runs and length, and its All scenarios view shows each
+session whole. Neither shows a week or a year at a glance.
 
 ### What the maintainer said
 
@@ -566,11 +614,15 @@ Their words in the Home design discussion, 2026-10-13 to 15. All are leans.
   with the app's own parser and session rule, in light and dark, with
   switches for the colors, the shading rule and the day start. The
   maintainer judged the heatmaps on the first four. The fifth, built after
-  this proposal, draws its rules: the Activity card alone under the stats
-  line, the tuned greens beside GitHub's, the last 12 months as 365 dates,
-  the switch to runs for the whole card, nearest-rank quartiles, and the
-  fifth shading rule. Its figures match this proposal's. The mockups are
-  local scratch, not in the repo.
+  this proposal was opened, draws its rules: the Activity card alone under
+  the stats line, the tuned greens beside GitHub's, the last 12 months as
+  365 dates, the switch to runs for the whole card, nearest-rank quartiles,
+  and the fifth shading rule. Its Fixed minutes switch draws HM3's present
+  recommendation, the calendar in fixed bands and the hour grid on the
+  period's quartiles. It predates the first review wave, so it shows neither
+  the line under the summary nor the hour grid's `Relative within this
+  period` label. Its figures match this proposal's. The mockups are local
+  scratch, not in the repo.
 - **Three research passes** by research subagents, on palettes, on heatmap
   UX, and on calendar and week heatmaps in other apps, plus a check of
   LeetCode's calendar in a browser. Each report marks what was read at a
@@ -601,7 +653,7 @@ with the app's own parser (`extract_data_from_file`) and session rule
 - **Runs fill 53% of session length** overall, and 48% in 2026 (the design
   discussion's probe).
 - **Midnight:** 22 of 325 sessions span it, and 480 runs land on the date
-  after their session began. 68 sessions start between midnight and 5 AM. A
+  after their session began. 65 sessions start between midnight and 5 AM. A
   4 AM day would split 6 sessions, a 6 AM day 3. 13 runs start on one date
   and end on the next.
 - **Clock changes:** the only clock change with runs in its skipped or
@@ -627,7 +679,7 @@ with the app's own parser (`extract_data_from_file`) and session rule
 - **Firefox,** which the maintainer reads the app in. The mockups were
   checked in headless Edge, the fifth across 214 views with no script error
   and no sideways scroll.
-- **A screen reader,** on anything: nothing is built.
+- **A screen reader, or a touch screen,** on anything: nothing is built.
 
 ## Design
 
@@ -640,6 +692,7 @@ Found 9,135 runs across 866 scenarios in your stats folder.
 
 +-- Activity ------------------------------------------------------------------------------- [ Last 12 months  v ] --+
 | Last 12 months · 4,748 runs on 85 days · 78 hr 12 min in runs                                                       |
+| Recorded time in runs is a minimum of time played. Each run counts on the date and hour it ended.                    |
 |                                                                                                                      |
 | By day                                                              By hour of the week                              |
 |           Nov  Dec  Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct     12 AM   3 AM   6 AM ...  6 PM   9 PM       |
@@ -648,27 +701,30 @@ Found 9,135 runs across 866 scenarios in your stats folder.
 |      ...                                                             ...                                             |
 | Fri  . # . . . . . . . . . . . . . . . . . . . # . . . . . . . . .   Sat  # # # .  . . . ...  # # # # # #          |
 |                                                  Less [][][][][] More                         Less [][][][][] More   |
-|   Shades: 1 to 26 min · 27 to 44 min · 46 min to 1 hr 16 min ·        Shades: 1 to 19 min · 21 to 38 min ·          |
-|           1 hr 18 min to 3 hr 10 min                                   39 to 59 min · 1 hr 1 min to 2 hr 15 min      |
+|   Shades: <1 to 15 min · 16 to 30 min · 31 min to 1 hr · over 1 hr    Relative within this period                   |
+|                                                                       Shades: 1 to 19 min · 21 to 38 min ·          |
+|                                                                       39 to 59 min · 1 hr 1 min to 2 hr 15 min      |
 +----------------------------------------------------------------------------------------------------------------------+
 ```
 
 How a player meets it:
 
 - **At app start,** the moment Home is looked at most, the card opens on the
-  last 12 months. The calendar shows which days had play and which were the
-  big ones. The hour grid shows when in the week the player plays. The
-  summary line gives the totals.
+  last 12 months. The calendar shows which days had play and roughly how
+  much, in bands that read the same in every period. The hour grid shows
+  when in the week the player plays. The summary line gives the totals,
+  and the line under it says the time is a minimum.
 - **Looking back at a year,** the player picks `2025` in the Range dropdown.
   Both heatmaps and the summary redraw at once, with no wait on the server.
-- **Reading a day,** they hover over a square, or move onto it with the
-  keyboard: `Sun, Oct 12, 2025 · 41 runs · 52 min in runs`.
-- **Reading an hour,** the same: `Sundays, 4 PM to 5 PM · 137 runs · 2 hr 15
-  min in runs`.
+- **Reading a day,** they hover over a square, tap it, or move onto it
+  with the keyboard: `Sun, Oct 12, 2025 · 41 runs · 52 min in runs`.
+- **Reading an hour,** the same: `Sundays, 4 PM to 5 PM · 137 runs ended ·
+  2 hr 15 min in those runs`.
 - **An old year whose runs have no length,** such as 2020, shades by runs,
   and a line under the summary says why.
-- **A new player** sees the card from their first run, with every day they
-  played in one shade until they have played on four days.
+- **A new player** sees the card from their first run, each day in the
+  band its own minutes put it in, and the hour grid in one shade until
+  they have played in four hours of the week.
 - **A player back from a break of over a year** sees the last 12 months
   empty, with `Last 12 months · No runs`, and their years in the dropdown.
 
@@ -683,10 +739,14 @@ How a player meets it:
   the accessible name `Range` and no visible label, its options carrying
   their own meaning. It does not persist.
 - **The summary line** under the title, a readout:
-  `{period} · {runs} runs on {days} days · {time} in runs`. On a period that
-  counts runs it leaves the time out, and a second line says why. On a period
-  with no runs it reads `{period} · No runs`. The time's hover says what time
-  in runs leaves out.
+  `{period} · {runs} runs on {days} days · {time} in runs`. The time's
+  hover says what time in runs leaves out.
+- **The line under the summary,** quieter, always visible. On a period that
+  counts time it reads `Recorded time in runs is a minimum of time played.
+  Each run counts on the date and hour it ended.` On a period that counts
+  runs the summary leaves the time out, and the line says why instead
+  (HM2). On a period with no runs the summary reads `{period} · No runs`,
+  with no line under it.
 - **The calendar.** One square per date, 13 px with a 3 px gap, in weeks of
   columns, Sunday at the top. The last 12 months take 53 columns; a calendar
   year takes 53, or 54 in a leap year that starts on a Saturday. The first
@@ -702,10 +762,16 @@ How a player meets it:
   through `9 PM`. Squares of 24 px with a 3 px gap.
 - **The legend,** under each heatmap at its right: `Less`, the empty tile and
   the four steps, `More`. Under it, the ranges line, one range per shade,
-  palest first.
-- **No click.** Clicking a day lists that day's records in GitHub, GitLab and
-  Anki. This app has no address that opens a day or a session, so a square
-  does nothing on click (see [Out of scope](#out-of-scope)).
+  palest first: the calendar's four fixed bands, and the hour grid's ranges
+  under `Relative within this period` (HM3).
+- **A click or a tap shows a square's text, and goes nowhere.** Clicking a
+  day lists that day's records in GitHub, GitLab and Anki. This app has no
+  address that opens a day or a session, so a square opens nothing (see
+  [Out of scope](#out-of-scope)). A click or a tap selects the square, as
+  the keyboard does, and a selected square shows its hover text until the
+  player selects another or taps outside the heatmap. On a touch screen
+  that is the only way to read a square. A drag scrolls the calendar
+  sideways and selects nothing.
 
 ### What is counted
 
@@ -728,9 +794,9 @@ How a player meets it:
 |---|---|
 | No usable stats folder, or no runs at all | No card. The setup surfaces or the stats line say why. |
 | A period with no runs, such as the last 12 months after a long break | Both heatmaps as empty tiles, `{period} · No runs`, the legend with no ranges line. The dropdown still lists the years with runs. |
-| Fewer than four days with runs, such as 2024's one day | Every day with runs in the second shade, and the ranges line gives that shade's range alone: `Shades: none · 36 min · none · none`. The hour grid follows the same rule over its hours. |
+| One day with runs, such as 2024's 36 minutes | The calendar puts it in its band, `31 min to 1 hr`, and its legend reads as in every period. The hour grid has two hours with runs, fewer than four, so both take the second shade, and its ranges line gives that shade's range alone: `Shades: none · 7 to 29 min · none · none`. |
 | A period whose runs lack lengths, such as 2019 to 2021 | Shaded by runs, the summary without a time, and `Shaded by runs, because {n} of these runs have no run length.` under it. |
-| A player with ten runs: the maintainer's first ten, on two days of 2019, none with a length | Shaded by runs. Both days in the second shade. The hour grid's four hours with runs split into quarters. |
+| A player with ten runs: the maintainer's first ten, on two days of 2019, none with a length | Shaded by runs. Both days, of 4 and 6 runs, in the band `1 to 15 runs`. The hour grid's four hours with runs split into quarters. |
 
 ### Daylight saving days
 
@@ -778,7 +844,7 @@ Rejected:
 - **dmc's `Heatmap`.** It draws the calendar only, so the hour grid would need
   a second building block and a second look. It has no legend, no label on a
   square, and a tooltip on the pointer only. Its shading is an even split, so
-  quartiles would have to be smuggled in as shade numbers through `domain`.
+  the bands would have to be smuggled in as shade numbers through `domain`.
 - **plotly's `go.Heatmap`,** in a `dcc.Graph`. It draws both grids, but it
   offers no accessible layer, carries the plotly toolbar, and hovers on the
   pointer only.
@@ -794,7 +860,11 @@ Rejected:
   accessible name is its hover text, empty squares included.
 - **One tab stop per heatmap.** The arrow keys move between squares, and Home
   and End go to the ends of a row. A focused square shows its hover text, as
-  GitHub's calendar has done since 2023.
+  GitHub's calendar has done since 2023. A click or a tap selects a square
+  the same way, which is how a touch screen reads one.
+- **Each table's accessible description is the line under the summary,** so
+  a screen reader hears that the time is a minimum and where runs land, or
+  why the period counts runs.
 - **The summary line and the ranges line are text,** read in place, so the
   totals and what each shade means don't depend on a hover. The summary's
   time takes focus and shows its hover, as Run History's hovers do.
@@ -845,7 +915,8 @@ them: `Oct 12` in the current year, `Oct 12, 2025` in an earlier one.
 | Summary, a period counting time | `{period} · {runs} runs on {days} days · {time} in runs`, such as `Last 12 months · 4,748 runs on 85 days · 78 hr 12 min in runs` | A readout chained with ` · `, so no period (rules 1 and 2). "In runs" says what the time counts (HM2). |
 | Summary, a period counting runs | `{period} · {runs} runs on {days} days` | The same readout with no time, since the time is unknown. |
 | Summary, a period with no runs | `{period} · No runs` | A readout. A fragment after ` · ` starts with a capital, as the latest-run card's `Time on this scenario unknown` does. |
-| Summary's time, hover and focus | `Time in runs counts each run from its start to its end, less its pauses. It leaves out the time between runs and any attempt that wrote no stats file, such as a restart.` | Says what the figure is and what it leaves out, as Run History's session length hover does. "Stats file" is the app's term. |
+| Summary's time, hover and focus | `Time in runs counts each run from its start to its end, less its pauses. It leaves out the time between runs and any attempt that wrote no run file, such as a restart.` | Says what the figure is and what it leaves out, as Run History's session length hover does. "Run file" is a stats file's name on screen, as the glossary's Run entry and the app's own run file messages have it. |
+| Under the summary, a period counting time | `Recorded time in runs is a minimum of time played. Each run counts on the date and hour it ended.` | Two sentences, each ending with a period. The first labels the figure as a minimum in plain view, as the ratified minimum rule asks (HM2), and covers every time on the card, so no single figure carries "at least". The second says where a run's time lands. Also each heatmap's accessible description. |
 | Under the summary, a period counting runs | `Shaded by runs, because {n} of these runs have no run length.`, or `Shaded by runs, because 1 of these runs has no run length.` | What happened, then why, in one sentence. "Run length" is the glossary's term. |
 | Caption over the calendar | `By day` | A chart caption, sentence case. Short, and true of both measures. |
 | Caption over the hour grid | `By hour of the week` | Says the grid adds weeks together, which "by hour" alone doesn't. |
@@ -854,9 +925,11 @@ them: `Oct 12` in the current year, `Oct 12, 2025` in an earlier one.
 | Hour grid, weekday labels | `Sun` to `Sat` | Every row labelled; seven rows have room. |
 | Hour grid, hour labels | `12 AM`, `3 AM`, `6 AM`, `9 AM`, `12 PM`, `3 PM`, `6 PM`, `9 PM` | The app's 12-hour clock, every third hour so the labels fit 24 px columns. |
 | Legend | `Less`, `More` | The convention of GitHub, GitLab, KovaaK's and Monkeytype. Never "better". |
-| Legend, ranges line | `Shades: {range} · {range} · {range} · {range}`, palest first. A range is `{least} to {most}`, one value when they are equal, `none` for a shade that holds no day. A unit shared by both ends is written once. Such as `Shades: 1 to 26 min · 27 to 44 min · 46 min to 1 hr 16 min · 1 hr 18 min to 3 hr 10 min`, or by runs `Shades: 1 to 4 runs · 5 to 10 runs · 12 to 23 runs · 27 to 78 runs` | A readout. Each range is exact, because the shades are worked out on the values as written. |
+| Calendar legend, ranges line | `Shades: <1 to 15 min · 16 to 30 min · 31 min to 1 hr · over 1 hr`, or on a period that counts runs `Shades: 1 to 15 runs · 16 to 30 runs · 31 to 60 runs · over 60 runs` | A readout of the fixed bands (HM3), the same in every period. `<1` because a day with runs can round to under a minute. |
+| Hour grid legend, label | `Relative within this period` | A legend entry, sentence case with no period (rules 1 and 3). Says the hour grid's shades rank the period's hours, so its ranges change with the period, where the calendar's don't (HM3). |
+| Hour grid legend, ranges line | `Shades: {range} · {range} · {range} · {range}`, palest first. A range is `{least} to {most}`, one value when they are equal, `none` for a shade that holds no hour, and `<1 min` for an hour at 0 minutes. A unit shared by both ends is written once. Such as `Shades: 1 to 19 min · 21 to 38 min · 39 to 59 min · 1 hr 1 min to 2 hr 15 min`, or by runs `Shades: 1 to 3 runs · 5 to 9 runs · 10 to 16 runs · 17 to 38 runs` | A readout. Each range is exact, because the shades are worked out on the values as written. |
 | Calendar square, hover and accessible name | `{weekday}, {date} · {runs} runs · {time} in runs`, such as `Sun, Oct 12, 2025 · 41 runs · 52 min in runs`. Counting runs: `{weekday}, {date} · {runs} runs`. No runs: `{weekday}, {date} · No runs` | The date first, then the facts, as a readout. The weekday because only three rows are labelled. |
-| Hour square, hover and accessible name | `{weekday}s, {hour} to {next hour} · {runs} runs · {time} in runs`, such as `Sundays, 4 PM to 5 PM · 137 runs · 2 hr 15 min in runs`, and `Saturdays, 11 PM to 12 AM` for the last hour. Counting runs, the time is left out. No runs: `Sundays, 6 AM to 7 AM · No runs` | The plural says the square adds up every such hour in the period. |
+| Hour square, hover and accessible name | `{weekday}s, {hour} to {next hour} · {runs} runs ended · {time} in those runs`, such as `Sundays, 4 PM to 5 PM · 137 runs ended · 2 hr 15 min in those runs`, `1 run ended` for one, and `Saturdays, 11 PM to 12 AM` for the last hour. Counting runs, the time is left out. No runs: `Sundays, 6 AM to 7 AM · No runs` | The plural says the square adds up every such hour in the period. "Ended" and "in those runs" say the minutes are credited to the hour the runs ended in, which can hold minutes played in the hour before (HM2). |
 | Calendar, accessible caption | `By day, {period}`, such as `By day, last 12 months` or `By day, 2025` | The visible caption with the period, so a screen reader names the table it enters. |
 | Hour grid, accessible caption | `By hour of the week, {period}` | As the calendar's. |
 | Rows' accessible headers, both heatmaps | `Sunday` to `Saturday` | Full names for a screen reader; the visible labels are short. |
@@ -867,9 +940,10 @@ Each entry is written as [docs/glossary.md](../glossary.md) would hold it.
 The shipping PR moves them in.
 
 - **Time in runs**, under "Play", after Run length. The sum of the run
-  lengths of a set of runs: how long they took to play, pauses left out. It
-  leaves out the time between runs and any attempt that wrote no stats file,
-  such as a restart, so it is less than the time played. It is unknown when
+  lengths of a set of runs, rounded as the app rounds a measured time: how
+  long the recorded runs took to play, pauses left out. It is a minimum of
+  the time played, because it leaves out the time between runs and any
+  attempt that wrote no stats file, such as a restart. It is unknown when
   any of the runs has no run length. How the Activity card uses it is in
   `home.md`.
   - On screen: `{time} in runs`.
@@ -961,10 +1035,14 @@ each in their own Firefox before it merges.
 
 - **Unit, the pure function,** through a table of cases: the periods listed,
   newest first, with no year that has no runs; the last 12 months equal to
-  Run History's 365 dates; each summary form; the switch to runs on one run
-  without a length; nearest-rank cut points, ties, and fewer than four days;
-  a day that rounds to `<1 min` still shaded; each range equal to the values
-  its hovers write, and `none` for an empty shade; a run counted on the date
+  Run History's 365 dates; each summary form, and the line under it in
+  each state; the switch to runs on one run without a length; the
+  calendar's bands at their edges (15 and 16, 30 and 31, 60 and 61 minutes,
+  and the same in runs), the same day's shade under its year and under the
+  last 12 months, and a day that rounds to `<1 min` in the first band; the
+  hour grid's nearest-rank cut points, ties, fewer than four hours, and an
+  hour at 0 minutes; each hour-grid range equal to the values its hovers
+  write, and `none` for an empty shade; a run counted on the date
   and hour it ended, including one that crossed midnight; two runs in a
   repeated hour landing in one square; the current year with no squares
   after today; a leap year starting on a Saturday taking 54 columns; Sunday
@@ -977,6 +1055,9 @@ each in their own Firefox before it merges.
 - **Live, each PR:** headless Edge at 3840, 2560, 1920 and 1536 px, in light
   and dark, on the maintainer's stats, a period with no runs, a year that
   counts runs, and a player with ten runs. Keyboard: the arrow keys, Home and
-  End, and focus showing the text. NVDA walked and recorded. The maintainer's
-  look in Firefox.
+  End, and focus showing the text. Touch, at a phone's width with touch
+  emulated: scroll the calendar sideways, tap a square reached by the
+  scroll and read its text, tap outside to dismiss it, and drag without
+  selecting. NVDA walked and recorded, with each table's description read.
+  The maintainer's look in Firefox.
 - **Docs:** `tests/test_docs.py` for the links, and the gates in AGENTS.md.
