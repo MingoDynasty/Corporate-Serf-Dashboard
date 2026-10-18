@@ -233,11 +233,14 @@ heading were edited on the captured page, not in the app.
   agrees with the run list about which run is newest.
 - **It is judged as today:** against the PB it was chasing, under its own
   version of the scenario, with the same badge, percentage, caps and accuracy.
-- **The card is rewritten on the same triggers as today:** a run landing on
-  any scenario, a change of scenario, the Score threshold percentage, and the
-  newest session ending. A run on another scenario can change the third line's
-  words (a new session makes the old one "last" or older) without changing
-  the run.
+- **The card is rewritten on today's triggers, plus the date moving on:** a
+  run landing on any scenario, a change of scenario, the Score threshold
+  percentage, the newest session ending, and the page's date store. A run on
+  another scenario can change the third line's words (a new session makes the
+  old one "last" or older) without changing the run. The date matters because
+  an older session's name leaves its year out only while it is this year's,
+  as the run list's rows do: a page left open over New Year's would otherwise
+  keep `Dec 31, 2:00 PM session` with no year.
 - **The scenario's name on the first line is always plain text,** with the
   whole name as its tooltip where the card cuts it short, as today while it
   is selected.
@@ -342,7 +345,9 @@ card's empty states open on `PB`.
   apart, and the card draws each as a line in the card's session style.
 - **`show_latest_run` computes two things:** the card's run, from the
   selected scenario, and the newest run overall, whose id it writes to the
-  store the chart's ring and the list's highlight read, as today.
+  store the chart's ring and the list's highlight read, as today. It takes
+  the page's date store (`TODAY_STORE_ID`) as an `Input`, read for nothing
+  but its change, as `build_run_list_rows` does for its session names.
 - **`latest_run_card_content`** loses its button branch and gains the three
   empty states. The scenario button leaves `latest_run_card`, the page's
   outputs, and `reach_scenario_or_the_one_asked_for`.
@@ -467,7 +472,9 @@ merges.
 - **Callbacks:** a change of scenario rewrites the card; with Follow off, a run
   on another scenario leaves the card's run and moves the ring's store; a run
   that starts a new session turns "last session" into the session's name; the
-  selection callback has no card input, and its three callers still select.
+  date store moving into a new year rewrites an older session's name with its
+  year, with no run landing; the selection callback has no card input, and
+  its three callers still select.
 - **Scenario Stats:** no Last played in any state; the first line's text and
   that it is not a heading; "No scenario selected" with nothing selected;
   Category and Number of runs unchanged.
