@@ -215,11 +215,18 @@ heading were edited on the captured page, not in the app.
 - **An existing stats folder with no runs shows no setup hint** above the
   row. The card's "No runs yet" state is what a new user with a stats folder
   sees.
+- **With Follow off, a run leaves the selection as it was,** empty or on
+  another scenario: `reach_scenario` returns nothing to write for it. With
+  Follow on it selects the run's scenario. Checked at `dc4e596` by calling
+  it, as two reviewers did.
 
 ### Not checked
 
 - What NVDA says of the hidden heading and of the cards' first lines. The
   mockups are captured pages, not the live app.
+- The empty store's new sentence in a browser. The mockups show today's. At
+  61 characters it is shorter than the two messages they measured, today's
+  at 63 and "Play this scenario…" at 66.
 - A run landing while the page is open. The rule ran in the served app, but
   no run landed during the captures.
 - 1536 px, and browser zoom at 110% and 125%.
@@ -273,17 +280,27 @@ card's empty states open on `PB`.
 
 | When | The card reads |
 |---|---|
-| The store has no runs | "No runs yet" over "Play a scenario in KovaaK's and your latest run will show here." (today's text) |
+| No scenario is selected, and the store has no runs | "No runs yet" over "Play a scenario in KovaaK's. Select it to see its latest run." |
 | No scenario is selected | "No scenario selected" |
-| The selected scenario has no runs | "No runs yet" over "Play this scenario in KovaaK's and your latest run will show here." |
+| The selected scenario has no runs, whether or not the store has any | "No runs yet" over "Play this scenario in KovaaK's and your latest run will show here." |
 
-- **No runs at all comes first.** A new user usually has nothing to select,
-  since the scenario list comes from local runs, so "this scenario" would
-  point at nothing.
-- **"Play this scenario"** because with Follow off a different scenario would
-  not show here. The PB card beside it says "Play this scenario to record one
-  in this app."
+- **The selection decides first, as on the PB card.** A playlist filter lists
+  its scenarios before any is played, so a scenario can be selected in a
+  store with no runs. The card then speaks of it, as the PB card beside it
+  does: "Play this scenario to record one in this app."
+- **"Play this scenario" holds with Follow off.** Playing the selected
+  scenario keeps it selected, and a different scenario would not show here.
+- **With nothing selected and no runs, the sentence says to select the
+  scenario played.** With Follow off a first run leaves the selection empty,
+  and the card then reads "No scenario selected", so today's "your latest run
+  will show here" would promise what the card does not do. With Follow on,
+  the default, the run's scenario is selected as it lands, and the second
+  step is already done.
 - **The card keeps its height** in every empty state.
+
+Rejected: today's sentence for a store with no runs, which is true only with
+Follow on; a sentence that changes with the Follow switch, which would make
+the switch one of the card's triggers for a state a new user sees once.
 
 ### What goes with the Show {scenario} button
 
@@ -371,9 +388,9 @@ has today and this table does not name is unchanged.
 | Latest-run card, third line, newest session | `Run {n} this session`, `Run {n} last session` | Today's words, with the time moved to the next line. |
 | Latest-run card, third line, older session | `Run {n} ({session} session)`, such as `Run 7 (Oct 16, 2:00 PM session)` | The session's name as the run list's row gives it. The maintainer's form. |
 | Latest-run card, fourth line | `{duration} on this scenario`, `Time on this scenario unknown` | Today's words, on a line of their own. |
-| Latest-run card, no runs at all | `No runs yet` over `Play a scenario in KovaaK's and your latest run will show here.` | Today's text. |
+| Latest-run card, no runs at all and no scenario selected | `No runs yet` over `Play a scenario in KovaaK's. Select it to see its latest run.` | Was `Play a scenario in KovaaK's and your latest run will show here.`, which only Follow on makes true. |
 | Latest-run card, no scenario selected | `No scenario selected` | The page's words for the state, as the PB card, the chart and the run list say them. |
-| Latest-run card, a scenario with no runs | `No runs yet` over `Play this scenario in KovaaK's and your latest run will show here.` | "This", because the card follows the selection. |
+| Latest-run card, a scenario with no runs | `No runs yet` over `Play this scenario in KovaaK's and your latest run will show here.` | "This", because the card follows the selection. Also in a store with no runs. |
 | Scenario Stats, first line | `Scenario stats` | Plain text in sentence case, as the other cards' first lines. Was `Scenario Stats`. |
 | Scenario Stats, no scenario selected | `No scenario selected` | As the two cards beside it. |
 | Run list heading, screen readers only | `{scenario} · {n} runs`, `1 run`, `All scenarios · {n} runs` | Today's words, hidden from view. |
@@ -465,8 +482,9 @@ merges.
   newest session (in progress, and ended); played only in an older session;
   played in an older session the same day as the newest; never played; no
   scenario selected; a store with no runs, with and without a scenario
-  selected. Each checks the run, the third line's two parts, and the empty
-  state's words.
+  selected, which read the empty store's sentence and "Play this scenario"
+  respectively. Each checks the run, the third line's two parts, and the
+  empty state's words.
 - **Unit, the older session's name:** this year and an earlier year, matching
   the run list's row for the same session; a visit with no usable start.
 - **Callbacks:** a change of scenario rewrites the card; with Follow off, a run
@@ -475,6 +493,11 @@ merges.
   date store moving into a new year rewrites an older session's name with its
   year, with no run landing; the selection callback has no card input, and
   its three callers still select.
+- **Callbacks, the first run into a store with no runs,** with Follow off and
+  on, with nothing selected and with a playlist's unplayed scenario selected
+  and another scenario played. With Follow off the selection stays as it
+  was, and the card reads "No scenario selected" or keeps "Play this
+  scenario". With Follow on the card shows the run.
 - **Scenario Stats:** no Last played in any state; the first line's text and
   that it is not a heading; "No scenario selected" with nothing selected;
   Category and Number of runs unchanged.
