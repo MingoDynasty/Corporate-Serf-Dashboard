@@ -809,6 +809,20 @@ a.run-toast-link:hover {
     scrollbar-color: transparent transparent;
 }
 
+/* Where the browser draws scrollbars over the page, as Firefox does on
+   Windows 11 by default, the grid's scrollbar takes no room, and with the
+   pointer on it, it covered the end of the last column and of the session
+   rows. The grid marks such a scrollbar invisible. The room goes inside both
+   scrolling areas, so the pinned row stays in line with the rows under it,
+   and the marks column gives it up. A scrollbar that takes room of its own
+   gets none: it already clears the rows, and the marks column has too little
+   left to give both. The room is the scrollbar's width with the pointer on
+   it, 12px in Firefox 158, so a cell's own padding stays clear beside it. */
+.run-history-list-grid:has(.ag-body-vertical-scroll.ag-scrollbar-invisible)
+    :is(.ag-center-cols-viewport, .ag-floating-top-viewport) {
+    padding-right: 12px;
+}
+
 /* A run's number sits under its session's name, clear of the session row's
    button. */
 .run-history-list-grid .run-list-number {
