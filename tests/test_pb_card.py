@@ -570,7 +570,12 @@ PLAYLIST = PlaylistData(
 @pytest.fixture
 def store(monkeypatch):
     """Stub the run store and the loaded playlists the card reads."""
-    held: dict = {"runs": {}, "pace_basis": None, "pace_asked": []}
+    held: dict = {
+        "runs": {},
+        "pace_basis": None,
+        "pace_asked": [],
+        "version_pace_asked": [],
+    }
     playlists = {BENCHMARK.code: BENCHMARK, PLAYLIST.code: PLAYLIST}
 
     def pace_basis(scenario):
@@ -578,6 +583,9 @@ def store(monkeypatch):
         if isinstance(held["pace_basis"], Exception):
             raise held["pace_basis"]
         return held["pace_basis"]
+
+    def version_pace_basis(scenario, version):
+        held["version_pace_asked"].append((scenario, version))
 
     # ``held["runs"]`` holds each scenario's runs oldest first.
     monkeypatch.setattr(
@@ -587,7 +595,7 @@ def store(monkeypatch):
     )
     monkeypatch.setattr(pb_card, "get_playlist_by_code", playlists.get)
     monkeypatch.setattr(pb_card, "get_pace_basis", pace_basis)
-    monkeypatch.setattr(pb_card, "get_version_pace_basis", lambda _s, _v: None)
+    monkeypatch.setattr(pb_card, "get_version_pace_basis", version_pace_basis)
     return held
 
 
@@ -631,15 +639,17 @@ def test_the_ladder_is_the_one_the_playlist_filters_benchmark_gives(
     assert _body_text(content) == expected
 
 
-def test_the_pace_basis_is_read_only_for_a_scenario_with_a_ladder(store):
-    """As the table reads it: a playlist's table never reads a performance file."""
+def test_the_gaps_pace_basis_is_read_only_for_a_scenario_with_a_ladder(store):
+    """Read the gap's basis as the table does, and the hover's basis either way."""
     store["runs"][SCENARIO] = _scored(3000, 3653)
 
     pb_card.show_pb(None, SCENARIO, PLAYLIST.code)
     assert store["pace_asked"] == []
+    assert store["version_pace_asked"] == [(SCENARIO, VERSION)]
 
     pb_card.show_pb(None, SCENARIO, BENCHMARK.code)
     assert store["pace_asked"] == [SCENARIO]
+    assert store["version_pace_asked"] == [(SCENARIO, VERSION)] * 2
 
 
 def test_a_failed_pace_lookup_costs_the_pace_gap_and_never_the_card(store, caplog):

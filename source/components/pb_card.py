@@ -298,8 +298,9 @@ def personal_best_from_store(
         return None
     ladder = _ladder(playlist_code, selected_scenario)
     pace_basis = None
-    # As the benchmark table does: only a scenario with a ladder shows a gap,
-    # so only then is a performance file read.
+    # The gap's pace basis, read as the table reads it: only a scenario with
+    # a ladder shows a gap. The hover's version basis is read either way, by
+    # ``what_runs_chased``, as the latest-run card reads it.
     if ladder:
         try:
             pace_basis = get_pace_basis(selected_scenario)
