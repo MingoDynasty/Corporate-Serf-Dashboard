@@ -130,8 +130,8 @@ every run in the store, a total Home already gives ("Found {runs} runs across
 The material consequence: `{scenario} · {n} runs` and `All scenarios · {n}
 runs` leave the screen, and the list gains 35 px of rows.
 
-**Recommendation: remove the visible heading line in both views. A visually
-hidden heading keeps the same words for screen readers.**
+**Recommendation: remove the visible heading line in both views. Its text
+stays for screen readers, hidden from view, in the same words.**
 
 - **Under R1 the card right above the list names its scenario,** and
   Scenario Stats keeps the run count.
@@ -222,7 +222,7 @@ heading were edited on the captured page, not in the app.
 
 ### Not checked
 
-- What NVDA says of the hidden heading and of the cards' first lines. The
+- What NVDA says of the hidden heading line and of the cards' first lines. The
   mockups are captured pages, not the live app.
 - The empty store's new sentence in a browser. The mockups show today's. At
   61 characters it is shorter than the two messages they measured, today's
@@ -337,12 +337,21 @@ the switch one of the card's triggers for a state a new user sees once.
 ### The run list
 
 - **The heading line is hidden from view in both views** and kept for screen
-  readers with the app's `visually-hidden` class, in today's words.
+  readers with the app's `visually-hidden` class, in today's words. It stays
+  what it is today, a line of text read in its place before the view switch.
+  "Heading line" is the spec's name for it: it is not an HTML heading, and it
+  does not become one.
 - **The view switch, "Expand all" and "Columns"** move up to the header's
   first line. Nothing else in the list changes.
 - **A scenario with no runs** no longer reads `{scenario} · 0 runs` above the
   list. The card reads "No runs yet", and the list shows the newest session
   alone, as today.
+
+Rejected: making the hidden line an `h2`, which would give the page a heading
+to jump to once Scenario Stats' heading goes. R3 only takes a line out of
+view, so a screen reader hears what it hears today; an `h2` would change that,
+and what NVDA makes of the page is not checked. An implementing PR that
+checks it can propose one.
 
 ### Narrow windows, keyboard and screen readers
 
@@ -350,8 +359,9 @@ the switch one of the card's triggers for a state a new user sees once.
   above the chart, and the latest-run card stays in the top row, above it.
 - **Keyboard:** the card's age still takes focus and shows the exact time.
   The button was the card's one control, and it is gone.
-- **Screen readers:** the run list keeps its heading, hidden. Scenario Stats'
-  first line is no longer a heading. The cards' first lines are read as text.
+- **Screen readers:** the run list keeps its heading line's text, hidden.
+  Scenario Stats' first line is no longer a heading, and it was the page's
+  only `h2`. The cards' first lines are read as text.
 
 ### How it is built
 
@@ -373,7 +383,8 @@ the switch one of the card's triggers for a state a new user sees once.
 - **The em dash guard's allowlist becomes empty.** Its check that the
   allowlisted string is still found, which proved the walk reads real source,
   needs another proof, such as a planted fixture the walk must find.
-- **The run list's heading** takes the `visually-hidden` class.
+- **The run list's heading line** keeps its `dmc.Text` and takes the
+  `visually-hidden` class.
 
 ### Copy
 
@@ -393,7 +404,7 @@ has today and this table does not name is unchanged.
 | Latest-run card, a scenario with no runs | `No runs yet` over `Play this scenario in KovaaK's and your latest run will show here.` | "This", because the card follows the selection. Also in a store with no runs. |
 | Scenario Stats, first line | `Scenario stats` | Plain text in sentence case, as the other cards' first lines. Was `Scenario Stats`. |
 | Scenario Stats, no scenario selected | `No scenario selected` | As the two cards beside it. |
-| Run list heading, screen readers only | `{scenario} · {n} runs`, `1 run`, `All scenarios · {n} runs` | Today's words, hidden from view. |
+| Run list heading line, screen readers only | `{scenario} · {n} runs`, `1 run`, `All scenarios · {n} runs` | Today's words, hidden from view. |
 
 Removed: `Last played:` with its values, `—` and `Never`, and its hover; the
 `Show {scenario}` button and its accessible name.
@@ -501,8 +512,9 @@ merges.
 - **Scenario Stats:** no Last played in any state; the first line's text and
   that it is not a heading; "No scenario selected" with nothing selected;
   Category and Number of runs unchanged.
-- **The run list:** the heading is hidden in both views and present for a
-  screen reader, and the header's controls sit on its first line.
+- **The run list:** the heading line's text is hidden in both views, still in
+  the page's text for a screen reader, and not a heading element; the
+  header's controls sit on its first line.
 - **The em dash guard** passes with an empty allowlist and still proves its
   walk reads real source.
 - **Live:** headless Edge and Firefox at 3840, 2560, 1920 and 1536 px, in
