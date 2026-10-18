@@ -376,16 +376,17 @@ a.run-toast-link:hover {
 }
 
 /* The latest-run card, over the run list. It is as tall as the row, and
-   never less than 132px, which holds its tallest state: its second line on
-   two lines in a narrow card. What it shows changes between runs and its
-   height never follows it, so the chart under it never jumps. The lines are
-   centered in that height. */
+   never less than 135px, which holds its tallest state: its second line on
+   two lines in a narrow card, over the run's session and its time on the
+   scenario. What it shows changes between runs and its height never follows
+   it, so the chart under it never jumps. The lines are centered in that
+   height. */
 .run-history-card {
     display: flex;
     flex-direction: column;
     gap: 2px;
     justify-content: center;
-    min-height: 132px;
+    min-height: 135px;
     min-width: 0;
     overflow: hidden;
     padding: 0 var(--mantine-spacing-sm);

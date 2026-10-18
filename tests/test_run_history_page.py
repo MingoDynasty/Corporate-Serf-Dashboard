@@ -1539,16 +1539,18 @@ def test_every_card_in_the_row_has_the_same_frame():
     assert "border-radius: var(--mantine-radius-sm);" in frame
 
 
-def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
-    """132px holds the card's tallest state, so its height never follows a run.
+def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
+    """135px holds the card's tallest state, so its height never follows a run.
 
-    A minimum and not a height: the card is as tall as the row, which the PB
+    The tallest state is the second line on two lines in a narrow card, over
+    the third and fourth lines, measured at 135px in Edge and Firefox. A
+    minimum and not a height: the card is as tall as the row, which the PB
     card makes taller in its setup state, with no KovaaK's username.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".run-history-card")
 
-    assert "min-height: 132px;" in card
+    assert "min-height: 135px;" in card
     assert re.search(r"(?m)^    height:", card) is None
     assert "min-width: 0;" in card
     assert "overflow: hidden;" in card
