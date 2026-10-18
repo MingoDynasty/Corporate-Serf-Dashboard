@@ -288,7 +288,7 @@ card's empty states open on `PB`.
 | When | The card reads |
 |---|---|
 | No scenario is selected, and the store has no runs | "No runs yet" over "Play a scenario in KovaaK's. Select it to see its latest run." |
-| No scenario is selected | "No scenario selected" |
+| No scenario is selected, and the store has runs | "No scenario selected" |
 | The selected scenario has no runs, whether or not the store has any | "No runs yet" over "Play this scenario in KovaaK's and your latest run will show here." |
 
 - **The selection decides first, as on the PB card.** A playlist filter lists
@@ -522,8 +522,7 @@ merges.
   scenario". With Follow on the card shows the run.
 - **Scenario Stats:** no Last played in any state; the first line's text and
   that it is not a heading; "No scenario selected" under the first line with
-  nothing selected;
-  Category and Number of runs unchanged.
+  nothing selected; Category and Number of runs unchanged.
 - **The run list:** the heading line's text is hidden in both views, still in
   the page's text for a screen reader, and not a heading element; the
   header's controls sit on its first line.
