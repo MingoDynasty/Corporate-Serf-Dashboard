@@ -423,9 +423,12 @@ the selected scenario, then Last played and Number of runs, at one weight,
 in a 270 px frame
 ([T2](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md),
 [T4](../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md)).
-Position moved to the PB card. The line goes after Number of runs. Placing
-it by importance, or moving it to the PB card beside the PB, is a later
-change that neither proposal makes.
+Position moved to the PB card. T4 lists a card's facts in importance order
+when it has no lead fact, so **the line goes second, after Category**, or
+first when no benchmark is selected. The typical score is the fact D1 makes
+the measure of skill; Last played and Number of runs are lookup context.
+Moving it to the PB card, beside the PB, is a later change that neither
+proposal makes.
 
 **The cost, measured on the shipped card** (headless Edge at 2560 and 1920
 px, the maintainer's stats, with a benchmark selected and without): the row
@@ -589,10 +592,10 @@ selected (the Category line is absent without one):
 ```
 | Scenario Stats              |  | Scenario Stats              |  | Scenario Stats              |
 | Category: Tracking · Smooth |  | Category: Tracking · Smooth |  | Category: Clicking · Static |
-| Last played: 2 minutes ago  |  | Last played: 2 months ago   |  | Last played: 5 minutes ago  |
-| Number of runs: 463         |  | Number of runs: 169         |  | Number of runs: 6           |
 | Typical score: 1,179        |  | Typical score: 1,390 ·      |  | Typical score: Too few      |
 |                             |  |   as of Apr 12              |  |   recent runs · 6 runs      |
+| Last played: 2 minutes ago  |  | Last played: 2 months ago   |  | Last played: 5 minutes ago  |
+| Number of runs: 463         |  | Number of runs: 169         |  | Number of runs: 6           |
          fresh                              as of                          unknown
 ```
 
@@ -790,7 +793,8 @@ fit; the line is a median of runs and almost always sits among them.
 
 ### The Scenario Stats line
 
-- **`Typical score:`** after Number of runs, in the card's label style, with
+- **`Typical score:`** second, after Category (first without one), in the
+  card's label style, with
   the value and hover in [Copy](#copy).
 - **It is worked out again when a run lands on the selected scenario, when
   the scenario changes, and on the page's 30-second tick,** so "as of"
@@ -927,7 +931,11 @@ They erase nothing.
   and in code. D1, D2 and D3 stand.
 - [2026-10-14, Scenario Stats names the selected benchmark's category](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md):
   "The three facts have one weight, Category first." The card gains a
-  fourth, Typical score, after Number of runs, at the same weight.
+  fourth, Typical score, second after Category, at the same weight.
+- [2026-10-14, a card's lines follow their role in the player's next action](../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md):
+  "Category, Last played, Number of runs in Scenario Stats." The rule
+  stands; its list becomes Category, Typical score, Last played, Number of
+  runs.
 
 Statements in the specs that go untrue, which the same PRs rewrite:
 
@@ -941,7 +949,7 @@ Statements in the specs that go untrue, which the same PRs rewrite:
   `Middle 80%` off in Overlays.
 - [run_history.md, Scenario Stats](../specs/run_history.md#scenario-stats):
   "under it, at one weight, are 'Category:', 'Last played:' and 'Number of
-  runs:'", which gains 'Typical score:'.
+  runs:'", which gains 'Typical score:' second.
 - [run_history.md, Time-scored scenarios](../specs/run_history.md#time-scored-scenarios):
   the list of surfaces that order or place scores, unchanged on a
   time-scored scenario, gains the typical score.
