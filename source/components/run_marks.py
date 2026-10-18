@@ -20,7 +20,9 @@ from source.components.score_threshold import (
 )
 from source.kovaaks.data_models import RunData
 from source.kovaaks.data_service import new_high_score_runs
+from source.kovaaks.pace import percent_faster
 from source.kovaaks.time_scored_service import PaceBasis, eligible_pace_constant
+from source.utilities.utilities import format_score
 
 
 class Chased(NamedTuple):
@@ -55,6 +57,27 @@ class RunMark:
     def passed(self) -> bool:
         """Whether the run was judged and met the score threshold."""
         return isinstance(self.verdict, ThresholdVerdict) and self.verdict.passed
+
+
+def new_pb_gain(score: float, previous_best: float, chased: Chased) -> str:
+    """Word how far a new PB beat the previous best, as its toast does.
+
+    The latest-run card says it of a run that has just set a PB, and the PB
+    card's score says it of the PB on hover, in the same words.
+    """
+    previous = format_score(previous_best)
+    gain_by_pace = (
+        percent_faster(chased.pace_constant, previous_best, score)
+        if chased.pace_constant is not None
+        else None
+    )
+    if gain_by_pace is not None:
+        return f"{gain_by_pace:.1f}% faster than your previous best of {previous}"
+    if previous_best > 0:
+        gain = (score / previous_best - 1) * 100
+        return f"Up {gain:.1f}% on your previous best of {previous}"
+    # Zero has no percentage to give, and a negative one would read backwards.
+    return f"Your previous best was {previous}"
 
 
 def what_runs_chased(

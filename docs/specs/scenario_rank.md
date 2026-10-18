@@ -7,10 +7,10 @@ automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
 no username configured it makes no network calls at all. During normal play
-the field explains its own state beside the value instead of popping up a
-notification, and only two things still interrupt: a Refresh the player
+the leaderboard line explains its own state beside the value instead of
+popping up a notification, and only two things still interrupt: a Refresh the player
 clicked, and a Steam ID that disagrees with the account KovaaK's found, said
-once per app session because the field has nowhere to put it.
+once per app session because the line has nowhere to put it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -102,6 +102,26 @@ benchmark tier) — see the
   unresolved until the total refreshes. `rank == total_players` still derives
   ([2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)).
 
+## On Run History
+
+- The position is the leaderboard line of Run History's
+  [PB card](run_history.md#the-pb-card), under the PB and sourced apart from
+  it ([T3](../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md)).
+- With a percentile, the line leads with it: `{percentile}% percentile`, two
+  decimals, such as `81.13% percentile`, and the position and the total are
+  the first line of its hover, `Position {position} of {total}`. In every
+  other state the line reads `Position: {value}`: `Position: {position}` with
+  no total, `Position: {position} of {total}` when a cached total is below
+  the position and gives no percentile, `Position: Unranked ({n} players)`,
+  or `Position: N/A` with one of the hints under
+  [Failure handling](#failure-handling). **Refresh** follows on the same line
+  where it fits.
+- The line follows the local PB: with no scenario selected, or a scenario
+  with no local runs, the card shows no line and the app looks nothing up for
+  it, even with a username set. A record KovaaK's holds from another
+  computer, for a scenario with no local runs, is not shown
+  ([T3](../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md)).
+
 ## Caching
 
 - Rank, leaderboard-total, and name-to-ID caches are JSON files under
@@ -128,10 +148,11 @@ benchmark tier) — see the
   replaces a known better value; only a user-clicked Refresh is
   board-authoritative and may write a lower score or `UNRANKED`
   ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
-- The Run History Position value says when its position was stored:
-  hovering or focusing it shows `Last updated {age} · {timestamp}`, from the
-  rank cache entry's `fetched_at`, and the value takes the dotted underline
-  the Last played value has. The time moves only when a leaderboard read is
+- The Run History leaderboard line says when its position was stored:
+  hovering or focusing its value shows `Last updated {age} · {timestamp}`,
+  under the position and the total where the percentile leads, from the rank
+  cache entry's `fetched_at`, and the value takes the dotted underline the
+  Last played value has. The time moves only when a leaderboard read is
   stored, so a failed fetch and an automatic read the monotonic writer refuses
   both leave it as it was. It dates the position alone; the leaderboard total
   beside it is cached separately with its own time. `N/A` has no hover, and
@@ -163,8 +184,8 @@ benchmark tier) — see the
   ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
   A chain that does catch up writes a board-authoritative rank, so it re-reads
   the leaderboard total too, TTL bypassed ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
-- The Run History rank widget passively re-reads the rank and total
-  caches on its existing interval — TTL ignored, no network calls
+- The Run History leaderboard line passively re-reads the rank and total
+  caches on the page's polling interval — TTL ignored, no network calls
   ([2026-07-01](../decision_log/2026/2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes.md)).
 - Background refresh failures are recorded in the console/file logs only;
   they produce no UI notification. The chain degrades silently — the widget
@@ -190,8 +211,9 @@ benchmark tier) — see the
 - Passive renders never toast — the routing policy sends persistent conditions
   to in-place UI
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
-  The Run History Position field carries its own
-  explanation instead: `N/A` plus " · set your KovaaK's username in Settings",
+  The Run History leaderboard line carries its own
+  explanation instead, after its `Position:` label: `N/A` plus " · set your
+  KovaaK's username in Settings",
   with Settings linked, when no username is configured, `N/A` plus
   " · lookup failed" when the lookup failed with nothing cached, and the
   cached value plus " · from cache" when a failed fetch was served from cache.
@@ -205,10 +227,11 @@ benchmark tier) — see the
   refresh Timer) moves the cache on, the interval reads a different value and
   the hint is retired rather than left contradicting a position that has
   since arrived.
-- With a scenario selected, Manual Refresh answers with a toast whatever
-  happens — the user asked for it — and every outcome comes off the
-  callback's own notification output; with none selected the click sets the
-  field to `N/A` and toasts nothing. A hard failure (an `error_message`
+- With a scenario selected that has local runs, Manual Refresh answers with
+  a toast whatever happens — the user asked for it — and every outcome comes
+  off the callback's own notification output. With none selected, or one
+  with no local runs, the line and its button are hidden, and a click that
+  lands as the selection changes sets the value to `N/A` and toasts nothing. A hard failure (an `error_message`
   result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh. The
@@ -231,7 +254,7 @@ benchmark tier) — see the
   no username configured never reaches the service at all: it is caught on the
   direct settings read after the `n_clicks` and selected-scenario guards, and
   answered blue, titled "KovaaK's username not set", leaving the value alone
-  because the field's own hint already explains it
+  because the line's own hint already explains it
   ([2026-08-09](../decision_log/2026/2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure.md)).
   Only a genuinely fresh result gets the green confirmation, titled "Position
   refreshed". Every outcome is a channel emission, so a repeat click always

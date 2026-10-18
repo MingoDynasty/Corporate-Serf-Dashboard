@@ -26,6 +26,7 @@ from source import app_shell  # noqa: E402
 from source.components import (  # noqa: E402
     chart_options,
     latest_run_card,
+    pb_card,
     run_history_chart,
     scenario_selection,
     setup_surfaces,
@@ -190,6 +191,7 @@ def test_the_layout_builds_every_id_the_blocks_are_registered_for():
         run_history.SESSION_IN_PROGRESS_STORE_ID,
     } <= mounted
     assert set(run_history.LATEST_RUN_CARD_IDS) <= mounted
+    assert set(run_history.PB_CARD_IDS) <= mounted
     # The Columns menu's own id is part of its checkboxes' ids and is no
     # component's id by itself.
     list_ids = run_history.RUN_LIST_IDS._asdict()
@@ -258,12 +260,12 @@ def test_the_layout_takes_a_query_parameter_it_does_not_name():
     }
 
 
-def test_the_top_row_holds_the_dropdowns_and_stats_then_the_latest_run_card():
-    """Two columns: the first holds the dropdowns and the Scenario Stats card.
+def test_the_top_row_holds_the_dropdowns_stats_and_pb_then_the_latest_run_card():
+    """Two columns: the first holds the dropdowns, Scenario Stats and the PB card.
 
     The latest-run card is the second column on its own, so it sits over
-    the run list. Nothing else is in the first column: the room after the
-    stats card is kept for notes.
+    the run list, and the PB card is last in the first, beside it. Nothing
+    is between the stats card and the PB card: that room is kept for notes.
     """
     row = _by_class(run_history.layout(), "run-history-top-row")
 
@@ -271,10 +273,20 @@ def test_the_top_row_holds_the_dropdowns_and_stats_then_the_latest_run_card():
     assert left.className == "run-history-top-row-left"
     assert card.className == latest_run_card.CARD_CLASS
     assert _ids(card) == set(run_history.LATEST_RUN_CARD_IDS)
-    dropdowns, stats = left.children
+    dropdowns, stats, pb = left.children
     assert dropdowns.className == "run-history-dropdown-column"
     assert stats.className == "scenario-stats-card"
-    assert run_history.SCENARIO_STATS_IDS.rank in _ids(stats)
+    # Position is the PB card's now.
+    assert run_history.PB_CARD_IDS.rank in _ids(pb)
+    assert run_history.PB_CARD_IDS.rank not in _ids(stats)
+    assert pb.className == pb_card.CARD_CLASS
+    page_owned = {"run_events", "scenario_dropdown", "playlist_filter"}
+    page_owned |= {"polling_interval", "relative_time_interval"}
+    assert _ids(pb) == {
+        component_id
+        for field, component_id in run_history.PB_CARD_IDS._asdict().items()
+        if field not in page_owned
+    }
     playlist_field, scenario_field = dropdowns.children
     assert playlist_field.className == "run-history-playlist-field"
     assert scenario_field.className == "run-history-scenario-field"
@@ -1482,10 +1494,11 @@ def test_the_columns_stack_when_the_page_itself_is_900px_or_narrower():
 
 
 def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
-    """The dropdowns, Scenario Stats, then the latest-run card, in the page's order.
+    """The dropdowns, Scenario Stats, PB, then the latest-run card, in the page's order.
 
     With the list above the chart there is nothing for the card to line up
-    with, so the first column's pieces and the card share one line.
+    with, so the first column's pieces and the card share one line, packed
+    from its start: the PB card no longer keeps to the column's right end.
     """
     narrow = _container_block(
         STYLESHEET.read_text(encoding="utf-8"), "run-history-page (max-width: 900px)"
@@ -1493,17 +1506,19 @@ def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
 
     row = re.search(r"\.run-history-top-row \{(.*?)\}", narrow, re.DOTALL)
     left = re.search(r"\.run-history-top-row-left \{(.*?)\}", narrow, re.DOTALL)
+    pb = re.search(r"\.pb-card \{(.*?)\}", narrow, re.DOTALL)
     card = re.search(r"\.run-history-card \{(.*?)\}", narrow, re.DOTALL)
     assert row and "display: flex;" in row.group(1)
     assert "flex-wrap: wrap;" in row.group(1)
     assert left and "display: contents;" in left.group(1)
+    assert pb and "margin-left: 0;" in pb.group(1)
     assert card and "flex: 1 1 380px;" in card.group(1)
 
 
 def test_every_card_in_the_row_has_the_same_frame():
     frame = _css_block(
         STYLESHEET.read_text(encoding="utf-8"),
-        ".run-history-card,\n.scenario-stats-card",
+        ".run-history-card,\n.scenario-stats-card,\n.pb-card",
     )
 
     assert "border: 1px solid var(--mantine-color-default-border);" in frame
@@ -1513,8 +1528,8 @@ def test_every_card_in_the_row_has_the_same_frame():
 def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
     """132px holds the card's tallest state, so its height never follows a run.
 
-    A minimum and not a height: the card is as tall as the row, which the
-    Scenario Stats card makes taller in its tallest states.
+    A minimum and not a height: the card is as tall as the row, which the PB
+    card makes taller in its setup state, with no KovaaK's username.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".run-history-card")
@@ -1526,15 +1541,12 @@ def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
     assert "justify-content: center;" in card
 
 
-def test_the_stats_card_keeps_300px_for_its_text_and_adds_only_its_border():
-    """Every line breaks where it did, and the frame adds no height but its border.
-
-    Its tallest states, with the Position hint on its own line, fill the row.
-    """
+def test_the_stats_card_is_270px_and_adds_only_its_border_to_the_height():
+    """Category fits beside the PB card without padding raising the row."""
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".scenario-stats-card")
 
-    assert "width: calc(300px + 2 * var(--mantine-spacing-sm) + 2px);" in card
+    assert "width: 270px;" in card
     assert "padding: 0 var(--mantine-spacing-sm);" in card
     assert "flex: 0 0 auto;" in card
     assert "justify-content: center;" in card
@@ -1542,6 +1554,57 @@ def test_the_stats_card_keeps_300px_for_its_text_and_adds_only_its_border():
     assert "font-size: 12px;" in heading
     assert "line-height: 18px;" in heading
     assert "color: var(--mantine-color-dimmed);" in heading
+
+
+def test_the_pb_card_is_300px_at_the_first_columns_right_end():
+    """Beside the latest-run card, with the room before it kept for notes.
+
+    Its frame adds only its border to its height, so the row stays the height
+    the dropdowns' column sets in every state that changes between runs.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    card = _css_block(css, ".pb-card")
+
+    assert "flex: 0 0 300px;" in card
+    assert "margin-left: auto;" in card
+    assert "padding: 0 var(--mantine-spacing-sm);" in card
+    assert "justify-content: center;" in card
+    assert "max-width: 100%;" in card
+    # The age stays in its line: not a flex container, which drops spaces.
+    assert "display" not in _css_block(css, ".pb-card-heading")
+    # dmc's boxes round the score and Refresh add no line of their own.
+    assert "display: flex;" in _css_block(css, ".pb-card-flex-target")
+    # The score's last space reaches a screen reader and takes no room, its
+    # line height included: the score's 33px would otherwise make the row
+    # 12px taller, measured in Edge and Firefox.
+    word_end = _css_block(css, ".pb-card-word-end")
+    assert "font-size: 0;" in word_end
+    assert "line-height: 0;" in word_end
+    assert "white-space: pre;" in word_end
+
+
+def test_the_pb_cards_quiet_lines_and_its_badge_use_the_themes_tokens():
+    """The rank colors from the benchmark files are the only fixed colors."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    badge = _css_block(css, ".pb-card .pb-card-rank-badge")
+
+    assert "color: var(--mantine-color-text);" in badge
+    assert "border: 1px solid var(--pb-card-rank-color);" in badge
+    assert (
+        "background: color-mix(in srgb, var(--pb-card-rank-color) 20%, transparent);"
+        in badge
+    )
+    assert "background: var(--pb-card-rank-color);" in _css_block(
+        css, ".pb-card-rank-dot"
+    )
+    for quiet in (".pb-card-heading", ".pb-card-faded"):
+        assert "color: var(--mantine-color-dimmed);" in _css_block(css, quiet)
+    # With no PB the faded line is empty and out of the card.
+    assert "display: none;" in _css_block(css, ".pb-card-faded:empty")
+    # Its hidden attribute takes the leaderboard line out with no local PB,
+    # which the line's own display would otherwise undo.
+    assert "display: flex;" in _css_block(css, ".pb-card-leaderboard")
+    assert "display: none;" in _css_block(css, ".pb-card-leaderboard[hidden]")
 
 
 def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
@@ -1621,7 +1684,7 @@ def test_the_cards_age_is_reworded_in_the_browser_on_the_30_second_tick():
     ]
     assert registration["prevent_initial_call"] is False
     assert interval.interval == 30_000
-    script = run_history._LATEST_RUN_TIME_SCRIPT
+    script = latest_run_card.AGE_SCRIPT
     assert "seconds === null || seconds === undefined" in script
     assert 'return [true, "", ""];' in script
     assert 'dagfuncs.relativeTime(seconds, "")' in script
