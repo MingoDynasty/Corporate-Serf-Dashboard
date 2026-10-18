@@ -27,13 +27,13 @@ dagfuncs.nullsLastComparator = function (
 // from two contexts: AG Grid colDef `{"function": ...}` strings, where dash-ag-grid
 // spreads this registry's contents into scope as BARE names -- call
 // `relativeTime(...)` directly, NOT `dagfuncs.relativeTime(...)` (there is no
-// `dagfuncs` in that scope) -- and the Scenario Stats clientside callbacks, which run
-// in real browser global scope and uses the full `window.dashAgGridFunctions` path.
-// See docs/decision_log/ (2026-06-20: Reference dash-ag-grid Grid Functions By
+// `dagfuncs` in that scope) -- and the Run History cards' clientside callbacks, which
+// run in real browser global scope and use the full `window.dashAgGridFunctions`
+// path. See docs/decision_log/ (2026-06-20: Reference dash-ag-grid Grid Functions By
 // Bare Name).
 //
-// `seconds` is epoch *seconds* (the grid already carries this; the Scenario Stats
-// stores emit it too); both guard null/empty -> the caller-supplied sentinel before
+// `seconds` is epoch *seconds* (the grid already carries this; the cards' stores
+// emit it too); both guard null/empty -> the caller-supplied sentinel before
 // constructing a Date (new Date(null) -> 1970, which must not render as an age).
 
 // Relative, humanized age: "5 minutes ago". Always a single rounded unit, never

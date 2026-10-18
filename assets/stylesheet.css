@@ -367,11 +367,11 @@ a.run-toast-link:hover {
     width: 270px;
 }
 
-/* The card's heading, drawn as the latest-run card's first line. */
+/* The card's first line, plain text drawn as the latest-run card's and the PB
+   card's first lines are. */
 .scenario-stats-card > .scenario-stats-heading {
     color: var(--mantine-color-dimmed);
     font-size: 12px;
-    font-weight: 400;
     line-height: 18px;
 }
 

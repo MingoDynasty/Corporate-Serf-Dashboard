@@ -66,7 +66,7 @@ CARD_CLASS = "run-history-card"
 HEADING_CLASS = "run-history-card-heading"
 HEADING_TEXT_CLASS = "run-history-card-heading-text"
 HEADING_LABEL_CLASS = "run-history-card-label"
-# The run's age, with the hover affordance Last played's has.
+# The run's age, with the hover affordance the playlist tables' Last played has.
 TIME_CLASS = "cell-tooltip-affordance"
 TIME_TARGET_CLASS = "run-history-card-time-target"
 SCENARIO_CLASS = "run-history-card-scenario"
@@ -80,7 +80,8 @@ EMPTY_MESSAGE_CLASS = "run-history-card-empty-message"
 
 
 # A card's age is worded in the browser, when the card is written and on every
-# 30-second tick, as Last played is, so it stays current on a page left open:
+# 30-second tick, as the playlist tables' Last played is, so it stays current
+# on a page left open:
 # during play the latest-run card's doubles as a break timer. The hover is the
 # exact time in the shared format. With nothing to date, the words that hold
 # the age are hidden, and the card's name before them stays. The latest-run

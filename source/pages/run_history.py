@@ -85,7 +85,6 @@ from source.components.scenario_stats import (
     ScenarioStatsIds,
     register_scenario_stats,
     scenario_stats_panel,
-    scenario_stats_stores,
 )
 from source.components.score_threshold import (
     normalize_score_threshold_percentage,
@@ -197,15 +196,12 @@ LATEST_RUN_CARD_IDS = LatestRunCardIds(
 SCENARIO_STATS_IDS = ScenarioStatsIds(
     category_row="run-history-category-row",
     category="run-history-category",
-    last_played="run-history-last-played",
-    last_played_tooltip="run-history-last-played-tooltip",
+    num_runs_row="run-history-num-runs-row",
     num_runs="run-history-num-runs",
-    last_played_ts="run-history-last-played-ts",
-    last_played_empty_value="run-history-last-played-empty-value",
+    no_scenario="run-history-stats-no-scenario",
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
-    relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 # The position's ids are the ones it had in the Scenario Stats card. No browser
 # remembers a value under any of them.
@@ -801,7 +797,6 @@ def layout(
                 id=CHART_OPTIONS_IDS.cached_plot,
                 data=generate_placeholder_plot().to_json(),
             ),
-            *scenario_stats_stores(SCENARIO_STATS_IDS),
             # The date the page is drawn on. Without it the first tick would
             # find no date held, write one, and rebuild a chart just drawn.
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
@@ -826,9 +821,9 @@ def layout(
                 interval=config.polling_interval,
                 n_intervals=0,
             ),
-            # A 30-second tick of its own for the relative times, Last played
-            # and the two cards' ages, so how often they are reworded never
-            # depends on how often the page polls for data.
+            # A 30-second tick of its own for the relative times, the two
+            # cards' ages, so how often they are reworded never depends on how
+            # often the page polls for data.
             dcc.Interval(
                 id=RELATIVE_TIME_INTERVAL_ID,
                 interval=30_000,

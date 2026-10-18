@@ -101,7 +101,8 @@ NEXT_RANK_CLASS = f"{RESULT_CLASS} pb-card-next-rank"
 RANK_DOT_CLASS = "pb-card-rank-dot"
 THRESHOLD_CLASS = "pb-card-threshold"
 FADED_CLASS = "pb-card-faded"
-# The score with a hover, with the affordance Last played's has.
+# The score with a hover, with the affordance the playlist tables' Last played
+# has.
 SCORE_HOVER_CLASS = f"{SCORE_CLASS} {TIME_CLASS}"
 LEADERBOARD_CLASS = f"{RESULT_CLASS} pb-card-leaderboard"
 FLEX_TARGET_CLASS = "pb-card-flex-target"

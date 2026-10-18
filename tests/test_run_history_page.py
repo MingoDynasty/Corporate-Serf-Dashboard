@@ -17,7 +17,7 @@ import dash
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
 import pytest
-from dash import dcc, no_update
+from dash import dcc, html, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -354,13 +354,26 @@ def test_section_titles_keep_visual_size_with_accessible_heading_order():
         if isinstance(component, dmc.Title)
     }
 
-    # An h2, drawn as the card's first line by the stylesheet.
-    assert titles["Scenario Stats"].order == 2
-    assert titles["Scenario Stats"].className == "scenario-stats-heading"
-    # The panel's groups sit under the page's h2 sections.
+    # The panel's groups, drawn small.
     for group in ("Overlays", "Run Data Points", "Score Threshold"):
         assert titles[group].order == 3
         assert titles[group].size == "h6"
+
+
+def test_the_three_cards_first_lines_are_plain_text_and_not_headings():
+    """Scenario Stats' first line reads as the PB card's and the latest-run card's do."""
+    page = run_history.layout()
+    titles = [
+        component.children
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Title)
+    ]
+    first_line = _by_class(page, "scenario-stats-heading")
+
+    assert "Scenario Stats" not in titles
+    assert "Scenario stats" not in titles
+    assert isinstance(first_line, html.Div)
+    assert first_line.children == "Scenario stats"
 
 
 def test_the_chart_sits_left_of_the_run_list():
