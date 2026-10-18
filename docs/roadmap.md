@@ -96,9 +96,21 @@ What we plan to do now or very soon, each with the reasons it comes next.
   Why it's next: the top row now puts two large scores side by side, but
   during a lookup they can refer to different scenarios.
 
-  Notes on a scenario remain a separate proposal for the room kept in the
-  first column. Current behavior is in
+  Notes on a scenario are their own proposal, the next entry, for the room
+  kept in the first column. Current behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
+
+- **Scenario notes** — review the scenario notes proposal, in
+  [`proposals/scenario_notes_proposal.md`](./proposals/scenario_notes_proposal.md).
+  It proposes one plain-text note per scenario, shown in the room the top row
+  kept between Scenario Stats and the PB card and edited in place, with
+  Follow waiting while a note has unsaved changes. It is designed and built
+  in parallel with the latest-run card's proposal; the two meet in the
+  callback that selects a scenario.
+
+  Why it's next: the top row kept that room for notes, and a reminder about
+  technique is read just before the next run, beside the target and the
+  result the row already shows.
 
 ---
 
