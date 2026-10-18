@@ -577,8 +577,12 @@ maintainer's checkout. It is not in the repository.
   counts characters.
 - **Save** writes the text to the scenario the editor opened on, closes the
   editor, and shows the saved text. Saving empty text, or only whitespace,
-  deletes the note. Saving text that equals what the editor
-  opened with writes nothing and leaves `edited_at` alone.
+  deletes the note. Saving text that equals what the editor opened with
+  writes nothing and leaves `edited_at` alone, when the editor opened on a
+  note the app could read. Opened on a broken file, the editor starts empty
+  and **Save** always writes: text replaces the file, and empty text deletes
+  it, each after the broken file is copied aside. So **Edit** then **Save**
+  clears a broken note's error with no hand edit.
 - **Cancel** closes the editor and shows the saved text.
 - **A failed save** keeps the editor open with its text, and the error under
   the buttons. The text keeps its unsaved changes and every protection.
@@ -669,7 +673,8 @@ the tick rewrites only the age, which shows only while reading.
   state. "Whitespace" here is what Python's `str.isspace` counts.
 - **Reading:** the four states of the schema machinery, per file. Missing
   means no note. Error shows its message on the card in place of the text,
-  and **Edit** opens an empty editor. Future shows its message and offers no
+  and **Edit** opens an empty editor whose **Save** always writes (see
+  [The editor](#the-editor)). Future shows its message and offers no
   **Edit**, since every write to the file is refused. Supported shows the
   note.
 - **Writing:** **Save** first reads the file on disk, not what the card
@@ -917,7 +922,8 @@ PR 1 touches nothing Proposal 2 does.
   that the case-only pair gets two files; each read state (missing, each
   error cause, supported, future) and each v1 rule; a save that writes, a save
   of empty text that deletes, a save over a broken file that copies it aside
-  first, a save refused by a newer file, a name with a trailing space kept as
+  first, a save of empty text from an editor opened on a broken file that
+  copies it aside and deletes it, a save refused by a newer file, a name with a trailing space kept as
   it is; `edited_at` written only when the text changes, in UTC.
 - **The selection callback, as pytest** with `ctx.triggered` faked as the
   current tests fake it: a run with unsaved changes moves nothing and sets the
