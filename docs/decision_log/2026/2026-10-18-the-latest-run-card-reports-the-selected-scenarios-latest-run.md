@@ -153,12 +153,23 @@ and the highlight leave the selected scenario's run.
   a sentence that changes with the Follow switch, which would make the switch
   one of the card's triggers for a state a new user sees once.
 
+**The card's floor rises from 132 px to 135 px,** a correction the
+implementation made and the proposal did not foresee. The card is never less
+than its tallest state, so its height never follows a run
+([2026-10-12](2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md)).
+With the fourth line, that state, the second line on two lines in a card
+380 px wide, measures 135 px in Edge and Firefox, so the old floor would
+have let the card grow by 3 px for such a run in a narrow window. The wide
+layout is unchanged, since the row is 141.4 px there.
+
 **Measured at the build,** against `main` at `69fd722` on the maintainer's
 stats (9,212 runs), headless Edge and Firefox, light and dark, at 3840, 2560,
-1920 and 1536 px: the top row is as tall as on `main` in every state, 141.4 px
-from 1920 up. The card's text is 113 px where it was 93, in a card 141.4 px
-tall. A run landing while the page is open was checked with a scratch stats
-folder, Follow off and on. The PR's description has the tables.
+1920 and 1536 px, in eight states: the top row is as tall as on `main` in
+every one, 141.4 px from 1920 up. The card's text is 113 to 114 px where it
+was 93 to 94, in a card 141.4 px tall, and no card's text leaves its card. A
+first run landing in an empty scratch stats folder while the page was open
+was checked with Follow off and on, with nothing selected and with a
+playlist's unplayed scenario selected. The PR's description has the tables.
 
 **What this changes in older entries.** Each keeps its text and gains a dated
 note.

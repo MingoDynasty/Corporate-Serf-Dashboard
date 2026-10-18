@@ -121,7 +121,7 @@ they're doing and ahead to what to train, usually with more attention to give.
 ### Run History
 
 The page that shows one scenario's runs: a chart of its scores, a list of its
-runs grouped by session, and the latest run played. With Follow on, it
+runs grouped by session, and its latest run. With Follow on, it
 follows the scenario being played
 ([run_history.md](specs/run_history.md)). The list has a second view, All
 scenarios, of each session across every scenario played in it.
@@ -139,18 +139,20 @@ need. Score vs Time plots the same runs by when they were played
 ### Latest-run card
 
 The card at the right end of Run History's top row, over the run list, that
-reports the last run played, on whatever scenario, with its verdict
+reports the selected scenario's latest run with its verdict
 ([run_history.md](specs/run_history.md#the-latest-run-card)).
 
 - On screen it has no title. Its first line reads
-  `Latest run · {age} · {scenario}`.
+  `Latest run · {age} · {scenario}`, or `Latest run` alone with no run to
+  report.
 
 ### Scenario Stats
 
 The card in Run History's top row about the selected scenario: its benchmark
-category, when it was last played, and how many runs it has
+category and how many runs it has
 ([run_history.md](specs/run_history.md#scenario-stats)).
 
+- On screen its first line reads `Scenario stats`.
 - In code: `scenario_stats`.
 
 ### PB card

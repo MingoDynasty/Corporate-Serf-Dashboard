@@ -1,8 +1,8 @@
 # Run History
 
 Run History charts one scenario's runs beside a list grouped by session.
-Its top row gives the scenario's benchmark category and history their own
-card alongside the personal best and latest run. The page receives new runs
+Its top row gives the scenario's benchmark category and run count their own
+card, beside cards for its personal best and its latest run. The page receives new runs
 without a reload and can follow the scenario just played. A check marks a
 run that met its score threshold and a star marks a new personal best, each
 judged when the run was played.
@@ -68,8 +68,8 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-09-19][query]).
 - A scenario that the Playlist filter does not list is still selected, and
   the filter is cleared in the same step. That holds for a `?scenario=` link,
-  for a run the page follows, for the latest-run card's scenario button, and
-  for a scenario's name pressed in the run list's All scenarios view
+  for a run the page follows, and for a scenario's name pressed in the run
+  list's All scenarios view
   ([2026-10-14][all-scenarios]).
   The scenario must have local runs: a link that names one with none leaves
   the filter alone and selects nothing. The filter empties in view with no
@@ -166,30 +166,26 @@ times that name or order runs remain absolute ([T4][card-order]).
 
 ## The latest-run card
 
-- The card reports the last run played, on whatever scenario, and is worked
-  out from the run store each time, never from the message a new run arrives
-  in. So it is right on a page load with no new run
+- The card reports the selected scenario's latest run: its last run in the
+  newest session that holds one, in the order
+  [sessions.md](sessions.md#sessions) sets, with the sessions split from
+  every run in the store, as the run list splits them
+  ([2026-10-18][follows]).
+  It is worked out from the run store each time, never from the message a
+  new run arrives in, so it is right on a page load with no new run
   ([2026-10-12][check]).
-  The last run played is the last run of the newest session, in the order
-  [sessions.md](sessions.md#sessions) sets.
+  During play with Follow on, the selected scenario is the one just played,
+  so the card reports the run just played.
 - Its first line reads `Latest run · {age} · {scenario}`. The age is how
-  long ago the run ended, worded as Last played words it, such as `just now`
-  or `5 minutes ago`, and worded again every 30 seconds, so during play it
-  reads as the length of the break since the last run. Hovering or focusing
-  the age shows the exact time, in the shared format with no seconds, such as
-  `Oct 9, 2026, 5:24 PM`
+  long ago the run ended, worded as the playlist tables' Last played words
+  it, such as `just now` or `5 minutes ago`, and worded again every 30
+  seconds, so during play it reads as the length of the break since the last
+  run. Hovering or focusing the age shows the exact time, in the shared
+  format with no seconds, such as `Oct 9, 2026, 5:24 PM`
   ([2026-07-11][timestamps], [T4][card-order]).
-  While the run's scenario is the selected one its name is
-  plain text, with the whole name as its tooltip where the card cuts it
-  short. While another scenario is selected the name is a button, drawn as
-  the app draws a link, whose accessible name is `Show {scenario}`. Pressing
-  it selects that scenario in place, clearing a Playlist filter that does not
-  list it, and the button then leaves the card
-  ([2026-10-12][check],
-  [2026-10-12][clear-filter]).
-  A press from the keyboard hands keyboard focus to the Selected scenario
-  dropdown once the button has gone, and the dropdown opens its list as it
-  does when tabbed into. A click with the mouse moves focus nowhere.
+  The scenario's name is plain text, with the whole name as its tooltip where
+  the card cuts it short. The card has no control of its own apart from the
+  age, which takes keyboard focus ([2026-10-18][follows]).
 - The score is large, formatted as the playlist scenario table formats PB
   Score, with one badge beside it. A new PB shows "New PB", whether or not
   the run was judged. Otherwise a judged run shows "Threshold passed" or
@@ -215,30 +211,53 @@ times that name or order runs remain absolute ([T4][card-order]).
   most 99.9%, and a judged miss shows at most one tenth under its goal.
   The card is the one place a run's percentage of the PB is printed
   ([2026-10-13][run-toast]).
-- The third line reads `Run {n} this session · {duration} on this scenario`
-  while the run's session is in progress, and `Run {n} last session` once it
-  has ended. `{n}` counts the session's runs on the run's scenario. The
-  duration is the time spent on the scenario in the session, as
+- The third line names the run in its session. In the newest session it
+  reads `Run {n} this session` while the session is in progress, and
+  `Run {n} last session` once it has ended. A run in an older session names
+  the session as the run list names its row, by when it began, with the year
+  where it is not this one: `Run 7 (Oct 16, 2:00 PM session)`,
+  `Run 8 (Jul 20, 2020, 11:47 PM session)`. The year is judged against the
+  app's own date. `{n}` counts the session's runs on the run's scenario
+  ([2026-10-18][follows]).
+- The fourth line reads `{duration} on this scenario`, the time spent on the
+  scenario in the run's session, as
   [sessions.md](sessions.md#where-sessions-show) defines it. Where that time
-  can't be known the line reads `Time on this scenario unknown` in its place
-  and keeps the run's number
-  ([2026-10-12][check]).
+  can't be known it reads `Time on this scenario unknown`
+  ([2026-10-12][check], [2026-10-18][follows]).
 - A measured time, here and in the run list, is rounded to the nearest
   minute, a half rounding up: `9 min`, `1 hr 6 min`
   ([2026-10-13][nearest-minute]).
   A time that rounds to zero reads `<1 min`, so that form means under 30
   seconds.
 - The card is 500px wide, the run list's width, and as tall as the top row,
-  and never less than 132px, which holds its tallest state. So nothing that
+  and never less than 135px, which holds its tallest state: the second line
+  on two lines in a narrow card, over the third and fourth. So nothing that
   changes between runs changes its height, and the page doesn't jump. Its
-  lines are centered in that height. With no run in the store it reads "No
-  runs yet" over "Play a scenario in KovaaK's and your latest run will show
-  here.", at the same height, and its first line has no words
-  ([2026-10-12][check]).
+  lines are centered in that height ([2026-10-18][follows]).
+  With a benchmark selected, its score sits 2px below the PB card's
+  ([2026-10-18][follows]).
+- With no run to report, the card's first line reads `Latest run` alone, and
+  the selection decides first, as on the PB card
+  ([2026-10-18][follows]):
+  - no scenario selected and no runs in the store: "No runs yet" over "Play a
+    scenario in KovaaK's. Select it to see its latest run.";
+  - no scenario selected, the store has runs: "No scenario selected";
+  - the selected scenario has no runs, whether or not the store has any: "No
+    runs yet" over "Play this scenario in KovaaK's and your latest run will
+    show here."
+
+  Each is at the same height.
 - The card is rewritten when a run lands on any scenario, when the selected
-  scenario changes, when the Score threshold percentage changes, and when
-  the newest session stops being in progress. A run that lands older than
-  the run store's newest leaves the card as it was.
+  scenario changes, when the Score threshold percentage changes, when the
+  newest session stops being in progress, and when the app's date moves on.
+  Whether a late run reaches the card is decided by the selected scenario's
+  latest run: a run on it newer than that run becomes the card's run, even
+  when it is older than the store's newest, and one older leaves the card as
+  it was ([2026-10-18][follows]).
+- With Follow off, a run on another scenario leaves the card's run as it is.
+  The chart's ring and the run list's highlight still mark the newest run on
+  any scenario, so they leave the selected scenario's run
+  ([2026-10-18][follows]).
 
 ## The PB card
 
@@ -255,7 +274,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   and adds only its border to its height, and its lines are centered in that
   height.
 - Its first line reads `PB · set {age}`: how long ago the PB run ended,
-  worded as Last played words it, such as `5 days ago`, and worded again
+  worded as the playlist tables' Last played words it, such as `5 days ago`,
+  and worded again
   every 30 seconds. Hovering or focusing the age shows the exact time, in the
   shared format with no seconds, such as `Oct 9, 2026, 5:24 PM`
   ([2026-07-11][timestamps]).
@@ -321,7 +341,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   line's hint takes two lines and the row is about 164px.
 - The card is not a landmark or a button, and its first line is text. The
   dotted score, the percentile, and the age take keyboard focus and show
-  their tooltips, as Last played's does.
+  their tooltips, as the latest-run card's age does.
 
 ## The chart
 
@@ -527,17 +547,21 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The list is a second column to the right of the chart, 500px wide and
   always shown ([2026-10-12][column]). It has two views, This scenario and
   All scenarios ([2026-10-14][all-scenarios]).
-- Its header is a heading line, and under it a switch between the two views
-  at the left, with the "Expand all" button and the "Columns" menu at the
-  right. The switch is a segmented control whose accessible name is
-  `Run list view`. The list starts on This scenario, the browser remembers
-  the switch, and pressing it shows the other view from its top with keyboard
-  focus left on the switch. At the list's 500px the switch and both buttons
-  share one line; where they don't fit, the buttons wrap under the switch
-  ([2026-10-14][all-scenarios]).
-- Under This scenario the heading line reads `{scenario} · {n} runs`, or
-  `1 run`, where `{n}` counts every run of the scenario in the run store, the
-  figure Scenario Stats shows as Number of runs. Under All scenarios it reads
+- Its header is one line: a switch between the two views at the left, with
+  the "Expand all" button and the "Columns" menu at the right. The switch is
+  a segmented control whose accessible name is `Run list view`. The list
+  starts on This scenario, the browser remembers the switch, and pressing it
+  shows the other view from its top with keyboard focus left on the switch.
+  At the list's 500px the switch and both buttons share one line, 56px tall
+  at 2560px; where they don't fit, the buttons wrap under the switch
+  ([2026-10-14][all-scenarios], [2026-10-18][heading-line]).
+- The header also holds a heading line, before the switch, for screen
+  readers only: it is hidden from view in both views, and it is a line of
+  text, not an HTML heading. The latest-run card above the list names its
+  scenario on screen ([2026-10-18][heading-line]).
+  Under This scenario the line reads `{scenario} · {n} runs`, or `1 run`,
+  where `{n}` counts every run of the scenario in the run store, the figure
+  Scenario Stats shows as Number of runs. Under All scenarios it reads
   `All scenarios · {n} runs`, where `{n}` counts every run in the store
   ([2026-10-14][all-scenarios]).
 
@@ -598,8 +622,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   chart. The highlight is a look alone and tells a screen reader nothing.
 - With runs and no scenario selected, this view reads "No scenario selected"
   with the switch still above it, and "Expand all" and "Columns" out of view.
-  A selected scenario with no local runs lists the newest session alone,
-  under the heading `{scenario} · 0 runs` ([2026-10-14][all-scenarios]).
+  A selected scenario with no local runs lists the newest session alone
+  ([2026-10-14][all-scenarios]), and the latest-run card above it reads "No
+  runs yet". The hidden heading line reads `{scenario} · 0 runs`
+  ([2026-10-18][heading-line]).
 - The grid's accessible name is `Runs of {scenario}, by session`.
 
 ### All scenarios
@@ -924,11 +950,18 @@ The card's lines, local-record scope and leaderboard presentation follow
 ## Scenario Stats
 
 - A card in the top row, framed as the latest-run card is, in the theme's
-  tokens. Its heading, "Scenario Stats", is an h2 drawn as the card's quiet
-  first line, and under it, at one weight, are "Category:", "Last played:"
-  and "Number of runs:" for the selected scenario ([T2][category],
-  [T4][card-order]). The personal best and the leaderboard position are
-  [the PB card's](#the-pb-card).
+  tokens. Its first line is plain text, "Scenario stats", in sentence case
+  and drawn as the other two cards' quiet first lines are; it is not a
+  heading ([2026-10-18][stats-last-played]). Under it, at one weight, are
+  "Category:" and "Number of runs:" for the selected scenario
+  ([T2][category], [T4][card-order]). The personal best and the leaderboard
+  position are [the PB card's](#the-pb-card), and when the scenario was last
+  played is [the latest-run card's](#the-latest-run-card)
+  ([2026-10-18][stats-last-played]).
+- With no scenario selected, the card reads "No scenario selected" under its
+  first line, in the PB card's empty-title style, in place of Category and
+  Number of runs. A selected scenario with no local runs reads `Number of
+  runs: 0` ([2026-10-18][stats-last-played]).
 - Category is `{category} · {subcategory}`, or `{category}` with one level,
   using the selected benchmark table's own group labels and length guard.
   It is shown only while the Playlist filter holds a benchmark with groups
@@ -939,17 +972,6 @@ The card's lines, local-record scope and leaderboard presentation follow
   change alone ([T2][category]).
 - Its frame is 270px wide and adds only a border to its height.
   The card fits in the row the dropdowns' column sets, its lines centered.
-- "Last played" is a relative, single-unit humanized string ("5 minutes
-  ago"), self-updating on its own 30-second interval
-  ([2026-06-21][last-played]).
-  Its empty states are explicit: `—` with no scenario selected, `Never` for
-  a scenario with no local runs, and only a real timestamp gets the tooltip
-  affordance: hover, keyboard focus, or touch
-  ([2026-06-30][empty-states]).
-  The tooltip shows the absolute timestamp without seconds, in the shared
-  GitHub-shaped format whose JS and Python implementations are kept in sync
-  by hand
-  ([2026-07-11][timestamps]).
 
 ## Run delivery
 
@@ -968,10 +990,10 @@ The card's lines, local-record scope and leaderboard presentation follow
 - One callback writes both dropdowns' values, with plain outputs. It reads
   the summary and lands on the scenario just played when Follow is on,
   clearing a Playlist filter that does not list it, and it is the callback
-  that applies a link's parameters, the card's scenario button, and a
-  scenario's name pressed in the run list's tree. Which of the four called is
-  read from what triggered the call
-  ([2026-10-12][clear-filter], [2026-10-14][all-scenarios]).
+  that applies a link's parameters and a scenario's name pressed in the run
+  list's tree. Which of the three called is read from what triggered the
+  call ([2026-10-12][clear-filter], [2026-10-14][all-scenarios],
+  [2026-10-18][follows]).
   With Follow off the page stays on the selected scenario.
 - The chart rebuild consumes the summary, so a batch of several runs becomes
   one rebuild and one change of scenario rather than a replay
@@ -1096,8 +1118,6 @@ The card's lines, local-record scope and leaderboard presentation follow
 [all-scenarios]: ../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md
 [count-link]: ../decision_log/2026/2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
-[last-played]: ../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md
-[empty-states]: ../decision_log/2026/2026-06-30-model-home-last-played-empty-states-explicitly.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md
 [threads]: ../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md
 [rank-history]: ../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md
@@ -1106,3 +1126,6 @@ The card's lines, local-record scope and leaderboard presentation follow
 [pb-card]: ../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md
 [card-order]: ../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md
 [accuracy]: ../decision_log/2026/2026-10-18-a-runs-accuracy-shows-two-decimals.md
+[follows]: ../decision_log/2026/2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md
+[stats-last-played]: ../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md
+[heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md

@@ -24,7 +24,9 @@ that handed keyboard focus on. Its third line takes two lines and names an
 older session. A late run "leaves the card alone, since the card reports the
 newest run" now holds per scenario: a late run on the selected scenario
 becomes the card's run once it is newer than that scenario's latest. The
-marks, the badge, the second line, and a past run's pace basis stand.
+card's one height through every state stands, at 135 px where it was 132,
+because its tallest state gained the fourth line. The marks, the badge, the
+second line, and a past run's pace basis stand.
 
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):

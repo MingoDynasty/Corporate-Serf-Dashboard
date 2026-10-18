@@ -90,11 +90,11 @@ have cleared, starts with run notifications on and on Confetti.
 
 ## Run History
 
-Run History's top row puts the selected scenario's history beside its
-personal best and the latest run. The **Playlist filter** sets the benchmark
+Run History's top row puts the selected scenario's stats beside its
+personal best and its latest run. The **Playlist filter** sets the benchmark
 context: Scenario Stats shows that benchmark's category and subcategory
-above Last played and Number of runs. Category disappears when the filter
-is empty, holds an ordinary playlist, or has no grouping for the scenario.
+above Number of runs. Category disappears when the filter is empty, holds
+an ordinary playlist, or has no grouping for the scenario.
 
 The PB card shows the local record, its rank and the next rank's score, then
 the leaderboard standing and the PB run's cm/360 and hit accuracy. The next
@@ -103,8 +103,15 @@ for its improvement over the previous best, the age for the exact time,
 and the percentile for the position and when it was updated. **Refresh**
 updates only the leaderboard standing. A scenario with no local runs reads
 "No local PB yet" and has no leaderboard lookup, even if KovaaK's holds a
-record from another computer. The latest-run card still reports the last
-run played, including when you are looking at another scenario.
+record from another computer.
+
+The latest-run card reports the selected scenario's latest run, so with
+**Follow newly played scenario** on it shows each run as you play it, and
+while you look another scenario up it shows when that one was last played
+and how the run went. A run from an older session names the session, such
+as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
+off, a run on another scenario doesn't reach the card: the run's toast links
+to it, and the run list's **All scenarios** view lists it.
 
 ## Playlists and Benchmarks
 
