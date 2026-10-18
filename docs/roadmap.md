@@ -87,12 +87,12 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **The latest-run card follows the selection** — proposed in
-  [`proposals/latest_run_card_follows_selection_proposal.md`](./proposals/latest_run_card_follows_selection_proposal.md),
-  with nothing ratified. The card would report the selected scenario's latest
-  run, Last played would leave Scenario Stats, and the run list would lose its
+- **The latest-run card follows the selection** — the
+  [proposal](./proposals/latest_run_card_follows_selection_proposal.md) was
+  ratified on 2026-10-18. The card will report the selected scenario's latest
+  run, Last played will leave Scenario Stats, and the run list will lose its
   heading line. Its argument rests on the card's alignment over the list.
-  One implementation PR follows ratification.
+  One implementation PR builds it.
 
   Why it's next: the top row now puts two large scores side by side, but
   during a lookup they can refer to different scenarios.

@@ -17,14 +17,17 @@ its height.
 
 ## Decisions needed
 
-Three rows: R1 to R3. Nothing is ratified. Each row is the maintainer's lean
-from the design discussion of 2026-10-14, refined on 2026-10-18 on full-size
-mockups built from their own stats (versions 12 to 14), and each keeps what
-they said, its argument, and what the alternatives would change. R2 and R3
-rest on R1: both are argued from the card naming the selected scenario, and
-neither should ship without it. Everything else is author-owned and is in
-[Design](#design), including the third line's layout and every string in
-[Copy](#copy); reviewers may challenge any of it.
+Three rulings: R1 to R3. The maintainer ratified this proposal on
+2026-10-18: "I ratify the proposal." That settles each row as its
+recommendation, R1 as amended in review. Before that, each row was the
+maintainer's lean from the design discussion of 2026-10-14, refined on
+2026-10-18 on full-size mockups built from their own stats (versions 12 to
+14), and each keeps what they said, its argument, and what the alternatives
+would have changed, for the record. R2 and R3 rest on R1: both are argued
+from the card naming the selected scenario, and neither should ship without
+it. Everything else is author-owned and is in [Design](#design), including
+the third line's layout and every string in [Copy](#copy), and the
+ratification covers it too.
 
 This is the second of two proposals from the 2026-10-14 discussion. The
 first, the top row cards, shipped in PRs #379, #380, #383 and #384, and this
@@ -33,9 +36,10 @@ run list, beside the PB card.
 
 ### R1. The latest-run card reports the selected scenario's latest run
 
-Status: open. The maintainer's lean, 2026-10-14, on three cases for the card
-(a new run, the selected scenario, a clicked run): "I agree with the case 2
-lean. Case 3 can come later or never." Refined on 2026-10-18, so the card
+Status: Ratified (user), 2026-10-18: accept the recommendation below, as
+amended. Before that, the maintainer's lean, 2026-10-14, on three cases for
+the card (a new run, the selected scenario, a clicked run): "I agree with the
+case 2 lean. Case 3 can come later or never." Refined on 2026-10-18, so the card
 follows the selection with nothing to fall back on: "For simplicity, why not
 just make the Latest Run card follow what scenario is selected in the top left
 filter?" That replaces their answer of 2026-10-14 that with no scenario
@@ -48,8 +52,9 @@ longer reaches the card.
 
 **Recommendation: the card reports the selected scenario's latest run, its
 last run in the newest session that holds one, judged exactly as the card
-judges a run today. With no scenario selected it says so. For a scenario with
-no runs it reads "No runs yet". The Show {scenario} button is removed.**
+judges a run today. With no scenario selected it says so, once the store has
+runs. For a scenario with no runs it reads "No runs yet". The Show {scenario}
+button is removed.**
 
 - **The two big scores always describe one scenario.** Looking up VT
   Controlsphere Viscose on 2026-10-18, with Viscose Benchmark S2 - Medium
@@ -85,7 +90,8 @@ Rejected:
 
 ### R2. Last played leaves Scenario Stats
 
-Status: open. The maintainer's lean, 2026-10-14, while Proposal 1 was in
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, the maintainer's lean, 2026-10-14, while Proposal 1 was in
 review, was to remove Last played; they kept it until now: "'just now' is
 fine, keep Last played until Proposal 2." On the card left behind, 2026-10-18:
 "Slim the Scenario Stats card is fine. Later it will likely hold the Typical
@@ -122,7 +128,8 @@ exception back, and `None` reads as zero runs).
 
 ### R3. The run list's heading line goes, in both views
 
-Status: open. The maintainer's lean, 2026-10-14. The heading names the list's
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, the maintainer's lean, 2026-10-14. The heading names the list's
 scenario and counts its runs. They noted that the All scenarios heading counts
 every run in the store, a total Home already gives ("Found {runs} runs across
 {scenarios} scenarios in your stats folder.").
@@ -474,7 +481,8 @@ is noted in the PR's description. It changes a public page in its release.
    `architecture.md`, AGENTS.md's copy rule 2, the roadmap, `product.md`, and
    this file deleted.
 
-It needs this proposal ratified. **Recommended:** `claude-opus-5-5` at xhigh,
+The proposal was ratified on 2026-10-18, so the PR is unblocked.
+**Recommended:** `claude-opus-5-5` at xhigh,
 since it removes an input from the shared selection callback and carries the
 shipping checklist. The maintainer looks at it in their own Firefox before it
 merges.
