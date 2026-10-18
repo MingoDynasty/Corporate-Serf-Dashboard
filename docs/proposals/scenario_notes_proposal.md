@@ -23,9 +23,9 @@ In this project's workflow a ruling is the maintainer's explicit "decided",
 as settled. An agreement in a design discussion is a lean: it records where
 the maintainer stands, and it stays open to review until they ratify it.
 Where a point only met no objection rather than an explicit yes, its row says
-so. SN7 and SN8 are open: the maintainer has no lean on either. After the
-first review, the maintainer chose how leaving the page treats unsaved text
-(SN3, rule 8); that choice is a lean too. Everything else is author-owned and is in
+so. SN8 is open: the maintainer has no lean on it. After the first review,
+the maintainer chose how leaving the page treats unsaved text (SN3, rule 8)
+and which empty state SN7 takes; those choices are leans too. Everything else is author-owned and is in
 [Design](#design), including every string in [Copy](#copy); reviewers may
 challenge any of it.
 
@@ -295,9 +295,12 @@ the file's modified time as the edit time.
 
 ### SN7. The empty state
 
-Status: open. The maintainer has no lean, 2026-10-18: "I don't feel strongly
-whether it's an empty card vs purely the link. I feel like it's simply a
-UI/UX preference. Let's leave it up for debate during proposal review."
+Status: open. The maintainer first had no lean, 2026-10-18: "I don't feel
+strongly whether it's an empty card vs purely the link. I feel like it's
+simply a UI/UX preference. Let's leave it up for debate during proposal
+review." After the first review they asked whether it matters that "for most
+users and most scenarios, the note will be blank", noted that either choice
+is "trivial to reverse", and chose the link: "SN7: go with the link."
 
 The material consequence: what a scenario with no note shows, which is most
 lookups and every new scenario, though rarely during play once the regulars
@@ -316,6 +319,16 @@ The two options, each in the same box, so the chart doesn't move either way:
 names what it adds, so a new player finds notes either way. The empty card
 spends a frame, a heading and a line to say there is nothing, and it costs
 the at-a-glance signal.
+
+- **The empty state is most players' usual case.** If most scenarios never
+  get a note, the empty card would be what the row shows nearly all the time:
+  its widest box, framed around "No note yet". The link costs one short line.
+- **A frame says more when notes are rare.** Around the few scenarios that
+  have a note, it stands out exactly when there is something to read.
+- **What the link gives up:** the row's other cards keep a frame and say
+  their state inside it, and with no scenario selected the note room is blank
+  between cards that read `No scenario selected`. Those cards always have
+  something to show, which the note card usually doesn't.
 
 ### SN8. The edited-age line
 
