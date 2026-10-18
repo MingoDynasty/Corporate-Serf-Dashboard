@@ -13,6 +13,13 @@ rules changed was swept in one pass. What a user notices is that the same
 thing now reads the same way on every page. A test keeps the em dash out of
 the app's source for good.
 
+**Superseded in part (2026-10-18).** [Last played leaves Scenario Stats](2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md)
+removes rule 2's one exception, the `—` empty value under Last played, so no
+string in the app carries an em dash. The guard's allowlist is gone, and its
+proof that the walk reads real source is the middle dot of the latest-run
+card's first line. AGENTS.md's rule 2 no longer names an exception.
+Everything else here stands.
+
 **Scope of "copy" (rule 8).** Every string this app's code puts in front of a
 user: page text, service messages a page shows verbatim (import refusals,
 startup playlist warnings, store messages, warmup stop reasons), chart

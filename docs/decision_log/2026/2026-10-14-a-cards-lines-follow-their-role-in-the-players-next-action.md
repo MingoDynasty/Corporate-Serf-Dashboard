@@ -8,6 +8,11 @@ context follows it in a quieter but readable style. A time that tells how
 old something is reads relative, with the exact time on hover and focus.
 How often a fact changes decides neither its order nor its weight.
 
+**Superseded in part (2026-10-18).** [Last played leaves Scenario Stats](2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md):
+Scenario Stats lists Category and Number of runs, and Last played leaves the
+ages this rule names on Run History. The rule, and every other application of
+it, stands.
+
 **Ruling.** T4 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`, as amended after the
 first review wave. This rule also binds later cards in this row, including

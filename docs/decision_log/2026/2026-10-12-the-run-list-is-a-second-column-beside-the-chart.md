@@ -25,6 +25,12 @@ column, and the latest-run card sits over the run list in their shared
 500px column. The amended Follow switch sits under the scenario dropdown.
 The list's width, its relation to the chart, and the rest of this entry stand.
 
+**Superseded in part (2026-10-18).** [The heading line's entry](2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md)
+takes the list's heading off the screen, in both views, and keeps it for
+screen readers. So it no longer sits on a line of its own above the buttons:
+the switch and the buttons are the header's first line. The heading's words
+and every other rule of the list stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." This entry is row R3, ratified as recommended.

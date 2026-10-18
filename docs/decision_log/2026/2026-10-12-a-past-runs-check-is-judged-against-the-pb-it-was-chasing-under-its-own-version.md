@@ -17,6 +17,15 @@ focus. Its time-of-day or date display below is historical. The card still
 reports the last run played on whatever scenario, and every rule of its
 marks and comparisons stands.
 
+**Superseded in part (2026-10-18).** [The latest-run card's rule](2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md)
+makes the card report the selected scenario's latest run, not the last run
+played on whatever scenario, and removes its scenario button with the script
+that handed keyboard focus on. Its third line takes two lines and names an
+older session. A late run "leaves the card alone, since the card reports the
+newest run" now holds per scenario: a late run on the selected scenario
+becomes the card's run once it is newer than that scenario's latest. The
+marks, the badge, the second line, and a past run's pace basis stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." Nothing here was a numbered row. It is the
