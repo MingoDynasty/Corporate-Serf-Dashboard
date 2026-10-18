@@ -98,7 +98,7 @@ Category and Number of runs.
 
 **Recommendation: remove Last played. The card's first line becomes plain
 text in sentence case, "Scenario stats", and with no scenario selected the
-card reads "No scenario selected" in place of its lines.**
+card reads "No scenario selected" under it, in place of its other lines.**
 
 - **Under R1, Last played repeats the card beside it.** Both read "1 day ago"
   for VT Controlsphere Viscose on 2026-10-18.
@@ -329,8 +329,10 @@ the switch one of the card's triggers for a state a new user sees once.
   stores, and its empty values `—` and `Never`.
 - **The first line is plain text, `Scenario stats`,** styled as today's quiet
   first line, at the card's top like the other two cards' first lines.
-- **With no scenario selected,** the card's lines give way to "No scenario
-  selected", styled as the PB card's.
+- **With no scenario selected,** Category and Number of runs give way to "No
+  scenario selected", styled as the PB card's. The `Scenario stats` first line
+  stays in every state, as the PB card keeps `PB` and the latest-run card
+  keeps `Latest run`.
 - **Category and Number of runs** keep their rules, and the card keeps its
   270 px frame.
 
@@ -510,7 +512,8 @@ merges.
   was, and the card reads "No scenario selected" or keeps "Play this
   scenario". With Follow on the card shows the run.
 - **Scenario Stats:** no Last played in any state; the first line's text and
-  that it is not a heading; "No scenario selected" with nothing selected;
+  that it is not a heading; "No scenario selected" under the first line with
+  nothing selected;
   Category and Number of runs unchanged.
 - **The run list:** the heading line's text is hidden in both views, still in
   the page's text for a screen reader, and not a heading element; the
