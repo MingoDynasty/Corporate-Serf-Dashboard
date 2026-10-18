@@ -36,8 +36,9 @@ Already ratified, and not reopened here: D1 to D3 of the
 advice); S1 to S4 of the
 [2026-10-11 sessions entry](../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md),
 whose S4 sends this definition to a proposal of its own; R1 to R7 of the Run
-History page; A1 to A3 of All scenarios; and T1 to T4 of the
-[top row cards proposal](top_row_cards_proposal.md).
+History page; A1 to A3 of All scenarios; and T1 to T4 of the top row
+cards, shipped in #380, #383 and #384
+([2026-10-14 entry](../decision_log/2026/2026-10-14-run-historys-top-row-has-one-card-per-kind-of-information.md)).
 
 The evidence below is one player's history: the maintainer's 9,135 runs over
 866 scenarios in 325 play sessions, last run 2026-10-09 22:03. It shows what
@@ -400,9 +401,8 @@ Status: Open. The maintainer: "Ship it first in today's Scenario Stats; the
 cards proposal can move it later."; "keep as no limit. '2,140 · as of Mar 3,
 2020' is still useful information, even if it is outdated."
 
-The material consequence: Scenario Stats gains a line, and the top row grows
-4 px with a KovaaK's username set, 20 px without one, until the cards work
-makes room.
+The material consequence: Scenario Stats gains a fourth fact. On the card as
+it shipped, the top row keeps its height.
 
 **Recommendation: a "Typical score" line in Scenario Stats, showing the value
 after the scenario's newest run, with "as of {date}" when that value is
@@ -416,43 +416,32 @@ carried or its newest run is more than 30 days old, and no limit on how old an
 - **The unknown state names its count,** so a player grinding a new scenario
   sees how far it is from known (see [Copy](#copy)).
 
-**Written against the Scenario Stats card at this proposal's base**
-(`ccce6c6`): the top row cards' PR 1 (#380) made the block a card with its
-content unchanged, Last played, Number of runs and Position, so the line goes
-after Number of runs. The top row cards proposal was ratified and merged after
-the maintainer's lean. Its card holds Category, Last played and Number of runs
-(its T2), its PB card takes Position, and a card orders its lines by
-importance (its T4); it doesn't mention the typical score. The maintainer
-chose to carry that dependency, and this proposal does not edit that one.
-What the rest of the cards work changes here:
+**Written against the Scenario Stats card as it shipped.** The top row
+cards shipped after the maintainer's lean, in #380, #383 and #384. The card
+now holds Category, while the Playlist filter holds a benchmark that groups
+the selected scenario, then Last played and Number of runs, at one weight,
+in a 270 px frame
+([T2](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md),
+[T4](../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md)).
+Position moved to the PB card. The line goes after Number of runs. Placing
+it by importance, or moving it to the PB card beside the PB, is a later
+change that neither proposal makes.
 
-- **Its PR 2** moves Position and Refresh out of the card, which frees the
-  room of about two lines.
-- **Its PR 3** adds Category as the card's first line, while a benchmark is
-  selected.
-- **Its T4** decides where the line sits among Category, Last played and
-  Number of runs; a later move to the PB card, beside the PB, is that work's
-  call too.
+**The cost, measured on the shipped card** (headless Edge at 2560 and 1920
+px, the maintainer's stats, with a benchmark selected and without): the row
+is 141 px, set by the dropdowns' column. With a username, simulated as a
+one-line leaderboard line, the card's lines fit inside that row with a
+fourth line, whatever it says, so the row keeps its height. Without a
+username, the PB card's hint sets the row (164 px with a benchmark, 143 px
+without), and the line doesn't change it either. A bare value such as
+`1,179` fits on one line. The "as of" and unknown values wrap to a second
+line in the 270 px card, and the card's height absorbs it.
 
-**The cost, measured at the base** (headless Edge at 2560, 1920 and 1536 px,
-the maintainer's stats): the row is 141 px, set by the dropdowns' column. With
-a username, simulated as a one-line Position, the card fits in it, and a
-fourth line of the same style makes the card and the row 145 px, 4 px taller.
-Without a username, Position's hint takes a line of its own and the row goes
-from 149 px to 169 px. The card's text is 300 px wide, and every value in
-[Copy](#copy) fits on one line in it: `Too few recent runs · 16 of 20`, one
-character longer than the longest unknown value, `Too few recent runs · 19
-runs`, measured on one line. The prototype's `Not enough recent runs` wraps
-there with a two-digit count.
-
-**Ordered against the top row cards' PRs 2 and 3: neither waits for the
+**Ordered against the top row cards' PRs 2 and 3: neither waited for the
 other.** Asked whether the line ships before or after them, the maintainer,
-2026-10-15: "I'll go with your recommendation." Shipping first, as the lean
-said, costs the row 4 px with a username until the cards' PR 2 frees room. The cards' PR 2 will likely
-land first anyway, because this line waits for the definition's PR. Both edit
-the Scenario Stats module, so whichever lands second rebases onto the
-other's. The definition and the chart don't touch the top row and wait for
-nothing.
+2026-10-15: "I'll go with your recommendation." Both have since shipped, so
+the line lands in the finished card. The definition and the chart don't
+touch the top row.
 
 ## Problem
 
@@ -466,7 +455,8 @@ nothing.
   dropped the old Average score line and drew no median, because "A new
   summary line would be a second definition of the typical run." This
   proposal is that definition.
-- **Scenario Stats shows Last played, Number of runs, and Position**
+- **Scenario Stats shows Category, Last played and Number of runs,** and the
+  PB card the personal best and the leaderboard position
   ([run_history.md](../specs/run_history.md#scenario-stats)). Nothing on any
   page shows how a scenario usually plays.
 - **The run list's Median and best is not it.** That checkbox, off to start,
@@ -530,9 +520,10 @@ sessions.
 
 ### Verified facts
 
-Checked at `ccce6c6`, this proposal's base, on 2026-10-15. They were first
-checked at `1799df0`; the top row cards' PR 1 (#380) merged between, and
-changed none of what is listed here except that Scenario Stats is now a card.
+Checked at `dcc4cba`, the `main` this proposal's branch last merged, on
+2026-10-18. They were first checked at `1799df0`. The top row cards (#380,
+#383, #384) merged between, and changed none of what is listed here except
+Scenario Stats, now a card without Position.
 
 - **The chart's builders.** `build_run_history_figure` in
   `source/components/run_history_chart.py` reads the scenario's runs in play
@@ -563,15 +554,16 @@ changed none of what is listed here except that Scenario Stats is now a card.
   copy of the run store.
 - **Scenario Stats.** `scenario_stats_panel` and `register_scenario_stats` in
   `source/components/scenario_stats.py`. With no scenario selected, Number of
-  runs reads `0` and Position `N/A`.
+  runs reads `0` and Last played `—`.
 - **Formatting.** `format_score` gives thousands separators and at most two
   decimals; `format_short_date` gives `Oct 12`, or `Mar 3, 2020` in another
   year.
 - **Scores' precision.** Of the 9,135 runs, 7,137 scored a whole number, and
   1,611 carry five or six decimals.
 
-Measured on 2026-10-15, the cost, the size and the draw order at `1799df0`,
-whose chart code the base leaves unchanged, and the row at the base:
+Measured: the cost, the size and the draw order on 2026-10-15 at `1799df0`,
+whose chart code `dcc4cba` leaves unchanged, and the row on 2026-10-18 at
+`dcc4cba`:
 
 - **Cost.** The largest scenario is VT DotTS Intermediate S5, 463 runs.
   Working out the value after each of its runs takes 3.9 ms, of which 2.9 ms
@@ -591,15 +583,17 @@ whose chart code the base leaves unchanged, and the row at the base:
 
 ### What the player sees
 
-The Scenario Stats card, as it is at the base, in each state:
+The Scenario Stats card, as it shipped, in each state, with a benchmark
+selected (the Category line is absent without one):
 
 ```
-| Scenario Stats              |  | Scenario Stats                      |  | Scenario Stats                      |
-| Last played: 2 minutes ago  |  | Last played: 2 months ago           |  | Last played: 5 minutes ago          |
-| Number of runs: 463         |  | Number of runs: 169                 |  | Number of runs: 6                   |
-| Typical score: 1,179        |  | Typical score: 1,390 · as of Apr 12 |  | Typical score: Too few recent runs · 6 runs |
-| Position: ...   Refresh     |  | Position: ...   Refresh             |  | Position: ...   Refresh             |
-         fresh                              as of                                  unknown
+| Scenario Stats              |  | Scenario Stats              |  | Scenario Stats              |
+| Category: Tracking · Smooth |  | Category: Tracking · Smooth |  | Category: Clicking · Static |
+| Last played: 2 minutes ago  |  | Last played: 2 months ago   |  | Last played: 5 minutes ago  |
+| Number of runs: 463         |  | Number of runs: 169         |  | Number of runs: 6           |
+| Typical score: 1,179        |  | Typical score: 1,390 ·      |  | Typical score: Too few      |
+|                             |  |   as of Apr 12              |  |   recent runs · 6 runs      |
+         fresh                              as of                          unknown
 ```
 
 The value has a dotted underline and a hover that says how it was worked out
@@ -859,8 +853,8 @@ drafts and are redone here.
 | Scenario Stats, label | `Typical score:` | A label as `Last played:` is. "Typical score" and not "Median score": the run list's Median and best already shows a plain median labelled `Median`, KovaaK's own leaderboard shows a third median (the median player's PB), and "median" alone reads as the median of every run. |
 | Scenario Stats, fresh value | `{score}`, such as `1,179` | Rounded as [Rounding](#rounding) says, formatted as a score is. |
 | Scenario Stats, "as of" value | `{score} · as of {date}`, such as `1,390 · as of Apr 12` or `2,140 · as of Mar 3, 2020` | A readout chain. The date is the short date the run list uses, with the year only when it isn't this year's, and has no age limit (TS5). |
-| Scenario Stats, unknown value | `Too few recent runs · {n} runs`, or `· 1 run` | Says why, then how many, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did, without its target: the number that would make the value fresh depends on the sessions, so `9 of 20` reads as eleven to go when the first run of a second session would do. The hover gives the rule and the session count. "Too few" and not the prototype's "Not enough", which wraps in the card's 300 px with a two-digit count. A runs-and-sessions readout (`6 runs · 1 session`) wraps too. |
-| Scenario Stats, no scenario | `N/A` | As Position reads with no scenario selected. |
+| Scenario Stats, unknown value | `Too few recent runs · {n} runs`, or `· 1 run` | Says why, then how many, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did, without its target: the number that would make the value fresh depends on the sessions, so `9 of 20` reads as eleven to go when the first run of a second session would do. The hover gives the rule and the session count. "Too few", shorter than the prototype's "Not enough"; in the shipped 270 px card either wraps to a second line, which the card's height absorbs. A runs-and-sessions readout (`6 runs · 1 session`) is longer still. |
+| Scenario Stats, no scenario | `N/A` | Nothing to work out. Last played's `—` is the one em dash copy rule 2 allows, so it isn't reused. |
 | Scenario Stats, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
 | Scenario Stats hover, fresh | `The median of {n} runs in {k} sessions, from {first} to {last}. The middle 50% scored {q1} to {q3}, and the middle 80% scored {p10} to {p90}.` | What the figure is, from what, and its spread. `on {date}` in place of `from {first} to {last}` when both are one date; `1 session` in the singular. |
 | Scenario Stats hover, carried | The fresh text, then `It's your last known typical score. The 30 days up to your newest run hold {n} runs in {k} sessions. A new one needs 10 runs from at least 2 sessions, or 20 runs.` | Why it is "as of", and what would make it current, as a fact, not advice. No "since then": the 30 days up to the newest run can reach back past the carried value's own newest run. `1 run`, `1 session` in the singular. |
@@ -931,6 +925,9 @@ They erase nothing.
   its Terms paragraph calls the typical run a working word that the proposal
   shipping it names. It is named the typical score on screen, in the glossary
   and in code. D1, D2 and D3 stand.
+- [2026-10-14, Scenario Stats names the selected benchmark's category](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md):
+  "The three facts have one weight, Category first." The card gains a
+  fourth, Typical score, after Number of runs, at the same weight.
 
 Statements in the specs that go untrue, which the same PRs rewrite:
 
@@ -943,9 +940,8 @@ Statements in the specs that go untrue, which the same PRs rewrite:
   "Three groups in order, holding seven controls" becomes eight, with
   `Middle 80%` off in Overlays.
 - [run_history.md, Scenario Stats](../specs/run_history.md#scenario-stats):
-  "under it, at one weight, are 'Last played:', 'Number of runs:', and
-  'Position:'", and the card's height in the row, which a fourth line raises
-  by 4 px.
+  "under it, at one weight, are 'Category:', 'Last played:' and 'Number of
+  runs:'", which gains 'Typical score:'.
 - [run_history.md, Time-scored scenarios](../specs/run_history.md#time-scored-scenarios):
   the list of surfaces that order or place scores, unchanged on a
   time-scored scenario, gains the typical score.
@@ -1014,19 +1010,16 @@ moves is noted in that PR's description.
 2. **The chart.** The line, the bands and the faded stretches on Score vs Run
    and Score vs Time, their order, colors, legend and hover, the Middle 80%
    switch, the zoom fit's comment, and the Run History spec's chart and panel
-   sections. Needs PR 1. It doesn't touch the top row, so it needn't wait for
-   the cards work.
+   sections. Needs PR 1. It doesn't touch the top row.
 3. **The Scenario Stats line.** The line, its hover, its updates, and the
-   spec's Scenario Stats section. Needs PR 1. It waits for neither of the top
-   row cards' PRs 2 and 3, as the maintainer chose under TS5, and whichever
-   lands second rebases.
+   spec's Scenario Stats section. Needs PR 1. The top row cards have
+   shipped, so it lands in the finished card.
 
 **Why three.** The definition is the contract later features read, and a PR
 of its own keeps its review on the boundaries rather than on plotly. The
-Scenario Stats line edits the module the cards' PRs 2 and 3 also edit, so it
-ships on its own, to be ordered with them, while the chart need not wait. If the
-maintainer prefers fewer PRs, PR 1 can fold into PR 2, at the cost of one
-larger review.
+Scenario Stats line is another module, with its own live checks of the top
+row. If the maintainer prefers fewer PRs, PR 1 can fold into PR 2, or PR 3
+into PR 2, each at the cost of one larger review.
 
 Each PR updates the specs and the glossary entries its own behavior changes,
 as it ships ([Terms](#terms) says which entry goes with which PR). The last
@@ -1067,7 +1060,7 @@ Each with where it is tracked.
 - **A consistency number,** such as the gap between P25 and P75 as a figure.
   The Backlog's Features item 2.3; the band shows it for now.
 - **The PB card's use of the figure,** such as the typical score beside the
-  PB. The top row cards proposal doesn't include it, and the maintainer chose
+  PB. The top row cards work didn't include it, and the maintainer chose
   to carry that dependency. The roadmap's Typical score entry names it, and
   the PR that ships this proposal adds it to the vault Backlog as a one-line
   bullet, so it outlives this file.
