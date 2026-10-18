@@ -11,7 +11,7 @@ with a scenario note: one plain-text reminder per scenario, on screen whenever
 that scenario is selected, written and rewritten in place. A note is edited
 with explicit Save and Cancel, and nothing the page does on its own while the
 player types can throw the text away. Each note is saved as a small file of
-its own, named from the scenario's exact name.
+its own, named from the scenario's name.
 
 ## Decisions needed
 
@@ -19,11 +19,13 @@ Eight rows, SN1 to SN8. **Nothing is ratified.** SN1 to SN6 are the
 maintainer's agreement from the design discussion of 2026-10-18, held on four
 full-size mockups built from their own stats. None was said in a ruling word.
 In this project's workflow a ruling is the maintainer's explicit "decided",
-"ruled", "locked" or "ratified". An agreement in a design discussion is a
-lean: it records where the maintainer stands, and it stays open to review
-until they ratify it. Where a point only met no objection rather than an
-explicit yes, its row says so. SN7 and SN8 are open: the maintainer
-has no lean on either. Everything else is author-owned and is in
+"ruled", "locked" or "ratified", or an unambiguous direction to treat a row
+as settled. An agreement in a design discussion is a lean: it records where
+the maintainer stands, and it stays open to review until they ratify it.
+Where a point only met no objection rather than an explicit yes, its row says
+so. SN7 and SN8 are open: the maintainer has no lean on either. After the
+first review, the maintainer chose how leaving the page treats unsaved text
+(SN3, rule 8); that choice is a lean too. Everything else is author-owned and is in
 [Design](#design), including every string in [Copy](#copy); reviewers may
 challenge any of it.
 
@@ -47,8 +49,8 @@ earlier text is gone, and no undo brings it back.
 **Recommendation: each scenario has at most one note, plain text with its line
 breaks kept and no formatting or links, which the player rewrites in place.
 Any scenario the page can select takes one, including a scenario a playlist
-lists that has never been played. A note belongs to the scenario's exact
-name.**
+lists that has never been played. A note belongs to the scenario's name as
+the app holds it.**
 
 - **A reminder about technique belongs to a scenario.** The Backlog idea this
   started from: "Option to save 'User Notes' on a scenario. (e.g. 'try to use
@@ -60,9 +62,11 @@ name.**
 - **The accepted cost was stated to the maintainer:** no undo once the editor
   closes. While it is open, Ctrl+Z undoes and **Cancel** puts the saved text
   back.
-- **The exact name is the app's identity for a scenario.** Every version of a
-  scenario shares its note, and a renamed scenario's note stays with the old
-  name ([SN6](#sn6-storage-a-file-per-note)).
+- **The app's name for a scenario is its identity.** That is the stats file's
+  `Scenario:` field with its outer spaces stripped, case and inner spaces
+  kept, the name every page already selects by. Every version of a scenario
+  shares its note, and a renamed scenario's note stays with the old name
+  ([SN6](#sn6-storage-a-file-per-note)).
 
 Rejected: a dated log of notes; keeping the previous text hidden in the file,
 a just-in-case feature (a later store version could turn each note into the
@@ -114,18 +118,25 @@ Their reason for rejecting a locked dropdown: "it feels a little restrictive
 to the user." Rules 1, 3 and 4 are those agreements, and rule 2 is the
 meaning of "unsaved changes" they were agreed with. When they asked what
 happens if several runs on different scenarios land, the newest-run answer in
-rule 3 met no objection, and so did rules 5 to 8 when the discussing session
-presented them; that is not an explicit yes. Two points are this author's:
-turning Follow off ends a wait (rule 3), and rule 9.
-Writing this proposal also found that two routes in rule 4 need more than the
-discussion assumed. The run toast's link draws the page again before the
-selection callback runs, and on 2026-10-18 the maintainer chose to have the
-browser stop it and select the scenario in place. A Playlist filter change can
-clear the selected scenario, a route the discussion did not list; including
-it is this author's call.
+rule 3 met no objection, and so did rules 5 to 7 when the discussing session
+presented them; that is not an explicit yes. Writing this proposal also found
+that two routes in rule 4 need more than the discussion assumed. The run
+toast's link draws the page again before the selection callback runs, and on
+2026-10-18 the maintainer chose to have the browser stop it and select the
+scenario in place. A Playlist filter change can clear the selected scenario, a
+route the discussion did not list; including it is this author's call. So
+are turning Follow off ending a wait (rule 3), the points of rules 3 and 4
+that the first review added, and rule 9.
+
+Rule 8 changed after the first review. The discussion's lean, which met no
+objection, was that unsaved text is lost if the player leaves the page. The
+review found that a reflexive reload or a navbar click to glance at another
+page would then discard a paragraph with no question, and the maintainer
+chose, on 2026-10-18, that leaving the page asks first.
 
 The material consequence: while a note has unsaved changes, Follow does not
-move the page, and every change of scenario the player makes asks first.
+move the page, and every change of scenario the player makes, and every way
+of leaving the page the app can catch, asks first.
 
 **Recommendation, as rules:**
 
@@ -136,7 +147,9 @@ move the page, and every change of scenario the player makes asks first.
 3. **Follow waits while the note has unsaved changes.** The run's toast still
    shows. While a run waits, the card names the scenario the page will switch
    to, since the toast is gone after 8 s. **Save** or **Cancel** then switches
-   once, to the newest waiting run's scenario. A run on the edited scenario
+   once, to the newest waiting run's scenario. So does undoing the changes:
+   once the text matches what the editor opened with again, the editor closes
+   and the page follows the waiting run at once. A run on the edited scenario
    ends the wait, and so does turning Follow off.
 4. **A change of scenario the player makes, with unsaved changes, opens a
    dialog:** **Keep editing**, **Discard**, **Save**. It covers a pick in the
@@ -144,18 +157,27 @@ move the page, and every change of scenario the player makes asks first.
    All scenarios view, the latest-run card's scenario button while it exists,
    and a Playlist filter change that leaves the edited scenario off the list.
    Keep editing puts the old selection back. Escape or a click outside the
-   dialog means Keep editing.
+   dialog means Keep editing. A toast's link to the edited scenario itself is
+   no change: it is stopped, no dialog opens, and nothing moves. While the
+   dialog is open, a toast's link does nothing, and a run that lands doesn't
+   change where the dialog leads.
 5. **An editor with no unsaved changes just closes** when the scenario
    changes, by Follow or by hand, and the card shows the new scenario's note.
 6. **A save goes to the scenario the editor opened on.**
 7. **Escape does nothing in the editor.** It closes popups everywhere else in
    the app, and here a reflexive press could throw away a paragraph.
-8. **Unsaved text is lost if the player leaves the page:** the navbar, a
-   reload, the browser's back button, closing the tab.
+8. **Leaving the page with unsaved changes asks first.** The app's own links
+   that leave Run History, the navbar, the header title and **Open scenario
+   table**, open the same dialog, and **Save** or **Discard** then follows the
+   link. The browser's back and forward buttons ask the same way, caught
+   before the page is drawn again. A reload, closing the tab, or going to
+   another site gets the browser's own "Leave site?" prompt. Only a crash or a
+   killed browser loses unsaved text without a question.
 9. **A failed save keeps the editor open,** with an error under it, and its
    unsaved changes keep every protection above. This replaces the discussion's
    "a scenario change then loses that text": with Follow waiting and every
-   route asking, nothing changes the scenario under a failed save.
+   route asking, nothing changes the scenario or leaves the page under a
+   failed save.
 
 - **The rule behind 3 and 4:** what the player does gets a question now; what
   happens to them waits in the card. The dialog opens only right after the
@@ -169,8 +191,9 @@ move the page, and every change of scenario the player makes asks first.
 Rejected: saving as you type; closing the editor when it loses focus; Escape
 undoing the edit; asking in the card instead of a dialog; locking the
 dropdown; pausing Follow whenever an editor is open; keeping the editor on the
-old scenario while the page shows the new one. Each reason is in
-[Alternatives rejected](#alternatives-rejected).
+old scenario while the page shows the new one; losing unsaved text when the
+player leaves the page; keeping the draft in the browser and restoring it on
+return. Each reason is in [Alternatives rejected](#alternatives-rejected).
 
 ### SN4. The first-run gap is accepted
 
@@ -223,13 +246,14 @@ new schema version and a conversion script.
 
 **Recommendation:**
 
-- **Path:** `data/scenario_notes/<prefix>-<code>.json`. The prefix is the
-  exact name with every character other than a letter, a digit, `-` or `_`
-  turned to `_`. The code is the first 8 hex digits of the sha256 of the exact
-  name in UTF-8. This is how `_safe_cache_key` in
-  `source/kovaaks/api_service.py` names a cache file.
+- **Path:** `data/scenario_notes/<prefix>-<code>.json`. The name is the
+  scenario's name as the app holds it (SN1). The prefix is that name with
+  every character other than a letter, a digit, `-` or `_` turned to `_`. The
+  code is the first 8 hex digits of the sha256 of the name in UTF-8. This is
+  how `_safe_cache_key` in `source/kovaaks/api_service.py` names a cache
+  file.
 - **Content:**
-  `{"schema_version": 1, "scenario": "<exact name>", "text": "<the note>"}`,
+  `{"schema_version": 1, "scenario": "<the name>", "text": "<the note>"}`,
   plus `"edited_at"` if SN8 ships.
 - **Read when its scenario is selected.** The path comes from the name, so no
   folder scan finds a note, and nothing is held in memory.
@@ -249,7 +273,7 @@ How the agreement was reached, all on 2026-10-18:
 - **The discussing session then moved to a file per note.** It had ruled out
   files named from the scenario because Windows ignores case in file names
   and two real scenarios differ only by case. The cache's naming, a readable
-  prefix plus a code from the exact name, removes that: it was added after
+  prefix plus a code from the whole name, removes that: it was added after
   sanitized names alone collided and overwrote each other.
 - **They asked whether a stats file's `Hash:` could tell scenarios apart.** It
   can't: it names a version of a scenario's contents, not the scenario.
@@ -371,13 +395,21 @@ Checked at `4f05766` on 2026-10-18. The design discussion read the code at
 - **A Playlist filter change can clear the selected scenario.** The
   filter's callback writes the scenario dropdown's list, and the dmc 2.8.0
   Select drops a value its new options lack. The spec states it for the
-  filter's own value. That it clears the selected scenario the same way is an
-  inference from the same component, not observed for this proposal.
+  filter's own value. During review, a fixture with the installed Dash and
+  Mantine components showed the same for a Select's value when its options
+  were replaced by a list without it.
 - **A value a callback writes is remembered like a pick.** The 2026-09-19
   entry: "Callback-written values *are* persisted — the response path reaches
   `recordUiEdit`". So when Keep editing writes the old scenario back, the
   browser should remember the old one, and a reload should open on it. The
-  design discussion assumed the opposite; the build checks it with a reload.
+  design discussion assumed the opposite. The same fixture showed a value
+  written back by a callback replacing a value the user had picked, and
+  surviving a reload; the build checks the whole flow on the page.
+- **The app strips a scenario name's outer spaces.** `extract_data_from_file`
+  in `source/kovaaks/data_service.py` strips the stats file's `Scenario:`
+  field, and `Scenario.strip_name` in `source/kovaaks/data_models.py` does the
+  same for a playlist's names. So the name every page selects by has no outer
+  spaces, while case and inner spaces are kept.
 - **Follow already lands on the newest run.** `forward_run_events` in
   `source/pages/run_history.py` summarizes a batch for the most recently
   played scenario, and the selection moves at most once per batch. The run
@@ -409,12 +441,14 @@ From the maintainer's stats folder on 2026-10-18. One player's data.
 - **Two names differ only by case:** `psalmTS angelic click 30% Larger` and
   `psalmTS angelic click 30% larger`. On Windows, file names from the name
   alone would put both notes in one file.
-- **One name ends in a space,** `Pasu Voltaic Silver `, so a key is never
-  trimmed. The longest name is 48 characters; none is outside ASCII.
+- **One raw `Scenario:` field ends in a space,** `Pasu Voltaic Silver `. The
+  app strips it, so the note belongs to `Pasu Voltaic Silver`, the name the
+  page already shows and selects. The longest name is 48 characters; none is
+  outside ASCII.
 - **Their files under SN6:** `SmoothBot_Perfected-98173bc5.json`,
   `psalmTS_angelic_click_30__Larger-e7ca36d5.json`,
   `psalmTS_angelic_click_30__larger-0f416bac.json`,
-  `Pasu_Voltaic_Silver_-04dda976.json`. Recomputed for this proposal.
+  `Pasu_Voltaic_Silver-424d7edd.json`. Recomputed for this proposal.
 - **The hash:** 866 names carry 882 hashes, and 16 scenarios have 2 or 3. A
   note keyed by hash would be lost at every update of its scenario. The
   case-only pair shares one hash: the lowercase name has 9 runs from
@@ -442,6 +476,17 @@ shrinks to 14 px; at 1536 px it takes two or three and the box keeps 32 to
 50 px. Growing the row instead keeps a 114 px box everywhere, and a waiting
 run then makes the row 246 px at 1920 px (+105).
 
+The editor this proposal recommends holds the text box at three lines, 69 px,
+and lets the card grow only where the line under the buttons needs the room.
+Measured again for this proposal, in headless Edge, with a run waiting:
+
+| Window | Row, no run waiting | Row, a run waiting | Row, a run waiting and the count |
+|---|---|---|---|
+| 2560 | 141 px | 141 px | 151 px (+10) |
+| 3840 | 141 px | 141 px | 141 px |
+| 1920 | 141 px | 201 px (+60) | 201 px (+60) |
+| 1536 | 294 px (+9 on the wrapped row) | 304 to 322 px (+19 to +37) | 322 px (+37) |
+
 ### Not checked
 
 - **The room with no scenario selected.** The mockup's capture has no such
@@ -450,9 +495,16 @@ run then makes the row 246 px at 1920 px (+105).
   wrapping line.
 - **The dialog as a real Mantine modal,** its focus, and what NVDA says of it.
   The mockup draws a stand-in.
-- **Persistence after Keep editing,** expected to hold from the 2026-09-19
-  entry.
-- **The Playlist filter route,** inferred, not observed.
+- **The whole Keep editing flow on the page,** after a pick and after a
+  Playlist filter change, including a reload. A fixture covered the parts.
+- **Catching the browser's back and forward buttons** before Dash Pages draws
+  the page again (rule 8). The browser fires the event after the address has
+  changed, and it can't be cancelled. A page script listening first can keep
+  Dash Pages from seeing it, then put the address back for Keep editing; that
+  is a plan, not a measurement.
+- **The browser's "Leave site?" prompt** in the maintainer's Firefox and in
+  Edge: each shows it only after the page has had a user gesture, which
+  typing is.
 - **Ctrl+Z in the app's text box.** Native undo is expected.
 - **How the page behind the dialog looks after a pick** (see
   [The dialog](#the-dialog)).
@@ -510,13 +562,15 @@ The note card alone, in each state:
 +-------------------------------------------------------------------------+
 
 6. A run waiting (unsaved changes, Follow on, a run landed on another scenario).
-+- Scenario note ---------------------------------------------------------+
-| +---------------------------------------------------------------------+ |
-| | try to use more wrist/fingers here; on sweeping motions use arm a|  | |
-| +---------------------------------------------------------------------+ |
-| [Save] [Cancel]  A run on Air Voltaic Invincible 4 Medium is waiting.  |
-|                  Press Save or Cancel to show it.                      |
-+-------------------------------------------------------------------------+
+   At 2560 px the line sits beside the buttons and the row keeps its height.
++- Scenario note ----------------------------------------------------------------------------------------+
+| +----------------------------------------------------------------------------------------------------+ |
+| | try to use more wrist/fingers here; on sweeping motions use arm a|                                 | |
+| +----------------------------------------------------------------------------------------------------+ |
+| [Save] [Cancel]  A run on Air Voltaic Invincible 4 Medium is waiting. Press Save or Cancel to show it. |
++--------------------------------------------------------------------------------------------------------+
+   At 1920 px the line wraps under the buttons, the text box keeps three lines,
+   and the card, with the row, grows by the line's height until the wait ends.
 
 7. The dialog, after a pick in the dropdown with unsaved changes.
         +- Your scenario note isn't saved ------------------------+
@@ -524,6 +578,9 @@ The note card alone, in each state:
         | before you switch to Smoothsphere Viscose?              |
         |                     [Keep editing] [Discard] [Save]     |
         +---------------------------------------------------------+
+   After a navbar click or the browser's back button, the same dialog asks
+   "Save your changes to the note on SmoothBot Perfected before you leave the
+   page?"
 
 8. A broken note file: the error in place of the text.
 +- Scenario note ------------------------------------------------- Edit -+
@@ -543,8 +600,9 @@ maintainer's checkout. It is not in the repository.
   never more than 800 px, so a line stays readable at 3840 px. At 3840 px the
   gap left over sits between the note card and the PB card. Where the first
   column wraps, it wraps as T1 set: the PB card first, then Scenario Stats.
-- **Height:** as tall as the row, as every card is. Its box never depends on
-  the note, so the chart doesn't move.
+- **Height:** as tall as the row, as every card is. While reading, its box
+  never depends on the note, so the chart doesn't move. While editing, the
+  card can grow (see [The editor](#the-editor)).
 - **First line:** `Scenario note`, quiet, as the other cards' first lines are,
   with `· edited {age}` if SN8 ships, and **Edit** at the line's right end,
   drawn as the app draws a link.
@@ -559,17 +617,19 @@ maintainer's checkout. It is not in the repository.
 - **Edit** turns the card into a text box over **Save** and **Cancel**, with
   the cursor at the end of the text. The first line reads `Scenario note`
   alone while editing.
-- **The editor keeps the row's height.** The discussion left this open. The
-  text box fills what the card leaves and scrolls inside itself. Re-measured
-  for this proposal: with no run waiting, the box is 69 px, about three lines,
-  at 1920, 2560 and 3840 px, and the chart never moves. Growing the row
-  instead would give a 114 px box, at the cost of moving the chart 45 px at
-  2560 px every time the player edits. The cost of keeping the row lands at
-  1920 px, and only while a run waits: the waiting line takes three lines
-  under the buttons and the box shrinks to about 14 px until the player
-  presses **Save** or **Cancel**. That matches the resolution ruling, 2560 and
-  3840 first, and the state lasts until the player's next click. The text
-  stays whole inside the box.
+- **The text box never shows less than three lines, 69 px,** and scrolls
+  inside itself. The editor keeps the row's height wherever that fits. The
+  card, and the row with it, grows only where the line under the buttons, the
+  waiting line, the count or a save error, needs more room than the row
+  leaves. Measured for this proposal: with a run waiting, nothing grows at
+  2560 or 3840 px; the count beside a waiting line adds 10 px at 2560 px; at
+  1920 px the row grows 60 px while a run waits; on the wrapped row at 1536
+  px, 9 to 37 px. The chart then moves only while the player edits, and at
+  2560 px only in the rare case of a long note while a run waits. Two
+  alternatives were set aside. Keeping the row's height at any cost left
+  about 14 px of text box at 1920 px while a run waited, too little to read
+  the line being typed. Growing the row on every edit gave a 114 px box but
+  moved the chart 45 px at 2560 px each time.
 - **A note holds at most 2,000 characters,** the number the discussion
   suggested. The card shows about 500 at 2560 px, and no cap can make a note fit
   at 1920 px, so the cap bounds rather than fits: a long paragraph and a short
@@ -607,6 +667,9 @@ maintainer's checkout. It is not in the repository.
 - **Save or Cancel** then moves the page once, to the scenario named, with the
   filter clearing that Follow already does for a scenario the filter doesn't
   list.
+- **Undoing the changes** does the same: once the text matches what the
+  editor opened with, the editor closes and the page moves once to the
+  scenario named. Nothing is left to protect, so nothing waits.
 - **The rest of the page while a run waits:** the chart, Scenario Stats and
   the PB card stay on the edited scenario, since the dropdown hasn't moved.
   The run list adds the run. Today's latest-run card moves to the newest run
@@ -614,9 +677,9 @@ maintainer's checkout. It is not in the repository.
 
 ### The dialog
 
-It opens when the player changes the scenario while the note has unsaved
-changes. Its title is `Your scenario note isn't saved`, and its body names the
-note's scenario and where the player asked to go.
+It opens when the player changes the scenario, or leaves the page, while the
+note has unsaved changes. Its title is `Your scenario note isn't saved`, and
+its body names the note's scenario and where the player asked to go.
 
 - **Keep editing** closes the dialog and leaves the editor and the selection
   as they were. Escape and a click outside the dialog do the same. Keyboard
@@ -628,6 +691,9 @@ note's scenario and where the player asked to go.
   editor.
 - **A run waiting is dropped** by Discard and Save: the player chose where to
   go. Keep editing keeps it waiting.
+- **While the dialog is open,** its destination is fixed. A run that lands
+  waits in the card as usual and doesn't change it, and a toast's link does
+  nothing.
 - **No close button:** the three answers are the ways out.
 
 Every way the player changes the scenario on this page:
@@ -636,20 +702,28 @@ Every way the player changes the scenario on this page:
 |---|---|---|
 | A pick in the Selected scenario dropdown | The pick has already changed the dropdown. A callback sees the new value differ from the edited scenario and opens the dialog. | The old scenario, written back by the selection callback. |
 | A Playlist filter change whose list lacks the edited scenario | The Select has already dropped the scenario. The same callback opens the dialog. | The old filter and the old scenario. |
-| The run toast's link | A script on the page stops the click before the page is drawn again, and opens the dialog. Save or Discard then selects the scenario in place, clearing a filter that doesn't list it, as the link would; the address stays as it was. | Nothing has moved. |
+| The run toast's link | A script on the page stops the click before the page is drawn again, and opens the dialog. Save or Discard then selects the scenario in place, clearing a filter that doesn't list it, as the link would; the address stays as it was. A link to the edited scenario itself is stopped too, with no dialog: nothing changes. | Nothing has moved. |
 | A name in the run list's All scenarios view | The selection callback holds the change and opens the dialog. | Nothing has moved. |
 | The latest-run card's scenario button, while it exists | As a name in the All scenarios view. | Nothing has moved. |
+
+Every way the player leaves the page (rule 8):
+
+| Route | How it is caught | Save or Discard |
+|---|---|---|
+| A navbar entry, the header title, **Open scenario table** | The same page script stops the click and opens the dialog. | Follows the link, by clicking it again past the script, so nothing repeats `dcc.Link`'s navigation by hand. |
+| The browser's back and forward buttons | The page script hears the history event before Dash Pages does, keeps it from Dash Pages, and opens the dialog. Keep editing puts the address back. Not yet tried (see Not checked). | Lets the history move through, and the page is drawn for the new address. |
+| A reload, closing the tab, another site | The browser's own "Leave site?" prompt, from a `beforeunload` handler set only while the note has unsaved changes. The browser draws it, so it has no app copy. | The browser's answer. |
+| A crash or a killed browser | Not caught. The text is lost. | |
 
 - **Behind the dialog after a pick or a filter change,** the chart and the
   other cards have already redrawn for the pick, since the dropdown is their
   input. Keep editing redraws them for the old scenario. The note card does
-  not redraw while the dialog is open. Catching a pick before the dropdown takes it would
-  need a hook into Mantine's list that the app doesn't have.
+  not redraw while the dialog is open. Catching a pick before the dropdown
+  takes it would need a hook into Mantine's list that the app doesn't have.
 - **With no unsaved changes,** every route behaves as today, and the toast's
   link draws the page again as it does now.
-- **Leaving the page** is not caught (SN3, rule 8). A browser's "Leave site?"
-  prompt can't see moves between the app's own pages, so it would catch a
-  reload and a tab close but not the navbar.
+- **If the build can't catch the back and forward buttons,** it stops and
+  asks the maintainer, rather than shipping rule 8 with that gap unsaid.
 
 ### What redraws the note card
 
@@ -662,7 +736,8 @@ the tick rewrites only the age, which shows only while reading.
 
 ### Storage
 
-- **The file name** is formed as SN6 states, from the exact name. The prefix
+- **The file name** is formed as SN6 states, from the scenario's name as the
+  app holds it. The prefix
   keeps every letter and digit, as Python's `str.isalnum` counts them, so it
   holds no path separator, and the code keeps names that differ only by case
   or punctuation apart. Where the shared helper lives is the build's call; the
@@ -685,7 +760,12 @@ the tick rewrites only the age, which shows only while reading.
   refuses the save. A broken file is copied to
   `<name>.corrupt-<n>.bak` beside it first, and the save replaces it. The
   text is written with `atomic_write_text`; empty text deletes the file after
-  the same check. The folder is made on the first save.
+  the same check. The folder is made on the first save. A file at the path
+  that holds another scenario's note is in the error state too ("is for
+  another scenario"), so a save copies it aside before replacing it, and
+  neither note is lost. A collision needs two names that differ only where the
+  prefix folds characters, such as case or punctuation, and share the first 8
+  hex digits of their sha256; none exists among 866 names.
 - **Where a broken file's error shows,** which the discussion left open: on
   that scenario's card only, and in the log as every store error is. Not in
   the startup warning queue, since notes are never read at startup, and not
@@ -752,19 +832,28 @@ A sketch for the implementer, not a contract.
   run, with unsaved changes, it sets the waiting store and moves nothing. For
   the card's button or a name in the list, it opens the dialog.
 - **A callback on the dropdown's and the filter's values** opens the dialog
-  when the scenario no longer matches the edited one.
-- **A page script for the toast's link,** listening for clicks before Dash's
-  own handler. While the card says there are unsaved changes, it stops the
-  link and writes its scenario to the dialog's store with `set_props`, as the
-  run list's script writes a name today.
+  when the scenario no longer matches the edited one. It needs a second Input
+  that nothing writes, or the renderer prunes its first call, as the
+  2026-09-19 entry's corollary describes.
+- **A page script** that, while the card says there are unsaved changes,
+  listens in the capture phase and calls both `preventDefault` and
+  `stopPropagation`, since React's root listener and the browser's own
+  navigation both come after it. It stops the toast's link and writes its
+  scenario to the dialog's store with `set_props`, as the run list's script
+  writes a name today. It stops a link that leaves the page and, after Save or
+  Discard, clicks it again with a flag it lets through. It hears `popstate` on
+  `window` before Dash Pages does and keeps it from Dash Pages. And it sets a
+  `beforeunload` handler.
 - **The dialog** is a Mantine modal in the page's layout.
 
 ### Copy
 
-Every string this proposal adds. They follow the nine copy rules in
-[AGENTS.md](../../AGENTS.md#styling-conventions). The discussion's drafts were
-checked against them: `No note yet.` loses its period, as `No runs yet` has
-none, and the waiting line is shorter.
+Every string this proposal adds or changes. They follow the nine copy rules
+in [AGENTS.md](../../AGENTS.md#styling-conventions). The discussion's drafts
+were checked against them: `No note yet.` loses its period, as `No runs yet`
+has none, and the waiting line is shorter. A scenario's name stays bare, as
+every other string in the app shows it; rule 6's quotes are for text the
+player typed. The browser's "Leave site?" prompt is the browser's own copy.
 
 | Where | String | Why |
 |---|---|---|
@@ -780,6 +869,8 @@ none, and the waiting line is shorter.
 | Dialog, title | `Your scenario note isn't saved` | |
 | Dialog, body | `Save your changes to the note on {from} before you switch to {to}?`, where `{from}` is the note's scenario and `{to}` the one asked for | Names both scenarios. |
 | Dialog, body, Playlist filter route | `The **Selected scenario** list no longer holds {from}. Save your changes to its note first?` | The player picked a playlist, not a scenario. |
+| Dialog, body, leaving the page | `Save your changes to the note on {from} before you leave the page?` | For a navbar entry, the header title, **Open scenario table**, and the back and forward buttons. |
+| Follow switch, help tooltip | `Automatically selects the scenario you just played when a new run is detected. If the **Playlist filter** doesn't list that scenario, the filter is cleared. It waits while a scenario note has unsaved changes.` | Today's text with one sentence added, so the help stays true. |
 | Dialog, buttons | `Keep editing`, `Discard`, `Save` | `Discard`, not `Cancel`, which could read as cancelling the switch. |
 | Save error | `Couldn't save the scenario note. See data/logs/debug.log.` | Rule 9; the log pointer as rule 7 sets it. |
 | Card and save errors, broken file | The schema machinery's messages with the kind `scenario note file`, such as `The scenario note file isn't valid JSON. File: {path}` | The shared wording for every store. |
@@ -793,8 +884,8 @@ History page". The shipping PR moves it in.
 - **Scenario note.** The player's own plain-text note about one scenario, such
   as a reminder about technique, shown in Run History's top row while the
   scenario is selected. Each scenario has at most one, rewritten in place. It
-  belongs to the scenario's exact name, so every version of the scenario
-  shares it.
+  belongs to the scenario's name as the app holds it, so every version of the
+  scenario shares it.
   - On screen: `Scenario note`.
   - In code: `scenario_notes`, the store and its folder.
   - Not a session note, a possible later idea that would belong to a session.
@@ -864,6 +955,18 @@ From the design discussion of 2026-10-18 unless marked.
   maintainer chose on 2026-10-18 to catch it and select in place. Catching it
   and then following the link was set aside too: the script would have to
   repeat `dcc.Link`'s navigation by hand.
+- **Losing unsaved text when the player leaves the page,** the discussion's
+  lean for rule 8. Set aside after the first review, on the maintainer's
+  choice of 2026-10-18: a reflexive reload, or a navbar click to glance at
+  another page, would discard a paragraph with no question, the same kind of
+  accident rule 7 keeps Escape from causing.
+- **The browser's prompt and the app's links only, leaving the back and
+  forward buttons to discard.** Cheaper, but the back button is an ordinary
+  way to leave a page, and it would be the one that loses text silently.
+- **Keeping the draft in the tab's session storage and restoring it on
+  return,** with no prompts. It covers every departure, but a restored draft
+  is more state for the player to reason about, and to test, than a question
+  at the moment of leaving.
 
 ## Delivery plan
 
@@ -879,8 +982,9 @@ moves is noted in the PR's description.
    Firefox.
 2. **The note card, the editor, Follow's wait, the dialog, and the shipping
    docs** (SN1 to SN5, SN7, SN8's line). The card, the editor and the waiting
-   line, the dialog and its routes, the toast link's script, the selection
-   callback's changes, the CSS, and the
+   line, the dialog and its routes, the page script that catches the toast's
+   link, the links that leave the page and the back and forward buttons, the
+   `beforeunload` guard, the selection callback's changes, the CSS, and the
    [Shipping a proposal](../../AGENTS.md#shipping-a-proposal-docs-definition-of-done)
    checklist: the decision-log entries, the notes in
    [Decisions this changes](#decisions-this-changes), the Run History spec,
@@ -927,14 +1031,20 @@ PR 1 touches nothing Proposal 2 does.
   error cause, supported, future) and each v1 rule; a save that writes, a save
   of empty text that deletes, a save over a broken file that copies it aside
   first, a save of empty text from an editor opened on a broken file that
-  copies it aside and deletes it, a save refused by a newer file, a name with a trailing space kept as
-  it is; `edited_at` written only when the text changes, in UTC.
+  copies it aside and deletes it, a save refused by a newer file, a file
+  holding another scenario's note copied aside before a save replaces it; a
+  raw `Scenario:` field with a trailing space keyed by its stripped name,
+  `Pasu_Voltaic_Silver-424d7edd.json`, so the run import, a playlist's name
+  and the store agree; `edited_at` written only when the text changes, in
+  UTC.
 - **The selection callback, as pytest** with `ctx.triggered` faked as the
   current tests fake it: a run with unsaved changes moves nothing and sets the
   waiting store; a later run replaces it; a run on the edited scenario clears
-  it; Follow off clears it; Save and Cancel release it once; a dialog answer
-  selects, and Keep editing puts the old values back; a run with no unsaved
-  changes moves the page as today.
+  it; Follow off clears it, and Follow on again brings nothing back; Save,
+  Cancel and undoing the changes each release it once; a run while the dialog
+  is open leaves its destination; a dialog answer selects, and Keep editing
+  puts the old values back; a run with no unsaved changes moves the page as
+  today.
 - **Live, headless Edge and Firefox, at 2560, 3840, 1920 and 1536 px, light
   and dark,** in the served app with a scratch state root and runs copied into
   its stats folder:
@@ -952,7 +1062,18 @@ PR 1 touches nothing Proposal 2 does.
     and no scenario selected;
   - after Keep editing on a pick, a reload opening on the old scenario;
   - the toast's link with no unsaved changes drawing the page again, as
-    today.
+    today; with unsaved changes, a link to the edited scenario neither
+    redraws nor asks, and a toast's link clicked while the dialog is open
+    does nothing;
+  - undoing every change while a run waits: the editor closes and the page
+    follows the run once;
+  - each way of leaving with unsaved changes: a navbar entry, the header
+    title and **Open scenario table** asking, and Save and Discard then
+    following the link; the back and forward buttons asking, and Keep
+    editing putting the address back; a reload and a tab close showing the
+    browser's prompt; no prompt with no unsaved changes;
+  - the text box at three lines or more with a run waiting, the count and a
+    save error, alone and together, and the row's height in each.
 - **The maintainer's look** in their own Firefox, on an instance of the PR's
   build.
 - **Docs:** `tests/test_docs.py` for the links, and the gates in AGENTS.md.
