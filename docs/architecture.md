@@ -214,9 +214,18 @@ state, not a field grafted onto someone else's schema.
   holds the playlist show-list (`playlist_visibility_service.py`): written
   atomically on each show/hide, read once and cached in-process, absent until
   the first show/hide (reads fall back to the first-run seed).
-- **Schema stamps** — the three durable stores above (settings, visibility, and
-  each user playlist under `data/playlists/`) carry a top-level integer
-  `"schema_version"`. The read machine lives once in
+- **Scenario notes** — `data/scenario_notes/` (not committed) holds the
+  player's notes (`kovaaks/scenario_notes_service.py`), one file per scenario,
+  named from the scenario's name as the app holds it through `safe_file_key`,
+  so names that differ only by case get a file each. A note is read from disk
+  each time it is asked for and never cached: its path comes from the name, so
+  nothing scans the folder. A save writes one file atomically, and saving empty
+  text deletes it. The folder is absent until the first save.
+- **Schema stamps** — the durable stores above (settings, visibility, each
+  user playlist under `data/playlists/`, and each scenario note under
+  `data/scenario_notes/`) carry a top-level integer `"schema_version"`. User
+  playlists and scenario notes are a store per file, each classified on its
+  own. The read machine lives once in
   `utilities/store_schema.py` and has four states per store: *missing* is the
   first-run default; *error* (unreadable, not JSON, no stamp, a malformed or
   non-positive stamp, or a supported stamp whose payload fails validation)
@@ -228,12 +237,17 @@ state, not a field grafted onto someone else's schema.
   `UnsupportedSchemaError`. There is no missing-means-v1 grandfather rule.
   Automatic writers (`bootstrap_stats_dir`) decline in the error and future
   states; user-initiated saves own an error-state file after copying it to an
-  adjacent `<name>.corrupt-<n>.bak`. The error and future states surface in the
+  adjacent `<name>.corrupt-<n>.bak`; every scenario note write is a user's
+  save. The error and future states surface in the
   UI — an alert on the settings page, one on the Playlists page for visibility,
-  and the startup warning queue for playlist files. The bundled corpus is
+  and the startup warning queue for playlist files. A scenario note's message
+  goes back to its caller, and no page shows it yet: the note card in the
+  [scenario notes proposal](proposals/scenario_notes_proposal.md) is to show
+  it on that scenario's card. The bundled corpus is
   exempt (it ships with its reader), and `data/cache/` is deliberately
   unstamped. `scripts/stamp_schema_version.py` is the one-time conversion for
-  installs created before the stamp; rationale and the run ordering are in
+  installs created before the stamp; scenario notes were born stamped and
+  aren't in it. Rationale and the run ordering are in
   `docs/decision_log/`.
 
 ## Module map
@@ -1165,6 +1179,17 @@ flowchart LR
   History filter, Journey picker, overview). The Run History
   filter adds one playlist to that list, the hidden one it holds, in
   `components/scenario_selection.py`.
+- `scenario_notes_service.py` — the scenario note store, a stamped file per
+  scenario under `data/scenario_notes/` (see State above). No page calls it
+  yet. `read_scenario_note` classifies one scenario's file into the four
+  store states, a supported one carrying a `ScenarioNote` (the text and its
+  `edited_at`, in UTC). `save_scenario_note` writes the note or, for empty
+  text, deletes it, under a module lock and after `_guard_note_destination`
+  reads the file on disk: a newer build's file refuses, and a broken one,
+  including one holding another scenario's note, is copied aside first.
+  Text equal to the note on disk writes nothing, so `edited_at` moves only
+  when the text changes. `validate_scenario_note_v1` is version 1's
+  definition, and `MAX_NOTE_CHARACTERS` its limit.
 - `evxl_snapshot.py` — the one read of `resources/evxl/benchmarks.json`,
   the Evxl benchmark snapshot that ships with the code
   (`evxl_entries_by_code`). Read once per process and keyed by case-folded
@@ -1313,9 +1338,12 @@ flowchart LR
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
   performs, with an optional `before_replace` hook the playlist, visibility,
-  and settings writers use for their destination point-checks),
+  settings, and scenario note writers use for their destination point-checks),
   `store_schema` (the `schema_version` marker, the four-state read machine, the
   per-store v1 validators, and `back_up_unusable_store()` — see State above),
+  `file_keys` (`safe_file_key()`, a readable prefix plus 8 hex digits of the
+  value's sha256, which names the cache's per-user files and each scenario
+  note's file, so a change to it orphans every saved note),
   `paths` (`state_dir()` / `package_root()` — see State above — plus
   `log_dir()`, the one construction of `data/logs`, because `app.py` writes
   there and the settings page displays it and pages cannot import `app`).
