@@ -85,10 +85,20 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- Nothing is ratified as next. Two proposals are in review: Typical score in
-  Scenario Stats (#382) and notes on a scenario (#390), for the room kept in
-  Run History's first column. Each adds its milestone here when it merges.
-  Current behavior is in [`specs/run_history.md`](./specs/run_history.md).
+- **Scenario notes** — the
+  [proposal](./proposals/scenario_notes_proposal.md) was ratified on
+  2026-10-18. It sets one plain-text note per scenario, shown in the room
+  the top row kept between Scenario Stats and the PB card and edited in
+  place, with Follow waiting while a note has unsaved changes. Two PRs build
+  it: the store first, then the card, the editor and the shipping docs.
+
+  Why it's next: the top row kept that room for notes, and a reminder about
+  technique is read just before the next run, beside the target and the
+  result the row already shows.
+
+- One other proposal is in review: Typical score in Scenario Stats (#382). It
+  adds its milestone here when it merges. Current behavior is in
+  [`specs/run_history.md`](./specs/run_history.md).
 
 ---
 
