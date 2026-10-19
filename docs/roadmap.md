@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Scenario notes** — Run History's top row now holds the player's own
+  note on the selected scenario, such as a reminder about technique, read
+  with no click between runs and edited in place with Save and Cancel. A
+  scenario with no note shows a link to add one. Nothing throws unsaved text
+  away: Follow waits while a note has unsaved changes and the card names the
+  run that waits, and every change of scenario or page the player makes asks
+  first. Each note is a small file of its own under `data/scenario_notes/`.
+  (PRs #394 and #396; design in #390) Design rationale distilled into
+  [`decision_log/`](./decision_log/README.md).
 - **The latest-run card follows the selection** — on Run History the
   latest-run card now reports the selected scenario's latest run, so it and
   the PB card beside it always describe one scenario, and a run from an older
@@ -70,14 +79,6 @@ sequence.
   matches group names either way. The grouping already shipped with the app,
   so nothing new is fetched. (PR #352; design in #338) Design rationale
   distilled into [`decision_log/`](./decision_log/README.md).
-- **Columns menu and KovaaK's ID columns** — the Playlists table and a
-  playlist's scenario table each gain a Columns menu that shows or hides any
-  column and remembers the choice in the browser. Each table also gains one
-  column that starts hidden, the KovaaK's ID of the benchmark or of the
-  scenario's leaderboard, so trying an API request by hand no longer starts
-  with digging the number out of a file. Both pages look as they did until
-  the menu is used. (PR #344; design in #334) Design rationale distilled
-  into [`decision_log/`](./decision_log/README.md).
 
 ---
 
@@ -85,18 +86,7 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **Scenario notes** — the
-  [proposal](./proposals/scenario_notes_proposal.md) was ratified on
-  2026-10-18. It sets one plain-text note per scenario, shown in the room
-  the top row kept between Scenario Stats and the PB card and edited in
-  place, with Follow waiting while a note has unsaved changes. Two PRs build
-  it: the store first, then the card, the editor and the shipping docs.
-
-  Why it's next: the top row kept that room for notes, and a reminder about
-  technique is read just before the next run, beside the target and the
-  result the row already shows.
-
-- One other proposal is in review: Typical score in Scenario Stats (#382). It
+- One proposal is in review: Typical score in Scenario Stats (#382). It
   adds its milestone here when it merges. Current behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
 

@@ -3,7 +3,8 @@
 The page shows one scenario's runs: a chart of every run in a range, with
 the Chart options panel beside it, and a list of the runs grouped by session.
 The list has a second view, All scenarios, of each session whole. Cards in
-its top row report the selected scenario's personal best and its latest run.
+its top row report the selected scenario's personal best and its latest run,
+and hold the player's own note on it.
 
 It never imports another page's module. Dash Pages loads each page file as
 ``pages.<name>``, so a second import path would make a second copy of that
@@ -26,7 +27,7 @@ from dash import (
     no_update,
 )
 
-from source.app_shell import RUN_EVENTS_BATCH_STORE_ID
+from source.app_shell import RUN_EVENTS_BATCH_STORE_ID, RUN_TOAST_LINK_CLASS
 from source.components.chart_options import (
     SETTINGS_HELP_TEXT,
     ChartOptionsIds,
@@ -72,6 +73,13 @@ from source.components.run_history_list import (
     run_list_from_store,
     run_list_panel,
     run_list_stores,
+)
+from source.components.scenario_note_card import (
+    NoteCardIds,
+    note_selection_ids,
+    register_scenario_note_card,
+    scenario_note_card,
+    scenario_note_dialog,
 )
 from source.components.scenario_selection import (
     SELECT_HIGHLIGHT_ON_OPEN_CLASS,
@@ -223,6 +231,41 @@ PB_CARD_IDS = PbCardIds(
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
     polling_interval=POLLING_INTERVAL_ID,
+    relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
+)
+NOTE_CARD_IDS = NoteCardIds(
+    card="run-history-note-card",
+    shown="run-history-note-shown",
+    note="run-history-note-read-state",
+    edited_at="run-history-note-edited-at",
+    label="run-history-note-age",
+    time="run-history-note-time",
+    time_tooltip="run-history-note-time-tooltip",
+    text="run-history-note-text",
+    edit="run-history-note-edit",
+    add="run-history-note-add",
+    editor="run-history-note-editor",
+    draft="run-history-note-draft",
+    save="run-history-note-save",
+    cancel="run-history-note-cancel",
+    waiting_line="run-history-note-waiting-line",
+    char_count="run-history-note-count",
+    error="run-history-note-error",
+    save_result="run-history-note-save-result",
+    dialog="run-history-note-dialog",
+    dialog_state="run-history-note-dialog-state",
+    question="run-history-note-question",
+    keep="run-history-note-keep-editing",
+    discard="run-history-note-discard",
+    dialog_save="run-history-note-dialog-save",
+    held="run-history-note-held",
+    go="run-history-note-go",
+    waiting="run-history-note-waiting",
+    filter_history="run-history-note-filter-history",
+    config="run-history-note-config",
+    fade_sink="run-history-note-fade-sink",
+    scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 
@@ -570,7 +613,9 @@ register_scenario_selection_clearing_filter(
     follow_switch=FOLLOW_SWITCH_ID,
     run_landed=RUN_LANDED_STORE_ID,
     scenario_asked=RUN_LIST_IDS.scenario_asked,
+    note=note_selection_ids(NOTE_CARD_IDS),
 )
+register_scenario_note_card(NOTE_CARD_IDS)
 
 
 def _range_select(
@@ -686,9 +731,9 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
 def _top_row(playlist_code: str | None) -> dmc.Box:
     """Build the row above the chart, in the columns of the chart and the run list.
 
-    The first column holds the dropdowns, the Scenario Stats card, the room
-    kept for notes, and the PB card at its right end. The second holds the
-    latest-run card, over the run list, so the PB card sits beside it.
+    The first column holds the dropdowns, the Scenario Stats card, the
+    scenario note card, and the PB card at its right end. The second holds
+    the latest-run card, over the run list, so the PB card sits beside it.
     """
     return dmc.Box(
         className="run-history-top-row",
@@ -697,6 +742,9 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                 [
                     _dropdown_column(playlist_code),
                     scenario_stats_panel(SCENARIO_STATS_IDS),
+                    scenario_note_card(
+                        NOTE_CARD_IDS, toast_link_class=RUN_TOAST_LINK_CLASS
+                    ),
                     pb_card(PB_CARD_IDS),
                 ],
                 className="run-history-top-row-left",
@@ -838,6 +886,7 @@ def layout(
                 children=setup_card_children(offer_account=False),
             ),
             _top_row(playlist_code),
+            scenario_note_dialog(NOTE_CARD_IDS),
             dmc.Box(
                 className="run-history-columns",
                 children=[

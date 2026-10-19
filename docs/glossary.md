@@ -166,6 +166,18 @@ PB ([run_history.md](specs/run_history.md#the-pb-card)).
 - On screen it has no title. Its first line reads `PB · set {age}`.
 - In code: `pb_card`.
 
+### Scenario note
+
+The player's own plain-text note about one scenario, such as a reminder about
+technique, shown in Run History's top row while the scenario is selected
+([run_history.md](specs/run_history.md#the-scenario-note-card)). Each scenario
+has at most one, rewritten in place. It belongs to the scenario's name as the
+app holds it, so every version of the scenario shares it.
+
+- On screen: `Scenario note`.
+- In code: `scenario_notes`, the store and its folder.
+- Not a session note, a possible later idea that would belong to a session.
+
 ### This scenario
 
 The run list's view of the selected scenario alone: the sessions that hold a

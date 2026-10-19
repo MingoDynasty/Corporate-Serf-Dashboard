@@ -17,6 +17,14 @@ review round on the contract. The premise is the public launch. `data/` is the
 app's database in lieu of SQLite, and a format change with no version marker is
 indistinguishable from corruption.
 
+**Superseded in part (2026-10-18).** [The scenario note entry](2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md)
+adds a fourth stamped store, each scenario note under
+`data/scenario_notes/`, a store per file as the user playlists are. A broken
+note file's error shows on that scenario's note card, not in the startup
+warnings or on Settings, since a note is read only when its scenario is
+selected. The conversion script doesn't cover notes, which were born
+stamped. The rest of this entry stands.
+
 **Scope.** `data/settings.json`, `data/playlist_visibility.json`, and every
 user playlist under `data/playlists/`. The bundled corpus in
 `resources/benchmarks/` is exempt: it ships with the code that reads it and is

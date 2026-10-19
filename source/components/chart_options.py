@@ -35,7 +35,8 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         "Automatically selects the scenario you just played when a new run is "
         "detected. If the ",
         control_name("Playlist filter"),
-        " doesn't list that scenario, the filter is cleared.",
+        " doesn't list that scenario, the filter is cleared. It waits while a "
+        "scenario note has unsaved changes.",
     ],
     "rank-overlay": (
         "Shows the selected playlist's rank threshold lines on the graph when "

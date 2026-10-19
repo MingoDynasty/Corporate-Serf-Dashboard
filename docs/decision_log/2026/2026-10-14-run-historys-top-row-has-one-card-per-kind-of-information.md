@@ -8,6 +8,12 @@ compare at a glance. The latest-run card aligns over the run list instead
 of filling the remaining width. The Follow switch sits under the scenario
 dropdown, accepting a slightly taller row.
 
+**Superseded in part (2026-10-18).** [The scenario note card's entry](2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md)
+fills the room this entry kept between Scenario Stats and the PB card: the
+"empty room with no element reserving it" now holds the note card, from
+240 px to 800 px wide. Where the column wraps, the PB card still goes first,
+then the note card, then Scenario Stats. The rest of this entry stands.
+
 **Rulings and delivery.** T1 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`: "I ratify Proposal 1,
 rows T1 to T4, as amended at 7329c23." The layout shipped in

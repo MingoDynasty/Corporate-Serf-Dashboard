@@ -113,6 +113,38 @@ as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
 off, a run on another scenario doesn't reach the card: the run's toast links
 to it, and the run list's **All scenarios** view lists it.
 
+### Scenario notes
+
+Each scenario can hold one note of your own, such as a reminder about
+technique, and Run History shows it between Scenario Stats and the PB card
+whenever the scenario is selected, with how long ago you last edited it.
+Click **Add a scenario note**, or **Edit** on a note, type, and click
+**Save**. **Cancel** puts the saved text back, and Ctrl+Z undoes while you
+type. Saving the note empty deletes it. A note holds up to 2,000 characters,
+and a long one fades at the bottom of the card: **Edit** shows all of it.
+Escape does nothing in the text box, so a stray press can't lose your text.
+
+While a note has changes you haven't saved:
+
+- **Follow newly played scenario** waits. A run you play still shows its
+  toast, the page stays on the note, and the line under **Save** names the
+  run's scenario. **Save**, **Cancel**, or undoing your changes then shows
+  it. Turning **Follow newly played scenario** off forgets the run.
+- Choosing another scenario, a playlist in the **Playlist filter** that
+  doesn't hold the scenario, a scenario's name in **All scenarios**, or a run
+  toast's link asks first: **Keep editing**, **Discard** or **Save**. So do
+  the navbar, the app's title, **Open scenario table**, and the browser's
+  back and forward buttons. In that dialog, Escape means **Keep editing**.
+- Reloading the page, closing the tab, or going to another site gets your
+  browser's own "Leave site?" prompt.
+
+Notes are saved on your PC under `data/scenario_notes/`, one small file per
+scenario, and never leave it. If a note's file can't be read, its card shows
+the problem and the file's path; **Edit** then **Save** replaces the file,
+and the old one is kept beside it with `.corrupt` in its name. A note
+belongs to the scenario's name, so a scenario KovaaK's renames starts with no
+note.
+
 ## Playlists and Benchmarks
 
 Benchmarks are playlists with rank data attached. The app ships with a bundled
