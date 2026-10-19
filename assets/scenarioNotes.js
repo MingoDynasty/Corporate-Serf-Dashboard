@@ -565,24 +565,42 @@
     ];
   }
 
-  // Fade a note cut off at the card's bottom. Measured once the text is
-  // drawn, and again whenever the text's box changes size, since the card's
-  // width decides where its lines break.
+  // Fade the bottom line of a note while more of it is below. Measured once
+  // the text is drawn, on every scroll, and whenever the text or the card
+  // changes size, since the card's width decides where its lines break. Only
+  // an attribute changes: a scroll position is the browser's, and nothing may
+  // redraw the note for it.
   function fade(_children, config) {
     var id = config.ids.text;
     function measure() {
-      var element = document.getElementById(id);
-      if (!element) {
+      var text = document.getElementById(id);
+      var viewport = text && text.closest(".mantine-ScrollArea-viewport");
+      if (!viewport) {
         return;
       }
-      if (!element.__scenarioNoteFade && window.ResizeObserver) {
-        element.__scenarioNoteFade = new window.ResizeObserver(measure);
-        element.__scenarioNoteFade.observe(element);
-      }
-      var clipped = element.scrollHeight > element.clientHeight + 1;
-      element.setAttribute("data-clipped", clipped ? "true" : "false");
+      var more =
+        viewport.scrollTop + viewport.clientHeight < viewport.scrollHeight - 1;
+      viewport.setAttribute("data-clipped", more ? "true" : "false");
     }
-    window.requestAnimationFrame(measure);
+    window.requestAnimationFrame(function () {
+      var text = document.getElementById(id);
+      var viewport = text && text.closest(".mantine-ScrollArea-viewport");
+      if (!viewport) {
+        return;
+      }
+      if (!viewport.__scenarioNoteFade) {
+        viewport.__scenarioNoteFade = true;
+        viewport.addEventListener("scroll", measure, { passive: true });
+        if (window.ResizeObserver) {
+          var observer = new window.ResizeObserver(measure);
+          observer.observe(viewport);
+          observer.observe(text);
+        }
+      }
+      // Another scenario's note, or the note just saved, starts at its top.
+      viewport.scrollTop = 0;
+      measure();
+    });
     return noUpdate();
   }
 

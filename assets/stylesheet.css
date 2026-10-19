@@ -623,8 +623,8 @@ a.run-toast-link:hover {
 .run-history-note-card:not([data-editing="true"]) .run-history-note-editor,
 .run-history-note-card-none .run-history-note-heading,
 .run-history-note-card-missing .run-history-note-read > .run-history-note-heading,
-.run-history-note-card-none .run-history-note-text,
-.run-history-note-card-missing .run-history-note-text,
+.run-history-note-card-none .run-history-note-scroll,
+.run-history-note-card-missing .run-history-note-scroll,
 .run-history-note-card-future .run-history-note-heading > .run-history-note-link,
 .run-history-note-card:not(.run-history-note-card-missing) .run-history-note-link-add {
     display: none;
@@ -673,22 +673,40 @@ a.run-toast-link:hover {
     font-size: var(--mantine-font-size-sm);
 }
 
-/* The note as typed: its line breaks kept, a word too long for the card
-   broken anywhere, centered in the card when it is short. One taller than
-   the card runs to its bottom, and a script fades its last line out. */
-.run-history-note-text {
+/* The note's scroll area: as tall as the note, centered in the card when it
+   is short, and no taller than the room under the first line. It reaches
+   into the card's right padding, so the scrollbar sits by the frame. */
+.run-history-note-scroll {
     flex: 0 1 auto;
+    margin-right: calc(4px - var(--mantine-spacing-sm));
+    min-height: 0;
+}
+
+/* While more of the note is below, a script fades the bottom line out. The
+   mask is on the viewport, so the scrollbar beside it stays whole. */
+.run-history-note-scroll .mantine-ScrollArea-viewport[data-clipped="true"] {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+}
+
+/* The keyboard's ring goes on the scroll area: the area clips anything drawn
+   outside its viewport, which is where the viewport's own ring would be. */
+.run-history-note-scroll:has(.mantine-ScrollArea-viewport:focus-visible) {
+    outline: 2px solid var(--mantine-primary-color-filled);
+    outline-offset: 2px;
+}
+
+.run-history-note-scroll .mantine-ScrollArea-viewport:focus-visible {
+    outline: none;
+}
+
+/* The note as typed: its line breaks kept, and a word too long for the card
+   broken anywhere. */
+.run-history-note-text {
     font-size: var(--mantine-font-size-sm);
     line-height: 20px;
     max-width: 75ch;
-    min-height: 0;
-    overflow: hidden;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
-}
-
-.run-history-note-text[data-clipped="true"] {
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
 }
 
 .run-history-note-editor {
