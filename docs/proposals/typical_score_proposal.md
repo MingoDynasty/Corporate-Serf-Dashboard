@@ -803,11 +803,13 @@ sessions.
 
 ### Verified facts
 
-Checked at `1dc9413`, the `main` this proposal's branch last merged, on
-2026-10-19. They were first checked at `1799df0`, then at `dcc4cba`. Between
-them the top row cards (#380, #383, #384) took Position out of Scenario Stats,
-#391 took Last played out of it, and #396 added the scenario note card to the
-top row. Nothing else listed here changed.
+Checked at `1dc9413` on 2026-10-19. They were first checked at `1799df0`,
+then at `dcc4cba`. Between them the top row cards (#380, #383, #384) took
+Position out of Scenario Stats, #391 took Last played out of it, and #396
+added the scenario note card to the top row. Nothing else listed here
+changed. The branch has since merged `main` at `97c9cd4`, whose #397 lets a
+long note scroll inside its card, which keeps its box: nothing listed here,
+and not the row's height.
 
 - **The chart's builders.** `build_run_history_figure` in
   `source/components/run_history_chart.py` reads the scenario's runs in play
