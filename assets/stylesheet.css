@@ -912,9 +912,9 @@ a.run-toast-link:hover {
     font-weight: 600;
 }
 
-/* The space that ends a part of a session row, for a screen reader: see
+/* The space that sets a group row's parts apart for a screen reader: see
    partEnd in runHistoryList.js. Kept, or the browser would drop a space at
-   the end of a line, and sized to nothing, so the row looks as it did. */
+   either end of a line, and sized to nothing, so the row looks as it did. */
 .run-list-part-end {
     font-size: 0;
     white-space: pre;

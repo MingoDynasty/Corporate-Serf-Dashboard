@@ -932,11 +932,26 @@ def test_a_rows_figures_go_ahead_of_its_count_unless_they_go_below():
     assert "var below = state.figures && data.figures && data.figures_below;" in (
         grouping
     )
-    assert 'below ? h("div", { className: "run-list-figures" }, data.figures)' in (
-        grouping
-    )
+    assert 'below ? h("div", { className: "run-list-figures" },' in grouping
     assert ".concat(figuresInLine(data), [\n            data.counts," in scenario
     assert ".concat(figuresInLine(data), [counts])" in session
+
+
+def test_the_part_end_opens_the_figures_below_so_the_line_ends_with_the_columns():
+    """The part end that tells the figures line from the first starts it.
+
+    After the line's last part, it was one of the line's flex items, and the
+    line's gap before it left the facts short of the columns' edge.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    grouping = script[script.index("function groupRow(") :]
+    grouping = grouping[: grouping.index("\n  }\n")]
+
+    assert '["div", { className: "run-list-line" }].concat(line)),' in grouping
+    assert (
+        'below ? h("div", { className: "run-list-figures" }, partEnd(), data.figures)'
+        in grouping
+    )
 
 
 def test_a_key_that_opens_or_closes_a_row_is_said_through_the_live_region():
