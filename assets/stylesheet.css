@@ -266,9 +266,9 @@ a.run-toast-link:hover {
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* The first column: the dropdowns, the Scenario Stats card, the room kept for
-   notes, and the PB card at its right end. It wraps on its own width, so it
-   needs no breakpoint, and the PB card is the first piece to wrap. */
+/* The first column: the dropdowns, the Scenario Stats card, the scenario
+   note card, and the PB card at its right end. It wraps on its own width, so
+   it needs no breakpoint, and the PB card is the first piece to wrap. */
 .run-history-top-row-left {
     display: flex;
     flex-wrap: wrap;
@@ -473,10 +473,10 @@ a.run-toast-link:hover {
 }
 
 /* The PB card, 300px wide at the first column's right end, so it sits beside
-   the latest-run card, and the room before it is kept for notes. Its frame
-   adds only its border to its height, as the Scenario Stats card's does, and
-   its lines are centered in the row's height. It shares the latest-run
-   card's lines: the score row, the line under it, and the empty state. */
+   the latest-run card, after the scenario note card. Its frame adds only its
+   border to its height, as the Scenario Stats card's does, and its lines are
+   centered in the row's height. It shares the latest-run card's lines: the
+   score row, the line under it, and the empty state. */
 .pb-card {
     display: flex;
     flex: 0 0 300px;
@@ -576,6 +576,197 @@ a.run-toast-link:hover {
 
 .pb-card-faded:empty {
     display: none;
+}
+
+/* The scenario note card, between Scenario Stats and the PB card. It takes
+   the room the row leaves, from 240px, and stops at 800px so a line stays
+   readable on a wide screen: the rest of the room sits before the PB card.
+
+   While reading, what it shows is out of the flow, so its box is the row's
+   and never the note's: the chart under the row stays where it is between a
+   note, no note, a broken file and no scenario. A card alone on a wrapped
+   line still gets five lines. While editing, the editor is in the flow and
+   holds the row's height where it fits, and the card grows only where the
+   lines under the buttons need more room than the row leaves. */
+.run-history-note-card {
+    border: 1px solid transparent;
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex: 1 1 240px;
+    flex-direction: column;
+    max-width: 800px;
+    min-height: 132px;
+    min-width: min(240px, 100%);
+    position: relative;
+}
+
+/* The frame says the scenario has a note, or a file that holds one. Without
+   either the room holds a link, and with no scenario nothing. */
+.run-history-note-card-note,
+.run-history-note-card-error,
+.run-history-note-card-future,
+.run-history-note-card[data-editing="true"] {
+    border-color: var(--mantine-color-default-border);
+}
+
+.run-history-note-read {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    inset: 0;
+    justify-content: safe center;
+    padding: 0 var(--mantine-spacing-sm);
+    position: absolute;
+}
+
+.run-history-note-card[data-editing="true"] .run-history-note-read,
+.run-history-note-card:not([data-editing="true"]) .run-history-note-editor,
+.run-history-note-card-none .run-history-note-heading,
+.run-history-note-card-missing .run-history-note-read > .run-history-note-heading,
+.run-history-note-card-none .run-history-note-text,
+.run-history-note-card-missing .run-history-note-text,
+.run-history-note-card-future .run-history-note-heading > .run-history-note-link,
+.run-history-note-card:not(.run-history-note-card-missing) .run-history-note-link-add {
+    display: none;
+}
+
+/* "Scenario note", its age, and Edit at the line's right end, drawn as the
+   other cards' first lines are. */
+.run-history-note-heading {
+    color: var(--mantine-color-dimmed);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 12px;
+    gap: var(--mantine-spacing-xs);
+    justify-content: space-between;
+    line-height: 18px;
+}
+
+/* Kept whole, with the spaces either side of the age: a flex container drops
+   a space between two items. */
+.run-history-note-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+}
+
+/* Edit and Add a scenario note: buttons, since each opens the editor and
+   goes nowhere, drawn as the app draws a link. */
+.run-history-note-link {
+    background: none;
+    border: 0;
+    color: var(--mantine-color-anchor);
+    cursor: pointer;
+    flex: 0 0 auto;
+    font: inherit;
+    padding: 0;
+    text-align: left;
+}
+
+.run-history-note-link:hover {
+    text-decoration: underline;
+}
+
+.run-history-note-link-add {
+    align-self: flex-start;
+    font-size: var(--mantine-font-size-sm);
+}
+
+/* The note as typed: its line breaks kept, a word too long for the card
+   broken anywhere, centered in the card when it is short. One taller than
+   the card runs to its bottom, and a script fades its last line out. */
+.run-history-note-text {
+    flex: 0 1 auto;
+    font-size: var(--mantine-font-size-sm);
+    line-height: 20px;
+    max-width: 75ch;
+    min-height: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.run-history-note-text[data-clipped="true"] {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+}
+
+.run-history-note-editor {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px var(--mantine-spacing-sm) 8px;
+}
+
+/* The text box fills what the row leaves it and never shows less than three
+   lines. It scrolls inside itself. Its height starts from nothing, so the
+   row's height, not the box's rows, decides the card's. */
+.run-history-note-text-box,
+.run-history-note-text-box .mantine-Textarea-wrapper {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+.run-history-note-text-box textarea {
+    flex: 1 1 auto;
+    font-size: var(--mantine-font-size-sm);
+    height: 0;
+    line-height: 19px;
+    min-height: 69px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    resize: none;
+}
+
+/* Save and Cancel, then the lines that need saying beside them where the
+   card is wide enough, and under them where it isn't. */
+.run-history-note-footer {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 6px var(--mantine-spacing-xs);
+}
+
+.run-history-note-buttons {
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--mantine-spacing-xs);
+}
+
+.run-history-note-lines {
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* With nothing to say the lines take no room, or the card would grow by a
+   line's gap where they wrap under the buttons. */
+.run-history-note-lines:not(:has(> :not(:empty))),
+.run-history-note-lines > :empty {
+    display: none;
+}
+
+.run-history-note-waiting {
+    color: var(--mantine-color-blue-text);
+    font-size: 13px;
+    line-height: 18px;
+}
+
+.run-history-note-count {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.run-history-note-error {
+    color: var(--mantine-color-error);
+    font-size: 13px;
+    line-height: 18px;
+    overflow-wrap: anywhere;
 }
 
 /* The chart beside the run list. The list's column is as wide as its seven

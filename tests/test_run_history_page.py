@@ -262,12 +262,12 @@ def test_the_layout_takes_a_query_parameter_it_does_not_name():
     }
 
 
-def test_the_top_row_holds_the_dropdowns_stats_and_pb_then_the_latest_run_card():
-    """Two columns: the first holds the dropdowns, Scenario Stats and the PB card.
+def test_the_top_row_holds_the_dropdowns_stats_note_and_pb_then_the_latest_run_card():
+    """Two columns: the first holds the dropdowns, Scenario Stats, the note and PB.
 
     The latest-run card is the second column on its own, so it sits over
-    the run list, and the PB card is last in the first, beside it. Nothing
-    is between the stats card and the PB card: that room is kept for notes.
+    the run list, and the PB card is last in the first, beside it. The
+    scenario note card is in the room between the stats card and the PB card.
     """
     row = _by_class(run_history.layout(), "run-history-top-row")
 
@@ -275,9 +275,10 @@ def test_the_top_row_holds_the_dropdowns_stats_and_pb_then_the_latest_run_card()
     assert left.className == "run-history-top-row-left"
     assert card.className == latest_run_card.CARD_CLASS
     assert _ids(card) == set(run_history.LATEST_RUN_CARD_IDS)
-    dropdowns, stats, pb = left.children
+    dropdowns, stats, note, pb = left.children
     assert dropdowns.className == "run-history-dropdown-column"
     assert stats.className == "scenario-stats-card"
+    assert note.id == run_history.NOTE_CARD_IDS.card
     # Position is the PB card's now.
     assert run_history.PB_CARD_IDS.rank in _ids(pb)
     assert run_history.PB_CARD_IDS.rank not in _ids(stats)
@@ -544,7 +545,7 @@ def test_the_mode_and_ranges_take_their_names_from_aria_labels():
     )
 
 
-def test_the_follow_help_says_a_filter_in_the_way_is_cleared():
+def test_the_follow_help_says_a_filter_in_the_way_is_cleared_and_a_note_waits():
     switch = _by_id(run_history.layout(), run_history.FOLLOW_SWITCH_ID)
 
     (tooltip,) = [
@@ -557,7 +558,7 @@ def test_the_follow_help_says_a_filter_in_the_way_is_cleared():
     assert rendered_text(tooltip.label) == (
         "Automatically selects the scenario you just played when a new run is "
         "detected. If the **Playlist filter** doesn't list that scenario, the "
-        "filter is cleared."
+        "filter is cleared. It waits while a scenario note has unsaved changes."
     )
 
 
@@ -596,7 +597,8 @@ def test_each_help_text_has_one_wording():
         "score-threshold-percentage",
     }
     assert rendered_text(help_text["automatically-change-scenario"]).endswith(
-        "If the **Playlist filter** doesn't list that scenario, the filter is cleared."
+        "If the **Playlist filter** doesn't list that scenario, the filter is "
+        "cleared. It waits while a scenario note has unsaved changes."
     )
     assert help_text["score-threshold-percentage"].endswith(
         "A run is judged against the personal best you had before the run."
@@ -884,22 +886,29 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
     assert GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__ == (
         "reach_scenario_or_the_one_asked_for"
     )
+    note = run_history.NOTE_CARD_IDS
     assert registration["output"] == (
-        f"..{ids.playlist_filter}.value...{ids.scenario_dropdown}.value.."
+        f"..{ids.playlist_filter}.value...{ids.scenario_dropdown}.value"
+        f"...{note.waiting}.data...{note.held}.data.."
     )
     assert "@" not in registration["output"]
     # A name pressed in the run list's tree is the third thing that reaches a
-    # scenario. It comes here and writes neither dropdown itself. The
-    # latest-run card follows the selection and has no input here.
+    # scenario, and the note card's answer the fourth. Each comes here and
+    # writes neither dropdown itself. The latest-run card follows the
+    # selection and has no input here.
     assert _keys(registration["inputs"]) == [
         f"{ids.deep_link}.data",
         f"{run_history.RUN_EVENTS_STORE_ID}.data",
         f"{asked_by_the_list}.data",
+        f"{note.go}.data",
+        f"{run_history.FOLLOW_SWITCH_ID}.checked",
     ]
     assert _keys(registration["state"]) == [
-        f"{run_history.FOLLOW_SWITCH_ID}.checked",
         f"{ids.playlist_filter}.value",
         f"{ids.scenario_dropdown}.value",
+        f"{note.editor}.data",
+        f"{note.draft}.value",
+        f"{note.waiting}.data",
     ]
     card_ids = set(run_history.LATEST_RUN_CARD_IDS)
     assert not card_ids & {
@@ -916,18 +925,36 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
     assert writers == [registration["output"]]
 
 
+_SELECTION_PROPS = scenario_selection.SelectionProps(
+    list_asked=f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
+    run_events=f"{run_history.RUN_EVENTS_STORE_ID}.data",
+    go=f"{run_history.NOTE_CARD_IDS.go}.data",
+    follow=f"{run_history.FOLLOW_SWITCH_ID}.checked",
+    deep_link=f"{run_history.SCENARIO_SELECTION_IDS.deep_link}.data",
+)
+
+
 def _press(triggered: list[dict], run_events, follow, list_scenario):
-    """Call the selection callback as Dash would, for a selected scenario of A."""
-    return scenario_selection.reach_the_scenario_asked_for(
+    """Call the selection callback as Dash would, for a selected scenario of A.
+
+    With no note open, so it writes only the dropdowns, and returns those.
+    """
+    *dropdowns, waiting, held = scenario_selection.reach_the_scenario_asked_for(
         triggered,
-        f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
+        _SELECTION_PROPS,
         {},
         run_events,
         list_scenario,
+        None,
         follow,
         None,
         "Scenario A",
+        None,
+        None,
+        None,
     )
+    assert (waiting, held) == (no_update, no_update)
+    return tuple(dropdowns)
 
 
 @pytest.mark.parametrize(
@@ -1969,15 +1996,26 @@ def _first_run_lands(monkeypatch, follow: bool, selected: str | None):
         selected,
     )
     if summary is not no_update:
-        _filter, moved_to = scenario_selection.reach_the_scenario_asked_for(
-            [{"prop_id": f"{run_history.RUN_EVENTS_STORE_ID}.data", "value": summary}],
-            f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
-            {},
-            summary,
-            None,
-            follow,
-            PLAYLIST_CODE if selected else None,
-            selected,
+        _filter, moved_to, _waiting, _held = (
+            scenario_selection.reach_the_scenario_asked_for(
+                [
+                    {
+                        "prop_id": f"{run_history.RUN_EVENTS_STORE_ID}.data",
+                        "value": summary,
+                    }
+                ],
+                _SELECTION_PROPS,
+                {},
+                summary,
+                None,
+                None,
+                follow,
+                PLAYLIST_CODE if selected else None,
+                selected,
+                None,
+                None,
+                None,
+            )
         )
         if moved_to is not no_update:
             selected = moved_to

@@ -7,7 +7,7 @@ import pytest
 
 from source.config import config_service, settings_service
 from source.config.config_service import ConfigData, get_config
-from source.kovaaks import api_service, time_scored_service
+from source.kovaaks import api_service, scenario_notes_service, time_scored_service
 
 
 @pytest.fixture(autouse=True)
@@ -52,6 +52,21 @@ def test_settings(
     settings_service.clear_settings_cache()
     settings_service.clear_stats_dir_pin()
     settings_service.clear_identity_pin()
+
+
+@pytest.fixture(autouse=True)
+def test_scenario_notes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Keep the scenario note store off the developer's real notes.
+
+    Run History reads a note whenever a scenario is selected, so any test
+    that draws or calls the page would otherwise read the real folder, and a
+    save would write to it.
+    """
+    monkeypatch.setattr(
+        scenario_notes_service,
+        "SCENARIO_NOTES_DIR",
+        tmp_path / "scenario-notes-store" / "scenario_notes",
+    )
 
 
 @pytest.fixture(autouse=True)

@@ -11,9 +11,14 @@ registered once per page.
 When a link, a new run, or a scenario's name in the page's run list names a
 scenario the playlist filter does not list, the filter is cleared and the
 scenario is selected.
+
+While the page's scenario note has unsaved changes, the selection callback
+moves nothing on its own: a run that lands waits, and a name pressed in the
+list asks first. The note card's script answers with a request this callback
+carries out, so one callback still writes both dropdowns.
 """
 
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import dash_mantine_components as dmc
 from dash import Input, NoUpdate, Output, State, callback, ctx, no_update
@@ -64,6 +69,46 @@ class ScenarioSelectionIds(NamedTuple):
     scenario_dropdown: str
     deep_link: str
     playlist_table_link: str
+
+
+class NoteSelectionIds(NamedTuple):
+    """The ids of the scenario note's pieces the selection callback reads and writes.
+
+    ``editor`` is the store of the open editor, ``{"scenario", "opened"}``, or
+    nothing while it is closed, and ``draft`` the text box whose ``value`` is
+    the text being typed. Together they say whether the note has unsaved
+    changes. ``waiting`` is the store of the scenario a held run would move
+    the page to, which this callback alone writes. ``held`` is the store this
+    callback writes a name pressed in the list to, instead of selecting it,
+    for the note card to ask about. ``go`` is the store the note card's
+    script writes the player's answer to (``note_request``).
+    """
+
+    go: str
+    editor: str
+    draft: str
+    waiting: str
+    held: str
+
+
+class SelectionProps(NamedTuple):
+    """The ``id.prop`` of each input that tells the selection callback what called."""
+
+    list_asked: str
+    run_events: str
+    go: str
+    follow: str
+    deep_link: str
+
+
+def has_unsaved_changes(editor: dict[str, Any] | None, draft: str | None) -> bool:
+    """Tell whether the note's editor is open on a text other than the one it opened with.
+
+    Typing a word and deleting it again leaves no unsaved changes.
+    """
+    if not editor or draft is None:
+        return False
+    return draft != editor["opened"]
 
 
 def _local_scenario_options() -> list:
@@ -224,12 +269,11 @@ def reach_scenario(
     restoring it. Written here, a link's selection is an ordinary one, which
     the browser then remembers like any other.
 
-    ``run_events`` is empty until a batch lands, and the deep-link store only
-    changes when the page is drawn again, which also empties ``run_events``.
-    So a summary means a run triggered this call, and none means the page has
-    just been drawn. With Follow off the summary is for the scenario already
-    selected and moves nothing. The switch is still read here, so that a
-    selection the user changes while a batch is on its way is not undone.
+    The caller passes a summary only for a call a run triggered, and none for
+    the page's first call, which applies the link. With Follow off the summary
+    is for the scenario already selected and moves nothing. The switch is
+    still read here, so that a selection the user changes while a batch is on
+    its way is not undone.
 
     One callback writes either dropdown's value, and this is what it runs for
     a link and for a run. A second writer would need ``allow_duplicate``, and
@@ -259,59 +303,181 @@ def reach_scenario(
     return playlist, scenario
 
 
-def _list_asked(triggered: list[dict], list_asked_prop: str) -> bool:
-    """Tell whether a press on a scenario's name in the run list is what called.
+def _called_with(triggered: list[dict], prop_id: str) -> bool:
+    """Tell whether the input ``prop_id`` called, holding a value.
 
-    ``list_asked_prop`` is the ``id.data`` of the store the list's script
-    writes the scenario to. The store is in the layout from the start, with
-    no value until a name is pressed, so a value is read as well.
+    Every store this reads is in the layout from the start, with no value
+    until something writes one, and a page's first call can name every input
+    as a trigger. So a trigger with no value is not a call.
     """
     return any(
-        trigger["prop_id"] == list_asked_prop and trigger["value"]
-        for trigger in triggered
+        trigger["prop_id"] == prop_id and trigger["value"] for trigger in triggered
     )
+
+
+def _named(triggered: list[dict], prop_id: str) -> bool:
+    return any(trigger["prop_id"] == prop_id for trigger in triggered)
+
+
+def _first_call(triggered: list[dict]) -> bool:
+    """Tell whether no input called: Dash then reports one trigger named ``.``."""
+    return all(trigger["prop_id"] == "." for trigger in triggered)
+
+
+def _select(
+    scenario: str | None, selected_playlist: str | None, selected_scenario: str | None
+) -> tuple[Any, Any]:
+    """Select ``scenario`` and clear a playlist filter in its way, or change nothing."""
+    if not scenario or scenario == selected_scenario:
+        return no_update, no_update
+    return (
+        None if _filter_leaves_out(selected_playlist, scenario) else no_update,
+        scenario,
+    )
+
+
+def note_request(
+    request: dict[str, Any],
+    waiting: str | None,
+    selected_playlist: str | None,
+    selected_scenario: str | None,
+) -> tuple[Any, Any, Any]:
+    """Carry out the note card's answer: the filter, the scenario, and the wait.
+
+    The card's script writes one of four requests, each once the editor is
+    closed or its answer is final, so none of them looks at unsaved changes:
+
+    - ``release`` moves the page to the scenario of the run that waited, as
+      Follow would have, and ends the wait. Save, Cancel, and undoing every
+      change send it, so with nothing waiting it changes nothing.
+    - ``select`` moves the page to a scenario the dialog was asked about, a
+      name in the list or a run toast's link, and drops the run that waited:
+      the player chose where to go.
+    - ``restore`` writes back the filter and the scenario the note was edited
+      on, which Keep editing asks for after a pick or a filter change has
+      already moved them. A run that waited goes on waiting.
+    - ``drop`` ends the wait and moves nothing: after a pick or a filter
+      change the page is already where the player asked.
+    """
+    restore = request.get("restore")
+    if restore is not None:
+        return (
+            no_update
+            if restore["playlist"] == selected_playlist
+            else restore["playlist"],
+            no_update
+            if restore["scenario"] == selected_scenario
+            else restore["scenario"],
+            no_update,
+        )
+    target = waiting if request.get("release") else request.get("select")
+    return (
+        *_select(target, selected_playlist, selected_scenario),
+        no_update if waiting is None else None,
+    )
+
+
+def _hold_run(run_events, follow_newly_played, editor, waiting) -> tuple[Any, Any, Any]:
+    """Hold a run that lands while the note has unsaved changes: nothing moves.
+
+    The run on another scenario becomes the one the page will move to, the
+    newest replacing any before it. A run on the edited scenario ends the
+    wait, since the page is where Follow would take it. Against the edited
+    scenario, not the dropdown, which a pick held behind the dialog has
+    already moved. With Follow off a run asks for nothing.
+    """
+    if not follow_newly_played:
+        return no_update, no_update, no_update
+    played = run_events["latest"]["scenario_name"]
+    if played == editor["scenario"]:
+        return no_update, no_update, no_update if waiting is None else None
+    return no_update, no_update, no_update if played == waiting else played
 
 
 def reach_the_scenario_asked_for(  # noqa: PLR0913
     triggered,
-    list_asked_prop,
+    props: SelectionProps,
     selection,
     run_events,
     list_scenario,
+    request,
     follow_newly_played,
     selected_playlist,
     selected_scenario,
+    editor,
+    draft,
+    waiting,
 ):
-    """Select the scenario a link, a new run, or the list names.
+    """Select the scenario a link, a new run, the list or the note card names.
+
+    Returns the filter, the scenario, the scenario a held run waits on, and a
+    name in the list held for the note card to ask about.
 
     A press on a scenario's name in the run list's tree is a third way to
     reach a scenario, beside the two ``reach_scenario`` takes: the list's
     script writes the name to a store. The scenario is selected, and a
     playlist filter that does not list it is cleared. The list writes no
     dropdown itself, because this is the one callback that writes either
-    value.
+    value. The note card's answers are a fourth (``note_request``).
 
-    Which of the three called is read from ``triggered``, what triggered the
-    call, never from the values. The summary store replays its last batch to
-    every later call, and the list's store its last name, so on a press
-    ``run_events`` can still hold a run from minutes ago, and on a run that
-    lands ``list_scenario`` the name pressed before it. Read from the values,
-    a press would follow that run, and the run would select that name again.
+    While the note has unsaved changes nothing here moves the page on its
+    own. A run that lands waits (``_hold_run``), and a press is held for the
+    note card, which asks the player and answers with a request. Turning
+    Follow off ends a wait, and turning it on brings none back.
+
+    Which input called is read from ``triggered``, never from the values. The
+    summary store replays its last batch to every later call, and the list's
+    store its last name, so on a press ``run_events`` can still hold a run
+    from minutes ago, and on a run that lands ``list_scenario`` the name
+    pressed before it. Read from the values, a press would follow that run,
+    the run would select that name again, and a flip of Follow would follow
+    a run already handled.
     """
-    if not _list_asked(triggered, list_asked_prop):
-        return reach_scenario(
+    unsaved = has_unsaved_changes(editor, draft)
+    if _called_with(triggered, props.go):
+        return (
+            *note_request(request, waiting, selected_playlist, selected_scenario),
+            no_update,
+        )
+    if _called_with(triggered, props.list_asked):
+        if unsaved and list_scenario and list_scenario != selected_scenario:
+            return no_update, no_update, no_update, {"to": list_scenario}
+        return (
+            *_select(list_scenario, selected_playlist, selected_scenario),
+            no_update,
+            no_update,
+        )
+    playlist: Any = no_update
+    scenario: Any = no_update
+    held_on: Any = no_update
+    if _called_with(triggered, props.run_events):
+        if unsaved:
+            playlist, scenario, held_on = _hold_run(
+                run_events, follow_newly_played, editor, waiting
+            )
+        else:
+            playlist, scenario = reach_scenario(
+                None,
+                run_events,
+                follow_newly_played,
+                selected_playlist,
+                selected_scenario,
+            )
+            # A wait outlives its unsaved changes only for a moment, and a run
+            # that moves the page ends it.
+            if waiting is not None and scenario is not no_update:
+                held_on = None
+    elif _named(triggered, props.deep_link) or _first_call(triggered):
+        playlist, scenario = reach_scenario(
             selection,
-            run_events,
+            None,
             follow_newly_played,
             selected_playlist,
             selected_scenario,
         )
-    if not list_scenario or list_scenario == selected_scenario:
-        return no_update, no_update
-    return (
-        None if _filter_leaves_out(selected_playlist, list_scenario) else no_update,
-        list_scenario,
-    )
+    if _named(triggered, props.follow) and not follow_newly_played:
+        held_on = no_update if waiting is None else None
+    return playlist, scenario, held_on, no_update
 
 
 def register_scenario_selection_clearing_filter(  # noqa: PLR0913
@@ -321,6 +487,7 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
     follow_switch: str,
     run_landed: str,
     scenario_asked: str,
+    note: NoteSelectionIds,
 ) -> None:
     """Register the block's callbacks for one page's ids.
 
@@ -340,7 +507,8 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
     ``scenario_asked`` is the id of a store a script on the page writes a
     scenario's name to, which selects it. The page keeps it in its layout at
     all times: the selection callback's outputs are always there, so each of
-    its inputs has to be too.
+    its inputs has to be too. The same holds for every piece of the note card
+    ``note`` names.
     """
     callback(
         Output(ids.scenario_dropdown, "data"),
@@ -374,18 +542,36 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
         # moved and the list is never built for a filter about to be cleared.
         Input(run_landed, "data"),
     )(select_playlist)
-    list_asked_prop = f"{scenario_asked}.data"
+    props = SelectionProps(
+        list_asked=f"{scenario_asked}.data",
+        run_events=f"{run_events}.data",
+        go=f"{note.go}.data",
+        follow=f"{follow_switch}.checked",
+        deep_link=f"{ids.deep_link}.data",
+    )
 
     def reach_scenario_or_the_one_asked_for(*values):
-        return reach_the_scenario_asked_for(ctx.triggered, list_asked_prop, *values)
+        return reach_the_scenario_asked_for(ctx.triggered, props, *values)
 
     callback(
         Output(ids.playlist_filter, "value"),
         Output(ids.scenario_dropdown, "value"),
+        Output(note.waiting, "data"),
+        Output(note.held, "data"),
         Input(ids.deep_link, "data"),
         Input(run_events, "data"),
         Input(scenario_asked, "data"),
-        State(follow_switch, "checked"),
+        # Written by the note card's controller with ``set_props``, never as
+        # its declared output: the controller takes the scenario dropdown this
+        # callback writes as an Input, and the two declared edges would close
+        # a loop the renderer refuses.
+        Input(note.go, "data"),
+        # An Input, so that turning Follow off ends a wait at once. The value
+        # still decides only whether a run is followed.
+        Input(follow_switch, "checked"),
         State(ids.playlist_filter, "value"),
         State(ids.scenario_dropdown, "value"),
+        State(note.editor, "data"),
+        State(note.draft, "value"),
+        State(note.waiting, "data"),
     )(reach_scenario_or_the_one_asked_for)
