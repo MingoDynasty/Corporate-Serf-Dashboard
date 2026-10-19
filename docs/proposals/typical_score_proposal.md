@@ -41,6 +41,12 @@ are pivots of TS2, TS4 and TS5 and ask no new question, so the scope freeze
 holds. The maintainer, on the new rows: "I have leans so far, but I still want
 things to be open for debate until I get other reviewers' opinions."
 
+**The third review wave** endorsed TS7 and TS8 and split on TS6. Two readers
+proposed drawing a value at full strength only when every run behind it is
+recent, and one endorsed D's test with the older runs shown. TS6 weighs the
+two with their measured costs, and still recommends D's test, now with a
+value's older runs shown on the card.
+
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
 (skill is judged by the typical run, unknown is not weak, verdicts not
@@ -496,7 +502,9 @@ scenario, which then updates its typical score."
 The material consequence: the value stops depending on the 30 days, and
 "recent" becomes a test every surface reads beside it. Right after a return,
 a value drawn at full strength can still hold up to 10 runs from before the
-break, and every later reader sees that value.
+break, and every later reader sees that value. It reads low if the player has
+improved since the break and high if they have declined, so a scenario can
+look stronger than it is right after a return, not only weaker.
 
 **Recommendation: the typical score after a run is the median of the
 scenario's last 20 runs, or of all its runs when it has fewer, whatever their
@@ -505,8 +513,10 @@ or 20. It is recent, and drawn at full strength, when the scenario's runs in
 the 30 days up to that moment meet either condition: at least 10 runs across 2
 or more sessions, or at least 20 runs in any number of sessions. Otherwise it
 is drawn faded, on a scenario that has never been recent too. Scenario Stats
-judges recency as of now, and the chart as of each point's time. Every run
-counts, as TS1 says.**
+judges recency as of now, and the chart as of each point's time. Whenever
+some of a value's runs are older than 30 days, Scenario Stats says how many
+are recent, faded or not, and its help says a full-strength value can hold
+older runs. Every run counts, as TS1 says.**
 
 - **It is the line the maintainer expected:** no limit's shape, with what
   isn't recent faded. Prototype v8 draws it.
@@ -539,12 +549,20 @@ counts, as TS1 says.**
     low: this player came back better than before the break.
   - In 2026 alone the median gap between the two values, where they differ,
     is 0.8%.
+- **The lag runs either way.** This player came back better than before each
+  break, so D's mixed values ran low: 20% of the 92 came in above the next
+  session, and 3% by 5% or more, against 30% and 8% of the values whose runs
+  were all recent. A player who comes back rusty sees the other direction:
+  10 old scores of 200 and 10 recent ones of 100 make a full-strength 150.
+  One player's history can't bound that. The maintainer's view of the worst
+  case, quoted above, covers the first direction only.
 - **Where the lag matters is in judgments made right after a return.** Of the
   features that will read the figure, weakness ranking and the rank-up chance
   are the ones that judge right then; run comparisons such as "better than 15
   of your last 20" read naturally under D, whose 20 runs are literally the
-  last 20. The maintainer's view of the worst case is quoted above. Any later
-  feature can also choose not to judge on a faded value.
+  last 20. A later feature can choose not to judge on a faded value, or ask
+  for more than the drawing's test, such as every run recent: the definition
+  hands it how many of a value's runs are recent.
 - **A faded value is no worse than a held one.** On 2026's 54 session starts
   where A held a carried value, D's value, which C draws too, missed the next
   session by 3.18% against A's 3.87% (interval −0.91 to +0.50 for the
@@ -566,9 +584,41 @@ counts, as TS1 says.**
   run. Score vs Time holds a value until the next run (TS3) and fades the hold
   at the moment its recent runs stop meeting the conditions: with no run in
   between they only age out, so the moment is exact. The line ends at the
-  newest run (TS3), so for up to 30 days after a scenario's last run the card
-  can be faded while the chart's last point is solid. The explainer says so
-  (Copy).
+  newest run (TS3), so the card can be faded while the chart's last point is
+  solid: the card can first fade within 30 days of the scenario's last run,
+  and the two then disagree until the next run. The explainer says so (Copy).
+- **The alternative is every run recent, the stricter test review proposed.**
+  A value is drawn at full strength only when every run behind it ended in
+  the 30 days up to the moment; its values, its line and where the line is
+  drawn are D's. It never draws runs from before a break at full strength, so
+  it can't overstate after a decline, and its rule is one sentence. Its cost
+  is fading: in 2026 full strength falls from 44.2% of runs to 30.9% and
+  faded rises from 20.1% to 33.4%, so faded outnumbers full. After a long
+  break the line turns solid at the 20th run back, not the 10th, and a
+  scenario played 10 to 19 times a month whose last 20 runs reach past 30
+  days stays faded. As of the newest run in the data, 31 scenarios played in
+  the last 30 days have a value: D draws 27 at full strength, this test 16.
+  Of the 11 it fades, 6 are returns still holding runs from 159 days or more
+  before, and 5 were played 14 to 19 times in the month, their oldest runs 30
+  to 49 days old.
+- **A 90-day ceiling on the oldest run, on top of D's test,** fades those 6
+  returns and keeps the 5 at full strength. Over 2026 it costs nearly as much
+  as every run recent, 32.7% of runs at full strength, because most of the
+  difference there is returns, and it puts a second age in the rule.
+- **Why D's test, and not every run recent.** The values that only every run
+  recent fades predict nearly as well as the values both draw at full
+  strength, and far better than the values D fades. At session starts in 2025
+  and 2026 those 92 missed the next session by 4.61%, the 227 whose runs were
+  all recent by 3.56%, and the 205 that D fades by 7.48%; in 2026 alone,
+  3.49%, 3.18% and 5.13%. So D's fade marks the values that are clearly
+  worse, where every run recent also fades nearly a third of 2026's
+  full-strength line. D's test is also the evidence TS1 ruled enough for a
+  current value, 10 recent runs from 2 sessions, and its faded stretches are
+  where A's value wasn't fresh. Its mixture is shown on the card, and a
+  feature that judges can ask for every run recent. If the maintainer would
+  rather bound the overstatement than show it, every run recent is coherent:
+  the choice is whether "recent" means enough recent runs or only recent
+  runs.
 - **Two simpler tests were set aside.** "At least 20 runs across 2 sessions",
   the maintainer's question, removes the lag but would cut 2026's
   full-strength runs from 44% to 28% and leave 57% with no line instead of
@@ -578,8 +628,8 @@ counts, as TS1 says.**
 
 Rejected: A, TS2's recommendation, a carried value held flat (v6); C, A's
 value with faded stretches drawn from the last 20 runs at any age (v7); no
-limit at full strength; the two simpler tests above; and no line before a
-scenario's first recent value.
+limit at full strength; every run recent and the 90-day ceiling, above; the
+two simpler tests above; and no line before a scenario's first recent value.
 
 The measurements are in the maintainer's scratch folder, the D evaluation and
 its script, checked against the rules evaluation: on the runs to 2026-10-09
