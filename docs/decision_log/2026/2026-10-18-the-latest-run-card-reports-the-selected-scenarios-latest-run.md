@@ -184,6 +184,10 @@ note.
   landing older than the store's newest leaves the card alone.
 - [2026-10-12, Follow and a scenario link clear the filter](2026-10-12-follow-and-a-scenario-link-clear-a-playlist-filter-that-does-not-list-the-scenario.md):
   the card's button as one of the selection callback's inputs.
+- [2026-10-14, a card's lines follow their role](2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md):
+  its closing paragraph, which kept the card on the last run played during a
+  lookup and left changing that to a separate proposal. This is that
+  proposal.
 
 Proposed in
 [#388](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/388),
