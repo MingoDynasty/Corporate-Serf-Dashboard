@@ -704,10 +704,14 @@ runs" follow it.**
   importance order.
 - **"Total runs" keeps the count apart from the runs behind the typical
   score,** which are at most 20.
-- **The first line says how recent a dimmed value is:** "as of {date}" when
-  none of its runs is recent, and how many are when some are (Copy).
-- **No height cost.** Measured at `1dc9413` (TS5), the row stays 143 px
-  without a benchmark and 164 px with one, the scenario note card beside it.
+- **The first line says how many of the value's runs are recent** whenever
+  some are older than 30 days, dimmed or not (Copy).
+- **No height cost.** Measured at `1dc9413` (TS5) with v8's first line
+  `· as of Aug 6`, the row stays 143 px without a benchmark and 164 px with
+  one, the scenario note card beside it. The longest first line in the Copy
+  block, `Typical score ⓘ · 14 recent runs in 1 session`, measures about 232
+  px with its icon at the heading's 12 px, inside the 246 px the 270 px card
+  leaves its text, so it doesn't wrap; PR 3 measures the row with it.
 - **Beyond TS5 it changes** the first line that the
   [2026-10-18 entry](../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md)
   shipped, still plain text, and the glossary's Scenario Stats entry. The card
@@ -876,17 +880,21 @@ the latest-run card use; `(dimmed)` marks it drawn in the theme's dimmed
 color:
 
 ```
-| Typical score ⓘ            |  | Typical score ⓘ · as of Aug 6 |  | Typical score ⓘ            |
-| 2,999                      |  | 763.55               (dimmed) |  | Too few runs               |
-| Category: Tracking · Smooth|  | Category: Clicking · Dynamic  |  | Category: Clicking · Static|
-| Total runs: 147            |  | Total runs: 91                |  | Total runs: 8              |
-          recent                          not recent                       too few runs
+| Typical score ⓘ            |  | Typical score ⓘ · 0 of 20 recent runs |  | Typical score ⓘ            |
+| 2,999                      |  | 763.55                       (dimmed) |  | Too few runs               |
+| Category: Tracking · Smooth|  | Category: Clicking · Dynamic          |  | Category: Clicking · Static|
+| Total runs: 147            |  | Total runs: 91                        |  | Total runs: 8              |
+          recent                              not recent                           too few runs
 ```
 
-A scenario with some recent runs, but too few, reads
-`Typical score ⓘ · 6 recent runs` over a dimmed value. The number has a dotted
-underline and a hover that says what it is from; the ⓘ explains the line, the
-bands and the fading (see [Copy](#copy)).
+Whenever some of a value's runs are older than 30 days, the first line says
+how many are recent, at full strength or not:
+`Typical score ⓘ · 14 of 20 recent runs` over a full-strength value, and
+`Typical score ⓘ · 6 of 20 recent runs` over a dimmed one. A value whose 10
+to 19 recent runs all come from one session reads
+`Typical score ⓘ · 14 recent runs in 1 session`, dimmed. The number has a
+dotted underline and a hover that says what it is from; the ⓘ explains the
+line, the bands and the fading (see [Copy](#copy)).
 
 The chart, Score vs Run, on VT ww5t Intermediate S5 around its return on
 2026-02-14, after 82 days away. Under D the line keeps no limit's shape, and
@@ -1082,9 +1090,9 @@ or under the plot, is PR 2's to choose and show.
 
 ### The Scenario Stats lead
 
-- **The first line** reads `Typical score` and a help icon, then, when the
-  value isn't recent, how recent it is (see [Copy](#copy)). It stays plain
-  text, as the 2026-10-18 entry made it.
+- **The first line** reads `Typical score` and a help icon, then, whenever
+  some of the value's runs are older than 30 days, how many are recent (see
+  [Copy](#copy)). It stays plain text, as the 2026-10-18 entry made it.
 - **The lead** is the value in the PB and latest-run cards' lead number,
   with a dotted underline for its hover, and in the theme's dimmed color when
   it isn't recent. The lead number is large text, so PR 3 checks the dimmed
@@ -1165,30 +1173,31 @@ entry changes its pointer from "a later proposal" to the Typical score entry.
 
 Every string this proposal adds or changes. They follow the nine copy rules in
 [AGENTS.md](../../AGENTS.md#styling-conventions). They were drafted in
-prototype v8 with the maintainer and redlined in an advisory consult with
-`gpt-6.1-sol` on 2026-10-19. `{n}` is the number of runs behind a value, at
-most 20; `{k}` its recent runs; `{s}` its sessions. `1 run`, `1 session` and
-`1 recent run` take the singular. Dates are the run list's short date, with
-the year only when it isn't this year, and a span on one date reads
-`on {date}`. `**…**` is bold through `control_name()`.
+prototype v8 with the maintainer, redlined in an advisory consult with
+`gpt-6.1-sol` on 2026-10-19, and revised after the third review wave. `{n}`
+is the number of runs behind a value, at most 20; `{k}` its recent runs;
+`{s}` its sessions. `1 run` and `1 session` take the singular;
+`{k} of {n} recent runs` stays plural, its noun counting the `{n}`. Dates
+are the run list's short date, with the year only when it isn't this year,
+and a span on one date reads `on {date}`. `**…**` is bold through
+`control_name()`.
 
 | Where | String | Why |
 |---|---|---|
-| Scenario Stats, first line | `Typical score` | Names the lead figure, as `PB` opens the PB card's first line and `Latest run` the latest-run card's (TS8). |
-| First line, not recent, no recent runs | `Typical score · as of {date}`, the newest run's date | Dates a value none of whose runs is recent, the "as of" TS5 ruled. |
-| First line, 1 to 9 recent runs | `Typical score · {k} recent runs` | Says how far along a return is without calling a value that has just moved old. |
-| First line, 10 to 19 recent runs from one session | `Typical score · {k} recent runs in 1 session` | Says why enough runs still read as not recent. |
+| Scenario Stats, first line | `Typical score`, alone when every run behind the value is recent | Names the lead figure, as `PB` opens the PB card's first line and `Latest run` the latest-run card's (TS8). |
+| First line, some of the value's runs older than 30 days | `Typical score · {k} of {n} recent runs`, `0 of {n}` included | Shows the mixture whether the value is at full strength or dimmed: how far along a return is, and that a full-strength value still holds older runs. No date: under TS6 it would always be the newest run's, which the hover's Runs line and the latest-run card already show. |
+| First line, 10 to 19 recent runs, all from one session | `Typical score · {k} recent runs in 1 session` | Says why enough runs still read as not recent; the sessions clause is then what fails. Without `of {n}`: with it and the session, the line measures about 256 px with its icon at 12 px, more than the card's 246, and would wrap. |
 | First line's help icon, accessible name | `About the typical score` | Not `Typical score help`: the Typical score switch's help icon has that name, as `settings_help_label` names every one `{label} help`. |
 | Lead, value | `{score}`, such as `2,999` | Rounded as [Rounding](#rounding) says, formatted as a score is; dimmed when not recent. |
 | Lead, too few runs | `Too few runs` | No "recent": this minimum has no age limit. |
 | Lead, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
 | No scenario selected | `No scenario selected` | The card's shipped empty state, unchanged. |
 | The count line | `Total runs: {n}` | Replaces `Number of runs:`, so the count isn't read as the runs behind the typical score (TS8). |
-| Lead hover | `The median of your last {n} runs.`, or `The median of your {n} runs.` when those are all of them; then `**Runs:** {n} in {s} sessions · {first} to {last}`, `**Recent:** {k} of {n} from the last 30 days`, `**Middle 50%:** {p25} to {p75}`, `**Middle 80%:** {p10} to {p90}`, one line each | A sentence, then readouts with bold labels, as the chart's hover has them. When the recent runs all come from one session and the value isn't recent, the Recent line adds ` · 1 session`. |
+| Lead hover | `The median of your last {n} runs.`, or `The median of your {n} runs.` when those are all of them; then `**Runs:** {n} in {s} sessions · {first} to {last}`, `**Recent:** {k} of {n} from the last 30 days`, `**Middle 50%:** {p25} to {p75}`, `**Middle 80%:** {p10} to {p90}`, one line each | A sentence, then readouts with bold labels, as the chart's hover has them. When 10 to 19 of the runs are recent and all from one session, the Recent line adds ` · 1 session`, the clause that then keeps the value from being recent. |
 | Lead hover, too few runs | `A typical score needs either:`, then `At least 10 runs across 2 or more sessions.` and `At least 20 runs, even if all from one session.` as a list, then `You have {n} runs in {s} sessions.` | The existence minimum, with no 30 days in it, and the count behind the lead. |
-| First line's help | `Your typical score is the median of your last 20 runs of this scenario, or of all your runs if you have fewer. Runs count regardless of age.` / `On the chart, the darker band shows the middle 50% of those scores, and the lighter band the middle 80%. Narrower bands mean more consistent scores. Turn the line and bands on or off in **Chart options**.` / `Faded means too few recent runs. It turns solid when your runs in the last 30 days meet either condition:`, then the same two conditions as a list / `The card judges recency as of now, and the chart as of each point's time.` | Four paragraphs: what the figure is, what the bands mean, what fading means, and why the card and the chart's last point can differ. No lesson on what a median is, and nothing the chart shows by itself, as the maintainer asked; "consistent" is the word players use. The second condition drops "they're" so it fits on one line at 320 px. |
+| First line's help | `Your typical score is the median of your last 20 runs of this scenario, or of all your runs if you have fewer. Runs count regardless of age.` / `On the chart, the darker band shows the middle 50% of those scores, and the lighter band the middle 80%. Narrower bands mean more consistent scores. Turn the line and bands on or off in **Chart options**.` / `A faded line, or a dimmed number on this card, means too few recent runs. It comes back to full strength when your runs in the last 30 days meet either condition:`, then the same two conditions as a list, then `At full strength, up to half of the runs behind your typical score can still be older than 30 days.` / `The card judges recency as of now, and the chart as of each point's time.` | Four paragraphs: what the figure is, what the bands mean, what fading and dimming mean and how old a full-strength value's runs can be, and why the card and the chart's last point can differ. The help opens from the card, over a number that dims, so it names both. "Up to half" is exact: a full-strength value has at least 10 recent runs of at most 20, or all 20 recent. No lesson on what a median is, and nothing the chart shows by itself, as the maintainer asked; "consistent" is the word players use. The second condition drops "they're" so it fits on one line at 320 px. |
 | Chart legend | `Typical score`, `Middle 50%`, `Middle 80%` | Sentence case, the switches' words. |
-| Line hover | `**Typical score**: {score}`, `**Runs**: {n} in {s} sessions · {first} to {last}`, `**Recent**: {k} of {n} in the 30 days up to this run`, `**Middle 50%**: {p25} to {p75}`, `**Middle 80%**: {p10} to {p90}`, one line each | The card hover's lines. "Up to this run" because each point is judged at its run. A band's line shows while its switch is on. A faded point whose recent runs are all from one session adds ` · 1 session`. The percentile names are dropped: they add terms and no information. |
+| Line hover | `**Typical score**: {score}`, `**Runs**: {n} in {s} sessions · {first} to {last}`, `**Recent**: {k} of {n} in the 30 days up to this run`, `**Middle 50%**: {p25} to {p75}`, `**Middle 80%**: {p10} to {p90}`, one line each | The card hover's lines. "Up to this run" because each point is judged at its run. A band's line shows while its switch is on. A point whose 10 to 19 recent runs all come from one session adds ` · 1 session`, as the card's hover does. The percentile names are dropped: they add terms and no information. |
 | Line hover, a hold faded after its runs aged out | `**Recent**: too few · last run {date}` | Score vs Time only; the count changes along the hold, so it isn't given. |
 | Chart options switch labels | `Typical score`, `Middle 50%`, `Middle 80%` | The legend's words, as the PB score switch takes its line's. |
 | Typical score switch help | `Draws your typical score: the median of your last 20 runs, or of all your runs if you have fewer. It's faded where too few of them are recent. **Score vs Sensitivity** doesn't show the line or bands.` | What it draws and where it doesn't. |
@@ -1200,9 +1209,11 @@ the year only when it isn't this year, and a span on one date reads
 
 Each entry is written as [docs/glossary.md](../glossary.md) would hold it,
 under "Scores and notifications", beside PB. Each implementation PR moves in
-the entries for the terms it ships: PR 1 Typical score and Recent, with the
-Median and best correction, PR 2 Middle 50% and Middle 80%, and PR 3 the
-Scenario Stats correction.
+what it ships, so the glossary never describes a surface the app doesn't
+draw yet: PR 1 Typical score and Recent without their on-screen lines, with
+the Median and best correction; PR 2 Middle 50% and Middle 80%, and Recent's
+chart line; PR 3 Recent's Scenario Stats line and the Scenario Stats
+correction.
 
 - **Typical score.** What a player's runs on a scenario usually score: the
   median of its last 20 runs, or of all its runs when it has fewer, whatever
@@ -1218,10 +1229,13 @@ Scenario Stats correction.
   - In code: `typical_score`.
 - **Recent.** The state of a typical score whose runs in the 30 days up to a
   moment number at least 10 across 2 or more sessions, or at least 20.
-  Scenario Stats judges it as of now, and the chart at each point.
-  - On screen: a full-strength line and an undimmed lead number; not recent,
-    a faded stretch, a dimmed number, and `as of {date}` or `{k} recent runs`
-    after `Typical score` in Scenario Stats.
+  Scenario Stats judges it as of now, and the chart at each point. A recent
+  value can still hold runs older than 30 days, up to half of them.
+  - On the chart: a full-strength stretch; not recent, a faded one.
+  - On Scenario Stats: an undimmed lead number; not recent, a dimmed one.
+    Whenever some of the value's runs are older than 30 days, recent or not,
+    `{k} of {n} recent runs` follows `Typical score`, or
+    `{k} recent runs in 1 session`.
   - In code: `recent`.
 - **Middle 50%.** The range the middle half of the runs behind a typical
   score fell in: from the first quartile to the third, P25 to P75. Run
