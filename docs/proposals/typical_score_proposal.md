@@ -1430,8 +1430,11 @@ Each with where it is tracked.
   (not), 20 from one (recent), 9 (not); a run ended exactly 30 days before the
   moment (counts) and one second more (doesn't); recent at the run and not
   later, with the fade moment of a hold equal to the moment its 10th-newest or
-  second session's last recent run passes 30 days; a value recent at its run
-  whose card, a day later, isn't.
+  second session's last recent run passes 30 days; a hold whose 20 recent runs
+  are all one session's, which fades when its 20th-newest run passes 30 days;
+  where both conditions held at the run, the later of the two moments; a
+  value recent at its run whose card, a day later, isn't; the count of a
+  value's recent runs, all of them, some with the value recent, and none.
 - **Unit, the chart's traces,** per mode on a hand-built history: which
   points are full strength and which faded, the joins at each end of a faded
   stretch with no step in the value, Score vs Time's holds, their fade moment
@@ -1443,12 +1446,17 @@ Each with where it is tracked.
   and the run points' color unchanged.
 - **Callbacks:** each switch rebuilds the chart; the lead updates on a run on
   the scenario, on a scenario change, and when the value stops being recent on
-  the tick; its empty states and first-line readouts.
+  the tick; its empty states and first-line readouts, `{k} of {n} recent
+  runs` over a full-strength value and a dimmed one, and none when every run
+  is recent.
 - **Live, PRs 2 and 3,** in headless Edge at 2560 and 1920 px, light and
   dark: the line and bands under the runs, the faded stretches, the legend,
   its clicks hiding a metric whole, and its layout with Chart options open,
   the switches and their memory, the hover, a zoom that refits to the bands,
-  the lead's dimmed contrast, and the top row's height with the lead. These
+  the lead's dimmed contrast, and the top row's height with the lead and the
+  longest first line, `Typical score ⓘ · 14 recent runs in 1 session`, with
+  and without a benchmark; if it wraps, PR 3 shortens it and lists the new
+  string in its description. These
   cover what pure tests can't: draw order, theme colors, the zoom script, and
   layout. Then the maintainer's look in Firefox.
 - **Performance,** measured again on the largest scenario in PR 2.
