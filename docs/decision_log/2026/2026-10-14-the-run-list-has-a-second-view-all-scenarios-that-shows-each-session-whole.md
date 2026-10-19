@@ -11,6 +11,19 @@ whole page, by the rule Follow and a scenario link already follow. What a
 player notices is that the order of a session is on screen, where before it
 was a count on a row.
 
+**Superseded in part (2026-10-18).** [The heading line's entry](2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md)
+takes the heading off the screen, in both views, and keeps it for screen
+readers, so the switch, **Expand all** and **Columns** sit on the header's
+first line and not its second. With the latest-run card's button gone, by
+[its rule](2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md),
+the store a pressed name is written to is the selection callback's third
+input, not its fourth. The heading's words and the rest of this entry stand.
+
+**Superseded in part (2026-10-18).** [The unsaved note text entry](2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md):
+while a scenario note has unsaved changes, a name pressed in the tree is held
+by the selection callback and asks in the note's dialog first. The rest of
+this entry stands.
+
 **Rulings.** By the maintainer, 2026-10-14, on
 [PR #375](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/375):
 "I ratify the proposal." Row A1, the scenario name's click, was ratified as

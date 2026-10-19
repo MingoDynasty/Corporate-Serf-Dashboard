@@ -28,6 +28,23 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Scenario notes** — Run History's top row now holds the player's own
+  note on the selected scenario, such as a reminder about technique, read
+  with no click between runs and edited in place with Save and Cancel. A
+  scenario with no note shows a link to add one. Nothing throws unsaved text
+  away: Follow waits while a note has unsaved changes and the card names the
+  run that waits, and every change of scenario or page the player makes asks
+  first. Each note is a small file of its own under `data/scenario_notes/`.
+  (PRs #394 and #396; design in #390) Design rationale distilled into
+  [`decision_log/`](./decision_log/README.md).
+- **The latest-run card follows the selection** — on Run History the
+  latest-run card now reports the selected scenario's latest run, so it and
+  the PB card beside it always describe one scenario, and a run from an older
+  session names that session. Its button that selected the last run's
+  scenario is gone. Last played left Scenario Stats, whose first line now
+  reads like the other cards', and the run list's heading line left the
+  screen, which gives the list more rows. (PR #391; design in #388) Design
+  rationale distilled into [`decision_log/`](./decision_log/README.md).
 - **Run History top row cards** — the dropdowns are stacked, Scenario Stats
   shows the selected benchmark's category, and a PB card puts the local
   record and next rank's score beside the latest run. The leaderboard line
@@ -62,24 +79,6 @@ sequence.
   matches group names either way. The grouping already shipped with the app,
   so nothing new is fetched. (PR #352; design in #338) Design rationale
   distilled into [`decision_log/`](./decision_log/README.md).
-- **Columns menu and KovaaK's ID columns** — the Playlists table and a
-  playlist's scenario table each gain a Columns menu that shows or hides any
-  column and remembers the choice in the browser. Each table also gains one
-  column that starts hidden, the KovaaK's ID of the benchmark or of the
-  scenario's leaderboard, so trying an API request by hand no longer starts
-  with digging the number out of a file. Both pages look as they did until
-  the menu is used. (PR #344; design in #334) Design rationale distilled
-  into [`decision_log/`](./decision_log/README.md).
-- **Time-scored scenarios measured by pace** — some scenarios score the time
-  left on a countdown when the task is done, and on those a percentage of the
-  score understates a real improvement several times over. The app now
-  recognizes such a scenario from the performance files KovaaK's writes beside
-  each run and measures it by pace, how fast a run finishes compared with the
-  personal best. Next Rank reads "+2.8% faster to Lavender" there, the score
-  threshold line and its verdict judge by pace, and a new personal best says
-  how much faster it finished. A scenario the app can't recognize reads as it
-  did before. (PR #343; design in #329) Design rationale distilled into
-  [`decision_log/`](./decision_log/README.md).
 
 ---
 
@@ -87,17 +86,8 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- **The latest-run card follows the selection** — write Proposal 2 now that
-  the top row cards have shipped. It will consider making the latest-run
-  card follow the selected scenario and removing the run list's heading
-  line. Its argument rests on the card's alignment over the list. This is
-  upcoming design work, not a change to the card's current scope.
-
-  Why it's next: the top row now puts two large scores side by side, but
-  during a lookup they can refer to different scenarios.
-
-  Notes on a scenario remain a separate proposal for the room kept in the
-  first column. Current behavior is in
+- One proposal is in review: Typical score in Scenario Stats (#382). It
+  adds its milestone here when it merges. Current behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
 
 - **Typical score** — what a player's recent runs on a scenario usually

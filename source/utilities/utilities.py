@@ -127,13 +127,18 @@ def format_score(value: float) -> str:
     return f"{value:,.2f}".rstrip("0").rstrip(".")
 
 
-def format_whole_percent(fraction: float) -> str:
-    """Format a fraction as a whole percentage, a half rounding up: 0.545 -> "55%".
+def format_percent(fraction: float) -> str:
+    """Format a fraction as a percentage to two decimals: 0.82307 -> "82.31%".
 
-    Not ``round``, which sends a half to the even number: 54.5 would read
-    54% and 55.5 would read 56%.
+    Two decimals, as KovaaK's shows a run's accuracy in game, with trailing
+    zeros kept so a right-aligned column lines up: 1.0 reads "100.00%". A
+    half rounds up. Not ``round`` or a ``.2f`` format, which send a half to
+    the even digit: 3.125% would read 3.12%.
     """
-    return f"{math.floor(fraction * 100 + 0.5)}%"
+    # The inner round strips float noise that would land a half under its
+    # rounding point: 57 / 800 * 10_000 is 712.4999999999999, which would read
+    # 7.12% where the run's 7.125% rounds up to 7.13%.
+    return f"{math.floor(round(fraction * 10_000, 6) + 0.5) / 100:.2f}%"
 
 
 def format_elapsed_duration(seconds: float) -> str:

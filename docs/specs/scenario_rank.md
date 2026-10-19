@@ -152,7 +152,8 @@ benchmark tier) — see the
   hovering or focusing its value shows `Last updated {age} · {timestamp}`,
   under the position and the total where the percentile leads, from the rank
   cache entry's `fetched_at`, and the value takes the dotted underline the
-  Last played value has. The time moves only when a leaderboard read is
+  playlist tables' Last played value has. The time moves only when a
+  leaderboard read is
   stored, so a failed fetch and an automatic read the monotonic writer refuses
   both leave it as it was. It dates the position alone; the leaderboard total
   beside it is cached separately with its own time. `N/A` has no hover, and

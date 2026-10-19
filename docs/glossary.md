@@ -121,7 +121,7 @@ they're doing and ahead to what to train, usually with more attention to give.
 ### Run History
 
 The page that shows one scenario's runs: a chart of its scores, a list of its
-runs grouped by session, and the latest run played. With Follow on, it
+runs grouped by session, and its latest run. With Follow on, it
 follows the scenario being played
 ([run_history.md](specs/run_history.md)). The list has a second view, All
 scenarios, of each session across every scenario played in it.
@@ -139,18 +139,20 @@ need. Score vs Time plots the same runs by when they were played
 ### Latest-run card
 
 The card at the right end of Run History's top row, over the run list, that
-reports the last run played, on whatever scenario, with its verdict
+reports the selected scenario's latest run with its verdict
 ([run_history.md](specs/run_history.md#the-latest-run-card)).
 
 - On screen it has no title. Its first line reads
-  `Latest run · {age} · {scenario}`.
+  `Latest run · {age} · {scenario}`, or `Latest run` alone with no run to
+  report.
 
 ### Scenario Stats
 
 The card in Run History's top row about the selected scenario: its benchmark
-category, when it was last played, and how many runs it has
+category and how many runs it has
 ([run_history.md](specs/run_history.md#scenario-stats)).
 
+- On screen its first line reads `Scenario stats`.
 - In code: `scenario_stats`.
 
 ### PB card
@@ -163,6 +165,18 @@ PB ([run_history.md](specs/run_history.md#the-pb-card)).
 
 - On screen it has no title. Its first line reads `PB · set {age}`.
 - In code: `pb_card`.
+
+### Scenario note
+
+The player's own plain-text note about one scenario, such as a reminder about
+technique, shown in Run History's top row while the scenario is selected
+([run_history.md](specs/run_history.md#the-scenario-note-card)). Each scenario
+has at most one, rewritten in place. It belongs to the scenario's name as the
+app holds it, so every version of the scenario shares it.
+
+- On screen: `Scenario note`.
+- In code: `scenario_notes`, the store and its folder.
+- Not a session note, a possible later idea that would belong to a session.
 
 ### This scenario
 
@@ -383,10 +397,12 @@ the latest-run card mark them is in
 
 ### Accuracy
 
-The share of a run's shots that hit. PB Accuracy on a scenario table means
-damage accuracy instead, the share of possible damage done, when the run
-records it, so one run can show two different accuracies
-([playlists.md](specs/playlists.md#the-per-playlist-scenario-table)).
+The share of a run's shots that hit, the figure KovaaK's shows for a run.
+Every place this app shows a run's accuracy shows this one, PB Accuracy on a
+scenario table included
+([playlists.md](specs/playlists.md#the-per-playlist-scenario-table)). It is
+not the share of possible damage done, which KovaaK's stats file calls
+Efficiency and this app does not show.
 
 ### Pace
 

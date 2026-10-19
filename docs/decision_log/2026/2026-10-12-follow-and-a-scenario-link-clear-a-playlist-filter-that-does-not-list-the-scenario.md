@@ -16,6 +16,22 @@ rule now covers every way of reaching such a scenario. The cost is that one
 run outside a playlist means picking the playlist again, because the browser
 remembers the emptied filter.
 
+**Superseded in part (2026-10-18).** [The latest-run card's rule](2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md)
+removes the card's button, so the selection callback's third input and the
+button's `State` below are gone. A name pressed in the All scenarios view is
+now the third input, and "which of the four called" reads which of the
+three, still from what triggered the call. R7, and one callback as the only
+writer of both dropdowns, stand.
+
+**Superseded in part (2026-10-18).** [The unsaved note text entry](2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md)
+has Follow select the scenario just played except while a scenario note has
+unsaved changes: the run then waits, and the card names its scenario. The
+selection callback gains the note card's answers and the Follow switch as
+inputs, so turning Follow off ends a wait, and it reads the note's editor and
+text as `State`. A name pressed in the All scenarios view is held while the
+note has unsaved changes. R7, and one callback as the only writer of both
+dropdowns, stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." This entry is row R7, ratified as recommended.

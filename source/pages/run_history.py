@@ -3,8 +3,8 @@
 The page shows one scenario's runs: a chart of every run in a range, with
 the Chart options panel beside it, and a list of the runs grouped by session.
 The list has a second view, All scenarios, of each session whole. Cards in
-its top row report the selected scenario's personal best and the last run
-played, on whatever scenario.
+its top row report the selected scenario's personal best and its latest run,
+and hold the player's own note on it.
 
 It never imports another page's module. Dash Pages loads each page file as
 ``pages.<name>``, so a second import path would make a second copy of that
@@ -12,7 +12,6 @@ module with its own state. What it shares with the Home page, the setup
 surfaces and the queued notices, lives under ``source/components/``.
 """
 
-import json
 import logging
 from datetime import datetime
 
@@ -28,7 +27,7 @@ from dash import (
     no_update,
 )
 
-from source.app_shell import RUN_EVENTS_BATCH_STORE_ID
+from source.app_shell import RUN_EVENTS_BATCH_STORE_ID, RUN_TOAST_LINK_CLASS
 from source.components.chart_options import (
     SETTINGS_HELP_TEXT,
     ChartOptionsIds,
@@ -75,6 +74,13 @@ from source.components.run_history_list import (
     run_list_panel,
     run_list_stores,
 )
+from source.components.scenario_note_card import (
+    NoteCardIds,
+    note_selection_ids,
+    register_scenario_note_card,
+    scenario_note_card,
+    scenario_note_dialog,
+)
 from source.components.scenario_selection import (
     SELECT_HIGHLIGHT_ON_OPEN_CLASS,
     ScenarioSelectionIds,
@@ -87,7 +93,6 @@ from source.components.scenario_stats import (
     ScenarioStatsIds,
     register_scenario_stats,
     scenario_stats_panel,
-    scenario_stats_stores,
 )
 from source.components.score_threshold import (
     normalize_score_threshold_percentage,
@@ -130,15 +135,12 @@ RUN_LANDED_STORE_ID = "run-history-run-landed"
 # when the answer changes, and the run list takes it as an input, which is
 # what takes "In progress" off a session nothing more is played in.
 SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
-# The id of the newest run in the run store, on whatever scenario. The card
-# writes it with what it shows, only when it is another run than the one
-# held. The graph takes it as an input: a figure rings its own scenario's
-# newest run, and the ring shows while this names the same run.
+# The id of the newest run in the run store, on whatever scenario. The
+# latest-run card's callback writes it from the store it reads the card's run
+# from, only when it is another run than the one held. The graph takes it as
+# an input: a figure rings its own scenario's newest run, and the ring shows
+# while this names the same run.
 LATEST_RUN_STORE_ID = "run-history-latest-run"
-# A store nothing reads. The script that hands keyboard focus on from the
-# card's scenario button writes nothing, and a clientside callback has to
-# have an output.
-CARD_FOCUS_SINK_ID = "run-history-card-focus-sink"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
@@ -197,21 +199,17 @@ LATEST_RUN_CARD_IDS = LatestRunCardIds(
     time="run-history-card-time",
     time_tooltip="run-history-card-time-tooltip",
     heading="run-history-card-heading",
-    scenario_button="run-history-card-scenario-button",
     body="run-history-card-body",
 )
 SCENARIO_STATS_IDS = ScenarioStatsIds(
     category_row="run-history-category-row",
     category="run-history-category",
-    last_played="run-history-last-played",
-    last_played_tooltip="run-history-last-played-tooltip",
+    num_runs_row="run-history-num-runs-row",
     num_runs="run-history-num-runs",
-    last_played_ts="run-history-last-played-ts",
-    last_played_empty_value="run-history-last-played-empty-value",
+    no_scenario="run-history-stats-no-scenario",
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
-    relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 # The position's ids are the ones it had in the Scenario Stats card. No browser
 # remembers a value under any of them.
@@ -233,6 +231,41 @@ PB_CARD_IDS = PbCardIds(
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
     polling_interval=POLLING_INTERVAL_ID,
+    relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
+)
+NOTE_CARD_IDS = NoteCardIds(
+    card="run-history-note-card",
+    shown="run-history-note-shown",
+    note="run-history-note-read-state",
+    edited_at="run-history-note-edited-at",
+    label="run-history-note-age",
+    time="run-history-note-time",
+    time_tooltip="run-history-note-time-tooltip",
+    text="run-history-note-text",
+    edit="run-history-note-edit",
+    add="run-history-note-add",
+    editor="run-history-note-editor",
+    draft="run-history-note-draft",
+    save="run-history-note-save",
+    cancel="run-history-note-cancel",
+    waiting_line="run-history-note-waiting-line",
+    char_count="run-history-note-count",
+    error="run-history-note-error",
+    save_result="run-history-note-save-result",
+    dialog="run-history-note-dialog",
+    dialog_state="run-history-note-dialog-state",
+    question="run-history-note-question",
+    keep="run-history-note-keep-editing",
+    discard="run-history-note-discard",
+    dialog_save="run-history-note-dialog-save",
+    held="run-history-note-held",
+    go="run-history-note-go",
+    waiting="run-history-note-waiting",
+    filter_history="run-history-note-filter-history",
+    config="run-history-note-config",
+    fade_sink="run-history-note-fade-sink",
+    scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
     relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
 )
 
@@ -414,47 +447,54 @@ def build_run_list_rows(  # noqa: PLR0913
 @callback(
     Output(LATEST_RUN_CARD_IDS.played_at, "data"),
     Output(LATEST_RUN_CARD_IDS.heading, "children"),
-    Output(LATEST_RUN_CARD_IDS.scenario_button, "children"),
-    Output(LATEST_RUN_CARD_IDS.scenario_button, "value"),
-    Output(LATEST_RUN_CARD_IDS.scenario_button, "aria-label"),
     Output(LATEST_RUN_CARD_IDS.body, "children"),
     Output(LATEST_RUN_STORE_ID, "data"),
-    # Any run, on any scenario: the card reports the last run played. It is
-    # still worked out from the run store and never from the batch.
+    # Any run, on any scenario. A run on another scenario moves the ring's
+    # store, and can change which session the card's run is in: a new
+    # session makes the old one "last" or older. The card is still worked
+    # out from the run store and never from the batch.
     Input(RUN_LANDED_STORE_ID, "data"),
-    # The run's scenario is a button only while another one is selected.
     Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
     # The percentage decides the badge of a run that is not a new PB.
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
-    # Read for nothing but its change: "this session" becomes "last session"
-    # with no run landing.
+    # The next two are read for nothing but their change. "This session"
+    # becomes "last session" with no run landing, and an older session's
+    # name leaves its year out only while it is this year's.
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
+    Input(TODAY_STORE_ID, "data"),
     State(LATEST_RUN_STORE_ID, "data"),
 )
-def show_latest_run(
+def show_latest_run(  # noqa: PLR0913
     _run_landed,
     selected_scenario,
     score_threshold_percentage,
     _held_in_progress,
+    _held_date,
     held_latest_run,
 ):
     """Write what the latest-run card shows, from the run store.
 
-    The page load runs it, so the card is right with no new run. It takes
-    the scenario dropdown and the session store, both written by callbacks a
-    run that lands also calls, so it waits for them and writes the card once
-    per batch, for the scenario the page ends up on.
+    The card reports the selected scenario's latest run. The page load runs
+    it, so the card is right with no new run. It takes the scenario dropdown
+    and the session store, both written by callbacks a run that lands also
+    calls, so it waits for them and writes the card once per batch, for the
+    scenario the page ends up on.
 
     The first output is when the run ended, which a script words as its age.
-    The last is the run's id, written only when it is another run than the
-    one held. The graph takes that store as an input, so writing the same id
-    again would restyle a chart that nothing had changed.
+    The last is the id of the newest run on any scenario, which the chart's
+    ring and the run list's highlight mark, so during a lookup they leave the
+    card's run. It is written only when it is another run than the one held.
+    The graph takes that store as an input, so writing the same id again
+    would restyle a chart that nothing had changed.
     """
-    shown = latest_run_from_store(score_threshold_percentage, datetime.now())
-    latest_run_id = None if shown is None else shown.run_id
+    shown, newest_run_id = latest_run_from_store(
+        selected_scenario, score_threshold_percentage, datetime.now()
+    )
     return (
-        *latest_run_card_content(shown, selected_scenario),
-        no_update if latest_run_id == held_latest_run else latest_run_id,
+        *latest_run_card_content(
+            shown, selected_scenario, store_has_runs=newest_run_id is not None
+        ),
+        no_update if newest_run_id == held_latest_run else newest_run_id,
     )
 
 
@@ -564,52 +604,6 @@ clientside_callback(
     Input(CHART_MODE_ID, "value"),
 )
 
-# Pressing the card's scenario button selects its scenario, and the button
-# then leaves the page, which drops keyboard focus to the document: the next
-# Tab would start again from the top of the page. So once the button has
-# gone, focus goes to the Selected scenario dropdown, which then names the
-# scenario that was asked for. It waits for the button to go because that is
-# when the new value is in the dropdown, and it stands down if focus has
-# moved elsewhere meanwhile.
-#
-# Only for a press from the keyboard, which is what ``:focus-visible`` on the
-# button says. A click with the mouse loses nothing by losing focus, and
-# focus on a searchable dropdown opens its list.
-_HAND_FOCUS_TO_SCENARIO_SCRIPT = """
-(clicks) => {
-    const button = document.getElementById(BUTTON_ID);
-    if (clicks && button && button.matches(":focus-visible")) {
-        const started = Date.now();
-        const handOn = () => {
-            if (button.offsetParent !== null) {
-                if (Date.now() - started < 5000) {
-                    window.setTimeout(handOn, 50);
-                }
-                return;
-            }
-            const held = document.activeElement;
-            if (!held || held === button || held === document.body) {
-                const field = document.getElementById(SCENARIO_ID);
-                if (field) {
-                    field.focus();
-                }
-            }
-        };
-        handOn();
-    }
-    return window.dash_clientside.no_update;
-}
-""".replace("BUTTON_ID", json.dumps(LATEST_RUN_CARD_IDS.scenario_button)).replace(
-    "SCENARIO_ID", json.dumps(SCENARIO_SELECTION_IDS.scenario_dropdown)
-)
-
-clientside_callback(
-    _HAND_FOCUS_TO_SCENARIO_SCRIPT,
-    Output(CARD_FOCUS_SINK_ID, "data"),
-    Input(LATEST_RUN_CARD_IDS.scenario_button, "n_clicks"),
-    prevent_initial_call=True,
-)
-
 register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
 register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
@@ -618,9 +612,10 @@ register_scenario_selection_clearing_filter(
     run_events=RUN_EVENTS_STORE_ID,
     follow_switch=FOLLOW_SWITCH_ID,
     run_landed=RUN_LANDED_STORE_ID,
-    scenario_button=LATEST_RUN_CARD_IDS.scenario_button,
     scenario_asked=RUN_LIST_IDS.scenario_asked,
+    note=note_selection_ids(NOTE_CARD_IDS),
 )
+register_scenario_note_card(NOTE_CARD_IDS)
 
 
 def _range_select(
@@ -736,9 +731,9 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
 def _top_row(playlist_code: str | None) -> dmc.Box:
     """Build the row above the chart, in the columns of the chart and the run list.
 
-    The first column holds the dropdowns, the Scenario Stats card, the room
-    kept for notes, and the PB card at its right end. The second holds the
-    latest-run card, over the run list, so the PB card sits beside it.
+    The first column holds the dropdowns, the Scenario Stats card, the
+    scenario note card, and the PB card at its right end. The second holds
+    the latest-run card, over the run list, so the PB card sits beside it.
     """
     return dmc.Box(
         className="run-history-top-row",
@@ -747,6 +742,9 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
                 [
                     _dropdown_column(playlist_code),
                     scenario_stats_panel(SCENARIO_STATS_IDS),
+                    scenario_note_card(
+                        NOTE_CARD_IDS, toast_link_class=RUN_TOAST_LINK_CLASS
+                    ),
                     pb_card(PB_CARD_IDS),
                 ],
                 className="run-history-top-row-left",
@@ -847,13 +845,11 @@ def layout(
                 id=CHART_OPTIONS_IDS.cached_plot,
                 data=generate_placeholder_plot().to_json(),
             ),
-            *scenario_stats_stores(SCENARIO_STATS_IDS),
             # The date the page is drawn on. Without it the first tick would
             # find no date held, write one, and rebuild a chart just drawn.
             dcc.Store(id=TODAY_STORE_ID, data=_today_text()),
             dcc.Store(id=RUN_LANDED_STORE_ID),
             dcc.Store(id=LATEST_RUN_STORE_ID),
-            dcc.Store(id=CARD_FOCUS_SINK_ID),
             # Drawn with the answer already in it, for the reason the date
             # is: the first tick would otherwise write it and rebuild a list
             # just drawn.
@@ -873,9 +869,9 @@ def layout(
                 interval=config.polling_interval,
                 n_intervals=0,
             ),
-            # A 30-second tick of its own for the relative times, Last played
-            # and the two cards' ages, so how often they are reworded never
-            # depends on how often the page polls for data.
+            # A 30-second tick of its own for the relative times, the two
+            # cards' ages, so how often they are reworded never depends on how
+            # often the page polls for data.
             dcc.Interval(
                 id=RELATIVE_TIME_INTERVAL_ID,
                 interval=30_000,
@@ -890,6 +886,7 @@ def layout(
                 children=setup_card_children(offer_account=False),
             ),
             _top_row(playlist_code),
+            scenario_note_dialog(NOTE_CARD_IDS),
             dmc.Box(
                 className="run-history-columns",
                 children=[

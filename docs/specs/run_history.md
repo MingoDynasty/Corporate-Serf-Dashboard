@@ -1,8 +1,9 @@
 # Run History
 
 Run History charts one scenario's runs beside a list grouped by session.
-Its top row gives the scenario's benchmark category and history their own
-card alongside the personal best and latest run. The page receives new runs
+Its top row gives the scenario's benchmark category and run count their own
+card, beside the player's own note on it and cards for its personal best and
+its latest run. The page receives new runs
 without a reload and can follow the scenario just played. A check marks a
 run that met its score threshold and a star marks a new personal best, each
 judged when the run was played.
@@ -68,13 +69,16 @@ of scope here, apart from its chart toolbar, noted under The chart.
   ([2026-09-19][query]).
 - A scenario that the Playlist filter does not list is still selected, and
   the filter is cleared in the same step. That holds for a `?scenario=` link,
-  for a run the page follows, for the latest-run card's scenario button, and
-  for a scenario's name pressed in the run list's All scenarios view
+  for a run the page follows, and for a scenario's name pressed in the run
+  list's All scenarios view
   ([2026-10-14][all-scenarios]).
   The scenario must have local runs: a link that names one with none leaves
   the filter alone and selects nothing. The filter empties in view with no
   toast, and the cleared filter is what the browser then remembers
   ([2026-10-12][clear-filter]).
+- While a scenario note has unsaved changes, the navbar's links and the
+  header title ask before they leave the page, and so do the browser's back
+  and forward buttons ([The dialog](#the-dialog)).
 - The page accepts query parameters it does not name and reads none of them.
   A run toast's link carries one, `run=` and the run's id, only so that
   each run's link is an address the page is not already at
@@ -93,9 +97,9 @@ times that name or order runs remain absolute ([T4][card-order]).
   the same gap, and one value sets the list's 500px width for both. The
   second column holds the latest-run card alone, so the card sits over the
   run list and its edges are the list's at every zoom level. The first holds,
-  in order, the dropdowns' column, the Scenario Stats card, the room kept for
-  notes, which holds nothing, and the PB card at its right end, beside the
-  latest-run card. Every card is as tall as the row.
+  in order, the dropdowns' column, the Scenario Stats card, the scenario note
+  card ([below](#the-scenario-note-card)), and the PB card at its right end,
+  beside the latest-run card. Every card is as tall as the row.
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under
@@ -110,8 +114,9 @@ times that name or order runs remain absolute ([T4][card-order]).
 - The two dropdowns and the Follow switch persist in the browser. The Follow
   switch carries a help tooltip: "Automatically selects the scenario you just
   played when a new run is detected. If the **Playlist filter** doesn't list
-  that scenario, the filter is cleared."
-  ([2026-10-12][clear-filter]).
+  that scenario, the filter is cleared. It waits while a scenario note has
+  unsaved changes."
+  ([2026-10-12][clear-filter], [2026-10-18][note-unsaved]).
 - Opening either dropdown's list keeps the selected name in the field and
   highlights it, so it can be copied, and the first keystroke replaces it
   with a search. The list shows every option until then. A drag on the field
@@ -153,7 +158,8 @@ times that name or order runs remain absolute ([T4][card-order]).
 - The first column wraps its pieces on its own width and never on the
   window's ([2026-08-03][content-area]).
   Where they don't fit on one line, the PB card goes to a second line of the
-  column first, at that line's right end, and then the Scenario Stats card.
+  column first, at that line's right end, then the scenario note card, and
+  then the Scenario Stats card ([2026-10-18][note-card]).
   The latest-run card stays in the second column, as tall as the row.
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
@@ -164,32 +170,159 @@ times that name or order runs remain absolute ([T4][card-order]).
   lands, so a scenario whose first run has just landed is in it with no
   reload, whether or not the page follows that run.
 
+## The scenario note card
+
+The player's own plain-text note on the selected scenario, read in place and
+edited with Save and Cancel ([2026-10-18][note-card]). What a note is and how
+it is saved is in [2026-10-18][note-store].
+
+- The card sits between the Scenario Stats card and the PB card, taking the
+  room the row leaves, from 240px to 800px wide; past 800px the rest of the
+  room sits before the PB card. It is as tall as the row and never less than
+  132px ([2026-10-18][note-card]).
+- What it shows while reading is out of the layout's flow, so its box is the
+  row's in every reading state: a note, a long note, no note, a broken file
+  and no scenario. The chart under the row doesn't move between them
+  ([2026-10-18][note-card]).
+- With a note: a frame, the first line `Scenario note · edited {age}` in the
+  other cards' quiet style with **Edit** at its right end, and the note at
+  14px, its line breaks kept, broken anywhere a word is too long, centered in
+  the card when short. A note taller than the card runs to its bottom and its
+  last line fades out. The text is selectable; only **Edit** opens the
+  editor. **Edit**'s accessible name is `Edit scenario note`
+  ([2026-10-18][note-card]).
+- The age is relative and reworded every 30 seconds, as the PB card's is, with
+  the exact time on hover and focus. It is the time the text last changed,
+  which only a Save that changes the text moves ([2026-10-18][note-store]).
+- With no note: the link **Add a scenario note** alone, at 14px, with no frame.
+  With no scenario selected the room is empty and unframed
+  ([2026-10-18][note-card]).
+- A broken note file: a frame, `Scenario note` with **Edit**, and the schema
+  machinery's message in place of the note, such as `The scenario note file
+  isn't valid JSON. File: {path}`. **Edit** opens an empty editor, and its
+  Save replaces the file after copying it aside. A file from a newer build
+  shows its message and offers no **Edit**. The error shows on that card
+  alone and in the log ([2026-10-18][note-store]).
+- The card is drawn again only when the page's scenario changes and the rules
+  below let the change through, by Save, and by the dialog's answers. A run
+  that lands on any scenario, the 30-second tick, the date moving on, the
+  Playlist filter, the Score threshold and a pick the dialog holds never
+  redraw it, and the text box is never drawn again while it is typed into
+  ([2026-10-18][note-unsaved]).
+
+### Editing a note
+
+- **Edit**, or **Add a scenario note**, turns the card into a text box over
+  **Save** and **Cancel**, focus in the box with the cursor at the end of the
+  text. The first line reads `Scenario note` alone. The box's accessible name
+  is `Scenario note` and its placeholder `Note for this scenario`; Tab reaches
+  **Save** and **Cancel** ([2026-10-18][note-card]).
+- The text box never shows less than three lines, 69px, and scrolls inside
+  itself. The editor keeps the row's height where that fits, and the card,
+  with the row, grows only where the lines under the buttons need more room
+  than the row leaves: the waiting line, the count and a save error, beside
+  the buttons on a wide card and under them on a narrow one. At 2560px a
+  waiting line or the count alone keeps the row's height
+  ([2026-10-18][note-card]).
+- A note holds at most 2,000 characters. The box stops typing there and cuts
+  a paste there. From 1,800 characters a count shows: `1,850 of 2,000
+  characters` ([2026-10-18][note-store]).
+- **Save** writes the text to the scenario the editor opened on, closes the
+  editor and shows the saved text, focus on **Edit**. Saving empty text, or
+  only whitespace, deletes the note, and focus goes to **Add a scenario
+  note**. Text equal to the note on disk writes nothing. **Cancel** closes the
+  editor on the saved text, focus on **Edit** or the link
+  ([2026-10-18][note-store]).
+- A failed save keeps the editor open with its text and its error under the
+  buttons. A file from a newer build refuses with the schema machinery's
+  message; any other failure reads `Couldn't save the scenario note. See
+  data/logs/debug.log.` ([2026-10-18][note-unsaved]).
+- The note has unsaved changes while the box's text differs from the text it
+  opened with. Typing a word and deleting it again leaves none
+  ([2026-10-18][note-unsaved]).
+- Escape does nothing in the editor ([2026-10-18][note-unsaved]).
+- With no unsaved changes, the editor just closes when the scenario changes,
+  by Follow or by hand, and the card shows the new scenario's note; the run
+  toast's link and every link out of the page behave as they do with no
+  editor open ([2026-10-18][note-unsaved]).
+- While the note has unsaved changes, Follow waits. A run on another scenario
+  leaves the page on the edited scenario, its toast shows as usual, and the
+  line under the buttons reads `A run on {scenario} is waiting. Press
+  **Save** or **Cancel** to show it.` The line is a polite live region,
+  in the page from the moment the editor opens, so it is there before its
+  text arrives. A newer run
+  replaces the one named; a run on the edited scenario ends the wait, and so
+  does turning Follow off. Turning it on again brings no run back. **Save**,
+  **Cancel**, or undoing every change (which also closes the editor) moves the
+  page once, to the newest waiting run's scenario, clearing a Playlist filter
+  that doesn't list it. Meanwhile the chart, Scenario Stats, the PB card and
+  the latest-run card stay on the edited scenario, and the run list adds the
+  run ([2026-10-18][note-unsaved]).
+
+### The dialog
+
+- While the note has unsaved changes, each change of scenario the player
+  makes and each departure the app can catch opens a dialog titled `Your
+  scenario note isn't saved`, with **Keep editing**, **Discard** and **Save**
+  and no close button. Focus starts on **Keep editing** and stays in the
+  dialog. Escape and a click outside it mean Keep editing, which returns
+  focus to the text box. **Discard** drops the text and goes where the player
+  asked; **Save** saves, then goes. A failed save acts as Keep editing, with
+  its error under the editor. Discard and Save drop a waiting run; Keep
+  editing keeps it waiting ([2026-10-18][note-unsaved]).
+- While the dialog is open its destination is fixed: a run that lands waits
+  in the card, and the run toast's link does nothing
+  ([2026-10-18][note-unsaved]).
+- Its question, by route ([2026-10-18][note-unsaved]):
+  - a pick in the Selected scenario dropdown, the run toast's link, a name in
+    the run list's All scenarios view: `Save your changes to the note on
+    {from} before you switch to {to}?`;
+  - a Playlist filter change whose list lacks the edited scenario: `The
+    **Selected scenario** list no longer holds {from}. Save your changes to
+    its note first?`;
+  - a navbar link, the header title, **Open scenario table**, and the
+    browser's back and forward buttons: `Save your changes to the note on
+    {from} before you leave the page?`.
+- A pick, or a filter change that drops the edited scenario, has already
+  happened when the dialog opens: the chart and the other cards redraw for it
+  behind the dialog, and the note card does not. Keep editing writes the old
+  scenario and filter back, and the browser remembers them, so a reload then
+  opens on the edited scenario ([2026-10-18][note-unsaved]).
+- The run toast's link is stopped before the page is drawn again. Save or
+  Discard then selects its scenario in place, clearing a filter that doesn't
+  list it, and the address stays as it was. A link to the edited scenario
+  itself is stopped with no dialog, and nothing moves
+  ([2026-10-18][note-unsaved]).
+- A link that leaves the page is stopped, and Save or Discard then follows
+  it. The back and forward buttons are kept from redrawing the page, the
+  address goes back at once, and Save or Discard then moves through history
+  again. A reload, closing the tab or going to another site gets the
+  browser's own "Leave site?" prompt, set only while the note has unsaved
+  changes; with none there is no prompt. A link that opens a new tab leaves
+  the page as it is ([2026-10-18][note-unsaved]).
+
 ## The latest-run card
 
-- The card reports the last run played, on whatever scenario, and is worked
-  out from the run store each time, never from the message a new run arrives
-  in. So it is right on a page load with no new run
+- The card reports the selected scenario's latest run: its last run in the
+  newest session that holds one, in the order
+  [sessions.md](sessions.md#sessions) sets, with the sessions split from
+  every run in the store, as the run list splits them
+  ([2026-10-18][follows]).
+  It is worked out from the run store each time, never from the message a
+  new run arrives in, so it is right on a page load with no new run
   ([2026-10-12][check]).
-  The last run played is the last run of the newest session, in the order
-  [sessions.md](sessions.md#sessions) sets.
+  During play with Follow on, the selected scenario is the one just played,
+  so the card reports the run just played.
 - Its first line reads `Latest run · {age} · {scenario}`. The age is how
-  long ago the run ended, worded as Last played words it, such as `just now`
-  or `5 minutes ago`, and worded again every 30 seconds, so during play it
-  reads as the length of the break since the last run. Hovering or focusing
-  the age shows the exact time, in the shared format with no seconds, such as
-  `Oct 9, 2026, 5:24 PM`
+  long ago the run ended, worded as the playlist tables' Last played words
+  it, such as `just now` or `5 minutes ago`, and worded again every 30
+  seconds, so during play it reads as the length of the break since the last
+  run. Hovering or focusing the age shows the exact time, in the shared
+  format with no seconds, such as `Oct 9, 2026, 5:24 PM`
   ([2026-07-11][timestamps], [T4][card-order]).
-  While the run's scenario is the selected one its name is
-  plain text, with the whole name as its tooltip where the card cuts it
-  short. While another scenario is selected the name is a button, drawn as
-  the app draws a link, whose accessible name is `Show {scenario}`. Pressing
-  it selects that scenario in place, clearing a Playlist filter that does not
-  list it, and the button then leaves the card
-  ([2026-10-12][check],
-  [2026-10-12][clear-filter]).
-  A press from the keyboard hands keyboard focus to the Selected scenario
-  dropdown once the button has gone, and the dropdown opens its list as it
-  does when tabbed into. A click with the mouse moves focus nowhere.
+  The scenario's name is plain text, with the whole name as its tooltip where
+  the card cuts it short. The card has no control of its own apart from the
+  age, which takes keyboard focus ([2026-10-18][follows]).
 - The score is large, formatted as the playlist scenario table formats PB
   Score, with one badge beside it. A new PB shows "New PB", whether or not
   the run was judged. Otherwise a judged run shows "Threshold passed" or
@@ -197,7 +330,8 @@ times that name or order runs remain absolute ([T4][card-order]).
   ([2026-10-12][check]).
   The badges are yellow, green, and gray in that order.
 - The second line compares the run with the PB it was chasing, then gives
-  its accuracy to the whole percent: `{pct}% of PB · Accuracy {accuracy}%`,
+  its accuracy to two decimals ([2026-10-18][accuracy]):
+  `{pct}% of PB · Accuracy {accuracy}%`,
   or `{pct}% of PB pace` where the comparison is by pace. A new PB says how
   far it beat the previous best instead:
   `Up {pct}% on your previous best of {previous}`,
@@ -214,30 +348,51 @@ times that name or order runs remain absolute ([T4][card-order]).
   most 99.9%, and a judged miss shows at most one tenth under its goal.
   The card is the one place a run's percentage of the PB is printed
   ([2026-10-13][run-toast]).
-- The third line reads `Run {n} this session · {duration} on this scenario`
-  while the run's session is in progress, and `Run {n} last session` once it
-  has ended. `{n}` counts the session's runs on the run's scenario. The
-  duration is the time spent on the scenario in the session, as
+- The third line names the run in its session. In the newest session it
+  reads `Run {n} this session` while the session is in progress, and
+  `Run {n} last session` once it has ended. A run in an older session names
+  the session as the run list names its row, by when it began, with the year
+  where it is not this one: `Run 7 (Oct 16, 2:00 PM session)`,
+  `Run 8 (Jul 20, 2020, 11:47 PM session)`. The year is judged against the
+  app's own date. `{n}` counts the session's runs on the run's scenario
+  ([2026-10-18][follows]).
+- The fourth line reads `{duration} on this scenario`, the time spent on the
+  scenario in the run's session, as
   [sessions.md](sessions.md#where-sessions-show) defines it. Where that time
-  can't be known the line reads `Time on this scenario unknown` in its place
-  and keeps the run's number
-  ([2026-10-12][check]).
+  can't be known it reads `Time on this scenario unknown`
+  ([2026-10-12][check], [2026-10-18][follows]).
 - A measured time, here and in the run list, is rounded to the nearest
   minute, a half rounding up: `9 min`, `1 hr 6 min`
   ([2026-10-13][nearest-minute]).
   A time that rounds to zero reads `<1 min`, so that form means under 30
   seconds.
 - The card is 500px wide, the run list's width, and as tall as the top row,
-  and never less than 132px, which holds its tallest state. So nothing that
+  and never less than 135px, which holds its tallest state: the second line
+  on two lines in a narrow card, over the third and fourth. So nothing that
   changes between runs changes its height, and the page doesn't jump. Its
-  lines are centered in that height. With no run in the store it reads "No
-  runs yet" over "Play a scenario in KovaaK's and your latest run will show
-  here.", at the same height, and its first line has no words
-  ([2026-10-12][check]).
+  lines are centered in that height ([2026-10-18][follows]).
+- With no run to report, the card's first line reads `Latest run` alone, and
+  the selection decides first, as on the PB card
+  ([2026-10-18][follows]):
+  - no scenario selected and no runs in the store: "No runs yet" over "Play a
+    scenario in KovaaK's. Select it to see its latest run.";
+  - no scenario selected, the store has runs: "No scenario selected";
+  - the selected scenario has no runs, whether or not the store has any: "No
+    runs yet" over "Play this scenario in KovaaK's and your latest run will
+    show here."
+
+  Each is at the same height.
 - The card is rewritten when a run lands on any scenario, when the selected
-  scenario changes, when the Score threshold percentage changes, and when
-  the newest session stops being in progress. A run that lands older than
-  the run store's newest leaves the card as it was.
+  scenario changes, when the Score threshold percentage changes, when the
+  newest session stops being in progress, and when the app's date moves on.
+  Whether a late run reaches the card is decided by the selected scenario's
+  latest run: a run on it newer than that run becomes the card's run, even
+  when it is older than the store's newest, and one older leaves the card as
+  it was ([2026-10-18][follows]).
+- With Follow off, a run on another scenario leaves the card's run as it is.
+  The chart's ring and the run list's highlight still mark the newest run on
+  any scenario, so they leave the selected scenario's run
+  ([2026-10-18][follows]).
 
 ## The PB card
 
@@ -254,7 +409,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   and adds only its border to its height, and its lines are centered in that
   height.
 - Its first line reads `PB · set {age}`: how long ago the PB run ended,
-  worded as Last played words it, such as `5 days ago`, and worded again
+  worded as the playlist tables' Last played words it, such as `5 days ago`,
+  and worded again
   every 30 seconds. Hovering or focusing the age shows the exact time, in the
   shared format with no seconds, such as `Oct 9, 2026, 5:24 PM`
   ([2026-07-11][timestamps]).
@@ -301,9 +457,10 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The last line is the PB run's sensitivity and accuracy, in the quieter
   style of the card's first line: `{cm/360} cm/360 · Accuracy {accuracy}%`.
   The sensitivity is the scenario table's PB cm/360, trailing zeros dropped
-  ([2026-09-27][trailing-zeros]), and the accuracy is the hit accuracy to the
-  whole percent, as the latest-run card shows a run's. Where the table's PB
-  cm/360 is unknown the line reads `Accuracy {accuracy}%` alone.
+  ([2026-09-27][trailing-zeros]), and the accuracy is the hit accuracy to two
+  decimals, as the latest-run card shows a run's ([2026-10-18][accuracy]).
+  Where the table's PB cm/360 is unknown the line reads
+  `Accuracy {accuracy}%` alone.
 - With no scenario selected the card reads `No scenario selected`, and for
   a scenario with no local runs `No local PB yet` over `Play this scenario
   to record one in this app.`. Its first line then reads `PB`, and it has no
@@ -319,7 +476,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   line's hint takes two lines and the row is about 164px.
 - The card is not a landmark or a button, and its first line is text. The
   dotted score, the percentile, and the age take keyboard focus and show
-  their tooltips, as Last played's does.
+  their tooltips, as the latest-run card's age does.
 
 ## The chart
 
@@ -525,17 +682,21 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The list is a second column to the right of the chart, 500px wide and
   always shown ([2026-10-12][column]). It has two views, This scenario and
   All scenarios ([2026-10-14][all-scenarios]).
-- Its header is a heading line, and under it a switch between the two views
-  at the left, with the "Expand all" button and the "Columns" menu at the
-  right. The switch is a segmented control whose accessible name is
-  `Run list view`. The list starts on This scenario, the browser remembers
-  the switch, and pressing it shows the other view from its top with keyboard
-  focus left on the switch. At the list's 500px the switch and both buttons
-  share one line; where they don't fit, the buttons wrap under the switch
-  ([2026-10-14][all-scenarios]).
-- Under This scenario the heading line reads `{scenario} · {n} runs`, or
-  `1 run`, where `{n}` counts every run of the scenario in the run store, the
-  figure Scenario Stats shows as Number of runs. Under All scenarios it reads
+- Its header is one line: a switch between the two views at the left, with
+  the "Expand all" button and the "Columns" menu at the right. The switch is
+  a segmented control whose accessible name is `Run list view`. The list
+  starts on This scenario, the browser remembers the switch, and pressing it
+  shows the other view from its top with keyboard focus left on the switch.
+  At the list's 500px the switch and both buttons share one line, 56px tall
+  at 2560px; where they don't fit, the buttons wrap under the switch
+  ([2026-10-14][all-scenarios], [2026-10-18][heading-line]).
+- The header also holds a heading line, before the switch, for screen
+  readers only: it is hidden from view in both views, and it is a line of
+  text, not an HTML heading. The latest-run card above the list names its
+  scenario on screen ([2026-10-18][heading-line]).
+  Under This scenario the line reads `{scenario} · {n} runs`, or `1 run`,
+  where `{n}` counts every run of the scenario in the run store, the figure
+  Scenario Stats shows as Number of runs. Under All scenarios it reads
   `All scenarios · {n} runs`, where `{n}` counts every run in the store
   ([2026-10-14][all-scenarios]).
 
@@ -569,12 +730,13 @@ The card's lines, local-record scope and leaderboard presentation follow
   top, with focus on its first row ([2026-10-14][count-link]).
 - A run row has seven columns: `#`, the run's number among this scenario's
   runs in its session, counted in the order they were played, "Time", a time
-  of day with no seconds, "Score", the marks, "Accuracy" to the whole
-  percent, "Shots Fired", and "Sensitivity". The marks column has no visible
-  header, and its accessible name is "Marks". Shots Fired is shown on every
-  scenario and counts the shots of the first weapon the stats file lists.
-  Sensitivity is the run's normalized sensitivity-and-scale string, as on the
-  chart's axis. Columns don't sort
+  of day with no seconds, "Score", the marks, "Accuracy" to two decimals
+  with trailing zeros kept, such as `82.31%` or `100.00%`
+  ([2026-10-18][accuracy]), "Shots Fired", and "Sensitivity". The marks
+  column has no visible header, and its accessible name is "Marks". Shots
+  Fired is shown on every scenario and counts the shots of the first weapon
+  the stats file lists. Sensitivity is the run's normalized
+  sensitivity-and-scale string, as on the chart's axis. Columns don't sort
   ([2026-10-12][column]).
 - A divider marks where the scenario was left and returned to within a
   session, and counts what was played between: `10 runs on 3 other
@@ -595,8 +757,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   chart. The highlight is a look alone and tells a screen reader nothing.
 - With runs and no scenario selected, this view reads "No scenario selected"
   with the switch still above it, and "Expand all" and "Columns" out of view.
-  A selected scenario with no local runs lists the newest session alone,
-  under the heading `{scenario} · 0 runs` ([2026-10-14][all-scenarios]).
+  A selected scenario with no local runs lists the newest session alone
+  ([2026-10-14][all-scenarios]), and the latest-run card above it reads "No
+  runs yet". The hidden heading line reads `{scenario} · 0 runs`
+  ([2026-10-18][heading-line]).
 - The grid's accessible name is `Runs of {scenario}, by session`.
 
 ### All scenarios
@@ -650,7 +814,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 ### Both views
 
 - A session row and a scenario row open and close on a click, with no request
-  to the server. On arrival the first session is open, and under All
+  to the server. Each starts with a gray chevron, the app's own icon at 16px,
+  that points right while the row is closed and down while it is open
+  ([2026-10-18][figure-columns]). On arrival the first session is open, and under All
   scenarios so is the scenario row of the last run played, unless the tree
   first arrives for a session's count, when only what its jump opens is
   open ([2026-10-14][count-link]). Each view keeps its own open rows, and
@@ -667,13 +833,30 @@ The card's lines, local-record scope and leaderboard presentation follow
   best" checkbox, off to start. The browser remembers each
   ([2026-10-14][median-best]).
 - With "Median and best" on, a scenario row under All scenarios and a session
-  row under This scenario gain a second line, `Median {median} · Best
-  {best}`, over the runs under the row, or `Score {score}` over one run, and
-  no line over none. The median is the middle score, or the mean of the two
+  row under This scenario show the median and best of the runs under the row,
+  `Median {median}` and `Best {best}`, or `Score {score}` over one run, and
+  nothing over none. The median is the middle score, or the mean of the two
   middle scores. Both count every run under the row at any sensitivity, are
   formatted as a score is, and show whether the row is open or closed. A
-  session row under All scenarios has no second line. Turning the checkbox on
-  or off makes no request ([2026-10-14][median-best]).
+  session row under All scenarios has none. Turning the checkbox on or off
+  makes no request ([2026-10-14][median-best]).
+- The figures sit in the row's own line, just before its count. The first
+  row under This scenario, which gives the session's length and says In
+  progress, keeps them on a second line under it, and is the one row that
+  grows when the checkbox turns on ([2026-10-18][figures-line]).
+- A scenario row reads `Median {median} · Best {best} · 4 runs`, or `Score
+  {score} · 1 run` ([2026-10-18][figures-line]).
+- Under This scenario, a session row's Median, Best, and count line up in
+  columns down the list, 16px apart with no dot between them. Each label is
+  on every row, right-aligned
+  against its value. Every value lines up on its decimal point: whole numbers
+  end at one place, and decimals stick out to the right. A one-run session
+  reads `Score {score}` in Best's column, with Median's column blank and
+  silent to a screen reader. The first row's second line ends short by the
+  count's column, so its Median and Best sit over the rows below, or at the
+  row's edge with no row below. Each column is as wide as its widest value
+  in any session of the scenario, loaded or not, so Show older sessions
+  never moves a column ([2026-10-18][figure-columns]).
 - Each view loads 30 sessions and counts its own. A "Show older sessions"
   button at the end adds 30 to the view it is pressed in. A change of
   scenario keeps both counts, and a reload starts both from 30
@@ -921,11 +1104,18 @@ The card's lines, local-record scope and leaderboard presentation follow
 ## Scenario Stats
 
 - A card in the top row, framed as the latest-run card is, in the theme's
-  tokens. Its heading, "Scenario Stats", is an h2 drawn as the card's quiet
-  first line, and under it, at one weight, are "Category:", "Last played:"
-  and "Number of runs:" for the selected scenario ([T2][category],
-  [T4][card-order]). The personal best and the leaderboard position are
-  [the PB card's](#the-pb-card).
+  tokens. Its first line is plain text, "Scenario stats", in sentence case
+  and drawn as the other two cards' quiet first lines are; it is not a
+  heading ([2026-10-18][stats-last-played]). Under it, at one weight, are
+  "Category:" and "Number of runs:" for the selected scenario
+  ([T2][category], [T4][card-order]). The personal best and the leaderboard
+  position are [the PB card's](#the-pb-card), and when the scenario was last
+  played is [the latest-run card's](#the-latest-run-card)
+  ([2026-10-18][stats-last-played]).
+- With no scenario selected, the card reads "No scenario selected" under its
+  first line, in the PB card's empty-title style, in place of Category and
+  Number of runs. A selected scenario with no local runs reads `Number of
+  runs: 0` ([2026-10-18][stats-last-played]).
 - Category is `{category} · {subcategory}`, or `{category}` with one level,
   using the selected benchmark table's own group labels and length guard.
   It is shown only while the Playlist filter holds a benchmark with groups
@@ -936,17 +1126,6 @@ The card's lines, local-record scope and leaderboard presentation follow
   change alone ([T2][category]).
 - Its frame is 270px wide and adds only a border to its height.
   The card fits in the row the dropdowns' column sets, its lines centered.
-- "Last played" is a relative, single-unit humanized string ("5 minutes
-  ago"), self-updating on its own 30-second interval
-  ([2026-06-21][last-played]).
-  Its empty states are explicit: `—` with no scenario selected, `Never` for
-  a scenario with no local runs, and only a real timestamp gets the tooltip
-  affordance: hover, keyboard focus, or touch
-  ([2026-06-30][empty-states]).
-  The tooltip shows the absolute timestamp without seconds, in the shared
-  GitHub-shaped format whose JS and Python implementations are kept in sync
-  by hand
-  ([2026-07-11][timestamps]).
 
 ## Run delivery
 
@@ -965,11 +1144,18 @@ The card's lines, local-record scope and leaderboard presentation follow
 - One callback writes both dropdowns' values, with plain outputs. It reads
   the summary and lands on the scenario just played when Follow is on,
   clearing a Playlist filter that does not list it, and it is the callback
-  that applies a link's parameters, the card's scenario button, and a
-  scenario's name pressed in the run list's tree. Which of the four called is
-  read from what triggered the call
-  ([2026-10-12][clear-filter], [2026-10-14][all-scenarios]).
+  that applies a link's parameters, a scenario's name pressed in the run
+  list's tree, and the scenario note card's answers. Which input called is
+  read from what triggered the call ([2026-10-12][clear-filter],
+  [2026-10-14][all-scenarios], [2026-10-18][follows]).
   With Follow off the page stays on the selected scenario.
+- While a scenario note has unsaved changes the same callback moves nothing
+  on its own: it holds a run in a store of its own, which the note card
+  names, and holds a name pressed in the list for the note card's dialog. The
+  Follow switch is one of its inputs, so turning Follow off ends a wait at
+  once. The note card's editor runs in the browser and decides there whether
+  a change of scenario asks, when the change lands
+  ([2026-10-18][note-unsaved]).
 - The chart rebuild consumes the summary, so a batch of several runs becomes
   one rebuild and one change of scenario rather than a replay
   ([2026-07-06][coalesce]).
@@ -1004,8 +1190,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   the list, and the chart
   ([2026-10-12][column]).
   The top row is then one wrapping line, in order: the dropdowns' column,
-  the Scenario Stats card, the PB card, and the latest-run card, which joins
-  a line at 380px and takes the room left on it.
+  the Scenario Stats card, the scenario note card, at least 240px wide, the
+  PB card, and the latest-run card, which joins a line at 380px and takes the
+  room left on it.
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side
@@ -1035,6 +1222,12 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The chart-appearance preferences live only in the browser's local
   storage. Nothing the panel sets is written server-side
   ([2026-08-20][points]).
+- Scenario notes are the one thing on this page a player writes and nothing
+  can rebuild. Each is a file under `data/scenario_notes/`, read when its
+  scenario is selected and never held in memory
+  ([2026-10-18][note-store]). Text that isn't saved yet lives only in the
+  open page: nothing keeps a draft, so only a crash or a killed browser loses
+  it without a question ([2026-10-18][note-unsaved]).
 - Nothing about a mark is stored. A check and a star are worked out again
   each time something asks, from the runs, the percentage, and what the
   performance files say now
@@ -1093,8 +1286,8 @@ The card's lines, local-record scope and leaderboard presentation follow
 [all-scenarios]: ../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md
 [count-link]: ../decision_log/2026/2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
-[last-played]: ../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md
-[empty-states]: ../decision_log/2026/2026-06-30-model-home-last-played-empty-states-explicitly.md
+[figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
+[figure-columns]: ../decision_log/2026/2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md
 [threads]: ../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md
 [rank-history]: ../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md
@@ -1102,3 +1295,10 @@ The card's lines, local-record scope and leaderboard presentation follow
 [category]: ../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md
 [pb-card]: ../decision_log/2026/2026-10-14-the-pb-card-shows-the-local-record-and-next-rank.md
 [card-order]: ../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md
+[accuracy]: ../decision_log/2026/2026-10-18-a-runs-accuracy-shows-two-decimals.md
+[follows]: ../decision_log/2026/2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md
+[stats-last-played]: ../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md
+[heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md
+[note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md
+[note-card]: ../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md
+[note-unsaved]: ../decision_log/2026/2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md

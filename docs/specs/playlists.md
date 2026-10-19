@@ -317,7 +317,10 @@ and [product.md](../product.md). Leaderboard placement is worded
   dropped, so a column can read `710` beside `863.94`, and the table's `50`
   is the chart's `50.0 cm/360`
   ([2026-09-27](../decision_log/2026/2026-09-27-the-scenario-table-drops-trailing-zeros-from-pb-score-and-pb-cm360.md)).
-  PB Accuracy prefers damage accuracy, falling back to hit accuracy.
+  PB Accuracy is the PB run's hit accuracy, the figure KovaaK's shows for
+  the run, to two decimals with trailing zeros kept, as Run History shows a
+  run's. It sorts on the unrounded value
+  ([2026-10-18](../decision_log/2026/2026-10-18-pb-accuracy-shows-hit-accuracy-as-the-game-does.md)).
 - Leaderboard ID is KovaaK's numeric ID for the scenario's global
   leaderboard, read from the app's name-to-ID mapping, the value the app
   itself sends to KovaaK's, and never from the copy embedded in the playlist

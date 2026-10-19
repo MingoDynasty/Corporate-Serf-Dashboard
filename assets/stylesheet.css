@@ -266,9 +266,9 @@ a.run-toast-link:hover {
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* The first column: the dropdowns, the Scenario Stats card, the room kept for
-   notes, and the PB card at its right end. It wraps on its own width, so it
-   needs no breakpoint, and the PB card is the first piece to wrap. */
+/* The first column: the dropdowns, the Scenario Stats card, the scenario
+   note card, and the PB card at its right end. It wraps on its own width, so
+   it needs no breakpoint, and the PB card is the first piece to wrap. */
 .run-history-top-row-left {
     display: flex;
     flex-wrap: wrap;
@@ -367,25 +367,26 @@ a.run-toast-link:hover {
     width: 270px;
 }
 
-/* The card's heading, drawn as the latest-run card's first line. */
+/* The card's first line, plain text drawn as the latest-run card's and the PB
+   card's first lines are. */
 .scenario-stats-card > .scenario-stats-heading {
     color: var(--mantine-color-dimmed);
     font-size: 12px;
-    font-weight: 400;
     line-height: 18px;
 }
 
 /* The latest-run card, over the run list. It is as tall as the row, and
-   never less than 132px, which holds its tallest state: its second line on
-   two lines in a narrow card. What it shows changes between runs and its
-   height never follows it, so the chart under it never jumps. The lines are
-   centered in that height. */
+   never less than 135px, which holds its tallest state: its second line on
+   two lines in a narrow card, over the run's session and its time on the
+   scenario. What it shows changes between runs and its height never follows
+   it, so the chart under it never jumps. The lines are centered in that
+   height. */
 .run-history-card {
     display: flex;
     flex-direction: column;
     gap: 2px;
     justify-content: center;
-    min-height: 132px;
+    min-height: 135px;
     min-width: 0;
     overflow: hidden;
     padding: 0 var(--mantine-spacing-sm);
@@ -401,15 +402,16 @@ a.run-toast-link:hover {
     min-width: 0;
 }
 
-/* Not a box of its own: the label and the name inside it are laid out as the
-   heading's own items, beside the scenario button. */
+/* Not a box of its own: the name inside it is laid out as the heading's own
+   item, beside the label, so it is the part that is cut short. */
 .run-history-card-heading-text {
     display: contents;
 }
 
 /* Kept whole, with the space it ends on: a flex container drops a space
-   between two items, and the label would run into the name. It sets no
-   display of its own, because with no run its hidden attribute removes it. */
+   between two items, and the label would run into the name. With no run
+   "Latest run" stays, and the words inside it that hold the age are hidden
+   by their own attribute, which a display set on them would undo. */
 .run-history-card-label {
     flex: 0 0 auto;
     white-space: pre;
@@ -428,28 +430,6 @@ a.run-toast-link:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-/* The scenario's name while another scenario is selected: a button, since it
-   changes what the page shows and goes nowhere, drawn as the app draws a
-   link. With no name to show it is out of the page, and out of the tab
-   order with it. */
-.run-history-card-scenario-button {
-    background: none;
-    border: 0;
-    color: var(--mantine-color-anchor);
-    cursor: pointer;
-    font: inherit;
-    padding: 0;
-    text-align: left;
-}
-
-.run-history-card-scenario-button:hover {
-    text-decoration: underline;
-}
-
-.run-history-card-scenario-button:empty {
-    display: none;
 }
 
 /* Not a box of its own either, so the heading and the lines under it are
@@ -481,8 +461,8 @@ a.run-toast-link:hover {
     line-height: 18px;
 }
 
-/* With no run in the store: a title over one sentence, as the chart's empty
-   states have them. */
+/* With no run to report: a title, over one sentence where there is
+   something to do, as the chart's empty states have them. */
 .run-history-card-empty-title {
     font-weight: 600;
 }
@@ -493,10 +473,10 @@ a.run-toast-link:hover {
 }
 
 /* The PB card, 300px wide at the first column's right end, so it sits beside
-   the latest-run card, and the room before it is kept for notes. Its frame
-   adds only its border to its height, as the Scenario Stats card's does, and
-   its lines are centered in the row's height. It shares the latest-run
-   card's lines: the score row, the line under it, and the empty state. */
+   the latest-run card, after the scenario note card. Its frame adds only its
+   border to its height, as the Scenario Stats card's does, and its lines are
+   centered in the row's height. It shares the latest-run card's lines: the
+   score row, the line under it, and the empty state. */
 .pb-card {
     display: flex;
     flex: 0 0 300px;
@@ -598,6 +578,199 @@ a.run-toast-link:hover {
     display: none;
 }
 
+/* The scenario note card, between Scenario Stats and the PB card. It takes
+   the room the row leaves, from 240px, and stops at 800px so a line stays
+   readable on a wide screen: the rest of the room sits before the PB card.
+
+   While reading, what it shows is out of the flow, so its box is the row's
+   and never the note's: the chart under the row stays where it is between a
+   note, no note, a broken file and no scenario. A card alone on a wrapped
+   line still gets five lines. While editing, the editor is in the flow and
+   holds the row's height where it fits, and the card grows only where the
+   lines under the buttons need more room than the row leaves. */
+.run-history-note-card {
+    border: 1px solid transparent;
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex: 1 1 240px;
+    flex-direction: column;
+    max-width: 800px;
+    min-height: 132px;
+    min-width: min(240px, 100%);
+    position: relative;
+}
+
+/* The frame says the scenario has a note, or a file that holds one. Without
+   either the room holds a link, and with no scenario nothing. */
+.run-history-note-card-note,
+.run-history-note-card-error,
+.run-history-note-card-future,
+.run-history-note-card[data-editing="true"] {
+    border-color: var(--mantine-color-default-border);
+}
+
+.run-history-note-read {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    inset: 0;
+    justify-content: safe center;
+    padding: 0 var(--mantine-spacing-sm);
+    position: absolute;
+}
+
+.run-history-note-card[data-editing="true"] .run-history-note-read,
+.run-history-note-card:not([data-editing="true"]) .run-history-note-editor,
+.run-history-note-card-none .run-history-note-heading,
+.run-history-note-card-missing .run-history-note-read > .run-history-note-heading,
+.run-history-note-card-none .run-history-note-text,
+.run-history-note-card-missing .run-history-note-text,
+.run-history-note-card-future .run-history-note-heading > .run-history-note-link,
+.run-history-note-card:not(.run-history-note-card-missing) .run-history-note-link-add {
+    display: none;
+}
+
+/* "Scenario note", its age, and Edit at the line's right end, drawn as the
+   other cards' first lines are. */
+.run-history-note-heading {
+    color: var(--mantine-color-dimmed);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 12px;
+    gap: var(--mantine-spacing-xs);
+    justify-content: space-between;
+    line-height: 18px;
+}
+
+/* Kept whole, with the spaces either side of the age: a flex container drops
+   a space between two items. */
+.run-history-note-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+}
+
+/* Edit and Add a scenario note: buttons, since each opens the editor and
+   goes nowhere, drawn as the app draws a link. */
+.run-history-note-link {
+    background: none;
+    border: 0;
+    color: var(--mantine-color-anchor);
+    cursor: pointer;
+    flex: 0 0 auto;
+    font: inherit;
+    padding: 0;
+    text-align: left;
+}
+
+.run-history-note-link:hover {
+    text-decoration: underline;
+}
+
+.run-history-note-link-add {
+    align-self: flex-start;
+    font-size: var(--mantine-font-size-sm);
+}
+
+/* The note as typed: its line breaks kept, a word too long for the card
+   broken anywhere, centered in the card when it is short. One taller than
+   the card runs to its bottom, and a script fades its last line out. */
+.run-history-note-text {
+    flex: 0 1 auto;
+    font-size: var(--mantine-font-size-sm);
+    line-height: 20px;
+    max-width: 75ch;
+    min-height: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.run-history-note-text[data-clipped="true"] {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+}
+
+.run-history-note-editor {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px var(--mantine-spacing-sm) 8px;
+}
+
+/* The text box fills what the row leaves it and never shows less than three
+   lines. It scrolls inside itself. Its height starts from nothing, so the
+   row's height, not the box's rows, decides the card's. */
+.run-history-note-text-box,
+.run-history-note-text-box .mantine-Textarea-wrapper {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+.run-history-note-text-box textarea {
+    flex: 1 1 auto;
+    font-size: var(--mantine-font-size-sm);
+    height: 0;
+    line-height: 19px;
+    min-height: 69px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    resize: none;
+}
+
+/* Save and Cancel, then the lines that need saying beside them where the
+   card is wide enough, and under them where it isn't. */
+.run-history-note-footer {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 6px var(--mantine-spacing-xs);
+}
+
+.run-history-note-buttons {
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--mantine-spacing-xs);
+}
+
+.run-history-note-lines {
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* With nothing to say the lines take no room: their box starts from no
+   width, so it stays on the buttons' line, and an empty line has no height.
+   The box is never hidden, so the waiting line, a live region, is in the page
+   before its text arrives. Wrapped under the buttons, an empty box would grow
+   the card by a line's gap. */
+.run-history-note-lines:not(:has(> :not(:empty))) {
+    flex-basis: 0;
+}
+
+.run-history-note-waiting {
+    color: var(--mantine-color-blue-text);
+    font-size: 13px;
+    line-height: 18px;
+}
+
+.run-history-note-count {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.run-history-note-error {
+    color: var(--mantine-color-error);
+    font-size: 13px;
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+
 /* The chart beside the run list. The list's column is as wide as its seven
    columns need, and the chart takes the rest. */
 .run-history-columns {
@@ -660,8 +833,8 @@ a.run-toast-link:hover {
     min-width: 0;
 }
 
-/* The run list fills its column: the heading line, then the grid, which
-   scrolls inside its own box so the chart beside it never moves. */
+/* The run list fills its column: the header, then the grid, which scrolls
+   inside its own box so the chart beside it never moves. */
 .run-history-list {
     border: 1px solid var(--mantine-color-default-border);
     border-radius: var(--mantine-radius-sm);
@@ -672,11 +845,11 @@ a.run-toast-link:hover {
     overflow: hidden;
 }
 
-/* The heading line, then a line of its own with the switch between the
-   views at the left and the two buttons at the right. Beside the buttons the
-   heading had about 240px, which cut a scenario's name short before its run
-   count. The second line wraps on the list's own width, and where the three
-   do not fit, the buttons go under the switch. */
+/* The switch between the views at the left and the two buttons at the right,
+   on one line. The heading line is in the header for a screen reader only,
+   and its absolute position takes it out of the line. The line wraps on the
+   list's own width, and where the three do not fit, the buttons go under the
+   switch. */
 .run-history-list-header {
     align-items: center;
     display: flex;
@@ -685,14 +858,6 @@ a.run-toast-link:hover {
     gap: var(--mantine-spacing-xs);
     justify-content: space-between;
     padding: var(--mantine-spacing-xs);
-}
-
-/* A whole line, which is what puts the controls on the next one. min-width:
-   0 because a flex item's automatic minimum is its text, and a name longer
-   than the line would push the list wider than its column. */
-.run-history-list-heading {
-    flex: 1 0 100%;
-    min-width: 0;
 }
 
 /* The left margin holds the buttons at the right when they wrap under the
@@ -729,9 +894,9 @@ a.run-toast-link:hover {
     display: block;
 }
 
-/* In the page for a screen reader and for nothing else: the name of the
-   list's marks column, the reason a run has no check, and the line that
-   says a row was opened or closed. */
+/* In the page for a screen reader and for nothing else: the run list's
+   heading line, the name of its marks column, the reason a run has no check,
+   and the line that says a row was opened or closed. */
 .visually-hidden {
     clip-path: inset(50%);
     height: 1px;
@@ -758,7 +923,7 @@ a.run-toast-link:hover {
 }
 
 .run-history-list-grid .ag-header-cell-text {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
 }
 
@@ -809,11 +974,26 @@ a.run-toast-link:hover {
     scrollbar-color: transparent transparent;
 }
 
+/* Where the browser draws scrollbars over the page, as Firefox does on
+   Windows 11 by default, the grid's scrollbar takes no room, and with the
+   pointer on it, it covered the end of the last column and of the session
+   rows. The grid marks such a scrollbar invisible. The room goes inside both
+   scrolling areas, so the pinned row stays in line with the rows under it,
+   and the marks column gives it up. A scrollbar that takes room of its own
+   gets none: it already clears the rows, and the marks column has too little
+   left to give both. The room is the scrollbar's width with the pointer on
+   it, 12px in Firefox 158, so a cell's own padding stays clear beside it. */
+.run-history-list-grid:has(.ag-body-vertical-scroll.ag-scrollbar-invisible)
+    :is(.ag-center-cols-viewport, .ag-floating-top-viewport) {
+    padding-right: 12px;
+}
+
 /* A run's number sits under its session's name, clear of the session row's
-   button. */
+   button. The column's width in run_list_column_defs moves with this
+   padding: the number's room is what the two leave. */
 .run-history-list-grid .run-list-number {
     color: var(--mantine-color-dimmed);
-    padding-left: 30px;
+    padding-left: 24px;
 }
 
 /* The marks column's header has a name and shows none. */
@@ -849,19 +1029,22 @@ a.run-toast-link:hover {
 
 /* What the list's script draws in a full-width row: a session row, a
    scenario row, a divider, a date header, the note under a session the
-   scenario was not played in, and the button that loads older sessions. */
+   scenario was not played in, and the button that loads older sessions.
+   It ends 4px in, where a cell's text does, so a row's facts end in line
+   with the last column. The room an overlay scrollbar needs is the grid
+   viewport's own, not this padding's. */
 .run-list-wide {
     align-items: center;
     display: flex;
     font-size: 13px;
     gap: 6px;
     height: 100%;
-    padding: 0 12px;
+    padding: 0 4px 0 6px;
     width: 100%;
 }
 
-/* A session row or a scenario row: its first line, and under it the row's
-   figures while Median and best is on. */
+/* A session row or a scenario row: its line, and under it the row's figures
+   while Median and best is on, on the one row that keeps them below. */
 .run-list-group {
     align-items: stretch;
     cursor: pointer;
@@ -880,7 +1063,7 @@ a.run-toast-link:hover {
 /* A scenario row sits one step in from its session row. Its toggle lines
    up with the runs' numbers under it. */
 .run-list-scenario {
-    padding-left: 24px;
+    padding-left: 18px;
 }
 
 .run-list-figures {
@@ -894,9 +1077,9 @@ a.run-toast-link:hover {
     font-weight: 600;
 }
 
-/* The space that ends a part of a session row, for a screen reader: see
+/* The space that sets a group row's parts apart for a screen reader: see
    partEnd in runHistoryList.js. Kept, or the browser would drop a space at
-   the end of a line, and sized to nothing, so the row looks as it did. */
+   either end of a line, and sized to nothing, so the row looks as it did. */
 .run-list-part-end {
     font-size: 0;
     white-space: pre;
@@ -954,21 +1137,87 @@ a.run-toast-link:hover {
     white-space: nowrap;
 }
 
+/* 14 by 16px, so no row grows and nothing beside it moves. The chevron's
+   box is 2px wider and overflows it evenly, which draws nothing outside:
+   its ink is half its box. */
 .run-list-toggle {
+    align-items: center;
     background: none;
     border: 0;
     color: var(--mantine-color-dimmed);
     cursor: pointer;
-    font-size: 11px;
+    display: flex;
+    height: 16px;
+    justify-content: center;
     padding: 0;
     width: 14px;
+}
+
+/* The chevron Chart options and the Columns menu draw, at 16px and not
+   their 20px, so its ink stays under the session date's digits: the row's
+   date is what it shows first. It points right when the row is closed and
+   down when it is open. A masked SVG recolored by background-color, as
+   local_icon draws one. */
+.run-list-chevron {
+    -webkit-mask: url("icons/material-symbols-keyboard-arrow-down.svg") no-repeat center / contain;
+    background-color: currentColor;
+    flex: none;
+    height: 16px;
+    mask: url("icons/material-symbols-keyboard-arrow-down.svg") no-repeat center / contain;
+    transform: rotate(-90deg);
+    width: 16px;
+}
+
+.run-list-toggle[aria-expanded="true"] .run-list-chevron {
+    transform: none;
+}
+
+/* Under This scenario, a session row's Median, Best, and count in columns:
+   see figureColumns in runHistoryList.js. A part of a column holds its
+   value and the widest text it can hold, unseen, in one cell, and is as wide
+   as the wider of the two. Tabular digits make the server's pick of the
+   widest text the browser's: every digit one width, wider than a comma. */
+.run-list-slot {
+    display: inline-grid;
+    font-variant-numeric: tabular-nums;
+}
+
+.run-list-slot > * {
+    grid-area: 1 / 1;
+}
+
+.run-list-slot-end {
+    justify-items: end;
+}
+
+.run-list-slot-start {
+    justify-items: start;
+}
+
+/* Hidden, and so out of the accessibility tree and a page search, while it
+   keeps its room. */
+.run-list-slot-widest,
+.run-list-column-blank {
+    visibility: hidden;
+}
+
+/* A space between two parts of the columns, in a box of its own, so a
+   screen reader hears the parts apart: see space in runHistoryList.js.
+   Kept, or the box would drop a space it starts and ends with. */
+.run-list-space {
+    display: inline-block;
+    white-space: pre;
+}
+
+.run-list-column-gap {
+    width: 16px;
 }
 
 .run-list-in-progress {
     background-color: var(--mantine-color-blue-light);
     border-radius: var(--mantine-radius-sm);
     color: var(--mantine-color-blue-light-color);
-    font-size: 11px;
+    font-size: 12px;
     padding: 0 6px;
     white-space: nowrap;
 }
@@ -977,8 +1226,8 @@ a.run-toast-link:hover {
 .run-list-date,
 .run-list-note {
     color: var(--mantine-color-dimmed);
-    font-size: 11px;
-    padding-left: 30px;
+    font-size: 12px;
+    padding-left: 24px;
 }
 
 /* A dashed rule either side of a divider's count, so it reads as a break in

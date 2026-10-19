@@ -2,7 +2,6 @@
 Provides business logic for Kovaak's API.
 """
 
-import hashlib
 import json
 import logging
 import os
@@ -33,6 +32,7 @@ from source.kovaaks.api_models import (
 from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.build_info import get_build_info
+from source.utilities.file_keys import safe_file_key
 from source.utilities.paths import state_dir
 
 # KovaaK's slow spells push /leaderboard/scores/global latency to ~28s while
@@ -466,26 +466,9 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
                 temp_file.unlink()
 
 
-def _safe_cache_key(value: str) -> str:
-    """Normalize user-provided values before embedding them in cache paths.
-
-    Sanitizing alone is lossy: every character outside the preserved set folds
-    to `_`, so distinct usernames like `a.b` and `a_b` produced one key and
-    silently shared (and overwrote) each other's cache files. The sanitized
-    prefix stays so cache directories remain human-readable, and a short digest
-    of the raw value makes distinct values distinct. sha256 is used rather than
-    `hash()` because the key must be stable across runs.
-    """
-    sanitized = "".join(
-        char if char.isalnum() or char in ("-", "_") else "_" for char in value
-    )
-    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:8]
-    return f"{sanitized}-{digest}"
-
-
 def _user_scenario_total_play_cache_file(username: str) -> Path:
     return Path(
-        CACHE_DIR, "user_scenario_total_play", f"{_safe_cache_key(username)}.json"
+        CACHE_DIR, "user_scenario_total_play", f"{safe_file_key(username)}.json"
     )
 
 
@@ -493,7 +476,7 @@ def _user_scenario_total_play_page_cache_file(username: str, page: int) -> Path:
     return Path(
         CACHE_DIR,
         "user_scenario_total_play",
-        _safe_cache_key(username),
+        safe_file_key(username),
         f"page_{page}.json",
     )
 
@@ -509,7 +492,7 @@ def _has_terminal_user_scenario_total_play_page(
     of rows. A raw page with fewer than `max_results` rows is our signal that we
     actually reached the end of pagination.
     """
-    page_dir = Path(CACHE_DIR, "user_scenario_total_play", _safe_cache_key(username))
+    page_dir = Path(CACHE_DIR, "user_scenario_total_play", safe_file_key(username))
     for page_file in page_dir.glob("page_*.json"):
         cache_data = _read_json(page_file)
         if not isinstance(cache_data, dict):
@@ -1054,7 +1037,7 @@ def _rank_cache_file(
         CACHE_DIR,
         "leaderboard",
         "user_rank",
-        _safe_cache_key(username),
+        safe_file_key(username),
         f"{leaderboard_id}.json",
     )
 

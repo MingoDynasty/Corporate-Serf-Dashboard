@@ -55,7 +55,6 @@ def _run(  # noqa: PLR0913
     sensitivity: float = 50.0,
     scale: str = "cm/360",
     accuracy: float = 0.61,
-    damage_accuracy: float | None = None,
     scenario_hash: str | None = VERSION,
 ) -> RunData:
     """Build one run of the scenario, ``minute`` minutes into the evening."""
@@ -67,7 +66,6 @@ def _run(  # noqa: PLR0913
         horizontal_sens=sensitivity,
         scenario=SCENARIO,
         accuracy=accuracy,
-        damage_accuracy=damage_accuracy,
         scenario_hash=scenario_hash,
         stats_file_name=f"{SCENARIO} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv",
         run_start=ended - timedelta(seconds=60),
@@ -232,8 +230,8 @@ def load_runs(monkeypatch):
 @pytest.mark.parametrize(
     ("stored_first", "faded"),
     [
-        pytest.param("began_first", "50 cm/360 · Accuracy 55%", id="as-played"),
-        pytest.param("began_second", "50 cm/360 · Accuracy 65%", id="against-play"),
+        pytest.param("began_first", "50 cm/360 · Accuracy 55.00%", id="as-played"),
+        pytest.param("began_second", "50 cm/360 · Accuracy 65.00%", id="against-play"),
     ],
 )
 def test_a_tie_that_ended_in_one_second_is_the_tables_pb_run(
@@ -300,7 +298,11 @@ def test_the_scores_hover_is_the_latest_run_cards_line_for_the_pb(
 
     shown = _shown(runs, version_pace_basis=version_pace_basis)
     landed = latest_run_card.latest_run(
-        runs, None, runs[-1].datetime_object, lambda _s, v: version_pace_basis(v)
+        runs,
+        runs[-1].scenario,
+        None,
+        runs[-1].datetime_object,
+        lambda _s, v: version_pace_basis(v),
     )
 
     assert shown.score_hover == hover
@@ -320,19 +322,21 @@ def test_the_scores_hover_is_measured_under_the_pbs_own_version():
 @pytest.mark.parametrize(
     ("fields", "faded"),
     [
-        pytest.param({}, "50 cm/360 · Accuracy 61%", id="trailing-zeros-dropped"),
+        pytest.param({}, "50 cm/360 · Accuracy 61.00%", id="trailing-zeros-dropped"),
         pytest.param(
-            {"sensitivity": 34.6375}, "34.64 cm/360 · Accuracy 61%", id="two-decimals"
+            {"sensitivity": 34.6375},
+            "34.64 cm/360 · Accuracy 61.00%",
+            id="two-decimals",
         ),
         pytest.param(
             {"scale": "Valorant", "sensitivity": 0.35},
-            "Accuracy 61%",
+            "Accuracy 61.00%",
             id="cm360-unknown",
         ),
         pytest.param(
-            {"accuracy": 0.545, "damage_accuracy": 0.9},
-            "50 cm/360 · Accuracy 55%",
-            id="hit-accuracy-not-damage",
+            {"accuracy": 57 / 800},
+            "50 cm/360 · Accuracy 7.13%",
+            id="a-half-rounds-up",
         ),
     ],
 )
@@ -355,7 +359,7 @@ SHOWN = PersonalBest(
     next_rank=NextRank(
         name="Lavender", color="#b39ddb", threshold="3,700", gap="+1.3%", points="47"
     ),
-    faded="50 cm/360 · Accuracy 61%",
+    faded="50 cm/360 · Accuracy 61.00%",
 )
 
 
@@ -460,7 +464,7 @@ def test_a_pb_is_its_score_and_badge_then_the_next_rank_then_the_faded_line():
         "Cerulean",
     ]
     assert rendered_text(next_rank) == "3,700 Lavender · +1.3% · 47 to go"
-    assert content.faded == "50 cm/360 · Accuracy 61%"
+    assert content.faded == "50 cm/360 · Accuracy 61.00%"
 
 
 def test_the_score_with_a_hover_takes_focus_and_shows_it_as_last_played_does():
@@ -570,7 +574,12 @@ PLAYLIST = PlaylistData(
 @pytest.fixture
 def store(monkeypatch):
     """Stub the run store and the loaded playlists the card reads."""
-    held: dict = {"runs": {}, "pace_basis": None, "pace_asked": []}
+    held: dict = {
+        "runs": {},
+        "pace_basis": None,
+        "pace_asked": [],
+        "version_pace_asked": [],
+    }
     playlists = {BENCHMARK.code: BENCHMARK, PLAYLIST.code: PLAYLIST}
 
     def pace_basis(scenario):
@@ -578,6 +587,9 @@ def store(monkeypatch):
         if isinstance(held["pace_basis"], Exception):
             raise held["pace_basis"]
         return held["pace_basis"]
+
+    def version_pace_basis(scenario, version):
+        held["version_pace_asked"].append((scenario, version))
 
     # ``held["runs"]`` holds each scenario's runs oldest first.
     monkeypatch.setattr(
@@ -587,7 +599,7 @@ def store(monkeypatch):
     )
     monkeypatch.setattr(pb_card, "get_playlist_by_code", playlists.get)
     monkeypatch.setattr(pb_card, "get_pace_basis", pace_basis)
-    monkeypatch.setattr(pb_card, "get_version_pace_basis", lambda _s, _v: None)
+    monkeypatch.setattr(pb_card, "get_version_pace_basis", version_pace_basis)
     return held
 
 
@@ -631,15 +643,17 @@ def test_the_ladder_is_the_one_the_playlist_filters_benchmark_gives(
     assert _body_text(content) == expected
 
 
-def test_the_pace_basis_is_read_only_for_a_scenario_with_a_ladder(store):
-    """As the table reads it: a playlist's table never reads a performance file."""
+def test_the_gaps_pace_basis_is_read_only_for_a_scenario_with_a_ladder(store):
+    """Read the gap's basis as the table does, and the hover's basis either way."""
     store["runs"][SCENARIO] = _scored(3000, 3653)
 
     pb_card.show_pb(None, SCENARIO, PLAYLIST.code)
     assert store["pace_asked"] == []
+    assert store["version_pace_asked"] == [(SCENARIO, VERSION)]
 
     pb_card.show_pb(None, SCENARIO, BENCHMARK.code)
     assert store["pace_asked"] == [SCENARIO]
+    assert store["version_pace_asked"] == [(SCENARIO, VERSION)] * 2
 
 
 def test_a_failed_pace_lookup_costs_the_pace_gap_and_never_the_card(store, caplog):

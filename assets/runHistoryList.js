@@ -36,9 +36,9 @@
 //      lands would otherwise leave a keyboard user on a different run, and a
 //      press on a scenario's name, which rebuilds the rows, on the row's
 //      first button.
-//  10. A row's height follows the Median and best checkbox. The grid
-//      measures the body's rows again when asked, and the pinned row only
-//      when its rows are handed in again.
+//  10. The height of a row whose figures go on a line of their own follows
+//      the Median and best checkbox. The grid measures the body's rows again
+//      when asked, and the pinned row only when its rows are handed in again.
 (function () {
   var dagfuncs = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
   var dagcomponentfuncs = (window.dashAgGridComponentFunctions =
@@ -60,7 +60,8 @@
     note: 26,
     more: 44,
   };
-  // What a row's second line adds, while Median and best is on.
+  // What a row's second line adds, while Median and best is on, on a row
+  // whose figures go below.
   var SECOND_LINE_HEIGHT = 16;
 
   var state = (window.runHistoryList = {
@@ -89,6 +90,9 @@
     // Whether Median and best is on. Not the grid's: the checkbox is set as
     // the page mounts, and it lasts across a new grid.
     figures: false,
+    // The widest text of each part of the figure columns, under This
+    // scenario: the model's, handed in with its rows.
+    columns: null,
     // A session asked for from its count, opened when the tree arrives.
     jump: null,
     expandLabel: undefined,
@@ -203,11 +207,14 @@
     return open.has(data.sid) && (data.vid == null || open.has(data.vid));
   };
   // The figures are on a row whether it is open or closed, so a row's height
-  // follows the checkbox and never a click.
+  // follows the checkbox and never a click. Only a row that keeps them on a
+  // line of their own grows.
   dagfuncs.runListRowHeight = function (params) {
     var data = params.data;
     var height = ROW_HEIGHTS[data.kind] || ROW_HEIGHTS.run;
-    return state.figures && data.figures ? height + SECOND_LINE_HEIGHT : height;
+    return state.figures && data.figures && data.figures_below
+      ? height + SECOND_LINE_HEIGHT
+      : height;
   };
   dagfuncs.runListRowClass = function (params) {
     return "run-list-row-" + params.data.kind;
@@ -340,21 +347,100 @@
   // A session row's parts are flex items with no text between them, and
   // Chrome and Edge hand a screen reader their text joined up: "2:22 AMIn
   // progress" (NVDA, 2026-10-13). A space between the items does nothing,
-  // because a flex container drops it. This one sits inside a part, at its
-  // end, where the stylesheet keeps it and gives it no size.
+  // because a flex container drops it. This one sits inside a part, where
+  // the stylesheet keeps it and gives it no size.
   function partEnd() {
     return h("span", { className: "run-list-part-end" }, " ");
   }
 
-  // A group row: its first line, and under it the row's figures while Median
-  // and best is on. The figures line is told from the first by its own
-  // part end, for the reason partEnd gives.
-  function groupRow(props, className, toggle, line, figures) {
-    var shown = state.figures && figures;
+  // A group row: its line, and under it the parts of a line of figures, on
+  // the one row whose figures go below. The figures line is told from the
+  // first by its own part end, for the reason partEnd gives. The part end
+  // opens the figures line: put after the line's last part, it was a flex
+  // item of the line, and the line's gap before it left the facts that far
+  // short of the columns' edge.
+  function groupRow(props, className, toggle, line, below) {
     return wideCell(props, "run-list-group " + className, { onClick: toggle }, [
-      h.apply(null, ["div", { className: "run-list-line" }].concat(line, shown ? [partEnd()] : [])),
-      shown ? h("div", { className: "run-list-figures" }, figures) : null,
+      h.apply(null, ["div", { className: "run-list-line" }].concat(line)),
+      below
+        ? h.apply(null, ["div", { className: "run-list-figures" }, partEnd()].concat(below))
+        : null,
     ]);
+  }
+
+  // A scenario row's figures in its own line, ahead of its count, while
+  // Median and best is on: the count stays at the right edge either way.
+  function figuresInLine(data) {
+    return state.figures && data.figures ? [data.figures, " · "] : [];
+  }
+
+  // ---- A session row's figures in columns, under This scenario ----
+  // Median, Best, and the count line up across the session rows, each value
+  // on its decimal point. Each part of a column is as wide as the widest
+  // text it holds in any session of the scenario, which the server names.
+  // That text is drawn in the part too, unseen, so the browser makes the
+  // part as wide as the wider of the two by the same layout that draws the
+  // text: a width the script measured would be right only at the zoom it
+  // measured. Unseen is out of the accessibility tree too. The unseen text
+  // goes first, as the first child gives the part its baseline, and an empty
+  // value has none: the part stood on the line by its bottom edge, and the
+  // line grew 3px (Firefox and Edge, 2026-10-18).
+  function slot(align, widest, content) {
+    return h.apply(
+      null,
+      ["span", { className: "run-list-slot run-list-slot-" + align }].concat(
+        widest.map(function (text) {
+          return h("span", { className: "run-list-slot-widest" }, text);
+        }),
+        [h("span", null, content)]
+      )
+    );
+  }
+
+  // One column's parts: its label right-aligned against its value, then the
+  // value's whole number right-aligned and its decimals after it.
+  function figureColumn(words, word, widest, value) {
+    return [
+      slot("end", words, word),
+      space(),
+      slot("end", [widest[0]], value[0]),
+      slot("start", [widest[1]], value[1]),
+    ];
+  }
+
+  // A space between two parts, as a character in a box of its own. Chrome
+  // and Edge hand a screen reader no space for a bare one between two parts,
+  // though they draw it, and read a label and its value as one word
+  // (2026-10-18). Nor for an empty box, which ran two columns together.
+  function space(className) {
+    var classes = className ? "run-list-space " + className : "run-list-space";
+    return h("span", { className: classes }, " ");
+  }
+
+  // The space between two columns, 16px wide.
+  function columnGap() {
+    return space("run-list-column-gap");
+  }
+
+  // Parts kept for their room alone, unseen and out of the accessibility
+  // tree, so the columns after them stay in line.
+  function blank(parts) {
+    return h.apply(null, ["span", { className: "run-list-column-blank" }].concat(parts));
+  }
+
+  // A one-run session's score sits under Best with its own label, Score, and
+  // its Median column is blank, so the row still reads as the one score.
+  function figureColumns(figures, labels) {
+    var widest = state.columns;
+    var bestWords = widest.one_run ? [labels.best, labels.score] : [labels.best];
+    var median = figures.score
+      ? [blank(figureColumn([labels.median], "", widest.median, ["", ""]).concat([columnGap()]))]
+      : figureColumn([labels.median], labels.median, widest.median, figures.median).concat([columnGap()]);
+    return median.concat(
+      figures.score
+        ? figureColumn(bestWords, labels.score, widest.best, figures.score)
+        : figureColumn(bestWords, labels.best, widest.best, figures.best)
+    );
   }
 
   function toggleButton(label, open, toggle) {
@@ -371,7 +457,9 @@
         tabIndex: -1,
         onClick: toggle,
       },
-      open ? "▾" : "▸"
+      // The app's own chevron, drawn by the stylesheet, which turns it by
+      // the button's aria-expanded.
+      h("span", { className: "run-list-chevron", "aria-hidden": "true" })
     );
   }
 
@@ -436,15 +524,15 @@
             data.name
           )
         ),
-        h(
-          "span",
-          { className: "run-list-group-facts" },
-          data.counts,
-          data.new_pb ? " " : null,
-          data.new_pb ? star(labels) : null
+        h.apply(
+          null,
+          ["span", { className: "run-list-group-facts" }].concat(figuresInLine(data), [
+            data.counts,
+            data.new_pb ? " " : null,
+            data.new_pb ? star(labels) : null,
+          ])
         ),
-      ],
-      data.figures
+      ]
     );
   }
 
@@ -466,20 +554,32 @@
       data.place != null
         ? linkButton("run-list-count", "count", { title: labels.wholeSession }, jump, data.counts)
         : data.counts;
+    // Only This scenario's session rows carry figures.
+    var figures = state.figures && data.figures;
+    var below = figures && data.figures_below;
+    // On a row whose figures are in its line, the count's part is as wide as
+    // the widest count, so Best's column ends in one place on every row. A
+    // count alone already ends at the row's edge.
+    var figuresAndCount =
+      figures && !below
+        ? figureColumns(data.figures, labels).concat([columnGap(), slot("end", [state.columns.count], counts)])
+        : [counts];
     var line = [
       toggleButton(labels.session, open, toggle),
       h("span", { className: "run-list-session-name" }, data.name, partEnd()),
       data.in_progress
         ? h("span", { className: "run-list-in-progress" }, labels.inProgress, partEnd())
         : null,
-      h(
-        "span",
-        { className: "run-list-group-facts" },
-        data.length
-          ? h("span", { title: data.length_help ? labels.lengthHelp : undefined }, data.length)
-          : null,
-        data.length ? " · " : null,
-        counts
+      h.apply(
+        null,
+        [
+          "span",
+          { className: "run-list-group-facts" },
+          data.length
+            ? h("span", { title: data.length_help ? labels.lengthHelp : undefined }, data.length)
+            : null,
+          data.length ? " · " : null,
+        ].concat(figuresAndCount)
       ),
     ];
     var kids = state.children[data.id] || [];
@@ -501,7 +601,20 @@
         )
       );
     }
-    return groupRow(props, "run-list-session", toggle, line, data.figures);
+    // The first row's figures line ends short by the count's part and the
+    // space before it, so its columns sit over the rows below. With no row
+    // below to line up with, it ends at the row's edge.
+    return groupRow(
+      props,
+      "run-list-session",
+      toggle,
+      line,
+      below
+        ? figureColumns(data.figures, labels).concat(
+            state.columns.count ? [blank([columnGap(), slot("end", [state.columns.count], "")])] : []
+          )
+        : null
+    );
   }
 
   dagcomponentfuncs.RunListWideRow = function (props) {
@@ -723,6 +836,8 @@
       });
     }
     state.sessionLimit = model.session_limit;
+    // Ahead of the rows, which the grid may draw as they go in.
+    state.columns = model.columns;
     state.sessionIds = [];
     state.children = {};
     rows.forEach(function (row) {

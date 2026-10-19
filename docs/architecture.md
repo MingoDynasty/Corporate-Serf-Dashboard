@@ -124,7 +124,9 @@ The diagram shows the Run History page's callbacks (`run_history.py`), which
 consume the batch in three steps: `forward_run_events` writes the summary,
 `reach_scenario` moves the two dropdowns from it, and `generate_graph`
 rebuilds once both have settled. Its run list and its latest-run card are
-rebuilt for every batch, on whatever scenario: the same answer of
+rebuilt for every batch, on whatever scenario, since a run on another one
+can change a session row's counts and which session the card's run is in:
+the same answer of
 `forward_run_events` also writes the id of the batch's newest run, which
 `build_run_list_rows` and `show_latest_run` take as an `Input`.
 
@@ -212,9 +214,18 @@ state, not a field grafted onto someone else's schema.
   holds the playlist show-list (`playlist_visibility_service.py`): written
   atomically on each show/hide, read once and cached in-process, absent until
   the first show/hide (reads fall back to the first-run seed).
-- **Schema stamps** — the three durable stores above (settings, visibility, and
-  each user playlist under `data/playlists/`) carry a top-level integer
-  `"schema_version"`. The read machine lives once in
+- **Scenario notes** — `data/scenario_notes/` (not committed) holds the
+  player's notes (`kovaaks/scenario_notes_service.py`), one file per scenario,
+  named from the scenario's name as the app holds it through `safe_file_key`,
+  so names that differ only by case get a file each. A note is read from disk
+  each time it is asked for and never cached: its path comes from the name, so
+  nothing scans the folder. A save writes one file atomically, and saving empty
+  text deletes it. The folder is absent until the first save.
+- **Schema stamps** — the durable stores above (settings, visibility, each
+  user playlist under `data/playlists/`, and each scenario note under
+  `data/scenario_notes/`) carry a top-level integer `"schema_version"`. User
+  playlists and scenario notes are a store per file, each classified on its
+  own. The read machine lives once in
   `utilities/store_schema.py` and has four states per store: *missing* is the
   first-run default; *error* (unreadable, not JSON, no stamp, a malformed or
   non-positive stamp, or a supported stamp whose payload fails validation)
@@ -226,12 +237,16 @@ state, not a field grafted onto someone else's schema.
   `UnsupportedSchemaError`. There is no missing-means-v1 grandfather rule.
   Automatic writers (`bootstrap_stats_dir`) decline in the error and future
   states; user-initiated saves own an error-state file after copying it to an
-  adjacent `<name>.corrupt-<n>.bak`. The error and future states surface in the
+  adjacent `<name>.corrupt-<n>.bak`; every scenario note write is a user's
+  save. The error and future states surface in the
   UI — an alert on the settings page, one on the Playlists page for visibility,
-  and the startup warning queue for playlist files. The bundled corpus is
+  and the startup warning queue for playlist files. A scenario note's message
+  shows on that scenario's note card on Run History, the one place a player
+  meets the file. The bundled corpus is
   exempt (it ships with its reader), and `data/cache/` is deliberately
   unstamped. `scripts/stamp_schema_version.py` is the one-time conversion for
-  installs created before the stamp; rationale and the run ordering are in
+  installs created before the stamp; scenario notes were born stamped and
+  aren't in it. Rationale and the run ordering are in
   `docs/decision_log/`.
 
 ## Module map
@@ -272,6 +287,7 @@ flowchart LR
         RunHistoryList["components/<br/>run_history_list.py"]
         RunMarks["components/<br/>run_marks.py"]
         LatestRunCard["components/<br/>latest_run_card.py"]
+        ScenarioNoteCard["components/<br/>scenario_note_card.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -288,6 +304,7 @@ flowchart LR
         EvxlSnapshot["kovaaks/<br/>evxl_snapshot.py"]
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlaySessions["kovaaks/<br/>play_sessions.py"]
+        ScenarioNotes["kovaaks/<br/>scenario_notes_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -345,6 +362,7 @@ flowchart LR
     RunHistory --> RunHistoryChart
     RunHistory --> RunHistoryList
     RunHistory --> LatestRunCard
+    RunHistory --> ScenarioNoteCard
     RunHistoryChart --> DataService
     RunHistoryChart --> PlotService
     RunHistoryChart --> RunHistoryList
@@ -363,6 +381,10 @@ flowchart LR
     LatestRunCard --> DataService
     LatestRunCard --> PlaySessions
     LatestRunCard --> TimeScored
+    ScenarioNoteCard --> ScenarioSelection
+    ScenarioNoteCard --> LatestRunCard
+    ScenarioNoteCard --> ChartOptions
+    ScenarioNoteCard --> ScenarioNotes
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -477,9 +499,9 @@ flowchart LR
   chart and the list, one CSS value (`--run-history-list-width`) setting the
   list's width for both, so the latest-run card, alone in the second column,
   sits over the list. The first column (`_top_row`, `_dropdown_column`) is a
-  wrapping row of the dropdowns' column, the Scenario Stats card, the room
-  kept for notes, and the PB card, which a left margin of `auto` pins to the
-  column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
+  wrapping row of the dropdowns' column, the Scenario Stats card, the
+  scenario note card, and the PB card, which a left margin of `auto` pins to
+  the column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
   Select's own box lays out nothing, so the stylesheet places the Select's
   siblings, never in its label: the link on the playlist filter label's line,
   and the Follow switch under the scenario dropdown, small
@@ -503,12 +525,17 @@ flowchart LR
   runs `reach_scenario`: it applies a visit's query parameters when the page
   is drawn, moves the selection to the scenario just played while Follow is
   on, and in both cases clears a playlist filter that does not list the
-  scenario. The latest-run card's scenario button is its third input, and a
-  click selects the scenario the button names under the same rule. A
-  scenario's name pressed in the run list's tree is its fourth, through the
-  store `run-history-list-scenario-asked`. It reads which of the four called
-  from what triggered the call, because the summary store replays its last
-  batch and the list's store its last name. `generate_graph` takes both dropdowns
+  scenario. A scenario's name pressed in the run list's tree is its third
+  input, through the store `run-history-list-scenario-asked`, and selects
+  that scenario under the same rule. The note card's answers are a fourth,
+  through `run-history-note-go`, and the Follow switch is an input too. It
+  reads which input called from what triggered the call, because the summary
+  store replays its last batch and the list's store its last name. While the
+  scenario note has unsaved changes (its editor store and text box are
+  `State`) it moves nothing on its own: it writes a held run's scenario to
+  `run-history-note-waiting` and a pressed name to `run-history-note-held`
+  for the note card to ask about, and carries out the card's answer
+  (`note_request`). `generate_graph` takes both dropdowns
   as `Input`, so Dash holds it until that callback has answered and the chart
   is rebuilt once per batch.
   `?scenario=` and `?playlist_code=` reach the two dropdowns through the
@@ -559,16 +586,17 @@ flowchart LR
   read or the overlays. That function restyles
   traces selected by name: the size and color go to the run trace, and the
   size alone to the New PB stars and the latest run's ring.
-  The Scenario Stats card (Category, Last played and Number of runs) is built
+  The Scenario Stats card (Category and Number of runs, or "No scenario
+  selected") is built
   by `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
   `register_scenario_stats` wires that module's callbacks to the same ids.
   The PB card, with Position as its leaderboard line, is built the same way
   by `components/pb_card.py` from `PB_CARD_IDS`, wired by
   `register_pb_card`. The position's ids are the ones it had in the
   Scenario Stats card. The page builds what the two cards only read: the
-  summary store, the scenario dropdown, the playlist filter, the polling
-  interval, and the 30-second interval that keeps the relative times
-  current.
+  summary store, the scenario dropdown, the playlist filter, and, for the PB
+  card, the polling interval and the 30-second interval that keeps the
+  relative times current.
   The run list is `components/run_history_list.py`'s, and the page holds the
   two callbacks that decide when it is rebuilt. A session row counts every
   scenario's runs, and the summary store is not written for a run the page
@@ -579,13 +607,14 @@ flowchart LR
   the Score threshold percentage, the date store, and
   `run-history-session-in-progress` as `Input`s. It builds the rows of the
   view on screen from the run store, never from the batch, and writes them to
-  a store with the heading line and the text for nothing to list. A session
+  a store with the heading line, which is for screen readers only, and the
+  text for nothing to list. A session
   count's jump is answered by the list's own server callback,
   `jump_to_session`, registered by `register_run_list()`: it writes the view
   switch and All scenarios' count of loaded sessions, both plain outputs, so
   Dash holds `build_run_list_rows` until it has answered and the tree is
   built once. A scenario's name pressed in the tree reaches the selection
-  callback through `run-history-list-scenario-asked`, its fourth input. Dash holds a
+  callback through `run-history-list-scenario-asked`, its third input. Dash holds a
   callback back only for a writer that is already queued, which is why the
   two stores leave in one answer: `reach_scenario` is then queued for the
   summary when the list is queued for the run, and the list is built once
@@ -601,30 +630,27 @@ flowchart LR
   it.
   The latest-run card is `components/latest_run_card.py`'s, and the page holds
   the callback that writes it, `show_latest_run`. It takes the same store for
-  every batch, the scenario dropdown, the Score threshold percentage, and the
-  session store as `Input`s, so it runs on the page load and waits for the
-  selection as the list does. It works the card out from the run store and
-  writes when the run ended, in epoch seconds, to the card's
-  `run-history-card-played-at` store. A clientside callback
-  (`latest_run_card.AGE_SCRIPT`, which the PB card registers for its own
-  age too) words that as the run's age with the shared
+  every batch, the scenario dropdown, the Score threshold percentage, the
+  session store, and the date store as `Input`s, so it runs on the page load
+  and waits for the selection as the list does. The card reports the
+  selected scenario's latest run: `latest_run_from_store` copies the run
+  store once and works out from that copy both the card's run and the
+  newest run on any scenario. The callback writes when the card's run ended,
+  in epoch seconds, to the card's `run-history-card-played-at` store. A
+  clientside callback (`latest_run_card.AGE_SCRIPT`, which the PB card
+  registers for its own age too) words that as the run's age with the shared
   `relativeTime` and `absoluteTime`, on the store's change and on the
-  30-second tick, as Last played's does, and hides the first line's words
-  with no run. `show_latest_run` also writes `run-history-latest-run`, the
-  id of the store's newest run, only when that is another run than the one
-  held. The
+  30-second tick, and with no run hides the words that hold the age, so the
+  first line reads `Latest run` alone. `show_latest_run` also writes
+  `run-history-latest-run`, the id of the store's newest run on any
+  scenario, only when that is another run than the one held. The
   graph takes that store: `register_chart_options()` is called with
   `latest_run`, so the one callback that styles the figure also shows or
   hides the ring round the latest run. A figure rings its own scenario's
   newest run, and the ring shows while that is the store's newest run. A run
   on another scenario with Follow off rebuilds no chart, and that callback
   then answers with a patch of the ring's opacity alone, which leaves a zoom
-  as it was. The card's scenario button is in the layout from the start and
-  is hidden while it names no scenario, because the selection callback takes
-  it as an input. A clientside callback on the same button
-  (`_HAND_FOCUS_TO_SCENARIO_SCRIPT`) hands keyboard focus to the scenario
-  dropdown once a press from the keyboard has made the button go, which
-  would otherwise drop focus to the document.
+  as it was.
   With no runs to read it draws `stats_dir_hint` and the setup card's two
   caution states, and never the account offer, so it registers no Skip
   callback. It registers the two flushes of `components/queued_notices.py`
@@ -863,8 +889,9 @@ flowchart LR
   The selection callback runs `reach_scenario` for a link and for a followed
   run, and where either names a scenario the filter does not list it clears
   the filter. It takes the deep-link store, the page's run summary store,
-  and the latest-run card's scenario button as `Input`s, and the Follow
-  switch and both dropdowns as `State`, and it is the only writer of either
+  and the store a name pressed in the run list's tree is written to as
+  `Input`s, and the Follow switch and both dropdowns as `State`, and it is
+  the only writer of either
   dropdown's value. Both outputs are plain on purpose: Dash holds a
   dependent callback back for a plain output and not for an
   `allow_duplicate` one, and the scenario list must not be built for the
@@ -895,15 +922,15 @@ flowchart LR
   threshold line is drawn at, from the current personal best.
   `normalize_score_threshold_percentage()` reads the percentage input, which
   is empty while the user is clearing it.
-- `components/scenario_stats.py` — the Scenario Stats card: Category, Last
-  played and Number of runs. A page fills in a `ScenarioStatsIds`: an id for
-  each component the card builds, plus the page's own run-events store, scenario
-  dropdown, playlist filter, and 30-second interval, which the card only
-  reads. It puts
-  `scenario_stats_stores()` and `scenario_stats_panel()` in its layout and
-  calls `register_scenario_stats()` with the ids once, at import, which
-  registers `get_scenario_category`, `get_scenario_num_runs` and the clientside
-  callback that words the Last played text. Category reads the selected
+- `components/scenario_stats.py` — the Scenario Stats card: Category and
+  Number of runs, or "No scenario selected" with nothing selected. A page
+  fills in a `ScenarioStatsIds`: an id for each component the card builds,
+  plus the page's own run-events store, scenario dropdown, and playlist
+  filter, which the card only reads. It puts `scenario_stats_panel()` in its
+  layout and calls `register_scenario_stats()` with the ids once, at import,
+  which registers `get_scenario_category` and `get_scenario_num_runs`; the
+  second writes the count and which of its line and the no-selection line
+  shows, in one answer. Category reads the selected
   benchmark's group through the table's `playlist_scenario_groups` length
   guard. What the card shows is specified in
   [run_history.md](specs/run_history.md#scenario-stats).
@@ -990,7 +1017,14 @@ flowchart LR
   a row class rule on a run row, and by the list's script on a scenario
   row, a full-width row, whose class rules the grid does not work out again
   when its data changes. A session row under This scenario and a scenario row
-  carry `figures`, the median and best of the runs under them. Every value a
+  carry `figures`, the median and best of the runs under them, which the
+  script puts in the row's line ahead of its count. A scenario row's are
+  worded; a session row's are split at the decimal point, and This
+  scenario's model carries `columns`, the widest text of each part over
+  every session the view can list, which the script lines the session rows'
+  figures and counts up by. The first session row under This scenario also
+  carries `figures_below`, which keeps them on a second line under it. Every
+  value a
   row shows is formatted here, and every model names its view, the store's
   newest run, even with nothing to list, and the rows that run opens. That
   run's row
@@ -1013,24 +1047,49 @@ flowchart LR
   columns, and every string the script shows are set here, the strings
   through the grid's `context` and the rows.
 - `components/latest_run_card.py` — the Run History page's latest-run card.
-  `latest_run()` is one pure function from a copy of the run store to the
-  text the card shows for the store's newest run, on whatever scenario: when
-  it ended, which the page's script words as an age, its score, one badge,
-  its percentage of the PB it was chasing or a new PB's gain, and its number
-  and the time on its scenario in its session.
+  `latest_run()` is one pure function from a copy of the run store and the
+  selected scenario to the text the card shows for that scenario's latest
+  run, its last in the newest session that holds one: when it ended, which
+  the page's script words as an age, its score, one badge, its percentage of
+  the PB it was chasing or a new PB's gain, its number in its session, which
+  names an older session as the run list names its row, and the time on its
+  scenario there.
   It judges the run with `score_threshold.judge_run()` from what
   `run_marks.what_runs_chased()` works out, as the run list does, and prints
   the percentage with `shown_percentage()`. A run nothing
   judges is measured against a goal of 100 for its percentage alone. The time
   on the scenario is the sum of its visits in the session, and reads as
   unknown where a visit's first run has no usable start.
-  `latest_run_from_store()` copies the store once. A page fills in a
-  `LatestRunCardIds`, puts `latest_run_card()` in its layout, and writes
-  what `latest_run_card_content()` returns to it from a callback of its own.
-  `AGE_SCRIPT` is the clientside script that words a card's age, which the
-  page registers for this card and `pb_card.py` for its own.
-  The card's scenario button, its store, and the first line's words with the
-  age in them are built once, with the card, and never by that callback.
+  `latest_run_from_store()` copies the store once and returns the card's run
+  with the id of the newest run on any scenario, which the chart's ring and
+  the run list's highlight read. A page fills in a `LatestRunCardIds`, puts
+  `latest_run_card()` in its layout, and writes what
+  `latest_run_card_content()` returns to it from a callback of its own; with
+  no run, that function chooses one of the card's three empty states from
+  the selection and whether the store has runs. `AGE_SCRIPT` is the
+  clientside script that words a card's age, which the page registers for
+  this card and `pb_card.py` for its own. The card's store and the first
+  line's words with the age in them are built once, with the card, and never
+  by that callback.
+- `components/scenario_note_card.py` — the Run History page's scenario note
+  card, its editor, and the dialog that asks before unsaved text is left
+  behind. A page fills in a `NoteCardIds`, puts `scenario_note_card()` and
+  `scenario_note_dialog()` in its layout, passes `note_selection_ids()` to
+  the selection callback's registration, and calls
+  `register_scenario_note_card()` once. Every piece of the card is in the
+  layout from the start and only shown or hidden, so the text box is never
+  drawn again while it is typed into. `show_note` draws the card from the
+  `shown` store alone, which nothing but the controller writes, and
+  `save_from_editor` saves through `scenario_notes_service` and draws the
+  card again in the same answer, with duplicate outputs: the controller
+  takes the save's result, and as an input of the drawing callback the save
+  would close a loop. The controller itself, `scenario_notes.controller`,
+  runs in the browser (`assets/scenarioNotes.js`): it opens and closes the
+  editor, decides when a change of scenario asks, answers the dialog, and
+  fills in the dialog's question, the waiting line and the count from
+  templates this module owns. It writes the selection callback's request
+  with `set_props`, since a declared output would close a loop through the
+  scenario dropdown it takes as an input.
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -1155,6 +1214,18 @@ flowchart LR
   History filter, Journey picker, overview). The Run History
   filter adds one playlist to that list, the hidden one it holds, in
   `components/scenario_selection.py`.
+- `scenario_notes_service.py` — the scenario note store, a stamped file per
+  scenario under `data/scenario_notes/` (see State above). Run History's
+  note card (`components/scenario_note_card.py`) reads and saves through it.
+  `read_scenario_note` classifies one scenario's file into the four
+  store states, a supported one carrying a `ScenarioNote` (the text and its
+  `edited_at`, in UTC). `save_scenario_note` writes the note or, for empty
+  text, deletes it, under a module lock and after `_guard_note_destination`
+  reads the file on disk: a newer build's file refuses, and a broken one,
+  including one holding another scenario's note, is copied aside first.
+  Text equal to the note on disk writes nothing, so `edited_at` moves only
+  when the text changes. `validate_scenario_note_v1` is version 1's
+  definition, and `MAX_NOTE_CHARACTERS` its limit.
 - `evxl_snapshot.py` — the one read of `resources/evxl/benchmarks.json`,
   the Evxl benchmark snapshot that ships with the code
   (`evxl_entries_by_code`). Read once per process and keyed by case-folded
@@ -1303,9 +1374,12 @@ flowchart LR
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
   performs, with an optional `before_replace` hook the playlist, visibility,
-  and settings writers use for their destination point-checks),
+  settings, and scenario note writers use for their destination point-checks),
   `store_schema` (the `schema_version` marker, the four-state read machine, the
   per-store v1 validators, and `back_up_unusable_store()` — see State above),
+  `file_keys` (`safe_file_key()`, a readable prefix plus 8 hex digits of the
+  value's sha256, which names the cache's per-user files and each scenario
+  note's file, so a change to it orphans every saved note),
   `paths` (`state_dir()` / `package_root()` — see State above — plus
   `log_dir()`, the one construction of `data/logs`, because `app.py` writes
   there and the settings page displays it and pages cannot import `app`).
@@ -1389,6 +1463,19 @@ flowchart LR
   any new play — `confetti.reset()` clears particles but does not stop a loop.
   It resolves `window.confetti` at call time, so asset load order is not
   load-bearing.
+- `assets/scenarioNotes.js` — the Run History scenario note in the browser:
+  the controller (`window.dash_clientside.scenario_notes.controller`) that
+  opens and closes the editor, decides when a change of scenario asks, and
+  answers the dialog, a `fade` that marks a note cut off at the card's
+  bottom, and the guard. The guard listens on `window` in the capture
+  phase, before React's root listener and before Dash Pages, and while the
+  card's `data-unsaved` attribute says so it stops the run toast's link, a
+  link to another address in the app, and the `popstate` of the back and
+  forward buttons, and asks the card. It stamps each history entry's place
+  into its state, wrapping `history.pushState` and `replaceState`, so a
+  `popstate` says how far it moved and the guard can move back. It adds a
+  `beforeunload` listener only while there are unsaved changes. It holds no
+  copy: the card's module passes every string in its config store.
 - `assets/selectHighlightOnOpen.js` — keeps the selected name on screen when
   a searchable dropdown opens, highlighted so it can be copied, where dmc's
   `clearSearchOnFocus` would empty the field. It acts on any input carrying
@@ -1418,7 +1505,7 @@ flowchart LR
 | The Run History page: its layout, its ids, or what its chart plots | `pages/run_history.py` for the layout, the ids, and the page's callbacks; `components/run_history_chart.py` for the modes, the ranges, and which runs are plotted; `plot/plot_service.py` for the three figure builders; `assets/stylesheet.css` for the columns and the two stacking rules; the rules are in `docs/specs/run_history.md` |
 | The Home page: what it shows, or its stats line | `pages/home.py` for the layout, `stats_line`, and the Skip callback; the rules are in `docs/specs/home.md` |
 | The Run History page's run list: its rows, its two views, when it is rebuilt, or how a grid is made to read as a tree | `components/run_history_list.py` for the rows (`build_run_list`, `build_session_tree`), the grid, its options, and the jump (`jump_to_session`); `assets/runHistoryList.js` for what the browser does with them; `pages/run_history.py` for `build_run_list_rows` and `track_session_in_progress`; `components/run_marks.py` for the check and the star; `components/scenario_selection.py` (`reach_the_scenario_asked_for`) for a scenario's name pressed in the tree |
-| The Run History page's latest-run card, the ring on the latest point, or the highlighted row | `components/latest_run_card.py` for what the card shows (`latest_run`) and how it is drawn; `pages/run_history.py` for `show_latest_run` and the `run-history-latest-run` store; `components/chart_options.py` (`apply_graph_appearance_ringing_latest_run`) and `plot/plot_service.py` (`show_latest_run_ring`) for the ring; `components/run_history_list.py` (`rowClassRules`) for the row; `components/scenario_selection.py` (`reach_the_scenario_asked_for`) for the card's scenario button |
+| The Run History page's latest-run card, the ring on the latest point, or the highlighted row | `components/latest_run_card.py` for what the card shows (`latest_run`) and how it is drawn; `pages/run_history.py` for `show_latest_run` and the `run-history-latest-run` store; `components/chart_options.py` (`apply_graph_appearance_ringing_latest_run`) and `plot/plot_service.py` (`show_latest_run_ring`) for the ring; `components/run_history_list.py` (`rowClassRules`) for the row |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | What a session or a visit is, or how a run's start and length are read | `kovaaks/play_sessions.py` for the session limit and the three pure functions; `kovaaks/data_service.py` (`_run_start_and_length`) for the two fields; the rules are in `docs/specs/sessions.md` |
 | How a time-scored scenario is recognized, or the pace math | `kovaaks/performance_file.py` for the file reader and the countdown check; `kovaaks/time_scored_service.py` for which file decides and which scores are eligible; `kovaaks/pace.py` for the formulas; the rules are in `docs/specs/run_history.md` |

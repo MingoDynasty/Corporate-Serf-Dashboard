@@ -26,6 +26,7 @@ from source.kovaaks.api_models import (
 )
 from source.utilities import atomic_write
 from source.utilities.build_info import BuildInfo
+from source.utilities.file_keys import safe_file_key
 from source.utilities.paths import STATE_DIR_ENV_VAR
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
@@ -2122,7 +2123,7 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
 
     username = "Mingo Dynasty/Bad:Name"
-    safe_username = api_service._safe_cache_key(username)
+    safe_username = safe_file_key(username)
 
     assert safe_username.startswith("Mingo_Dynasty_Bad_Name-")
     assert re.fullmatch(r"Mingo_Dynasty_Bad_Name-[0-9a-f]{8}", safe_username)
@@ -2162,7 +2163,7 @@ def test_cache_keys_distinguish_usernames_that_sanitize_alike(monkeypatch):
 def test_cache_key_is_stable_across_calls(monkeypatch):
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
 
-    assert api_service._safe_cache_key("a.b") == api_service._safe_cache_key("a.b")
+    assert safe_file_key("a.b") == safe_file_key("a.b")
     assert api_service._rank_cache_file(98330, "a.b") == api_service._rank_cache_file(
         98330, "a.b"
     )

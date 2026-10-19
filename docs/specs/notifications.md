@@ -402,7 +402,9 @@ toasts under, and it applies to every toast the app adds from here on
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
   It writes neither dropdown: the page's one selection callback reads the
   summary and changes the scenario at most once per batch
-  ([2026-10-12](../decision_log/2026/2026-10-12-follow-and-a-scenario-link-clear-a-playlist-filter-that-does-not-list-the-scenario.md)).
+  ([2026-10-12](../decision_log/2026/2026-10-12-follow-and-a-scenario-link-clear-a-playlist-filter-that-does-not-list-the-scenario.md)),
+  or holds the run while a scenario note has unsaved changes
+  ([run_history.md](run_history.md#editing-a-note)).
   A control flip alone forwards nothing, because the controls are `State` and
   a Store replays its last value, and a remount does not replay a retained
   batch (`prevent_initial_call`).
@@ -463,6 +465,15 @@ toasts under, and it applies to every toast the app adds from here on
   `dmc.Anchor` would decode the address and cut a name holding `&` short,
   and an `html.A` would reload the app and lose the toast
   ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+- On Run History, while a scenario note has unsaved changes, the link is
+  stopped before the page is drawn again and asks in the note's dialog. Save
+  or Discard then selects the scenario in place, clearing a Playlist filter
+  that doesn't list it, and the address stays as it was. A link to the
+  edited scenario itself is stopped with no dialog, and the link does
+  nothing while the dialog is open. With no unsaved changes the link draws
+  the page again, as it does from any page
+  ([run_history.md](run_history.md#the-dialog),
+  [2026-10-18](../decision_log/2026/2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md)).
 - Tab reaches the link while the toast is up, and Enter follows it. The
   toast is an alert to assistive technology, as every Mantine toast is, and
   it is the one toast that holds a control. No screen reader was run on it.

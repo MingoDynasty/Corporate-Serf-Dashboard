@@ -21,7 +21,7 @@ view.
 import json
 import statistics
 from collections import Counter, defaultdict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import date, datetime
 from typing import Any, NamedTuple, TypedDict
 
@@ -66,11 +66,11 @@ from source.kovaaks.play_sessions import (
 from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.utilities.utilities import (
     format_elapsed_duration,
+    format_percent,
     format_score,
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
-    format_whole_percent,
 )
 
 # How many sessions each view loads at first, and how many more each press of
@@ -112,15 +112,21 @@ SESSION_LENGTH_HELP = (
 )
 ALL_SCENARIOS_HEADING = "All scenarios"
 ALL_SCENARIOS_GRID_NAME = "Runs of all scenarios, by session"
-# A scenario row's name is a button that selects the scenario. Its name is the
-# latest-run card's button's, and a press says what the dropdown now holds.
+# A scenario row's name is a button that selects the scenario, and a press says
+# what the dropdown now holds.
 SHOW_SCENARIO_LABEL = "Show {scenario}"
 SELECTED_SCENARIO_TEXT = "Selected scenario: {scenario}"
-# The second line of a row that stands for one scenario's runs, while Median
-# and best is on. Never worded as typical, usual, average, or normal: it
-# describes the runs under the row and compares nothing.
-MEDIAN_AND_BEST_TEXT = "Median {median} · Best {best}"
-ONE_SCORE_TEXT = "Score {score}"
+# The figures of a row that stands for one scenario's runs, while Median and
+# best is on: in the row's line ahead of its count, or under it on a row that
+# carries ``figures_below``. Never worded as typical, usual, average, or
+# normal: it describes the runs under the row and compares nothing. Under This
+# scenario the script draws a session row's words in columns, so it is handed
+# them alone.
+MEDIAN_LABEL = "Median"
+BEST_LABEL = "Best"
+SCORE_LABEL = "Score"
+MEDIAN_AND_BEST_TEXT = f"{MEDIAN_LABEL} {{median}} · {BEST_LABEL} {{best}}"
+ONE_SCORE_TEXT = f"{SCORE_LABEL} {{score}}"
 THRESHOLD_PASSED_TEXT = "Threshold passed"
 BELOW_THRESHOLD_TEXT = "Below threshold"
 NEW_PB_TEXT = "New PB"
@@ -139,6 +145,28 @@ UNJUDGED_TEXT = {
 }
 
 
+class FigureColumns(TypedDict):
+    """The widest text each part of This scenario's figure columns holds.
+
+    The script makes each part as wide as its text here, so the columns line
+    up across the session rows. Taken over every session the view can list,
+    loaded or not, so Show older sessions never moves a column.
+
+    ``median`` and ``best`` are each a whole number and its decimals, either
+    of them ``""`` where no session has one. Best's column also holds a
+    one-run session's score. ``count`` is the widest count of the rows whose
+    figures sit in their line, every row but the first, and ``None`` with no
+    such row. The first row's count is left out: it is in no column, and it
+    grows with every run played. ``one_run`` tells whether any session's
+    figures are one run's score, so Best's label has room for Score.
+    """
+
+    median: list[str]
+    best: list[str]
+    count: str | None
+    one_run: bool
+
+
 class RunListModel(TypedDict):
     """Everything the browser is sent to draw the list in one view.
 
@@ -150,8 +178,10 @@ class RunListModel(TypedDict):
     opened, so a row the player closed is not reopened by a later change of
     scenario or of view. ``session_limit`` is how many sessions this view's
     rows were loaded up to, which the script adds to when older ones are
-    asked for. ``empty`` is the text shown in place of the list when there is
-    nothing to list, and ``None`` otherwise.
+    asked for. ``columns`` is what the figure columns under This scenario are
+    sized by, and ``None`` in the other view or with nothing to list.
+    ``empty`` is the text shown in place of the list when there is nothing to
+    list, and ``None`` otherwise.
     """
 
     rows: list[dict[str, Any]]
@@ -159,6 +189,7 @@ class RunListModel(TypedDict):
     newest_run: str | None
     forced_open: list[str]
     session_limit: int
+    columns: FigureColumns | None
     heading: str
     grid_name: str
     empty: str | None
@@ -182,6 +213,7 @@ def empty_run_list(
         "newest_run": newest_run,
         "forced_open": [],
         "session_limit": SESSIONS_PER_LOAD,
+        "columns": None,
         "heading": "",
         "grid_name": "",
         "empty": text,
@@ -228,6 +260,64 @@ def _figures(runs: Iterable[RunData]) -> str | None:
     )
 
 
+def _split_score(score: float) -> list[str]:
+    """Split a score as it reads at its decimal point: ``["17,080", ".5"]``.
+
+    A score with no decimals has none to split off: ``["17,080", ""]``.
+    """
+    whole, point, decimals = format_score(score).partition(".")
+    return [whole, point + decimals]
+
+
+def _figure_parts(runs: Sequence[RunData]) -> dict[str, list[str]] | None:
+    """Split a session row's figures for its columns under This scenario, or ``None``.
+
+    Two or more runs give a ``median`` and a ``best``, and one run gives its
+    ``score``, which the list draws in Best's column under its own label. A
+    row with no run has no figures. The values are the ones ``_figures``
+    words, each split at its decimal point.
+    """
+    scores = [run.score for run in runs]
+    if not scores:
+        return None
+    if len(scores) == 1:
+        return {"score": _split_score(scores[0])}
+    return {
+        "median": _split_score(statistics.median(scores)),
+        "best": _split_score(max(scores)),
+    }
+
+
+def _widest(texts: Iterable[str]) -> str:
+    """Return the text that draws widest: the most characters, then the most digits.
+
+    A column's texts differ only in their digits, their separators, and a
+    count's plural s, and the list draws every digit one width, wider than
+    any of those. So the text this picks is the one the browser draws widest.
+    """
+    return max(
+        texts, key=lambda text: (len(text), sum(map(str.isdigit, text))), default=""
+    )
+
+
+def _figure_columns(
+    figures: Sequence[dict[str, list[str]] | None], counts: Sequence[str]
+) -> FigureColumns:
+    """Find the widest text of each part of the figure columns.
+
+    ``figures`` is every listed session's ``_figure_parts``, and ``counts``
+    the counts of the rows whose figures sit in their line.
+    """
+    medians = [parts["median"] for parts in figures if parts and "median" in parts]
+    bests = [parts.get("best") or parts["score"] for parts in figures if parts]
+    return {
+        "median": [_widest(m[0] for m in medians), _widest(m[1] for m in medians)],
+        "best": [_widest(b[0] for b in bests), _widest(b[1] for b in bests)],
+        "count": _widest(counts) if counts else None,
+        "one_run": any(parts and "score" in parts for parts in figures),
+    }
+
+
 # A run row's id is this and the run's id. The script finds the row of a
 # view's mark by it.
 RUN_ROW_ID_PREFIX = "r:"
@@ -252,7 +342,7 @@ def _run_row(
         "passed": mark.passed,
         "check_text": _check_text(mark),
         "new_pb": mark.is_new_pb,
-        "accuracy": format_whole_percent(run.accuracy),
+        "accuracy": format_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "sens": f"{run.horizontal_sens} {run.sens_scale}",
     }
@@ -369,19 +459,24 @@ def build_run_list(
     in_progress = find_play_session_in_progress(sessions, now) is not None
     today = now.date()
     # Each session with its place among all sessions, counting back from the
-    # newest, which its count's link loads All scenarios up to.
+    # newest, which its count's link loads All scenarios up to, and its runs
+    # of the scenario.
     listed = [
-        (place, session)
+        (place, session, played)
         for place, session in enumerate(reversed(sessions), start=1)
-        if session is newest_session
-        or any(run.scenario == scenario for run in session.runs)
+        if (played := [run for run in session.runs if run.scenario == scenario])
+        or session is newest_session
+    ]
+    figures = [_figure_parts(played) for _, _, played in listed]
+    counts = [
+        f"{len(played):,} of {_count(len(session.runs), 'run')}"
+        for _, session, played in listed
     ]
 
     rows: list[dict] = []
-    for place, session in listed[:session_limit]:
+    for index, (place, session, _) in enumerate(listed[:session_limit]):
         session_id = f"s:{run_id(session.runs[0])}"
         is_first_row = session is newest_session
-        played = [run for run in session.runs if run.scenario == scenario]
         rows.append(
             {
                 "id": session_id,
@@ -397,9 +492,14 @@ def build_run_list(
                     else None
                 ),
                 "length_help": is_first_row,
-                "counts": f"{len(played):,} of {_count(len(session.runs), 'run')}",
+                "counts": counts[index],
                 "place": place,
-                "figures": _figures(played),
+                "figures": figures[index],
+                # Only the first row gives its length, and while the session
+                # is played it says so: with the figures too, its line can
+                # run past a 500px list (by about 10px, measured 2026-10-18),
+                # so it keeps them on a line of their own.
+                "figures_below": is_first_row,
             }
         )
         rows.extend(
@@ -417,6 +517,8 @@ def build_run_list(
         "newest_run": newest_run,
         "forced_open": [rows[0]["id"]],
         "session_limit": session_limit,
+        # The first listed session is the first row, whose figures go below.
+        "columns": _figure_columns(figures, counts[1:]),
         "heading": f"{scenario} · {_count(scenario_run_count, 'run')}",
         "grid_name": f"Runs of {scenario}, by session",
         "empty": None,
@@ -582,6 +684,8 @@ def build_session_tree(
         "newest_run": newest_run,
         "forced_open": forced_open,
         "session_limit": session_limit,
+        # Its rows are different scenarios, so columns would compare nothing.
+        "columns": None,
         "heading": (
             f"{ALL_SCENARIOS_HEADING} · "
             f"{_count(sum(len(session.runs) for session in sessions), 'run')}"
@@ -699,9 +803,9 @@ RUN_LIST_MENU_COLUMNS = (
     MenuColumn("shots", "Shots Fired"),
     MenuColumn("sens", "Sensitivity"),
 )
-# The choice that is not a column: the second line of a row that stands for
-# one scenario's runs. Off to start, so the list looks as it did until
-# someone asks for more. The browser remembers it under its id.
+# The choice that is not a column: the median and best of the runs under a
+# row that stands for one scenario's runs. Off to start, so the list looks as
+# it did until someone asks for more. The browser remembers it under its id.
 MEDIAN_AND_BEST_CHOICE = MenuChoice("median_best", "Median and best")
 
 
@@ -764,7 +868,9 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             "headerName": "#",
             "cellClass": "run-list-number",
             "headerClass": "run-list-number",
-            **_fixed_width(56),
+            # Moves with the class's padding-left in the stylesheet: the
+            # number's room is what the two leave.
+            **_fixed_width(50),
         },
         {"field": "time", "headerName": "Time", **_fixed_width(66)},
         {"field": "score", "headerName": "Score", **_fixed_width(72)},
@@ -829,8 +935,10 @@ def run_list_class(model: RunListModel) -> str:
 def run_list_panel(ids: RunListIds) -> dmc.Box:
     """Build the list: its header, the grid, and the text for nothing to list.
 
-    The header is the heading line, and under it the switch between the two
-    views at the left, with Expand all and the Columns menu at the right.
+    The header is the switch between the two views at the left, with Expand
+    all and the Columns menu at the right. The heading line is in it too, in
+    its place before the switch, for a screen reader only: the latest-run
+    card above the list names its scenario on screen.
 
     The grid is given no rows. The page's callback writes them to
     ``ids.model``, and the script registered by ``register_run_list`` hands
@@ -844,11 +952,12 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
             dmc.Box(
                 className="run-history-list-header",
                 children=[
+                    # A line of text, and not an HTML heading, so a screen
+                    # reader hears what it heard while the line was on
+                    # screen.
                     dmc.Text(
                         id=ids.heading,
-                        className="run-history-list-heading",
-                        fw=600,
-                        truncate="end",
+                        className="run-history-list-heading visually-hidden",
                     ),
                     dmc.SegmentedControl(
                         data=LIST_VIEW_OPTIONS,
@@ -957,6 +1066,9 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                             "lengthHelp": SESSION_LENGTH_HELP,
                             "wholeSession": WHOLE_SESSION_HELP,
                             "newPb": NEW_PB_TEXT,
+                            "median": MEDIAN_LABEL,
+                            "best": BEST_LABEL,
+                            "score": SCORE_LABEL,
                         },
                     },
                 },

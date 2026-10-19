@@ -7,6 +7,9 @@ skipped and comments never reach the AST. Only ``source/`` is walked: a dash
 typed into a renderer under ``assets/`` is review territory. The three-period
 ellipsis is deliberately not gated, since clientside JavaScript spreads
 (``...navbar``) and a log line use it legitimately.
+
+No string is allowed one. The last that was, Last played's empty value in the
+Scenario Stats card, left with the row.
 """
 
 import ast
@@ -14,12 +17,10 @@ from pathlib import Path
 
 SOURCE_ROOT = Path(__file__).resolve().parent.parent / "source"
 EM_DASH = "—"
-
-# (module, enclosing function, whole string). The one ratified em dash is the
-# empty value under Last played when no scenario is selected.
-ALLOWED_EM_DASHES = {
-    ("source/components/scenario_stats.py", "get_scenario_num_runs", EM_DASH),
-}
+# The separator copy rule 2 chains readout fragments with, in place of the em
+# dash. The walk finding it in real source is what proves the walk reads
+# real source, now that it finds no em dash there.
+MIDDLE_DOT = " · "
 
 
 def _docstring_ids(tree: ast.AST) -> set[int]:
@@ -39,8 +40,8 @@ def _docstring_ids(tree: ast.AST) -> set[int]:
     return docstrings
 
 
-def em_dash_strings(source: str) -> list[tuple[str, str]]:
-    """List ``(enclosing function, string)`` for each non-docstring em dash."""
+def strings_with(source: str, glyph: str) -> list[tuple[str, str]]:
+    """List ``(enclosing function, string)`` for each non-docstring holding ``glyph``."""
     tree = ast.parse(source)
     docstrings = _docstring_ids(tree)
     found: list[tuple[str, str]] = []
@@ -54,7 +55,7 @@ def em_dash_strings(source: str) -> list[tuple[str, str]]:
                 isinstance(child, ast.Constant)
                 and isinstance(child.value, str)
                 and id(child) not in docstrings
-                and EM_DASH in child.value
+                and glyph in child.value
             ):
                 found.append((function, child.value))
             visit(child, function)
@@ -63,22 +64,30 @@ def em_dash_strings(source: str) -> list[tuple[str, str]]:
     return found
 
 
-def _source_em_dashes() -> set[tuple[str, str, str]]:
+def _source_strings_with(glyph: str) -> set[tuple[str, str, str]]:
     return {
         (path.relative_to(SOURCE_ROOT.parent).as_posix(), function, value)
         for path in sorted(SOURCE_ROOT.rglob("*.py"))
-        for function, value in em_dash_strings(path.read_text(encoding="utf-8"))
+        for function, value in strings_with(path.read_text(encoding="utf-8"), glyph)
     }
 
 
-def test_source_strings_carry_no_em_dash_outside_the_allowlist():
-    assert sorted(_source_em_dashes() - ALLOWED_EM_DASHES) == []
+def test_source_strings_carry_no_em_dash():
+    assert sorted(_source_strings_with(EM_DASH)) == []
 
 
-def test_the_allowlisted_glyph_is_still_found():
-    # Proves the walk sees real source: a walk that skipped too much would
-    # pass the guard above vacuously.
-    assert ALLOWED_EM_DASHES <= _source_em_dashes()
+def test_the_walk_reads_real_source():
+    """A walk that read none of ``source/`` would pass the guard above vacuously.
+
+    The same walk, over the same files, finds the middle dot the latest-run
+    card's first line is chained with, inline in its layout, and one in an
+    f-string's literal part.
+    """
+    module = "source/components/latest_run_card.py"
+    found = _source_strings_with(MIDDLE_DOT)
+
+    assert (module, "latest_run_card", MIDDLE_DOT) in found
+    assert (module, "latest_run", MIDDLE_DOT) in found
 
 
 def test_the_walk_reads_fstring_parts_and_skips_docstrings():
@@ -96,7 +105,7 @@ class Holder:
 
     label = "plain — constant"
 '''
-    assert em_dash_strings(source) == [
+    assert strings_with(source, EM_DASH) == [
         ("build", " — points"),
         ("<module>", "plain — constant"),
     ]

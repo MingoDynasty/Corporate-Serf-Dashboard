@@ -84,7 +84,7 @@ from source.utilities.notifications import (
     channel_toast,
     toast,
 )
-from source.utilities.utilities import format_score, format_whole_percent
+from source.utilities.utilities import format_percent, format_score
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,8 @@ NEXT_RANK_CLASS = f"{RESULT_CLASS} pb-card-next-rank"
 RANK_DOT_CLASS = "pb-card-rank-dot"
 THRESHOLD_CLASS = "pb-card-threshold"
 FADED_CLASS = "pb-card-faded"
-# The score with a hover, with the affordance Last played's has.
+# The score with a hover, with the affordance the playlist tables' Last played
+# has.
 SCORE_HOVER_CLASS = f"{SCORE_CLASS} {TIME_CLASS}"
 LEADERBOARD_CLASS = f"{RESULT_CLASS} pb-card-leaderboard"
 FLEX_TARGET_CLASS = "pb-card-flex-target"
@@ -190,11 +191,10 @@ def _faded_line(run: RunData) -> str:
     """Word the PB run's sensitivity and its hit accuracy.
 
     The sensitivity is the scenario table's PB cm/360, formatted as that
-    column formats it. The accuracy is the hit accuracy, as the latest-run
-    card and the run list show a run's, which can differ from the table's PB
-    Accuracy: that column prefers the damage accuracy.
+    column formats it. The accuracy is the hit accuracy, as the table's PB
+    Accuracy, the latest-run card and the run list show a run's.
     """
-    accuracy = f"Accuracy {format_whole_percent(run.accuracy)}"
+    accuracy = f"Accuracy {format_percent(run.accuracy)}"
     cm360 = personal_best_cm360(run)
     if cm360 is None:
         return accuracy
@@ -298,8 +298,9 @@ def personal_best_from_store(
         return None
     ladder = _ladder(playlist_code, selected_scenario)
     pace_basis = None
-    # As the benchmark table does: only a scenario with a ladder shows a gap,
-    # so only then is a performance file read.
+    # The gap's pace basis, read as the table reads it: only a scenario with
+    # a ladder shows a gap. The hover's version basis is read either way, by
+    # ``what_runs_chased``, as the latest-run card reads it.
     if ladder:
         try:
             pace_basis = get_pace_basis(selected_scenario)
