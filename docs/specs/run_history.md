@@ -234,8 +234,6 @@ times that name or order runs remain absolute ([T4][card-order]).
   on two lines in a narrow card, over the third and fourth. So nothing that
   changes between runs changes its height, and the page doesn't jump. Its
   lines are centered in that height ([2026-10-18][follows]).
-  With a benchmark selected, its score sits 2px below the PB card's
-  ([2026-10-18][follows]).
 - With no run to report, the card's first line reads `Latest run` alone, and
   the selection decides first, as on the PB card
   ([2026-10-18][follows]):

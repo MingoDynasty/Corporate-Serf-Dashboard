@@ -68,9 +68,13 @@ the PB card's 3,653. Under this rule it shows Viscose's own latest run, 3,133,
 - The time spent on the scenario takes a line of its own in every form:
   `{duration} on this scenario`, or `Time on this scenario unknown`. The
   maintainer could go either way, and the author chose it because, with a
-  benchmark selected, it lines the card's score up with the PB card's: 2 px
-  apart, where one line left 12. With no benchmark the PB card has one line
-  fewer, and the run's score sits 8.5 px above the PB's. One line also fit:
+  benchmark selected and the PB card's leaderboard line on one line, it lines
+  the card's score up with the PB card's: 2 px apart, where one line left 12.
+  With no benchmark the PB card has one line fewer, and the run's score sits
+  8.5 px above the PB's. Both cards center their own lines, so the offset
+  follows the PB card's state and is not a rule the app holds: with no
+  KovaaK's username the leaderboard line's hint takes two lines, and the run's
+  score sits 24 px below the PB's. One line also fit:
   the longest real line, 70 characters, took 373 of 474 px.
 - `{n}` is still the run's number among the scenario's runs in that session,
   and the time still the sum of the scenario's visits in it.
