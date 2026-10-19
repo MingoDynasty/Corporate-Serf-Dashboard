@@ -677,7 +677,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 ### Both views
 
 - A session row and a scenario row open and close on a click, with no request
-  to the server. On arrival the first session is open, and under All
+  to the server. Each starts with a gray chevron, the app's own icon at 16px,
+  that points right while the row is closed and down while it is open
+  ([2026-10-18][figure-columns]). On arrival the first session is open, and under All
   scenarios so is the scenario row of the last run played, unless the tree
   first arrives for a session's count, when only what its jump opens is
   open ([2026-10-14][count-link]). Each view keeps its own open rows, and
@@ -694,18 +696,30 @@ The card's lines, local-record scope and leaderboard presentation follow
   best" checkbox, off to start. The browser remembers each
   ([2026-10-14][median-best]).
 - With "Median and best" on, a scenario row under All scenarios and a session
-  row under This scenario show `Median {median} · Best {best}` over the runs
-  under the row, or `Score {score}` over one run, and nothing over none. The
-  median is the middle score, or the mean of the two middle scores. Both count
-  every run under the row at any sensitivity, are formatted as a score is, and
-  show whether the row is open or closed. A session row under All scenarios
-  has none. Turning the checkbox on or off makes no request
-  ([2026-10-14][median-best]).
-- The figures sit in the row's own line, just before its count, as `Median
-  {median} · Best {best} · 4 runs`. The first row under This scenario, which
-  gives the session's length and says In progress, keeps them on a second line
-  under it, and is the one row that grows when the checkbox turns on
-  ([2026-10-18][figures-line]).
+  row under This scenario show the median and best of the runs under the row,
+  `Median {median}` and `Best {best}`, or `Score {score}` over one run, and
+  nothing over none. The median is the middle score, or the mean of the two
+  middle scores. Both count every run under the row at any sensitivity, are
+  formatted as a score is, and show whether the row is open or closed. A
+  session row under All scenarios has none. Turning the checkbox on or off
+  makes no request ([2026-10-14][median-best]).
+- The figures sit in the row's own line, just before its count. The first
+  row under This scenario, which gives the session's length and says In
+  progress, keeps them on a second line under it, and is the one row that
+  grows when the checkbox turns on ([2026-10-18][figures-line]).
+- A scenario row reads `Median {median} · Best {best} · 4 runs`, or `Score
+  {score} · 1 run` ([2026-10-18][figures-line]).
+- Under This scenario, a session row's Median, Best, and count line up in
+  columns down the list, 16px apart with no dot between them. Each label is
+  on every row, right-aligned
+  against its value. Every value lines up on its decimal point: whole numbers
+  end at one place, and decimals stick out to the right. A one-run session
+  reads `Score {score}` in Best's column, with Median's column blank and
+  silent to a screen reader. The first row's second line ends short by the
+  count's column, so its Median and Best sit over the rows below, or at the
+  row's edge with no row below. Each column is as wide as its widest value
+  in any session of the scenario, loaded or not, so Show older sessions
+  never moves a column ([2026-10-18][figure-columns]).
 - Each view loads 30 sessions and counts its own. A "Show older sessions"
   button at the end adds 30 to the view it is pressed in. A change of
   scenario keeps both counts, and a reload starts both from 30
@@ -1122,6 +1136,7 @@ The card's lines, local-record scope and leaderboard presentation follow
 [count-link]: ../decision_log/2026/2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
 [figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
+[figure-columns]: ../decision_log/2026/2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md
 [threads]: ../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md
 [rank-history]: ../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md

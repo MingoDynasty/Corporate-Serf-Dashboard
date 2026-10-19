@@ -1,6 +1,10 @@
 # 2026-10-18: Median And Best Sit In The Row's Own Line, Ahead Of Its Count
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-10-18 columns entry](2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md):
+under This scenario, a session row's median, best, and count sit in columns
+with no dot between them, and a one-run row's score sits in Best's column.
+The line's placement, the first row's second line, and All scenarios stand.
 
 With Median and best on, a row's median and best now sit in the row's own
 line, just before its run count, instead of on a second line under it. That
