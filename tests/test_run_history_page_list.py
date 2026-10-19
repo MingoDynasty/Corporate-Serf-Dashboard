@@ -336,6 +336,23 @@ def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
     assert marks_room >= marks["minWidth"]
 
 
+def test_the_run_numbers_room_moves_with_its_indent():
+    """The # column's width and its padding move together.
+
+    The number's room is what the two leave, less a cell's 4px on the right:
+    22px, as it was at 56px and 30px.
+    """
+    (number,) = [c for c in _grid().columnDefs if c.get("field") == "n"]
+    css = STYLESHEET.read_text(encoding="utf-8")
+    indent = re.search(
+        r"padding-left: (\d+)px;",
+        _css_block(css, ".run-history-list-grid .run-list-number"),
+    )
+
+    assert indent
+    assert number["width"] - int(indent.group(1)) - 4 == 22
+
+
 def test_each_column_shows_a_field_the_rows_carry():
     fields = {column["field"] for column in _grid().columnDefs if "field" in column}
 
