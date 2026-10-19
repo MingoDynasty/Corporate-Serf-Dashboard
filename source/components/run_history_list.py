@@ -293,7 +293,7 @@ def _widest(texts: Iterable[str]) -> str:
 
     A column's texts differ only in their digits, their separators, and a
     count's plural s, and the list draws every digit one width, wider than
-    any of those. So the browser would draw these the same way round.
+    any of those. So the text this picks is the one the browser draws widest.
     """
     return max(
         texts, key=lambda text: (len(text), sum(map(str.isdigit, text))), default=""
@@ -474,7 +474,7 @@ def build_run_list(
     ]
 
     rows: list[dict] = []
-    for index, (place, session, played) in enumerate(listed[:session_limit]):
+    for index, (place, session, _) in enumerate(listed[:session_limit]):
         session_id = f"s:{run_id(session.runs[0])}"
         is_first_row = session is newest_session
         rows.append(
