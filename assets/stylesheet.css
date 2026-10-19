@@ -944,8 +944,9 @@ a.run-toast-link:hover {
     white-space: nowrap;
 }
 
-/* 14 by 16px, so no row grows and nothing beside it moves. The chevron is
-   2px wider and overflows it evenly: the icon's box is twice its ink. */
+/* 14 by 16px, so no row grows and nothing beside it moves. The chevron's
+   box is 2px wider and overflows it evenly, which draws nothing outside:
+   its ink is half its box. */
 .run-list-toggle {
     align-items: center;
     background: none;
