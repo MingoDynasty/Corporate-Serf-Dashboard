@@ -890,11 +890,36 @@ def test_a_rows_height_follows_median_and_best_and_the_pinned_row_is_measured_to
     setting = script[script.index("state.setFigures = function") :]
 
     assert (
-        "return state.figures && data.figures ? height + SECOND_LINE_HEIGHT : height;"
-        in script
-    )
+        "return state.figures && data.figures && data.figures_below\n"
+        "      ? height + SECOND_LINE_HEIGHT\n"
+        "      : height;"
+    ) in script
     assert "api.resetRowHeights();" in setting
     assert "api.updateGridOptions({ pinnedTopRowData: [pinned.data] });" in setting
+
+
+def test_a_rows_figures_go_ahead_of_its_count_unless_they_go_below():
+    """``Median … · Best … · 7 runs``: the count stays at the right edge."""
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    grouping = script[script.index("function groupRow(") :]
+    grouping = grouping[: grouping.index("\n  }\n")]
+    scenario = script[script.index("function scenarioRow(") :]
+    scenario = scenario[: scenario.index("\n  }\n")]
+    session = script[script.index("function sessionRow(") :]
+    session = session[: session.index("\n  }\n")]
+
+    assert (
+        "return state.figures && data.figures && !data.figures_below"
+        ' ? [data.figures, " · "] : [];'
+    ) in script
+    assert "var below = state.figures && data.figures && data.figures_below;" in (
+        grouping
+    )
+    assert 'below ? h("div", { className: "run-list-figures" }, data.figures)' in (
+        grouping
+    )
+    assert ".concat(figuresInLine(data), [\n            data.counts," in scenario
+    assert ".concat(figuresInLine(data), [counts])" in session
 
 
 def test_a_key_that_opens_or_closes_a_row_is_said_through_the_live_region():
@@ -1192,6 +1217,23 @@ def test_the_switch_sits_at_the_left_and_the_buttons_at_the_right():
         css, ".run-history-list-header"
     )
     assert "margin-left: auto;" in _css_block(css, ".run-history-list-actions")
+
+
+def test_no_text_in_the_list_is_under_12px():
+    """The list's smallest text was 11px, which read too small (2026-10-18).
+
+    A size of 0 is the part end's space, which is meant to take no room.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    sizes = {
+        selector.strip(): int(size)
+        for selector, body in re.findall(r"(?ms)^([^{}@/]+?) \{(.*?)^\}", css)
+        if "run-list" in selector or "run-history-list" in selector
+        for size in re.findall(r"font-size: (\d+)px;", body)
+    }
+
+    assert sizes
+    assert {s: px for s, px in sizes.items() if 0 < px < 12} == {}
 
 
 def test_a_scenarios_name_gives_before_its_count():

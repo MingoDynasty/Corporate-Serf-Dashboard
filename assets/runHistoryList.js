@@ -36,9 +36,9 @@
 //      lands would otherwise leave a keyboard user on a different run, and a
 //      press on a scenario's name, which rebuilds the rows, on the row's
 //      first button.
-//  10. A row's height follows the Median and best checkbox. The grid
-//      measures the body's rows again when asked, and the pinned row only
-//      when its rows are handed in again.
+//  10. The height of a row whose figures go on a line of their own follows
+//      the Median and best checkbox. The grid measures the body's rows again
+//      when asked, and the pinned row only when its rows are handed in again.
 (function () {
   var dagfuncs = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
   var dagcomponentfuncs = (window.dashAgGridComponentFunctions =
@@ -60,7 +60,8 @@
     note: 26,
     more: 44,
   };
-  // What a row's second line adds, while Median and best is on.
+  // What a row's second line adds, while Median and best is on, on a row
+  // whose figures go below.
   var SECOND_LINE_HEIGHT = 16;
 
   var state = (window.runHistoryList = {
@@ -203,11 +204,14 @@
     return open.has(data.sid) && (data.vid == null || open.has(data.vid));
   };
   // The figures are on a row whether it is open or closed, so a row's height
-  // follows the checkbox and never a click.
+  // follows the checkbox and never a click. Only a row that keeps them on a
+  // line of their own grows.
   dagfuncs.runListRowHeight = function (params) {
     var data = params.data;
     var height = ROW_HEIGHTS[data.kind] || ROW_HEIGHTS.run;
-    return state.figures && data.figures ? height + SECOND_LINE_HEIGHT : height;
+    return state.figures && data.figures && data.figures_below
+      ? height + SECOND_LINE_HEIGHT
+      : height;
   };
   dagfuncs.runListRowClass = function (params) {
     return "run-list-row-" + params.data.kind;
@@ -346,15 +350,22 @@
     return h("span", { className: "run-list-part-end" }, " ");
   }
 
-  // A group row: its first line, and under it the row's figures while Median
-  // and best is on. The figures line is told from the first by its own
-  // part end, for the reason partEnd gives.
-  function groupRow(props, className, toggle, line, figures) {
-    var shown = state.figures && figures;
+  // A group row: its line, and under it the row's figures while Median and
+  // best is on, on a row whose figures go below. The figures line is told
+  // from the first by its own part end, for the reason partEnd gives.
+  function groupRow(props, className, toggle, line) {
+    var data = props.data;
+    var below = state.figures && data.figures && data.figures_below;
     return wideCell(props, "run-list-group " + className, { onClick: toggle }, [
-      h.apply(null, ["div", { className: "run-list-line" }].concat(line, shown ? [partEnd()] : [])),
-      shown ? h("div", { className: "run-list-figures" }, figures) : null,
+      h.apply(null, ["div", { className: "run-list-line" }].concat(line, below ? [partEnd()] : [])),
+      below ? h("div", { className: "run-list-figures" }, data.figures) : null,
     ]);
+  }
+
+  // The figures in a row's own line, ahead of its count, while Median and
+  // best is on: the count stays at the right edge either way.
+  function figuresInLine(data) {
+    return state.figures && data.figures && !data.figures_below ? [data.figures, " · "] : [];
   }
 
   function toggleButton(label, open, toggle) {
@@ -436,15 +447,15 @@
             data.name
           )
         ),
-        h(
-          "span",
-          { className: "run-list-group-facts" },
-          data.counts,
-          data.new_pb ? " " : null,
-          data.new_pb ? star(labels) : null
+        h.apply(
+          null,
+          ["span", { className: "run-list-group-facts" }].concat(figuresInLine(data), [
+            data.counts,
+            data.new_pb ? " " : null,
+            data.new_pb ? star(labels) : null,
+          ])
         ),
-      ],
-      data.figures
+      ]
     );
   }
 
@@ -472,14 +483,16 @@
       data.in_progress
         ? h("span", { className: "run-list-in-progress" }, labels.inProgress, partEnd())
         : null,
-      h(
-        "span",
-        { className: "run-list-group-facts" },
-        data.length
-          ? h("span", { title: data.length_help ? labels.lengthHelp : undefined }, data.length)
-          : null,
-        data.length ? " · " : null,
-        counts
+      h.apply(
+        null,
+        [
+          "span",
+          { className: "run-list-group-facts" },
+          data.length
+            ? h("span", { title: data.length_help ? labels.lengthHelp : undefined }, data.length)
+            : null,
+          data.length ? " · " : null,
+        ].concat(figuresInLine(data), [counts])
       ),
     ];
     var kids = state.children[data.id] || [];
@@ -501,7 +514,7 @@
         )
       );
     }
-    return groupRow(props, "run-list-session", toggle, line, data.figures);
+    return groupRow(props, "run-list-session", toggle, line);
   }
 
   dagcomponentfuncs.RunListWideRow = function (props) {

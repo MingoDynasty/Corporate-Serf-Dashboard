@@ -670,13 +670,18 @@ The card's lines, local-record scope and leaderboard presentation follow
   best" checkbox, off to start. The browser remembers each
   ([2026-10-14][median-best]).
 - With "Median and best" on, a scenario row under All scenarios and a session
-  row under This scenario gain a second line, `Median {median} · Best
-  {best}`, over the runs under the row, or `Score {score}` over one run, and
-  no line over none. The median is the middle score, or the mean of the two
-  middle scores. Both count every run under the row at any sensitivity, are
-  formatted as a score is, and show whether the row is open or closed. A
-  session row under All scenarios has no second line. Turning the checkbox on
-  or off makes no request ([2026-10-14][median-best]).
+  row under This scenario show `Median {median} · Best {best}` over the runs
+  under the row, or `Score {score}` over one run, and nothing over none. The
+  median is the middle score, or the mean of the two middle scores. Both count
+  every run under the row at any sensitivity, are formatted as a score is, and
+  show whether the row is open or closed. A session row under All scenarios
+  has none. Turning the checkbox on or off makes no request
+  ([2026-10-14][median-best]).
+- The figures sit in the row's own line, just before its count, as `Median
+  {median} · Best {best} · 4 runs`. The first row under This scenario, which
+  gives the session's length and says In progress, keeps them on a second line
+  under it, and is the one row that grows when the checkbox turns on
+  ([2026-10-18][figures-line]).
 - Each view loads 30 sessions and counts its own. A "Show older sessions"
   button at the end adds 30 to the view it is pressed in. A change of
   scenario keeps both counts, and a reload starts both from 30
@@ -1096,6 +1101,7 @@ The card's lines, local-record scope and leaderboard presentation follow
 [all-scenarios]: ../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md
 [count-link]: ../decision_log/2026/2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
+[figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
 [last-played]: ../decision_log/2026/2026-06-21-relative-humanized-last-played-timestamps.md
 [empty-states]: ../decision_log/2026/2026-06-30-model-home-last-played-empty-states-explicitly.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md

@@ -944,6 +944,16 @@ def test_only_the_first_row_takes_the_lengths_hover():
     assert (first["length_help"], older["length_help"]) == (True, False)
 
 
+def test_only_the_first_row_keeps_its_figures_below_its_line():
+    """It alone gives its length and In progress, which leave the figures no room."""
+    day = timedelta(days=1)
+    runs = [*_minutes(0, start=EVENING - day), *_minutes(0, 2)]
+
+    first, older = _of_kind(_build(runs), "session")
+
+    assert (first["figures_below"], older["figures_below"]) == (True, False)
+
+
 FIGURES_CASES = [
     ((3324.0,), "Score 3,324"),
     ((3324.0, 3422.0), "Median 3,373 · Best 3,422"),
@@ -1187,6 +1197,16 @@ def test_a_scenario_rows_figures_count_its_own_visit_alone():
     figures = [row["figures"] for row in _of_kind(_tree(runs), "scenario")]
 
     assert figures == ["Score 300", "Score 100", "Median 15 · Best 20"]
+
+
+def test_a_scenario_row_keeps_its_figures_in_its_line():
+    """The newest visit's row too: the newest session's length is on its session row."""
+    runs = [*_minutes(0, start=EVENING - timedelta(days=1)), *_minutes(0), *_minutes(2)]
+
+    scenario_rows = _of_kind(_tree(runs), "scenario")
+
+    assert scenario_rows
+    assert not any(row.get("figures_below") for row in scenario_rows)
 
 
 def test_the_selected_scenarios_rows_carry_the_band_and_no_other_rows_do():
