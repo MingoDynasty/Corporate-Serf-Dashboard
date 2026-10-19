@@ -120,8 +120,9 @@ technique, and Run History shows it between Scenario Stats and the PB card
 whenever the scenario is selected, with how long ago you last edited it.
 Click **Add a scenario note**, or **Edit** on a note, type, and click
 **Save**. **Cancel** puts the saved text back, and Ctrl+Z undoes while you
-type. Saving the note empty deletes it. A note holds up to 2,000 characters,
-and a long one fades at the bottom of the card: **Edit** shows all of it.
+type. Saving the note empty deletes it. A note holds up to 2,000 characters.
+One longer than the card scrolls inside it, with a scrollbar at its right
+edge, and its bottom line fades until you reach the end.
 Escape does nothing in the text box, so a stray press can't lose your text.
 
 While a note has changes you haven't saved:

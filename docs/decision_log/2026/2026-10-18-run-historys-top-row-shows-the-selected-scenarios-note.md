@@ -1,6 +1,11 @@
 # 2026-10-18: Run History's Top Row Shows The Selected Scenario's Note
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-10-19 long-note entry](2026-10-19-a-long-scenario-note-scrolls-in-its-card.md):
+a note taller than the card scrolls inside it, with a scrollbar Mantine draws,
+and its bottom line fades only while more is below, so **Edit** is no longer
+the only way to read it. The box rule, and the reasons against Show more,
+stand.
 
 Run History's top row now holds the selected scenario's note, in the room
 kept for it between Scenario Stats and the PB card, so a reminder is read
