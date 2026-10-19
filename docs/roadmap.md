@@ -92,14 +92,15 @@ What we plan to do now or very soon, each with the reasons it comes next.
 
 - **Typical score** — what a player's recent runs on a scenario usually
   score, defined once for every later judgment of skill. Its
-  [proposal](./proposals/typical_score_proposal.md), in review with its
-  definition ruled, recommends the median of a scenario's last 20 runs from the
-  30 days up to each run, known once those runs number 10 from two sessions
-  or fill all 20. Run History's chart would draw it after every run, as a
-  gray line with the middle half of the runs shaded around it, and Scenario
-  Stats would show it. Three implementation PRs build it: the definition,
-  the chart, and the Scenario Stats line. Showing it in the top row's PB
-  card, beside the PB, is a later change that neither proposal makes.
+  [proposal](./proposals/typical_score_proposal.md), in review, recommends
+  the median of a scenario's last 20 runs at any age, known once those runs
+  number 10 from two sessions or fill all 20, and drawn at full strength only
+  where enough of them are from the last 30 days. Run History's chart would
+  draw it after every run, as a gray line inside bands for the middle half
+  and the middle 80% of the runs, and Scenario Stats would lead with it.
+  Three implementation PRs build it: the definition, the chart, and the
+  Scenario Stats lead. Showing it in the top row's PB card, beside the PB, is
+  a later change that neither proposal makes.
 
   Why it's next:
   - The guiding principles judge skill by the typical run, and no page shows

@@ -7,29 +7,39 @@ Date: 2026-10-15
 
 The app's stated direction is to judge skill by what a player's recent runs
 usually score, but it has never defined that figure, so no page shows it and
-the Run History chart draws no line for it. This proposal defines the
-typical score as the median of a scenario's last 20 runs from the 30 days up to
-each run, known once those runs number 10 from two sessions or fill all 20, and
-carried forward with an "as of" date when later runs fall short. The chart
-draws it after every run as a gray line with the middle half of the runs
-shaded around it, faded where it is only "as of", with a lighter band for the
-middle 80% behind a Chart options switch. Scenario Stats shows the figure after
-the scenario's newest run, dated when it is old.
+the Run History chart draws no line for it. This proposal defines the typical
+score as the median of a scenario's last 20 runs, whatever their age, drawn at
+full strength where enough of those runs are recent and faded where they are
+not. The chart draws it after every run as a gray line inside two bands, the
+middle half and the middle 80% of the runs, and each of the three has a switch
+of its own. Scenario Stats leads with the figure as its large number, dimmed
+when it isn't recent.
 
 ## Decisions needed
 
-Five rows, TS1 to TS5. **TS1, TS3, TS4 and TS5 are ruled; TS2 is open.** Each
-row began as the maintainer's lean or agreement from the design discussion of
-2026-10-14 and 2026-10-15, worked out over five measurements and six versions
-of a live prototype on their own stats, and each quotes what they said. A
-lean is not a ruling: reviewers are invited to challenge any row, and any author-owned
-choice in [Design](#design). **TS2 is the row the maintainer asked to be
-scrutinized hardest**, and it gives the alternative its strongest case. The
-first review wave endorsed TS2 to TS5 and contested one point of TS1, whether
-runs of different versions of a scenario count together. The maintainer ruled
-TS1 on 2026-10-15, as recommended: every version counts, the assumption
-stated. On 2026-10-18 they ratified TS3, TS4 and TS5 as recommended, and left
-TS2 open.
+Eight rows, TS1 to TS8. **TS1, TS3, TS4 and TS5 are ruled. TS2 is pivoted
+to TS6, and TS6, TS7 and TS8 are proposed and open.** Each row began as the
+maintainer's lean or agreement from the design discussion of 2026-10-14 to
+2026-10-19, worked out over measurements and eight versions of a live
+prototype on their own stats, and each quotes what they said. A lean is not a
+ruling: reviewers are invited to challenge any row, and any author-owned
+choice in [Design](#design). The first review wave endorsed TS2 to TS5 and
+contested one point of TS1, whether runs of different versions of a scenario
+count together. The maintainer ruled TS1 on 2026-10-15, as recommended: every
+version counts, the assumption stated. On 2026-10-18 they ratified TS3, TS4
+and TS5 as recommended, and left TS2 open.
+
+**What changed on 2026-10-19.** Working through TS2 on prototypes v7 and v8,
+the maintainer leaned toward an option neither review wave saw: no limit's
+line, faded where its runs aren't recent. TS6 carries it. Two more leans
+followed from it, and they change ruled rows: a switch each for the line and
+both bands, all on (TS7, which would amend TS4), and Scenario Stats led by the
+typical score (TS8, which would amend TS5). TS6 also amends TS1: the 30 days
+leave the value and decide only how it is drawn. **Each ruled row stands as
+ruled until the maintainer rules on the row that would amend it.** The three
+are pivots of TS2, TS4 and TS5 and ask no new question, so the scope freeze
+holds. The maintainer, on the new rows: "I have leans so far, but I still want
+things to be open for debate until I get other reviewers' opinions."
 
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
@@ -42,14 +52,19 @@ cards, shipped in #380, #383 and #384
 ([2026-10-14 entry](../decision_log/2026/2026-10-14-run-historys-top-row-has-one-card-per-kind-of-information.md)).
 
 The evidence below is one player's history: the maintainer's 9,135 runs over
-866 scenarios in 325 play sessions, last run 2026-10-09 22:03. It shows what
-the rules do on that history and nothing about other players'.
+866 scenarios in 325 play sessions, last run 2026-10-09 22:03, and for TS6 the
+same history to 2026-10-16, 9,212 runs in 328 sessions. It shows what the
+rules do on that history and nothing about other players'.
 
 ### TS1. The definition
 
 Status: Ruled (user), 2026-10-15: "TS1: accept recommendation, pool every
 version with the assumption stated." That settles the row as recommended
-below, the version question included. Before that, the maintainer's lean,
+below, the version question included. **TS6, proposed 2026-10-19, would amend
+it:** the value would count the last 20 runs at any age, the 30 days would
+decide only how it is drawn, and no value would be carried. The minimums, the
+session rule, the versions, sensitivities and warm-up runs, and the fixed
+constants would stand. Until the maintainer rules on TS6, this row stands. Before that, the maintainer's lean,
 built up over the discussion: "I agree
 with all leans" (2026-10-14, including fixed numbers and every sensitivity);
 "Version 1 counts every run, and the warm-up rule comes later. This keeps the
@@ -187,7 +202,9 @@ belongs to the comparisons that come later.
 
 ### TS2. Window and staleness on the chart
 
-Status: Open, **for heavy scrutiny.** The maintainer, 2026-10-15: "Let's go
+Status: **Pivoted to TS6** on 2026-10-19, on the maintainer's lean, not a
+ruling. The row is kept below as both review waves read it. Before that it was
+open, for heavy scrutiny. The maintainer, 2026-10-15: "Let's go
 with the 30 day window for now, but I'd like for this to be heavily
 scrutinized during proposal review. On paper it seems like it's the best
 approach to keep a consistent definition and to make future proposals
@@ -367,8 +384,10 @@ Rejected: steps once per session (prototype v1); session values joined
 ### TS4. The bands
 
 Status: Ruled (user), 2026-10-18, with TS3 and TS5. That settles the row as
-recommended below; how an "as of" stretch draws its bands follows TS2, which
-is still open. Before that, the maintainer: "Yes: include the P10 to P90 band
+recommended below; how an "as of" stretch draws its bands follows TS2, now
+pivoted to TS6. **TS7, proposed 2026-10-19, would amend it:** the middle 50%
+would get a switch of its own, and the Middle 80% switch would start on. P10
+and P90 would stand. Until the maintainer rules on TS7, this row stands. Before that, the maintainer: "Yes: include the P10 to P90 band
 as a Chart options switch, off by default, lighter shade."; "I think P10 and
 P90 are the better metrics than min/max."
 
@@ -403,8 +422,11 @@ maximum (the 2026-08-01 plan); a carried stretch drawn dotted with no band
 ### TS5. The figure on the page
 
 Status: Ruled (user), 2026-10-18, with TS3 and TS4. That settles the row as
-recommended below, except what TS2, still open, decides for it: the 30 days
-after which a value reads "as of", and what a value that isn't fresh shows.
+recommended below, except what TS2, now pivoted to TS6, decides for it: the
+30 days after which a value reads "as of", and what a value that isn't fresh
+shows. **TS8, proposed 2026-10-19, would amend it:** the card would lead with
+the typical score instead of giving it a line. Until the maintainer rules on
+TS8, this row stands.
 Before that, the maintainer: "Ship it first in today's Scenario Stats; the
 cards proposal can move it later."; "keep as no limit. '2,140 · as of Mar 3,
 2020' is still useful information, even if it is outdated."
@@ -456,6 +478,191 @@ other.** Asked whether the line ships before or after them, the maintainer,
 2026-10-15: "I'll go with your recommendation." Both have since shipped, so
 the line lands in the finished card. The definition and the chart don't
 touch the top row.
+
+### TS6. No limit's line, faded where its runs aren't recent
+
+Status: Proposed, 2026-10-19, on the maintainer's lean, not a ruling. It would
+replace TS2's answer and amend TS1, as TS1's status says. The maintainer,
+2026-10-18, after TS2's options were laid out: "I think it is the opposite.
+"No Limit" looks much better on the graph, and "Faded" is the alternative."
+and "I would have expected that the "Faded" option keeps the same shape as the
+"No Limits" option on the graph, just that the "unknown" area is faded to show
+uncertainty". On 2026-10-19, with this option built and measured: "I am also
+leaning toward option D." On its cost after a return, for weakness ranking:
+"In the worst case situation, a scenario will appear weaker than it actually
+is. But this serves as a small encouragement to the user to play that
+scenario, which then updates its typical score."
+
+The material consequence: the value stops depending on the 30 days, and
+"recent" becomes a test every surface reads beside it. Right after a return,
+a value drawn at full strength can still hold up to 10 runs from before the
+break, and every later reader sees that value.
+
+**Recommendation: the typical score after a run is the median of the
+scenario's last 20 runs, or of all its runs when it has fewer, whatever their
+age. It is known once those runs number at least 10 from at least 2 sessions,
+or 20. It is recent, and drawn at full strength, when the scenario's runs in
+the 30 days up to that moment meet either condition: at least 10 runs across 2
+or more sessions, or at least 20 runs in any number of sessions. Otherwise it
+is drawn faded, on a scenario that has never been recent too. Scenario Stats
+judges recency as of now, and the chart as of each point's time. Every run
+counts, as TS1 says.**
+
+- **It is the line the maintainer expected:** no limit's shape, with what
+  isn't recent faded. Prototype v8 draws it.
+- **One way to work out the value, one test for how it is drawn.** TS2's
+  recommendation (A, v6) and v7's blend (C) both take the median of the recent
+  runs alone while the test passes and of other runs when it doesn't, so their
+  line steps where a faded stretch turns recent. After VT Pasu Intermediate
+  S5's April 2026 return, C zigzags between its two values. At the 49 runs of
+  2025 and 2026 where a faded stretch turned recent, A stepped by a median
+  5.6% of the value (40% at worst) and C by 3.9% (31%), while D moved 0.7%
+  (4%), an ordinary run's move.
+- **"Recent" keeps one meaning.** TS2's deciding argument stands: the chart,
+  Scenario Stats and later readers share one test for current. D moves the 30
+  days from the value into that test, where no limit drops them.
+- **Its cost is a lag right after a return, at full strength.** The test
+  passes at 10 recent runs, so for at most the next 10 runs a full-strength
+  value still holds older ones: up to 10 of its 20 right after a break, where
+  no limit's first values back held a median of 18 of 20 (TS2, point 2).
+  Measured at the start of each session in 2025 and 2026, against the median
+  of the session that followed:
+  - Over every full-strength value, D is 0.2 points less accurate than A,
+    4.03% against 3.82% (95% interval +0.05 to +0.54, 348 targets).
+  - Where the two differ, 28% of those values, D is about 1 point worse:
+    4.90% against 3.82%, with A closer on 68% and D on 18%. 71 of those 99
+    windows span a break of 21 days or more, and the other 28 are all from
+    2025, when the player was climbing fast. In 2026 all 51 span a break.
+  - Run by run against the next 10 runs, the gap grows with the old runs: 0.3
+    points with 1 to 4 of them, 1.25 with 5 to 9, 2.6 with all 10. D misses
+    low: this player came back better than before the break.
+  - In 2026 alone the median gap between the two values, where they differ,
+    is 0.8%.
+- **Where the lag matters is in judgments made right after a return.** Of the
+  features that will read the figure, weakness ranking and the rank-up chance
+  are the ones that judge right then; run comparisons such as "better than 15
+  of your last 20" read naturally under D, whose 20 runs are literally the
+  last 20. The maintainer's view of the worst case is quoted above. Any later
+  feature can also choose not to judge on a faded value.
+- **A faded value is no worse than a held one.** On 2026's 54 session starts
+  where A held a carried value, D's value, which C draws too, missed the next
+  session by 3.18% against A's 3.87% (interval −0.91 to +0.46 for the
+  difference). Holding a value flat has no accuracy case.
+- **Coverage.** Of 2026's 3,547 runs, A draws 44.2% at full strength, 8.0%
+  faded and 47.7% with no line; D 44.2%, 20.1% and 35.7%; no limit 64.3% at
+  full strength and 35.7% with no line. D's extra faded line is all light
+  play.
+- **Light play keeps its faded value.** A scenario that has never had 10
+  recent runs from 2 sessions shows its value faded once it has 10 runs from 2
+  sessions at any age. Those values ran about 8.5% below the next session in
+  2026, a median error of 9.1% over 46 session starts: the price of drawing
+  them. Drawing nothing until a first recent value would make the value
+  depend on the scenario's whole history, the kind of flag TS1 rejected,
+  where one stray run months earlier satisfies it. D2 is met by the fade: the
+  value shows as not recent, never as weak.
+- **The judging moment.** Scenario Stats judges recency as of now, so it fades
+  the moment the test stops passing. Score vs Run judges each point at its
+  run. Score vs Time holds a value until the next run (TS3) and fades the hold
+  at the moment its recent runs stop meeting the conditions: with no run in
+  between they only age out, so the moment is exact. The line ends at the
+  newest run (TS3), so for up to 30 days after a scenario's last run the card
+  can be faded while the chart's last point is solid. The explainer says so
+  (Copy).
+- **Two simpler tests were set aside.** "At least 20 runs across 2 sessions",
+  the maintainer's question, removes the lag but would cut 2026's
+  full-strength runs from 44% to 28% and leave 57% with no line instead of
+  36%: a scenario with 10 to 19 runs loses its value. "At least 15 of the 20
+  recent" would cap the lag at 5 old runs, about 0.3 points, but leaves a
+  scenario played 10 to 14 times a month faded for good; it was not measured.
+
+Rejected: A, TS2's recommendation, a carried value held flat (v6); C, A's
+value with faded stretches drawn from the last 20 runs at any age (v7); no
+limit at full strength; the two simpler tests above; and no line before a
+scenario's first recent value.
+
+The measurements are in the maintainer's scratch folder, the D evaluation and
+its script, checked against the rules evaluation: on the runs to 2026-10-09
+the two agree exactly.
+
+### TS7. The line and both bands, each with a switch
+
+Status: Proposed, 2026-10-19, on the maintainer's lean, not a ruling. It would
+amend TS4, as TS4's status says. The maintainer: "If it's a switch then the
+user has the option to not always draw it. But if it's purely a legend, then
+it will always be drawn and the user has to manually disable it every time
+they change scenarios."; then "My current lean is to enable all 3 metrics by
+default (i.e. encouraging users to see and use everything), but allow users to
+turn each metric off individually. While it may be uncommon to do so, it
+doesn't seem like it's very difficult to implement, and it gives more
+customization to the user."
+
+The material consequence: Chart options grows from seven controls to ten, and
+a player meets both bands at once, not one.
+
+**Recommendation: three switches in Chart options' Overlays group, after PB
+score: Typical score for the line, Middle 50%, and Middle 80%, all on to start
+and remembered as every Chart options control is. Each hides its faded
+stretches with it. Scenario Stats doesn't follow them.**
+
+- **Every other overlay has one.** Rank thresholds, Show all ranks, PB score
+  and Score threshold overlay are switches. As TS4 is ruled, the line and the
+  middle 50% would be the chart's only overlays a player can't turn off,
+  except by a legend click the chart forgets when it next redraws, at a new
+  run or another scenario.
+- **On to start, so a player meets all three,** "encouraging users to see and
+  use everything". The Middle 80% switch starting on reverses the
+  maintainer's 2026-10-14 lean, off to start, which TS4 ruled.
+- **The defaults are chosen once.** A switch remembers each player's choice,
+  and changing a remembered switch's default later discards those choices
+  ([2026-09-19](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
+- **The cost is a busier first chart.** Both bands, the rank lines, the PB
+  line and the threshold line can show at once. With Chart options open, the
+  legend's five entries wrap onto a second line over the chart's title; PR 2
+  lays the legend out so they don't ([The legend](#the-legend)).
+
+Rejected: TS4 as ruled, the middle 50% always drawn and the middle 80% off to
+start; one switch for the line and the middle 50% together, which leaves no
+way to keep the line without the band; legend clicks alone; and one band
+chooser in place of two switches, a control unlike every other overlay's.
+
+### TS8. Scenario Stats leads with the typical score
+
+Status: Proposed, 2026-10-19, on the maintainer's lean, not a ruling. It would
+amend TS5, as TS5's status says. The maintainer: "I think the typical score
+value should be emphasized as it is the Scenario stats card's defining
+metric, compared to the PB card's PB score, and Latest Run card's latest run
+score."; on the card's count: "I'm concerned that the "Number of runs" metric
+may get confused by the runs for the Typical score; i.e. the user might think
+all 169 runs are used for the Typical Score calculation."
+
+The material consequence: the card's first line, which #391 shipped as
+"Scenario stats", names its lead figure, and "Number of runs" is renamed.
+The row keeps its height.
+
+**Recommendation: the card leads with the typical score as the PB card leads
+with the PB. Its first line reads "Typical score", with a help icon, then how
+recent the value is when it isn't. The value follows in the large number the
+PB and latest-run cards use, dimmed when it isn't recent. Category and "Total
+runs" follow it.**
+
+- **It is the card's defining figure,** as the PB is the PB card's and the
+  latest run's score the latest-run card's, so it takes the same place and
+  size. The card had no lead fact, which is why TS5 placed the line by T4's
+  importance order.
+- **"Total runs" keeps the count apart from the runs behind the typical
+  score,** which are at most 20.
+- **The first line says how recent a dimmed value is:** "as of {date}" when
+  none of its runs is recent, and how many are when some are (Copy).
+- **No height cost.** Measured at `1dc9413` (TS5), the row stays 143 px
+  without a benchmark and 164 px with one, the scenario note card beside it.
+- **Beyond TS5 it changes** the first line that the
+  [2026-10-18 entry](../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md)
+  shipped, still plain text, and the glossary's Scenario Stats entry. The card
+  keeps its name, Scenario Stats, in the docs and the code.
+
+Rejected: TS5 as ruled, a line second after Category; and a first line kept
+as "Scenario stats" over a smaller "Typical score" label, which costs a line
+and breaks the cards' pattern of a first line naming the lead figure.
 
 ## Problem
 
@@ -524,10 +731,14 @@ scenario's runs in the next session, as a share of that median.
 - **The previous session's median predicts the next session as well** as the
   typical score (TS2). The typical score's case is steadiness for judgments.
 - **Coverage is limited by history, not the window** (TS2, point 4).
+- **Taking the 30 days out of the value and into the drawing** costs 0.2
+  points of accuracy at full strength, in the first runs after a return or
+  during a fast climb, and removes the step where a faded stretch turns
+  recent (TS6).
 
 The measurements, their method and their caveats are in the maintainer's
-scratch folder: the window evaluation, its 30-day rerun, and the session-rule
-comparison, with their scripts. The caveats that matter most: one player; a
+scratch folder: the window evaluation, its 30-day rerun, the session-rule
+comparison, and the D evaluation, with their scripts. The caveats that matter most: one player; a
 steep improvement phase in 2025 and a plateau in 2026, where the windows part
 in the first and not the second; targets from sessions of three to five runs
 are noisy; and many cells about returns and grinds come from a handful of
@@ -599,71 +810,63 @@ whose chart code `dcc4cba` leaves unchanged, and the row on 2026-10-18 at
 
 ## Design
 
+The design below is TS6, TS7 and TS8, the recommendation, and the ruled rows
+where those leave them standing. Where a ruled row's text says otherwise, the
+new row is what is recommended, and the ruled row stands until the maintainer
+rules.
+
 ### What the player sees
 
-The Scenario Stats card, as it shipped, in each state, with a benchmark
-selected (the Category line is absent without one):
+Scenario Stats, in each state, with a benchmark selected (the Category line
+is absent without one). The lead number is the large number the PB card and
+the latest-run card use; `(dimmed)` marks it drawn in the theme's dimmed
+color:
 
 ```
-| Scenario Stats              |  | Scenario Stats              |  | Scenario Stats              |
-| Category: Tracking · Smooth |  | Category: Tracking · Smooth |  | Category: Clicking · Static |
-| Typical score: 1,179        |  | Typical score: 1,390 ·      |  | Typical score: Too few      |
-|                             |  |   as of Apr 12              |  |   recent runs · 6 runs      |
-| Last played: 2 minutes ago  |  | Last played: 2 months ago   |  | Last played: 5 minutes ago  |
-| Number of runs: 463         |  | Number of runs: 169         |  | Number of runs: 6           |
-         fresh                              as of                          unknown
+| Typical score ⓘ            |  | Typical score ⓘ · as of Aug 6 |  | Typical score ⓘ            |
+| 2,999                      |  | 763.55               (dimmed) |  | Too few runs               |
+| Category: Tracking · Smooth|  | Category: Clicking · Dynamic  |  | Category: Clicking · Static|
+| Total runs: 147            |  | Total runs: 91                |  | Total runs: 8              |
+          recent                          not recent                       too few runs
 ```
 
-The value has a dotted underline and a hover that says how it was worked out
-(see [Copy](#copy)).
+A scenario with some recent runs, but too few, reads
+`Typical score ⓘ · 6 recent runs` over a dimmed value. The number has a dotted
+underline and a hover that says what it is from; the ⓘ explains the line, the
+bands and the fading (see [Copy](#copy)).
 
-The chart, Score vs Run, on a scenario played on and off (the shape of VT
-ww5t Intermediate S5 over its last 200 runs). `▒` is a band and `━` the line,
-at full strength; `░` and `┄` are the same band and line at a third of their
-strength, not a dotted line:
+The chart, Score vs Run, on VT ww5t Intermediate S5 around its return on
+2026-02-14, after 82 days away. Under D the line keeps no limit's shape, and
+the 30 days decide only how strongly it is drawn:
 
-```
-VT ww5t Intermediate S5                 ● Run data point   ★ New PB   ━ Typical score   ▒ Middle 50%
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  PB score (1470.00)
-     ·   ★     ·     ·   ★    ·    ·      ·   ★    ·     ·    ·   ★   ·     ·   ·
-                    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-             ━━━━━━━━━━━━━━━━━━━━━━━━┄┄┄┄┄┄┄┄┄┄┄┄┄┄━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ·    ·         ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     ·     ·   ·     ·     ·    ·       ·  ·     ·     ·    ·     ·     ·     ·
-|-- unknown --|------- fresh ---------|--- as of ---|---------- fresh -------------|
-  no line yet:  the 10th run from two   a break, then  10 runs from two sessions in
-  under 10 runs sessions                one run: the   the window again; the faded
-                                        last value is  stretch joins this run
-                                        carried
-```
+| Runs | Recent runs | Drawn | Value |
+|---|---|---|---|
+| 54 to 56, before the break | 20 of 20 | full strength | 1,240 |
+| 57 to 65, back | 1 to 9 of 20 | faded | 1,240, bending to 1,260 as new runs replace old |
+| 66 to 70 | 10 to 14 of 20 | full strength | 1,260, 1,275, 1,285, 1,290 |
+| 76 on | 20 of 20 | full strength | 1,300, the same as A's |
 
-The line's hover, on a point of a fresh stretch and of a faded one:
+Under A the faded stretch holds 1,240 flat and the line steps to 1,290 at run
+66; under C it bends to 1,260 and steps to 1,290. D has no step: runs 66 to 70
+are its lag, at most 30 points under A here.
+
+The line's hover, on a point at full strength and one faded:
 
 ```
-Typical score: 1,350                         Typical score: 1,350
-Middle 50% (P25 to P75): 1,330 to 1,362      Middle 50% (P25 to P75): 1,330 to 1,362
-20 runs in 4 sessions · Mar 2 to Apr 12      20 runs in 4 sessions · Mar 2 to Apr 12
-                                             As of Apr 12
+Typical score: 1,350                                 Typical score: 686.98
+Runs: 20 in 4 sessions · Mar 2 to Apr 12             Runs: 20 in 5 sessions · Aug 20, 2025 to Apr 17
+Recent: 14 of 20 in the 30 days up to this run       Recent: 6 of 20 in the 30 days up to this run
+Middle 50%: 1,330 to 1,362                           Middle 50%: 622.44 to 729.86
+Middle 80%: 1,310 to 1,385                           Middle 80%: 593.92 to 800.92
 ```
 
-With **Middle 80%** turned on, a lighter band surrounds the middle 50% and
-the hover gains `Middle 80% (P10 to P90): 1,310 to 1,385` under the middle
-50%.
-
-Score vs Time, the same scenario at All time. Each value holds flat until the
-next run; a hold that runs on more than 30 days past the newest run behind it
-fades from that point:
-
-```
-                                                                  ┏━━━━━━━━━━ ends at the
-         ┏━━━━━━━━━━━━━━━━━━━━━━┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┛·  · ·  ·   newest run
-  ━━━━━━━┛ ·  · ·               ↑                                 · ·
-   · ·  ·                       30 days after the newest run
-                                behind the value, the hold fades
-  Sep 2025        Nov 2025        Jan 2026        Mar 2026        May 2026
-```
-
-Score vs Sensitivity is unchanged: no line and no bands.
+Score vs Time holds each value flat until the next run. A hold that outlives
+its recent runs fades from the moment they stop meeting the conditions: a
+value whose 10th-newest run is 25 days old, with no run for 10 days after it,
+holds at full strength for 5 days and faded for the other 5. The line ends at
+the newest run (TS3), so this happens only between two runs. v8 holds the
+newest value to now and so draws it at the right end too: on Flower 50cm,
+whose last run was on 2026-10-01, it turns faded on 2026-10-16.
 
 Chart options, the Overlays group:
 
@@ -672,30 +875,33 @@ Overlays
  (●) Rank thresholds  ⓘ
  ( ) Show all ranks   ⓘ
  (●) PB score         ⓘ
- ( ) Middle 80%       ⓘ
+ (●) Typical score    ⓘ
+ (●) Middle 50%       ⓘ
+ (●) Middle 80%       ⓘ
 ```
 
 ### The definition, exactly
 
-- **The window after a run** is the scenario's runs up to and including that
-  run, in play order, keeping the last 20 or fewer that ended no more than 30
-  days before that run ended. A run that ended exactly 30 days before counts.
-  Play order sorts by when a run ended, so the window is always a run of
-  consecutive runs ending at the run itself.
-- **Fresh** when the window holds at least 10 runs from at least 2 play
-  sessions, or holds 20 runs. A window's sessions are the play sessions its
-  runs belong to, split over every scenario's runs.
-- **The value** is the window's median, with P25 and P75 (the middle 50%) and
-  P10 and P90 (the middle 80%) interpolated between runs, the "inclusive"
-  method: `statistics.quantiles(scores, n=4, method="inclusive")` and its
-  `n=10` twin. An even count's median is the mean of the two middle scores.
-- **Carried** when the window fails the rule and an earlier window passed: the
-  value, both bands, the run and session counts, and the first and last dates
-  are the last fresh window's.
-- **Unknown** when no window has passed yet.
-- **"As of"** applies to a carried value, and to a fresh value whose newest
-  run ended more than 30 days before the time asked about. Its date is the
-  date of the newest run behind the value.
+- **The runs after a run** are the scenario's last 20 runs up to and including
+  it, in play order, or all of them when it has fewer. Play order sorts by
+  when a run ended.
+- **Known** when those runs number at least 10 from at least 2 play sessions,
+  or 20. A run's session is the play session it belongs to, split over every
+  scenario's runs. Before that the value is unknown; once known, it is never
+  unknown again.
+- **The value** is their median, with P25 and P75 (the middle 50%) and P10
+  and P90 (the middle 80%) interpolated between runs, the "inclusive" method:
+  `statistics.quantiles(scores, n=4, method="inclusive")` and its `n=10`
+  twin. An even count's median is the mean of the two middle scores.
+- **Recent at a moment** when the value's runs that ended in the 30 days up to
+  that moment, a run ended exactly 30 days before counting, number at least 10
+  from at least 2 sessions, or 20. Because the value counts the last 20 runs,
+  "10 of them in the 30 days" is the same as "10 runs in the 30 days", which
+  is how the copy says it.
+- **The moment** is now for Scenario Stats, a point's run for Score vs Run,
+  and every moment of a hold for Score vs Time. With no run in between, a
+  value's recent runs only age out, oldest first, so a hold that is recent at
+  its run stops being recent once, at a moment worked out from their ages.
 - **Every run counts,** at every sensitivity and on every version of the
   scenario, warm-up runs included, and runs of every version are treated as
   comparable (TS1, Versions). A run with no `Hash:` counts.
@@ -718,104 +924,130 @@ Overlays
   range shows them,** as the New PB stars are judged over the whole history.
   So the line at the left edge of `Last 100 runs` is already the value that
   run had.
-- **A stretch is faded where its points are carried.** The faded stretch
-  starts at the last fresh point before it and ends at the first fresh point
-  after it, so the line and the bands are continuous. A point is fresh or
-  carried; the segment between a fresh point and a carried one is faded.
-- **A fresh value is drawn at full strength however old its run is.** A run
-  axis has no time to show passing; the age since the newest run is the
-  Scenario Stats line's to say.
+- **A point is drawn at full strength when its value was recent at its run,
+  and faded when it wasn't.** A faded stretch starts at the last full-strength
+  point before it and ends at the first after it, so the line and the bands
+  are continuous, and since both sides are worked out the same way the line
+  has no step where a stretch fades or turns recent.
+- **A run axis has no time passing,** so a point's strength never changes
+  after its run; how recent the value is now is Scenario Stats' to say.
 
 #### Score vs Time
 
 - **Each value holds flat from its run to the next plotted run,** a step at
-  each run. The line ends at the newest plotted run.
-- **A hold fades 30 days after the newest run behind its value,** and a
-  carried value's hold is faded throughout. The faded part ends where the
-  next run's value begins, so the two meet.
-- **Why the line ends at the newest run, and not now,** which the prototype
-  did: held to now, the time axis stretches to today. A scenario last played
-  in 2020 would then draw its runs at the left edge of six empty years at All
-  time, where today's axis spans its runs. Ending at the newest run also
+  each run. The line ends at the newest plotted run (TS3).
+- **A hold is at full strength while its value is recent,** and fades at the
+  moment its recent runs stop meeting the conditions; a value that wasn't
+  recent at its run holds faded throughout. The faded part ends where the next
+  run's value begins, so the two meet.
+- **Why the line ends at the newest run, and not now,** as TS3 ruled and v8
+  does not: held to now, the time axis stretches to today. A scenario last
+  played in 2020 would then draw its runs at the left edge of six empty years
+  at All time, where today's axis spans its runs. Ending at the newest run also
   keeps the figure free of the clock, so a chart left open draws nothing new
-  as days pass, and the age since the newest run is the Scenario Stats
-  line's, as on Score vs Run.
+  as days pass, and how recent the value is now is Scenario Stats', as on
+  Score vs Run.
 
 #### Score vs Sensitivity
 
 No line and no bands, until that mode is redesigned: a rolling value has no
-order along a sensitivity axis. The Middle 80% switch changes nothing there.
+order along a sensitivity axis. The three switches change nothing there.
 
 #### Traces, order and color
 
 - **Up to six traces are added** after the run trace, the stars and the ring:
   the faded middle 80%, the faded middle 50%, the middle 80%, the middle 50%,
-  the faded line, and the line, each only when it has a point to draw. The
-  middle 80% traces exist only with the switch on.
+  the faded line, and the line, each only when its switch is on and it has a
+  point to draw.
 - **They draw under the runs by `zorder` −1,** not by coming first. So
   `figure.data[0]` stays the run trace, `generated_point_color` stays right,
   and the tests that read the run trace by position don't change. Inside
   their layer, data order draws the line over the bands, and full strength
   over faded. The prototype put its traces first and set the run color in
   the theme step to make up for it; this does neither.
-- **The legend** reads `Run data point`, `New PB`, `Typical score`,
-  `Middle 50%`, `Middle 80%`, ordered by legend rank. A faded trace shares a
-  legend group with its full-strength twin and has no entry of its own,
-  unless the figure holds only its faded stretch. A click on an entry hides
-  both, and as with the stars, the choice is not remembered.
+- **One legend group per metric.** The legend reads `Run data point`,
+  `New PB`, `Typical score`, `Middle 50%`, `Middle 80%`, ordered by legend
+  rank. A faded trace sits in its metric's group with no entry of its own,
+  unless the figure holds only its faded stretch, so a click on an entry hides
+  the metric whole, faded stretches included. As with the stars, a legend
+  click is not remembered; the switches are.
 - **Gray in both themes, with no color setting,** themed in the presentation
   step by trace name, as the ring is. Light: the line `#343a40`, the middle
   50% that gray at 14% opacity, the middle 80% at 7%. Dark: `#dee2e6` at the
   same strengths. The figure is built with the light colors, as it is with
   the ring's. A faded trace is drawn at 35% opacity. The line is 2.5 px wide.
-- **No customization beyond the switch.** The
+- **No customization beyond the switches.** The
   [2026-08-20 points entry](../decision_log/2026/2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there.md)
-  keeps everything but the run points' size and color fixed. The switch shows
-  or hides a band, as the PB score switch shows a line; it does not style
+  keeps everything but the run points' size and color fixed. A switch shows
+  or hides a metric, as the PB score switch shows a line; none styles
   anything.
 
 #### Hover
 
 - **The run points' hover doesn't change.** The bands take no hover. The line
-  has its own, with the lines in [Copy](#copy): the value, the middle 50%,
-  the middle 80% while it is drawn, the runs and sessions behind the value
-  with their dates, and `As of {date}` on a faded stretch.
+  has its own, with the lines in [Copy](#copy): the value, its runs and their
+  dates, how many are recent, and each band while its switch is on.
 - On Score vs Time a hold has a point at each end, both with its value's
-  hover.
+  hover, and the faded part of a hold that outlives its runs says so.
 
 #### The zoom fit
 
 **The line and the bands take part in the fit, as wanted.** The script already
 fits every visible trace, so a refit keeps the band inside the view instead of
-clipping it, and a legend-hidden band leaves the fit as today. The script's
+clipping it, and a hidden band leaves the fit as today. The script's
 comment, which names only the runs, the stars and the ring, is updated, and
 so is the spec's sentence. One case is left: on Score vs Time a flat hold that
 spans the whole zoomed window has no point inside it, so it doesn't widen the
 fit; the line is a median of runs and almost always sits among them.
 
-#### The Middle 80% switch
+#### The switches
 
-- **In the Overlays group, after PB score,** labelled `Middle 80%`, off to
-  start, remembered in the browser like every Chart options control.
-- **Its id is chosen once: `run-history-middle-80-overlay-switch`, unchecked
-  by default.** Dash discards a stored value when a later visit draws a
-  different default
+- **In the Overlays group, after PB score:** `Typical score`, `Middle 50%`
+  and `Middle 80%`, each with a help icon, all on to start, remembered in the
+  browser like every Chart options control.
+- **Their ids and defaults are chosen once:**
+  `run-history-typical-score-overlay-switch`,
+  `run-history-middle-50-overlay-switch` and
+  `run-history-middle-80-overlay-switch`, all checked by default. Dash
+  discards a stored value when a later visit draws a different default
   ([2026-09-19](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)),
   so neither may change.
-- **It is an input of the chart rebuild,** as the PB score switch is, so the
-  figure holds the middle 80% traces, and the hover its line, only while it
-  is on.
+- **They are inputs of the chart rebuild,** as the PB score switch is, so the
+  figure holds a metric's traces, and the hover its line, only while its
+  switch is on. A band may show without the line.
 
-### The Scenario Stats line
+#### The legend
 
-- **`Typical score:`** second, after Category (first without one), in the
-  card's label style, with
-  the value and hover in [Copy](#copy).
+With Chart options open, the five entries no longer fit on one line beside the
+chart's title and wrap onto a second line over it (v8, 1,800 px window). The
+Backlog already holds the same wrap for three entries on a narrow chart. PR 2
+lays the legend out so that it never covers the title, measured at the
+narrowest chart the Backlog item names, a 657 px graph with Chart options
+open. The labels stay: shorter ones would say less and still wrap on a
+narrower chart. Where the legend goes, under the title on a line of its own
+or under the plot, is PR 2's to choose and show.
+
+### The Scenario Stats lead
+
+- **The first line** reads `Typical score` and a help icon, then, when the
+  value isn't recent, how recent it is (see [Copy](#copy)). It stays plain
+  text, as the 2026-10-18 entry made it.
+- **The lead** is the value in the PB and latest-run cards' lead number,
+  with a dotted underline for its hover, and in the theme's dimmed color when
+  it isn't recent. The lead number is large text, so PR 3 checks the dimmed
+  color against the 3:1 that large text needs, in both themes.
+- **Under it,** `Category:` with a benchmark selected, then `Total runs:`.
+- **With no scenario selected** the card reads `No scenario selected` in
+  place of its lead and lines, as it does today. With no local runs, the lead
+  reads `No runs yet` and `Total runs: 0` follows. Below the minimum, it
+  reads `Too few runs`.
 - **It is worked out again when a run lands on the selected scenario, when
-  the scenario changes, and on the page's 30-second tick,** so "as of"
-  appears within 30 seconds of a value turning 30 days old. The time is the
-  app's own clock. The tick costs at most the 3.9 ms measured above.
-- **Its value is the chart's last point,** from the same function.
+  the scenario changes, and on the page's 30-second tick,** so it dims within
+  30 seconds of the test failing. The card has no tick of its own since #391;
+  it takes the page's, which the PB card already reads. The time is the app's
+  own clock. A run costs at most the 3.9 ms measured above.
+- **Its value is the chart's last point's,** from the same function; its
+  recency is as of now.
 
 ### Rounding
 
@@ -835,100 +1067,124 @@ asks. Rounding is for display only: the definition keeps the exact values.
 - **One pure module, `source/kovaaks/typical_score.py`,** takes a scenario's
   runs in play order and the play sessions, and returns the value after each
   run: its median, quartiles, P10 and P90, run and session counts, first and
-  last dates, and whether it is fresh, carried, or unknown. A second function
-  answers "as of" for a value at a time handed in. Nothing reads the run
-  store inside it.
+  last dates, and whether it is known. A second function answers whether a
+  value is recent at a moment handed in, with its recent runs and their
+  sessions counted, and a third the moment a held value stops being recent.
+  Nothing reads the run store inside it.
 - **One copy of the run store per build.** The scenario's runs are taken from
   the same copy the sessions are split from, so a run that lands mid-build
   can't be in one and not the other. A plotted run that copy doesn't hold
   gets no point, and the rebuild its landing triggers draws it.
 - **Nothing is stored.** The value is worked out from the runs whenever the
-  chart or the stats line asks, as sessions are.
+  chart or the card asks, as sessions are.
 - **The prototype is read for behavior, not copied.** It is a patch over the
   app; the build writes the module and the traces afresh.
-- **The cost is about 4 ms at worst per chart build,** on top of today's 4 to
-  7 ms, and the figure about doubles in size at the default range.
+- **The cost was about 4 ms at worst per chart build** under TS2's rule, on
+  top of today's 4 to 7 ms, and the figure about doubles in size at the
+  default range. D adds a recency test at each point; PR 2 measures it again.
+
+### Where prototype v8 differs
+
+So these don't read as open questions:
+
+- **v8 holds Score vs Time's newest value to now,** which TS3 rejects, so it
+  draws a fade at the right end that this design shows only between runs. Its
+  explainer's last sentence says the card and Score vs Time judge as of now,
+  which holds only there; the [Copy](#copy) here fits TS3.
+- **v8 puts its traces first** and sets the run color in the theme step, as
+  earlier prototypes did.
+- **v8's switches carry prototype ids,** and its panel at the bottom right
+  offers the options TS6 compares.
 
 ### Beside Median and best
 
 The two answer different questions and keep different words. Median and best,
 in the run list, describe the runs under one row: a session's or a visit's,
 all of them, with no window and no minimum, and they compare nothing. The
-typical score is a rolling figure with a window and a minimum, worked out
-after each run, and it is what later judgments read. A session row's median
-and the typical score after that session's last run will often differ, and
-that is correct. The labels keep them apart: `Median` never says typical, and
-`Typical score` never says median. The glossary's Median and best entry
-changes its pointer from "a later proposal" to the Typical score entry.
+typical score is a rolling figure over the last 20 runs, with a minimum,
+worked out after each run, and it is what later judgments read. A session
+row's median and the typical score after that session's last run will often
+differ, and that is correct. The labels keep them apart: `Median` never says
+typical, and `Typical score` never says median. The glossary's Median and best
+entry changes its pointer from "a later proposal" to the Typical score entry.
 
 ### Copy
 
-Every string this proposal adds. They follow the nine copy rules in
-[AGENTS.md](../../AGENTS.md#styling-conventions). The prototype's strings were
-drafts and are redone here.
+Every string this proposal adds or changes. They follow the nine copy rules in
+[AGENTS.md](../../AGENTS.md#styling-conventions). They were drafted in
+prototype v8 with the maintainer and redlined in an advisory consult with
+`gpt-6.1-sol` on 2026-10-19. `{n}` is the number of runs behind a value, at
+most 20; `{k}` its recent runs; `{s}` its sessions. `1 run`, `1 session` and
+`1 recent run` take the singular. Dates are the run list's short date, with
+the year only when it isn't this year, and a span on one date reads
+`on {date}`. `**…**` is bold through `control_name()`.
 
 | Where | String | Why |
 |---|---|---|
-| Scenario Stats, label | `Typical score:` | A label as `Last played:` is. "Typical score" and not "Median score": the run list's Median and best already shows a plain median labelled `Median`, KovaaK's own leaderboard shows a third median (the median player's PB), and "median" alone reads as the median of every run. |
-| Scenario Stats, fresh value | `{score}`, such as `1,179` | Rounded as [Rounding](#rounding) says, formatted as a score is. |
-| Scenario Stats, "as of" value | `{score} · as of {date}`, such as `1,390 · as of Apr 12` or `2,140 · as of Mar 3, 2020` | A readout chain. The date is the short date the run list uses, with the year only when it isn't this year's, and has no age limit (TS5). |
-| Scenario Stats, unknown value | `Too few recent runs · {n} runs`, or `· 1 run` | Says why, then how many, as the 2026-08-01 plan's "Collecting data, 6/10 runs" did, without its target: the number that would make the value fresh depends on the sessions, so `9 of 20` reads as eleven to go when the first run of a second session would do. The hover gives the rule and the session count. "Too few", shorter than the prototype's "Not enough"; in the shipped 270 px card either wraps to a second line, which the card's height absorbs. A runs-and-sessions readout (`6 runs · 1 session`) is longer still. |
-| Scenario Stats, no scenario | `N/A` | Nothing to work out. Last played's `—` is the one em dash copy rule 2 allows, so it isn't reused. |
-| Scenario Stats, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
-| Scenario Stats hover, fresh | `The median of {n} runs in {k} sessions, from {first} to {last}. The middle 50% scored {q1} to {q3}, and the middle 80% scored {p10} to {p90}.` | What the figure is, from what, and its spread. `on {date}` in place of `from {first} to {last}` when both are one date; `1 session` in the singular. |
-| Scenario Stats hover, carried | The fresh text, then `It's your last known typical score. The 30 days up to your newest run hold {n} runs in {k} sessions. A new one needs 10 runs from at least 2 sessions, or 20 runs.` | Why it is "as of", and what would make it current, as a fact, not advice. No "since then": the 30 days up to the newest run can reach back past the carried value's own newest run. `1 run`, `1 session` in the singular. |
-| Scenario Stats hover, fresh but old | The fresh text, then `It's been more than 30 days since you played this scenario.` | Why it is "as of". |
-| Scenario Stats hover, unknown | `A typical score needs 10 runs from at least 2 sessions, or 20 runs, within 30 days. The 30 days up to your newest run hold {n} runs in {k} sessions.` | The rule and the count behind the readout. |
-| Chart legend | `Typical score`, `Middle 50%`, `Middle 80%` | Sentence case. "Middle 50%" and "Middle 80%" say what share of the runs each band holds; the percentile names go in the hover for the player who reads them. |
-| Line hover, first line | `<b>Typical score</b>: {score}` | Bold labels, as the run points' hover. |
-| Line hover, middle 50% | `<b>Middle 50% (P25 to P75)</b>: {q1} to {q3}` | The precise names, in the hover only. |
-| Line hover, middle 80% | `<b>Middle 80% (P10 to P90)</b>: {p10} to {p90}` | Only while the switch is on. |
-| Line hover, basis | `{n} runs in {k} sessions · {first} to {last}`, or `· {date}` when both are one date | A readout, no period. |
-| Line hover, faded stretch | `As of {date}` | The newest run's date, as in Scenario Stats. |
-| Chart options switch, label | `Middle 80%` | The legend's words, as the PB score switch takes its line's. |
-| Chart options switch, help | `Shades the middle 80% of the runs behind your typical score, from the 10th to the 90th percentile, in a lighter shade than the middle 50%. **Score vs Sensitivity** draws no typical score.` | What it adds and where it doesn't apply. The mode is bold through `control_name()`, as the empty state bolds the modes. |
-| Chart options switch, help icon's accessible name | `Middle 80% help` | `settings_help_label` names every help icon `{label} help`, as `PB score help`; plain text, as an accessible name stays. |
+| Scenario Stats, first line | `Typical score` | Names the lead figure, as `PB` opens the PB card's first line and `Latest run` the latest-run card's (TS8). |
+| First line, not recent, no recent runs | `Typical score · as of {date}`, the newest run's date | Dates a value none of whose runs is recent, the "as of" TS5 ruled. |
+| First line, 1 to 9 recent runs | `Typical score · {k} recent runs` | Says how far along a return is without calling a value that has just moved old. |
+| First line, 10 to 19 recent runs from one session | `Typical score · {k} recent runs in 1 session` | Says why enough runs still read as not recent. |
+| First line's help icon, accessible name | `About the typical score` | Not `Typical score help`: the Typical score switch's help icon has that name, as `settings_help_label` names every one `{label} help`. |
+| Lead, value | `{score}`, such as `2,999` | Rounded as [Rounding](#rounding) says, formatted as a score is; dimmed when not recent. |
+| Lead, too few runs | `Too few runs` | No "recent": this minimum has no age limit. |
+| Lead, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
+| No scenario selected | `No scenario selected` | The card's shipped empty state, unchanged. |
+| The count line | `Total runs: {n}` | Replaces `Number of runs:`, so the count isn't read as the runs behind the typical score (TS8). |
+| Lead hover | `The median of your last {n} runs.`, or `The median of your {n} runs.` when those are all of them; then `**Runs:** {n} in {s} sessions · {first} to {last}`, `**Recent:** {k} of {n} from the last 30 days`, `**Middle 50%:** {p25} to {p75}`, `**Middle 80%:** {p10} to {p90}`, one line each | A sentence, then readouts with bold labels, as the chart's hover has them. When the recent runs all come from one session and the value isn't recent, the Recent line adds ` · 1 session`. |
+| Lead hover, too few runs | `A typical score needs either:`, then `At least 10 runs across 2 or more sessions.` and `At least 20 runs, even if all from one session.` as a list, then `You have {n} runs in {s} sessions.` | The existence minimum, with no 30 days in it, and the count behind the lead. |
+| First line's help | `Your typical score is the median of your last 20 runs of this scenario, or of all your runs if you have fewer. Runs count regardless of age.` / `On the chart, the darker band shows the middle 50% of those scores, and the lighter band the middle 80%. Narrower bands mean more consistent scores. Turn the line and bands on or off in **Chart options**.` / `Faded means too few recent runs. It turns solid when your runs in the last 30 days meet either condition:`, then the same two conditions as a list / `The card judges recency as of now, and the chart as of each point's time.` | Four paragraphs: what the figure is, what the bands mean, what fading means, and why the card and the chart's last point can differ. No lesson on what a median is, and nothing the chart shows by itself, as the maintainer asked; "consistent" is the word players use. The second condition drops "they're" so it fits on one line at 320 px. |
+| Chart legend | `Typical score`, `Middle 50%`, `Middle 80%` | Sentence case, the switches' words. |
+| Line hover | `**Typical score**: {score}`, `**Runs**: {n} in {s} sessions · {first} to {last}`, `**Recent**: {k} of {n} in the 30 days up to this run`, `**Middle 50%**: {p25} to {p75}`, `**Middle 80%**: {p10} to {p90}`, one line each | The card hover's lines. "Up to this run" because each point is judged at its run. A band's line shows while its switch is on. A faded point whose recent runs are all from one session adds ` · 1 session`. The percentile names are dropped: they add terms and no information. |
+| Line hover, a hold faded after its runs aged out | `**Recent**: too few · last run {date}` | Score vs Time only; the count changes along the hold, so it isn't given. |
+| Chart options switch labels | `Typical score`, `Middle 50%`, `Middle 80%` | The legend's words, as the PB score switch takes its line's. |
+| Typical score switch help | `Draws your typical score: the median of your last 20 runs, or of all your runs if you have fewer. It's faded where too few of them are recent. **Score vs Sensitivity** doesn't show the line or bands.` | What it draws and where it doesn't. |
+| Middle 50% switch help | `Shades the middle 50% of the runs behind your typical score. A narrower band means more consistent scores. **Score vs Sensitivity** doesn't show this band.` | As the explainer says it; each help names the mode it doesn't apply to, since each is read alone. |
+| Middle 80% switch help | `Shades the middle 80% of the runs behind your typical score, in a lighter shade than the middle 50%. **Score vs Sensitivity** doesn't show this band.` | |
+| Switch help icons, accessible names | `Typical score help`, `Middle 50% help`, `Middle 80% help` | `settings_help_label`'s `{label} help`, plain text, as an accessible name stays. |
 
 ### Terms
 
 Each entry is written as [docs/glossary.md](../glossary.md) would hold it,
 under "Scores and notifications", beside PB. Each implementation PR moves in
-the entries for the terms it ships: PR 1 Typical score and As of, with the
-Median and best correction, and PR 2 Middle 50% and Middle 80%.
+the entries for the terms it ships: PR 1 Typical score and Recent, with the
+Median and best correction, PR 2 Middle 50% and Middle 80%, and PR 3 the
+Scenario Stats correction.
 
-- **Typical score.** What a player's recent runs on a scenario usually score:
-  the median of the scenario's last 20 runs or fewer from the 30 days up to a
-  run. It is known once those runs number at least 10 from at least 2
-  sessions, or fill all 20, and before that it is unknown, which is never
-  read as weak. The rules are in the typical score's spec.
+- **Typical score.** What a player's runs on a scenario usually score: the
+  median of its last 20 runs, or of all its runs when it has fewer, whatever
+  their age. It is known once those runs number at least 10 from at least 2
+  sessions, or 20, and before that it is unknown, which is never read as weak.
+  It is drawn at full strength when recent and faded when not. The rules are
+  in the typical score's spec.
   - The roadmap and the decision log call it the typical run.
   - Not Median and best, which describe the runs under one row of the run
-    list, with no window and no minimum.
+    list, with no minimum.
   - Not the median KovaaK's leaderboard shows, which is the median player's
     PB.
   - In code: `typical_score`.
+- **Recent.** The state of a typical score whose runs in the 30 days up to a
+  moment number at least 10 across 2 or more sessions, or at least 20.
+  Scenario Stats judges it as of now, and the chart at each point.
+  - On screen: a full-strength line and an undimmed lead number; not recent,
+    a faded stretch, a dimmed number, and `as of {date}` or `{k} recent runs`
+    after `Typical score` in Scenario Stats.
+  - In code: `recent`.
 - **Middle 50%.** The range the middle half of the runs behind a typical
   score fell in: from the first quartile to the third, P25 to P75. Run
-  History draws it as a band around the typical score.
-  - On screen: `Middle 50%`, and `Middle 50% (P25 to P75)` in the chart's
-    hover.
+  History draws it as a band around the typical score while its switch is on.
+  - On screen: `Middle 50%`.
 - **Middle 80%.** The range the middle 80% of the runs behind a typical score
   fell in: from the 10th percentile to the 90th, P10 to P90. Run History draws
-  it while its Chart options switch is on.
-  - On screen: `Middle 80%`, and `Middle 80% (P10 to P90)` in the chart's
-    hover.
-- **As of.** The state of a typical score that no longer rests on recent
-  runs, shown with the date of the newest run behind it, because the runs
-  since have fallen short of the minimum, or because more than 30 days have
-  passed with no run.
-  - On screen: `as of {date}` in Scenario Stats, and a faded stretch on the
-    chart.
-  - In code: a value kept after its window fell short is `carried`.
+  it as a lighter band while its switch is on.
+  - On screen: `Middle 80%`.
 
-Entry the same PRs correct: **Median and best** says "Not the typical run,
+Entries the same PRs correct: **Median and best** says "Not the typical run,
 which is what a player's recent runs usually score. A later proposal defines
-that." It becomes "Not the typical score, which is what a player's recent runs
-usually score."
+that." It becomes "Not the typical score, which is what a player's runs on a
+scenario usually score." **Scenario Stats** says "On screen its first line
+reads `Scenario stats`." It becomes "On screen its first line reads
+`Typical score`, the figure it leads with."
 
 ### Decisions this changes
 
@@ -944,13 +1200,15 @@ They erase nothing.
   its Terms paragraph calls the typical run a working word that the proposal
   shipping it names. It is named the typical score on screen, in the glossary
   and in code. D1, D2 and D3 stand.
-- [2026-10-14, Scenario Stats names the selected benchmark's category](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md):
-  "The three facts have one weight, Category first." The card gains a
-  fourth, Typical score, second after Category, at the same weight.
-- [2026-10-14, a card's lines follow their role in the player's next action](../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md):
-  "Category, Last played, Number of runs in Scenario Stats." The rule
-  stands; its list becomes Category, Typical score, Last played, Number of
-  runs.
+- [2026-10-14, Scenario Stats names the selected benchmark's category](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md)
+  and
+  [2026-10-14, a card's lines follow their role in the player's next action](../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md):
+  Scenario Stats was a card with no lead fact, its lines at one weight in
+  importance order. Under TS8 it leads with the typical score, and Category
+  and Total runs follow at one weight. T4's rule stands for cards with no lead.
+- [2026-10-18, Last played leaves Scenario Stats and its first line is plain text](../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md):
+  the first line stays plain text and reads `Typical score` instead of
+  `Scenario stats`, and `Number of runs:` becomes `Total runs:`.
 
 Statements in the specs that go untrue, which the same PRs rewrite:
 
@@ -960,11 +1218,12 @@ Statements in the specs that go untrue, which the same PRs rewrite:
   list of what the Share chart figure holds, which gains the typical score's
   line and bands with their hover.
 - [run_history.md, Chart options panel](../specs/run_history.md#chart-options-panel):
-  "Three groups in order, holding seven controls" becomes eight, with
-  `Middle 80%` off in Overlays.
+  "Three groups in order, holding seven controls" becomes ten, with
+  `Typical score`, `Middle 50%` and `Middle 80%` on in Overlays.
 - [run_history.md, Scenario Stats](../specs/run_history.md#scenario-stats):
-  "under it, at one weight, are 'Category:', 'Last played:' and 'Number of
-  runs:'", which gains 'Typical score:' second.
+  the first line "Scenario stats", and "Category:" and "Number of runs:" at
+  one weight under it, become the typical score's first line and lead over
+  "Category:" and "Total runs:"; `Number of runs: 0` becomes `Total runs: 0`.
 - [run_history.md, Time-scored scenarios](../specs/run_history.md#time-scored-scenarios):
   the list of surfaces that order or place scores, unchanged on a
   time-scored scenario, gains the typical score.
@@ -972,7 +1231,8 @@ Statements in the specs that go untrue, which the same PRs rewrite:
   "The Run History page is the one page that shows a session, in two places:
   its run list and its latest-run card." The typical score's hovers count the
   sessions behind a value, a third place.
-- [glossary.md, Median and best](../glossary.md#median-and-best), as above.
+- [glossary.md, Median and best](../glossary.md#median-and-best) and
+  [Scenario Stats](../glossary.md#scenario-stats), as above.
 
 Untouched: the 2026-10-14 Median and best entry, whose label rule this keeps,
 and the 2026-08-20 points entry (see Traces, order and color).
@@ -986,15 +1246,17 @@ Each was drawn in a prototype or measured, on the maintainer's stats.
 - **Session values joined** (v2). It mixes the per-session freeze into the
   line, which belongs to comparisons (TS3).
 - **A carried stretch dotted, with no band** (v3 to v5). It read as gaps
-  everywhere; faded keeps the band and the continuity (TS2).
-- **7 days.** It loses fresh values that 14 and 30 days get right, for no
-  accuracy gain.
-- **14 days.** Equal to 30 in 2026; in the 2025 climb it held flat "as of"
-  values under a rising player, where 30 days drew the climb (TS2).
-- **60 days.** Like no limit after a return: in 35 of 55 returns its first
-  value back held pre-break runs, a median of 16, and it missed the first
-  session back by 8.1%.
-- **No limit.** TS2's alternative.
+  everywhere; fading keeps the band and the continuity.
+- **A carried value held flat and faded** (v6), TS2's recommendation. TS6.
+- **A's value while recent, the last 20 at any age while not** (v7). TS6.
+- **No limit at full strength.** TS6, and TS2's case against it.
+- **7, 14 and 60 days as the window.** Measured under TS2's rule: 7 days loses
+  fresh values that 14 and 30 days get right; 14 equalled 30 in 2026 and held
+  flat "as of" values under the 2025 climb; 60 days, like no limit, called
+  months-old values current after a return. TS6 keeps 30 days for the test.
+- **At least 20 recent runs from 2 sessions, and at least 15 of 20 recent,**
+  as the test. TS6.
+- **No line before a scenario's first recent value.** TS6.
 - **A window the player chooses.** TS2.
 - **The rolling maximum and minimum** as ceiling and floor. TS4.
 - **The line drawn lighter until its window is full,** as Aimcurve draws its
@@ -1004,22 +1266,16 @@ Each was drawn in a prototype or measured, on the maintainer's stats.
   variant. TS1.
 - **Runs at the current sensitivity, or on the current version, only.** TS1;
   the version alternatives under its Versions.
-- **Holding the newest value until now on Score vs Time,** as the prototype
-  did. [Score vs Time](#score-vs-time).
+- **Holding the newest value until now on Score vs Time,** as the prototypes
+  do. [Score vs Time](#score-vs-time).
 - **The traces first in the figure,** as the prototype put them. It moves
   the run trace off index 0, so the run points take another colorway entry
   unless their color is set, and every test that reads `figure.data[0]`
   changes. `zorder` draws them under the runs from the end of the list.
-
-### Optional, beyond the rows
-
-Flagged, not recommended, and left out unless a reviewer or the maintainer
-wants it:
-
-- **A switch for the typical score line itself,** beside PB score. It would
-  let a player who finds the line noise turn it off for good. It costs a
-  control, its copy and its remembered id, and it contradicts TS4's "always
-  drawn". A click on the legend hides it for one figure.
+- **One switch for the line and the middle 50%, legend clicks alone, or one
+  band chooser.** TS7.
+- **A "Typical score:" line second in Scenario Stats,** TS5 as ruled, and a
+  smaller label under a "Scenario stats" first line. TS8.
 
 ## Delivery plan
 
@@ -1031,16 +1287,16 @@ moves is noted in that PR's description.
    and `architecture.md`. Nothing on screen, as the Sessions implementation
    shipped. Needs nothing.
 2. **The chart.** The line, the bands and the faded stretches on Score vs Run
-   and Score vs Time, their order, colors, legend and hover, the Middle 80%
-   switch, the zoom fit's comment, and the Run History spec's chart and panel
-   sections. Needs PR 1. It doesn't touch the top row.
-3. **The Scenario Stats line.** The line, its hover, its updates, and the
-   spec's Scenario Stats section. Needs PR 1. The top row cards have
-   shipped, so it lands in the finished card.
+   and Score vs Time, their order, colors, legend groups and hover, the three
+   switches, the legend's layout, the zoom fit's comment, and the Run History
+   spec's chart and panel sections. Needs PR 1. It doesn't touch the top row.
+3. **The Scenario Stats lead.** The first line, its help, the lead and its
+   hover, Total runs, its updates, and the spec's Scenario Stats section.
+   Needs PR 1.
 
 **Why three.** The definition is the contract later features read, and a PR
 of its own keeps its review on the boundaries rather than on plotly. The
-Scenario Stats line is another module, with its own live checks of the top
+Scenario Stats lead is another module, with its own live checks of the top
 row. If the maintainer prefers fewer PRs, PR 1 can fold into PR 2, or PR 3
 into PR 2, each at the cost of one larger review.
 
@@ -1054,13 +1310,14 @@ roadmap, `product.md`, the vault Backlog bullet named in
 [Out of scope](#out-of-scope), and this file deleted.
 
 **Recommended:** `claude-opus-5-5`, at high for PRs 1 and 3 and at xhigh for
-PR 2, which walks each state through two chart modes, the themes, the zoom fit
-and the legend. The maintainer looks at PRs 2 and 3 in their own Firefox
-before each merges.
+PR 2, which walks each state through two chart modes, the themes, the
+switches, the legend's layout and the zoom fit. The maintainer looks at PRs 2
+and 3 in their own Firefox before each merges.
 
 ### Fallbacks
 
-- **PR 2 grows too large.** Ship Score vs Run first and Score vs Time after.
+- **PR 2 grows too large.** Ship Score vs Run first and Score vs Time after,
+  or the legend's layout as a PR of its own before the line.
 
 ## Out of scope
 
@@ -1071,7 +1328,8 @@ Each with where it is tracked.
   session for them. The vault Backlog's Post-Run Analysis items 3 and 6.
 - **The score trend verdict.** The roadmap's Future list; its chart is the
   one this proposal draws.
-- **Weakness by the typical run.** The roadmap's Future list.
+- **Weakness by the typical run.** The roadmap's Future list. Whether it
+  judges on a value that isn't recent is its own proposal's to decide.
 - **The rank-up chance.** The roadmap's Future list, as difficulty measured
   against the player's own runs; the middle 80% against the rank lines is its
   picture.
@@ -1094,32 +1352,38 @@ Each with where it is tracked.
 
 - **Unit, the definition,** through pure functions on hand-built runs and
   sessions, each state and boundary: 9 runs (unknown), 10 runs from one
-  session (unknown), 10 from two (fresh), 19 in one sitting (unknown), 20 in
-  one sitting (fresh); a run ended exactly 30 days before (counts) and one
-  second more (doesn't); a break, then one run (carried, "as of" the old
-  newest run's date), then back to fresh; known never turns unknown; an even
-  count's median; the quartiles and deciles against hand-worked values;
-  another scenario's runs joining two of this scenario's runs into one
-  session; every sensitivity and version counted; same-second runs in play
-  order; "as of" at exactly 30 days (not yet) and after (yes); rounding of
-  whole, one-decimal and six-decimal scores, a half rounding up.
+  session (unknown), 10 from two (known), 19 in one sitting (unknown), 20 in
+  one sitting (known); the value from the last 20 at any age, and from all of
+  them below 20; known never turning unknown; an even count's median; the
+  quartiles and deciles against hand-worked values; another scenario's runs
+  joining two of this scenario's runs into one session; every sensitivity and
+  version counted; same-second runs in play order; rounding of whole,
+  one-decimal and six-decimal scores, a half rounding up.
+- **Unit, recency:** 10 recent runs from 2 sessions (recent), 10 from one
+  (not), 20 from one (recent), 9 (not); a run ended exactly 30 days before the
+  moment (counts) and one second more (doesn't); recent at the run and not
+  later, with the fade moment of a hold equal to the moment its 10th-newest or
+  second session's last recent run passes 30 days; a value recent at its run
+  whose card, a day later, isn't.
 - **Unit, the chart's traces,** per mode on a hand-built history: which
   points are full strength and which faded, the joins at each end of a faded
-  stretch, Score vs Time's holds, their fading at 30 days and their end at
-  the newest run; `figure.data[0]` the run trace, `zorder`, legend groups and
-  ranks; no traces with no known value, and none on Score vs Sensitivity; the
-  middle 80% only with the switch on; the hover's lines.
+  stretch with no step in the value, Score vs Time's holds, their fade moment
+  and their end at the newest run; `figure.data[0]` the run trace, `zorder`,
+  one legend group per metric, legend ranks; no traces with no known value,
+  and none on Score vs Sensitivity; each metric's traces only with its switch
+  on; the hover's lines, a band's line only with its switch on.
 - **Unit, the presentation step:** each theme's colors on the line and bands,
   and the run points' color unchanged.
-- **Callbacks:** the switch rebuilds the chart; the stats line updates on a
-  run on the scenario, on a scenario change, and when a value turns "as of"
-  on the tick; its empty states.
+- **Callbacks:** each switch rebuilds the chart; the lead updates on a run on
+  the scenario, on a scenario change, and when the value stops being recent on
+  the tick; its empty states and first-line readouts.
 - **Live, PRs 2 and 3,** in headless Edge at 2560 and 1920 px, light and
-  dark: the line and bands under the runs, the faded stretches, the legend
-  and its clicks, the hover, a zoom that refits to the bands, and the top
-  row's height with the stats line. These cover what pure tests can't: draw
-  order, theme colors, the zoom script, and layout. Then the maintainer's
-  look in Firefox.
+  dark: the line and bands under the runs, the faded stretches, the legend,
+  its clicks hiding a metric whole, and its layout with Chart options open,
+  the switches and their memory, the hover, a zoom that refits to the bands,
+  the lead's dimmed contrast, and the top row's height with the lead. These
+  cover what pure tests can't: draw order, theme colors, the zoom script, and
+  layout. Then the maintainer's look in Firefox.
 - **Performance,** measured again on the largest scenario in PR 2.
 - **Docs:** `tests/test_docs.py` for links and summaries, and the gates in
   AGENTS.md.
