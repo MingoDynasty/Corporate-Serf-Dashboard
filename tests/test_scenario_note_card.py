@@ -308,6 +308,14 @@ def test_the_card_and_the_editor_carry_the_copy_block_words():
     assert getattr(_by_id(page_card, IDS.waiting_line), "aria-live") == "polite"
 
 
+def test_edit_and_add_wear_mantines_focus_ring():
+    """Drawn as links on plain buttons, they would otherwise get the browser's ring."""
+    page_card = card.scenario_note_card(IDS, toast_link_class="toast-link")
+
+    for button_id in (IDS.edit, IDS.add):
+        assert "mantine-focus-auto" in _by_id(page_card, button_id).className.split()
+
+
 def test_a_long_note_scrolls_in_a_scroll_area_that_draws_its_own_scrollbar():
     """Mantine's scrollbar shows whenever the note is longer than the card.
 

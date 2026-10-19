@@ -111,6 +111,9 @@ READ_CLASS = "run-history-note-read"
 HEADING_CLASS = "run-history-note-heading"
 LABEL_CLASS = "run-history-note-label"
 LINK_CLASS = "run-history-note-link"
+# Mantine's keyboard focus ring, which a dmc button would have brought. Without
+# it the ring is the browser's own, near-black in Chromium on the dark theme.
+FOCUS_CLASS = "mantine-focus-auto"
 TEXT_CLASS = "run-history-note-text"
 SCROLL_CLASS = "run-history-note-scroll"
 EDITOR_CLASS = "run-history-note-editor"
@@ -274,7 +277,7 @@ def _read_view(ids: NoteCardIds) -> html.Div:
                     html.Span([NOTE_LABEL, _age_label(ids)], className=LABEL_CLASS),
                     html.Button(
                         EDIT_LABEL,
-                        className=LINK_CLASS,
+                        className=f"{LINK_CLASS} {FOCUS_CLASS}",
                         id=ids.edit,
                         type="button",
                         **edit_name,
@@ -298,7 +301,7 @@ def _read_view(ids: NoteCardIds) -> html.Div:
             ),
             html.Button(
                 ADD_LABEL,
-                className=f"{LINK_CLASS} {LINK_CLASS}-add",
+                className=f"{LINK_CLASS} {LINK_CLASS}-add {FOCUS_CLASS}",
                 id=ids.add,
                 type="button",
             ),
