@@ -1018,9 +1018,13 @@ flowchart LR
   row, a full-width row, whose class rules the grid does not work out again
   when its data changes. A session row under This scenario and a scenario row
   carry `figures`, the median and best of the runs under them, which the
-  script puts in the row's line ahead of its count. The first session row
-  under This scenario also carries `figures_below`, which keeps them on a
-  second line under it. Every value a
+  script puts in the row's line ahead of its count. A scenario row's are
+  worded; a session row's are split at the decimal point, and This
+  scenario's model carries `columns`, the widest text of each part over
+  every session the view can list, which the script lines the session rows'
+  figures and counts up by. The first session row under This scenario also
+  carries `figures_below`, which keeps them on a second line under it. Every
+  value a
   row shows is formatted here, and every model names its view, the store's
   newest run, even with nothing to list, and the rows that run opens. That
   run's row

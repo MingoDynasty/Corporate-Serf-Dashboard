@@ -336,6 +336,23 @@ def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
     assert marks_room >= marks["minWidth"]
 
 
+def test_the_run_numbers_room_moves_with_its_indent():
+    """The # column's width and its padding move together.
+
+    The number's room is what the two leave, less a cell's 4px on the right:
+    22px, as it was at 56px and 30px.
+    """
+    (number,) = [c for c in _grid().columnDefs if c.get("field") == "n"]
+    css = STYLESHEET.read_text(encoding="utf-8")
+    indent = re.search(
+        r"padding-left: (\d+)px;",
+        _css_block(css, ".run-history-list-grid .run-list-number"),
+    )
+
+    assert indent
+    assert number["width"] - int(indent.group(1)) - 4 == 22
+
+
 def test_each_column_shows_a_field_the_rows_carry():
     fields = {column["field"] for column in _grid().columnDefs if "field" in column}
 
@@ -470,6 +487,10 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
             ),
             "wholeSession": "Show the whole session",
             "newPb": "New PB",
+            # The figures' words, which This scenario draws in columns.
+            "median": "Median",
+            "best": "Best",
+            "score": "Score",
         },
     }
 
@@ -898,28 +919,188 @@ def test_a_rows_height_follows_median_and_best_and_the_pinned_row_is_measured_to
     assert "api.updateGridOptions({ pinnedTopRowData: [pinned.data] });" in setting
 
 
-def test_a_rows_figures_go_ahead_of_its_count_unless_they_go_below():
+def _function(script: str, name: str) -> str:
+    """Return one function of the list's script, from its name to its end."""
+    body = script[script.index(f"function {name}(") :]
+    return body[: body.index("\n  }\n")]
+
+
+def test_a_scenario_rows_figures_go_ahead_of_its_count():
     """``Median … · Best … · 7 runs``: the count stays at the right edge."""
     script = LIST_SCRIPT.read_text(encoding="utf-8")
-    grouping = script[script.index("function groupRow(") :]
-    grouping = grouping[: grouping.index("\n  }\n")]
-    scenario = script[script.index("function scenarioRow(") :]
-    scenario = scenario[: scenario.index("\n  }\n")]
-    session = script[script.index("function sessionRow(") :]
-    session = session[: session.index("\n  }\n")]
+
+    assert 'return state.figures && data.figures ? [data.figures, " · "] : [];' in (
+        _function(script, "figuresInLine")
+    )
+    assert ".concat(figuresInLine(data), [\n            data.counts," in (
+        _function(script, "scenarioRow")
+    )
+
+
+def test_a_session_rows_figures_and_count_go_in_columns_in_its_line_or_below():
+    """Under This scenario, Median, Best, and the count line up across the rows.
+
+    The count takes a column only on a row whose figures are in its line. The
+    first row's figures go below, and that line ends short by the count's
+    column, so its Median and Best sit over the rows below.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    session = _function(script, "sessionRow")
+    grouping = _function(script, "groupRow")
+
+    assert "var figures = state.figures && data.figures;" in session
+    assert "var below = figures && data.figures_below;" in session
+    assert (
+        "figureColumns(data.figures, labels).concat([columnGap(), "
+        'slot("end", [state.columns.count], counts)])\n        : [counts];'
+    ) in session
+    assert (
+        'state.columns.count ? [blank([columnGap(), slot("end", '
+        '[state.columns.count], "")])] : []'
+    ) in session
+    assert "function groupRow(props, className, toggle, line, below) {" in grouping
+    assert (
+        '? h.apply(null, ["div", { className: "run-list-figures" }, partEnd()]'
+        ".concat(below))"
+    ) in grouping
+
+
+def test_the_part_end_opens_the_figures_below_so_the_line_ends_with_the_columns():
+    """The part end that tells the figures line from the first starts it.
+
+    After the line's last part, it was one of the line's flex items, and the
+    line's gap before it left the facts short of the columns' edge.
+    """
+    grouping = _function(LIST_SCRIPT.read_text(encoding="utf-8"), "groupRow")
+
+    assert '["div", { className: "run-list-line" }].concat(line)),' in grouping
+    assert '["div", { className: "run-list-figures" }, partEnd()]' in grouping
+
+
+def test_a_columns_part_is_as_wide_as_the_widest_text_it_holds_drawn_unseen():
+    """The browser sizes each part by the text the server names as the widest.
+
+    The unseen text and the value share one grid cell, and the unseen text
+    comes first, as the first child gives the part its baseline. Unseen is
+    out of the accessibility tree and a page search. Tabular digits keep the
+    server's pick of the widest text the browser's.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    css = STYLESHEET.read_text(encoding="utf-8")
+    slot = _function(script, "slot")
+
+    assert 'return h("span", { className: "run-list-slot-widest" }, text);' in slot
+    assert slot.index("run-list-slot-widest") < slot.index('[h("span", null, content)]')
+    assert "display: inline-grid;" in _css_block(css, ".run-list-slot")
+    assert "font-variant-numeric: tabular-nums;" in _css_block(css, ".run-list-slot")
+    assert "grid-area: 1 / 1;" in _css_block(css, ".run-list-slot > *")
+    assert "justify-items: end;" in _css_block(css, ".run-list-slot-end")
+    assert "justify-items: start;" in _css_block(css, ".run-list-slot-start")
+    assert ".run-list-slot-widest,\n.run-list-column-blank {" in css
+    assert "visibility: hidden;" in _css_block(css, ".run-list-column-blank")
+
+
+def test_a_value_lines_up_on_its_decimal_point_under_its_label():
+    """The label and the whole number end at their parts' right edges.
+
+    The decimals start at theirs.
+    """
+    column = _function(LIST_SCRIPT.read_text(encoding="utf-8"), "figureColumn")
 
     assert (
-        "return state.figures && data.figures && !data.figures_below"
-        ' ? [data.figures, " · "] : [];'
-    ) in script
-    assert "var below = state.figures && data.figures && data.figures_below;" in (
-        grouping
+        'slot("end", words, word),\n      space(),\n'
+        '      slot("end", [widest[0]], value[0]),\n'
+        '      slot("start", [widest[1]], value[1]),'
+    ) in column
+
+
+def test_every_space_between_parts_is_a_character_in_a_box_of_its_own():
+    """Chrome and Edge hand a screen reader no space for a bare one between parts.
+
+    Nor for an empty box, which read ``17,080Best``. The space between two
+    columns is 16px wide.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    css = STYLESHEET.read_text(encoding="utf-8")
+    space = _css_block(css, ".run-list-space")
+
+    assert (
+        'var classes = className ? "run-list-space " + className : "run-list-space";\n'
+        '    return h("span", { className: classes }, " ");'
+    ) in _function(script, "space")
+    assert 'return space("run-list-column-gap");' in _function(script, "columnGap")
+    assert "display: inline-block;" in space
+    assert "white-space: pre;" in space
+    assert "width: 16px;" in _css_block(css, ".run-list-column-gap")
+    # No bare space between two parts of a column.
+    assert '" ",' not in _function(script, "figureColumn")
+
+
+def test_a_one_run_sessions_score_sits_under_best_and_its_median_is_blank():
+    """The blank is Median's column drawn empty and hidden, so it keeps its room.
+
+    Best's label has room for Score wherever a session has one run.
+    """
+    columns = _function(LIST_SCRIPT.read_text(encoding="utf-8"), "figureColumns")
+
+    assert (
+        "var bestWords = widest.one_run ? [labels.best, labels.score] : [labels.best];"
+    ) in columns
+    assert (
+        'blank(figureColumn([labels.median], "", widest.median, ["", ""])'
+        ".concat([columnGap()]))"
+    ) in columns
+    assert "figureColumn(bestWords, labels.score, widest.best, figures.score)" in (
+        columns
     )
-    assert 'below ? h("div", { className: "run-list-figures" }, data.figures)' in (
-        grouping
+    assert "figureColumn(bestWords, labels.best, widest.best, figures.best)" in columns
+
+
+def test_the_columns_widths_reach_the_script_with_the_rows_they_size():
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    applying = script[script.index("state.apply = function") :]
+
+    assert applying.index("state.columns = model.columns;") < applying.index(
+        "api.updateGridOptions({ pinnedTopRowData: rows.slice(0, 1)"
     )
-    assert ".concat(figuresInLine(data), [\n            data.counts," in scenario
-    assert ".concat(figuresInLine(data), [counts])" in session
+    read = {
+        *re.findall(r"\bstate\.columns\.(\w+)", script),
+        *re.findall(r"\bwidest\.(\w+)", _function(script, "figureColumns")),
+    }
+    assert read <= set(run_history_list.FigureColumns.__annotations__)
+
+
+def test_a_group_rows_toggle_draws_the_apps_chevron_turned_by_its_state():
+    """Right when the row is closed and down when open, in the toggle's gray.
+
+    At 16px in the toggle's 14 by 16px box, so no row grows. The drawing
+    says nothing to a screen reader: the button's name and state do.
+    """
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    css = STYLESHEET.read_text(encoding="utf-8")
+    toggle = _function(script, "toggleButton")
+    chevron = _css_block(css, ".run-list-chevron")
+    icon = "icons/material-symbols-keyboard-arrow-down.svg"
+
+    assert 'h("span", { className: "run-list-chevron", "aria-hidden": "true" })' in (
+        toggle
+    )
+    assert "▸" not in script
+    assert "▾" not in script
+    assert (REPO_ROOT / "assets" / icon).is_file()
+    assert f'mask: url("{icon}") no-repeat center / contain;' in chevron
+    assert f'-webkit-mask: url("{icon}") no-repeat center / contain;' in chevron
+    assert "background-color: currentColor;" in chevron
+    assert "width: 16px;" in chevron
+    assert "height: 16px;" in chevron
+    assert "transform: rotate(-90deg);" in chevron
+    assert "transform: none;" in _css_block(
+        css, '.run-list-toggle[aria-expanded="true"] .run-list-chevron'
+    )
+    button = _css_block(css, ".run-list-toggle")
+    assert "width: 14px;" in button
+    assert "height: 16px;" in button
+    assert "color: var(--mantine-color-dimmed);" in button
 
 
 def test_a_key_that_opens_or_closes_a_row_is_said_through_the_live_region():

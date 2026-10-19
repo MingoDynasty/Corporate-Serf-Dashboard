@@ -961,19 +961,33 @@ FIGURES_CASES = [
     ((100.0, 101.0, 90.0, 130.0), "Median 100.5 · Best 130"),
 ]
 FIGURES_IDS = ["one", "two", "odd", "even"]
+# The same figures as a session row under This scenario carries them, split
+# at the decimal point for its columns.
+FIGURE_PARTS = [
+    {"score": ["3,324", ""]},
+    {"median": ["3,373", ""], "best": ["3,422", ""]},
+    {"median": ["100", ""], "best": ["120", ".5"]},
+    {"median": ["100", ".5"], "best": ["130", ""]},
+]
 
 
-@pytest.mark.parametrize(("scores", "figures"), FIGURES_CASES, ids=FIGURES_IDS)
-def test_a_session_row_gives_the_median_and_best_of_the_scenarios_runs(scores, figures):
-    runs = [
-        *[
-            _run(A, EVENING + timedelta(minutes=2 * index), score=score)
-            for index, score in enumerate(scores)
-        ],
-        *_minutes(30, scenario=B),
+def _session(start: datetime, *scores: float, scenario: str = A) -> list[RunData]:
+    """Build one session's runs of ``scenario``, two minutes apart, with these scores."""
+    return [
+        _run(scenario, start + timedelta(minutes=2 * index), score=score)
+        for index, score in enumerate(scores)
     ]
 
-    assert _build(runs)["rows"][0]["figures"] == figures
+
+@pytest.mark.parametrize(
+    ("scores", "parts"),
+    [(scores, parts) for (scores, _), parts in zip(FIGURES_CASES, FIGURE_PARTS)],
+    ids=FIGURES_IDS,
+)
+def test_a_session_row_splits_its_median_and_best_at_the_decimal_point(scores, parts):
+    runs = [*_session(EVENING, *scores), *_minutes(30, scenario=B)]
+
+    assert _build(runs)["rows"][0]["figures"] == parts
 
 
 def test_a_session_row_with_no_run_of_the_scenario_has_no_figures():
@@ -983,7 +997,126 @@ def test_a_session_row_with_no_run_of_the_scenario_has_no_figures():
 
     assert first["counts"] == "0 of 1 run"
     assert first["figures"] is None
-    assert older["figures"] == "Score 100"
+    assert older["figures"] == {"score": ["100", ""]}
+
+
+# --- This scenario: the figure columns -----------------------------------------
+
+
+def test_the_columns_hold_the_widest_whole_number_and_decimals_of_each_column():
+    """Whole numbers and decimals are sized apart, so the decimal points line up."""
+    day = timedelta(days=1)
+    runs = [
+        *_session(EVENING - 2 * day, 10.0, 20.26),
+        *_session(EVENING - day, 17080.0, 17080.0, 18980.5),
+        *_session(EVENING, 300.0, 400.0),
+    ]
+
+    columns = _build(runs)["columns"]
+
+    assert columns["median"] == ["17,080", ".13"]
+    assert columns["best"] == ["18,980", ".26"]
+
+
+def test_a_column_with_no_decimals_in_any_session_has_none_to_hold():
+    runs = [*_session(EVENING - timedelta(days=1), 100.0, 2000.0), *_minutes(30)]
+
+    columns = _build(runs)["columns"]
+
+    assert columns["median"] == ["1,050", ""]
+    assert columns["best"] == ["2,000", ""]
+
+
+def test_the_columns_come_from_every_session_and_not_only_the_loaded_ones():
+    """So Show older sessions never moves a column."""
+    day = timedelta(days=1)
+    oldest = EVENING - 3 * day
+    runs = [
+        *_session(oldest, 99990.0, 99999.5),
+        *_minutes(*range(5, 15), scenario=B, start=oldest),
+        *_session(oldest + timedelta(hours=2), 5.0),
+        *_session(EVENING - 2 * day, 10.0, 20.0),
+        *_session(EVENING - day, 10.0, 20.0),
+        *_session(EVENING, 10.0, 20.0),
+    ]
+
+    model = _build(runs, limit=2)
+
+    assert len(_of_kind(model, "session")) == 2
+    assert model["columns"] == {
+        "median": ["99,994", ".75"],
+        "best": ["99,999", ".5"],
+        "count": "2 of 12 runs",
+        "one_run": True,
+    }
+
+
+def test_a_one_run_sessions_score_is_held_by_bests_column():
+    runs = [
+        *_session(EVENING - timedelta(days=1), 123456.0),
+        *_session(EVENING, 10.0, 20.0),
+    ]
+
+    columns = _build(runs)["columns"]
+
+    assert columns["best"] == ["123,456", ""]
+    assert columns["median"] == ["15", ""]
+    assert columns["one_run"] is True
+
+
+def test_with_no_one_run_session_bests_label_holds_best_alone():
+    runs = [*_session(EVENING - timedelta(days=1), 10.0, 20.0), *_minutes(30, 32)]
+
+    assert _build(runs)["columns"]["one_run"] is False
+
+
+def test_with_every_session_one_run_the_median_column_holds_nothing():
+    runs = [*_session(EVENING - timedelta(days=1), 10.0), *_minutes(30)]
+
+    columns = _build(runs)["columns"]
+
+    assert columns["median"] == ["", ""]
+    assert columns["best"] == ["100", ""]
+
+
+def test_the_count_column_leaves_out_the_first_row_whose_count_is_in_no_column():
+    """Its figures go below, and its count grows with every run played."""
+    runs = [
+        *_session(EVENING - timedelta(days=1), 10.0),
+        *_session(EVENING, *[10.0] * 12),
+    ]
+
+    model = _build(runs)
+
+    assert model["rows"][0]["counts"] == "12 of 12 runs"
+    assert model["columns"]["count"] == "1 of 1 run"
+
+
+def test_with_the_first_row_alone_no_row_has_a_count_to_line_up():
+    assert _build(_minutes(0, 2))["columns"]["count"] is None
+
+
+def test_of_two_counts_as_long_the_one_with_more_digits_is_the_widest():
+    """A comma is narrower than a digit, so ``100 of 100`` outdraws ``1 of 1,000``."""
+    day = timedelta(days=1)
+    crowded = EVENING - 2 * day
+    runs = [
+        *_session(crowded, 1.0),
+        *[_run(B, crowded + timedelta(seconds=index + 1)) for index in range(999)],
+        *_session(EVENING - day, *[1.0] * 100),
+        *_minutes(30),
+    ]
+
+    model = _build(runs)
+
+    counts = [row["counts"] for row in _of_kind(model, "session")[1:]]
+    assert counts == ["100 of 100 runs", "1 of 1,000 runs"]
+    assert model["columns"]["count"] == "100 of 100 runs"
+
+
+def test_the_trees_model_and_an_empty_model_have_no_columns():
+    assert _tree(_minutes(0, 2))["columns"] is None
+    assert build_run_list([], A, SESSIONS_PER_LOAD, EVENING, {})["columns"] is None
 
 
 # --- All scenarios: the tree ---------------------------------------------------
