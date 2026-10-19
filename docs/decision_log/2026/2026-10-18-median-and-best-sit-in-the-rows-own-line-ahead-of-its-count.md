@@ -17,8 +17,10 @@ This scenario rows were measured, "Ruled: This scenario's session rows also
 go on one line (Median · Best · count), except the first row, which keeps its
 second line." This supersedes the second-line part of
 [the 2026-10-14 entry](2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md),
-whose checkbox, default, and choice of rows stand. What the list does today is
-in [run_history.md](../../specs/run_history.md#the-run-list).
+whose checkbox, default, and choice of rows stand. Built in
+[#392](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/392).
+What the list does today is in
+[run_history.md](../../specs/run_history.md#the-run-list).
 
 **What the line says.**
 
