@@ -550,9 +550,9 @@ older runs. Every run counts, as TS1 says.**
   - In 2026 alone the median gap between the two values, where they differ,
     is 0.8%.
 - **The lag runs either way.** This player came back better than before each
-  break, so D's mixed values ran low: 20% of the 92 came in above the next
-  session, and 3% by 5% or more, against 30% and 8% of the values whose runs
-  were all recent. A player who comes back rusty sees the other direction:
+  break, so D's mixed values ran low: 20% of the 92 were above the next
+  session's median, and 3% by 5% or more, against 30% and 8% of the values
+  whose runs were all recent. A player who comes back rusty sees the other direction:
   10 old scores of 200 and 10 recent ones of 100 make a full-strength 150.
   One player's history can't bound that. The maintainer's view of the worst
   case, quoted above, covers the first direction only.
@@ -598,9 +598,9 @@ older runs. Every run counts, as TS1 says.**
   scenario played 10 to 19 times a month whose last 20 runs reach past 30
   days stays faded. As of the newest run in the data, 31 scenarios played in
   the last 30 days have a value: D draws 27 at full strength, this test 16.
-  Of the 11 it fades, 6 are returns still holding runs from 159 days or more
-  before, and 5 were played 14 to 19 times in the month, their oldest runs 30
-  to 49 days old.
+  Of the 11 it fades, 6 are returns still holding runs 159 or more days old,
+  and 5 were played 14 to 19 times in the month, their oldest runs 30 to 49
+  days old.
 - **A 90-day ceiling on the oldest run, on top of D's test,** fades those 6
   returns and keeps the 5 at full strength. Over 2026 it costs nearly as much
   as every run recent, 32.7% of runs at full strength, because most of the
