@@ -15,19 +15,17 @@ its own, named from the scenario's name.
 
 ## Decisions needed
 
-Eight rows, SN1 to SN8. **Nothing is ratified.** SN1 to SN6 are the
-maintainer's agreement from the design discussion of 2026-10-18, held on four
-full-size mockups built from their own stats. None was said in a ruling word.
-In this project's workflow a ruling is the maintainer's explicit "decided",
-"ruled", "locked" or "ratified", or an unambiguous direction to treat a row
-as settled. An agreement in a design discussion is a lean: it records where
-the maintainer stands, and it stays open to review until they ratify it.
-Where a point only met no objection rather than an explicit yes, its row says
-so. SN8 is open: the maintainer has no lean on it. After the first review,
-the maintainer chose how leaving the page treats unsaved text (SN3, rule 8)
-and which empty state SN7 takes; those choices are leans too. Everything else is author-owned and is in
-[Design](#design), including every string in [Copy](#copy); reviewers may
-challenge any of it.
+Eight rulings, SN1 to SN8. The maintainer ratified this proposal on
+2026-10-18: "I ratify the scenario notes proposal, SN1 to SN8, as at
+88aa8b0." That settles each row as its recommendation, SN1, SN3 and SN6 as
+amended in review. Before that, SN1 to SN6 were the maintainer's agreement
+from the design discussion of 2026-10-18, held on four full-size mockups
+built from their own stats, and after the first review they chose how
+leaving the page treats unsaved text (SN3, rule 8) and which empty state SN7
+takes. Each row keeps what they said, its argument, and what the
+alternatives would have changed, for the record. Everything else is
+author-owned and is in [Design](#design), including every string in
+[Copy](#copy), and the ratification covers it too.
 
 This proposal builds on the top row cards (Proposal 1, rows T1 to T4,
 ratified on 2026-10-14 in #379), which are not reopened here. T1 kept the
@@ -39,7 +37,8 @@ scenario ([Proposal 2](#proposal-2)).
 
 ### SN1. A note is one plain-text note per scenario, rewritten in place
 
-Status: open. The maintainer, 2026-10-18: "Agreed: one note per scenario that
+Status: Ratified (user), 2026-10-18: accept the recommendation below, as
+amended. Before that, the maintainer, 2026-10-18: "Agreed: one note per scenario that
 I rewrite, with the edited age shown behind a switch in the mockup." And:
 "Agreed: the first version is plain-text scenario notes on Run History only".
 
@@ -75,7 +74,8 @@ formatting and links.
 
 ### SN2. The note is always on screen for the selected scenario
 
-Status: open. The discussing session presented this as its lean. The
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, the discussing session presented this as its lean. The
 maintainer answered only the empty state (SN7) and raised no objection to
 the rest; that is not an explicit yes.
 
@@ -104,7 +104,8 @@ glance during play; a Show more control.
 
 ### SN3. The editor, Follow, and changes the player makes
 
-Status: open. The maintainer's agreement on the buttons, 2026-10-18: "I am
+Status: Ratified (user), 2026-10-18: accept the recommendation below, as
+amended. Before that, the maintainer's agreement on the buttons, 2026-10-18: "I am
 still leaning toward explicit Save/Cancel buttons. From the older
 `scenario-stats-layout-v9.html` mockup, it showed small buttons that didn't
 take up much screen space. Having explicit buttons also means it trivial for
@@ -197,7 +198,8 @@ return. Each reason is in [Alternatives rejected](#alternatives-rejected).
 
 ### SN4. The first-run gap is accepted
 
-Status: open. The maintainer, 2026-10-18: "Agreed: the Notes proposal accepts
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, the maintainer, 2026-10-18: "Agreed: the Notes proposal accepts
 the one-run gap and states the numbers, and following scenario starts from
 KovaaK's log goes to the Backlog as its own idea."
 
@@ -224,7 +226,8 @@ in six.
 
 ### SN5. The first version is scenario notes on Run History only
 
-Status: open. The maintainer, 2026-10-18: "Agreed: the first version is
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, the maintainer, 2026-10-18: "Agreed: the first version is
 plain-text scenario notes on Run History only, and the playlist-table column
 waits for a later proposal."
 
@@ -236,7 +239,8 @@ History's top row.** Each item left out is listed in
 
 ### SN6. Storage: a file per note
 
-Status: open. The maintainer, 2026-10-18: "Agreed: each scenario note gets its
+Status: Ratified (user), 2026-10-18: accept the recommendation below, as
+amended. Before that, the maintainer, 2026-10-18: "Agreed: each scenario note gets its
 own file, named from the scenario with a code from its exact name, holding the
 exact name and the text."
 
@@ -254,7 +258,7 @@ new schema version and a conversion script.
   file.
 - **Content:**
   `{"schema_version": 1, "scenario": "<the name>", "text": "<the note>"}`,
-  plus `"edited_at"` if SN8 ships.
+  plus `"edited_at"` (SN8).
 - **Read when its scenario is selected.** The path comes from the name, so no
   folder scan finds a note, and nothing is held in memory.
 - **Save writes one file;** saving empty text deletes it.
@@ -295,7 +299,8 @@ the file's modified time as the edit time.
 
 ### SN7. The empty state
 
-Status: open. The maintainer first had no lean, 2026-10-18: "I don't feel
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, the maintainer first had no lean, 2026-10-18: "I don't feel
 strongly whether it's an empty card vs purely the link. I feel like it's
 simply a UI/UX preference. Let's leave it up for debate during proposal
 review." After the first review they asked whether it matters that "for most
@@ -332,7 +337,8 @@ the at-a-glance signal.
 
 ### SN8. The edited-age line
 
-Status: open, not yet judged. The mockup shows it behind a switch.
+Status: Ratified (user), 2026-10-18: accept the recommendation below.
+Before that, it was not yet judged; the mockup shows it behind a switch.
 
 The material consequence: whether the store keeps an edit time. If it ships
 later instead, every note written before then has no time to show, and adding
@@ -556,10 +562,10 @@ The note card alone, in each state:
 | ░░ since a tense hand ░░░░░░░░░░░░░░░░░░░░░ |  (fading)
 +---------------------------------------------+
 
-3a. No note, recommended (SN7): a link in the same box, no frame.
+3a. No note (SN7): a link in the same box, no frame.
   Add a scenario note
 
-3b. No note, the alternative: an empty card.
+3b. Set aside by the ratification, for the record: an empty card.
 +- Scenario note ---------------------------------------------- Add a note -+
 | No note yet                                                              |
 +--------------------------------------------------------------------------+
@@ -617,7 +623,7 @@ maintainer's checkout. It is not in the repository.
   never depends on the note, so the chart doesn't move. While editing, the
   card can grow (see [The editor](#the-editor)).
 - **First line:** `Scenario note`, quiet, as the other cards' first lines are,
-  with `· edited {age}` if SN8 ships, and **Edit** at the line's right end,
+  with `· edited {age}` (SN8), and **Edit** at the line's right end,
   drawn as the app draws a link.
 - **Text:** 14 px, line breaks kept, wrapped anywhere a word is too long for
   the card, centered in the card's height when short. A note taller than the
@@ -744,8 +750,8 @@ A testable statement for the build: **the note card is redrawn only by a
 change of the page's scenario that the rules let through, by Edit, Save and
 Cancel, and by the dialog's answers.** A run landing on any scenario, the
 30-second tick, the date moving on, the Playlist filter, the Score threshold
-and a dropdown value held behind the dialog never redraw it. If SN8 ships,
-the tick rewrites only the age, which shows only while reading.
+and a dropdown value held behind the dialog never redraw it. The tick
+rewrites only the age (SN8), which shows only while reading.
 
 ### Storage
 
@@ -756,7 +762,7 @@ the tick rewrites only the age, which shows only while reading.
   or punctuation apart. Where the shared helper lives is the build's call; the
   cache's `_safe_cache_key` is private to `api_service.py` today.
 - **Version 1 of the file:** a JSON object with exactly `schema_version`,
-  `scenario` and `text`, plus `edited_at` if SN8 ships. `scenario` must equal
+  `scenario`, `text` and `edited_at` (SN8). `scenario` must equal
   the name the page asked for. `text` is a string with at least one character
   that isn't whitespace, and at most 2,000 characters.
   `edited_at` is an ISO 8601 time in UTC, such as `2026-10-18T20:25:00Z`. Any
@@ -871,10 +877,10 @@ player typed. The browser's "Leave site?" prompt is the browser's own copy.
 | Where | String | Why |
 |---|---|---|
 | Card, first line | `Scenario note` | Names a note that belongs to a scenario, leaving "session note" free. |
-| Card, first line, if SN8 ships | `Scenario note · edited {age}`, such as `edited 3 weeks ago`; hover `Oct 9, 2026, 5:24 PM` | As the PB card's `PB · set {age}`. |
+| Card, first line, with the edit age (SN8) | `Scenario note · edited {age}`, such as `edited 3 weeks ago`; hover `Oct 9, 2026, 5:24 PM` | As the PB card's `PB · set {age}`. |
 | Card, button | `Edit`; accessible name `Edit scenario note` | Short on screen, named in full for a screen reader. |
-| Empty state, recommended | `Add a scenario note` | A link that says what it adds. |
-| Empty state, alternative | `Scenario note` over `No note yet`, with `Add a note` | A status readout, as `No runs yet`. |
+| Empty state (SN7) | `Add a scenario note` | A link that says what it adds. |
+| Empty state set aside by the ratification, for the record | `Scenario note` over `No note yet`, with `Add a note` | A status readout, as `No runs yet`. |
 | Editor, text box | Placeholder `Note for this scenario`; accessible name `Scenario note` | A bare noun phrase, as rule 4 asks. |
 | Editor, buttons | `Save`, `Cancel` | |
 | Editor, count from 1,800 characters | `{n} of 2,000 characters`, such as `1,850 of 2,000 characters` | A readout, no period. |
@@ -887,7 +893,7 @@ player typed. The browser's "Leave site?" prompt is the browser's own copy.
 | Dialog, buttons | `Keep editing`, `Discard`, `Save` | `Discard`, not `Cancel`, which could read as cancelling the switch. |
 | Save error | `Couldn't save the scenario note. See data/logs/debug.log.` | Rule 9; the log pointer as rule 7 sets it. |
 | Card and save errors, broken file | The schema machinery's messages with the kind `scenario note file`, such as `The scenario note file isn't valid JSON. File: {path}` | The shared wording for every store. |
-| Card errors, version 1's own rules | `The scenario note file {predicate} File: {path}`, the predicate one of `has an unknown key "{key}".`, `is missing "{key}".`, `is for another scenario.`, `holds an empty note.`, `holds more than 2,000 characters.`, `must hold "{key}" as text.`, and if SN8 ships `must hold "edited_at" as a UTC time.` | As the settings file's predicates compose. |
+| Card errors, version 1's own rules | `The scenario note file {predicate} File: {path}`, the predicate one of `has an unknown key "{key}".`, `is missing "{key}".`, `is for another scenario.`, `holds an empty note.`, `holds more than 2,000 characters.`, `must hold "{key}" as text.`, and `must hold "edited_at" as a UTC time.` | As the settings file's predicates compose. |
 
 ### Terms
 
@@ -986,13 +992,13 @@ From the design discussion of 2026-10-18 unless marked.
 Two pull requests, in order. This is intent, not a contract: a boundary that
 moves is noted in the PR's description.
 
-1. **The scenario note store,** with nothing on screen (SN6, and SN8's field
-   if it ships). The module, the v1 validator, the destination guard, read,
-   save and delete, their tests, and the code-truth docs: `architecture.md`'s
-   "State" and "Schema stamps", and `store_schema.py`'s docstring. It needs
-   SN6 and SN8 ratified. **Recommended:** `claude-opus-5-5` at high: it
-   follows the settings store's pattern closely. Nothing to look at in
-   Firefox.
+1. **The scenario note store,** with nothing on screen (SN6, and SN8's
+   `edited_at` field). The module, the v1 validator, the destination guard,
+   read, save and delete, their tests, and the code-truth docs:
+   `architecture.md`'s "State" and "Schema stamps", and `store_schema.py`'s
+   docstring. Unblocked: SN6 and SN8 were ratified on 2026-10-18.
+   **Recommended:** `claude-opus-5-5` at high: it follows the settings
+   store's pattern closely. Nothing to look at in Firefox.
 2. **The note card, the editor, Follow's wait, the dialog, and the shipping
    docs** (SN1 to SN5, SN7, SN8's line). The card, the editor and the waiting
    line, the dialog and its routes, the page script that catches the toast's
@@ -1002,8 +1008,8 @@ moves is noted in the PR's description.
    checklist: the decision-log entries, the notes in
    [Decisions this changes](#decisions-this-changes), the Run History spec,
    the glossary's entry from [Terms](#terms), the user guide, the roadmap,
-   `product.md`, and this file deleted. It needs PR 1 merged and the
-   proposal ratified. **Recommended:** `claude-opus-5-5` at xhigh, since the
+   `product.md`, and this file deleted. It needs PR 1 merged; the proposal
+   was ratified on 2026-10-18. **Recommended:** `claude-opus-5-5` at xhigh, since the
    editor's rules interact and it changes the shared selection callback. The
    maintainer looks at it in their own Firefox at 2560 px, with a run landing
    while a note is being edited.

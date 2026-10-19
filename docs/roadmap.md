@@ -100,9 +100,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
   kept in the first column. Current behavior is in
   [`specs/run_history.md`](./specs/run_history.md).
 
-- **Scenario notes** — review the scenario notes proposal, in
-  [`proposals/scenario_notes_proposal.md`](./proposals/scenario_notes_proposal.md).
-  It proposes one plain-text note per scenario, shown in the room the top row
+- **Scenario notes** — the
+  [proposal](./proposals/scenario_notes_proposal.md) was ratified on
+  2026-10-18. It sets one plain-text note per scenario, shown in the room the top row
   kept between Scenario Stats and the PB card and edited in place, with
   Follow waiting while a note has unsaved changes. Its implementation runs
   beside the latest-run card's; the two meet in the callback that selects a
