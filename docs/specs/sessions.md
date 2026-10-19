@@ -38,12 +38,17 @@ Two words are kept apart throughout. A **break** is time between runs. A
   session. The word visit is not on screen.
 - The newest session is always the list's first row, whether or not it is in
   progress, and is marked while it is (see [In progress](#in-progress)).
-- The latest-run card reports the last run played, on whatever scenario. Its
-  third line gives the run's number among its scenario's runs in its session,
-  and the time spent on that scenario in the session: the sum of the
-  scenario's visits, each from its first run's start to its last run's end.
-  It says "this session" while the session is in progress and "last session"
-  once it has ended (see [In progress](#in-progress)).
+- The latest-run card reports the selected scenario's latest run: its last
+  run in the newest session that holds one
+  ([2026-10-18](../decision_log/2026/2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md)).
+  Its third line gives the run's number among its scenario's runs in its
+  session, and its fourth the time spent on that scenario in the session:
+  the sum of the scenario's visits, each from its first run's start to its
+  last run's end. For the newest session it says "this session" while the
+  session is in progress and "last session" once it has ended (see
+  [In progress](#in-progress)). An older session is named as the list names
+  its row, by its first run's start, such as `Run 7 (Oct 16, 2:00 PM
+  session)`.
 - Where the first run of any of those visits has no usable start, the card
   says the time on the scenario is unknown and gives no number. Such a visit
   is counted from that run's end, so one long run would read as under a

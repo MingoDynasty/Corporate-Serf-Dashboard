@@ -8,6 +8,12 @@ category it names, because a scenario can belong to several benchmarks.
 When that benchmark has no groups or does not list the scenario, the row
 disappears so the card holds only useful facts.
 
+**Superseded in part (2026-10-18).** [Last played leaves Scenario Stats](2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md):
+the card holds Category and Number of runs, under a first line that is
+plain text, `Scenario stats`, and no longer an `h2`. With no scenario
+selected it reads "No scenario selected" in place of both, so Last played's
+empty states below are historical. Category's rules stand.
+
 **Ruling.** T2 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`. The maintainer wanted
 the category while grinding a benchmark and kept Last played because the

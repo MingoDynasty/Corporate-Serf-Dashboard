@@ -330,7 +330,9 @@ def test_the_landed_run_reaches_the_card_as_a_percentage_of_pb_pace(
     folders.performance_file(THIRD)
 
     _land(monkeypatch, folders.stats_file(THIRD, 883.02))
-    shown = latest_run_card.latest_run_from_store(95, datetime(2026, 8, 3, 10, 0, 0))
+    shown, _newest = latest_run_card.latest_run_from_store(
+        SCENARIO, 95, datetime(2026, 8, 3, 10, 0, 0)
+    )
 
     assert shown is not None
     assert shown.badge is latest_run_card.CardBadge.BELOW_THRESHOLD
