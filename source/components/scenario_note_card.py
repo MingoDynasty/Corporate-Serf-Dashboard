@@ -111,7 +111,11 @@ READ_CLASS = "run-history-note-read"
 HEADING_CLASS = "run-history-note-heading"
 LABEL_CLASS = "run-history-note-label"
 LINK_CLASS = "run-history-note-link"
+# Mantine's keyboard focus ring, which a dmc button would have brought. Without
+# it the ring is the browser's own, near-black in Chromium on the dark theme.
+FOCUS_CLASS = "mantine-focus-auto"
 TEXT_CLASS = "run-history-note-text"
+SCROLL_CLASS = "run-history-note-scroll"
 EDITOR_CLASS = "run-history-note-editor"
 TEXT_BOX_CLASS = "run-history-note-text-box"
 FOOTER_CLASS = "run-history-note-footer"
@@ -273,17 +277,31 @@ def _read_view(ids: NoteCardIds) -> html.Div:
                     html.Span([NOTE_LABEL, _age_label(ids)], className=LABEL_CLASS),
                     html.Button(
                         EDIT_LABEL,
-                        className=LINK_CLASS,
+                        className=f"{LINK_CLASS} {FOCUS_CLASS}",
                         id=ids.edit,
                         type="button",
                         **edit_name,
                     ),
                 ],
             ),
-            html.Div(className=TEXT_CLASS, id=ids.text),
+            # Mantine draws this scrollbar itself, so it shows whenever the
+            # note is longer than the card. The browser's own would be an
+            # overlay in Firefox on Windows 11, gone a second after the page
+            # draws, and a note cut inside a run of blank lines would look
+            # whole. The browsers make the viewport a tab stop only while it
+            # scrolls; the region role is what lets it carry a name.
+            dmc.ScrollArea(
+                html.Div(className=TEXT_CLASS, id=ids.text),
+                className=SCROLL_CLASS,
+                type="auto",
+                scrollbars="y",
+                offsetScrollbars="y",
+                scrollbarSize=8,
+                attributes={"viewport": {"role": "region", "aria-label": NOTE_LABEL}},
+            ),
             html.Button(
                 ADD_LABEL,
-                className=f"{LINK_CLASS} {LINK_CLASS}-add",
+                className=f"{LINK_CLASS} {LINK_CLASS}-add {FOCUS_CLASS}",
                 id=ids.add,
                 type="button",
             ),
@@ -567,8 +585,9 @@ def register_scenario_note_card(ids: NoteCardIds) -> None:
         Input(ids.edited_at, "data"),
         Input(ids.relative_time_interval, "n_intervals"),
     )
-    # Fades a note taller than the card. Whether it overflows depends on the
-    # card's width, which the server never knows.
+    # Fades the note's bottom line while more of it is below, and starts a
+    # newly drawn note at its top. Whether it overflows depends on the card's
+    # width, which the server never knows.
     clientside_callback(
         ClientsideFunction(namespace="scenario_notes", function_name="fade"),
         Output(ids.fade_sink, "data"),

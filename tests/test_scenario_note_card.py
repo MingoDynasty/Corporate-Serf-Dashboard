@@ -308,6 +308,32 @@ def test_the_card_and_the_editor_carry_the_copy_block_words():
     assert getattr(_by_id(page_card, IDS.waiting_line), "aria-live") == "polite"
 
 
+def test_edit_and_add_wear_mantines_focus_ring():
+    """Drawn as links on plain buttons, they would otherwise get the browser's ring."""
+    page_card = card.scenario_note_card(IDS, toast_link_class="toast-link")
+
+    for button_id in (IDS.edit, IDS.add):
+        assert "mantine-focus-auto" in _by_id(page_card, button_id).className.split()
+
+
+def test_a_long_note_scrolls_in_a_scroll_area_that_draws_its_own_scrollbar():
+    """Mantine's scrollbar shows whenever the note is longer than the card.
+
+    The browser's own is an overlay in Firefox on Windows 11, gone a second
+    after the page draws. The viewport is a tab stop while it scrolls, so it
+    carries a name, which a generic element can't.
+    """
+    page_card = card.scenario_note_card(IDS, toast_link_class="toast-link")
+    area = next(c for c in _walk(page_card) if isinstance(c, dmc.ScrollArea))
+
+    assert area.children.id == IDS.text
+    assert area.className == "run-history-note-scroll"
+    assert (area.type, area.scrollbars) == ("auto", "y")
+    assert area.attributes == {
+        "viewport": {"role": "region", "aria-label": "Scenario note"}
+    }
+
+
 def test_the_dialog_has_no_close_button_and_keep_editing_takes_focus_first():
     dialog = card.scenario_note_dialog(IDS)
     keep = _by_id(dialog, IDS.keep)
@@ -359,6 +385,30 @@ def test_the_card_takes_the_room_from_240_to_800px_and_reading_never_sizes_it():
     assert "border: 1px solid transparent;" in box
     assert "position: absolute;" in read
     assert "inset: 0;" in read
+
+
+def test_the_note_scrolls_in_the_room_under_its_first_line_and_fades_while_more_is_below():
+    """The scroll area shrinks to the room left, so a long note never sizes the card.
+
+    The fade is on the viewport, keyed on what the script measures, so the
+    scrollbar beside it stays whole and the fade goes at the note's end.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    area = _css_block(css, ".run-history-note-scroll")
+    viewport = _css_block(
+        css,
+        '.run-history-note-scroll .mantine-ScrollArea-viewport[data-clipped="true"]',
+    )
+    text = _css_block(css, ".run-history-note-text")
+
+    assert "flex: 0 1 auto;" in area
+    assert "min-height: 0;" in area
+    assert "mask-image:" in viewport
+    # The text itself never clips: the viewport does.
+    assert "overflow" not in text.replace("overflow-wrap", "")
+    script = SCRIPT.read_text(encoding="utf-8")
+    assert 'viewport.addEventListener("scroll", measure, { passive: true });' in script
+    assert 'viewport.setAttribute("data-clipped", more ? "true" : "false");' in script
 
 
 def test_the_text_box_never_shows_less_than_three_lines():
