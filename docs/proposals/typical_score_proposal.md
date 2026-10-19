@@ -409,8 +409,8 @@ Before that, the maintainer: "Ship it first in today's Scenario Stats; the
 cards proposal can move it later."; "keep as no limit. '2,140 · as of Mar 3,
 2020' is still useful information, even if it is outdated."
 
-The material consequence: Scenario Stats gains a fourth fact. On the card as
-it shipped, the top row keeps its height.
+The material consequence: Scenario Stats gains a line. On the card as it
+ships today, the top row keeps its height.
 
 **Recommendation: a "Typical score" line in Scenario Stats, showing the value
 after the scenario's newest run, with "as of {date}" when that value is
@@ -424,29 +424,32 @@ carried or its newest run is more than 30 days old, and no limit on how old an
 - **The unknown state names its count,** so a player grinding a new scenario
   sees how far it is from known (see [Copy](#copy)).
 
-**Written against the Scenario Stats card as it shipped.** The top row
-cards shipped after the maintainer's lean, in #380, #383 and #384. The card
-now holds Category, while the Playlist filter holds a benchmark that groups
-the selected scenario, then Last played and Number of runs, at one weight,
-in a 270 px frame
+**Written against the Scenario Stats card as it ships today.** The top row
+cards shipped after the maintainer's lean, in #380, #383 and #384, and two
+PRs have changed the row since. #391 moved Last played to the latest-run card
+and made the card's first line plain text
+([2026-10-18](../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md)),
+and #396 put the scenario note card beside it
+([2026-10-18](../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md)).
+The card now holds Category, while the Playlist filter holds a benchmark that
+groups the selected scenario, then Number of runs, at one weight, in a 270 px
+frame
 ([T2](../decision_log/2026/2026-10-14-scenario-stats-names-the-selected-benchmarks-category.md),
 [T4](../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md)).
-Position moved to the PB card. T4 lists a card's facts in importance order
-when it has no lead fact, so **the line goes second, after Category**, or
-first when no benchmark is selected. The typical score is the fact D1 makes
-the measure of skill; Last played and Number of runs are lookup context.
-Moving it to the PB card, beside the PB, is a later change that neither
-proposal makes.
+With no scenario selected it reads "No scenario selected" in place of its
+lines. Position moved to the PB card. T4 lists a card's facts in importance
+order when it has no lead fact, so **the line goes second, after Category**,
+or first when no benchmark is selected. The typical score is the fact D1 makes
+the measure of skill; Number of runs is lookup context. Moving it to the PB
+card, beside the PB, is a later change that neither proposal makes.
 
-**The cost, measured on the shipped card** (headless Edge at 2560 and 1920
-px, the maintainer's stats, with a benchmark selected and without): the row
-is 141 px, set by the dropdowns' column. With a username, simulated as a
-one-line leaderboard line, the card's lines fit inside that row with a
-fourth line, whatever it says, so the row keeps its height. Without a
-username, the PB card's hint sets the row (164 px with a benchmark, 143 px
-without), and the line doesn't change it either. A bare value such as
-`1,179` fits on one line. The "as of" and unknown values wrap to a second
-line in the 270 px card, and the card's height absorbs it.
+**The cost, measured on today's row** (headless Edge at 2560 and 1920 px, the
+maintainer's stats, no username, with a benchmark selected and without, on
+2026-10-19 at `1dc9413`): the row is 143 px without a benchmark and 164 px
+with one, set by the PB card. Prototype v8, which leads the card with the
+typical score as a large number (TS8), leaves both heights unchanged, so a
+line of ordinary text fits too. The "as of" and unknown values may wrap to a
+second line in the 270 px card, and the card's height absorbs it.
 
 **Ordered against the top row cards' PRs 2 and 3: neither waited for the
 other.** Asked whether the line ships before or after them, the maintainer,
@@ -466,8 +469,9 @@ touch the top row.
   dropped the old Average score line and drew no median, because "A new
   summary line would be a second definition of the typical run." This
   proposal is that definition.
-- **Scenario Stats shows Category, Last played and Number of runs,** and the
-  PB card the personal best and the leaderboard position
+- **Scenario Stats shows Category and Number of runs,** the PB card the
+  personal best and the leaderboard position, and the latest-run card when
+  the scenario was last played
   ([run_history.md](../specs/run_history.md#scenario-stats)). Nothing on any
   page shows how a scenario usually plays.
 - **The run list's Median and best is not it.** That checkbox, off to start,
@@ -531,10 +535,11 @@ sessions.
 
 ### Verified facts
 
-Checked at `dcc4cba`, the `main` this proposal's branch last merged, on
-2026-10-18. They were first checked at `1799df0`. The top row cards (#380,
-#383, #384) merged between, and changed none of what is listed here except
-Scenario Stats, now a card without Position.
+Checked at `1dc9413`, the `main` this proposal's branch last merged, on
+2026-10-19. They were first checked at `1799df0`, then at `dcc4cba`. Between
+them the top row cards (#380, #383, #384) took Position out of Scenario Stats,
+#391 took Last played out of it, and #396 added the scenario note card to the
+top row. Nothing else listed here changed.
 
 - **The chart's builders.** `build_run_history_figure` in
   `source/components/run_history_chart.py` reads the scenario's runs in play
@@ -564,8 +569,10 @@ Scenario Stats, now a card without Position.
   `get_runs_in_play_order` in `source/kovaaks/data_service.py` each return a
   copy of the run store.
 - **Scenario Stats.** `scenario_stats_panel` and `register_scenario_stats` in
-  `source/components/scenario_stats.py`. With no scenario selected, Number of
-  runs reads `0` and Last played `—`.
+  `source/components/scenario_stats.py`. With no scenario selected the card
+  shows `NO_SCENARIO_TEXT`, "No scenario selected", in place of its lines. It
+  has no interval of its own since #391; the PB card's ids carry the page's
+  30-second `relative_time_interval`.
 - **Formatting.** `format_score` gives thousands separators and at most two
   decimals; `format_short_date` gives `Oct 12`, or `Mar 3, 2020` in another
   year.
