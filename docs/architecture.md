@@ -304,7 +304,7 @@ flowchart LR
         EvxlSnapshot["kovaaks/<br/>evxl_snapshot.py"]
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlaySessions["kovaaks/<br/>play_sessions.py"]
-        ScenarioNotes["kovaaks/scenario_<br/>notes_service.py"]
+        ScenarioNotes["kovaaks/<br/>scenario_notes_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 

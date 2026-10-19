@@ -220,7 +220,7 @@ def card_class(state: str) -> str:
 
 
 def _controller_config(ids: NoteCardIds) -> dict[str, Any]:
-    """Build what the controller reads besides its inputs: the ids, and its one string."""
+    """Build what the controller reads besides its inputs: the ids, and the templates it fills in."""
     return {
         "ids": ids._asdict(),
         "count": COUNT_TEMPLATE,
