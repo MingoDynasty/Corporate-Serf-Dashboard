@@ -31,9 +31,8 @@ This proposal builds on the top row cards (Proposal 1, rows T1 to T4,
 ratified on 2026-10-14 in #379), which are not reopened here. T1 kept the
 room this proposal fills, and T4 set how a card orders its lines and that an
 age reads relative with the exact time on hover. Proposal 2, the latest-run
-card following the selection (#388), was ratified on 2026-10-18 and is not
-built yet. The two implementations meet in the callback that selects a
-scenario ([Proposal 2](#proposal-2)).
+card following the selection (#388), shipped on 2026-10-18 in #391, so this
+proposal builds on the page as it now is ([Proposal 2](#proposal-2)).
 
 ### SN1. A note is one plain-text note per scenario, rewritten in place
 
@@ -155,8 +154,8 @@ of leaving the page the app can catch, asks first.
 4. **A change of scenario the player makes, with unsaved changes, opens a
    dialog:** **Keep editing**, **Discard**, **Save**. It covers a pick in the
    Selected scenario dropdown, the run toast's link, a name in the run list's
-   All scenarios view, the latest-run card's scenario button while it exists,
-   and a Playlist filter change that leaves the edited scenario off the list.
+   All scenarios view, and a Playlist filter change that leaves the edited
+   scenario off the list.
    Keep editing puts the old selection back. Escape or a click outside the
    dialog means Keep editing. A toast's link to the edited scenario itself is
    no change: it is stopped, no dialog opens, and nothing moves. While the
@@ -399,10 +398,10 @@ Checked at `4f05766` on 2026-10-18. The design discussion read the code at
 - **One callback writes both dropdowns' values.**
   `reach_the_scenario_asked_for` in `source/components/scenario_selection.py`,
   registered by `register_scenario_selection_clearing_filter`, takes Follow's
-  run summary, the page's deep-link store, the latest-run card's scenario
-  button and a name pressed in the All scenarios view. A pick in the dropdown
-  is not among its inputs: it changes the dropdown's value in the browser
-  first.
+  run summary, the page's deep-link store and a name pressed in the All
+  scenarios view. At `4f05766` it also took the latest-run card's scenario
+  button, which #391 has since removed. A pick in the dropdown is not among
+  its inputs: it changes the dropdown's value in the browser first.
 - **The run toast's link draws the page again.** It is a `dcc.Link` to
   `/run-history?scenario={scenario}&run={run id}`, and Dash Pages rebuilds the
   page on a change of address. The deep-link store "only changes when the
@@ -532,14 +531,16 @@ Measured again for this proposal, in headless Edge, with a run waiting:
 
 ### The top row as a player meets it
 
-At 2560 px, with a benchmark selected and Follow on. The note card is the
-third box; the latest-run card, at the right, sits over the run list.
+At 2560 px, with a benchmark selected and Follow on, as the page is since
+#391. The note card is the third box; the latest-run card, at the right,
+sits over the run list and reports the selected scenario's latest run. The
+latest-run card's figures are illustrative.
 
 ```text
-+ Playlist filter -----+ +- Scenario Stats ---+ +- Scenario note · edited 3 weeks ago -------- Edit -+ +- PB · set 1 day ago --+ +- Latest run · 1 day ago -+
-| [Jay9's Benchmark  v]| | Category: Tracking | | try to use more wrist/fingers here; on sweeping     | | 5,079.14  (Sapphire)  | | 11,598  (New PB)         |
-| Selected scenario    | | Last played: 1 day | | motions use arm                                     | | Top rank              | | Up 0.5% on your previous |
-| [SmoothBot Perfect v]| | Number of runs: 23 | |                                                     | | 81.13% percentile     | | Run 4 last session       |
++ Playlist filter -----+ +- Scenario stats ---+ +- Scenario note · edited 3 weeks ago -------- Edit -+ +- PB · set 1 day ago --+ +- Latest run · 1 day ago -+
+| [Jay9's Benchmark  v]| | Category: Tracking | | try to use more wrist/fingers here; on sweeping     | | 5,079.14  (Sapphire)  | | 4,912  (Below thresh.)   |
+| Selected scenario    | | Number of runs: 23 | | motions use arm                                     | | Top rank              | | 96.7% of PB · Acc 61.2%  |
+| [SmoothBot Perfect v]| |                    | |                                                     | | 81.13% percentile     | | Run 4 last session       |
 | (o) Follow newly ... | |                    | |                                                     | | 40 cm/360 · Acc 64.89%| |                          |
 +----------------------+ +--------------------+ +-----------------------------------------------------+ +-----------------------+ +--------------------------+
 ```
@@ -691,8 +692,8 @@ maintainer's checkout. It is not in the repository.
   scenario named. Nothing is left to protect, so nothing waits.
 - **The rest of the page while a run waits:** the chart, Scenario Stats and
   the PB card stay on the edited scenario, since the dropdown hasn't moved.
-  The run list adds the run. Today's latest-run card moves to the newest run
-  on any scenario; under Proposal 2's R1 it would stay on the edited one.
+  The run list adds the run. The latest-run card, which follows the
+  selection since #391, stays on the edited scenario too.
 
 ### The dialog
 
@@ -723,7 +724,6 @@ Every way the player changes the scenario on this page:
 | A Playlist filter change whose list lacks the edited scenario | The Select has already dropped the scenario. The same callback opens the dialog. | The old filter and the old scenario. |
 | The run toast's link | A script on the page stops the click before the page is drawn again, and opens the dialog. Save or Discard then selects the scenario in place, clearing a filter that doesn't list it, as the link would; the address stays as it was. A link to the edited scenario itself is stopped too, with no dialog: nothing changes. | Nothing has moved. |
 | A name in the run list's All scenarios view | The selection callback holds the change and opens the dialog. | Nothing has moved. |
-| The latest-run card's scenario button, while it exists | As a name in the All scenarios view. | Nothing has moved. |
 
 Every way the player leaves the page (rule 8):
 
@@ -797,21 +797,19 @@ rewrites only the age (SN8), which shows only while reading.
 
 ### Proposal 2
 
-Proposal 2 (#388) was ratified and merged on 2026-10-18; its one
-implementation PR is not built yet. That PR and this proposal's can be built
-in parallel. They meet in two places:
+Proposal 2 (#388) shipped on 2026-10-18 in #391. Two of its changes bear on
+this proposal:
 
-- **The selection callback.** This proposal adds inputs to it: the dialog's
-  answers and the editor's unsaved state. Proposal 2's R1 removes one, the
-  latest-run card's **Show {scenario}** button, which this proposal names as a
-  route "while it exists". Whichever implementation merges second rebases
-  onto the first and re-checks the whole selection flow.
-- **The Run History spec.** Both edit the top row and the selection
-  statements.
+- **The selection callback lost an input.** Proposal 2's R1 removed the
+  latest-run card's **Show {scenario}** button, so the routes into the
+  dialog are the dropdown, the run toast's link, a name in the All scenarios
+  view and a Playlist filter change. This proposal adds the dialog's answers
+  and the editor's unsaved state to the callback.
+- **The latest-run card follows the selection.** While Follow waits on a
+  note, the card stays on the edited scenario with the rest of the row.
 
-While Follow waits on a note, today's latest-run card moves to the newest run
-on any scenario. Under R1 it would stay on the edited scenario, which agrees
-with the rest of the row.
+This proposal was written while #391 was open and was brought up to date
+after it merged; the ratified rows are unchanged.
 
 ### Narrow windows, keyboard and screen readers
 
@@ -849,7 +847,7 @@ A sketch for the implementer, not a contract.
 - **The selection callback** stays the one writer of both dropdowns. It gains
   the dialog's answers as an input and the editor's state as `State`. For a
   run, with unsaved changes, it sets the waiting store and moves nothing. For
-  the card's button or a name in the list, it opens the dialog.
+  a name in the list, it opens the dialog.
 - **A callback on the dropdown's and the filter's values** opens the dialog
   when the scenario no longer matches the edited one. It needs a second Input
   that nothing writes, or the renderer prunes its first call, as the
@@ -1024,9 +1022,8 @@ merging PR 1 doesn't freeze it. One PR would also work; it would be large.
 and the dialog, which would otherwise lose text, and they are most of its
 size.
 
-**With Proposal 2:** if its implementation is open at the same time as PR 2,
-the second to merge rebases onto the first and re-checks the selection flow.
-PR 1 touches nothing Proposal 2 does.
+**With Proposal 2:** it shipped in #391, so PR 2 builds on the selection
+callback as #391 left it. PR 1 touches nothing Proposal 2 did.
 
 ## Out of scope
 
