@@ -770,7 +770,9 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             "headerName": "#",
             "cellClass": "run-list-number",
             "headerClass": "run-list-number",
-            **_fixed_width(56),
+            # Moves with the class's padding-left in the stylesheet: the
+            # number's room is what the two leave.
+            **_fixed_width(50),
         },
         {"field": "time", "headerName": "Time", **_fixed_width(66)},
         {"field": "score", "headerName": "Score", **_fixed_width(72)},

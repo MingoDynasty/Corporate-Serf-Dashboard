@@ -796,10 +796,11 @@ a.run-toast-link:hover {
 }
 
 /* A run's number sits under its session's name, clear of the session row's
-   button. */
+   button. The column's width in run_list_column_defs moves with this
+   padding: the number's room is what the two leave. */
 .run-history-list-grid .run-list-number {
     color: var(--mantine-color-dimmed);
-    padding-left: 30px;
+    padding-left: 24px;
 }
 
 /* The marks column's header has a name and shows none. */
@@ -835,19 +836,22 @@ a.run-toast-link:hover {
 
 /* What the list's script draws in a full-width row: a session row, a
    scenario row, a divider, a date header, the note under a session the
-   scenario was not played in, and the button that loads older sessions. */
+   scenario was not played in, and the button that loads older sessions.
+   It ends 4px in, where a cell's text does, so a row's facts end in line
+   with the last column. The room an overlay scrollbar needs is the grid
+   viewport's own, not this padding's. */
 .run-list-wide {
     align-items: center;
     display: flex;
     font-size: 13px;
     gap: 6px;
     height: 100%;
-    padding: 0 12px;
+    padding: 0 4px 0 6px;
     width: 100%;
 }
 
-/* A session row or a scenario row: its first line, and under it the row's
-   figures while Median and best is on. */
+/* A session row or a scenario row: its line, and under it the row's figures
+   while Median and best is on, on the one row that keeps them below. */
 .run-list-group {
     align-items: stretch;
     cursor: pointer;
@@ -866,7 +870,7 @@ a.run-toast-link:hover {
 /* A scenario row sits one step in from its session row. Its toggle lines
    up with the runs' numbers under it. */
 .run-list-scenario {
-    padding-left: 24px;
+    padding-left: 18px;
 }
 
 .run-list-figures {
@@ -880,9 +884,9 @@ a.run-toast-link:hover {
     font-weight: 600;
 }
 
-/* The space that ends a part of a session row, for a screen reader: see
+/* The space that sets a group row's parts apart for a screen reader: see
    partEnd in runHistoryList.js. Kept, or the browser would drop a space at
-   the end of a line, and sized to nothing, so the row looks as it did. */
+   either end of a line, and sized to nothing, so the row looks as it did. */
 .run-list-part-end {
     font-size: 0;
     white-space: pre;
@@ -964,7 +968,7 @@ a.run-toast-link:hover {
 .run-list-note {
     color: var(--mantine-color-dimmed);
     font-size: 12px;
-    padding-left: 30px;
+    padding-left: 24px;
 }
 
 /* A dashed rule either side of a divider's count, so it reads as a break in

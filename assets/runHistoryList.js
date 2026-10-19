@@ -344,21 +344,24 @@
   // A session row's parts are flex items with no text between them, and
   // Chrome and Edge hand a screen reader their text joined up: "2:22 AMIn
   // progress" (NVDA, 2026-10-13). A space between the items does nothing,
-  // because a flex container drops it. This one sits inside a part, at its
-  // end, where the stylesheet keeps it and gives it no size.
+  // because a flex container drops it. This one sits inside a part, where
+  // the stylesheet keeps it and gives it no size.
   function partEnd() {
     return h("span", { className: "run-list-part-end" }, " ");
   }
 
   // A group row: its line, and under it the row's figures while Median and
   // best is on, on a row whose figures go below. The figures line is told
-  // from the first by its own part end, for the reason partEnd gives.
+  // from the first by its own part end, for the reason partEnd gives. The
+  // part end opens the figures line: put after the line's last part, it was
+  // a flex item of the line, and the line's gap before it left the facts
+  // that far short of the columns' edge.
   function groupRow(props, className, toggle, line) {
     var data = props.data;
     var below = state.figures && data.figures && data.figures_below;
     return wideCell(props, "run-list-group " + className, { onClick: toggle }, [
-      h.apply(null, ["div", { className: "run-list-line" }].concat(line, below ? [partEnd()] : [])),
-      below ? h("div", { className: "run-list-figures" }, data.figures) : null,
+      h.apply(null, ["div", { className: "run-list-line" }].concat(line)),
+      below ? h("div", { className: "run-list-figures" }, partEnd(), data.figures) : null,
     ]);
   }
 
