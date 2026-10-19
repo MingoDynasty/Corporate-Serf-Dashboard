@@ -944,14 +944,79 @@ a.run-toast-link:hover {
     white-space: nowrap;
 }
 
+/* 14 by 16px, so no row grows and nothing beside it moves. The chevron is
+   2px wider and overflows it evenly: the icon's box is twice its ink. */
 .run-list-toggle {
+    align-items: center;
     background: none;
     border: 0;
     color: var(--mantine-color-dimmed);
     cursor: pointer;
-    font-size: 12px;
+    display: flex;
+    height: 16px;
+    justify-content: center;
     padding: 0;
     width: 14px;
+}
+
+/* The chevron Chart options and the Columns menu draw, at 16px and not
+   their 20px, so its ink stays under the session date's digits: the row's
+   date is what it shows first. It points right when the row is closed and
+   down when it is open. A masked SVG recolored by background-color, as
+   local_icon draws one. */
+.run-list-chevron {
+    -webkit-mask: url("icons/material-symbols-keyboard-arrow-down.svg") no-repeat center / contain;
+    background-color: currentColor;
+    flex: none;
+    height: 16px;
+    mask: url("icons/material-symbols-keyboard-arrow-down.svg") no-repeat center / contain;
+    transform: rotate(-90deg);
+    width: 16px;
+}
+
+.run-list-toggle[aria-expanded="true"] .run-list-chevron {
+    transform: none;
+}
+
+/* Under This scenario, a session row's Median, Best, and count in columns:
+   see figureColumns in runHistoryList.js. A part of a column holds its
+   value and the widest text it can hold, unseen, in one cell, and is as wide
+   as the wider of the two. Tabular digits make the server's pick of the
+   widest text the browser's: every digit one width, wider than a comma. */
+.run-list-slot {
+    display: inline-grid;
+    font-variant-numeric: tabular-nums;
+}
+
+.run-list-slot > * {
+    grid-area: 1 / 1;
+}
+
+.run-list-slot-end {
+    justify-items: end;
+}
+
+.run-list-slot-start {
+    justify-items: start;
+}
+
+/* Hidden, and so out of the accessibility tree and a page search, while it
+   keeps its room. */
+.run-list-slot-widest,
+.run-list-column-blank {
+    visibility: hidden;
+}
+
+/* A space between two parts of the columns, in a box of its own, so a
+   screen reader hears the parts apart: see space in runHistoryList.js.
+   Kept, or the box would drop a space it starts and ends with. */
+.run-list-space {
+    display: inline-block;
+    white-space: pre;
+}
+
+.run-list-column-gap {
+    width: 16px;
 }
 
 .run-list-in-progress {
