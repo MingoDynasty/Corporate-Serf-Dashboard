@@ -116,9 +116,10 @@ ALL_SCENARIOS_GRID_NAME = "Runs of all scenarios, by session"
 # what the dropdown now holds.
 SHOW_SCENARIO_LABEL = "Show {scenario}"
 SELECTED_SCENARIO_TEXT = "Selected scenario: {scenario}"
-# The second line of a row that stands for one scenario's runs, while Median
-# and best is on. Never worded as typical, usual, average, or normal: it
-# describes the runs under the row and compares nothing.
+# The figures of a row that stands for one scenario's runs, while Median and
+# best is on: in the row's line ahead of its count, or under it on a row that
+# carries ``figures_below``. Never worded as typical, usual, average, or
+# normal: it describes the runs under the row and compares nothing.
 MEDIAN_AND_BEST_TEXT = "Median {median} · Best {best}"
 ONE_SCORE_TEXT = "Score {score}"
 THRESHOLD_PASSED_TEXT = "Threshold passed"
@@ -400,6 +401,11 @@ def build_run_list(
                 "counts": f"{len(played):,} of {_count(len(session.runs), 'run')}",
                 "place": place,
                 "figures": _figures(played),
+                # Only the first row gives its length, and while the session
+                # is played it says so: with the figures too, its line can
+                # run past a 500px list (by about 10px, measured 2026-10-18),
+                # so it keeps them on a line of their own.
+                "figures_below": is_first_row,
             }
         )
         rows.extend(
@@ -699,9 +705,9 @@ RUN_LIST_MENU_COLUMNS = (
     MenuColumn("shots", "Shots Fired"),
     MenuColumn("sens", "Sensitivity"),
 )
-# The choice that is not a column: the second line of a row that stands for
-# one scenario's runs. Off to start, so the list looks as it did until
-# someone asks for more. The browser remembers it under its id.
+# The choice that is not a column: the median and best of the runs under a
+# row that stands for one scenario's runs. Off to start, so the list looks as
+# it did until someone asks for more. The browser remembers it under its id.
 MEDIAN_AND_BEST_CHOICE = MenuChoice("median_best", "Median and best")
 
 

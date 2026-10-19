@@ -96,7 +96,7 @@ the same form as the finished ones under it.
   session's run count, such as `7 of 47 runs`, jumps there, and a click on a
   scenario's name in the tree puts it on the chart. An open session has Show
   all runs, and the Columns menu's Median and best adds each row's median and
-  best score as a second line. *Problem solved:* what else was played in a
+  best score to its line. *Problem solved:* what else was played in a
   session was a count and a divider that named nothing, so the order of a
   session, and how it went across scenarios, was nowhere on screen.
 - **The latest run, on a card** (Run History page, PR #372; design in #356).
