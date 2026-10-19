@@ -106,6 +106,18 @@ the same form as the finished ones under it.
   session it was. *Problem solved:* the verdict on the run you just finished
   was on screen for a few seconds, in a toast. The card keeps it until the
   next run.
+- **A note on each scenario** (Run History page, PRs #394 and #PRTWO; design
+  in #390). The top row shows the player's own plain-text note on the
+  selected scenario, such as "try to use more wrist/fingers here; on sweeping
+  motions use arm", with how long ago it was edited, and **Edit** rewrites it
+  in place. Nothing the page does on its own throws unsaved text away: Follow
+  waits for it, and a change of scenario or page asks first. *Problem
+  solved:* a reminder about technique had nowhere to live in the app, so it
+  was kept in the player's head or another window, and it is read just
+  before the next run, beside the target and the result the row already
+  shows. It is read at a glance during play and during a lookup before
+  playing a scenario; the first run of a visit with Follow on shows it only
+  once that run lands.
 - **Sessions** (PR #359; design in #355). The app groups your runs into
   sessions: the runs separated by breaks of no more than 30 minutes. A
   session reads as in progress until 30 minutes after its last run.

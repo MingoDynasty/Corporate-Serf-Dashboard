@@ -1600,7 +1600,7 @@ def test_the_stats_card_is_270px_and_adds_only_its_border_to_the_height():
 
 
 def test_the_pb_card_is_300px_at_the_first_columns_right_end():
-    """Beside the latest-run card, with the room before it kept for notes.
+    """Beside the latest-run card, after the scenario note card.
 
     Its frame adds only its border to its height, so the row stays the height
     the dropdowns' column sets in every state that changes between runs.

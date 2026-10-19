@@ -9,6 +9,14 @@ run exists. A run that sets a new personal best keeps the celebration as its
 one toast, and runs detected together share one toast, for the newest. The
 app is less quiet for it, and one switch turns the toast off.
 
+**Superseded in part (2026-10-18).** [The unsaved note text entry](2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md):
+on Run History, while a scenario note has unsaved changes, the toast's link
+is stopped before the page is drawn again and asks in the note's dialog; Save
+or Discard then selects the scenario in place, and the address stays. A link
+to the edited scenario itself is stopped with no dialog. With no unsaved
+changes the link draws the page again, as this entry says. The toast itself
+is unchanged.
+
 **The ruling.** Row T1 of the Run toasts proposal, ratified by the
 maintainer on 2026-10-11 with its two clauses, on a new personal best and on
 runs detected together. Their words on 2026-10-10:

@@ -241,9 +241,8 @@ state, not a field grafted onto someone else's schema.
   save. The error and future states surface in the
   UI — an alert on the settings page, one on the Playlists page for visibility,
   and the startup warning queue for playlist files. A scenario note's message
-  goes back to its caller, and no page shows it yet: the note card in the
-  [scenario notes proposal](proposals/scenario_notes_proposal.md) is to show
-  it on that scenario's card. The bundled corpus is
+  shows on that scenario's note card on Run History, the one place a player
+  meets the file. The bundled corpus is
   exempt (it ships with its reader), and `data/cache/` is deliberately
   unstamped. `scripts/stamp_schema_version.py` is the one-time conversion for
   installs created before the stamp; scenario notes were born stamped and
@@ -288,6 +287,7 @@ flowchart LR
         RunHistoryList["components/<br/>run_history_list.py"]
         RunMarks["components/<br/>run_marks.py"]
         LatestRunCard["components/<br/>latest_run_card.py"]
+        ScenarioNoteCard["components/<br/>scenario_note_card.py"]
     end
 
     subgraph Services["Domain & plotting services"]
@@ -304,6 +304,7 @@ flowchart LR
         EvxlSnapshot["kovaaks/<br/>evxl_snapshot.py"]
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlaySessions["kovaaks/<br/>play_sessions.py"]
+        ScenarioNotes["kovaaks/scenario_<br/>notes_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -361,6 +362,7 @@ flowchart LR
     RunHistory --> RunHistoryChart
     RunHistory --> RunHistoryList
     RunHistory --> LatestRunCard
+    RunHistory --> ScenarioNoteCard
     RunHistoryChart --> DataService
     RunHistoryChart --> PlotService
     RunHistoryChart --> RunHistoryList
@@ -379,6 +381,10 @@ flowchart LR
     LatestRunCard --> DataService
     LatestRunCard --> PlaySessions
     LatestRunCard --> TimeScored
+    ScenarioNoteCard --> ScenarioSelection
+    ScenarioNoteCard --> LatestRunCard
+    ScenarioNoteCard --> ChartOptions
+    ScenarioNoteCard --> ScenarioNotes
     Playlists --> ControlName
     SettingsPage --> ControlName
     Playlists --> ColumnsMenu
@@ -493,9 +499,9 @@ flowchart LR
   chart and the list, one CSS value (`--run-history-list-width`) setting the
   list's width for both, so the latest-run card, alone in the second column,
   sits over the list. The first column (`_top_row`, `_dropdown_column`) is a
-  wrapping row of the dropdowns' column, the Scenario Stats card, the room
-  kept for notes, and the PB card, which a left margin of `auto` pins to the
-  column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
+  wrapping row of the dropdowns' column, the Scenario Stats card, the
+  scenario note card, and the PB card, which a left margin of `auto` pins to
+  the column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
   Select's own box lays out nothing, so the stylesheet places the Select's
   siblings, never in its label: the link on the playlist filter label's line,
   and the Follow switch under the scenario dropdown, small
@@ -521,9 +527,15 @@ flowchart LR
   on, and in both cases clears a playlist filter that does not list the
   scenario. A scenario's name pressed in the run list's tree is its third
   input, through the store `run-history-list-scenario-asked`, and selects
-  that scenario under the same rule. It reads which of the three called from
-  what triggered the call, because the summary store replays its last batch
-  and the list's store its last name. `generate_graph` takes both dropdowns
+  that scenario under the same rule. The note card's answers are a fourth,
+  through `run-history-note-go`, and the Follow switch is an input too. It
+  reads which input called from what triggered the call, because the summary
+  store replays its last batch and the list's store its last name. While the
+  scenario note has unsaved changes (its editor store and text box are
+  `State`) it moves nothing on its own: it writes a held run's scenario to
+  `run-history-note-waiting` and a pressed name to `run-history-note-held`
+  for the note card to ask about, and carries out the card's answer
+  (`note_request`). `generate_graph` takes both dropdowns
   as `Input`, so Dash holds it until that callback has answered and the chart
   is rebuilt once per batch.
   `?scenario=` and `?playlist_code=` reach the two dropdowns through the
@@ -1055,6 +1067,25 @@ flowchart LR
   this card and `pb_card.py` for its own. The card's store and the first
   line's words with the age in them are built once, with the card, and never
   by that callback.
+- `components/scenario_note_card.py` — the Run History page's scenario note
+  card, its editor, and the dialog that asks before unsaved text is left
+  behind. A page fills in a `NoteCardIds`, puts `scenario_note_card()` and
+  `scenario_note_dialog()` in its layout, passes `note_selection_ids()` to
+  the selection callback's registration, and calls
+  `register_scenario_note_card()` once. Every piece of the card is in the
+  layout from the start and only shown or hidden, so the text box is never
+  drawn again while it is typed into. `show_note` draws the card from the
+  `shown` store alone, which nothing but the controller writes, and
+  `save_from_editor` saves through `scenario_notes_service` and draws the
+  card again in the same answer, with duplicate outputs: the controller
+  takes the save's result, and as an input of the drawing callback the save
+  would close a loop. The controller itself, `scenario_notes.controller`,
+  runs in the browser (`assets/scenarioNotes.js`): it opens and closes the
+  editor, decides when a change of scenario asks, answers the dialog, and
+  fills in the dialog's question, the waiting line and the count from
+  templates this module owns. It writes the selection callback's request
+  with `set_props`, since a declared output would close a loop through the
+  scenario dropdown it takes as an input.
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -1180,8 +1211,9 @@ flowchart LR
   filter adds one playlist to that list, the hidden one it holds, in
   `components/scenario_selection.py`.
 - `scenario_notes_service.py` — the scenario note store, a stamped file per
-  scenario under `data/scenario_notes/` (see State above). No page calls it
-  yet. `read_scenario_note` classifies one scenario's file into the four
+  scenario under `data/scenario_notes/` (see State above). Run History's
+  note card (`components/scenario_note_card.py`) reads and saves through it.
+  `read_scenario_note` classifies one scenario's file into the four
   store states, a supported one carrying a `ScenarioNote` (the text and its
   `edited_at`, in UTC). `save_scenario_note` writes the note or, for empty
   text, deletes it, under a module lock and after `_guard_note_destination`
@@ -1427,6 +1459,19 @@ flowchart LR
   any new play — `confetti.reset()` clears particles but does not stop a loop.
   It resolves `window.confetti` at call time, so asset load order is not
   load-bearing.
+- `assets/scenarioNotes.js` — the Run History scenario note in the browser:
+  the controller (`window.dash_clientside.scenario_notes.controller`) that
+  opens and closes the editor, decides when a change of scenario asks, and
+  answers the dialog, a `fade` that marks a note cut off at the card's
+  bottom, and the guard. The guard listens on `window` in the capture
+  phase, before React's root listener and before Dash Pages, and while the
+  card's `data-unsaved` attribute says so it stops the run toast's link, a
+  link to another address in the app, and the `popstate` of the back and
+  forward buttons, and asks the card. It stamps each history entry's place
+  into its state, wrapping `history.pushState` and `replaceState`, so a
+  `popstate` says how far it moved and the guard can move back. It adds a
+  `beforeunload` listener only while there are unsaved changes. It holds no
+  copy: the card's module passes every string in its config store.
 - `assets/selectHighlightOnOpen.js` — keeps the selected name on screen when
   a searchable dropdown opens, highlighted so it can be copied, where dmc's
   `clearSearchOnFocus` would empty the field. It acts on any input carrying

@@ -19,6 +19,11 @@ first line and not its second. With the latest-run card's button gone, by
 the store a pressed name is written to is the selection callback's third
 input, not its fourth. The heading's words and the rest of this entry stand.
 
+**Superseded in part (2026-10-18).** [The unsaved note text entry](2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md):
+while a scenario note has unsaved changes, a name pressed in the tree is held
+by the selection callback and asks in the note's dialog first. The rest of
+this entry stands.
+
 **Rulings.** By the maintainer, 2026-10-14, on
 [PR #375](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/375):
 "I ratify the proposal." Row A1, the scenario name's click, was ratified as

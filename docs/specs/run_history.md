@@ -2,7 +2,8 @@
 
 Run History charts one scenario's runs beside a list grouped by session.
 Its top row gives the scenario's benchmark category and run count their own
-card, beside cards for its personal best and its latest run. The page receives new runs
+card, beside the player's own note on it and cards for its personal best and
+its latest run. The page receives new runs
 without a reload and can follow the scenario just played. A check marks a
 run that met its score threshold and a star marks a new personal best, each
 judged when the run was played.
@@ -75,6 +76,9 @@ of scope here, apart from its chart toolbar, noted under The chart.
   the filter alone and selects nothing. The filter empties in view with no
   toast, and the cleared filter is what the browser then remembers
   ([2026-10-12][clear-filter]).
+- While a scenario note has unsaved changes, the navbar's links and the
+  header title ask before they leave the page, and so do the browser's back
+  and forward buttons ([The dialog](#the-dialog)).
 - The page accepts query parameters it does not name and reads none of them.
   A run toast's link carries one, `run=` and the run's id, only so that
   each run's link is an address the page is not already at
@@ -93,9 +97,9 @@ times that name or order runs remain absolute ([T4][card-order]).
   the same gap, and one value sets the list's 500px width for both. The
   second column holds the latest-run card alone, so the card sits over the
   run list and its edges are the list's at every zoom level. The first holds,
-  in order, the dropdowns' column, the Scenario Stats card, the room kept for
-  notes, which holds nothing, and the PB card at its right end, beside the
-  latest-run card. Every card is as tall as the row.
+  in order, the dropdowns' column, the Scenario Stats card, the scenario note
+  card ([below](#the-scenario-note-card)), and the PB card at its right end,
+  beside the latest-run card. Every card is as tall as the row.
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under
@@ -110,8 +114,9 @@ times that name or order runs remain absolute ([T4][card-order]).
 - The two dropdowns and the Follow switch persist in the browser. The Follow
   switch carries a help tooltip: "Automatically selects the scenario you just
   played when a new run is detected. If the **Playlist filter** doesn't list
-  that scenario, the filter is cleared."
-  ([2026-10-12][clear-filter]).
+  that scenario, the filter is cleared. It waits while a scenario note has
+  unsaved changes."
+  ([2026-10-12][clear-filter], [2026-10-18][note-unsaved]).
 - Opening either dropdown's list keeps the selected name in the field and
   highlights it, so it can be copied, and the first keystroke replaces it
   with a search. The list shows every option until then. A drag on the field
@@ -153,7 +158,8 @@ times that name or order runs remain absolute ([T4][card-order]).
 - The first column wraps its pieces on its own width and never on the
   window's ([2026-08-03][content-area]).
   Where they don't fit on one line, the PB card goes to a second line of the
-  column first, at that line's right end, and then the Scenario Stats card.
+  column first, at that line's right end, then the scenario note card, and
+  then the Scenario Stats card ([2026-10-18][note-card]).
   The latest-run card stays in the second column, as tall as the row.
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
@@ -163,6 +169,135 @@ times that name or order runs remain absolute ([T4][card-order]).
   playlist still lists its scenarios. The list is read again when a run
   lands, so a scenario whose first run has just landed is in it with no
   reload, whether or not the page follows that run.
+
+## The scenario note card
+
+The player's own plain-text note on the selected scenario, read in place and
+edited with Save and Cancel ([2026-10-18][note-card]). What a note is and how
+it is saved is in [2026-10-18][note-store].
+
+- The card sits between the Scenario Stats card and the PB card, taking the
+  room the row leaves, from 240px to 800px wide; past 800px the rest of the
+  room sits before the PB card. It is as tall as the row and never less than
+  132px ([2026-10-18][note-card]).
+- What it shows while reading is out of the layout's flow, so its box is the
+  row's in every reading state: a note, a long note, no note, a broken file
+  and no scenario. The chart under the row doesn't move between them
+  ([2026-10-18][note-card]).
+- With a note: a frame, the first line `Scenario note · edited {age}` in the
+  other cards' quiet style with **Edit** at its right end, and the note at
+  14px, its line breaks kept, broken anywhere a word is too long, centered in
+  the card when short. A note taller than the card runs to its bottom and its
+  last line fades out. The text is selectable; only **Edit** opens the
+  editor. **Edit**'s accessible name is `Edit scenario note`
+  ([2026-10-18][note-card]).
+- The age is relative and reworded every 30 seconds, as the PB card's is, with
+  the exact time on hover and focus. It is the time the text last changed,
+  which only a Save that changes the text moves ([2026-10-18][note-store]).
+- With no note: the link **Add a scenario note** alone, at 14px, with no frame.
+  With no scenario selected the room is empty and unframed
+  ([2026-10-18][note-card]).
+- A broken note file: a frame, `Scenario note` with **Edit**, and the schema
+  machinery's message in place of the note, such as `The scenario note file
+  isn't valid JSON. File: {path}`. **Edit** opens an empty editor, and its
+  Save replaces the file after copying it aside. A file from a newer build
+  shows its message and offers no **Edit**. The error shows on that card
+  alone and in the log ([2026-10-18][note-store]).
+- The card is drawn again only when the page's scenario changes and the rules
+  below let the change through, by Save, and by the dialog's answers. A run
+  that lands on any scenario, the 30-second tick, the date moving on, the
+  Playlist filter, the Score threshold and a pick the dialog holds never
+  redraw it, and the text box is never drawn again while it is typed into
+  ([2026-10-18][note-unsaved]).
+
+### Editing a note
+
+- **Edit**, or **Add a scenario note**, turns the card into a text box over
+  **Save** and **Cancel**, focus in the box with the cursor at the end of the
+  text. The first line reads `Scenario note` alone. The box's accessible name
+  is `Scenario note` and its placeholder `Note for this scenario`; Tab reaches
+  **Save** and **Cancel** ([2026-10-18][note-card]).
+- The text box never shows less than three lines, 69px, and scrolls inside
+  itself. The editor keeps the row's height where that fits, and the card,
+  with the row, grows only where the lines under the buttons need more room
+  than the row leaves: the waiting line, the count and a save error, beside
+  the buttons on a wide card and under them on a narrow one. At 2560px a
+  waiting line or the count alone keeps the row's height
+  ([2026-10-18][note-card]).
+- A note holds at most 2,000 characters. The box stops typing there and cuts
+  a paste there. From 1,800 characters a count shows: `1,850 of 2,000
+  characters` ([2026-10-18][note-store]).
+- **Save** writes the text to the scenario the editor opened on, closes the
+  editor and shows the saved text, focus on **Edit**. Saving empty text, or
+  only whitespace, deletes the note, and focus goes to **Add a scenario
+  note**. Text equal to the note on disk writes nothing. **Cancel** closes the
+  editor on the saved text, focus on **Edit** or the link
+  ([2026-10-18][note-store]).
+- A failed save keeps the editor open with its text and its error under the
+  buttons. A file from a newer build refuses with the schema machinery's
+  message; any other failure reads `Couldn't save the scenario note. See
+  data/logs/debug.log.` ([2026-10-18][note-unsaved]).
+- The note has unsaved changes while the box's text differs from the text it
+  opened with. Typing a word and deleting it again leaves none
+  ([2026-10-18][note-unsaved]).
+- Escape does nothing in the editor ([2026-10-18][note-unsaved]).
+- With no unsaved changes, the editor just closes when the scenario changes,
+  by Follow or by hand, and the card shows the new scenario's note; the run
+  toast's link and every link out of the page behave as they do with no
+  editor open ([2026-10-18][note-unsaved]).
+- While the note has unsaved changes, Follow waits. A run on another scenario
+  leaves the page on the edited scenario, its toast shows as usual, and the
+  line under the buttons reads `A run on {scenario} is waiting. Press
+  **Save** or **Cancel** to show it.`, announced politely. A newer run
+  replaces the one named; a run on the edited scenario ends the wait, and so
+  does turning Follow off. Turning it on again brings no run back. **Save**,
+  **Cancel**, or undoing every change (which also closes the editor) moves the
+  page once, to the newest waiting run's scenario, clearing a Playlist filter
+  that doesn't list it. Meanwhile the chart, Scenario Stats, the PB card and
+  the latest-run card stay on the edited scenario, and the run list adds the
+  run ([2026-10-18][note-unsaved]).
+
+### The dialog
+
+- While the note has unsaved changes, each change of scenario the player
+  makes and each departure the app can catch opens a dialog titled `Your
+  scenario note isn't saved`, with **Keep editing**, **Discard** and **Save**
+  and no close button. Focus starts on **Keep editing** and stays in the
+  dialog. Escape and a click outside it mean Keep editing, which returns
+  focus to the text box. **Discard** drops the text and goes where the player
+  asked; **Save** saves, then goes. A failed save acts as Keep editing, with
+  its error under the editor. Discard and Save drop a waiting run; Keep
+  editing keeps it waiting ([2026-10-18][note-unsaved]).
+- While the dialog is open its destination is fixed: a run that lands waits
+  in the card, and the run toast's link does nothing
+  ([2026-10-18][note-unsaved]).
+- Its question, by route ([2026-10-18][note-unsaved]):
+  - a pick in the Selected scenario dropdown, the run toast's link, a name in
+    the run list's All scenarios view: `Save your changes to the note on
+    {from} before you switch to {to}?`;
+  - a Playlist filter change whose list lacks the edited scenario: `The
+    **Selected scenario** list no longer holds {from}. Save your changes to
+    its note first?`;
+  - a navbar link, the header title, **Open scenario table**, and the
+    browser's back and forward buttons: `Save your changes to the note on
+    {from} before you leave the page?`.
+- A pick, or a filter change that drops the edited scenario, has already
+  happened when the dialog opens: the chart and the other cards redraw for it
+  behind the dialog, and the note card does not. Keep editing writes the old
+  scenario and filter back, and the browser remembers them, so a reload then
+  opens on the edited scenario ([2026-10-18][note-unsaved]).
+- The run toast's link is stopped before the page is drawn again. Save or
+  Discard then selects its scenario in place, clearing a filter that doesn't
+  list it, and the address stays as it was. A link to the edited scenario
+  itself is stopped with no dialog, and nothing moves
+  ([2026-10-18][note-unsaved]).
+- A link that leaves the page is stopped, and Save or Discard then follows
+  it. The back and forward buttons are kept from redrawing the page, the
+  address goes back at once, and Save or Discard then moves through history
+  again. A reload, closing the tab or going to another site gets the
+  browser's own "Leave site?" prompt, set only while the note has unsaved
+  changes; with none there is no prompt. A link that opens a new tab leaves
+  the page as it is ([2026-10-18][note-unsaved]).
 
 ## The latest-run card
 
@@ -993,11 +1128,18 @@ The card's lines, local-record scope and leaderboard presentation follow
 - One callback writes both dropdowns' values, with plain outputs. It reads
   the summary and lands on the scenario just played when Follow is on,
   clearing a Playlist filter that does not list it, and it is the callback
-  that applies a link's parameters and a scenario's name pressed in the run
-  list's tree. Which of the three called is read from what triggered the
-  call ([2026-10-12][clear-filter], [2026-10-14][all-scenarios],
-  [2026-10-18][follows]).
+  that applies a link's parameters, a scenario's name pressed in the run
+  list's tree, and the scenario note card's answers. Which input called is
+  read from what triggered the call ([2026-10-12][clear-filter],
+  [2026-10-14][all-scenarios], [2026-10-18][follows]).
   With Follow off the page stays on the selected scenario.
+- While a scenario note has unsaved changes the same callback moves nothing
+  on its own: it holds a run in a store of its own, which the note card
+  names, and holds a name pressed in the list for the note card's dialog. The
+  Follow switch is one of its inputs, so turning Follow off ends a wait at
+  once. The note card's editor runs in the browser and decides there whether
+  a change of scenario asks, when the change lands
+  ([2026-10-18][note-unsaved]).
 - The chart rebuild consumes the summary, so a batch of several runs becomes
   one rebuild and one change of scenario rather than a replay
   ([2026-07-06][coalesce]).
@@ -1032,8 +1174,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   the list, and the chart
   ([2026-10-12][column]).
   The top row is then one wrapping line, in order: the dropdowns' column,
-  the Scenario Stats card, the PB card, and the latest-run card, which joins
-  a line at 380px and takes the room left on it.
+  the Scenario Stats card, the scenario note card, at least 240px wide, the
+  PB card, and the latest-run card, which joins a line at 380px and takes the
+  room left on it.
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side
@@ -1063,6 +1206,12 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The chart-appearance preferences live only in the browser's local
   storage. Nothing the panel sets is written server-side
   ([2026-08-20][points]).
+- Scenario notes are the one thing on this page a player writes and nothing
+  can rebuild. Each is a file under `data/scenario_notes/`, read when its
+  scenario is selected and never held in memory
+  ([2026-10-18][note-store]). Text that isn't saved yet lives only in the
+  open page: nothing keeps a draft, so only a crash or a killed browser loses
+  it without a question ([2026-10-18][note-unsaved]).
 - Nothing about a mark is stored. A check and a star are worked out again
   each time something asks, from the runs, the percentage, and what the
   performance files say now
@@ -1133,3 +1282,6 @@ The card's lines, local-record scope and leaderboard presentation follow
 [follows]: ../decision_log/2026/2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md
 [stats-last-played]: ../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md
 [heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md
+[note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md
+[note-card]: ../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md
+[note-unsaved]: ../decision_log/2026/2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md

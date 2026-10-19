@@ -8,6 +8,7 @@ and a callback graph the renderer accepts.
 """
 
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -321,6 +322,53 @@ def test_the_dialog_has_no_close_button_and_keep_editing_takes_focus_first():
         IDS.discard,
         IDS.dialog_save,
     ]
+
+
+# --- The stylesheet -------------------------------------------------------------------
+
+STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
+
+
+def _css_block(css: str, selector: str) -> str:
+    """Return the body of the top-level rule for ``selector`` alone."""
+    match = re.search(
+        rf"(?m)(?<!,\n)^{re.escape(selector)} \{{(.*?)^\}}", css, re.DOTALL
+    )
+    assert match, f"no {selector} rule in the stylesheet"
+    return match.group(1)
+
+
+def test_the_card_takes_the_room_from_240_to_800px_and_reading_never_sizes_it():
+    """While reading, what the card shows is out of the flow: its box is the row's.
+
+    So the chart under the row never moves between a note, none, a broken
+    file and no scenario. The floor gives a card alone on a wrapped line
+    five lines.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    box = _css_block(css, ".run-history-note-card")
+    read = _css_block(css, ".run-history-note-read")
+
+    assert "flex: 1 1 240px;" in box
+    assert "max-width: 800px;" in box
+    assert "min-width: min(240px, 100%);" in box
+    assert "min-height: 132px;" in box
+    assert "position: relative;" in box
+    # The frame is always there, transparent with no note, so no state
+    # changes the box by its border.
+    assert "border: 1px solid transparent;" in box
+    assert "position: absolute;" in read
+    assert "inset: 0;" in read
+
+
+def test_the_text_box_never_shows_less_than_three_lines():
+    """Its height starts from nothing, so the row decides the card's height."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    box = _css_block(css, ".run-history-note-text-box textarea")
+
+    assert "min-height: 69px;" in box
+    assert "height: 0;" in box
+    assert "resize: none;" in box
 
 
 # --- The page script and the callback graph -------------------------------------------
