@@ -13,6 +13,9 @@ def safe_file_key(value: str) -> str:
     of the raw value makes distinct values distinct, including values Windows
     file names would fold together by case. sha256 is used rather than
     ``hash()`` because the key must be stable across runs.
+
+    The scenario note store names its files with this, and those names are a
+    saved format: changing the formula orphans every note already written.
     """
     sanitized = "".join(
         char if char.isalnum() or char in ("-", "_") else "_" for char in value
