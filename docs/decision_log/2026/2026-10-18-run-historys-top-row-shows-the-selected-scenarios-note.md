@@ -18,7 +18,7 @@ ratified by the maintainer on 2026-10-18: "I ratify the scenario notes
 proposal, SN1 to SN8, as at 88aa8b0." The ratification covers Design and its
 Copy block. On SN7 the maintainer, after the first review: "SN7: go with the
 link." Built in
-[#PRTWO](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRTWO).
+[#396](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/396).
 Current behavior is in
 [run_history.md](../../specs/run_history.md#the-scenario-note-card); what the
 note is and how it is saved is in

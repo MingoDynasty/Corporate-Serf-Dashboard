@@ -35,7 +35,7 @@ sequence.
   away: Follow waits while a note has unsaved changes and the card names the
   run that waits, and every change of scenario or page the player makes asks
   first. Each note is a small file of its own under `data/scenario_notes/`.
-  (PRs #394 and #PRTWO; design in #390) Design rationale distilled into
+  (PRs #394 and #396; design in #390) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
 - **The latest-run card follows the selection** — on Run History the
   latest-run card now reports the selected scenario's latest run, so it and

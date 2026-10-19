@@ -20,7 +20,7 @@ dialog for a change they make themselves, which "really encourages the user
 to settle the issue as soon as possible". After the first review they chose
 that leaving the page asks first, and that the run toast's link is stopped
 and selects in place. Built in
-[#PRTWO](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRTWO).
+[#396](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/396).
 Current behavior is in
 [run_history.md](../../specs/run_history.md#editing-a-note).
 

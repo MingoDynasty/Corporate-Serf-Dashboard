@@ -16,7 +16,7 @@ proposal, SN1 to SN8, as at 88aa8b0." SN1 and SN6 as amended in review. The
 store was built in
 [#394](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/394),
 the card and its editor in
-[#PRTWO](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRTWO).
+[#396](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/396).
 The card's behavior is in
 [the scenario notes entry](2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md)
 and the editor's protections in

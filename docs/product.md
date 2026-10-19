@@ -106,7 +106,7 @@ the same form as the finished ones under it.
   session it was. *Problem solved:* the verdict on the run you just finished
   was on screen for a few seconds, in a toast. The card keeps it until the
   next run.
-- **A note on each scenario** (Run History page, PRs #394 and #PRTWO; design
+- **A note on each scenario** (Run History page, PRs #394 and #396; design
   in #390). The top row shows the player's own plain-text note on the
   selected scenario, such as "try to use more wrist/fingers here; on sweeping
   motions use arm", with how long ago it was edited, and **Edit** rewrites it
