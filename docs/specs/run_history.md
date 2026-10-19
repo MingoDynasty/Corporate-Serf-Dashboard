@@ -248,7 +248,9 @@ it is saved is in [2026-10-18][note-store].
 - While the note has unsaved changes, Follow waits. A run on another scenario
   leaves the page on the edited scenario, its toast shows as usual, and the
   line under the buttons reads `A run on {scenario} is waiting. Press
-  **Save** or **Cancel** to show it.`, announced politely. A newer run
+  **Save** or **Cancel** to show it.` The line is a polite live region,
+  in the page from the moment the editor opens, so it is there before its
+  text arrives. A newer run
   replaces the one named; a run on the edited scenario ends the wait, and so
   does turning Follow off. Turning it on again brings no run back. **Save**,
   **Cancel**, or undoing every change (which also closes the editor) moves the

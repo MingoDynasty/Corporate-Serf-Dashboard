@@ -293,7 +293,8 @@ def _read_view(ids: NoteCardIds) -> html.Div:
 
 def _editor(ids: NoteCardIds) -> html.Div:
     """Build the editor: the text box over Save and Cancel and the lines beside them."""
-    # Announced as it appears, which is after a run lands.
+    # A polite live region, in the page while it is empty too: a region
+    # that arrives with its text already in it may not be announced.
     live_region: dict[str, Any] = {"aria-live": "polite"}
     return html.Div(
         className=EDITOR_CLASS,

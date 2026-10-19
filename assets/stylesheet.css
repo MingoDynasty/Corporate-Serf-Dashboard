@@ -743,11 +743,13 @@ a.run-toast-link:hover {
     min-width: 0;
 }
 
-/* With nothing to say the lines take no room, or the card would grow by a
-   line's gap where they wrap under the buttons. */
-.run-history-note-lines:not(:has(> :not(:empty))),
-.run-history-note-lines > :empty {
-    display: none;
+/* With nothing to say the lines take no room: their box starts from no
+   width, so it stays on the buttons' line, and an empty line has no height.
+   The box is never hidden, so the waiting line, a live region, is in the page
+   before its text arrives. Wrapped under the buttons, an empty box would grow
+   the card by a line's gap. */
+.run-history-note-lines:not(:has(> :not(:empty))) {
+    flex-basis: 0;
 }
 
 .run-history-note-waiting {

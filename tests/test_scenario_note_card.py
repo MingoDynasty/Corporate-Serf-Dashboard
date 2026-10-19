@@ -371,6 +371,20 @@ def test_the_text_box_never_shows_less_than_three_lines():
     assert "resize: none;" in box
 
 
+def test_the_waiting_line_is_in_the_page_before_its_text_arrives():
+    """A live region that enters the page with its text in it may not be announced.
+
+    So the lines under the buttons are never hidden while empty: they start
+    from no width instead, which keeps them on the buttons' line.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    empty = _css_block(css, ".run-history-note-lines:not(:has(> :not(:empty)))")
+
+    assert "flex-basis: 0;" in empty
+    assert "display: none" not in empty
+    assert ".run-history-note-lines > :empty" not in css
+
+
 # --- The page script and the callback graph -------------------------------------------
 
 
