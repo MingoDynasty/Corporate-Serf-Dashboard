@@ -1219,6 +1219,23 @@ def test_the_switch_sits_at_the_left_and_the_buttons_at_the_right():
     assert "margin-left: auto;" in _css_block(css, ".run-history-list-actions")
 
 
+def test_no_text_in_the_list_is_under_12px():
+    """The list's smallest text was 11px, which read too small (2026-10-18).
+
+    A size of 0 is the part end's space, which is meant to take no room.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    sizes = {
+        selector.strip(): int(size)
+        for selector, body in re.findall(r"(?ms)^([^{}@/]+?) \{(.*?)^\}", css)
+        if "run-list" in selector or "run-history-list" in selector
+        for size in re.findall(r"font-size: (\d+)px;", body)
+    }
+
+    assert sizes
+    assert {s: px for s, px in sizes.items() if 0 < px < 12} == {}
+
+
 def test_a_scenarios_name_gives_before_its_count():
     css = STYLESHEET.read_text(encoding="utf-8")
     name = _css_block(css, ".run-list-scenario-name")

@@ -758,7 +758,7 @@ a.run-toast-link:hover {
 }
 
 .run-history-list-grid .ag-header-cell-text {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
 }
 
@@ -973,7 +973,7 @@ a.run-toast-link:hover {
     border: 0;
     color: var(--mantine-color-dimmed);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     padding: 0;
     width: 14px;
 }
@@ -982,7 +982,7 @@ a.run-toast-link:hover {
     background-color: var(--mantine-color-blue-light);
     border-radius: var(--mantine-radius-sm);
     color: var(--mantine-color-blue-light-color);
-    font-size: 11px;
+    font-size: 12px;
     padding: 0 6px;
     white-space: nowrap;
 }
@@ -991,7 +991,7 @@ a.run-toast-link:hover {
 .run-list-date,
 .run-list-note {
     color: var(--mantine-color-dimmed);
-    font-size: 11px;
+    font-size: 12px;
     padding-left: 30px;
 }
 
