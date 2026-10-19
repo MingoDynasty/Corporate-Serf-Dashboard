@@ -194,9 +194,9 @@ approach to keep a consistent definition and to make future proposals
 smoother. But from a user perspective, seeing the continuous line with No
 Limits looks much more appealing than the 30 day option with gaps everywhere;
 i.e. with these many gaps, I wonder if it's even worth showing at all." Then,
-after seeing the faded style: "Yes: faded, with bands kept, is the
-recommended style; no limit stays the alternative in the scrutinized
-decision."
+asked whether "as of" stretches should be drawn faded or dotted, they chose
+faded. That answer chose between the two styles of the 30-day line; it did
+not choose 30 days over no limit.
 
 The question: should a value built from runs more than 30 days before it count
 as current, and how should the chart draw a value that no longer does? And is
