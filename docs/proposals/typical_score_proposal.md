@@ -525,14 +525,15 @@ counts, as TS1 says.**
   passes at 10 recent runs, so for at most the next 10 runs a full-strength
   value still holds older ones: up to 10 of its 20 right after a break, where
   no limit's first values back held a median of 18 of 20 (TS2, point 2).
-  Measured at the start of each session in 2025 and 2026, against the median
-  of the session that followed:
-  - Over every full-strength value, D is 0.2 points less accurate than A,
-    4.03% against 3.82% (95% interval +0.05 to +0.54, 348 targets).
-  - Where the two differ, 28% of those values, D is about 1 point worse:
-    4.90% against 3.82%, with A closer on 68% and D on 18%. 71 of those 99
-    windows span a break of 21 days or more, and the other 28 are all from
-    2025, when the player was climbing fast. In 2026 all 51 span a break.
+  Measured at the start of each session in 2025 and 2026, with recency judged
+  at that start, against the median of the session that followed:
+  - Over every full-strength value, D is 0.3 points less accurate than A,
+    3.83% against 3.56% (95% interval +0.04 to +0.48, 319 targets).
+  - On the 227 whose runs were all recent at the start, D's value is A's. On
+    the other 92, of mixed age, D is about 1 point worse: 4.61% against
+    3.57% (+0.32 to +2.02), with A closer on 58% and D on 17%. 69 of those 92
+    windows span a break of 21 days or more, and 21 of the other 23 are from
+    2025, when the player was climbing fast. In 2026, 50 of 52 span a break.
   - Run by run against the next 10 runs, the gap grows with the old runs: 0.3
     points with 1 to 4 of them, 1.25 with 5 to 9, 2.6 with all 10. D misses
     low: this player came back better than before the break.
@@ -546,7 +547,7 @@ counts, as TS1 says.**
   feature can also choose not to judge on a faded value.
 - **A faded value is no worse than a held one.** On 2026's 54 session starts
   where A held a carried value, D's value, which C draws too, missed the next
-  session by 3.18% against A's 3.87% (interval −0.91 to +0.46 for the
+  session by 3.18% against A's 3.87% (interval −0.91 to +0.50 for the
   difference). Holding a value flat has no accuracy case.
 - **Coverage.** Of 2026's 3,547 runs, A draws 44.2% at full strength, 8.0%
   faded and 47.7% with no line; D 44.2%, 20.1% and 35.7%; no limit 64.3% at
@@ -582,7 +583,9 @@ scenario's first recent value.
 
 The measurements are in the maintainer's scratch folder, the D evaluation and
 its script, checked against the rules evaluation: on the runs to 2026-10-09
-the two agree exactly.
+the two agree exactly. Its figures at a session start judge D's recency at
+that start, as TS6 does; its first version judged it by A's rule there, which
+kept 29 values at full strength that TS6 fades.
 
 ### TS7. The line and both bands, each with a switch
 
@@ -731,10 +734,10 @@ scenario's runs in the next session, as a share of that median.
 - **The previous session's median predicts the next session as well** as the
   typical score (TS2). The typical score's case is steadiness for judgments.
 - **Coverage is limited by history, not the window** (TS2, point 4).
-- **Taking the 30 days out of the value and into the drawing** costs 0.2
-  points of accuracy at full strength, in the first runs after a return or
-  during a fast climb, and removes the step where a faded stretch turns
-  recent (TS6).
+- **Taking the 30 days out of the value and into the drawing** costs 0.3
+  points of accuracy at full strength, all of it on values that still hold
+  runs from before a break or a fast climb, and removes the step where a
+  faded stretch turns recent (TS6).
 
 The measurements, their method and their caveats are in the maintainer's
 scratch folder: the window evaluation, its 30-day rerun, the session-rule
