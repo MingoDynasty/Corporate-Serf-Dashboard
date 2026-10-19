@@ -431,8 +431,8 @@ decision-log entry
      separate child after the anchor (`_username_unset_status()` in
      `source/pages/playlists.py`).
   2. No em dashes. Split prose into sentences, and chain readout fragments
-     with ` · `. The one exception is the `—` empty value under Last played;
-     `tests/test_em_dash_guard.py` gates everything else under `source/`.
+     with ` · `. `tests/test_em_dash_guard.py` gates every string under
+     `source/`.
   3. Sentence case for controls, placeholders, tooltips, status lines, chart
      annotations, legend entries, and toast, alert, and modal titles. Page
      titles, section headings, and grid column headers keep Title Case, as do

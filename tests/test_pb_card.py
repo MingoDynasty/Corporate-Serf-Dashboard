@@ -298,7 +298,11 @@ def test_the_scores_hover_is_the_latest_run_cards_line_for_the_pb(
 
     shown = _shown(runs, version_pace_basis=version_pace_basis)
     landed = latest_run_card.latest_run(
-        runs, None, runs[-1].datetime_object, lambda _s, v: version_pace_basis(v)
+        runs,
+        runs[-1].scenario,
+        None,
+        runs[-1].datetime_object,
+        lambda _s, v: version_pace_basis(v),
     )
 
     assert shown.score_hover == hover

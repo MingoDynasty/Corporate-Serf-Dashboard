@@ -10,14 +10,14 @@ rule for a scenario the playlist filter does not list is
 
 import json
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import dash
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
 import pytest
-from dash import dcc, no_update
+from dash import dcc, html, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -28,11 +28,13 @@ from source.components import (  # noqa: E402
     latest_run_card,
     pb_card,
     run_history_chart,
+    run_history_list,
     scenario_selection,
     setup_surfaces,
 )
 from source.components.columns_menu import choice_checkbox_id  # noqa: E402
 from source.config import settings_service  # noqa: E402
+from source.kovaaks.data_models import RunData  # noqa: E402
 from source.pages import home, run_history  # noqa: E402
 from tests.rendered_text import rendered_text  # noqa: E402
 
@@ -352,13 +354,26 @@ def test_section_titles_keep_visual_size_with_accessible_heading_order():
         if isinstance(component, dmc.Title)
     }
 
-    # An h2, drawn as the card's first line by the stylesheet.
-    assert titles["Scenario Stats"].order == 2
-    assert titles["Scenario Stats"].className == "scenario-stats-heading"
-    # The panel's groups sit under the page's h2 sections.
+    # The panel's groups, drawn small.
     for group in ("Overlays", "Run Data Points", "Score Threshold"):
         assert titles[group].order == 3
         assert titles[group].size == "h6"
+
+
+def test_the_three_cards_first_lines_are_plain_text_and_not_headings():
+    """Scenario Stats' first line reads as the PB card's and the latest-run card's do."""
+    page = run_history.layout()
+    titles = [
+        component.children
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Title)
+    ]
+    first_line = _by_class(page, "scenario-stats-heading")
+
+    assert "Scenario Stats" not in titles
+    assert "Scenario stats" not in titles
+    assert isinstance(first_line, html.Div)
+    assert first_line.children == "Scenario stats"
 
 
 def test_the_chart_sits_left_of_the_run_list():
@@ -864,7 +879,6 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
     registration = _selection_registration()
     ids = run_history.SCENARIO_SELECTION_IDS
 
-    button = run_history.LATEST_RUN_CARD_IDS.scenario_button
     asked_by_the_list = run_history.RUN_LIST_IDS.scenario_asked
 
     assert GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__ == (
@@ -874,21 +888,23 @@ def test_one_callback_writes_both_dropdowns_and_neither_write_is_a_duplicate():
         f"..{ids.playlist_filter}.value...{ids.scenario_dropdown}.value.."
     )
     assert "@" not in registration["output"]
-    # The latest-run card's button is the third thing that reaches a
-    # scenario, and a name pressed in the run list's tree the fourth. Each
-    # comes here and writes neither dropdown itself.
+    # A name pressed in the run list's tree is the third thing that reaches a
+    # scenario. It comes here and writes neither dropdown itself. The
+    # latest-run card follows the selection and has no input here.
     assert _keys(registration["inputs"]) == [
         f"{ids.deep_link}.data",
         f"{run_history.RUN_EVENTS_STORE_ID}.data",
-        f"{button}.n_clicks",
         f"{asked_by_the_list}.data",
     ]
     assert _keys(registration["state"]) == [
         f"{run_history.FOLLOW_SWITCH_ID}.checked",
         f"{ids.playlist_filter}.value",
         f"{ids.scenario_dropdown}.value",
-        f"{button}.value",
     ]
+    card_ids = set(run_history.LATEST_RUN_CARD_IDS)
+    assert not card_ids & {
+        dep["id"] for dep in registration["inputs"] + registration["state"]
+    }
     # It applies this visit's query parameters, so the page load runs it.
     assert registration["prevent_initial_call"] is False
     writers = [
@@ -907,12 +923,10 @@ def _press(triggered: list[dict], run_events, follow, list_scenario):
         f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
         {},
         run_events,
-        0,
         list_scenario,
         follow,
         None,
         "Scenario A",
-        None,
     )
 
 
@@ -1525,16 +1539,18 @@ def test_every_card_in_the_row_has_the_same_frame():
     assert "border-radius: var(--mantine-radius-sm);" in frame
 
 
-def test_the_card_is_as_tall_as_the_row_and_never_under_132px():
-    """132px holds the card's tallest state, so its height never follows a run.
+def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
+    """135px holds the card's tallest state, so its height never follows a run.
 
-    A minimum and not a height: the card is as tall as the row, which the PB
+    The tallest state is the second line on two lines in a narrow card, over
+    the third and fourth lines, measured at 135px in Edge and Firefox. A
+    minimum and not a height: the card is as tall as the row, which the PB
     card makes taller in its setup state, with no KovaaK's username.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".run-history-card")
 
-    assert "min-height: 132px;" in card
+    assert "min-height: 135px;" in card
     assert re.search(r"(?m)^    height:", card) is None
     assert "min-width: 0;" in card
     assert "overflow: hidden;" in card
@@ -1618,20 +1634,9 @@ def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
     assert "white-space: pre;" in label
     # The run's age stays in the label's line, though dmc wraps it in a box.
     assert "display: inline;" in _css_block(css, ".run-history-card-time-target")
-    # Hidden by its attribute with no run, so nothing may set its display.
-    assert "display" not in label
     assert "min-width: 0;" in scenario
     assert "text-overflow: ellipsis;" in scenario
     assert "white-space: nowrap;" in scenario
-
-
-def test_the_scenario_button_is_out_of_the_page_while_it_names_no_scenario():
-    """It is always in the layout, so it is hidden, and not removed."""
-    css = STYLESHEET.read_text(encoding="utf-8")
-
-    assert "display: none;" in _css_block(
-        css, ".run-history-card-scenario-button:empty"
-    )
 
 
 # --- The latest-run card ---------------------------------------------------------------
@@ -1641,15 +1646,16 @@ def _card_registration() -> dict:
     return _registration(f"{run_history.LATEST_RUN_CARD_IDS.body}.children")
 
 
-def test_the_card_is_written_by_these_four_inputs_and_on_load():
-    """Not by the date: the browser words the run's age, so midnight changes nothing."""
+def test_the_card_is_written_by_these_five_inputs_and_on_load():
+    """The date among them: an older session's name leaves its year out only while it is this year's.
+
+    The browser words the run's age, so the date is not read for that.
+    """
     registration = _card_registration()
     card = run_history.LATEST_RUN_CARD_IDS
 
     assert registration["output"] == (
         f"..{card.played_at}.data...{card.heading}.children"
-        f"...{card.scenario_button}.children"
-        f"...{card.scenario_button}.value...{card.scenario_button}.aria-label"
         f"...{card.body}.children...{run_history.LATEST_RUN_STORE_ID}.data.."
     )
     assert _keys(registration["inputs"]) == [
@@ -1657,6 +1663,7 @@ def test_the_card_is_written_by_these_four_inputs_and_on_load():
         f"{run_history.SCENARIO_SELECTION_IDS.scenario_dropdown}.value",
         f"{run_history.CHART_OPTIONS_IDS.score_threshold_percentage}.value",
         f"{run_history.SESSION_IN_PROGRESS_STORE_ID}.data",
+        f"{run_history.TODAY_STORE_ID}.data",
     ]
     assert _keys(registration["state"]) == [f"{run_history.LATEST_RUN_STORE_ID}.data"]
     # The page load runs it, so the card is right with no new run.
@@ -1725,62 +1732,303 @@ def test_the_card_waits_for_the_selection_and_for_the_session_to_be_judged():
 def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch):
     asked = []
     shown = latest_run_card.LatestRun(
-        run_id="landed.csv",
-        scenario="Scenario B",
+        run_id="selected.csv",
+        scenario=SCENARIO,
         played_at=datetime(2026, 10, 12, 22, 49),
         score="812.4",
         badge=None,
         result="Accuracy 55.00%",
-        session="Run 1 this session · 4 min on this scenario",
+        session="Run 1 this session",
+        time_on_scenario="4 min on this scenario",
     )
 
     def from_store(*arguments):
         asked.append(arguments)
-        return shown
+        return latest_run_card.StoreRuns(shown, "landed.csv")
 
     monkeypatch.setattr(run_history, "latest_run_from_store", from_store)
     monkeypatch.setattr(run_history, "datetime", _clock_at(2026, 10, 12, 22, 50))
 
-    answer = run_history.show_latest_run("landed.csv", SCENARIO, 95, True, "held.csv")
+    answer = run_history.show_latest_run(
+        "landed.csv", SCENARIO, 95, True, "2026-10-12", "held.csv"
+    )
 
     # The batch only calls it: nothing of the run is read from the store that
     # names it.
-    assert asked == [(95, datetime(2026, 10, 12, 22, 50))]
-    played_at, heading, button, button_value, button_label, body, latest_run_id = answer
+    assert asked == [(SCENARIO, 95, datetime(2026, 10, 12, 22, 50))]
+    played_at, heading, body, latest_run_id = answer
     assert played_at == datetime(2026, 10, 12, 22, 49).timestamp()
-    # The name is the button, so the server writes nothing beside the words.
-    assert heading is None
-    assert (button, button_value, button_label) == (
-        "Scenario B",
-        "Scenario B",
-        "Show Scenario B",
-    )
+    assert rendered_text(heading) == SCENARIO
     assert [rendered_text(line) for line in body] == [
         "812.4",
         "Accuracy 55.00%",
-        "Run 1 this session · 4 min on this scenario",
+        "Run 1 this session",
+        "4 min on this scenario",
     ]
+    # The ring's store names the newest run on any scenario, not the card's.
     assert latest_run_id == "landed.csv"
     # One value per output, in the outputs' order.
     assert len(answer) == len(_card_registration()["output"].split("..."))
 
 
-def test_with_no_run_in_the_store_the_card_says_so(monkeypatch):
-    monkeypatch.setattr(run_history, "latest_run_from_store", lambda *_arguments: None)
+@pytest.mark.parametrize(
+    ("selected", "newest_run_id", "said"),
+    [
+        (
+            None,
+            None,
+            [
+                "No runs yet",
+                "Play a scenario in KovaaK's. Select it to see its latest run.",
+            ],
+        ),
+        (None, "a.csv", ["No scenario selected"]),
+        (
+            SCENARIO,
+            "a.csv",
+            [
+                "No runs yet",
+                "Play this scenario in KovaaK's and your latest run will show here.",
+            ],
+        ),
+        (
+            SCENARIO,
+            None,
+            [
+                "No runs yet",
+                "Play this scenario in KovaaK's and your latest run will show here.",
+            ],
+        ),
+    ],
+)
+def test_with_no_run_to_report_the_card_says_why(
+    monkeypatch, selected, newest_run_id, said
+):
+    """The selection decides first, then whether the store holds any run."""
+    monkeypatch.setattr(
+        run_history,
+        "latest_run_from_store",
+        lambda *_arguments: latest_run_card.StoreRuns(None, newest_run_id),
+    )
 
-    played_at, heading, button, _value, _label, body, latest_run_id = (
-        run_history.show_latest_run(None, None, 95, False, None)
+    played_at, heading, body, _latest_run_id = run_history.show_latest_run(
+        None, selected, 95, False, "2026-10-12", None
     )
 
     assert played_at is None
     assert heading is None
-    assert button is None
-    assert [rendered_text(line) for line in body] == [
-        "No runs yet",
-        "Play a scenario in KovaaK's and your latest run will show here.",
-    ]
-    # No run was held and none is: nothing to write.
-    assert latest_run_id is no_update
+    assert [rendered_text(line) for line in body] == said
+
+
+# --- The latest-run card, against a run store ------------------------------------------
+
+
+def _record(scenario: str, ended: datetime, score: float = 100.0) -> RunData:
+    """Build one stored run of 60 seconds that ended at ``ended``."""
+    return RunData(
+        datetime_object=ended,
+        score=score,
+        sens_scale="cm/360",
+        horizontal_sens=40.8,
+        scenario=scenario,
+        accuracy=0.5,
+        stats_file_name=f"{scenario} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv",
+        run_start=ended - timedelta(seconds=60),
+        run_length=timedelta(seconds=60),
+    )
+
+
+class _Store:
+    """The run store the card reads, which a test adds runs to."""
+
+    def __init__(self, monkeypatch, *runs: RunData):
+        self.runs = list(runs)
+        monkeypatch.setattr(latest_run_card, "get_all_runs", lambda: list(self.runs))
+        monkeypatch.setattr(
+            latest_run_card, "get_version_pace_basis", lambda _scenario, _version: None
+        )
+
+
+def _card_at(monkeypatch, moment: datetime, selected, held_latest_run=None):
+    """Call the card's callback as the page does at ``moment``.
+
+    Returns what a reader sees in the card, the first line's scenario then
+    every line under it, and the ring store's write.
+    """
+    monkeypatch.setattr(run_history, "datetime", _clock_at(*moment.timetuple()[:6]))
+    _played_at, heading, body, latest_run_id = run_history.show_latest_run(
+        None, selected, 95, True, moment.date().isoformat(), held_latest_run
+    )
+    return rendered_text(heading), [rendered_text(line) for line in body], latest_run_id
+
+
+B_SCENARIO = "Scenario B"
+EVENING = datetime(2026, 10, 12, 21, 0)
+
+
+def test_a_change_of_scenario_rewrites_the_card_for_the_new_one(monkeypatch):
+    _Store(
+        monkeypatch,
+        _record(SCENARIO, EVENING, score=80.0),
+        _record(B_SCENARIO, EVENING + timedelta(minutes=5), score=612.5),
+    )
+    now = EVENING + timedelta(minutes=6)
+
+    on_a = _card_at(monkeypatch, now, SCENARIO)
+    on_b = _card_at(monkeypatch, now, B_SCENARIO)
+
+    assert on_a[:2] == (
+        SCENARIO,
+        ["80", "Accuracy 50.00%", "Run 1 this session", "1 min on this scenario"],
+    )
+    assert on_b[0] == B_SCENARIO
+    assert on_b[1][0] == "612.5"
+
+
+def test_with_follow_off_a_run_on_another_scenario_moves_the_ring_and_not_the_card(
+    monkeypatch,
+):
+    """The selection stays on A, so the card keeps A's run, and the ring leaves it."""
+    store = _Store(monkeypatch, _record(SCENARIO, EVENING, score=80.0))
+    before = _card_at(monkeypatch, EVENING + timedelta(minutes=1), SCENARIO)
+    landed = _record(B_SCENARIO, EVENING + timedelta(minutes=5), score=612.5)
+    store.runs.append(landed)
+
+    after = _card_at(
+        monkeypatch,
+        EVENING + timedelta(minutes=6),
+        SCENARIO,
+        held_latest_run=before[2],
+    )
+
+    assert after[:2] == before[:2]
+    assert after[2] == run_history_list.run_id(landed)
+    assert before[2] == run_history_list.run_id(store.runs[0])
+
+
+def test_a_run_that_starts_a_new_session_names_the_old_one(monkeypatch):
+    """With Follow off, a run on another scenario can change the third line's words."""
+    a_run = _record(SCENARIO, EVENING, score=80.0)
+    store = _Store(monkeypatch, a_run)
+    an_hour_on = EVENING + timedelta(hours=1)
+
+    ended = _card_at(monkeypatch, an_hour_on, SCENARIO)
+    store.runs.append(_record(B_SCENARIO, an_hour_on))
+    named = _card_at(monkeypatch, an_hour_on + timedelta(minutes=1), SCENARIO)
+
+    assert ended[1][2] == "Run 1 last session"
+    assert named[1][2] == "Run 1 (Oct 12, 8:59 PM session)"
+
+
+def test_the_date_moving_into_a_new_year_puts_the_year_in_an_older_sessions_name(
+    monkeypatch,
+):
+    """With no run landing: the date store's write is what calls the card."""
+    _Store(
+        monkeypatch,
+        _record(SCENARIO, datetime(2026, 12, 30, 21, 1)),
+        _record(B_SCENARIO, datetime(2026, 12, 31, 9, 0)),
+    )
+
+    before = _card_at(monkeypatch, datetime(2026, 12, 31, 23, 59), SCENARIO)
+    after = _card_at(monkeypatch, datetime(2027, 1, 1, 0, 0), SCENARIO)
+
+    assert before[1][2] == "Run 1 (Dec 30, 9:00 PM session)"
+    assert after[1][2] == "Run 1 (Dec 30, 2026, 9:00 PM session)"
+    assert f"{run_history.TODAY_STORE_ID}.data" in _keys(_card_registration()["inputs"])
+
+
+PLAYLIST_CODE = "KovaaKsPlaylistCode"
+
+
+def _first_run_lands(monkeypatch, follow: bool, selected: str | None):
+    """Land a first run, on B, in a store with no runs, as the page's callbacks do.
+
+    A playlist filter lists A alone, which has never been played. The run is
+    delivered, the selection callback runs if a summary was written, and the
+    card is written for the scenario the page ends up on. Returns the card
+    before and after, and the selection after.
+    """
+    monkeypatch.setattr(
+        scenario_selection, "get_playlist_by_code", lambda code: object()
+    )
+    monkeypatch.setattr(
+        scenario_selection, "get_scenarios_from_playlist_code", lambda code: [SCENARIO]
+    )
+    monkeypatch.setattr(
+        scenario_selection, "is_scenario_in_database", lambda name: name == B_SCENARIO
+    )
+    store = _Store(monkeypatch)
+    before = _card_at(monkeypatch, EVENING, selected)
+
+    landed = _record(B_SCENARIO, EVENING + timedelta(minutes=1), score=612.5)
+    store.runs.append(landed)
+    summary, _landed_id = run_history.forward_run_events(
+        _batch(_run(B_SCENARIO, run_id=run_history_list.run_id(landed))),
+        follow,
+        selected,
+    )
+    if summary is not no_update:
+        _filter, moved_to = scenario_selection.reach_the_scenario_asked_for(
+            [{"prop_id": f"{run_history.RUN_EVENTS_STORE_ID}.data", "value": summary}],
+            f"{run_history.RUN_LIST_IDS.scenario_asked}.data",
+            {},
+            summary,
+            None,
+            follow,
+            PLAYLIST_CODE if selected else None,
+            selected,
+        )
+        if moved_to is not no_update:
+            selected = moved_to
+    after = _card_at(monkeypatch, EVENING + timedelta(minutes=2), selected)
+    return before, after, selected
+
+
+@pytest.mark.parametrize("selected", [None, SCENARIO])
+def test_with_follow_on_a_first_run_into_an_empty_store_shows_in_the_card(
+    monkeypatch, selected
+):
+    """Its scenario is selected as it lands, so the card reports it."""
+    before, after, now_selected = _first_run_lands(monkeypatch, True, selected)
+
+    assert before[1][0] == "No runs yet"
+    assert now_selected == B_SCENARIO
+    assert after[0] == B_SCENARIO
+    assert after[1][0] == "612.5"
+
+
+@pytest.mark.parametrize(
+    ("selected", "before_message", "after_lines"),
+    [
+        # Nothing selected: the sentence said to select the scenario played,
+        # and the card now says no scenario is selected.
+        (
+            None,
+            "Play a scenario in KovaaK's. Select it to see its latest run.",
+            ["No scenario selected"],
+        ),
+        # A playlist's unplayed scenario selected: it is still unplayed.
+        (
+            SCENARIO,
+            "Play this scenario in KovaaK's and your latest run will show here.",
+            [
+                "No runs yet",
+                "Play this scenario in KovaaK's and your latest run will show here.",
+            ],
+        ),
+    ],
+)
+def test_with_follow_off_a_first_run_into_an_empty_store_leaves_the_selection(
+    monkeypatch, selected, before_message, after_lines
+):
+    before, after, now_selected = _first_run_lands(monkeypatch, False, selected)
+
+    assert before[1] == ["No runs yet", before_message]
+    assert now_selected == selected
+    assert after[1] == after_lines
+    # The ring's store still moves to the run.
+    assert after[2] is not None
 
 
 def test_the_card_starts_empty_and_the_page_load_fills_it():
@@ -1790,99 +2038,73 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
 
     assert _by_id(page, card.heading).children is None
     assert _by_id(page, card.body).children is None
-    assert _by_id(page, card.scenario_button).children is None
+    assert _by_id(page, card.body).children is None
 
 
-def test_pressing_the_cards_button_hands_focus_on_from_a_script_of_its_own():
-    """The button leaves the page once its scenario is selected.
+def test_the_page_holds_no_scenario_button_and_no_script_to_hand_focus_on():
+    """The card follows the selection, so it has no scenario of its own to offer.
 
-    Keyboard focus would go with it, so a script takes the press as its one
-    input. It writes a store nothing reads, and no page load calls it.
+    The button's keyboard focus script and the store it wrote went with it.
     """
-    registration = _registration(f"{run_history.CARD_FOCUS_SINK_ID}.data")
-    button = run_history.LATEST_RUN_CARD_IDS.scenario_button
+    page = run_history.layout()
 
-    assert _keys(registration["inputs"]) == [f"{button}.n_clicks"]
-    assert registration["state"] == []
-    assert registration["prevent_initial_call"] is True
-    assert registration["clientside_function"] is not None
-    assert isinstance(
-        _by_id(run_history.layout(), run_history.CARD_FOCUS_SINK_ID), dcc.Store
-    )
-    # Nothing reads the store it writes.
+    assert not hasattr(run_history, "CARD_FOCUS_SINK_ID")
+    assert not hasattr(run_history, "_HAND_FOCUS_TO_SCENARIO_SCRIPT")
+    assert "run-history-card-focus-sink" not in _ids(page)
+    assert "run-history-card-scenario-button" not in _ids(page)
     assert not [
         entry
         for entry in GLOBAL_CALLBACK_LIST
-        if run_history.CARD_FOCUS_SINK_ID
+        if "run-history-card-scenario-button"
         in {dep["id"] for dep in entry["inputs"] + entry["state"]}
     ]
-
-
-def test_the_focus_script_waits_for_the_button_to_go_and_then_focuses_the_dropdown():
-    """The script is not run here, so its text is held.
-
-    It acts only on a press from the keyboard: a click with the mouse loses
-    nothing by losing focus, and focus on the dropdown opens its list. It
-    leaves focus alone once the user has moved it somewhere else.
-    """
-    script = run_history._HAND_FOCUS_TO_SCENARIO_SCRIPT
-    card = run_history.LATEST_RUN_CARD_IDS
-    selection = run_history.SCENARIO_SELECTION_IDS
-
-    assert f'document.getElementById("{card.scenario_button}")' in script
-    assert f'document.getElementById("{selection.scenario_dropdown}")' in script
-    assert 'button.matches(":focus-visible")' in script
-    assert "button.offsetParent !== null" in script
-    assert "held === button || held === document.body" in script
-    assert "field.focus();" in script
-    assert "BUTTON_ID" not in script
-    assert "SCENARIO_ID" not in script
 
 
 # --- The latest run's id, and the ring ------------------------------------------------
 
 
-def _shown_run(run_id: str) -> latest_run_card.LatestRun:
-    return latest_run_card.LatestRun(
-        run_id=run_id,
-        scenario=SCENARIO,
-        played_at=datetime(2026, 10, 12, 22, 50),
-        score="812.4",
-        badge=None,
-        result="Accuracy 55.00%",
-        session="Run 1 this session · 4 min on this scenario",
-    )
-
-
 @pytest.mark.parametrize(
-    ("held", "shown", "written"),
+    ("held", "newest", "written"),
     [
         # Another run than the one held: on load, and when a run lands.
         (None, "a.csv", "a.csv"),
         ("a.csv", "b.csv", "b.csv"),
         # The same run: a change of scenario, of the percentage, of the
-        # session's state.
+        # session's state, of the date.
         ("a.csv", "a.csv", no_update),
     ],
 )
-def test_the_latest_runs_id_is_written_only_when_it_is_another_run(
-    monkeypatch, held, shown, written
+@pytest.mark.parametrize("selected", [SCENARIO, None])
+def test_the_newest_runs_id_is_written_only_when_it_is_another_run(
+    monkeypatch, held, newest, written, selected
 ):
-    """The graph takes the store, so the same id again would restyle the chart."""
+    """The graph takes the store, so the same id again would restyle the chart.
+
+    It is the newest run on any scenario, whatever the card reports, so it is
+    written with no scenario selected too.
+    """
     monkeypatch.setattr(
-        run_history, "latest_run_from_store", lambda *_arguments: _shown_run(shown)
+        run_history,
+        "latest_run_from_store",
+        lambda *_arguments: latest_run_card.StoreRuns(None, newest),
     )
 
-    *_card, latest_run_id = run_history.show_latest_run(None, SCENARIO, 95, True, held)
+    *_card, latest_run_id = run_history.show_latest_run(
+        None, selected, 95, True, "2026-10-12", held
+    )
 
     assert latest_run_id == written or latest_run_id is written
 
 
 def test_a_run_store_emptied_of_runs_takes_the_held_id_away(monkeypatch):
-    monkeypatch.setattr(run_history, "latest_run_from_store", lambda *_arguments: None)
+    monkeypatch.setattr(
+        run_history,
+        "latest_run_from_store",
+        lambda *_arguments: latest_run_card.StoreRuns(None, None),
+    )
 
     *_card, latest_run_id = run_history.show_latest_run(
-        None, SCENARIO, 95, False, "a.csv"
+        None, SCENARIO, 95, False, "2026-10-12", "a.csv"
     )
 
     assert latest_run_id is None

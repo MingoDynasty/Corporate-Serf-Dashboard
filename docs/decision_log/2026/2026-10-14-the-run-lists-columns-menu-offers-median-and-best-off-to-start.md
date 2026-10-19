@@ -1,6 +1,10 @@
 # 2026-10-14: The Run List's Columns Menu Offers Median And Best, Off To Start
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-10-18 entry](2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md):
+the figures sit in the row's own line, ahead of its count, and only the first
+row under This scenario keeps a second line. The checkbox, its default, and
+which rows carry figures stand.
 
 The Columns menu on Run History has a third checkbox, Median and best, which
 is off until a player turns it on. With it on, a row that stands for one

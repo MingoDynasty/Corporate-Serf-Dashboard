@@ -1,9 +1,9 @@
-"""What the Run History page's latest-run card shows: the last run played.
+"""What the Run History page's latest-run card shows: the selected scenario's latest run.
 
-``latest_run`` works out, from a copy of the run store, the newest run on any
-scenario and what the card says about it: when it was played, its score, its
-verdict, how it measured up against the PB it was chasing, and where it sits
-in its session. The rest of the module draws that in the card.
+``latest_run`` works out, from a copy of the run store, the selected
+scenario's latest run and what the card says about it: when it was played,
+its score, its verdict, how it measured up against the PB it was chasing, and
+where it sits in its session. The rest of the module draws that in the card.
 
 The card is worked out from the run store each time, never from the message a
 new run arrives in, so it is right on a page that has just been drawn, with
@@ -24,6 +24,7 @@ from source.components.run_history_list import (
     BELOW_THRESHOLD_TEXT,
     NEW_PB_TEXT,
     NO_RUNS_TEXT,
+    NO_SCENARIO_TEXT,
     THRESHOLD_PASSED_TEXT,
     run_id,
 )
@@ -49,20 +50,26 @@ from source.utilities.utilities import (
     format_elapsed_duration,
     format_percent,
     format_score,
+    format_short_timestamp,
 )
 
 LATEST_RUN_LABEL = "Latest run"
-NO_RUNS_MESSAGE = "Play a scenario in KovaaK's and your latest run will show here."
+# With no scenario selected and no runs at all. With Follow off a first run
+# leaves the selection empty, so "will show here" would promise what the card
+# does not do.
+NO_RUNS_MESSAGE = "Play a scenario in KovaaK's. Select it to see its latest run."
+NO_SCENARIO_RUNS_MESSAGE = (
+    "Play this scenario in KovaaK's and your latest run will show here."
+)
 
 CARD_CLASS = "run-history-card"
 HEADING_CLASS = "run-history-card-heading"
 HEADING_TEXT_CLASS = "run-history-card-heading-text"
 HEADING_LABEL_CLASS = "run-history-card-label"
-# The run's age, with the hover affordance Last played's has.
+# The run's age, with the hover affordance the playlist tables' Last played has.
 TIME_CLASS = "cell-tooltip-affordance"
 TIME_TARGET_CLASS = "run-history-card-time-target"
 SCENARIO_CLASS = "run-history-card-scenario"
-SCENARIO_BUTTON_CLASS = f"{SCENARIO_CLASS} run-history-card-scenario-button"
 BODY_CLASS = "run-history-card-body"
 SCORE_ROW_CLASS = "run-history-card-score-row"
 SCORE_CLASS = "run-history-card-score"
@@ -73,10 +80,12 @@ EMPTY_MESSAGE_CLASS = "run-history-card-empty-message"
 
 
 # A card's age is worded in the browser, when the card is written and on every
-# 30-second tick, as Last played is, so it stays current on a page left open:
+# 30-second tick, as the playlist tables' Last played is, so it stays current
+# on a page left open:
 # during play the latest-run card's doubles as a break timer. The hover is the
-# exact time in the shared format. With nothing to date, the words before the
-# age are hidden. The latest-run card and the PB card both register it.
+# exact time in the shared format. With nothing to date, the words that hold
+# the age are hidden, and the card's name before them stays. The latest-run
+# card and the PB card both register it.
 AGE_SCRIPT = """
     (seconds, _nIntervals) => {
         if (seconds === null || seconds === undefined) {
@@ -109,12 +118,12 @@ BADGE_TEXT = {
 
 @dataclass(frozen=True)
 class LatestRun:
-    """What the card says about the last run played, as the text it shows.
+    """What the card says about the selected scenario's latest run, as the text it shows.
 
     ``run_id`` is the run's id as the run list keys its row and a run event
     names it. ``played_at`` is when the run ended, as the run's file names it,
-    which the browser words as an age. ``result`` is the card's second line
-    and ``session`` its third.
+    which the browser words as an age. ``result`` is the card's second line,
+    ``session`` its third and ``time_on_scenario`` its fourth.
     """
 
     run_id: str
@@ -124,6 +133,7 @@ class LatestRun:
     badge: CardBadge | None
     result: str
     session: str
+    time_on_scenario: str
 
 
 def _badge(verdict: ThresholdVerdict | Unjudged, is_new_pb: bool) -> CardBadge | None:
@@ -171,13 +181,33 @@ def _comparison(
     return f"{shown_percentage(measured):.1f}% of {measure}"
 
 
-def _session_line(session: PlaySession, scenario: str, in_progress: bool) -> str:
-    """Word the run's number in its session and the time spent on its scenario.
+def _which_session(
+    sessions: list[PlaySession], session: PlaySession, now: datetime
+) -> str:
+    """Word which session a run is in, after its number.
 
-    The run is the session's last, so its number is how many of the session's
-    runs were on its scenario. The time is the sum of the scenario's visits,
-    each from its first run's start to its last run's end, so it includes
-    the breaks between a visit's runs.
+    The newest session is "this session" while it is in progress and "last
+    session" once it has ended. An older one is named as the run list names
+    its row, by when it began, with the year where it is not this one. The
+    word "session" stays inside the parentheses, or the time would read as
+    the run's own.
+    """
+    if session is not sessions[-1]:
+        return f"({format_short_timestamp(session.start, now.date())} session)"
+    if find_play_session_in_progress(sessions, now) is not None:
+        return "this session"
+    return "last session"
+
+
+def _session_lines(
+    session: PlaySession, scenario: str, which_session: str
+) -> tuple[str, str]:
+    """Word the run's number in its session, then the time spent on its scenario.
+
+    The run is its scenario's last in the session, so its number is how many
+    of the session's runs were on its scenario. The time is the sum of the
+    scenario's visits, each from its first run's start to its last run's
+    end, so it includes the breaks between a visit's runs.
 
     A visit whose first run has no usable start is counted from that run's
     end, so a visit of one long run would add nothing and the time could
@@ -190,41 +220,49 @@ def _session_line(session: PlaySession, scenario: str, in_progress: bool) -> str
         if visit.scenario == scenario
     ]
     number = sum(len(visit.runs) for visit in visits)
-    which_session = "this session" if in_progress else "last session"
+    run_line = f"Run {number} {which_session}"
     if any(visit.runs[0].run_start is None for visit in visits):
-        return f"Run {number} {which_session} · Time on this scenario unknown"
+        return run_line, "Time on this scenario unknown"
     seconds = sum((visit.end - visit.start).total_seconds() for visit in visits)
-    return (
-        f"Run {number} {which_session} · "
-        f"{format_elapsed_duration(seconds)} on this scenario"
-    )
+    return run_line, f"{format_elapsed_duration(seconds)} on this scenario"
 
 
 def latest_run(
     all_runs: Iterable[RunData],
+    scenario: str | None,
     goal_percentage: float | None,
     now: datetime,
     version_pace_basis: Callable[[str, str | None], PaceBasis | None],
 ) -> LatestRun | None:
-    """Work out what the card says about the newest run in ``all_runs``.
+    """Work out what the card says about ``scenario``'s latest run in ``all_runs``.
 
     ``all_runs`` is a copy of every run in the run store, on every scenario.
-    ``goal_percentage`` is ``None`` while the percentage is empty. ``now`` is
-    the app's own clock, which decides whether the run's session is in
-    progress. ``version_pace_basis`` answers for one version of one
-    scenario. ``None`` with no runs.
+    ``scenario`` is the selected one, or nothing. ``goal_percentage`` is
+    ``None`` while the percentage is empty. ``now`` is the app's own clock,
+    which decides whether the newest session is in progress and which year
+    an older session's name leaves out. ``version_pace_basis`` answers for
+    one version of one scenario. ``None`` with no scenario, or none of its
+    runs.
 
-    The newest run is the last run of the newest session, the run the run
-    list names as the newest. It is judged as the list judges it: against
-    the PB it was chasing, under its own version of the scenario.
+    The scenario's latest run is its last run in the newest session that
+    holds one. The sessions are split from every run, as the run list splits
+    them, so the two agree on which run is newest, two that ended in the same
+    second included. A run that lands late, older than the store's newest,
+    is the card's run once it is newer than the scenario's latest. It is
+    judged as the list judges it: against the PB it was chasing, under its
+    own version of the scenario.
     """
+    if not scenario:
+        return None
     runs = list(all_runs)
     sessions = split_into_play_sessions(runs)
-    if not sessions:
+    for session in reversed(sessions):
+        played = [run for run in session.runs if run.scenario == scenario]
+        if played:
+            break
+    else:
         return None
-    session = sessions[-1]
-    run = session.runs[-1]
-    scenario = run.scenario
+    run = played[-1]
     scenario_runs = in_play_order(
         scenario_run for scenario_run in runs if scenario_run.scenario == scenario
     )
@@ -242,6 +280,9 @@ def latest_run(
 
     accuracy = f"Accuracy {format_percent(run.accuracy)}"
     comparison = _comparison(run.score, chased, verdict, is_new_pb)
+    session_line, time_line = _session_lines(
+        session, scenario, _which_session(sessions, session, now)
+    )
     return LatestRun(
         run_id=run_id(run),
         scenario=scenario,
@@ -249,29 +290,46 @@ def latest_run(
         score=format_score(run.score),
         badge=_badge(verdict, is_new_pb),
         result=accuracy if comparison is None else f"{comparison} · {accuracy}",
-        session=_session_line(
-            session,
-            scenario,
-            find_play_session_in_progress(sessions, now) is not None,
-        ),
+        session=session_line,
+        time_on_scenario=time_line,
     )
 
 
+class StoreRuns(NamedTuple):
+    """What the page reads from one copy of the run store.
+
+    ``shown`` is what the card says about the selected scenario's latest run,
+    or ``None``. ``newest_run_id`` is the id of the newest run on any
+    scenario, the run the chart's ring and the run list's highlight mark, or
+    ``None`` with no runs in the store.
+    """
+
+    shown: LatestRun | None
+    newest_run_id: str | None
+
+
 def latest_run_from_store(
+    selected_scenario: str | None,
     score_threshold_percentage: float | str | None,
     now: datetime,
-) -> LatestRun | None:
-    """Work out what the card says from the run store.
+) -> StoreRuns:
+    """Work out what the card says, and the newest run on any scenario, from the run store.
 
     ``score_threshold_percentage`` is the percentage field's value as the
     browser sends it. The runs are copied from the store once, so the run,
-    its session, and the PB it was chasing all come from the same moment.
+    its session, the PB it was chasing, and the newest run all come from the
+    same moment.
     """
-    return latest_run(
-        get_all_runs(),
-        normalize_score_threshold_percentage(score_threshold_percentage),
-        now,
-        get_version_pace_basis,
+    runs = get_all_runs()
+    return StoreRuns(
+        shown=latest_run(
+            runs,
+            selected_scenario,
+            normalize_score_threshold_percentage(score_threshold_percentage),
+            now,
+            get_version_pace_basis,
+        ),
+        newest_run_id=run_id(in_play_order(runs)[-1]) if runs else None,
     )
 
 
@@ -283,12 +341,10 @@ class LatestRunCardIds(NamedTuple):
 
     ``played_at`` is a store holding when the run ended, in epoch seconds, or
     nothing with no run. A script on the page words it into ``label``, the
-    first line's words before the scenario's name, hidden with no run:
-    ``time`` is the run's age in it and ``time_tooltip`` the age's hover.
-    ``heading`` holds the scenario's name while it is the one selected, and
-    ``body`` the lines under the first. ``scenario_button`` is the
-    scenario's name while another scenario is selected: a button whose
-    ``value`` is the name and whose click asks the page for that scenario.
+    first line's words between ``Latest run`` and the scenario's name, hidden
+    with no run: ``time`` is the run's age in it and ``time_tooltip`` the
+    age's hover. ``heading`` holds the run's scenario's name, and ``body``
+    the lines under the first, or the card's empty state.
     """
 
     played_at: str
@@ -296,7 +352,6 @@ class LatestRunCardIds(NamedTuple):
     time: str
     time_tooltip: str
     heading: str
-    scenario_button: str
     body: str
 
 
@@ -305,21 +360,15 @@ class CardContent(NamedTuple):
 
     played_at: float | None
     heading: html.Span | None
-    scenario_button: str | None
-    scenario_button_value: str | None
-    scenario_button_label: str | None
     body: list[Any]
 
 
 def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
     """Build the card with nothing in it yet.
 
-    The page's callbacks write what it shows. What they write is in the
-    layout from the start and is never drawn again. A page must hold every
-    input of a callback whose output it holds, so a scenario button that came
-    and went with the card's text would call the callback it feeds each time
-    it was put back. And the run's age, which a script writes, would come
-    and go under the script if the server's answer drew it.
+    The page's callbacks write what it shows. The run's age, which a script
+    writes, is in the layout from the start: it would come and go under the
+    script if the server's answer drew it.
     """
     return dmc.Box(
         className=CARD_CLASS,
@@ -331,38 +380,42 @@ def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
                     # One item of the heading, with the age inline in it. The
                     # heading is a flex container, which drops a space between
                     # its items, and a screen reader would be handed the words
-                    # on either side of the age run together.
+                    # on either side of the age run together. The card's name
+                    # stays with no run, as the PB card's does, and only the
+                    # words that hold the age are hidden.
                     html.Span(
                         [
-                            f"{LATEST_RUN_LABEL} · ",
-                            dmc.Tooltip(
-                                dmc.Text(
-                                    className=TIME_CLASS,
-                                    id=ids.time,
-                                    inherit=True,
-                                    span=True,
-                                    tabIndex=0,
-                                ),
-                                # dmc wraps the tooltip's target in a block
-                                # box, which would break the line round it.
-                                boxWrapperProps={"className": TIME_TARGET_CLASS},
-                                events=TOOLTIP_EVENTS,
-                                id=ids.time_tooltip,
-                                label="",
+                            LATEST_RUN_LABEL,
+                            html.Span(
+                                [
+                                    " · ",
+                                    dmc.Tooltip(
+                                        dmc.Text(
+                                            className=TIME_CLASS,
+                                            id=ids.time,
+                                            inherit=True,
+                                            span=True,
+                                            tabIndex=0,
+                                        ),
+                                        # dmc wraps the tooltip's target in a
+                                        # block box, which would break the
+                                        # line round it.
+                                        boxWrapperProps={
+                                            "className": TIME_TARGET_CLASS
+                                        },
+                                        events=TOOLTIP_EVENTS,
+                                        id=ids.time_tooltip,
+                                        label="",
+                                    ),
+                                    " · ",
+                                ],
+                                hidden=True,
+                                id=ids.label,
                             ),
-                            " · ",
                         ],
                         className=HEADING_LABEL_CLASS,
-                        hidden=True,
-                        id=ids.label,
                     ),
                     html.Span(id=ids.heading, className=HEADING_TEXT_CLASS),
-                    html.Button(
-                        id=ids.scenario_button,
-                        className=SCENARIO_BUTTON_CLASS,
-                        n_clicks=0,
-                        type="button",
-                    ),
                 ],
             ),
             html.Div(id=ids.body, className=BODY_CLASS),
@@ -370,30 +423,43 @@ def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
     )
 
 
+def _empty_body(selected_scenario: str | None, store_has_runs: bool) -> list[html.Div]:
+    """Build what the card says with no run to report.
+
+    The selection decides first, as on the PB card: a playlist filter lists
+    its scenarios before any is played, so a scenario can be selected in a
+    store with no runs, and the card then speaks of it.
+    """
+    if selected_scenario:
+        message = NO_SCENARIO_RUNS_MESSAGE
+    elif store_has_runs:
+        return [html.Div(NO_SCENARIO_TEXT, className=EMPTY_TITLE_CLASS)]
+    else:
+        message = NO_RUNS_MESSAGE
+    return [
+        html.Div(NO_RUNS_TEXT, className=EMPTY_TITLE_CLASS),
+        html.Div(message, className=EMPTY_MESSAGE_CLASS),
+    ]
+
+
 def latest_run_card_content(
     shown: LatestRun | None,
     selected_scenario: str | None,
+    store_has_runs: bool,
 ) -> CardContent:
-    """Build what the card shows for a run, or for a run store with none.
+    """Build what the card shows for the selected scenario's latest run, or its empty state.
 
-    While the run's scenario is the one selected its name is plain text.
-    While another is selected the name is the scenario button, which selects
-    it.
+    ``store_has_runs`` tells the two states with no scenario selected apart:
+    a store with no runs reads the first run's two steps, and a store with
+    runs reads that no scenario is selected.
     """
     if shown is None:
         return CardContent(
             played_at=None,
             heading=None,
-            scenario_button=None,
-            scenario_button_value=None,
-            scenario_button_label=None,
-            body=[
-                html.Div(NO_RUNS_TEXT, className=EMPTY_TITLE_CLASS),
-                html.Div(NO_RUNS_MESSAGE, className=EMPTY_MESSAGE_CLASS),
-            ],
+            body=_empty_body(selected_scenario, store_has_runs),
         )
 
-    is_selected = shown.scenario == selected_scenario
     score_row: list[Any] = [html.Span(shown.score, className=SCORE_CLASS)]
     if shown.badge is not None:
         score_row.append(
@@ -408,18 +474,14 @@ def latest_run_card_content(
         )
     return CardContent(
         played_at=shown.played_at.timestamp(),
-        heading=(
-            # The title gives the whole name where the card cuts it short.
-            html.Span(shown.scenario, className=SCENARIO_CLASS, title=shown.scenario)
-            if is_selected
-            else None
+        # The title gives the whole name where the card cuts it short.
+        heading=html.Span(
+            shown.scenario, className=SCENARIO_CLASS, title=shown.scenario
         ),
-        scenario_button=None if is_selected else shown.scenario,
-        scenario_button_value=None if is_selected else shown.scenario,
-        scenario_button_label=None if is_selected else f"Show {shown.scenario}",
         body=[
             html.Div(score_row, className=SCORE_ROW_CLASS),
             html.Div(shown.result, className=RESULT_CLASS),
             html.Div(shown.session, className=SESSION_CLASS),
+            html.Div(shown.time_on_scenario, className=SESSION_CLASS),
         ],
     )

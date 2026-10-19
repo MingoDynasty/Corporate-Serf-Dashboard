@@ -122,7 +122,7 @@ def test_the_list_holds_its_header_the_grid_and_the_text_for_nothing_to_list():
     assert header.className == "run-history-list-header"
     heading, switch, actions = header.children
     assert (heading.id, switch.id) == (IDS.heading, IDS.view)
-    # The switch at the left of the second line, the two buttons at its right.
+    # The switch at the left of the header's line, the two buttons at its right.
     assert actions.className == "run-history-list-actions"
     expand_all, menu = actions.children
     assert expand_all.id == IDS.expand_all
@@ -890,11 +890,36 @@ def test_a_rows_height_follows_median_and_best_and_the_pinned_row_is_measured_to
     setting = script[script.index("state.setFigures = function") :]
 
     assert (
-        "return state.figures && data.figures ? height + SECOND_LINE_HEIGHT : height;"
-        in script
-    )
+        "return state.figures && data.figures && data.figures_below\n"
+        "      ? height + SECOND_LINE_HEIGHT\n"
+        "      : height;"
+    ) in script
     assert "api.resetRowHeights();" in setting
     assert "api.updateGridOptions({ pinnedTopRowData: [pinned.data] });" in setting
+
+
+def test_a_rows_figures_go_ahead_of_its_count_unless_they_go_below():
+    """``Median … · Best … · 7 runs``: the count stays at the right edge."""
+    script = LIST_SCRIPT.read_text(encoding="utf-8")
+    grouping = script[script.index("function groupRow(") :]
+    grouping = grouping[: grouping.index("\n  }\n")]
+    scenario = script[script.index("function scenarioRow(") :]
+    scenario = scenario[: scenario.index("\n  }\n")]
+    session = script[script.index("function sessionRow(") :]
+    session = session[: session.index("\n  }\n")]
+
+    assert (
+        "return state.figures && data.figures && !data.figures_below"
+        ' ? [data.figures, " · "] : [];'
+    ) in script
+    assert "var below = state.figures && data.figures && data.figures_below;" in (
+        grouping
+    )
+    assert 'below ? h("div", { className: "run-list-figures" }, data.figures)' in (
+        grouping
+    )
+    assert ".concat(figuresInLine(data), [\n            data.counts," in scenario
+    assert ".concat(figuresInLine(data), [counts])" in session
 
 
 def test_a_key_that_opens_or_closes_a_row_is_said_through_the_live_region():
@@ -1192,6 +1217,52 @@ def test_the_switch_sits_at_the_left_and_the_buttons_at_the_right():
         css, ".run-history-list-header"
     )
     assert "margin-left: auto;" in _css_block(css, ".run-history-list-actions")
+
+
+def test_the_heading_line_is_for_a_screen_reader_only_in_both_views():
+    """The latest-run card above the list names its scenario on screen.
+
+    The line keeps its words, in its place before the switch, and stays a
+    line of text: an HTML heading would change what a screen reader hears.
+    """
+    heading = _by_id(run_history.layout(), IDS.heading)
+
+    assert isinstance(heading, dmc.Text)
+    assert heading.className.split() == ["run-history-list-heading", "visually-hidden"]
+    assert getattr(heading, "fw", None) is None
+    assert getattr(heading, "truncate", None) is None
+
+
+def test_the_hidden_heading_line_leaves_the_controls_on_the_headers_first_line():
+    """Its absolute position takes it out of the header's line.
+
+    Nothing gives it a line of its own any more, which is what put the
+    switch and the buttons on a second line while it was on screen.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    hidden = _css_block(css, ".visually-hidden")
+
+    assert "position: absolute;" in hidden
+    assert "clip-path: inset(50%);" in hidden
+    assert not re.search(r"(?m)^\.run-history-list-heading \{", css)
+    assert "flex: 1 0 100%;" not in css
+
+
+def test_no_text_in_the_list_is_under_12px():
+    """The list's smallest text was 11px, which read too small (2026-10-18).
+
+    A size of 0 is the part end's space, which is meant to take no room.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    sizes = {
+        selector.strip(): int(size)
+        for selector, body in re.findall(r"(?ms)^([^{}@/]+?) \{(.*?)^\}", css)
+        if "run-list" in selector or "run-history-list" in selector
+        for size in re.findall(r"font-size: (\d+)px;", body)
+    }
+
+    assert sizes
+    assert {s: px for s, px in sizes.items() if 0 < px < 12} == {}
 
 
 def test_a_scenarios_name_gives_before_its_count():

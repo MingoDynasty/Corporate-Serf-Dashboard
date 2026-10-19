@@ -8,9 +8,9 @@ ids once, at import. Its layout takes the deep-link store's data from
 ``initial_scenario_options``. The callbacks are plain functions here and are
 registered once per page.
 
-When a link, a new run, the page's scenario button, or a scenario's name in
-the page's run list names a scenario the playlist filter does not list, the
-filter is cleared and the scenario is selected.
+When a link, a new run, or a scenario's name in the page's run list names a
+scenario the playlist filter does not list, the filter is cleared and the
+scenario is selected.
 """
 
 from typing import NamedTuple
@@ -259,19 +259,6 @@ def reach_scenario(
     return playlist, scenario
 
 
-def _button_was_clicked(triggered: list[dict]) -> bool:
-    """Tell whether a click on the page's scenario button is what called.
-
-    ``triggered`` is ``ctx.triggered``. The button is the callback's one
-    ``n_clicks`` input. Its count is read as well, because a call that
-    nothing triggered names no input, and a button just drawn has no clicks.
-    """
-    return any(
-        trigger["prop_id"].endswith(".n_clicks") and trigger["value"]
-        for trigger in triggered
-    )
-
-
 def _list_asked(triggered: list[dict], list_asked_prop: str) -> bool:
     """Tell whether a press on a scenario's name in the run list is what called.
 
@@ -290,35 +277,28 @@ def reach_the_scenario_asked_for(  # noqa: PLR0913
     list_asked_prop,
     selection,
     run_events,
-    _button_clicks,
     list_scenario,
     follow_newly_played,
     selected_playlist,
     selected_scenario,
-    button_scenario,
 ):
-    """Select the scenario a link, a new run, the scenario button, or the list names.
+    """Select the scenario a link, a new run, or the list names.
 
-    The page's scenario button is a third way to reach a scenario, beside the
-    two ``reach_scenario`` takes: its ``value`` names a scenario, and a click
-    selects it. A press on a scenario's name in the run list's tree is the
-    fourth: the list's script writes the name to a store. Either way the
-    scenario is selected, and a playlist filter that does not list it is
-    cleared. Neither writes a dropdown itself, because this is the one
-    callback that writes either value.
+    A press on a scenario's name in the run list's tree is a third way to
+    reach a scenario, beside the two ``reach_scenario`` takes: the list's
+    script writes the name to a store. The scenario is selected, and a
+    playlist filter that does not list it is cleared. The list writes no
+    dropdown itself, because this is the one callback that writes either
+    value.
 
-    Which of the four called is read from ``triggered``, what triggered the
+    Which of the three called is read from ``triggered``, what triggered the
     call, never from the values. The summary store replays its last batch to
-    every later call, and the list's store its last name, so on a click
+    every later call, and the list's store its last name, so on a press
     ``run_events`` can still hold a run from minutes ago, and on a run that
     lands ``list_scenario`` the name pressed before it. Read from the values,
-    a click would follow that run, and the run would select that name again.
+    a press would follow that run, and the run would select that name again.
     """
-    if _button_was_clicked(triggered):
-        asked_scenario = button_scenario
-    elif _list_asked(triggered, list_asked_prop):
-        asked_scenario = list_scenario
-    else:
+    if not _list_asked(triggered, list_asked_prop):
         return reach_scenario(
             selection,
             run_events,
@@ -326,11 +306,11 @@ def reach_the_scenario_asked_for(  # noqa: PLR0913
             selected_playlist,
             selected_scenario,
         )
-    if not asked_scenario or asked_scenario == selected_scenario:
+    if not list_scenario or list_scenario == selected_scenario:
         return no_update, no_update
     return (
-        None if _filter_leaves_out(selected_playlist, asked_scenario) else no_update,
-        asked_scenario,
+        None if _filter_leaves_out(selected_playlist, list_scenario) else no_update,
+        list_scenario,
     )
 
 
@@ -340,7 +320,6 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
     run_events: str,
     follow_switch: str,
     run_landed: str,
-    scenario_button: str,
     scenario_asked: str,
 ) -> None:
     """Register the block's callbacks for one page's ids.
@@ -358,11 +337,10 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
     shows, so a first run landing while Follow is off would leave its
     scenario out of the list until the filter next changed.
 
-    ``scenario_button`` is the id of a button on the page whose ``value``
-    names a scenario and whose click selects it. ``scenario_asked`` is the id
-    of a store a script on the page writes a scenario's name to, which
-    selects it. The page keeps both in its layout at all times: the selection
-    callback's outputs are always there, so each of its inputs has to be too.
+    ``scenario_asked`` is the id of a store a script on the page writes a
+    scenario's name to, which selects it. The page keeps it in its layout at
+    all times: the selection callback's outputs are always there, so each of
+    its inputs has to be too.
     """
     callback(
         Output(ids.scenario_dropdown, "data"),
@@ -406,10 +384,8 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
         Output(ids.scenario_dropdown, "value"),
         Input(ids.deep_link, "data"),
         Input(run_events, "data"),
-        Input(scenario_button, "n_clicks"),
         Input(scenario_asked, "data"),
         State(follow_switch, "checked"),
         State(ids.playlist_filter, "value"),
         State(ids.scenario_dropdown, "value"),
-        State(scenario_button, "value"),
     )(reach_scenario_or_the_one_asked_for)

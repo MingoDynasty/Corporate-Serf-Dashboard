@@ -96,17 +96,16 @@ the same form as the finished ones under it.
   session's run count, such as `7 of 47 runs`, jumps there, and a click on a
   scenario's name in the tree puts it on the chart. An open session has Show
   all runs, and the Columns menu's Median and best adds each row's median and
-  best score as a second line. *Problem solved:* what else was played in a
+  best score to its line. *Problem solved:* what else was played in a
   session was a count and a divider that named nothing, so the order of a
   session, and how it went across scenarios, was nowhere on screen.
 - **The latest run, on a card** (Run History page, PR #372; design in #356).
-  A card at the top of the page reports the last run played, whatever
-  scenario is selected: its score, whether it passed your threshold or set a
-  new personal best, its percentage of the personal best it was chasing, and
-  which run of the session it was. *Problem solved:* the verdict on the run
-  you just finished was on screen for a few seconds, in a toast. The card
-  keeps it until the next run, and names a run played on another scenario
-  with one click to go there.
+  A card at the top of the page reports the selected scenario's latest run:
+  its score, whether it passed your threshold or set a new personal best, its
+  percentage of the personal best it was chasing, and which run of the
+  session it was. *Problem solved:* the verdict on the run you just finished
+  was on screen for a few seconds, in a toast. The card keeps it until the
+  next run.
 - **Sessions** (PR #359; design in #355). The app groups your runs into
   sessions: the runs separated by breaks of no more than 30 minutes. A
   session reads as in progress until 30 minutes after its last run.
@@ -289,14 +288,26 @@ the same form as the finished ones under it.
 - **The target and result together on Run History** (PRs #380, #383 and #384;
   design in #379). The top row gives the selected
   scenario's personal best and its next rank's score a card beside the latest
-  run. The benchmark category, Last played and Number of runs stay together
-  in Scenario Stats, and the leaderboard percentile moves beside the PB.
+  run. The benchmark category and Number of runs stay together in Scenario
+  Stats, and the leaderboard percentile moves beside the PB.
   *Problem solved:* the record to beat used to be only a chart line that
   could be hidden, the next rank was on another page, and the latest-run
   card spent most of its width on empty space. The two scores now compare
   at a glance, with the benchmark's category explaining what is being
   practiced. Relative ages also show the break since the last run without
   calculating it from a clock time.
+- **The latest-run card follows the selection** (Run History page, PR #391;
+  design in #388). The latest-run card reports the selected scenario's
+  latest run, and a run from an older session names that session, such as
+  `Run 7 (Oct 16, 2:00 PM session)`. Last played left Scenario Stats, since
+  the card now says the same, and the run list's heading line left the
+  screen, since the card names the scenario right above it. *Problem
+  solved:* looking a scenario up before playing it set the PB card beside the
+  last run of another scenario, so the two big scores could not be compared.
+  Now they always describe one scenario, and a lookup shows when it was last
+  played and how that run went. With Follow off, a run on another scenario no
+  longer reaches the card; its toast's link and the All scenarios view lead
+  to it.
 - **Scenario rank and percentile** (PRs #8–#10). The Run History page
   shows your global leaderboard standing for the selected scenario, led by
   its percentile — `82.33% percentile`, with `Position 11,290 of 63,892` on
