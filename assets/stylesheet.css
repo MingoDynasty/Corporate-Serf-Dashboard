@@ -878,8 +878,8 @@ a.run-toast-link:hover {
     width: 100%;
 }
 
-/* A session row or a scenario row: its first line, and under it the row's
-   figures while Median and best is on. */
+/* A session row or a scenario row: its line, and under it the row's figures
+   while Median and best is on, on the one row that keeps them below. */
 .run-list-group {
     align-items: stretch;
     cursor: pointer;
