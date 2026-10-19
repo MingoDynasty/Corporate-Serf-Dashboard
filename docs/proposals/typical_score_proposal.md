@@ -18,7 +18,7 @@ the scenario's newest run, dated when it is old.
 
 ## Decisions needed
 
-Five rows, TS1 to TS5. **TS1 is ruled; TS2 to TS5 are not ratified.** Each
+Five rows, TS1 to TS5. **TS1, TS3, TS4 and TS5 are ruled; TS2 is open.** Each
 row began as the maintainer's lean or agreement from the design discussion of
 2026-10-14 and 2026-10-15, worked out over five measurements and six versions
 of a live prototype on their own stats, and each quotes what they said. A
@@ -28,7 +28,8 @@ scrutinized hardest**, and it gives the alternative its strongest case. The
 first review wave endorsed TS2 to TS5 and contested one point of TS1, whether
 runs of different versions of a scenario count together. The maintainer ruled
 TS1 on 2026-10-15, as recommended: every version counts, the assumption
-stated.
+stated. On 2026-10-18 they ratified TS3, TS4 and TS5 as recommended, and left
+TS2 open.
 
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
@@ -330,7 +331,9 @@ alone.
 
 ### TS3. The line is drawn after every run
 
-Status: Open. The maintainer: "Agreed: draw the typical score per run on the
+Status: Ruled (user), 2026-10-18: "For simplicity, I'll ratify the other
+decisions TS3, TS4, and TS5." That settles the row as recommended below.
+Before that, the maintainer: "Agreed: draw the typical score per run on the
 chart (held flat between runs in Score vs Time). The session freeze stays a
 rule for comparisons, which come later."
 
@@ -363,9 +366,11 @@ Rejected: steps once per session (prototype v1); session values joined
 
 ### TS4. The bands
 
-Status: Open. The maintainer: "Yes: include the P10 to P90 band as a Chart
-options switch, off by default, lighter shade."; "I think P10 and P90 are the
-better metrics than min/max."
+Status: Ruled (user), 2026-10-18, with TS3 and TS5. That settles the row as
+recommended below; how an "as of" stretch draws its bands follows TS2, which
+is still open. Before that, the maintainer: "Yes: include the P10 to P90 band
+as a Chart options switch, off by default, lighter shade."; "I think P10 and
+P90 are the better metrics than min/max."
 
 The material consequence: the chart gains a shaded band on every known
 stretch, and Chart options gains a switch.
@@ -397,7 +402,10 @@ maximum (the 2026-08-01 plan); a carried stretch drawn dotted with no band
 
 ### TS5. The figure on the page
 
-Status: Open. The maintainer: "Ship it first in today's Scenario Stats; the
+Status: Ruled (user), 2026-10-18, with TS3 and TS4. That settles the row as
+recommended below, except what TS2, still open, decides for it: the 30 days
+after which a value reads "as of", and what a value that isn't fresh shows.
+Before that, the maintainer: "Ship it first in today's Scenario Stats; the
 cards proposal can move it later."; "keep as no limit. '2,140 · as of Mar 3,
 2020' is still useful information, even if it is outdated."
 
