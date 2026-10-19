@@ -187,10 +187,18 @@ it is saved is in [2026-10-18][note-store].
 - With a note: a frame, the first line `Scenario note · edited {age}` in the
   other cards' quiet style with **Edit** at its right end, and the note at
   14px, its line breaks kept, broken anywhere a word is too long, centered in
-  the card when short. A note taller than the card runs to its bottom and its
-  last line fades out. The text is selectable; only **Edit** opens the
+  the card when short. The text is selectable; only **Edit** opens the
   editor. **Edit**'s accessible name is `Edit scenario note`
   ([2026-10-18][note-card]).
+- A note taller than the room under the first line scrolls inside the card,
+  with a scrollbar this app draws at the card's right edge whenever there is
+  more than fits, whatever the system's scrollbar setting. Its bottom line
+  fades while more of the note is below and not at its end. The wheel, a
+  trackpad and the scrollbar's thumb scroll it; while it can scroll it is a
+  tab stop after **Edit**, a region named `Scenario note`, and the arrow
+  keys, Page Up and Down, Home and End scroll it. Another scenario's note, or
+  a note just saved, starts at its top. A scroll redraws nothing
+  ([2026-10-19][long-note]).
 - The age is relative and reworded every 30 seconds, as the PB card's is, with
   the exact time on hover and focus. It is the time the text last changed,
   which only a Save that changes the text moves ([2026-10-18][note-store]).
@@ -1301,4 +1309,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md
 [note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md
 [note-card]: ../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md
+[long-note]: ../decision_log/2026/2026-10-19-a-long-scenario-note-scrolls-in-its-card.md
 [note-unsaved]: ../decision_log/2026/2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md

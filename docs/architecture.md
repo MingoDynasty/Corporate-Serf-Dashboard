@@ -1466,8 +1466,8 @@ flowchart LR
 - `assets/scenarioNotes.js` — the Run History scenario note in the browser:
   the controller (`window.dash_clientside.scenario_notes.controller`) that
   opens and closes the editor, decides when a change of scenario asks, and
-  answers the dialog, a `fade` that marks a note cut off at the card's
-  bottom, and the guard. The guard listens on `window` in the capture
+  answers the dialog, a `fade` that marks a note while more of it is below
+  the card's scroll area, and the guard. The guard listens on `window` in the capture
   phase, before React's root listener and before Dash Pages, and while the
   card's `data-unsaved` attribute says so it stops the run toast's link, a
   link to another address in the app, and the `popstate` of the back and
