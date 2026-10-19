@@ -45,7 +45,11 @@ things to be open for debate until I get other reviewers' opinions."
 proposed drawing a value at full strength only when every run behind it is
 recent, and one endorsed D's test with the older runs shown. TS6 weighs the
 two with their measured costs, and still recommends D's test, now with a
-value's older runs shown on the card.
+value's older runs shown on the card. After the wave the maintainer took the
+sessions out of that test, keeping them only for a scenario's first value,
+and chose the help's wording, all put to review. They named the goals the
+review is to weigh: the typical score as accurate as possible, simple for a
+player to understand, and appealing on the chart.
 
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
@@ -68,8 +72,10 @@ Status: Ruled (user), 2026-10-15: "TS1: accept recommendation, pool every
 version with the assumption stated." That settles the row as recommended
 below, the version question included. **TS6, proposed 2026-10-19, would amend
 it:** the value would count the last 20 runs at any age, the 30 days would
-decide only how it is drawn, and no value would be carried. The minimums, the
-session rule, the versions, sensitivities and warm-up runs, and the fixed
+decide only how it is drawn, and no value would be carried. The session rule
+would decide only whether a value is known: a value would be drawn at full
+strength once 10 of its runs are recent, from any number of sessions. The
+minimums, the versions, sensitivities and warm-up runs, and the fixed
 constants would stand. Until the maintainer rules on TS6, this row stands. Before that, the maintainer's lean,
 built up over the discussion: "I agree
 with all leans" (2026-10-14, including fixed numbers and every sensitivity);
@@ -499,24 +505,32 @@ leaning toward option D." On its cost after a return, for weakness ranking:
 is. But this serves as a small encouragement to the user to play that
 scenario, which then updates its typical score."
 
+After the third review wave, on 2026-10-19, the maintainer took the sessions
+out of the recency test, kept them for a scenario's first value, and chose
+the help's wording, all put to review and none ruled: "Let's go with that
+option and put it to review." They set the goals the row is to be judged by:
+"I'm trying to find the right balance with the Typical Score calculation
+formula and copy that: 1. Keeps the Typical Score as accurate as possible 2.
+While still being simple for a user to understand 3. While still being
+visually appealing on the chart".
+
 The material consequence: the value stops depending on the 30 days, and
 "recent" becomes a test every surface reads beside it. Right after a return,
 a value drawn at full strength can still hold up to 10 runs from before the
 break, and every later reader sees that value. It reads low if the player has
 improved since the break and high if they have declined, so a scenario can
-look stronger than it is right after a return, not only weaker.
+look stronger than it is right after a return, not only weaker. The 2
+sessions now guard only a scenario's first value.
 
 **Recommendation: the typical score after a run is the median of the
 scenario's last 20 runs, or of all its runs when it has fewer, whatever their
 age. It is known once those runs number at least 10 from at least 2 sessions,
-or 20. It is recent, and drawn at full strength, when the scenario's runs in
-the 30 days up to that moment meet either condition: at least 10 runs across 2
-or more sessions, or at least 20 runs in any number of sessions. Otherwise it
+or 20. It is recent, and drawn at full strength, when at least 10 of them are
+from the 30 days up to that moment, from any number of sessions. Otherwise it
 is drawn faded, on a scenario that has never been recent too. Scenario Stats
 judges recency as of now, and the chart as of each point's time. Whenever
 some of a value's runs are older than 30 days, Scenario Stats says how many
-are recent, faded or not, and its help says a full-strength value can hold
-older runs. Every run counts, as TS1 says.**
+are recent, faded or not. Every run counts, as TS1 says.**
 
 - **It is the line the maintainer expected:** no limit's shape, with what
   isn't recent faded. Prototype v8 draws it.
@@ -537,21 +551,22 @@ older runs. Every run counts, as TS1 says.**
   no limit's first values back held a median of 18 of 20 (TS2, point 2).
   Measured at the start of each session in 2025 and 2026, with recency judged
   at that start, against the median of the session that followed:
-  - Over every full-strength value, D is 0.3 points less accurate than A,
-    3.83% against 3.56% (95% interval +0.04 to +0.48, 319 targets).
+  - Over every full-strength value with a value of A's beside it, D is 0.3
+    points less accurate than A, 3.84% against 3.56% (95% interval +0.04 to
+    +0.47, 322 targets).
   - On the 227 whose runs were all recent at the start, D's value is A's. On
-    the other 92, of mixed age, D is about 1 point worse: 4.61% against
-    3.57% (+0.32 to +2.02), with A closer on 58% and D on 17%. 69 of those 92
-    windows span a break of 21 days or more, and 21 of the other 23 are from
-    2025, when the player was climbing fast. In 2026, 50 of 52 span a break.
+    the other 95, of mixed age, D is about 1 point worse: 4.59% against
+    3.61% (+0.25 to +1.76), with A closer on 56% and D on 18%. 71 of those 95
+    windows span a break of 21 days or more, and 22 of the other 24 are from
+    2025, when the player was climbing fast. In 2026, 51 of 53 span a break.
   - Run by run against the next 10 runs, the gap grows with the old runs: 0.3
     points with 1 to 4 of them, 1.25 with 5 to 9, 2.6 with all 10. D misses
     low: this player came back better than before the break.
   - In 2026 alone the median gap between the two values, where they differ,
     is 0.8%.
 - **The lag runs either way.** This player came back better than before each
-  break, so D's mixed values ran low: 20% of the 92 were above the next
-  session's median, and 3% by 5% or more, against 30% and 8% of the values
+  break, so D's mixed values ran low: 20% of them were above the next
+  session's median, and 4% by 5% or more, against 30% and 8% of the values
   whose runs were all recent. A player who comes back rusty sees the other direction:
   10 old scores of 200 and 10 recent ones of 100 make a full-strength 150.
   One player's history can't bound that. The maintainer's view of the worst
@@ -568,22 +583,24 @@ older runs. Every run counts, as TS1 says.**
   session by 3.18% against A's 3.87% (interval −0.91 to +0.50 for the
   difference). Holding a value flat has no accuracy case.
 - **Coverage.** Of 2026's 3,547 runs, A draws 44.2% at full strength, 8.0%
-  faded and 47.7% with no line; D 44.2%, 20.1% and 35.7%; no limit 64.3% at
-  full strength and 35.7% with no line. D's extra faded line is all light
-  play.
+  faded and 47.7% with no line; D 46.0%, 18.2% and 35.7%; no limit 64.3% at
+  full strength and 35.7% with no line. Where D draws a line and A doesn't,
+  it is light play.
 - **Light play keeps its faded value.** A scenario that has never had 10
-  recent runs from 2 sessions shows its value faded once it has 10 runs from 2
-  sessions at any age. Those values ran about 8.5% below the next session in
-  2026, a median error of 9.1% over 46 session starts: the price of drawing
-  them. Drawing nothing until a first recent value would make the value
+  recent runs shows its value faded once it has 10 runs from 2 sessions, or
+  20, at any age. Where A had no value, D's values ran about 8.5% below the
+  next session in 2026, a median error of 9.1% over 46 session starts, 3 of
+  which D draws at full strength: the price of drawing them. Drawing nothing
+  until a first recent value would make the value
   depend on the scenario's whole history, the kind of flag TS1 rejected,
   where one stray run months earlier satisfies it. D2 is met by the fade: the
   value shows as not recent, never as weak.
 - **The judging moment.** Scenario Stats judges recency as of now, so it fades
   the moment the test stops passing. Score vs Run judges each point at its
   run. Score vs Time holds a value until the next run (TS3) and fades the hold
-  at the moment its recent runs stop meeting the conditions: with no run in
-  between they only age out, so the moment is exact. The line ends at the
+  when fewer than 10 of its runs are recent: with no run in between they only
+  age out, so the moment is exact, when its 10th-newest run turns 30 days
+  old. The line ends at the
   newest run (TS3), so the card can be faded while the chart's last point is
   solid: the card can first fade within 30 days of the scenario's last run,
   and the two then disagree until the next run. The explainer says so (Copy).
@@ -592,8 +609,8 @@ older runs. Every run counts, as TS1 says.**
   the 30 days up to the moment; its values, its line and where the line is
   drawn are D's. It never draws runs from before a break at full strength, so
   it can't overstate after a decline, and its rule is one sentence. Its cost
-  is fading: in 2026 full strength falls from 44.2% of runs to 30.9% and
-  faded rises from 20.1% to 33.4%, so faded outnumbers full. After a long
+  is fading: in 2026 full strength falls from 46.0% of runs to 30.9% and
+  faded rises from 18.2% to 33.4%, so faded outnumbers full. After a long
   break the line turns solid at the 20th run back, not the 10th, and a
   scenario played 10 to 19 times a month whose last 20 runs reach past 30
   days stays faded. As of the newest run in the data, 31 scenarios played in
@@ -603,39 +620,57 @@ older runs. Every run counts, as TS1 says.**
   days old.
 - **A 90-day ceiling on the oldest run, on top of D's test,** fades those 6
   returns and keeps the 5 at full strength. Over 2026 it costs nearly as much
-  as every run recent, 32.7% of runs at full strength, because most of the
+  as every run recent, 32.9% of runs at full strength, because most of the
   difference there is returns, and it puts a second age in the rule.
 - **Why D's test, and not every run recent.** The values that only every run
   recent fades predict nearly as well as the values both draw at full
   strength, and far better than the values D fades. At session starts in 2025
-  and 2026 those 92 missed the next session by 4.61%, the 227 whose runs were
-  all recent by 3.56%, and the 205 that D fades by 7.48%; in 2026 alone,
-  3.49%, 3.18% and 5.13%. So D's fade marks the values that are clearly
-  worse, where every run recent also fades nearly a third of 2026's
-  full-strength line. D's test is also the evidence TS1 ruled enough for a
-  current value, 10 recent runs from 2 sessions, and its faded stretches are
-  where A's value wasn't fresh. Its mixture is shown on the card, and a
+  and 2026 those 98 missed the next session by 4.58%, the 227 whose runs were
+  all recent by 3.56%, and the 199 that D fades by 7.69%; in 2026 alone,
+  3.57%, 3.18% and 5.14%. So D's fade marks the values that are clearly
+  worse, where every run recent also fades a third of 2026's full-strength
+  line. Its test is one number a player can check against the card's count,
+  10 runs from the last 30 days. Its mixture is shown on the card, and a
   feature that judges can ask for every run recent. If the maintainer would
   rather bound the overstatement than show it, every run recent is coherent:
   the choice is whether "recent" means enough recent runs or only recent
   runs.
+- **The 2 sessions guard only a scenario's first value.** A first session is
+  one day's form, which moves a scenario's median by about 3% for this
+  player, and on a new scenario the scores are still climbing: 434 of the
+  691 PBs of 2026 came on scenarios with fewer than 10 earlier runs (both
+  measured 2026-10-08). Once a value exists its 20 runs span other days, and
+  asking 2 recent sessions as well added nothing measurable. D's first test
+  did ask it: dropping it draws 2026's full strength at 46.0% of runs instead
+  of 44.2%, and moves 6 session starts of 2025 and 2026 to full strength, too
+  few to compare (4.05% against 3.83%). Two other cuts were measured and set
+  aside. Dropping the sessions everywhere gives a new scenario's first
+  session a full-strength value, 0.9% of 2026's runs. Dropping only "or 20 in
+  one session" from both rules erases values a scenario already had, after
+  long sessions of it: 547 runs of 2025 and 2026 on 26 scenarios. Dropping it
+  from the first test alone faded the values that predicted best, 2.35%
+  against 3.95% over 30 session starts.
 - **Two simpler tests were set aside.** "At least 20 runs across 2 sessions",
   the maintainer's question, removes the lag but would cut 2026's
-  full-strength runs from 44% to 28% and leave 57% with no line instead of
+  full-strength runs from 46% to 28% and leave 57% with no line instead of
   36%: a scenario with 10 to 19 runs loses its value. "At least 15 of the 20
   recent" would cap the lag at 5 old runs, about 0.3 points, but leaves a
   scenario played 10 to 14 times a month faded for good; it was not measured.
 
 Rejected: A, TS2's recommendation, a carried value held flat (v6); C, A's
 value with faded stretches drawn from the last 20 runs at any age (v7); no
-limit at full strength; every run recent and the 90-day ceiling, above; the
-two simpler tests above; and no line before a scenario's first recent value.
+limit at full strength; every run recent and the 90-day ceiling, above; D's
+first test, which asked 2 recent sessions or 20; dropping the sessions, or
+the 20 in one session, everywhere; the two simpler tests above; and no line
+before a scenario's first recent value.
 
 The measurements are in the maintainer's scratch folder, the D evaluation and
 its script, checked against the rules evaluation: on the runs to 2026-10-09
 the two agree exactly. Its figures at a session start judge D's recency at
 that start, as TS6 does; its first version judged it by A's rule there, which
-kept 29 values at full strength that TS6 fades.
+kept 29 values at full strength that TS6 fades. Its figures for D use the
+test above, with D's first test measured beside it, and the cuts to the
+sessions come from a companion script on the same runs.
 
 ### TS7. The line and both bands, each with a switch
 
@@ -709,8 +744,8 @@ runs" follow it.**
 - **No height cost.** Measured at `1dc9413` (TS5) with v8's first line
   `· as of Aug 6`, the row stays 143 px without a benchmark and 164 px with
   one, the scenario note card beside it. The longest first line in the Copy
-  block, `Typical score ⓘ · 14 recent runs in 1 session`, measures about 232
-  px with its icon at the heading's 12 px, inside the 246 px the 270 px card
+  block, `Typical score ⓘ · 19 of 20 recent runs`, measures about 198 px
+  with its icon at the heading's 12 px, inside the 246 px the 270 px card
   leaves its text, so it doesn't wrap; PR 3 measures the row with it.
 - **Beyond TS5 it changes** the first line that the
   [2026-10-18 entry](../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md)
@@ -892,9 +927,7 @@ color:
 Whenever some of a value's runs are older than 30 days, the first line says
 how many are recent, at full strength or not:
 `Typical score ⓘ · 14 of 20 recent runs` over a full-strength value, and
-`Typical score ⓘ · 6 of 20 recent runs` over a dimmed one. A value whose 10
-to 19 recent runs all come from one session reads
-`Typical score ⓘ · 14 recent runs in 1 session`, dimmed. The number has a
+`Typical score ⓘ · 6 of 20 recent runs` over a dimmed one. The number has a
 dotted underline and a hover that says what it is from; the ⓘ explains the
 line, the bands and the fading (see [Copy](#copy)).
 
@@ -956,11 +989,11 @@ Overlays
   and P90 (the middle 80%) interpolated between runs, the "inclusive" method:
   `statistics.quantiles(scores, n=4, method="inclusive")` and its `n=10`
   twin. An even count's median is the mean of the two middle scores.
-- **Recent at a moment** when the value's runs that ended in the 30 days up to
-  that moment, a run ended exactly 30 days before counting, number at least 10
-  from at least 2 sessions, or 20. Because the value counts the last 20 runs,
-  "10 of them in the 30 days" is the same as "10 runs in the 30 days", which
-  is how the copy says it.
+- **Recent at a moment** when at least 10 of the value's runs ended in the 30
+  days up to that moment, a run ended exactly 30 days before counting, from
+  any number of sessions. Because the value counts the last 20 runs, "10 of
+  them in the 30 days" is the same as "10 runs in the 30 days". Sessions
+  decide only whether a value is known.
 - **The moment** is now for Scenario Stats, a point's run for Score vs Run,
   and every moment of a hold for Score vs Time. With no run in between, a
   value's recent runs only age out, oldest first, so a hold that is recent at
@@ -1188,18 +1221,17 @@ and a span on one date reads `on {date}`. `**…**` is bold through
 |---|---|---|
 | Scenario Stats, first line | `Typical score`, alone when every run behind the value is recent | Names the lead figure, as `PB` opens the PB card's first line and `Latest run` the latest-run card's (TS8). |
 | First line, some of the value's runs older than 30 days | `Typical score · {k} of {n} recent runs`, `0 of {n}` included | Shows the mixture whether the value is at full strength or dimmed: how far along a return is, and that a full-strength value still holds older runs. No date: under TS6 it would always be the newest run's, which the hover's Runs line and the latest-run card already show. |
-| First line, 10 to 19 recent runs, all from one session | `Typical score · {k} recent runs in 1 session` | Says why enough runs still read as not recent; the sessions clause is then what fails. Without `of {n}`: with it and the session, the line measures about 256 px with its icon at 12 px, more than the card's 246, and would wrap. |
 | First line's help icon, accessible name | `About the typical score` | Not `Typical score help`: the Typical score switch's help icon has that name, as `settings_help_label` names every one `{label} help`. |
 | Lead, value | `{score}`, such as `2,999` | Rounded as [Rounding](#rounding) says, formatted as a score is; dimmed when not recent. |
 | Lead, too few runs | `Too few runs` | No "recent": this minimum has no age limit. |
 | Lead, no local runs | `No runs yet` | As the latest-run card's empty state says it. |
 | No scenario selected | `No scenario selected` | The card's shipped empty state, unchanged. |
 | The count line | `Total runs: {n}` | Replaces `Number of runs:`, so the count isn't read as the runs behind the typical score (TS8). |
-| Lead hover | `The median of your last {n} runs.`, or `The median of your {n} runs.` when those are all of them; then `**Runs:** {n} in {s} sessions · {first} to {last}`, `**Recent:** {k} of {n} from the last 30 days`, `**Middle 50%:** {p25} to {p75}`, `**Middle 80%:** {p10} to {p90}`, one line each | A sentence, then readouts with bold labels, as the chart's hover has them. When 10 to 19 of the runs are recent and all from one session, the Recent line adds ` · 1 session`, the clause that then keeps the value from being recent. |
-| Lead hover, too few runs | `A typical score needs either:`, then `At least 10 runs across 2 or more sessions.` and `At least 20 runs, even if all from one session.` as a list, then `You have {n} runs in {s} sessions.` | The existence minimum, with no 30 days in it, and the count behind the lead. |
-| First line's help | `Your typical score is the median of your last 20 runs of this scenario, or of all your runs if you have fewer. Runs count regardless of age.` / `On the chart, the darker band shows the middle 50% of those scores, and the lighter band the middle 80%. Narrower bands mean more consistent scores. Turn the line and bands on or off in **Chart options**.` / `A faded line, or a dimmed number on this card, means too few recent runs. It comes back to full strength when your runs in the last 30 days meet either condition:`, then the same two conditions as a list, then `Full strength only needs 10 recent runs, so up to 10 of the 20 behind your typical score can be older than 30 days.` / `The card judges recency as of now, and the chart as of each point's time.` | Four paragraphs: what the figure is, what the bands mean, what fading and dimming mean and how old a full-strength value's runs can be, and why the card and the chart's last point can differ. The help opens from the card, over a number that dims, so it names both. The disclosure sentence is the maintainer's wording of 2026-10-19, put to review: it names the 10 and the 20 where an earlier "up to half" left the reader to work them out. Two simplifications are open with it: "only needs 10 recent runs" leaves the 2 sessions to the list above it, and "of the 20" stands for "of all of them" on a scenario with fewer than 20 runs, where fewer can be older. No lesson on what a median is, and nothing the chart shows by itself, as the maintainer asked; "consistent" is the word players use. The second condition drops "they're" so it fits on one line at 320 px. |
+| Lead hover | `The median of your last {n} runs.`, or `The median of your {n} runs.` when those are all of them; then `**Runs:** {n} in {s} sessions · {first} to {last}`, `**Recent:** {k} of {n} from the last 30 days`, `**Middle 50%:** {p25} to {p75}`, `**Middle 80%:** {p10} to {p90}`, one line each | A sentence, then readouts with bold labels, as the chart's hover has them. Recency counts no sessions, so the Recent line names none. |
+| Lead hover, too few runs | `A typical score needs 10 runs across 2 or more sessions, or 20 in one session. You have {n} runs in {s} sessions.` | The existence minimum, the only rule that counts sessions, with no 30 days in it, and the count behind the lead. Two sentences and no list; shown only on a scenario with no value, where it says what to play. |
+| First line's help | `Your typical score is the median of your last 20 runs of this scenario, or of all your runs if you have fewer. Runs count regardless of age.` / `On the chart, the darker band shows the middle 50% of those scores, and the lighter band the middle 80%. Narrower bands mean more consistent scores. Turn the line and bands on or off in **Chart options**.` / `A faded line, or a dimmed number on this card, means fewer than 10 of the runs behind your typical score are from the last 30 days, so it may be out of date.` / `The card shows how recent it is today, and the chart how recent it was at each run.` | Four paragraphs: what the figure is, what the bands mean, when it fades and why that matters, and why the card and the chart's last point can differ. The help opens from the card, over a number that dims, so it names both. The third paragraph is the maintainer's choice of 2026-10-19, put to review. It states the whole recency rule in one sentence, with no term for the opposite state: "full strength" stays a word of this document. It says what fading means for the player, "may be out of date", and leaves room for an older value that is still right. It shows a full-strength value's mixture by implication, since a value with 10 recent runs isn't faded while up to half of its runs can be older, and the card's count shows it outright. "The runs behind your typical score" holds for a scenario with fewer than 20 runs. The fourth paragraph, reworded by the author on the same day, says the card and chart difference without "judges recency". No lesson on what a median is, and nothing the chart shows by itself, as the maintainer asked; "consistent" is the word players use. |
 | Chart legend | `Typical score`, `Middle 50%`, `Middle 80%` | Sentence case, the switches' words. |
-| Line hover | `**Typical score**: {score}`, `**Runs**: {n} in {s} sessions · {first} to {last}`, `**Recent**: {k} of {n} in the 30 days up to this run`, `**Middle 50%**: {p25} to {p75}`, `**Middle 80%**: {p10} to {p90}`, one line each | The card hover's lines. "Up to this run" because each point is judged at its run. A band's line shows while its switch is on. A point whose 10 to 19 recent runs all come from one session adds ` · 1 session`, as the card's hover does. The percentile names are dropped: they add terms and no information. |
+| Line hover | `**Typical score**: {score}`, `**Runs**: {n} in {s} sessions · {first} to {last}`, `**Recent**: {k} of {n} in the 30 days up to this run`, `**Middle 50%**: {p25} to {p75}`, `**Middle 80%**: {p10} to {p90}`, one line each | The card hover's lines. "Up to this run" because each point is judged at its run. A band's line shows while its switch is on. The percentile names are dropped: they add terms and no information. |
 | Line hover, a hold faded after its runs aged out | `**Recent**: too few · last run {date}` | Score vs Time only; the count changes along the hold, so it isn't given. |
 | Chart options switch labels | `Typical score`, `Middle 50%`, `Middle 80%` | The legend's words, as the PB score switch takes its line's. |
 | Typical score switch help | `Draws your typical score: the median of your last 20 runs, or of all your runs if you have fewer. It's faded where too few of them are recent. **Score vs Sensitivity** doesn't show the line or bands.` | What it draws and where it doesn't. |
@@ -1229,15 +1261,14 @@ correction.
   - Not the median KovaaK's leaderboard shows, which is the median player's
     PB.
   - In code: `typical_score`.
-- **Recent.** The state of a typical score whose runs in the 30 days up to a
-  moment number at least 10 across 2 or more sessions, or at least 20.
-  Scenario Stats judges it as of now, and the chart at each point. A recent
-  value can still hold runs older than 30 days, up to half of them.
+- **Recent.** The state of a typical score at least 10 of whose runs are from
+  the 30 days up to a moment, from any number of sessions. Scenario Stats
+  judges it as of now, and the chart at each point. A recent value can still
+  hold runs older than 30 days, up to half of them.
   - On the chart: a full-strength stretch; not recent, a faded one.
   - On Scenario Stats: an undimmed lead number; not recent, a dimmed one.
     Whenever some of the value's runs are older than 30 days, recent or not,
-    `{k} of {n} recent runs` follows `Typical score`, or
-    `{k} recent runs in 1 session`.
+    `{k} of {n} recent runs` follows `Typical score`.
   - In code: `recent`.
 - **Middle 50%.** The range the middle half of the runs behind a typical
   score fell in: from the first quartile to the third, P25 to P75. Run
@@ -1323,6 +1354,9 @@ Each was drawn in a prototype or measured, on the maintainer's stats.
   fresh values that 14 and 30 days get right; 14 equalled 30 in 2026 and held
   flat "as of" values under the 2025 climb; 60 days, like no limit, called
   months-old values current after a return. TS6 keeps 30 days for the test.
+- **2 recent sessions in the full-strength test,** D's first test, and
+  **sessions dropped from both rules, or "or 20 in one session" dropped from
+  both.** TS6.
 - **At least 20 recent runs from 2 sessions, and at least 15 of 20 recent,**
   as the test. TS6.
 - **No line before a scenario's first recent value.** TS6.
@@ -1428,15 +1462,14 @@ Each with where it is tracked.
   joining two of this scenario's runs into one session; every sensitivity and
   version counted; same-second runs in play order; rounding of whole,
   one-decimal and six-decimal scores, a half rounding up.
-- **Unit, recency:** 10 recent runs from 2 sessions (recent), 10 from one
-  (not), 20 from one (recent), 9 (not); a run ended exactly 30 days before the
-  moment (counts) and one second more (doesn't); recent at the run and not
-  later, with the fade moment of a hold equal to the moment its 10th-newest or
-  second session's last recent run passes 30 days; a hold whose 20 recent runs
-  are all one session's, which fades when its 20th-newest run passes 30 days;
-  where both conditions held at the run, the later of the two moments; a
-  value recent at its run whose card, a day later, isn't; the count of a
-  value's recent runs, all of them, some with the value recent, and none.
+- **Unit, recency:** 10 recent runs (recent), from 2 sessions and from one;
+  9 (not); a run ended exactly 30 days before the moment (counts) and one
+  second more (doesn't); a known value, from 2 sessions or 20 runs, whose 10
+  recent runs are all one session's (recent); recent at the run and not
+  later, with the fade moment of a hold equal to the moment its 10th-newest
+  run passes 30 days; a value recent at its run whose card, a day later,
+  isn't; the count of a value's recent runs, all of them, some with the value
+  recent, and none.
 - **Unit, the chart's traces,** per mode on a hand-built history: which
   points are full strength and which faded, the joins at each end of a faded
   stretch with no step in the value, Score vs Time's holds, their fade moment
@@ -1456,7 +1489,7 @@ Each with where it is tracked.
   its clicks hiding a metric whole, and its layout with Chart options open,
   the switches and their memory, the hover, a zoom that refits to the bands,
   the lead's dimmed contrast, and the top row's height with the lead and the
-  longest first line, `Typical score ⓘ · 14 recent runs in 1 session`, with
+  longest first line, `Typical score ⓘ · 19 of 20 recent runs`, with
   and without a benchmark; if it wraps, PR 3 shortens it and lists the new
   string in its description. These
   cover what pure tests can't: draw order, theme colors, the zoom script, and
