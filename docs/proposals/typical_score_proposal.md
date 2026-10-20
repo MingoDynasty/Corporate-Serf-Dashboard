@@ -17,8 +17,8 @@ when it isn't recent.
 
 ## Decisions needed
 
-Eight rows, TS1 to TS8. **TS1 and TS3 to TS6 are ruled, TS1 as TS6 amends
-it. TS2 is pivoted to TS6, and TS7 and TS8 are proposed and open.** Each row
+Eight rows, TS1 to TS8. **Every row is ruled but TS2, which is pivoted to
+TS6. TS1, TS4 and TS5 stand as TS6, TS7 and TS8 amend them.** Each row
 began as the maintainer's lean or agreement from the design discussion of
 2026-10-14 to 2026-10-19, worked out over measurements and eight versions of
 a live prototype on their own stats, and each quotes what they said. A lean
@@ -57,7 +57,7 @@ at full strength only when every run behind it is recent. All three agreed
 that the sessions belong only to a scenario's first value, and that the help's
 sentence says enough under the amended test. TS7 and TS8 were endorsed again.
 On 2026-10-20 the maintainer ruled TS6 for the amended test, after weighing
-every cost it still carries, so TS1 now stands as TS6 amends it.
+every cost it still carries, and then TS7 and TS8 as recommended.
 
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
@@ -416,9 +416,10 @@ Rejected: steps once per session (prototype v1); session values joined
 
 Status: Ruled (user), 2026-10-18, with TS3 and TS5. That settles the row as
 recommended below; how an "as of" stretch draws its bands follows TS2, now
-pivoted to TS6. **TS7, proposed 2026-10-19, would amend it:** the middle 50%
-would get a switch of its own, and the Middle 80% switch would start on. P10
-and P90 would stand. Until the maintainer rules on TS7, this row stands. Before that, the maintainer: "Yes: include the P10 to P90 band
+pivoted to TS6. **TS7, ruled 2026-10-20, amends it:** the middle 50% gets a
+switch of its own, and the Middle 80% switch starts on. P10 and P90 stand.
+Where this row's text differs from TS7, TS7 governs. Before this row's
+ruling, the maintainer: "Yes: include the P10 to P90 band
 as a Chart options switch, off by default, lighter shade."; "I think P10 and
 P90 are the better metrics than min/max."
 
@@ -455,12 +456,12 @@ maximum (the 2026-08-01 plan); a carried stretch drawn dotted with no band
 Status: Ruled (user), 2026-10-18, with TS3 and TS4. That settles the row as
 recommended below, except what TS2, now pivoted to TS6, decides for it: the
 30 days after which a value reads "as of", and what a value that isn't fresh
-shows. **TS8, proposed 2026-10-19, would amend it:** the card would lead with
-the typical score instead of giving it a line. Until the maintainer rules on
-TS8, this row stands.
-Before that, the maintainer: "Ship it first in today's Scenario Stats; the
-cards proposal can move it later."; "keep as no limit. '2,140 · as of Mar 3,
-2020' is still useful information, even if it is outdated."
+shows. **TS8, ruled 2026-10-20, amends it:** the card leads with the typical
+score instead of giving it a line. Where this row's text differs from TS8,
+TS8 governs. Before this row's ruling, the maintainer: "Ship it first in
+today's Scenario Stats; the cards proposal can move it later."; "keep as no
+limit. '2,140 · as of Mar 3, 2020' is still useful information, even if it
+is outdated."
 
 The material consequence: Scenario Stats gains a line. On the card as it
 ships today, the top row keeps its height.
@@ -697,8 +698,9 @@ sessions come from a companion script on the same runs.
 
 ### TS7. The line and both bands, each with a switch
 
-Status: Proposed, 2026-10-19, on the maintainer's lean, not a ruling. It would
-amend TS4, as TS4's status says. The maintainer: "If it's a switch then the
+Status: Ruled (user), 2026-10-20, with TS8: "I rule TS7 and TS8." That
+settles the row as recommended below. It amends TS4, as TS4's status says.
+Before the ruling, the maintainer: "If it's a switch then the
 user has the option to not always draw it. But if it's purely a legend, then
 it will always be drawn and the user has to manually disable it every time
 they change scenarios."; then "My current lean is to enable all 3 metrics by
@@ -738,8 +740,9 @@ chooser in place of two switches, a control unlike every other overlay's.
 
 ### TS8. Scenario Stats leads with the typical score
 
-Status: Proposed, 2026-10-19, on the maintainer's lean, not a ruling. It would
-amend TS5, as TS5's status says. The maintainer: "I think the typical score
+Status: Ruled (user), 2026-10-20, with TS7: "I rule TS7 and TS8." That
+settles the row as recommended below. It amends TS5, as TS5's status says.
+Before the ruling, the maintainer: "I think the typical score
 value should be emphasized as it is the Scenario stats card's defining
 metric, compared to the PB card's PB score, and Latest Run card's latest run
 score."; on the card's count: "I'm concerned that the "Number of runs" metric
@@ -927,10 +930,9 @@ whose chart code `dcc4cba` leaves unchanged, and the row on 2026-10-18 at
 
 ## Design
 
-The design below is TS6 as ruled, TS7 and TS8 as recommended, and the ruled
-rows where those leave them standing. Where TS1's text says otherwise, TS6
-governs. Where TS4's or TS5's says otherwise, TS7 or TS8 is what is
-recommended, and the ruled row stands until the maintainer rules.
+The design below is TS6, TS7 and TS8, and the earlier rows where those leave
+them standing. Where the text of TS1, TS4 or TS5 says otherwise, the row
+that amends it governs.
 
 ### What the player sees
 
