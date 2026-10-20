@@ -1452,7 +1452,8 @@ in that PR's description.
   at each end, and the spec's sentences on them. Needs 2b.
 - **PR 3, the Scenario Stats lead.** The first line, its help, the lead and
   its hover, Total runs, its updates, and the spec's Scenario Stats section.
-  Needs PR 1, and lands in any order with the chart's PRs.
+  Needs PR 1 and 2b: its help describes the line, the bands and their
+  switches, so it lands once 2b draws them, beside 2c or after it.
 
 **Why this split.** The definition is the contract later features read, and
 a PR of its own keeps its review on the boundaries rather than on plotly. The
@@ -1461,7 +1462,8 @@ goes first: it changes the chart before any trace is added, and can land
 beside PR 1. Each mode then has a PR of its own, because Score vs Time's
 holds, which fade at an exact moment between runs, are the geometry most
 likely to hide a bug. The Scenario Stats lead is another module, with its own
-live checks of the top row. The cost is two more reviews and two more looks
+live checks of the top row, and it follows 2b because its help names what 2b
+draws. The cost is two more reviews and two more looks
 in Firefox, and a stretch in which Score vs Run draws the line and Score vs
 Time doesn't: 2c is meant to follow 2b closely, and a release between them
 shows the line on one mode only.
