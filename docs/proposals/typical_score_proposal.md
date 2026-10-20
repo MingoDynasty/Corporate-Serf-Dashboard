@@ -956,13 +956,13 @@ Middle 50%: 1,330 to 1,362                           Middle 50%: 622.44 to 729.8
 Middle 80%: 1,310 to 1,385                           Middle 80%: 593.92 to 800.92
 ```
 
-Score vs Time holds each value flat until the next run. A hold that outlives
-its recent runs fades from the moment they stop meeting the conditions: a
-value whose 10th-newest run is 25 days old, with no run for 10 days after it,
-holds at full strength for 5 days and faded for the other 5. The line ends at
-the newest run (TS3), so this happens only between two runs. v8 holds the
-newest value to now and so draws it at the right end too: on Flower 50cm,
-whose last run was on 2026-10-01, it turns faded on 2026-10-16.
+Score vs Time holds each value flat until the next run. A hold fades from the
+moment fewer than 10 of its runs are recent, when its 10th-newest run turns
+30 days old: a value whose 10th-newest run is 25 days old, with no run for 10
+days after it, holds at full strength for 5 days and faded for the other 5.
+The line ends at the newest run (TS3), so this happens only between two runs.
+v8 holds the newest value to now and so draws it at the right end too: on
+Flower 50cm, whose last run was on 2026-10-01, it turns faded on 2026-10-16.
 
 Chart options, the Overlays group:
 
@@ -1033,9 +1033,9 @@ Overlays
 - **Each value holds flat from its run to the next plotted run,** a step at
   each run. The line ends at the newest plotted run (TS3).
 - **A hold is at full strength while its value is recent,** and fades at the
-  moment its recent runs stop meeting the conditions; a value that wasn't
-  recent at its run holds faded throughout. The faded part ends where the next
-  run's value begins, so the two meet.
+  moment fewer than 10 of its runs are recent, when its 10th-newest run turns
+  30 days old; a value that wasn't recent at its run holds faded throughout.
+  The faded part ends where the next run's value begins, so the two meet.
 - **Why the line ends at the newest run, and not now,** as TS3 ruled and v8
   does not: held to now, the time axis stretches to today. A scenario last
   played in 2020 would then draw its runs at the left edge of six empty years
