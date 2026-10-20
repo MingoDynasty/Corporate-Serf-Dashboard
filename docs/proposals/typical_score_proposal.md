@@ -137,7 +137,9 @@ and warm-up runs. The numbers are fixed constants, not settings.**
   long sitting did not overstate the player either: its value sat 1.6% below
   the next session on average, and above it in 10 of 29. With the exception,
   accuracy is unchanged within noise: 3.82% against 3.93% from the next
-  session's median, at 30 days.
+  session's median, at 30 days. Under TS6 nothing is carried, so without the
+  exception a long sitting would take away a value the scenario already
+  had: 547 runs of 2025 and 2026 on 26 scenarios (TS6).
 - **The maintainer's "two sessions only until established" measured the
   same.** It also fixes the grind, and the two rules differ on 71 runs of
   8,529. This one is recommended because it reads off the window alone: the
@@ -147,7 +149,9 @@ and warm-up runs. The numbers are fixed constants, not settings.**
   Carried values stayed within 3% to 5% of the next session for up to four
   months on a plateau, and ran 10% to 14% low after a fast-improvement phase
   or a five-to-eight-month break. That is why a carried value is always
-  labelled "as of".
+  labelled "as of". Under TS6 nothing is carried: after a break the value is
+  still the median of the last 20 runs, drawn faded until 10 of them are
+  recent again.
 - **Unknown before any fresh value,** which D2 requires: unknown is never
   read as weak. A value once fresh is never unknown again, so after the first
   known value the line has no gaps.
