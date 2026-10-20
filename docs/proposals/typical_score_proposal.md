@@ -1445,8 +1445,10 @@ in that PR's description.
 - **PR 2b, Score vs Run.** The line, the bands and their faded stretches on
   Score vs Run; the traces' order, colors, legend groups and the line's
   hover; the three switches; the zoom fit's comment; and the Run History
-  spec's chart and panel sections. Score vs Time draws no line until 2c.
-  Needs PR 1 and 2a. It doesn't touch the top row.
+  spec's chart and panel sections. Score vs Time draws no line until 2c, so
+  2b's three switch helps name both modes that don't show the line or bands,
+  listed under New copy in its description, and 2c restores the Copy block's
+  words. Needs PR 1 and 2a. It doesn't touch the top row.
 - **PR 2c, Score vs Time.** Each value held flat to the next run, a hold's
   fade at its exact moment, the line's end at the newest run, a hold's hover
   at each end, and the spec's sentences on them. Needs 2b.
@@ -1463,10 +1465,10 @@ beside PR 1. Each mode then has a PR of its own, because Score vs Time's
 holds, which fade at an exact moment between runs, are the geometry most
 likely to hide a bug. The Scenario Stats lead is another module, with its own
 live checks of the top row, and it follows 2b because its help names what 2b
-draws. The cost is two more reviews and two more looks
-in Firefox, and a stretch in which Score vs Run draws the line and Score vs
-Time doesn't: 2c is meant to follow 2b closely, and a release between them
-shows the line on one mode only.
+draws. The cost is two more reviews and two more looks in Firefox, and a
+stretch in which Score vs Run draws the line and Score vs Time doesn't, the
+switch helps saying so: 2c is meant to follow 2b closely, and a release
+between them shows the line on one mode only.
 
 Each PR updates the specs and the glossary entries its own behavior changes,
 as it ships ([Terms](#terms) says which entry goes with which PR). The last
