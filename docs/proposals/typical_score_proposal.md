@@ -648,8 +648,8 @@ are recent, faded or not. Every run counts, as TS1 says.**
   session a full-strength value, 0.9% of 2026's runs. Dropping only "or 20 in
   one session" from both rules erases values a scenario already had, after
   long sessions of it: 547 runs of 2025 and 2026 on 26 scenarios. Dropping it
-  from the first test alone faded the values that predicted best, 2.35%
-  against 3.95% over 30 session starts.
+  from the full-strength test alone faded the values that predicted best,
+  2.35% against 3.95% over 30 session starts.
 - **Two simpler tests were set aside.** "At least 20 runs across 2 sessions",
   the maintainer's question, removes the lag but would cut 2026's
   full-strength runs from 46% to 28% and leave 57% with no line instead of
