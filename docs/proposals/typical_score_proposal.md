@@ -850,11 +850,16 @@ makes of it where that differs.
   7 to 60 days both give a fresh value, they give the same one about 90% of
   the time; the 20-run cap decides first. No limit, which is TS6's value,
   agrees with them less often, 70% to 76%, because it still holds runs from
-  before a break, which TS6 draws faded. Fresh values miss the next session
-  by about 3%, close to how much one session's median varies on its own;
-  TS6's full-strength values miss by 3.84% at session starts.
+  before a break. TS6 draws such a value at full strength while 10 of its
+  runs are recent, older runs and all, and faded once fewer are: the lag its
+  cost bullet measures. Fresh values miss the next session by about 3%,
+  close to how much one session's median varies on its own; at session
+  starts, TS6's full-strength values miss by 3.84%, against 3.56% for the
+  window's values on the same starts (TS6).
 - **What longer windows add is old values labelled current.** See TS2, points
-  2 and 5. TS6 draws those values faded instead.
+  2 and 5. TS6 fades a value only while fewer than 10 of its runs are
+  recent, so a value of mostly old runs is faded, and one with up to 10 old
+  runs beside 10 recent ones is at full strength.
 - **Carried values** hold within 3% to 5% for up to four months on a plateau,
   and run 10% to 14% low after a fast-improvement phase or a break of five to
   eight months. Every age bucket's bias is negative: an old value understates
@@ -866,7 +871,9 @@ makes of it where that differs.
   typical score (TS2). The typical score's case is steadiness for judgments.
 - **Coverage is limited by history, not the window** (TS2, point 4). With no
   window in the value, TS6 leaves 35.7% of 2026's runs with no line, against
-  the 30-day window's 47.7%: the difference is light play, drawn faded.
+  the 30-day window's 47.7%. The difference is light play, nearly all of it
+  drawn faded: 3 of its 46 session starts in 2026 were at full strength
+  (TS6).
 - **Taking the 30 days out of the value and into the drawing** costs 0.3
   points of accuracy at full strength, all of it on values that still hold
   runs from before a break or a fast climb, and removes the step where a
