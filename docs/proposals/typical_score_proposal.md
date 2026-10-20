@@ -153,8 +153,8 @@ and warm-up runs. The numbers are fixed constants, not settings.**
   months on a plateau, and ran 10% to 14% low after a fast-improvement phase
   or a five-to-eight-month break. That is why a carried value is always
   labelled "as of". Under TS6 nothing is carried: after a break the value is
-  still the median of the last 20 runs, drawn faded until 10 of them are
-  recent again.
+  still the median of the last 20 runs, drawn faded while fewer than 10 of
+  them are recent.
 - **Unknown before any fresh value,** which D2 requires: unknown is never
   read as weak. A value once fresh is never unknown again, so after the first
   known value the line has no gaps.
