@@ -35,8 +35,8 @@ line, faded where its runs aren't recent. TS6 carries it. Two more leans
 followed from it, and they change ruled rows: a switch each for the line and
 both bands, all on (TS7, which would amend TS4), and Scenario Stats led by the
 typical score (TS8, which would amend TS5). TS6 also amends TS1: the 30 days
-leave the value and decide only how it is drawn. **Each ruled row stands as
-ruled until the maintainer rules on the row that would amend it.** The three
+leave the value and decide only how it is drawn. **Each ruled row stood as
+ruled until the maintainer ruled on the row that amends it.** The three
 are pivots of TS2, TS4 and TS5 and ask no new question, so the scope freeze
 holds. The maintainer, on the new rows: "I have leans so far, but I still want
 things to be open for debate until I get other reviewers' opinions."
