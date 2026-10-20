@@ -98,8 +98,9 @@ What we plan to do now or very soon, each with the reasons it comes next.
   where enough of them are from the last 30 days. Run History's chart would
   draw it after every run, as a gray line inside bands for the middle half
   and the middle 80% of the runs, and Scenario Stats would lead with it.
-  Three implementation PRs build it: the definition, the chart, and the
-  Scenario Stats lead. Showing it in the top row's PB card, beside the PB, is
+  Five implementation PRs build it: the definition, the chart in three (its
+  legend, then each mode), and the Scenario Stats lead. Showing it in the top
+  row's PB card, beside the PB, is
   a later change that neither proposal makes.
 
   Why it's next:

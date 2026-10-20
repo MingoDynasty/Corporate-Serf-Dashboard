@@ -730,7 +730,7 @@ stretches with it. Scenario Stats doesn't follow them.**
   ([2026-09-19](../decision_log/2026/2026-09-19-a-query-parameter-selects-a-control-it-does-not-suspend-its-memory.md)).
 - **The cost is a busier first chart.** Both bands, the rank lines, the PB
   line and the threshold line can show at once. With Chart options open, the
-  legend's five entries wrap onto a second line over the chart's title; PR 2
+  legend's five entries wrap onto a second line over the chart's title; PR 2a
   lays the legend out so they don't ([The legend](#the-legend)).
 
 Rejected: TS4 as ruled, the middle 50% always drawn and the middle 80% off to
@@ -1141,12 +1141,14 @@ fit; the line is a median of runs and almost always sits among them.
 
 With Chart options open, the five entries no longer fit on one line beside the
 chart's title and wrap onto a second line over it (v8, 1,800 px window). The
-Backlog already holds the same wrap for three entries on a narrow chart. PR 2
-lays the legend out so that it never covers the title, measured at the
-narrowest chart the Backlog item names, a 657 px graph with Chart options
-open. The labels stay: shorter ones would say less and still wrap on a
-narrower chart. Where the legend goes, under the title on a line of its own
-or under the plot, is PR 2's to choose and show.
+Backlog already holds the same wrap for three entries on a narrow chart. PR
+2a lays the legend out so that it never covers the title, shown on today's
+entries on a chart narrow enough to wrap them, before any trace is added.
+PR 2b measures it again with all five, at the narrowest chart the Backlog
+item names, a 657 px graph with Chart options open. The labels stay: shorter
+ones would say less and still wrap on a narrower chart. Where the legend
+goes, under the title on a line of its own or under the plot, is PR 2a's to
+choose and show.
 
 ### The Scenario Stats lead
 
@@ -1202,7 +1204,8 @@ asks. Rounding is for display only: the definition keeps the exact values.
   app; the build writes the module and the traces afresh.
 - **The cost was about 4 ms at worst per chart build** under TS2's rule, on
   top of today's 4 to 7 ms, and the figure about doubles in size at the
-  default range. D adds a recency test at each point; PR 2 measures it again.
+  default range. D adds a recency test at each point; PRs 2b and 2c measure
+  it again, each on its own mode.
 
 ### Where prototype v8 differs
 
@@ -1270,9 +1273,9 @@ Each entry is written as [docs/glossary.md](../glossary.md) would hold it,
 under "Scores and notifications", beside PB. Each implementation PR moves in
 what it ships, so the glossary never describes a surface the app doesn't
 draw yet: PR 1 Typical score and Recent without their on-screen lines, with
-the Median and best correction; PR 2 Middle 50% and Middle 80%, and Recent's
+the Median and best correction; PR 2b Middle 50% and Middle 80%, and Recent's
 chart line; PR 3 Recent's Scenario Stats line and the Scenario Stats
-correction.
+correction. PRs 2a and 2c add no term.
 
 - **Typical score.** What a player's runs on a scenario usually score: the
   median of its last 20 runs, or of all its runs when it has fewer, whatever
@@ -1407,26 +1410,42 @@ Each was drawn in a prototype or measured, on the maintainer's stats.
 
 ## Delivery plan
 
-Three implementation PRs. This is intent, not a contract: a boundary that
-moves is noted in that PR's description.
+Five implementation PRs, the chart in three of them, as the maintainer chose
+on 2026-10-20. This is intent, not a contract: a boundary that moves is noted
+in that PR's description.
 
-1. **The definition.** `source/kovaaks/typical_score.py` with its pure
-   functions and tests, a new capability spec, `docs/specs/typical_score.md`,
-   and `architecture.md`. Nothing on screen, as the Sessions implementation
-   shipped. Needs nothing.
-2. **The chart.** The line, the bands and the faded stretches on Score vs Run
-   and Score vs Time, their order, colors, legend groups and hover, the three
-   switches, the legend's layout, the zoom fit's comment, and the Run History
-   spec's chart and panel sections. Needs PR 1. It doesn't touch the top row.
-3. **The Scenario Stats lead.** The first line, its help, the lead and its
-   hover, Total runs, its updates, and the spec's Scenario Stats section.
-   Needs PR 1.
+- **PR 1, the definition.** `source/kovaaks/typical_score.py` with its pure
+  functions and tests, a new capability spec, `docs/specs/typical_score.md`,
+  and `architecture.md`. Nothing on screen, as the Sessions implementation
+  shipped. Needs nothing.
+- **PR 2a, the legend's layout.** The legend laid out so that it never covers
+  the chart's title ([The legend](#the-legend)), shown on today's entries
+  where a narrow chart wraps them now, and a sentence in the Run History spec
+  on where the legend sits. It closes the vault Backlog's item on that wrap.
+  No trace is added. Needs nothing.
+- **PR 2b, Score vs Run.** The line, the bands and their faded stretches on
+  Score vs Run; the traces' order, colors, legend groups and the line's
+  hover; the three switches; the zoom fit's comment; and the Run History
+  spec's chart and panel sections. Score vs Time draws no line until 2c.
+  Needs PR 1 and 2a. It doesn't touch the top row.
+- **PR 2c, Score vs Time.** Each value held flat to the next run, a hold's
+  fade at its exact moment, the line's end at the newest run, a hold's hover
+  at each end, and the spec's sentences on them. Needs 2b.
+- **PR 3, the Scenario Stats lead.** The first line, its help, the lead and
+  its hover, Total runs, its updates, and the spec's Scenario Stats section.
+  Needs PR 1, and lands in any order with the chart's PRs.
 
-**Why three.** The definition is the contract later features read, and a PR
-of its own keeps its review on the boundaries rather than on plotly. The
-Scenario Stats lead is another module, with its own live checks of the top
-row. If the maintainer prefers fewer PRs, PR 1 can fold into PR 2, or PR 3
-into PR 2, each at the cost of one larger review.
+**Why this split.** The definition is the contract later features read, and
+a PR of its own keeps its review on the boundaries rather than on plotly. The
+chart is the largest piece, so no one review carries it whole. The legend
+goes first: it changes the chart before any trace is added, and can land
+beside PR 1. Each mode then has a PR of its own, because Score vs Time's
+holds, which fade at an exact moment between runs, are the geometry most
+likely to hide a bug. The Scenario Stats lead is another module, with its own
+live checks of the top row. The cost is two more reviews and two more looks
+in Firefox, and a stretch in which Score vs Run draws the line and Score vs
+Time doesn't: 2c is meant to follow 2b closely, and a release between them
+shows the line on one mode only.
 
 Each PR updates the specs and the glossary entries its own behavior changes,
 as it ships ([Terms](#terms) says which entry goes with which PR). The last
@@ -1437,15 +1456,16 @@ checklist: a decision-log entry for each row, the notes in
 roadmap, `product.md`, the vault Backlog bullet named in
 [Out of scope](#out-of-scope), and this file deleted.
 
-**Recommended:** `claude-opus-5-5`, at high for PRs 1 and 3 and at xhigh for
-PR 2, which walks each state through two chart modes, the themes, the
-switches, the legend's layout and the zoom fit. The maintainer looks at PRs 2
-and 3 in their own Firefox before each merges.
+**Recommended:** `claude-opus-5-5`, at high for PRs 1, 2a and 3, and at
+xhigh for 2b and 2c: 2b walks each state through the themes, the switches,
+the legend groups and the zoom fit, and 2c the holds and their fade moments.
+The maintainer looks at 2a, 2b, 2c and 3 in their own Firefox before each
+merges.
 
 ### Fallbacks
 
-- **PR 2 grows too large.** Ship Score vs Run first and Score vs Time after,
-  or the legend's layout as a PR of its own before the line.
+- **PR 2b grows too large.** The bands and their two switches follow the line
+  in a PR of their own.
 
 ## Out of scope
 
@@ -1509,16 +1529,18 @@ Each with where it is tracked.
   the tick; its empty states and first-line readouts, `{k} of {n} recent
   runs` over a full-strength value and a dimmed one, and none when every run
   is recent.
-- **Live, PRs 2 and 3,** in headless Edge at 2560 and 1920 px, light and
-  dark: the line and bands under the runs, the faded stretches, the legend,
-  its clicks hiding a metric whole, and its layout with Chart options open,
-  the switches and their memory, the hover, a zoom that refits to the bands,
+- **Live, PRs 2a to 2c and 3,** in headless Edge at 2560 and 1920 px, light
+  and dark, each PR on what it adds: the legend's layout on today's entries
+  on a narrow chart (2a), and with all five and Chart options open (2b); the
+  line and bands under the runs, the faded stretches, the legend's clicks
+  hiding a metric whole, the switches and their memory, the hover, and a zoom
+  that refits to the bands (2b); Score vs Time's holds and their fade (2c);
   the lead's dimmed contrast, and the top row's height with the lead and the
-  longest first line, `Typical score ⓘ · 19 of 20 recent runs`, with
-  and without a benchmark; if it wraps, PR 3 shortens it and lists the new
-  string in its description. These
-  cover what pure tests can't: draw order, theme colors, the zoom script, and
-  layout. Then the maintainer's look in Firefox.
-- **Performance,** measured again on the largest scenario in PR 2.
+  longest first line, `Typical score ⓘ · 19 of 20 recent runs`, with and
+  without a benchmark; if it wraps, PR 3 shortens it and lists the new string
+  in its description (3). These cover what pure tests can't: draw order,
+  theme colors, the zoom script, and layout. Then the maintainer's look in
+  Firefox.
+- **Performance,** measured again on the largest scenario in PRs 2b and 2c.
 - **Docs:** `tests/test_docs.py` for links and summaries, and the gates in
   AGENTS.md.
