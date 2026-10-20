@@ -113,11 +113,17 @@ and warm-up runs. The numbers are fixed constants, not settings.**
 - **The median, because one run can't move it far.** A spike PB or a botched
   run moves a mean; the median is the score the middle run reached. The
   maintainer's own notes read P50 as "typical performance".
-- **20 runs, because shorter and longer samples did worse.** PR #351's test,
-  at commit `6177dd3`, on its definition then (14 days, warm-up runs left
-  out), put the last 10, 30, and 50 runs at 3.5%, 3.6%, and 3.6% from the
-  level of the session that followed, after removing the average offset, and
-  the last 20 at 3.2%. It is also the maintainer's hand method.
+- **20 runs.** Under TS6's value, the last runs at any age, 10 to 30 runs
+  predicted the next session about equally well on this history: 2.7% to
+  3.0% from its median at session starts with 50 or more earlier runs, every
+  difference from 20 inside its interval. 40 and 50 runs lagged behind, at
+  3.3% and 3.9%. 20 sits inside that range. It is also the maintainer's hand
+  method, it gives P10 and P90 runs to fall between, and TS6's test is half
+  of it: with 10, "10 recent" would mean every run recent. PR #351's test, at
+  commit `6177dd3`, on its definition then (14 days, warm-up runs left out),
+  had put the last 20 at 3.2% from the level of the session that followed,
+  after removing the average offset, ahead of 10, 30 and 50 at 3.5%, 3.6% and
+  3.6%.
 - **30 days** is argued in TS2.
 - **10 runs from 2 sessions, so one sitting is never called typical.** A
   session's median moves with the day's form, about 3% on this history, and
