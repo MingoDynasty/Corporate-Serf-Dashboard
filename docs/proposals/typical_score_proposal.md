@@ -839,26 +839,34 @@ and breaks the cards' pattern of a first line naming the lead figure.
 ### The evidence
 
 All from the maintainer's history (see
-[Decisions needed](#decisions-needed) for its size), measured 2026-10-14 and
-2026-10-15. A value's error is its distance from the median of the
-scenario's runs in the next session, as a share of that median.
+[Decisions needed](#decisions-needed) for its size), measured from
+2026-10-14 to 2026-10-20. A value's error is its distance from the median of
+the scenario's runs in the next session, as a share of that median. The
+first six findings were measured for the 30-day window that TS1 and TS2
+proposed, before TS6 took the window out of the value. Each says what TS6
+makes of it where that differs.
 
 - **Inside regular play the window barely matters.** Where two windows from
   7 to 60 days both give a fresh value, they give the same one about 90% of
-  the time; the 20-run cap decides first. No limit agrees with them less
-  often, 70% to 76%. Fresh values miss the next session by about 3%,
-  close to how much one session's median varies on its own.
+  the time; the 20-run cap decides first. No limit, which is TS6's value,
+  agrees with them less often, 70% to 76%, because it still holds runs from
+  before a break, which TS6 draws faded. Fresh values miss the next session
+  by about 3%, close to how much one session's median varies on its own;
+  TS6's full-strength values miss by 3.84% at session starts.
 - **What longer windows add is old values labelled current.** See TS2, points
-  2 and 5.
+  2 and 5. TS6 draws those values faded instead.
 - **Carried values** hold within 3% to 5% for up to four months on a plateau,
   and run 10% to 14% low after a fast-improvement phase or a break of five to
   eight months. Every age bucket's bias is negative: an old value understates
-  the player.
+  the player. TS6 carries nothing, and the values it draws faded missed by
+  7.69% at session starts.
 - **The session rule** fixes the long single-session grind at no accuracy
-  cost (TS1).
+  cost (TS1). Under TS6 its "or 20" keeps a long grind's value known.
 - **The previous session's median predicts the next session as well** as the
   typical score (TS2). The typical score's case is steadiness for judgments.
-- **Coverage is limited by history, not the window** (TS2, point 4).
+- **Coverage is limited by history, not the window** (TS2, point 4). With no
+  window in the value, TS6 leaves 35.7% of 2026's runs with no line, against
+  the 30-day window's 47.7%: the difference is light play, drawn faded.
 - **Taking the 30 days out of the value and into the drawing** costs 0.3
   points of accuracy at full strength, all of it on values that still hold
   runs from before a break or a fast climb, and removes the step where a
@@ -866,7 +874,8 @@ scenario's runs in the next session, as a share of that median.
 
 The measurements, their method and their caveats are in the maintainer's
 scratch folder: the window evaluation, its 30-day rerun, the session-rule
-comparison, and the D evaluation, with their scripts. The caveats that matter most: one player; a
+comparison, the D evaluation, and two checks of TS6's value, the versions it
+holds and how many runs it should count, with their scripts. The caveats that matter most: one player; a
 steep improvement phase in 2025 and a plateau in 2026, where the windows part
 in the first and not the second; targets from sessions of three to five runs
 are noisy; and many cells about returns and grinds come from a handful of
