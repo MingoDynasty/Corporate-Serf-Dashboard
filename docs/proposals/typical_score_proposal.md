@@ -51,6 +51,15 @@ and chose the help's wording, all put to review. They named the goals the
 review is to weigh: the typical score as accurate as possible, simple for a
 player to understand, and appealing on the chart.
 
+**The fourth review wave** judged the amended TS6 by those goals. Two
+readers endorsed the amended test, and one kept its proposal to draw a value
+at full strength only when every run behind it is recent. All three agreed
+that the sessions belong only to a scenario's first value, and that the help's
+sentence says enough under the amended test. TS7 and TS8 were endorsed again.
+What is left is a trade-off for the maintainer: fewer faded values, with the
+older runs shown, against a promise that every run behind a full-strength
+value is recent.
+
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
 (skill is judged by the typical run, unknown is not weak, verdicts not
