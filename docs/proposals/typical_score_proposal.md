@@ -137,9 +137,12 @@ and warm-up runs. The numbers are fixed constants, not settings.**
   long sitting did not overstate the player either: its value sat 1.6% below
   the next session on average, and above it in 10 of 29. With the exception,
   accuracy is unchanged within noise: 3.82% against 3.93% from the next
-  session's median, at 30 days. Under TS6 nothing is carried, so without the
-  exception a long sitting would take away a value the scenario already
-  had: 547 runs of 2025 and 2026 on 26 scenarios (TS6).
+  session's median, at 30 days. Under TS6 nothing is carried, and the value
+  is worked out at each run from its last 20, so the exception is what keeps
+  a known value known: any 20 runs pass. Without it, a long sitting's last 20
+  runs would be one session's and unmake a value the scenario already had,
+  on 547 runs of 2025 and 2026 on 26 scenarios (TS6), and a first sitting of
+  20 or more runs would have no value until the next session.
 - **The maintainer's "two sessions only until established" measured the
   same.** It also fixes the grind, and the two rules differ on 71 runs of
   8,529. This one is recommended because it reads off the window alone: the
@@ -1035,7 +1038,9 @@ Overlays
 - **Known** when those runs number at least 10 from at least 2 play sessions,
   or 20. A run's session is the play session it belongs to, split over every
   scenario's runs. Before that the value is unknown; once known, it is never
-  unknown again.
+  unknown again, which follows from the rule rather than adding to it: from
+  20 runs on, the last 20 always pass, and below 20 every run is among them,
+  so the sessions that made it known stay.
 - **The value** is their median, with P25 and P75 (the middle 50%) and P10
   and P90 (the middle 80%) interpolated between runs, the "inclusive" method:
   `statistics.quantiles(scores, n=4, method="inclusive")` and its `n=10`
