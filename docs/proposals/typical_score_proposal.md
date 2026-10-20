@@ -17,17 +17,17 @@ when it isn't recent.
 
 ## Decisions needed
 
-Eight rows, TS1 to TS8. **TS1, TS3, TS4 and TS5 are ruled. TS2 is pivoted
-to TS6, and TS6, TS7 and TS8 are proposed and open.** Each row began as the
-maintainer's lean or agreement from the design discussion of 2026-10-14 to
-2026-10-19, worked out over measurements and eight versions of a live
-prototype on their own stats, and each quotes what they said. A lean is not a
-ruling: reviewers are invited to challenge any row, and any author-owned
-choice in [Design](#design). The first review wave endorsed TS2 to TS5 and
-contested one point of TS1, whether runs of different versions of a scenario
-count together. The maintainer ruled TS1 on 2026-10-15, as recommended: every
-version counts, the assumption stated. On 2026-10-18 they ratified TS3, TS4
-and TS5 as recommended, and left TS2 open.
+Eight rows, TS1 to TS8. **TS1 and TS3 to TS6 are ruled, TS1 as TS6 amends
+it. TS2 is pivoted to TS6, and TS7 and TS8 are proposed and open.** Each row
+began as the maintainer's lean or agreement from the design discussion of
+2026-10-14 to 2026-10-19, worked out over measurements and eight versions of
+a live prototype on their own stats, and each quotes what they said. A lean
+is not a ruling: reviewers are invited to challenge any row, and any
+author-owned choice in [Design](#design). The first review wave endorsed TS2
+to TS5 and contested one point of TS1, whether runs of different versions of
+a scenario count together. The maintainer ruled TS1 on 2026-10-15, as
+recommended: every version counts, the assumption stated. On 2026-10-18 they
+ratified TS3, TS4 and TS5 as recommended, and left TS2 open.
 
 **What changed on 2026-10-19.** Working through TS2 on prototypes v7 and v8,
 the maintainer leaned toward an option neither review wave saw: no limit's
@@ -56,9 +56,8 @@ readers endorsed the amended test, and one kept its proposal to draw a value
 at full strength only when every run behind it is recent. All three agreed
 that the sessions belong only to a scenario's first value, and that the help's
 sentence says enough under the amended test. TS7 and TS8 were endorsed again.
-What is left is a trade-off for the maintainer: fewer faded values, with the
-older runs shown, against a promise that every run behind a full-strength
-value is recent.
+On 2026-10-20 the maintainer ruled TS6 for the amended test, after weighing
+every cost it still carries, so TS1 now stands as TS6 amends it.
 
 Already ratified, and not reopened here: D1 to D3 of the
 [2026-10-04 entry](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)
@@ -79,14 +78,14 @@ rules do on that history and nothing about other players'.
 
 Status: Ruled (user), 2026-10-15: "TS1: accept recommendation, pool every
 version with the assumption stated." That settles the row as recommended
-below, the version question included. **TS6, proposed 2026-10-19, would amend
-it:** the value would count the last 20 runs at any age, the 30 days would
-decide only how it is drawn, and no value would be carried. The session rule
-would decide only whether a value is known: a value would be drawn at full
-strength once 10 of its runs are recent, from any number of sessions. The
-minimums, the versions, sensitivities and warm-up runs, and the fixed
-constants would stand. Until the maintainer rules on TS6, this row stands. Before that, the maintainer's lean,
-built up over the discussion: "I agree
+below, the version question included. **TS6, ruled 2026-10-20, amends it:**
+the value counts the last 20 runs at any age, the 30 days decide only how it
+is drawn, and no value is carried. The session rule decides only whether a
+value is known: a value is drawn at full strength once 10 of its runs are
+recent, from any number of sessions. The minimums, the versions,
+sensitivities and warm-up runs, and the fixed constants stand. Where this
+row's text differs from TS6, TS6 governs. Before this row's ruling, the
+maintainer's lean, built up over the discussion: "I agree
 with all leans" (2026-10-14, including fixed numbers and every sensitivity);
 "Version 1 counts every run, and the warm-up rule comes later. This keeps the
 design of Typical Score simple, at the tradeoff that its score will likely
@@ -191,6 +190,17 @@ to have changed the scale. The scores do step at some, by up to 40%, but
 almost all came after breaks long enough for practice or rust to explain the
 step. The one close to its last run, a 16-day gap, sits inside the 2025
 climb.
+
+**Under TS6** no window clears an old version, and no value is carried. A
+value holds runs of two versions for up to 19 runs after any change, however
+long the break before it. On the same history to 2026-10-16, 59 runs have
+such a value, 37 of them in 2026, where the 30-day window had 19 and none in
+2026. 25 of them are drawn at full strength, on three scenarios: VT
+Bounceshot Viscose Medium (10) and B180T Voltaic Easy (8) in October 2026,
+the second still holding runs of a version it left in 2021, and VT Ground
+Intermediate S5 Bot 3 (7) in November 2025. Every run recent would have
+faded all 25. Their steps, −13%, +40% and +19%, came after breaks of 151, 63
+and 16 days, so they can't be told apart from rust or practice either.
 
 - **Why pooling.** The hash is a poor proxy for a scoring change: it changes
   with any edit to the scenario, so scoping by it would have reset the value
@@ -502,17 +512,19 @@ touch the top row.
 
 ### TS6. No limit's line, faded where its runs aren't recent
 
-Status: Proposed, 2026-10-19, on the maintainer's lean, not a ruling. It would
-replace TS2's answer and amend TS1, as TS1's status says. The maintainer,
-2026-10-18, after TS2's options were laid out: "I think it is the opposite.
-"No Limit" looks much better on the graph, and "Faded" is the alternative."
-and "I would have expected that the "Faded" option keeps the same shape as the
-"No Limits" option on the graph, just that the "unknown" area is faded to show
-uncertainty". On 2026-10-19, with this option built and measured: "I am also
-leaning toward option D." On its cost after a return, for weakness ranking:
-"In the worst case situation, a scenario will appear weaker than it actually
-is. But this serves as a small encouragement to the user to play that
-scenario, which then updates its typical score."
+Status: Ruled (user), 2026-10-20, after the fourth review wave and a last
+look at every cost it still carries: "I still rule TS6 for D as amended."
+That settles the row as recommended below, the test as amended. It replaces
+TS2's answer and amends TS1, as TS1's status says. Before the ruling, the
+maintainer, 2026-10-18, after TS2's options were laid out: "I think it is
+the opposite. "No Limit" looks much better on the graph, and "Faded" is the
+alternative." and "I would have expected that the "Faded" option keeps the
+same shape as the "No Limits" option on the graph, just that the "unknown"
+area is faded to show uncertainty". On 2026-10-19, with this option built
+and measured: "I am also leaning toward option D." On its cost after a
+return, for weakness ranking: "In the worst case situation, a scenario will
+appear weaker than it actually is. But this serves as a small encouragement
+to the user to play that scenario, which then updates its typical score."
 
 After the third review wave, on 2026-10-19, the maintainer took the sessions
 out of the recency test, kept them for a scenario's first value, and chose
@@ -528,8 +540,10 @@ The material consequence: the value stops depending on the 30 days, and
 a value drawn at full strength can still hold up to 10 runs from before the
 break, and every later reader sees that value. It reads low if the player has
 improved since the break and high if they have declined, so a scenario can
-look stronger than it is right after a return, not only weaker. The 2
-sessions now guard only a scenario's first value.
+look stronger than it is right after a return, not only weaker. A value also
+holds two versions of a scenario for up to 19 runs after any change, not only
+within 30 days (TS1, Versions). The 2 sessions now guard only a scenario's
+first value.
 
 **Recommendation: the typical score after a run is the median of the
 scenario's last 20 runs, or of all its runs when it has fewer, whatever their
@@ -640,10 +654,10 @@ are recent, faded or not. Every run counts, as TS1 says.**
   worse, where every run recent also fades a third of 2026's full-strength
   line. Its test is one number a player can check against the card's count,
   10 runs from the last 30 days. Its mixture is shown on the card, and a
-  feature that judges can ask for every run recent. If the maintainer would
-  rather bound the overstatement than show it, every run recent is coherent:
-  the choice is whether "recent" means enough recent runs or only recent
-  runs.
+  feature that judges can ask for every run recent. Every run recent was the
+  coherent choice for bounding the overstatement rather than showing it: the
+  choice was whether "recent" means enough recent runs or only recent runs,
+  and the ruling takes enough recent runs.
 - **The 2 sessions guard only a scenario's first value.** A first session is
   one day's form, which moves a scenario's median by about 3% for this
   player, and on a new scenario the scores are still climbing: 434 of the
@@ -913,10 +927,10 @@ whose chart code `dcc4cba` leaves unchanged, and the row on 2026-10-18 at
 
 ## Design
 
-The design below is TS6, TS7 and TS8, the recommendation, and the ruled rows
-where those leave them standing. Where a ruled row's text says otherwise, the
-new row is what is recommended, and the ruled row stands until the maintainer
-rules.
+The design below is TS6 as ruled, TS7 and TS8 as recommended, and the ruled
+rows where those leave them standing. Where TS1's text says otherwise, TS6
+governs. Where TS4's or TS5's says otherwise, TS7 or TS8 is what is
+recommended, and the ruled row stands until the maintainer rules.
 
 ### What the player sees
 
