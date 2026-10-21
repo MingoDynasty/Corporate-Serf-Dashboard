@@ -559,7 +559,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   [typical_score.md](typical_score.md) defines it: a line with a point at each
   plotted run whose value is known, legend "Typical score", and two bands
   around it, "Middle 50%" (P25 to P75) and the lighter "Middle 80%" (P10 to
-  P90). A run before the scenario's first known value has no point. Every
+  P90). A run before the scenario's first known value has no point. When the
+  plotted range holds only one known value, as on the run that first makes
+  it known, that value is drawn flat for half a run on either side of its
+  run, so the line and the bands show. Every
   value is worked out over the scenario's whole history and only then is the
   range applied, so the value at the range's first run counts the runs the
   range leaves out, as the stars do. A value's sessions are split over every

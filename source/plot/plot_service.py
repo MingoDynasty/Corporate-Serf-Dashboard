@@ -618,12 +618,13 @@ def typical_score_traces(  # noqa: PLR0913
 ) -> list[go.Scatter]:
     """Build the typical score's line and bands over the plotted runs.
 
-    ``values`` is in step with ``x_values``: the value after each plotted run,
-    worked out over the scenario's whole history. A stretch is drawn at full
-    strength where its values were recent at their runs and faded where they
-    weren't. Each metric is drawn only while its switch is on, and a band's
-    hover line only shows with its band. ``today`` only decides which hover
-    dates carry a year.
+    ``x_values`` are the plotted runs' places on the run axis, and ``values``
+    is in step with them: the value after each plotted run, worked out over
+    the scenario's whole history. A stretch is drawn at full strength where
+    its values were recent at their runs and faded where they weren't. Each
+    metric is drawn only while its switch is on, and a band's hover line only
+    shows with its band. ``today`` only decides which hover dates carry a
+    year.
 
     The traces come in drawing order, each only when it has a point: the
     faded middle 80% and middle 50%, the full-strength middle 80% and middle
@@ -631,6 +632,14 @@ def typical_score_traces(  # noqa: PLR0913
     legend entry only when the metric has no full-strength stretch.
     """
     full, faded = _typical_score_stretches(x_values, values)
+    if len(full) + len(faded) == 1 and len((full or faded)[0]) == 1:
+        # The only known value, as on the run that first makes it known.
+        # plotly's lines mode draws a one-point trace as nothing, and its
+        # bands would have no width, so it is drawn flat for half a run on
+        # either side of its run instead.
+        (point,) = (full or faded)[0]
+        stub = [point._replace(x=point.x - 0.5), point._replace(x=point.x + 0.5)]
+        full, faded = ([stub], []) if full else ([], [stub])
     traces: list[go.Scatter] = []
     bands = [
         (middle_80, MIDDLE_80_TRACE_NAME, lambda value: (value.p10, value.p90)),

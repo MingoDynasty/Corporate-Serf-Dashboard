@@ -853,12 +853,70 @@ def test_the_lines_hover_says_the_value_its_runs_how_recent_and_each_band(
 
 
 def test_the_hover_counts_one_session_and_a_span_on_one_date(load_runs) -> None:
-    """Twenty runs in one sitting are known, from one session on one date."""
-    load_runs(*_sitting(datetime(2026, 10, 12, 10), [100.0] * 20))
+    """Run 21's last twenty runs are known, from one session on one date."""
+    load_runs(*_sitting(datetime(2026, 10, 12, 10), [100.0] * 21))
 
     _faded, full = _line_traces(_figure(SCORE_VS_RUN)[0])
 
-    assert _hover_lines(full, 20)[1] == "<b>Runs</b>: 20 in 1 session · on Oct 12"
+    assert _hover_lines(full, 21)[1] == "<b>Runs</b>: 20 in 1 session · on Oct 12"
+
+
+@pytest.mark.parametrize(
+    ("runs", "known_at"),
+    [
+        # Ten runs from two sessions: the tenth is the first known value.
+        (
+            [
+                *_sitting(
+                    datetime(2026, 10, 11, 10), [100.0, 104.0, 108.0, 112.0, 116.0]
+                ),
+                *_sitting(
+                    datetime(2026, 10, 12, 10), [120.0, 124.0, 128.0, 132.0, 136.0]
+                ),
+            ],
+            10,
+        ),
+        # Twenty runs in one sitting: the twentieth is.
+        (_sitting(datetime(2026, 10, 12, 10), [100.0 + n for n in range(20)]), 20),
+    ],
+)
+def test_a_scenarios_only_known_value_is_drawn_flat_for_half_a_run_each_side(
+    load_runs, runs, known_at
+) -> None:
+    """A one-point line draws nothing in plotly, and a one-point band has no width."""
+    load_runs(*runs)
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+    typical = _typical_traces(figure)
+    _faded, full = _line_traces(figure)
+
+    edges = [known_at - 0.5, known_at + 0.5]
+    assert [trace.name for trace in typical] == [
+        MIDDLE_80_TRACE_NAME,
+        MIDDLE_50_TRACE_NAME,
+        TYPICAL_SCORE_TRACE_NAME,
+    ]
+    assert list(full.x) == edges
+    assert full.y[0] == full.y[1]
+    assert full.customdata[0] == full.customdata[1]
+    for band in typical[:2]:
+        assert list(band.x) == [*edges, *reversed(edges)]
+        top, bottom = band.y[0], band.y[2]
+        assert top > full.y[0] > bottom
+    assert all(trace.showlegend for trace in typical)
+
+
+def test_with_more_than_one_known_value_every_point_sits_at_its_run(
+    load_runs,
+) -> None:
+    """Only a figure's one known value is drawn flat around its run."""
+    load_runs(*_return_after_a_break())
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+
+    assert all(
+        float(x).is_integer() for trace in _typical_traces(figure) for x in trace.x if x
+    )
 
 
 @pytest.mark.parametrize(
