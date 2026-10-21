@@ -739,10 +739,11 @@ def _run_start_and_length(
 
 
 def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
-    """
-    Extracts data from a scenario CSV file.
-    :param full_file_path: full file path of the file to extract data from.
-    :return: RunData object
+    """Extract a run from a scenario CSV, or None when it cannot be read.
+
+    Reject missing required data and scores that are not finite. Unusable
+    optional data, such as the start, run length, sensitivity conversion or
+    hash, costs that metadata only, never the run.
     """
     accuracy = None
     shots_fired = None
@@ -786,6 +787,11 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
 
             if line.startswith("Score:"):
                 score = float(line.split(",")[1].strip())
+                # float accepts NaN and infinities; sorting or interpolating
+                # them can fail in the statistical readers.
+                if not math.isfinite(score):
+                    msg = "Run score must be finite."
+                    raise ValueError(msg)
             elif line.startswith("Sens Scale:"):
                 sens_scale = line.split(",")[1].strip()
             elif line.startswith("Sens Increment:"):

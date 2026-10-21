@@ -202,8 +202,8 @@ one scenario: the middle score and the highest score of the runs under that
 row. They count every run under the row and compare nothing
 ([run_history.md](specs/run_history.md#both-views)).
 
-- Not the typical run, which is what a player's recent runs usually score. A
-  later proposal defines that.
+- Not the typical score, which is what a player's runs on a scenario usually
+  score.
 - In code: `figures`, and the Columns menu's choice `median_best`.
 
 ## Playlists
@@ -378,6 +378,28 @@ sensitivity. It's the player's own record, not their leaderboard score
 - In code: `high_score` for the score, or `pb_score` in the scenario table's
   row fields, and `personal_best` or `pb` for the run that set it and that
   run's stats. The PB a run was chasing is its previous best.
+
+### Typical score
+
+What a player's runs on a scenario usually score: the median of its last 20
+runs, or of all its runs when it has fewer, whatever their age. It is known
+once those runs number at least 10 from at least 2 sessions, or 20, and before
+that it is unknown, which is never read as weak. The rules are in
+[the typical score's spec](specs/typical_score.md).
+
+- The roadmap and the decision log call it the typical run.
+- Not Median and best, which describe the runs under one row of the run list,
+  with no minimum.
+- Not the median KovaaK's leaderboard shows, which is the median player's PB.
+- In code: `typical_score`.
+
+### Recent
+
+The state of a typical score at least 10 of whose runs are from the 30 days
+up to a moment, from any number of sessions. A recent value can still hold
+runs older than 30 days, up to half of them.
+
+- In code: `recent`.
 
 ### New PB
 
