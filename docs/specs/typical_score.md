@@ -5,12 +5,17 @@ It uses the median of the last twenty runs, with a minimum before the value
 is known and a separate test of how recent its runs are.
 The definition and its display rounding are available as pure functions, with
 no page or chart using them yet.
+Stats files with non-finite scores are skipped during import so malformed
+scores cannot stop a calculation.
 
 ## Supporting runs and existence
 
 - A scenario is its name. Every sensitivity, scenario version and warm-up
   run counts, including a run with no version hash. Versions are treated as
   comparable even when a rework changes the scoring scale.
+- The CSV parser skips a stats file whose score is NaN or infinite, including
+  numeric overflow to infinity. It never enters the run store or a supporting
+  window. Finite scores, including zero and negative scores, are retained.
 - After each run, the supporting window is that scenario's last 20 runs up
   to and including it, or all of its runs if it has fewer, at any age.
 - Runs follow `play_sessions.in_play_order`: end time, then start time,

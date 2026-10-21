@@ -8,7 +8,11 @@ from sortedcontainers import SortedList
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import RecordedSensitivity, RunData, ScenarioStats
-from source.kovaaks.play_sessions import PLAY_SESSION_BREAK_LIMIT
+from source.kovaaks.play_sessions import (
+    PLAY_SESSION_BREAK_LIMIT,
+    split_into_play_sessions,
+)
+from source.kovaaks.typical_score import build_typical_scores, format_typical_score
 from source.my_watchdog import file_watchdog
 
 extract_data_from_file = data_service.extract_data_from_file
@@ -35,6 +39,7 @@ def _write_stats_file(
     dpi: str | None = None,
     extra_line: str | None = None,
     scenario: str = SCENARIO_NAME,
+    score: str = "123.45",
 ) -> None:
     """Write a synthetic stats file in the key-value order KovaaK's uses.
 
@@ -45,7 +50,7 @@ def _write_stats_file(
     ``extra_line`` appends one raw line verbatim, for the malformed shapes a
     mid-write file has.
     """
-    lines = ["Score:,123.45", f"Sens Scale:,{sens_scale}"]
+    lines = [f"Score:,{score}", f"Sens Scale:,{sens_scale}"]
     if sens_increment is not None:
         lines.append(f"Sens Increment:,{sens_increment}")
     lines.append(f"Horiz Sens:,{horizontal_sens}")
@@ -153,6 +158,63 @@ def test_extract_data_from_file_parses_valid_file() -> None:
         assert run.shots_fired == 100
     finally:
         file_path.unlink(missing_ok=True)
+
+
+@pytest.mark.parametrize(
+    "score",
+    [
+        "nan",
+        "NaN",
+        "+nan",
+        "-nan",
+        "inf",
+        "+inf",
+        "-inf",
+        "Infinity",
+        "-Infinity",
+        "1e309",
+        "-1e309",
+    ],
+)
+def test_extract_data_from_file_rejects_non_finite_scores(score) -> None:
+    run = _extract_written_file("non-finite-score", score=score)
+
+    assert run is None
+
+
+@pytest.mark.parametrize("score", ["0", "-1", "123.456789", "1e20"])
+def test_extract_data_from_file_preserves_finite_scores(score) -> None:
+    run = _extract_written_file("finite-score", score=score)
+
+    assert run is not None
+    assert run.score == float(score)
+
+
+def test_non_finite_score_cannot_poison_a_known_typical_score(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
+    monkeypatch.setattr(
+        data_service, "run_database", SortedList(key=lambda run: run.datetime_object)
+    )
+    start = datetime(2026, 5, 1, 10)
+    for index in range(21):
+        stamp = (start + timedelta(minutes=index * 2)).strftime("%Y.%m.%d-%H.%M.%S")
+        path = tmp_path / f"1w4ts - Challenge - {stamp} Stats.csv"
+        _write_stats_file(
+            path, DAMAGE_SUB_CSV_ROW, score="nan" if index == 19 else "123.45"
+        )
+        data_service.load_csv_file_into_database(str(path))
+
+    snapshot = data_service.get_all_runs()
+    values = build_typical_scores(snapshot, split_into_play_sessions(snapshot))
+
+    assert len(snapshot) == len(values) == 20
+    assert not values[-2].known
+    assert values[-1].known
+    assert values[-1].median == 123.45
+    assert format_typical_score(values[-1].median, values[-1].runs) == "123.45"
+    assert data_service.get_scenario_stats(SCENARIO_NAME).number_of_runs == 20
 
 
 def test_shots_fired_is_the_count_of_the_weapon_row_accuracy_came_from() -> None:
