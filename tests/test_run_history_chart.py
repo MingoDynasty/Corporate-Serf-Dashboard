@@ -8,6 +8,7 @@ store the app keeps.
 
 import logging
 import re
+import statistics
 from dataclasses import replace
 from datetime import date, datetime, timedelta
 
@@ -890,20 +891,52 @@ def test_a_scenarios_only_known_value_is_drawn_flat_for_half_a_run_each_side(
     typical = _typical_traces(figure)
     _faded, full = _line_traces(figure)
 
-    edges = [known_at - 0.5, known_at + 0.5]
+    stretch = [known_at - 0.5, known_at, known_at + 0.5]
     assert [trace.name for trace in typical] == [
         MIDDLE_80_TRACE_NAME,
         MIDDLE_50_TRACE_NAME,
         TYPICAL_SCORE_TRACE_NAME,
     ]
-    assert list(full.x) == edges
-    assert full.y[0] == full.y[1]
-    assert full.customdata[0] == full.customdata[1]
+    assert list(full.x) == stretch
+    assert len(set(full.y)) == 1
+    assert full.customdata[0] == full.customdata[1] == full.customdata[2]
     for band in typical[:2]:
-        assert list(band.x) == [*edges, *reversed(edges)]
-        top, bottom = band.y[0], band.y[2]
+        assert list(band.x) == [*stretch, *reversed(stretch)]
+        top, bottom = band.y[0], band.y[3]
         assert top > full.y[0] > bottom
     assert all(trace.showlegend for trace in typical)
+
+
+def test_a_zoom_on_the_only_known_values_run_still_holds_its_line_and_bands(
+    load_runs,
+) -> None:
+    """The zoom fit counts only the points inside the window, so the run keeps one.
+
+    The window holds run 10 alone, narrower than the half runs drawn on
+    either side of it. The fit's rule is ``assets/homeGraphZoomFit.js``'s.
+    """
+    load_runs(
+        *_sitting(datetime(2026, 10, 11, 10), [100.0, 104.0, 108.0, 112.0, 116.0]),
+        *_sitting(datetime(2026, 10, 12, 10), [120.0, 124.0, 128.0, 132.0, 136.0]),
+    )
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+    start, end = 9.75, 10.25
+    in_window = {
+        trace.name: sorted(
+            y
+            for x, y in zip(trace.x, trace.y, strict=True)
+            if x is not None and start <= x <= end
+        )
+        for trace in _typical_traces(figure)
+    }
+
+    median = statistics.median([100.0 + 4 * n for n in range(10)])
+    assert in_window[TYPICAL_SCORE_TRACE_NAME] == [median]
+    # Each band's bottom and top at run 10.
+    for name in (MIDDLE_50_TRACE_NAME, MIDDLE_80_TRACE_NAME):
+        bottom, top = in_window[name]
+        assert bottom < median < top
 
 
 def test_with_more_than_one_known_value_every_point_sits_at_its_run(

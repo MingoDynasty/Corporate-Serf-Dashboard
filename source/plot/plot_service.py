@@ -636,9 +636,15 @@ def typical_score_traces(  # noqa: PLR0913
         # The only known value, as on the run that first makes it known.
         # plotly's lines mode draws a one-point trace as nothing, and its
         # bands would have no width, so it is drawn flat for half a run on
-        # either side of its run instead.
+        # either side of its run instead. The point at the run itself stays:
+        # the zoom fit counts only points inside the zoomed window, so a
+        # zoom on the run alone would otherwise leave the value out of view.
         (point,) = (full or faded)[0]
-        stub = [point._replace(x=point.x - 0.5), point._replace(x=point.x + 0.5)]
+        stub = [
+            point._replace(x=point.x - 0.5),
+            point,
+            point._replace(x=point.x + 0.5),
+        ]
         full, faded = ([stub], []) if full else ([], [stub])
     traces: list[go.Scatter] = []
     bands = [
