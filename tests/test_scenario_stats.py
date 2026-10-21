@@ -107,6 +107,7 @@ PAGE_BUILT_FIELDS = (
     "run_events",
     "scenario_dropdown",
     "playlist_filter",
+    "relative_time_interval",
 )
 
 
@@ -151,6 +152,15 @@ def _expected_registrations(ids) -> list[tuple]:
             [f"{ids.run_events}.data", f"{ids.scenario_dropdown}.value"],
             [],
         ),
+        (
+            scenario_stats.get_scenario_typical_score,
+            [
+                f"{ids.run_events}.data",
+                f"{ids.scenario_dropdown}.value",
+                f"{ids.relative_time_interval}.n_intervals",
+            ],
+            [f"{ids.lead}.children", f"{ids.recent_readout}.children"],
+        ),
     ]
 
 
@@ -183,16 +193,16 @@ def test_the_card_holds_category_and_the_run_count_and_no_last_played(monkeypatc
     components = _layout_components(monkeypatch)
     card = _card()
     texts = [
-        child
+        component
         for component in _walk_components(card)
-        for child in [getattr(component, "children", None)]
-        if isinstance(child, str) and child
+        if isinstance(component, str) and component
     ]
 
     assert texts == [
-        "Scenario stats",
+        "Typical score",
+        " ",
         "Category: ",
-        "Number of runs: ",
+        "Total runs: ",
         "No scenario selected",
     ]
     assert not [text for text in texts if "Last played" in text]
@@ -212,7 +222,7 @@ def test_the_first_line_is_plain_text_in_sentence_case_and_not_a_heading():
 
     assert isinstance(first_line, html.Div)
     assert not isinstance(first_line, dmc.Title)
-    assert first_line.children == "Scenario stats"
+    assert first_line.children[0].children[0] == "Typical score"
     assert first_line.className == "scenario-stats-heading"
     assert not [
         component
@@ -295,6 +305,8 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "second-num_runs",
         "second-num_runs_row",
         "second-no_scenario",
+        "second-lead",
+        "second-recent_readout",
     }
     assert _card_registrations(IDS) == first_page
 

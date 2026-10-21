@@ -148,11 +148,11 @@ reports the selected scenario's latest run with its verdict
 
 ### Scenario Stats
 
-The card in Run History's top row about the selected scenario: its benchmark
-category and how many runs it has
+The card in Run History's top row about the selected scenario: its typical
+score, benchmark category and total run count
 ([run_history.md](specs/run_history.md#scenario-stats)).
 
-- On screen its first line reads `Scenario stats`.
+- On screen its first line reads `Typical score`, the figure it leads with.
 - In code: `scenario_stats`.
 
 ### PB card
@@ -401,6 +401,9 @@ up to a moment, from any number of sessions. A recent value can still hold
 runs older than 30 days, up to half of them.
 
 - On the chart: a full-strength stretch; not recent, a faded one.
+- On Scenario Stats: an undimmed lead number; not recent, a dimmed one.
+  Whenever some of the value's runs are older than 30 days, recent or not,
+  `{k} of {n} recent runs` follows `Typical score`.
 - In code: `recent`.
 
 ### Middle 50%

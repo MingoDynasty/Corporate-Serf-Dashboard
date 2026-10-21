@@ -375,6 +375,45 @@ a.run-toast-link:hover {
     line-height: 18px;
 }
 
+/* Tooltip targets need flex boxes: dmc's block wrapper adds a baseline
+   gap, changing the first line's height when its help icon is present. */
+.scenario-stats-heading {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.scenario-stats-tooltip-target {
+    display: flex;
+}
+
+.scenario-stats-recency {
+    white-space: pre;
+}
+
+.scenario-stats-dimmed {
+    color: var(--mantine-color-dimmed);
+}
+
+/* Flex drops trailing spaces from the accessibility tree. A preserved
+   zero-size space separates the first-line words and the lead from the
+   next line without increasing the lead's line height. */
+.scenario-stats-word-end {
+    font-size: 0;
+    line-height: 0;
+    white-space: pre;
+}
+
+.scenario-stats-help p,
+.scenario-stats-value-help p {
+    margin: 0 0 8px;
+}
+
+.scenario-stats-help p:last-child {
+    margin-bottom: 0;
+}
+
 /* The latest-run card, over the run list. It is as tall as the row, and
    never less than 135px, which holds its tallest state: its second line on
    two lines in a narrow card, over the run's session and its time on the

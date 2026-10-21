@@ -1187,18 +1187,36 @@ The card's lines, local-record scope and leaderboard presentation follow
 ## Scenario Stats
 
 - A card in the top row, framed as the latest-run card is, in the theme's
-  tokens. Its first line is plain text, "Scenario stats", in sentence case
-  and drawn as the other two cards' quiet first lines are; it is not a
-  heading ([2026-10-18][stats-last-played]). Under it, at one weight, are
-  "Category:" and "Number of runs:" for the selected scenario
-  ([T2][category], [T4][card-order]). The personal best and the leaderboard
-  position are [the PB card's](#the-pb-card), and when the scenario was last
-  played is [the latest-run card's](#the-latest-run-card)
-  ([2026-10-18][stats-last-played]).
+  tokens. Its first line is plain text, "Typical score", with a help icon
+  named "About the typical score". Its lead is the typical score in the
+  same large-number style as the PB and latest-run cards, with a dotted
+  underline and a hover. Category and Total runs follow at one weight.
+- The lead is the value after the scenario's newest run, built by the same
+  function as the chart's last point from one snapshot of the whole run
+  store. Recency is judged against the app's own clock as of now, and a
+  value that isn't recent is dimmed in the theme's dimmed color.
+- Whenever some supporting runs are older than 30 days, the first line adds
+  ` · {k} of {n} recent runs`, including zero, whether the lead is dimmed or
+  at full strength. It adds no readout when every supporting run is recent.
+- The lead's hover gives the median's supporting count, the run and session
+  counts and short dates, the number from the last 30 days, and both the
+  middle 50% and middle 80%. A single date reads `on {date}`, and only a
+  date outside the current year shows its year. Chart switches change
+  neither this hover nor the card.
 - With no scenario selected, the card reads "No scenario selected" under its
-  first line, in the PB card's empty-title style, in place of Category and
-  Number of runs. A selected scenario with no local runs reads `Number of
-  runs: 0` ([2026-10-18][stats-last-played]).
+  first line, in the PB card's empty-title style, in place of the lead,
+  Category and Total runs. A scenario with no local runs reads "No runs yet"
+  over `Total runs: 0`. Below the existence minimum the lead reads "Too few
+  runs", whose hover gives the minimum and the scenario's run and session
+  counts, with singular wording for one.
+- The first line's help explains the median, both bands and their switches,
+  the dimming, and why the card's recency can differ from the chart's last
+  point. The help icon and the hovered lead accept keyboard focus.
+- A selected-scenario run, a scenario change, and the page's 30-second
+  relative-time tick update the lead and readout. The tick dims a value
+  within 30 seconds of its recency test failing. Unchanged rendered content
+  returns `no_update` so a held tooltip stays mounted across ticks. The
+  card builds no interval of its own.
 - Category is `{category} · {subcategory}`, or `{category}` with one level,
   using the selected benchmark table's own group labels and length guard.
   It is shown only while the Playlist filter holds a benchmark with groups

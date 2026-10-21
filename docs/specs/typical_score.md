@@ -4,7 +4,8 @@ The typical score defines what a player's runs on a scenario usually score.
 It uses the median of the last twenty runs, with a minimum before the value
 is known and a separate test of how recent its runs are.
 The definition and its display rounding are pure functions, and the Run
-History chart draws the value on Score vs Run, faded where it isn't recent.
+History chart draws the value on Score vs Run, and Scenario Stats leads
+with it, each faded or dimmed where it isn't recent.
 Stats files with non-finite scores are skipped during import so malformed
 scores cannot stop a calculation.
 
@@ -99,7 +100,12 @@ scores cannot stop a calculation.
   `TYPICAL_SCORE_MIN_RUNS` (10), `TYPICAL_SCORE_MIN_SESSIONS` (2), and
   `TYPICAL_SCORE_RECENT_AGE` (30 days). There are no settings for them.
 - No value is cached or persisted.
-- The Run History chart is the one caller so far: on Score vs Run it builds
+- The Run History chart is a caller: on Score vs Run it builds
   every value of the scenario's history, keeps the plotted runs' values, and
   judges each at its own run. What it draws is in
   [run_history.md](run_history.md#the-chart).
+- Scenario Stats builds the scenario's newest value from one whole-store
+  snapshot and judges its recency as of now, on scenario changes, arriving
+  runs and the page's 30-second tick. Its lead and hover use this module's
+  rounding and both bands, independently of the chart's switches. The
+  card is specified in [run_history.md](run_history.md#scenario-stats).

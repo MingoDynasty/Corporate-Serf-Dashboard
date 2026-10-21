@@ -1,28 +1,202 @@
 """Build the Scenario Stats card and wire its callbacks to a page's ids.
 
-The card holds Category and Number of runs under its first line, or says no
-scenario is selected. A page that hosts it fills in a ``ScenarioStatsIds``,
+The card leads with the typical score, followed by Category and Total runs,
+or says no scenario is selected. A page that hosts it fills in a ``ScenarioStatsIds``,
 puts ``scenario_stats_panel`` in its layout, and calls
 ``register_scenario_stats`` with the ids once, at import. The callbacks are
 plain functions here and are registered once per page.
 """
 
-from typing import NamedTuple
+import json
+from datetime import datetime
+from typing import Any, NamedTuple
 
 import dash_mantine_components as dmc
-from dash import Input, Output, callback, html
+from dash import Input, Output, State, callback, html, no_update
+from plotly.io.json import to_json_plotly
 
-from source.components.latest_run_card import EMPTY_TITLE_CLASS
+from source.components.chart_options import (
+    SETTINGS_HELP_TOOLTIP_WIDTH,
+    TOOLTIP_EVENTS,
+)
+from source.components.control_name import control_name
+from source.components.latest_run_card import EMPTY_TITLE_CLASS, SCORE_CLASS, TIME_CLASS
+from source.components.local_icon import local_icon
 from source.components.run_history_list import NO_SCENARIO_TEXT
 from source.kovaaks.data_service import (
+    get_all_runs,
     get_playlist_by_code,
     get_scenario_stats,
     is_benchmark_playlist,
     is_scenario_in_database,
 )
+from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.playlist_scenarios_service import playlist_scenario_groups
+from source.kovaaks.typical_score import (
+    TypicalScore,
+    build_typical_scores,
+    format_typical_score,
+    typical_score_recency,
+)
+from source.utilities.utilities import format_short_date
 
-SCENARIO_STATS_LABEL = "Scenario stats"
+SCENARIO_STATS_LABEL = "Typical score"
+TOO_FEW_RUNS_TEXT = "Too few runs"
+NO_RUNS_TEXT = "No runs yet"
+TOOLTIP_TARGET_CLASS = "scenario-stats-tooltip-target"
+WORD_END_CLASS = "scenario-stats-word-end"
+DIMMED_CLASS = "scenario-stats-dimmed"
+
+
+def _help() -> dmc.Tooltip:
+    """Explain the figure beside the card's first line."""
+    paragraphs: list[Any] = [
+        "Your typical score is the median of your last 20 runs of this scenario, "
+        "or of all your runs if you have fewer. Runs count regardless of age.",
+        [
+            "On the chart, the darker band shows the middle 50% of those scores, "
+            "and the lighter band the middle 80%. Narrower bands mean more "
+            "consistent scores. Turn the line and bands on or off in ",
+            control_name("Chart options"),
+            ".",
+        ],
+        "A faded line, or a dimmed number on this card, means fewer than 10 of "
+        "the runs behind your typical score are from the last 30 days, so it "
+        "may be out of date.",
+        "The card shows how recent it is today, and the chart how recent it "
+        "was at each run.",
+    ]
+    return dmc.Tooltip(
+        dmc.ActionIcon(
+            local_icon("material-symbols:info-outline", width=12),
+            className="settings-help-icon",
+            color="gray",
+            radius="xl",
+            size=14,
+            variant="subtle",
+            **{"aria-label": "About the typical score"},
+        ),
+        boxWrapperProps={"className": TOOLTIP_TARGET_CLASS},
+        label=html.Div([html.P(text) for text in paragraphs]),
+        classNames={"tooltip": "scenario-stats-help"},
+        events=TOOLTIP_EVENTS,
+        multiline=True,
+        withArrow=True,
+        w=SETTINGS_HELP_TOOLTIP_WIDTH,
+    )
+
+
+def _value_hover(value: TypicalScore, total: int, now: datetime) -> html.Div:
+    """Describe the supporting runs, their recency and both bands."""
+    recent = typical_score_recency(value, now)
+    count = value.run_count
+    sessions = value.session_count
+    first = format_short_date(value.first_date.date(), now.date())
+    last = format_short_date(value.last_date.date(), now.date())
+    dates = (
+        f"on {first}"
+        if value.first_date.date() == value.last_date.date()
+        else f"{first} to {last}"
+    )
+
+    def formatted(score: float | None) -> str:
+        assert score is not None
+        return format_typical_score(score, value.runs)
+
+    return html.Div(
+        [
+            html.P(
+                f"The median of your {'last ' if total > count else ''}{count} runs."
+            ),
+            html.Div(
+                [
+                    control_name("Runs:"),
+                    f" {count} in {sessions} {'session' if sessions == 1 else 'sessions'} · {dates}",
+                ]
+            ),
+            html.Div(
+                [
+                    control_name("Recent:"),
+                    f" {recent.run_count} of {count} from the last 30 days",
+                ]
+            ),
+            html.Div(
+                [
+                    control_name("Middle 50%:"),
+                    f" {formatted(value.p25)} to {formatted(value.p75)}",
+                ]
+            ),
+            html.Div(
+                [
+                    control_name("Middle 80%:"),
+                    f" {formatted(value.p10)} to {formatted(value.p90)}",
+                ]
+            ),
+        ],
+        className="scenario-stats-value-help",
+    )
+
+
+def get_scenario_typical_score(
+    _,
+    selected_scenario: str | None,
+    _tick,
+    current_lead=None,
+    current_readout=None,
+) -> tuple[Any, Any, bool]:
+    """Build the lead from one run snapshot, keeping unchanged tooltips mounted."""
+    lead: Any = []
+    readout: Any = ""
+    if selected_scenario:
+        # A landing run must not appear in the scenario's window without its
+        # session, so both are taken from this one copy of the whole store.
+        snapshot = get_all_runs()
+        runs = [run for run in snapshot if run.scenario == selected_scenario]
+        now = datetime.now()
+        if not runs:
+            lead = html.Div(NO_RUNS_TEXT, className=EMPTY_TITLE_CLASS)
+        else:
+            value = build_typical_scores(runs, split_into_play_sessions(snapshot))[-1]
+            if value.known:
+                recent = typical_score_recency(value, now)
+                if recent.run_count < value.run_count:
+                    readout = f" · {recent.run_count} of {value.run_count} recent runs"
+                assert value.median is not None
+                text = format_typical_score(value.median, value.runs)
+                css = f"{SCORE_CLASS} {TIME_CLASS}"
+                if not recent.recent:
+                    css += f" {DIMMED_CLASS}"
+                label: Any = _value_hover(value, len(runs), now)
+            else:
+                text = TOO_FEW_RUNS_TEXT
+                css = f"{EMPTY_TITLE_CLASS} {TIME_CLASS}"
+                n, sessions = value.run_count, value.session_count
+                label = (
+                    "A typical score needs 10 runs across 2 or more sessions, "
+                    f"or 20 in one session. You have {n} "
+                    f"{'run' if n == 1 else 'runs'} in {sessions} "
+                    f"{'session' if sessions == 1 else 'sessions'}."
+                )
+            lead = dmc.Tooltip(
+                html.Span(
+                    [text, html.Span(" ", className=WORD_END_CLASS)],
+                    className=css,
+                    tabIndex=0,
+                ),
+                boxWrapperProps={"className": TOOLTIP_TARGET_CLASS},
+                label=label,
+                events=TOOLTIP_EVENTS,
+                multiline=True,
+                withArrow=True,
+                w=360,
+            )
+    # Dash sends State as JSON. Comparing the rendered tree avoids replacing
+    # a tooltip on a tick that changes none of its copy, including at mount.
+    if json.loads(to_json_plotly(lead)) == current_lead:
+        lead = no_update
+    if readout == current_readout:
+        readout = no_update
+    return lead, readout, not bool(selected_scenario)
 
 
 class ScenarioStatsIds(NamedTuple):
@@ -32,9 +206,11 @@ class ScenarioStatsIds(NamedTuple):
     Dash allows one callback per output.
 
     ``scenario_stats_panel`` builds the card from ``category_row``,
-    ``category``, ``num_runs_row``, ``num_runs`` and ``no_scenario``.
+    ``category``, ``num_runs_row``, ``num_runs``, ``no_scenario``, ``lead``
+    and ``recent_readout``.
     ``run_events``, ``scenario_dropdown`` and ``playlist_filter`` are the
-    page's own. The card reads them and builds none of them: ``run_events``
+    page's own, as is its ``relative_time_interval``. The card reads them and
+    builds none of them: ``run_events``
     is the store the page's run delivery writes when new runs land on the
     scenario it shows.
     """
@@ -47,6 +223,9 @@ class ScenarioStatsIds(NamedTuple):
     run_events: str
     scenario_dropdown: str
     playlist_filter: str
+    lead: str
+    recent_readout: str
+    relative_time_interval: str
 
 
 def get_scenario_category(
@@ -93,7 +272,19 @@ def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
             # Plain text, as the PB card's and the latest-run card's first
             # lines are, and not a heading: the three are one kind of thing on
             # screen.
-            html.Div(SCENARIO_STATS_LABEL, className="scenario-stats-heading"),
+            html.Div(
+                [
+                    html.Span(
+                        [SCENARIO_STATS_LABEL, html.Span(" ", className=WORD_END_CLASS)]
+                    ),
+                    _help(),
+                    html.Span(
+                        id=ids.recent_readout, className="scenario-stats-recency"
+                    ),
+                ],
+                className="scenario-stats-heading",
+            ),
+            html.Div(id=ids.lead),
             html.Div(
                 dmc.Text(
                     [
@@ -109,7 +300,7 @@ def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
                 dmc.Text(
                     [
                         dmc.Text(
-                            "Number of runs: ",
+                            "Total runs: ",
                             fw=700,
                             span=True,
                         ),
@@ -155,3 +346,13 @@ def register_scenario_stats(ids: ScenarioStatsIds) -> None:
         Input(ids.run_events, "data"),
         Input(ids.scenario_dropdown, "value"),
     )(get_scenario_num_runs)
+    callback(
+        Output(ids.lead, "children"),
+        Output(ids.recent_readout, "children"),
+        Output(ids.lead, "hidden"),
+        Input(ids.run_events, "data"),
+        Input(ids.scenario_dropdown, "value"),
+        Input(ids.relative_time_interval, "n_intervals"),
+        State(ids.lead, "children"),
+        State(ids.recent_readout, "children"),
+    )(get_scenario_typical_score)
