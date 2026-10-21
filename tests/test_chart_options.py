@@ -9,6 +9,7 @@ rules that open and collapse the panel beside the graph.
 
 import json
 import re
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -20,6 +21,17 @@ from dash import Patch, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 from source.components import chart_options, scenario_selection
+from source.kovaaks.data_models import RunData
+from source.kovaaks.play_sessions import split_into_play_sessions
+from source.kovaaks.typical_score import build_typical_scores
+from source.plot.plot_service import (
+    MIDDLE_50_TRACE_NAME,
+    MIDDLE_80_TRACE_NAME,
+    TYPICAL_SCORE_TRACE_NAME,
+    generate_score_vs_run_plot,
+    generated_point_color,
+    typical_score_traces,
+)
 from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -73,6 +85,9 @@ CHART_OPTIONS_INPUT_DEFAULTS = {
     IDS.rank_overlay: ("checked", True),
     IDS.show_all_ranks: ("checked", False),
     IDS.high_score_overlay: ("checked", True),
+    IDS.typical_score_overlay: ("checked", True),
+    IDS.middle_50_overlay: ("checked", True),
+    IDS.middle_80_overlay: ("checked", True),
     IDS.score_threshold_overlay: ("checked", True),
     IDS.score_threshold_percentage: ("value", 95),
 }
@@ -90,6 +105,9 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         IDS.rank_overlay: "rank-overlay",
         IDS.show_all_ranks: "show-all-ranks",
         IDS.high_score_overlay: "high-score-overlay",
+        IDS.typical_score_overlay: "typical-score-overlay",
+        IDS.middle_50_overlay: "middle-50-overlay",
+        IDS.middle_80_overlay: "middle-80-overlay",
         IDS.score_threshold_overlay: "score-threshold-overlay",
         IDS.score_threshold_percentage: "score-threshold-percentage",
     }
@@ -134,6 +152,24 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
             "overlay line tracks your current personal best. A run is judged "
             "against the personal best you had before the run."
         ),
+        # Until Score vs Time draws the line, each names both modes that
+        # don't show it.
+        IDS.typical_score_overlay: (
+            "Draws your typical score: the median of your last 20 runs, or of "
+            "all your runs if you have fewer. It's faded where too few of them "
+            "are recent. **Score vs Time** and **Score vs Sensitivity** don't "
+            "show the line or bands."
+        ),
+        IDS.middle_50_overlay: (
+            "Shades the middle 50% of the runs behind your typical score. A "
+            "narrower band means more consistent scores. **Score vs Time** and "
+            "**Score vs Sensitivity** don't show this band."
+        ),
+        IDS.middle_80_overlay: (
+            "Shades the middle 80% of the runs behind your typical score, in a "
+            "lighter shade than the middle 50%. **Score vs Time** and **Score "
+            "vs Sensitivity** don't show this band."
+        ),
     }
 
     for component_id, text in expected.items():
@@ -169,12 +205,46 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
         IDS.rank_overlay: "Rank thresholds",
         IDS.show_all_ranks: "Show all ranks",
         IDS.high_score_overlay: "PB score",
+        IDS.typical_score_overlay: "Typical score",
+        IDS.middle_50_overlay: "Middle 50%",
+        IDS.middle_80_overlay: "Middle 80%",
         IDS.score_threshold_overlay: "Score threshold overlay",
         IDS.score_threshold_percentage: "Score threshold percentage",
     }
 
 
-def test_the_panel_holds_three_groups_seven_controls_and_no_notification_control(
+def test_the_typical_scores_switches_follow_pb_score_under_their_chosen_ids(
+    monkeypatch,
+):
+    """A browser remembers each switch under its id, so the ids never change."""
+    components = _layout_components(monkeypatch)
+    (overlays,) = [
+        group
+        for group in components[IDS.panel].children
+        if group.children[0].children == "Overlays"
+    ]
+
+    assert [control.id for control in overlays.children[1:]] == [
+        IDS.rank_overlay,
+        IDS.show_all_ranks,
+        IDS.high_score_overlay,
+        "run-history-typical-score-overlay-switch",
+        "run-history-middle-50-overlay-switch",
+        "run-history-middle-80-overlay-switch",
+    ]
+    # Each help icon is named for its switch, as every icon in the panel is.
+    for control in overlays.children[4:]:
+        (icon,) = [
+            component
+            for component in _walk_components(control.label)
+            if isinstance(component, dmc.ActionIcon)
+        ]
+        assert icon.to_plotly_json()["props"]["aria-label"] == (
+            f"{_label_text(control)} help"
+        )
+
+
+def test_the_panel_holds_three_groups_ten_controls_and_no_notification_control(
     monkeypatch,
 ):
     """The run toast is app-wide, so its switch is on the Settings page.
@@ -202,6 +272,9 @@ def test_the_panel_holds_three_groups_seven_controls_and_no_notification_control
         IDS.rank_overlay,
         IDS.show_all_ranks,
         IDS.high_score_overlay,
+        IDS.typical_score_overlay,
+        IDS.middle_50_overlay,
+        IDS.middle_80_overlay,
         IDS.point_size,
         IDS.point_color,
         IDS.score_threshold_overlay,
@@ -486,6 +559,100 @@ def test_the_graph_is_patched_only_when_the_latest_run_is_all_that_changed(
 
     assert isinstance(result, Patch) == patched
     assert isinstance(result, go.Figure) != patched
+
+
+# --- The typical score's colors ------------------------------------------------------
+
+
+def _typical_score_plot() -> str:
+    """Build a cached Score vs Run figure with the typical score's six traces.
+
+    Twenty runs in one sitting make run 20's value known, and five runs two
+    months later are faded, so both strengths of each metric are drawn.
+    """
+    runs = [
+        RunData(
+            datetime_object=first + timedelta(minutes=index),
+            score=100.0 + index,
+            sens_scale="cm/360",
+            horizontal_sens=40.0,
+            scenario="Scenario",
+            accuracy=0.5,
+        )
+        for first, count in ((datetime(2026, 8, 1, 10), 20), (datetime(2026, 10, 1), 5))
+        for index in range(count)
+    ]
+    today = date(2026, 10, 12)
+    figure = generate_score_vs_run_plot(
+        runs, 1, "Scenario", False, [], False, (), today
+    )
+    figure.add_traces(
+        typical_score_traces(
+            range(1, len(runs) + 1),
+            build_typical_scores(runs, split_into_play_sessions(runs)),
+            today,
+            line=True,
+            middle_50=True,
+            middle_80=True,
+        )
+    )
+    return figure.to_json()
+
+
+@pytest.mark.parametrize(
+    ("scheme", "line", "middle_50", "middle_80"),
+    [
+        ("light", "#343a40", "rgba(52, 58, 64, 0.14)", "rgba(52, 58, 64, 0.07)"),
+        ("dark", "#dee2e6", "rgba(222, 226, 230, 0.14)", "rgba(222, 226, 230, 0.07)"),
+    ],
+)
+def test_the_typical_scores_line_and_bands_take_each_themes_gray(
+    scheme, line, middle_50, middle_80
+):
+    """Faded or not, by trace name; the run points keep their generated color."""
+    plot_json = _typical_score_plot()
+    figure = chart_options.apply_graph_appearance(scheme, plot_json, "Default", "")
+    typical = [
+        trace
+        for trace in figure.data
+        if trace.name
+        in {TYPICAL_SCORE_TRACE_NAME, MIDDLE_50_TRACE_NAME, MIDDLE_80_TRACE_NAME}
+    ]
+
+    colors = {
+        (trace.name, trace.opacity): trace.line.color
+        if trace.name == TYPICAL_SCORE_TRACE_NAME
+        else trace.fillcolor
+        for trace in typical
+    }
+    assert colors == {
+        (MIDDLE_80_TRACE_NAME, 0.35): middle_80,
+        (MIDDLE_50_TRACE_NAME, 0.35): middle_50,
+        (MIDDLE_80_TRACE_NAME, 1): middle_80,
+        (MIDDLE_50_TRACE_NAME, 1): middle_50,
+        (TYPICAL_SCORE_TRACE_NAME, 0.35): line,
+        (TYPICAL_SCORE_TRACE_NAME, 1): line,
+    }
+    # The run points set no color, so they draw in the template's first.
+    assert figure.data[0].name == "Run data point"
+    assert figure.data[0].marker.color is None
+    assert figure.layout.template.layout.colorway[0] == generated_point_color(scheme)
+    # The line keeps its width, and the bands no outline, whatever the theme.
+    assert {trace.line.width for trace in typical} == {0, 2.5}
+
+
+def test_the_cached_figure_is_built_with_the_light_colors():
+    """As the ring is, so a theme change only recolors."""
+    figure = go.Figure(json.loads(_typical_score_plot()))
+
+    assert {
+        trace.line.color
+        for trace in figure.data
+        if trace.name == TYPICAL_SCORE_TRACE_NAME
+    } == {"#343a40"}
+    assert {
+        trace.fillcolor for trace in figure.data if trace.name == MIDDLE_50_TRACE_NAME
+    } == {"rgba(52, 58, 64, 0.14)"}
 
 
 # --- The stylesheet rules that open and collapse the panel ---------------------------

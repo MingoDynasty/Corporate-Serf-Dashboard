@@ -3,8 +3,8 @@
 The typical score defines what a player's runs on a scenario usually score.
 It uses the median of the last twenty runs, with a minimum before the value
 is known and a separate test of how recent its runs are.
-The definition and its display rounding are available as pure functions, with
-no page or chart using them yet.
+The definition and its display rounding are pure functions, and the Run
+History chart draws the value on Score vs Run, faded where it isn't recent.
 Stats files with non-finite scores are skipped during import so malformed
 scores cannot stop a calculation.
 
@@ -98,4 +98,8 @@ scores cannot stop a calculation.
 - The fixed constants are `TYPICAL_SCORE_WINDOW_RUNS` (20),
   `TYPICAL_SCORE_MIN_RUNS` (10), `TYPICAL_SCORE_MIN_SESSIONS` (2), and
   `TYPICAL_SCORE_RECENT_AGE` (30 days). There are no settings for them.
-- No value is cached or persisted. There is no production caller yet.
+- No value is cached or persisted.
+- The Run History chart is the one caller so far: on Score vs Run it builds
+  every value of the scenario's history, keeps the plotted runs' values, and
+  judges each at its own run. What it draws is in
+  [run_history.md](run_history.md#the-chart).

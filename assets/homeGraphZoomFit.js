@@ -1,18 +1,20 @@
 // Plotly autoranges the Run History graph's score axis once, over every run, and an
 // x-only zoom never recomputes it, so the runs in a zoomed slice sit squashed
 // in a thin band. plotly.js has no option to autorange y over the visible x
-// window, so refit the score axis to the runs in view whenever x is zoomed.
+// window, so refit the score axis to the points in view whenever x is zoomed.
 (() => {
     const attached = new WeakSet();
     // The y range each plot's last refit applied, so resetting x undoes only
     // a y range this asset set and never one the user dragged themselves.
     const lastFit = new WeakMap();
 
-    // Only traces are fitted: the run points, and the New PB stars and the
-    // latest run's ring, which repeat run points and so never move the fit.
-    // Overlay lines are shapes and stay out on purpose: the PB score line
-    // sits at or above every run, so fitting it would pin the axis top there
-    // and undo most of the refit.
+    // Only traces are fitted: the run points; the New PB stars and the latest
+    // run's ring, which repeat run points and so never move the fit; and the
+    // typical score's line and bands. A band's trace holds its top and its
+    // bottom as points, so a refit keeps the band in view rather than
+    // clipping it. Overlay lines are shapes and stay out on purpose: the PB
+    // score line sits at or above every run, so fitting it would pin the axis
+    // top there and undo most of the refit.
     function visibleScoreRange(gd) {
         // _fullLayout, _fullData, and the axis converters are plotly.js
         // internals, unchanged through plotly.js 4. The in-range test

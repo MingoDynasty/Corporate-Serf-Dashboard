@@ -7,6 +7,8 @@ store the app keeps.
 """
 
 import logging
+import re
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 
 import pytest
@@ -24,8 +26,11 @@ from source.kovaaks import data_service
 from source.kovaaks.data_models import Rank, RunData
 from source.plot.plot_service import (
     LATEST_RUN_TRACE_NAME,
+    MIDDLE_50_TRACE_NAME,
+    MIDDLE_80_TRACE_NAME,
     NEW_PB_TRACE_NAME,
     RUN_DATA_POINT_TRACE_NAME,
+    TYPICAL_SCORE_TRACE_NAME,
 )
 
 SCENARIO = "1w4ts"
@@ -77,16 +82,30 @@ def load_runs(monkeypatch):
     return load
 
 
-def _figure(
+def _figure(  # noqa: PLR0913
     mode: str,
     *,
     run_range: str | None = "100",
     day_range: str | None = "90",
     playlist: str | None = None,
     today: date = TODAY,
+    typical_score: bool = True,
+    middle_50: bool = True,
+    middle_80: bool = True,
 ):
+    """Build a figure with the switches as a first visit draws them, unless told."""
     return build_run_history_figure(
-        mode, SCENARIO, run_range, day_range, True, False, playlist, today
+        mode,
+        SCENARIO,
+        run_range,
+        day_range,
+        True,
+        False,
+        playlist,
+        today,
+        typical_score_switch=typical_score,
+        middle_50_switch=middle_50,
+        middle_80_switch=middle_80,
     )
 
 
@@ -325,7 +344,13 @@ def test_a_chart_with_no_new_pb_in_range_has_no_star_trace(load_runs) -> None:
     runs[0] = _run(999.0, runs[0].datetime_object)
     load_runs(*runs)
 
-    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range="50")
+    figure, _supports_overlays = _figure(
+        SCORE_VS_RUN,
+        run_range="50",
+        typical_score=False,
+        middle_50=False,
+        middle_80=False,
+    )
 
     assert [trace.name for trace in figure.data] == [
         RUN_DATA_POINT_TRACE_NAME,
@@ -435,6 +460,9 @@ def test_both_rank_switches_reach_the_figure(load_runs, monkeypatch, mode) -> No
             show_all_ranks,
             "KovaaKsTestCode",
             TODAY,
+            typical_score_switch=True,
+            middle_50_switch=True,
+            middle_80_switch=True,
         )
         return [
             annotation.text.split(" (")[0] for annotation in figure.layout.annotations
@@ -573,3 +601,291 @@ def test_of_two_runs_that_ended_in_one_second_the_later_played_is_ringed(
 
     assert _ring(figure).meta == "second.csv"
     assert (list(_ring(figure).x), list(_ring(figure).y)) == ([3], [400.0])
+
+
+# --- The typical score on Score vs Run ------------------------------------------
+
+TYPICAL_SCORE_NAMES = {
+    TYPICAL_SCORE_TRACE_NAME,
+    MIDDLE_50_TRACE_NAME,
+    MIDDLE_80_TRACE_NAME,
+}
+
+
+def _sitting(first: datetime, scores: list[float]) -> list[RunData]:
+    """Build one play session: a run a minute, starting at ``first``."""
+    return [
+        _run(score, first + timedelta(minutes=index))
+        for index, score in enumerate(scores)
+    ]
+
+
+def _return_after_a_break() -> list[RunData]:
+    """Build 35 runs: two sittings in August, then one after 60 days away.
+
+    Runs 1 to 12 are one sitting, so the value is unknown until run 13 opens
+    the second. Runs 13 to 20 are recent at their runs. Runs 21 to 29 come
+    back with fewer than 10 of their 20 runs from the last 30 days, and from
+    run 30 on, 10 or more are.
+    """
+    return [
+        *_sitting(datetime(2026, 8, 1, 10), [100.0 + n for n in range(1, 13)]),
+        *_sitting(datetime(2026, 8, 2, 10), [100.0 + n for n in range(13, 21)]),
+        *_sitting(datetime(2026, 10, 1, 10), [200.0 + n for n in range(1, 16)]),
+    ]
+
+
+def _typical_traces(figure) -> list:
+    return [trace for trace in figure.data if trace.name in TYPICAL_SCORE_NAMES]
+
+
+def _line_traces(figure) -> tuple:
+    """Return the faded line and the full-strength line, either None if absent."""
+    lines = [t for t in figure.data if t.name == TYPICAL_SCORE_TRACE_NAME]
+    faded = [t for t in lines if t.opacity < 1]
+    full = [t for t in lines if t.opacity == 1]
+    return (faded[0] if faded else None), (full[0] if full else None)
+
+
+def _hover_lines(trace, x_value: float) -> list[str]:
+    """Render a line trace's hover at one point, as plotly would fill it in."""
+    index = list(trace.x).index(x_value)
+    text = re.sub(
+        r"%\{customdata\[(\d+)\]\}",
+        lambda match: str(trace.customdata[index][int(match.group(1))]),
+        trace.hovertemplate.removesuffix("<extra></extra>"),
+    )
+    return text.split("<br>")
+
+
+def test_the_line_starts_at_the_first_known_value_and_fades_where_not_recent(
+    load_runs,
+) -> None:
+    """Runs 21 to 29 are faded, and the stretch meets the full line at 20 and 30."""
+    load_runs(*_return_after_a_break())
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+    faded, full = _line_traces(figure)
+
+    assert list(full.x) == [*range(13, 21), None, *range(30, 36)]
+    assert list(faded.x) == list(range(20, 31))
+    # Where the two kinds meet, both hold the same value: no step and no gap.
+    full_at = dict(zip(full.x, full.y, strict=True))
+    assert faded.y[0] == full_at[20]
+    assert faded.y[-1] == full_at[30] == 160.5
+    # The bands' shapes cover the same stretches, top then bottom.
+    for trace in _typical_traces(figure):
+        if trace.fill == "toself":
+            drawn = {x for x in trace.x if x is not None}
+            assert drawn == set(faded.x if trace.opacity < 1 else full.x) - {None}
+
+
+def test_a_value_at_the_ranges_left_edge_counts_the_runs_the_range_hides(
+    load_runs,
+) -> None:
+    """Judged over the whole history first, as the stars are."""
+    load_runs(*_daily_runs(120))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range="100")
+    _faded, full = _line_traces(figure)
+
+    # Run 21's last 20 runs are runs 2 to 21, scored 2 to 21.
+    assert (full.x[0], full.y[0]) == (21, 11.5)
+
+
+def test_the_traces_draw_under_the_runs_in_their_own_order(load_runs) -> None:
+    """The run trace stays first, so the run points keep the colorway's first color.
+
+    Inside their layer the line draws over the bands and full strength over
+    faded, each metric in one legend group, ranked after the stars.
+    """
+    load_runs(*_return_after_a_break())
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+    typical = _typical_traces(figure)
+
+    assert figure.data[0].name == RUN_DATA_POINT_TRACE_NAME
+    assert all(trace.zorder is None for trace in figure.data[:3])
+    assert [(trace.name, trace.opacity) for trace in typical] == [
+        (MIDDLE_80_TRACE_NAME, 0.35),
+        (MIDDLE_50_TRACE_NAME, 0.35),
+        (MIDDLE_80_TRACE_NAME, 1),
+        (MIDDLE_50_TRACE_NAME, 1),
+        (TYPICAL_SCORE_TRACE_NAME, 0.35),
+        (TYPICAL_SCORE_TRACE_NAME, 1),
+    ]
+    assert {trace.zorder for trace in typical} == {-1}
+    assert all(trace.legendgroup == trace.name for trace in typical)
+    assert {(trace.name, trace.legendrank) for trace in typical} == {
+        (TYPICAL_SCORE_TRACE_NAME, 1001),
+        (MIDDLE_50_TRACE_NAME, 1002),
+        (MIDDLE_80_TRACE_NAME, 1003),
+    }
+    # One entry a metric, on its full-strength trace.
+    assert [trace.showlegend for trace in typical] == [
+        False,
+        False,
+        True,
+        True,
+        False,
+        True,
+    ]
+    # The bands take no hover; the line has its own.
+    assert {trace.hoverinfo for trace in typical if trace.fill == "toself"} == {"skip"}
+
+
+def test_a_metric_with_only_a_faded_stretch_gives_it_the_legend_entry(
+    load_runs,
+) -> None:
+    """A run every four days never has 10 in the last 30 days."""
+    load_runs(
+        *[
+            _run(100.0 + index, MIDNIGHT_TODAY - timedelta(days=4 * (19 - index)))
+            for index in range(20)
+        ]
+    )
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+    typical = _typical_traces(figure)
+
+    assert [(trace.name, trace.opacity, trace.showlegend) for trace in typical] == [
+        (MIDDLE_80_TRACE_NAME, 0.35, True),
+        (MIDDLE_50_TRACE_NAME, 0.35, True),
+        (TYPICAL_SCORE_TRACE_NAME, 0.35, True),
+    ]
+    # Known from the 10th run, which has 10 runs from 10 sessions.
+    assert typical[-1].x[0] == 10
+
+
+def test_a_scenario_with_no_known_value_has_no_typical_score_traces(
+    load_runs,
+) -> None:
+    """Twelve runs in one sitting: no value yet, and no line to draw."""
+    load_runs(*_sitting(datetime(2026, 10, 12, 10), [100.0] * 12))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+
+    assert _typical_traces(figure) == []
+
+
+@pytest.mark.parametrize("bridged", [False, True])
+def test_the_sessions_are_split_over_every_scenarios_runs(load_runs, bridged) -> None:
+    """Another scenario's runs can join two sittings of this one into one session.
+
+    Ten runs in two halves an hour apart are known. With runs on another
+    scenario between the halves, they are one session and not yet known.
+    """
+    halves = [
+        *_sitting(datetime(2026, 10, 12, 10), [100.0] * 5),
+        *_sitting(datetime(2026, 10, 12, 11), [100.0] * 5),
+    ]
+    bridge = [
+        replace(
+            _run(50.0, datetime(2026, 10, 12, 10, 4) + timedelta(minutes=minutes)),
+            scenario="Another scenario",
+        )
+        for minutes in (20, 40)
+    ]
+    load_runs(*halves, *(bridge if bridged else []))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+
+    assert (_typical_traces(figure) == []) is bridged
+
+
+@DAY_MODES
+def test_score_vs_time_and_score_vs_sensitivity_draw_no_typical_score_yet(
+    load_runs, mode
+) -> None:
+    load_runs(*_daily_runs(40))
+
+    figure, _supports_overlays = _figure(mode, day_range="all")
+
+    assert _typical_traces(figure) == []
+
+
+@pytest.mark.parametrize(
+    ("switches", "drawn"),
+    [
+        ((True, False, False), {TYPICAL_SCORE_TRACE_NAME}),
+        ((False, True, False), {MIDDLE_50_TRACE_NAME}),
+        ((False, False, True), {MIDDLE_80_TRACE_NAME}),
+        ((False, True, True), {MIDDLE_50_TRACE_NAME, MIDDLE_80_TRACE_NAME}),
+        ((False, False, False), set()),
+    ],
+)
+def test_each_metric_is_drawn_only_while_its_switch_is_on(
+    load_runs, switches, drawn
+) -> None:
+    """A band can show without the line, and its faded stretch goes with it."""
+    load_runs(*_return_after_a_break())
+    typical_score, middle_50, middle_80 = switches
+
+    figure, _supports_overlays = _figure(
+        SCORE_VS_RUN,
+        typical_score=typical_score,
+        middle_50=middle_50,
+        middle_80=middle_80,
+    )
+
+    names = [trace.name for trace in _typical_traces(figure)]
+    assert set(names) == drawn
+    # Each metric drawn has its faded stretch and its full strength.
+    assert all(names.count(name) == 2 for name in drawn)
+
+
+def test_the_lines_hover_says_the_value_its_runs_how_recent_and_each_band(
+    load_runs,
+) -> None:
+    """Run 30's last 20 runs: 10 from August, 10 from October 1."""
+    load_runs(*_return_after_a_break())
+
+    _faded, full = _line_traces(_figure(SCORE_VS_RUN)[0])
+
+    assert _hover_lines(full, 30) == [
+        "<b>Typical score</b>: 161",
+        "<b>Runs</b>: 20 in 3 sessions · Aug 1 to Oct 1",
+        "<b>Recent</b>: 10 of 20 in the 30 days up to this run",
+        "<b>Middle 50%</b>: 116 to 205",
+        "<b>Middle 80%</b>: 113 to 208",
+    ]
+    assert full.hoverlabel.font.size == 16
+
+
+def test_the_hover_counts_one_session_and_a_span_on_one_date(load_runs) -> None:
+    """Twenty runs in one sitting are known, from one session on one date."""
+    load_runs(*_sitting(datetime(2026, 10, 12, 10), [100.0] * 20))
+
+    _faded, full = _line_traces(_figure(SCORE_VS_RUN)[0])
+
+    assert _hover_lines(full, 20)[1] == "<b>Runs</b>: 20 in 1 session · on Oct 12"
+
+
+@pytest.mark.parametrize(
+    ("middle_50", "middle_80", "band_lines"),
+    [
+        (True, False, ["<b>Middle 50%</b>: 116 to 205"]),
+        (False, True, ["<b>Middle 80%</b>: 113 to 208"]),
+        (False, False, []),
+    ],
+)
+def test_a_bands_hover_line_shows_only_with_its_band(
+    load_runs, middle_50, middle_80, band_lines
+) -> None:
+    load_runs(*_return_after_a_break())
+
+    _faded, full = _line_traces(
+        _figure(SCORE_VS_RUN, middle_50=middle_50, middle_80=middle_80)[0]
+    )
+
+    assert _hover_lines(full, 30)[3:] == band_lines
+
+
+def test_the_hover_dates_carry_the_year_only_in_another_year(load_runs) -> None:
+    load_runs(*_return_after_a_break())
+
+    _faded, full = _line_traces(_figure(SCORE_VS_RUN, today=date(2027, 1, 5))[0])
+
+    assert _hover_lines(full, 30)[1] == (
+        "<b>Runs</b>: 20 in 3 sessions · Aug 1, 2026 to Oct 1, 2026"
+    )

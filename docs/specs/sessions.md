@@ -20,8 +20,9 @@ Two words are kept apart throughout. A **break** is time between runs. A
 
 ## Where sessions show
 
-- The Run History page is the one page that shows a session, in two places:
-  its run list and its latest-run card.
+- The Run History page is the one page that shows a session, in three
+  places: its run list, its latest-run card, and the hover of the chart's
+  typical score line, which counts the sessions behind a value.
 - The run list has two views. Under This scenario it lists a scenario's runs
   under the session each was played in, names a session by when it started,
   and counts the session's runs, and it gives the length of the newest session

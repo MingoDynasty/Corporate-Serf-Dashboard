@@ -367,6 +367,9 @@ flowchart LR
     RunHistoryChart --> DataService
     RunHistoryChart --> PlotService
     RunHistoryChart --> RunHistoryList
+    RunHistoryChart --> PlaySessions
+    RunHistoryChart --> TypicalScore
+    PlotService --> TypicalScore
     RunHistoryList --> RunMarks
     RunHistoryList --> ColumnsMenu
     RunHistoryList --> DataService
@@ -587,7 +590,9 @@ flowchart LR
   `plot_service.apply_point_appearance` — appearance never reruns the data
   read or the overlays. That function restyles
   traces selected by name: the size and color go to the run trace, and the
-  size alone to the New PB stars and the latest run's ring.
+  size alone to the New PB stars and the latest run's ring. Before it,
+  `apply_graph_appearance` recolors the typical score's line and bands for
+  the theme (`plot_service.apply_typical_score_colors`).
   The Scenario Stats card (Category and Number of runs, or "No scenario
   selected") is built
   by `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
@@ -986,9 +991,16 @@ flowchart LR
 - `components/run_history_chart.py` — what the Run History chart plots, with
   no component ids: the three modes, the range options in runs and in days,
   the empty-state copy, and `build_run_history_figure()`. That function
-  reads a scenario's runs in play order, judges the new PBs over all of
+  takes one copy of the run store (`data_service.get_all_runs`), puts the
+  scenario's runs from it in play order, judges the new PBs over all of
   them, applies the range the mode counts in, and hands the runs to one of
-  `plot_service`'s three builders. A range of N days starts at the midnight
+  `plot_service`'s three builders. On Score vs Run, while any of the typical
+  score's switches is on, it also splits that copy into play sessions,
+  builds the typical score after every run of the scenario
+  (`typical_score.build_typical_scores`), and adds
+  `plot_service.typical_score_traces()` for the plotted runs' values: the
+  scenario's runs and the sessions come from one copy, so a run that lands
+  mid-build is in both or neither. A range of N days starts at the midnight
   N minus 1 days before the app's own date
   (`first_moment_of_day_range()`).
 - `components/run_marks.py` — the check and the star a past run carries, with
@@ -1116,11 +1128,13 @@ flowchart LR
   `get_runs_newest_first` hands
   a scenario's runs to the time-scored lookup
   ([decision log](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
-  `get_runs_in_play_order` hands them to the Run History chart, oldest
-  first, in the order play sessions are split in, which settles two runs
-  that ended in the same second where the store keeps them as loaded.
+  `get_runs_in_play_order` returns a scenario's runs oldest first, in the
+  order play sessions are split in, which settles two runs that ended in the
+  same second where the store keeps them as loaded.
   `get_all_runs` hands a copy of every scenario's runs to the Run History
-  run list, which splits it into play sessions. A run also keeps
+  run list and latest-run card, which split it into play sessions, and to
+  its chart, which takes the scenario's runs from it and, for the typical
+  score, the sessions. A run also keeps
   `shots_fired`, the shot count its accuracy was worked out from.
   `new_high_score_runs` is the new PB rule, a pure pass over one scenario's
   runs in time order. Its callers hand it everything the scenario holds,
@@ -1260,20 +1274,22 @@ flowchart LR
   splits one play session. `PlaySession` and `ScenarioVisit` are frozen
   tuples of runs with a start and an end, and nothing is stored.
   `in_play_order` is that sort by itself, which the Run History chart also
-  asks for, through `data_service.get_runs_in_play_order`. The Run History
-  page's run list calls the other three, through
-  `components/run_history_list.py`.
+  asks for. The Run History page's run list calls the other three, through
+  `components/run_history_list.py`, and the chart splits its copy of the run
+  store with `split_into_play_sessions` for the typical score.
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
-- `typical_score.py` — the typical score's pure definition, with no production
-  caller yet. `build_typical_scores` takes one scenario's runs and the play
+- `typical_score.py` — the typical score's pure definition, which the Run
+  History chart draws on Score vs Run. `build_typical_scores` takes one
+  scenario's runs and the play
   sessions split across every scenario from the same snapshot, returning a
   frozen `TypicalScore` after each run. `typical_score_recency` judges a
   value at a supplied moment, with recent run and session counts;
   `typical_score_fade_time` gives a held value's inclusive recency boundary.
   `format_typical_score` applies the window's display precision and half-up
-  rounding without changing its statistics. Nothing reads the store, reads
-  the clock, or persists a value. Rules in
+  rounding without changing its statistics, remembering each score's
+  decimal places by score. Nothing reads the store, reads the clock, or
+  persists a value. Rules in
   [specs/typical_score.md](specs/typical_score.md).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
@@ -1287,7 +1303,9 @@ flowchart LR
   `generate_score_vs_run_plot`, `generate_score_vs_time_plot`, and
   `generate_score_vs_sensitivity_plot`.
   Each plots every run it is given as one point, titles the figure with the
-  scenario's name alone, and draws no summary line. Score vs Run puts a
+  scenario's name alone, and draws no summary line: the typical score's
+  traces come from `typical_score_traces()`, which the chart module adds to
+  the Score vs Run figure. Score vs Run puts a
   run at its number in the scenario's whole history on a numeric axis and
   writes the axis ticks itself, a date at the first plotted run of each day,
   thinned for an assumed plot width since the server does not know the real
@@ -1298,6 +1316,15 @@ flowchart LR
   `show_latest_run_ring()` shows it or hides it by its opacity, never by
   `visible`, which would take the ring out of the axis ranges and move every
   point. `apply_point_appearance` sizes it with the stars.
+  `typical_score_traces()` turns the values after the plotted runs into up to
+  six traces, a line and two bands each at full strength and faded, judged at
+  each point's own run with `typical_score_recency`. They come after the run
+  trace and draw under it by `zorder` −1, so the run trace stays first and
+  keeps the colorway's first color (`generated_point_color`). A metric's
+  traces share its name, which is their legend group and the handle
+  `apply_typical_score_colors()` recolors them by with the theme. The line's
+  hover takes its figures from `customdata`, rounded by
+  `format_typical_score`.
 
 ### Infrastructure
 - `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its

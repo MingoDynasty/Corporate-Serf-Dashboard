@@ -1,10 +1,10 @@
 """Choose what the Run History chart plots: its modes, its ranges, and its figure.
 
 The chart plots every run of one scenario inside a range. Score vs Run counts
-its range in runs. Score vs Time and Score vs Sensitivity count theirs in
-calendar days. The page holds the controls and the callback, and asks
-``build_run_history_figure`` for the figure. Nothing here has a component id
-or registers a callback.
+its range in runs and draws the typical score over them. Score vs Time and
+Score vs Sensitivity count theirs in calendar days. The page holds the
+controls and the callback, and asks ``build_run_history_figure`` for the
+figure. Nothing here has a component id or registers a callback.
 """
 
 import logging
@@ -14,16 +14,19 @@ import plotly.graph_objects as go
 
 from source.components.run_history_list import run_id
 from source.kovaaks.data_service import (
+    get_all_runs,
     get_rank_data_from_playlist_code,
-    get_runs_in_play_order,
     get_sensitivities_vs_runs,
     new_high_score_runs,
 )
+from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
+from source.kovaaks.typical_score import build_typical_scores
 from source.plot.plot_service import (
     generate_empty_plot,
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
     generate_score_vs_time_plot,
+    typical_score_traces,
 )
 
 logger = logging.getLogger(__name__)
@@ -110,6 +113,10 @@ def build_run_history_figure(  # noqa: PLR0913
     show_all_ranks_switch: bool,
     selected_playlist: str | None,
     today: date,
+    *,
+    typical_score_switch: bool,
+    middle_50_switch: bool,
+    middle_80_switch: bool,
 ) -> tuple[go.Figure, bool]:
     """Build the chart for one scenario that has runs, in the mode asked for.
 
@@ -123,8 +130,16 @@ def build_run_history_figure(  # noqa: PLR0913
     tagged with the run's id. Whether the ring shows is not decided here: it
     shows only while that run is also the last one played on any scenario,
     and a run on another scenario changes that with no new figure.
+
+    Score vs Run also draws the typical score's line and bands, each while
+    its switch is on. The other two modes draw neither yet.
     """
-    runs = get_runs_in_play_order(selected_scenario)
+    # One copy of the store for the scenario's runs and, when the typical
+    # score is drawn, the play sessions: a run that lands mid-build is then in
+    # both or neither, and ``build_typical_scores`` refuses a run its sessions
+    # don't hold.
+    all_runs = get_all_runs()
+    runs = in_play_order(run for run in all_runs if run.scenario == selected_scenario)
     newest = runs[-1]
     newest_id = run_id(newest)
     # Judged over the whole history, and only then is the range applied: a
@@ -136,21 +151,35 @@ def build_run_history_figure(  # noqa: PLR0913
     if mode == SCORE_VS_RUN:
         run_count = _range_count(run_range, RUN_RANGE_OPTIONS, RUN_RANGE_DEFAULT)
         plotted = runs if run_count is None else runs[-run_count:]
-        return (
-            generate_score_vs_run_plot(
-                plotted,
-                len(runs) - len(plotted) + 1,
-                selected_scenario,
-                rank_overlay_switch,
-                _rank_data(selected_playlist, selected_scenario),
-                show_all_ranks_switch,
-                new_pbs,
-                today,
-                newest,
-                newest_id,
-            ),
-            True,
+        first_run_number = len(runs) - len(plotted) + 1
+        figure = generate_score_vs_run_plot(
+            plotted,
+            first_run_number,
+            selected_scenario,
+            rank_overlay_switch,
+            _rank_data(selected_playlist, selected_scenario),
+            show_all_ranks_switch,
+            new_pbs,
+            today,
+            newest,
+            newest_id,
         )
+        if typical_score_switch or middle_50_switch or middle_80_switch:
+            # Worked out over the whole history before the range is applied,
+            # as the stars are, so the value at the range's first run counts
+            # the runs before it that the range leaves out.
+            values = build_typical_scores(runs, split_into_play_sessions(all_runs))
+            figure.add_traces(
+                typical_score_traces(
+                    range(first_run_number, len(runs) + 1),
+                    values[-len(plotted) :],
+                    today,
+                    line=typical_score_switch,
+                    middle_50=middle_50_switch,
+                    middle_80=middle_80_switch,
+                )
+            )
+        return figure, True
 
     if mode not in (SCORE_VS_TIME, SCORE_VS_SENSITIVITY):
         logger.error("Unsupported chart mode: %r", mode)

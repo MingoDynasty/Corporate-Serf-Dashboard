@@ -41,7 +41,9 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
     personal_best = _personal_best(896.2, pb_hash)
     monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _scenario: True)
     monkeypatch.setattr(
-        run_history, "build_run_history_figure", lambda *_args: (go.Figure(), True)
+        run_history,
+        "build_run_history_figure",
+        lambda *_args, **_switches: (go.Figure(), True),
     )
     monkeypatch.setattr(run_history, "get_high_score", lambda _scenario: 896.2)
     monkeypatch.setattr(
@@ -57,6 +59,9 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
         "100",
         "90",
         "2026-07-06",
+        False,
+        False,
+        False,
         False,
         False,
         False,

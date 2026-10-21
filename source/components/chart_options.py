@@ -21,6 +21,7 @@ from source.plot.plot_service import (
     POINT_SIZE_OPTIONS,
     apply_light_dark_mode,
     apply_point_appearance,
+    apply_typical_score_colors,
     generate_placeholder_plot,
     generated_point_color,
     latest_run_ring_opacity,
@@ -51,6 +52,31 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
     "high-score-overlay": (
         "Shows your current personal best score as a reference line on the graph."
     ),
+    "typical-score-overlay": [
+        "Draws your typical score: the median of your last 20 runs, or of all "
+        "your runs if you have fewer. It's faded where too few of them are "
+        "recent. ",
+        control_name("Score vs Time"),
+        " and ",
+        control_name("Score vs Sensitivity"),
+        " don't show the line or bands.",
+    ],
+    "middle-50-overlay": [
+        "Shades the middle 50% of the runs behind your typical score. A "
+        "narrower band means more consistent scores. ",
+        control_name("Score vs Time"),
+        " and ",
+        control_name("Score vs Sensitivity"),
+        " don't show this band.",
+    ],
+    "middle-80-overlay": [
+        "Shades the middle 80% of the runs behind your typical score, in a "
+        "lighter shade than the middle 50%. ",
+        control_name("Score vs Time"),
+        " and ",
+        control_name("Score vs Sensitivity"),
+        " don't show this band.",
+    ],
     "score-threshold-overlay": (
         "Shows a score goal line based on the selected percentage of your "
         "current personal best."
@@ -122,6 +148,9 @@ class ChartOptionsIds(NamedTuple):
     rank_overlay: str
     show_all_ranks: str
     high_score_overlay: str
+    typical_score_overlay: str
+    middle_50_overlay: str
+    middle_80_overlay: str
     point_size: str
     point_size_label: str
     point_color: str
@@ -185,6 +214,7 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
     if not plot_json:
         plot_json = generate_placeholder_plot().to_json()
     figure = apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
+    apply_typical_score_colors(figure, color_scheme)
     return apply_point_appearance(figure, point_size, point_color)
 
 
@@ -314,6 +344,40 @@ def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
                         label=settings_help_label(
                             "PB score",
                             SETTINGS_HELP_TEXT["high-score-overlay"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                    # The typical score's three, each on to start. Like every
+                    # remembered control's, their defaults never change: the
+                    # browser discards a stored choice once a later visit
+                    # draws another default.
+                    dmc.Switch(
+                        id=ids.typical_score_overlay,
+                        labelPosition="right",
+                        label=settings_help_label(
+                            "Typical score",
+                            SETTINGS_HELP_TEXT["typical-score-overlay"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                    dmc.Switch(
+                        id=ids.middle_50_overlay,
+                        labelPosition="right",
+                        label=settings_help_label(
+                            "Middle 50%",
+                            SETTINGS_HELP_TEXT["middle-50-overlay"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                    dmc.Switch(
+                        id=ids.middle_80_overlay,
+                        labelPosition="right",
+                        label=settings_help_label(
+                            "Middle 80%",
+                            SETTINGS_HELP_TEXT["middle-80-overlay"],
                         ),
                         checked=True,
                         persistence=True,
