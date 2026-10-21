@@ -527,6 +527,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   ([2026-10-12][every-run]).
 - The plot title is the scenario's name alone
   ([2026-10-12][every-run]).
+- The legend sits under the plot, below the axis title, its entries in a row
+  from the plot's left edge. Entries that don't fit one row wrap onto more,
+  and the plot gives up that height, so the legend never covers the title,
+  the axis title, or the plot.
 - Score vs Run and Score vs Time mark each plotted run that set a
   [new PB](../glossary.md#new-pb) with a star: a second trace, legend "New
   PB", drawn over the run points. A new PB is a run whose score is strictly

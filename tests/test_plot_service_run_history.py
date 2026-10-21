@@ -137,11 +137,25 @@ def test_the_run_points_keep_their_legend_entry(build) -> None:
 
 
 @EVERY_MODE
-def test_the_legend_sits_above_the_plot(build) -> None:
-    legend = build(_three_runs()).layout.legend
+def test_the_legend_sits_under_the_plot_clear_of_the_title(build) -> None:
+    """A legend that wraps must never reach the title.
 
-    assert (legend.orientation, legend.x, legend.xanchor) == ("h", 1, "right")
-    assert (legend.y, legend.yanchor) == (1.02, "bottom")
+    Over the plot, a narrow chart wrapped the legend up into the title. Pinned
+    to the figure's bottom edge in container coordinates, its rows are
+    reserved in the bottom margin, as far from the title as the figure goes.
+    The title keeps its own place in the top margin.
+    """
+    layout = build(_three_runs()).layout
+
+    legend = layout.legend
+    assert legend.orientation == "h"
+    assert (legend.xref, legend.x, legend.xanchor) == ("paper", 0, "left")
+    assert (legend.yref, legend.y, legend.yanchor) == ("container", 0, "bottom")
+    assert (layout.title.yref, layout.title.y, layout.title.yanchor) == (
+        None,
+        None,
+        None,
+    )
 
 
 @EVERY_MODE

@@ -74,19 +74,21 @@ LATEST_RUN_RING_SIZE_PRESET_PX = {"Small": 14, "Large": 22}
 # that wasn't converted, so the line then ends at the sensitivity itself.
 _RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
 
-# The legend of every score chart, laid out horizontally above the plot
-# instead of in Plotly's default right-hand column: a few entries never
-# earned a reserved column, and the plot is the scarce thing on the page. It
-# lands in the top margin the title already reserved, so the plot area keeps
-# its full height and gains the column's width. Right-anchored to balance the
-# left-aligned title; at the narrowest the chart gets (the options panel open
-# just above its stacking threshold) it still clears the title rather than
-# colliding with it.
-_LEGEND_ABOVE_PLOT = {
+# The legend of every score chart: horizontal rows under the plot, in place of
+# Plotly's right-hand column, which would take the plot's width. Pinned to the
+# figure's bottom edge in container coordinates, so Plotly reserves every row
+# in the bottom margin and lifts the axis title clear of it: a legend that
+# wraps, on a narrow chart or with more entries, takes plot height and never
+# covers anything. Over the plot it shared the top margin with the title, and
+# a wrapped legend climbed into the title, because Plotly sizes a margin by
+# the larger of two items' needs, not their sum.
+_LEGEND_UNDER_PLOT = {
     "orientation": "h",
-    "x": 1,
-    "xanchor": "right",
-    "y": 1.02,
+    "xref": "paper",
+    "x": 0,
+    "xanchor": "left",
+    "yref": "container",
+    "y": 0,
     "yanchor": "bottom",
 }
 
@@ -439,7 +441,7 @@ def _generate_run_history_plot(  # noqa: PLR0913
         xaxis=xaxis,
         yaxis={"title": "Score"},
         font={"size": 14},
-        legend=_LEGEND_ABOVE_PLOT,
+        legend=_LEGEND_UNDER_PLOT,
     )
     _add_rank_overlays(figure, rank_overlay_switch, rank_data, scores, show_all_ranks)
     return figure
