@@ -1172,14 +1172,19 @@ fit; the line is a median of runs and almost always sits among them.
 
 With Chart options open, the five entries no longer fit on one line beside the
 chart's title and wrap onto a second line over it (v8, 1,800 px window). The
-Backlog already holds the same wrap for three entries on a narrow chart. PR
-2a lays the legend out so that it never covers the title, shown on today's
-entries on a chart narrow enough to wrap them, before any trace is added.
-PR 2b measures it again with all five, at the narrowest chart the Backlog
-item names, a 657 px graph with Chart options open. The labels stay: shorter
-ones would say less and still wrap on a narrower chart. Where the legend
-goes, under the title on a line of its own or under the plot, is PR 2a's to
-choose and show.
+Backlog already holds the same wrap for three entries on a narrow chart.
+
+**Ruled (user), 2026-10-21: the legend stays where it is,** above the plot and
+right-anchored, and PR 2a, which was to lay it out off the title, is dropped:
+"I vote to keep the legend in its original position. If that becomes a
+problem then I will cross that bridge when I get there." Then "Yes, ruled."
+([#399](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/399#issuecomment-6312838006),
+closed unmerged). So on a narrow chart the entries may run into the title or
+wrap over it, and the Backlog item stays open. PR 2b changes no layout. It
+measures the legend with all five entries, at 2560 and 1920 px windows with
+Chart options open and closed, in both themes, and at the 657 px graph the
+Backlog item names, and reports what it finds. The labels stay: shorter ones
+would say less and still wrap on a narrower chart.
 
 ### The Scenario Stats lead
 
@@ -1443,24 +1448,26 @@ Each was drawn in a prototype or measured, on the maintainer's stats.
 
 Five implementation PRs, the chart in three of them, as the maintainer chose
 on 2026-10-20. This is intent, not a contract: a boundary that moves is noted
-in that PR's description.
+in that PR's description. On 2026-10-21 the maintainer ruled PR 2a out
+([The legend](#the-legend)), so four remain, the chart in two.
 
 - **PR 1, the definition.** `source/kovaaks/typical_score.py` with its pure
   functions and tests, a new capability spec, `docs/specs/typical_score.md`,
   and `architecture.md`. Nothing on screen, as the Sessions implementation
   shipped. Needs nothing.
-- **PR 2a, the legend's layout.** The legend laid out so that it never covers
-  the chart's title ([The legend](#the-legend)), shown on today's entries
-  where a narrow chart wraps them now, and a sentence in the Run History spec
-  on where the legend sits. It closes the vault Backlog's item on that wrap.
-  No trace is added. Needs nothing.
+- **PR 2a, the legend's layout. Dropped, ruled (user) 2026-10-21**
+  ([The legend](#the-legend), #399 closed unmerged). It was to lay the legend
+  out so that it never covers the chart's title, and to close the vault
+  Backlog's item on that wrap. The legend stays above the plot, and the item
+  stays open.
 - **PR 2b, Score vs Run.** The line, the bands and their faded stretches on
   Score vs Run; the traces' order, colors, legend groups and the line's
-  hover; the three switches; the zoom fit's comment; and the Run History
-  spec's chart and panel sections. Score vs Time draws no line until 2c, so
-  2b's three switch helps name both modes that don't show the line or bands,
-  listed under New copy in its description, and 2c restores the Copy block's
-  words. Needs PR 1 and 2a. It doesn't touch the top row.
+  hover; the three switches; the zoom fit's comment; the legend measured with
+  all five entries, with no layout change; and the Run History spec's chart
+  and panel sections. Score vs Time draws no line until 2c, so 2b's three
+  switch helps name both modes that don't show the line or bands, listed
+  under New copy in its description, and 2c restores the Copy block's words.
+  Needs PR 1. It doesn't touch the top row.
 - **PR 2c, Score vs Time.** Each value held flat to the next run, a hold's
   fade at its exact moment, the line's end at the newest run, a hold's hover
   at each end, and the spec's sentences on them. Needs 2b.
@@ -1471,13 +1478,13 @@ in that PR's description.
 
 **Why this split.** The definition is the contract later features read, and
 a PR of its own keeps its review on the boundaries rather than on plotly. The
-chart is the largest piece, so no one review carries it whole. The legend
-goes first: it changes the chart before any trace is added, and can land
-beside PR 1. Each mode then has a PR of its own, because Score vs Time's
+chart is the largest piece, so no one review carries it whole. The legend was
+to go first, before any trace is added; the 2026-10-21 ruling dropped that
+PR. Each mode then has a PR of its own, because Score vs Time's
 holds, which fade at an exact moment between runs, are the geometry most
 likely to hide a bug. The Scenario Stats lead is another module, with its own
 live checks of the top row, and it follows 2b because its help names what 2b
-draws. The cost is two more reviews and two more looks in Firefox, and a
+draws. The cost is one more review and one more look in Firefox, and a
 stretch in which Score vs Run draws the line and Score vs Time doesn't, the
 switch helps saying so: 2c is meant to follow 2b closely, and a release
 between them shows the line on one mode only.
@@ -1491,10 +1498,10 @@ checklist: a decision-log entry for each row, the notes in
 roadmap, `product.md`, the vault Backlog bullet named in
 [Out of scope](#out-of-scope), and this file deleted.
 
-**Recommended:** `claude-opus-5-5`, at high for PRs 1, 2a and 3, and at
+**Recommended:** `claude-opus-5-5`, at high for PRs 1 and 3, and at
 xhigh for 2b and 2c: 2b walks each state through the themes, the switches,
 the legend groups and the zoom fit, and 2c the holds and their fade moments.
-The maintainer looks at 2a, 2b, 2c and 3 in their own Firefox before each
+The maintainer looks at 2b, 2c and 3 in their own Firefox before each
 merges.
 
 ### Fallbacks
@@ -1564,9 +1571,9 @@ Each with where it is tracked.
   the tick; its empty states and first-line readouts, `{k} of {n} recent
   runs` over a full-strength value and a dimmed one, and none when every run
   is recent.
-- **Live, PRs 2a to 2c and 3,** in headless Edge at 2560 and 1920 px, light
-  and dark, each PR on what it adds: the legend's layout on today's entries
-  on a narrow chart (2a), and with all five and Chart options open (2b); the
+- **Live, PRs 2b, 2c and 3,** in headless Edge at 2560 and 1920 px, light
+  and dark, each PR on what it adds: the legend with all five entries,
+  Chart options open and closed, measured and not laid out again (2b); the
   line and bands under the runs, the faded stretches, the legend's clicks
   hiding a metric whole, the switches and their memory, the hover, and a zoom
   that refits to the bands (2b); Score vs Time's holds and their fade (2c);
