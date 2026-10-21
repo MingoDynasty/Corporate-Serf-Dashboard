@@ -79,9 +79,10 @@ _RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[
 # earned a reserved column, and the plot is the scarce thing on the page. It
 # lands in the top margin the title already reserved, so the plot area keeps
 # its full height and gains the column's width. Right-anchored to balance the
-# left-aligned title; at the narrowest the chart gets (the options panel open
-# just above its stacking threshold) it still clears the title rather than
-# colliding with it.
+# left-aligned title. On a narrow chart, such as one beside the open options
+# panel, the entries run into the title and can wrap over it. The maintainer
+# accepted that and kept this placement over a legend under the plot (#399,
+# closed unmerged).
 _LEGEND_ABOVE_PLOT = {
     "orientation": "h",
     "x": 1,
