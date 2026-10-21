@@ -166,6 +166,9 @@ CHART_OPTIONS_IDS = ChartOptionsIds(
     rank_overlay="run-history-rank-overlay-switch",
     show_all_ranks="run-history-show-all-ranks-switch",
     high_score_overlay="run-history-high-score-overlay-switch",
+    typical_score_overlay="run-history-typical-score-overlay-switch",
+    middle_50_overlay="run-history-middle-50-overlay-switch",
+    middle_80_overlay="run-history-middle-80-overlay-switch",
     point_size="run-history-point-size",
     point_size_label="run-history-point-size-label",
     point_color="run-history-point-color",
@@ -528,6 +531,9 @@ clientside_callback(
     Input(CHART_OPTIONS_IDS.rank_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.show_all_ranks, "checked"),
     Input(CHART_OPTIONS_IDS.high_score_overlay, "checked"),
+    Input(CHART_OPTIONS_IDS.typical_score_overlay, "checked"),
+    Input(CHART_OPTIONS_IDS.middle_50_overlay, "checked"),
+    Input(CHART_OPTIONS_IDS.middle_80_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.score_threshold_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
 )
@@ -542,6 +548,9 @@ def generate_graph(  # noqa: PLR0913
     rank_overlay_switch,
     show_all_ranks_switch,
     high_score_overlay_switch,
+    typical_score_overlay_switch,
+    middle_50_overlay_switch,
+    middle_80_overlay_switch,
     score_threshold_overlay_switch,
     score_threshold_percentage,
 ):
@@ -565,6 +574,9 @@ def generate_graph(  # noqa: PLR0913
         show_all_ranks_switch,
         selected_playlist,
         datetime.now().date(),
+        typical_score_switch=typical_score_overlay_switch,
+        middle_50_switch=middle_50_overlay_switch,
+        middle_80_switch=middle_80_overlay_switch,
     )
 
     if supports_overlays:

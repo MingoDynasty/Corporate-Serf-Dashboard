@@ -4,10 +4,11 @@ This module handles functions around plots.
 
 import logging
 import re
-from collections.abc import Collection, Sequence
+from collections.abc import Callable, Collection, Sequence
 from datetime import date, datetime
 from itertools import groupby
 from operator import attrgetter
+from typing import NamedTuple, cast
 
 import pandas as pd
 import plotly.express as px
@@ -15,6 +16,12 @@ import plotly.graph_objs as go
 import plotly.io as pio
 
 from source.kovaaks.data_models import Rank, RunData
+from source.kovaaks.typical_score import (
+    TypicalScore,
+    TypicalScoreRecency,
+    format_typical_score,
+    typical_score_recency,
+)
 from source.utilities.utilities import (
     format_absolute_timestamp,
     format_decimal,
@@ -70,6 +77,36 @@ _LATEST_RUN_RING_COLORS = {"light": "#1c7ed6", "dark": "#74c0fc"}
 LATEST_RUN_RING_SIZE_DEFAULT_PX = 18
 LATEST_RUN_RING_SIZE_PRESET_PX = {"Small": 14, "Large": 22}
 
+# The typical score's line and its two bands. Each name is the metric's legend
+# entry, its legend group, so a click hides its faded stretches with it, and
+# the handle the theme colors it by.
+TYPICAL_SCORE_TRACE_NAME = "Typical score"
+MIDDLE_50_TRACE_NAME = "Middle 50%"
+MIDDLE_80_TRACE_NAME = "Middle 80%"
+# After the run points and the stars, which keep plotly's default rank, 1000.
+_TYPICAL_SCORE_LEGEND_RANKS = {
+    TYPICAL_SCORE_TRACE_NAME: 1001,
+    MIDDLE_50_TRACE_NAME: 1002,
+    MIDDLE_80_TRACE_NAME: 1003,
+}
+# One gray per theme, the bands as shares of it. A figure is built with the
+# light colors, and the theme step recolors them by trace name.
+_TYPICAL_SCORE_COLORS = {
+    "light": {
+        TYPICAL_SCORE_TRACE_NAME: "#343a40",
+        MIDDLE_50_TRACE_NAME: "rgba(52, 58, 64, 0.14)",
+        MIDDLE_80_TRACE_NAME: "rgba(52, 58, 64, 0.07)",
+    },
+    "dark": {
+        TYPICAL_SCORE_TRACE_NAME: "#dee2e6",
+        MIDDLE_50_TRACE_NAME: "rgba(222, 226, 230, 0.14)",
+        MIDDLE_80_TRACE_NAME: "rgba(222, 226, 230, 0.07)",
+    },
+}
+# A stretch whose values weren't recent at their runs.
+_TYPICAL_SCORE_FADED_OPACITY = 0.35
+_TYPICAL_SCORE_LINE_WIDTH_PX = 2.5
+
 # The run points' sensitivity hover line. ``customdata[3]`` is empty for a run
 # that wasn't converted, so the line then ends at the sensitivity itself.
 _RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
@@ -79,9 +116,10 @@ _RUN_SENSITIVITY_HOVER_LINE = "<b>Sensitivity</b>: %{customdata[2]}%{customdata[
 # earned a reserved column, and the plot is the scarce thing on the page. It
 # lands in the top margin the title already reserved, so the plot area keeps
 # its full height and gains the column's width. Right-anchored to balance the
-# left-aligned title; at the narrowest the chart gets (the options panel open
-# just above its stacking threshold) it still clears the title rather than
-# colliding with it.
+# left-aligned title. On a narrow chart, such as one beside the open options
+# panel, the entries run into the title and can wrap over it. The maintainer
+# accepted that and kept this placement over a legend under the plot (#399,
+# closed unmerged).
 _LEGEND_ABOVE_PLOT = {
     "orientation": "h",
     "x": 1,
@@ -361,6 +399,303 @@ def show_latest_run_ring(
     return figure
 
 
+class _TypicalScorePoint(NamedTuple):
+    """A known typical score at its plotted run, judged recent or not there."""
+
+    x: float
+    value: TypicalScore
+    recency: TypicalScoreRecency
+
+
+def _typical_score_stretches(
+    x_values: Sequence[float], values: Sequence[TypicalScore]
+) -> tuple[list[list[_TypicalScorePoint]], list[list[_TypicalScorePoint]]]:
+    """Split the known values into full-strength and faded stretches.
+
+    A value is judged at its own newest run, the run it is plotted at. A
+    faded stretch takes in the full-strength point on each side of it, so
+    the two kinds meet at a point and the line has no gap or step there. An
+    unknown value ends a stretch and has no point.
+    """
+    points = [
+        _TypicalScorePoint(
+            x_value, value, typical_score_recency(value, value.last_date)
+        )
+        if value.known
+        else None
+        for x_value, value in zip(x_values, values, strict=True)
+    ]
+    groups = [
+        list(group)
+        for _strength, group in groupby(
+            points, key=lambda point: None if point is None else point.recency.recent
+        )
+    ]
+    full: list[list[_TypicalScorePoint]] = []
+    faded: list[list[_TypicalScorePoint]] = []
+    for index, group in enumerate(groups):
+        first = group[0]
+        if first is None:
+            continue
+        stretch = cast("list[_TypicalScorePoint]", group)
+        if first.recency.recent:
+            full.append(stretch)
+            continue
+        before = groups[index - 1][-1] if index > 0 else None
+        after = groups[index + 1][0] if index + 1 < len(groups) else None
+        faded.append(
+            [
+                *([before] if before is not None else []),
+                *stretch,
+                *([after] if after is not None else []),
+            ]
+        )
+    return full, faded
+
+
+def _typical_score_hover_template(*, middle_50: bool, middle_80: bool) -> str:
+    """Return the line's hover, its words fixed and its figures from ``customdata``.
+
+    A band's line shows only with its band. The figures are each point's
+    ``_typical_score_hover_data``, in this order.
+    """
+    lines = [
+        "<b>Typical score</b>: %{customdata[0]}",
+        "<b>Runs</b>: %{customdata[1]}",
+        "<b>Recent</b>: %{customdata[2]} in the 30 days up to this run",
+    ]
+    index = 3
+    for shown, label in ((middle_50, "Middle 50%"), (middle_80, "Middle 80%")):
+        if shown:
+            lines.append(
+                f"<b>{label}</b>: %{{customdata[{index}]}} to "
+                f"%{{customdata[{index + 1}]}}"
+            )
+            index += 2
+    return "<br>".join(lines) + "<extra></extra>"
+
+
+def _typical_score_hover_data(
+    point: _TypicalScorePoint, today: date, *, middle_50: bool, middle_80: bool
+) -> list[str]:
+    """Return the figures the line's hover shows at one point, rounded for display."""
+    value = point.value
+
+    def shown(statistic: float | None) -> str:
+        # Only a known value has a point, and a known value has every statistic.
+        return format_typical_score(cast("float", statistic), value.runs)
+
+    first, last = value.first_date.date(), value.last_date.date()
+    span = (
+        f"on {format_short_date(first, today)}"
+        if first == last
+        else f"{format_short_date(first, today)} to {format_short_date(last, today)}"
+    )
+    sessions = value.session_count
+    data = [
+        shown(value.median),
+        f"{value.run_count} in {sessions} "
+        f"{'session' if sessions == 1 else 'sessions'} · {span}",
+        f"{point.recency.run_count} of {value.run_count}",
+    ]
+    if middle_50:
+        data += [shown(value.p25), shown(value.p75)]
+    if middle_80:
+        data += [shown(value.p10), shown(value.p90)]
+    return data
+
+
+def _typical_score_trace(
+    name: str,
+    xs: list[float | None],
+    ys: list[float | None],
+    *,
+    faded: bool,
+    show_legend: bool,
+) -> go.Scatter:
+    """Build one of the typical score's traces, drawn under the runs."""
+    return go.Scatter(
+        x=xs,
+        y=ys,
+        mode="lines",
+        name=name,
+        legendgroup=name,
+        legendrank=_TYPICAL_SCORE_LEGEND_RANKS[name],
+        showlegend=show_legend,
+        opacity=_TYPICAL_SCORE_FADED_OPACITY if faded else 1,
+        # Under every run point, star and ring while added after them, so the
+        # run trace stays the figure's first and keeps the colorway's first
+        # color (``generated_point_color``). Among these traces, data order
+        # draws the line over the bands and full strength over faded.
+        zorder=-1,
+    )
+
+
+def _typical_score_line(  # noqa: PLR0913
+    stretches: list[list[_TypicalScorePoint]],
+    today: date,
+    *,
+    faded: bool,
+    show_legend: bool,
+    middle_50: bool,
+    middle_80: bool,
+) -> go.Scatter:
+    """Build the line through the stretches' values, with its hover at each point."""
+    xs: list[float | None] = []
+    ys: list[float | None] = []
+    hover_data: list[list[str] | None] = []
+    for stretch in stretches:
+        if xs:
+            xs.append(None)
+            ys.append(None)
+            hover_data.append(None)
+        for point in stretch:
+            xs.append(point.x)
+            ys.append(point.value.median)
+            hover_data.append(
+                _typical_score_hover_data(
+                    point, today, middle_50=middle_50, middle_80=middle_80
+                )
+            )
+    trace = _typical_score_trace(
+        TYPICAL_SCORE_TRACE_NAME, xs, ys, faded=faded, show_legend=show_legend
+    )
+    trace.update(
+        line={
+            "color": _TYPICAL_SCORE_COLORS["light"][TYPICAL_SCORE_TRACE_NAME],
+            "width": _TYPICAL_SCORE_LINE_WIDTH_PX,
+        },
+        customdata=hover_data,
+        hovertemplate=_typical_score_hover_template(
+            middle_50=middle_50, middle_80=middle_80
+        ),
+        hoverlabel={"font_size": 16},
+    )
+    return trace
+
+
+def _typical_score_band(
+    name: str,
+    stretches: list[list[_TypicalScorePoint]],
+    bounds: Callable[[TypicalScore], tuple[float | None, float | None]],
+    *,
+    faded: bool,
+    show_legend: bool,
+) -> go.Scatter:
+    """Build a band between two percentiles, one filled shape per stretch."""
+    xs: list[float | None] = []
+    ys: list[float | None] = []
+    for stretch in stretches:
+        if xs:
+            xs.append(None)
+            ys.append(None)
+        # Along the top, then back along the bottom: ``toself`` closes each
+        # shape between gaps.
+        for point in stretch:
+            xs.append(point.x)
+            ys.append(bounds(point.value)[1])
+        for point in reversed(stretch):
+            xs.append(point.x)
+            ys.append(bounds(point.value)[0])
+    trace = _typical_score_trace(name, xs, ys, faded=faded, show_legend=show_legend)
+    trace.update(
+        fill="toself",
+        fillcolor=_TYPICAL_SCORE_COLORS["light"][name],
+        line={"width": 0},
+        hoverinfo="skip",
+    )
+    return trace
+
+
+def typical_score_traces(  # noqa: PLR0913
+    x_values: Sequence[float],
+    values: Sequence[TypicalScore],
+    today: date,
+    *,
+    line: bool,
+    middle_50: bool,
+    middle_80: bool,
+) -> list[go.Scatter]:
+    """Build the typical score's line and bands over the plotted runs.
+
+    ``x_values`` are the plotted runs' places on the run axis, and ``values``
+    is in step with them: the value after each plotted run, worked out over
+    the scenario's whole history. A stretch is drawn at full strength where
+    its values were recent at their runs and faded where they weren't. Each
+    metric is drawn only while its switch is on, and a band's hover line only
+    shows with its band. ``today`` only decides which hover dates carry a
+    year.
+
+    The traces come in drawing order, each only when it has a point: the
+    faded middle 80% and middle 50%, the full-strength middle 80% and middle
+    50%, then the faded line and the line. A faded trace takes its metric's
+    legend entry only when the metric has no full-strength stretch.
+    """
+    full, faded = _typical_score_stretches(x_values, values)
+    if len(full) + len(faded) == 1 and len((full or faded)[0]) == 1:
+        # The only known value, as on the run that first makes it known.
+        # plotly's lines mode draws a one-point trace as nothing, and its
+        # bands would have no width, so it is drawn flat for half a run on
+        # either side of its run instead. The point at the run itself stays:
+        # the zoom fit counts only points inside the zoomed window, so a
+        # zoom on the run alone would otherwise leave the value out of view.
+        (point,) = (full or faded)[0]
+        stub = [
+            point._replace(x=point.x - 0.5),
+            point,
+            point._replace(x=point.x + 0.5),
+        ]
+        full, faded = ([stub], []) if full else ([], [stub])
+    traces: list[go.Scatter] = []
+    bands = [
+        (middle_80, MIDDLE_80_TRACE_NAME, lambda value: (value.p10, value.p90)),
+        (middle_50, MIDDLE_50_TRACE_NAME, lambda value: (value.p25, value.p75)),
+    ]
+    for is_faded, stretches in ((True, faded), (False, full)):
+        if not stretches:
+            continue
+        traces.extend(
+            _typical_score_band(
+                name,
+                stretches,
+                bounds,
+                faded=is_faded,
+                show_legend=not is_faded or not full,
+            )
+            for shown, name, bounds in bands
+            if shown
+        )
+    if line:
+        traces.extend(
+            _typical_score_line(
+                stretches,
+                today,
+                faded=is_faded,
+                show_legend=not is_faded or not full,
+                middle_50=middle_50,
+                middle_80=middle_80,
+            )
+            for is_faded, stretches in ((True, faded), (False, full))
+            if stretches
+        )
+    return traces
+
+
+def apply_typical_score_colors(figure: go.Figure, color_scheme: str) -> go.Figure:
+    """Color the typical score's line and bands for a color scheme, in place.
+
+    A figure without them, such as an empty state's, is left as it is.
+    """
+    colors = _TYPICAL_SCORE_COLORS.get(color_scheme, _TYPICAL_SCORE_COLORS["light"])
+    figure.update_traces(
+        line={"color": colors[TYPICAL_SCORE_TRACE_NAME]},
+        selector={"name": TYPICAL_SCORE_TRACE_NAME},
+    )
+    for name in (MIDDLE_50_TRACE_NAME, MIDDLE_80_TRACE_NAME):
+        figure.update_traces(fillcolor=colors[name], selector={"name": name})
+    return figure
+
+
 def _generate_run_history_plot(  # noqa: PLR0913
     runs: Sequence[RunData],
     x_values: Sequence[float | str | datetime],
@@ -378,7 +713,8 @@ def _generate_run_history_plot(  # noqa: PLR0913
     ``runs`` and ``x_values`` are in step, and the run trace keeps their
     order. Each run in ``new_high_score_runs`` that is plotted gets a star,
     in a trace that exists only when there is one to draw. The title is the
-    scenario's name alone, and no trace sums the runs up.
+    scenario's name alone. No trace here sums the runs up: the caller adds
+    the typical score's (``typical_score_traces``).
 
     ``ringed_run`` gets a ring when it is plotted, tagged ``ringed_run_id``,
     in a trace of its own that comes last so the ring is drawn over a star.

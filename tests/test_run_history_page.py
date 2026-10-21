@@ -593,6 +593,9 @@ def test_each_help_text_has_one_wording():
         "rank-overlay",
         "show-all-ranks",
         "high-score-overlay",
+        "typical-score-overlay",
+        "middle-50-overlay",
+        "middle-80-overlay",
         "score-threshold-overlay",
         "score-threshold-percentage",
     }
@@ -1117,6 +1120,9 @@ def test_the_chart_rebuilds_on_the_mode_both_ranges_the_date_and_the_playlist_fi
         f"{options.rank_overlay}.checked",
         f"{options.show_all_ranks}.checked",
         f"{options.high_score_overlay}.checked",
+        f"{options.typical_score_overlay}.checked",
+        f"{options.middle_50_overlay}.checked",
+        f"{options.middle_80_overlay}.checked",
         f"{options.score_threshold_overlay}.checked",
         f"{options.score_threshold_percentage}.value",
     ]
@@ -1148,6 +1154,7 @@ def _graph(
     run_range="100",
     day_range="90",
     high_score_overlay=False,
+    typical_score_overlays=(True, True, True),
     threshold_overlay=False,
     percentage=95,
     supports_overlays=True,
@@ -1155,8 +1162,8 @@ def _graph(
     """Call the chart callback with the data layer stood in for."""
     built = []
 
-    def build(*args):
-        built.append(args)
+    def build(*args, **kwargs):
+        built.append((args, kwargs))
         return go.Figure(layout={"title": "built"}), supports_overlays
 
     monkeypatch.setattr(run_history, "is_scenario_in_database", lambda _name: True)
@@ -1173,6 +1180,7 @@ def _graph(
         True,
         False,
         high_score_overlay,
+        *typical_score_overlays,
         threshold_overlay,
         percentage,
     )
@@ -1189,7 +1197,7 @@ def _annotations(plot_json: str) -> list[str]:
 def test_with_no_scenario_selected_the_chart_says_so():
     plot = run_history.generate_graph(
         None, None, None, "score_vs_run", "100", "90", "2026-10-12", True, False,
-        True, True, 95,
+        True, True, True, True, True, 95,
     )  # fmt: skip
 
     assert _annotations(plot) == [
@@ -1203,7 +1211,7 @@ def test_a_scenario_with_no_local_runs_says_so(monkeypatch):
 
     plot = run_history.generate_graph(
         None, "Never Played", None, "score_vs_run", "100", "90", "2026-10-12",
-        True, False, True, True, 95,
+        True, False, True, True, True, True, True, 95,
     )  # fmt: skip
 
     assert _annotations(plot) == [
@@ -1226,18 +1234,26 @@ def test_the_chart_asks_for_the_figure_with_every_control_and_todays_date(monkey
         mode="score_vs_time",
         run_range="50",
         day_range="30",
+        typical_score_overlays=(True, False, True),
     )
 
     assert built == [
         (
-            "score_vs_time",
-            SCENARIO,
-            "50",
-            "30",
-            True,
-            False,
-            "KovaaKsTestCode",
-            date(2026, 10, 12),
+            (
+                "score_vs_time",
+                SCENARIO,
+                "50",
+                "30",
+                True,
+                False,
+                "KovaaKsTestCode",
+                date(2026, 10, 12),
+            ),
+            {
+                "typical_score_switch": True,
+                "middle_50_switch": False,
+                "middle_80_switch": True,
+            },
         )
     ]
     assert json.loads(plot)["layout"]["title"]["text"] == "built"
@@ -1374,7 +1390,7 @@ def test_a_chart_left_open_past_midnight_is_rebuilt_for_the_new_date(monkeypatch
         day_range="7",
     )
 
-    assert [arguments[-1] for arguments in built] == [date(2026, 10, 13)]
+    assert [arguments[-1] for arguments, _switches in built] == [date(2026, 10, 13)]
 
 
 # --- The stylesheet --------------------------------------------------------------------

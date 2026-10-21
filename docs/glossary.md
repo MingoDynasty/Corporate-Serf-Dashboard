@@ -384,7 +384,8 @@ sensitivity. It's the player's own record, not their leaderboard score
 What a player's runs on a scenario usually score: the median of its last 20
 runs, or of all its runs when it has fewer, whatever their age. It is known
 once those runs number at least 10 from at least 2 sessions, or 20, and before
-that it is unknown, which is never read as weak. The rules are in
+that it is unknown, which is never read as weak. It is drawn at full strength
+when recent and faded when not. The rules are in
 [the typical score's spec](specs/typical_score.md).
 
 - The roadmap and the decision log call it the typical run.
@@ -399,7 +400,24 @@ The state of a typical score at least 10 of whose runs are from the 30 days
 up to a moment, from any number of sessions. A recent value can still hold
 runs older than 30 days, up to half of them.
 
+- On the chart: a full-strength stretch; not recent, a faded one.
 - In code: `recent`.
+
+### Middle 50%
+
+The range the middle half of the runs behind a typical score fell in: from the
+first quartile to the third, P25 to P75. Run History draws it as a band around
+the typical score while its switch is on.
+
+- On screen: `Middle 50%`.
+
+### Middle 80%
+
+The range the middle 80% of the runs behind a typical score fell in: from the
+10th percentile to the 90th, P10 to P90. Run History draws it as a lighter band
+while its switch is on.
+
+- On screen: `Middle 80%`.
 
 ### New PB
 
