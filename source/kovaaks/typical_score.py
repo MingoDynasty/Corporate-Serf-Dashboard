@@ -89,26 +89,27 @@ def build_typical_scores(
         for run in session.runs
     }
     ordered = in_play_order(runs)
+    try:
+        ordered_session_ids = [session_by_run[run] for run in ordered]
+    except KeyError:
+        msg = "Runs and play sessions must come from the same run snapshot."
+        raise ValueError(msg) from None
+    # Binary arithmetic can turn the median of 2.3 and 2.4 into
+    # 2.3499999999999996, losing a half before display rounding.
+    # Decimal arithmetic preserves it without quantizing the value.
+    ordered_scores = [Decimal(str(run.score)) for run in ordered]
     values: list[TypicalScore] = []
-    for index in range(len(ordered)):
-        window = tuple(
-            ordered[max(0, index + 1 - TYPICAL_SCORE_WINDOW_RUNS) : index + 1]
-        )
-        try:
-            session_ids = tuple(session_by_run[run] for run in window)
-        except KeyError:
-            msg = "Runs and play sessions must come from the same run snapshot."
-            raise ValueError(msg) from None
+    for end in range(1, len(ordered) + 1):
+        start = max(0, end - TYPICAL_SCORE_WINDOW_RUNS)
+        window = tuple(ordered[start:end])
+        session_ids = tuple(ordered_session_ids[start:end])
         known = len(window) == TYPICAL_SCORE_WINDOW_RUNS or (
             len(window) >= TYPICAL_SCORE_MIN_RUNS
             and len(set(session_ids)) >= TYPICAL_SCORE_MIN_SESSIONS
         )
         middle = p25 = p75 = p10 = p90 = None
         if known:
-            # Binary arithmetic can turn the median of 2.3 and 2.4 into
-            # 2.3499999999999996, losing a half before display rounding.
-            # Decimal arithmetic preserves it without quantizing the value.
-            scores = [Decimal(str(run.score)) for run in window]
+            scores = ordered_scores[start:end]
             middle = float(median(scores))
             quartiles = quantiles(scores, n=4, method="inclusive")
             p25, p75 = float(quartiles[0]), float(quartiles[-1])
