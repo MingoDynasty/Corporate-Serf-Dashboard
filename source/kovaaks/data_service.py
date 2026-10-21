@@ -741,8 +741,9 @@ def _run_start_and_length(
 def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
     """Extract a run from a scenario CSV, or None when it cannot be read.
 
-    Reject missing required data and scores that are not finite. An unusable
-    optional start or run length costs those fields only, never the run.
+    Reject missing required data and scores that are not finite. Unusable
+    optional data, such as the start, run length, sensitivity conversion or
+    hash, costs that metadata only, never the run.
     """
     accuracy = None
     shots_fired = None
