@@ -9,6 +9,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
+from functools import lru_cache
 from statistics import median, quantiles
 
 from source.kovaaks.data_models import RunData
@@ -155,6 +156,16 @@ def typical_score_fade_time(value: TypicalScore) -> datetime | None:
     )
 
 
+# Remembered by score: the chart formats five statistics at every plotted
+# point, each over a window it shares with its neighbors, so without this a
+# build works out the same score's places again and again. Bounded, as the
+# scores a process sees are not.
+@lru_cache(maxsize=4096)
+def _score_places(score: float) -> int:
+    """Return how many decimal places a score was recorded with."""
+    return max(0, -int(Decimal(str(score)).normalize().as_tuple().exponent))
+
+
 def format_typical_score(score: float, runs: Iterable[RunData]) -> str:
     """Format a median or percentile to its supporting runs' score precision.
 
@@ -163,13 +174,7 @@ def format_typical_score(score: float, runs: Iterable[RunData]) -> str:
     follow ``format_score``. Empty supporting runs raise ``ValueError``.
     This display step never changes a ``TypicalScore``'s statistics.
     """
-    places = max(
-        (
-            max(0, -int(Decimal(str(run.score)).normalize().as_tuple().exponent))
-            for run in runs
-        ),
-        default=None,
-    )
+    places = max((_score_places(run.score) for run in runs), default=None)
     if places is None:
         msg = "A typical score needs supporting runs to choose its display precision."
         raise ValueError(msg)

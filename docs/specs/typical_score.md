@@ -76,6 +76,9 @@ scores cannot stop a calculation.
   reads `2.15`.
 - Only the current supporting window chooses precision. Empty supporting
   runs are rejected with `ValueError`.
+- How many decimal places a score was recorded with is remembered by score,
+  for the life of the process and up to 4,096 scores, because the chart
+  formats several statistics over the same runs at every point.
 
 ## API and snapshot ownership
 
@@ -95,4 +98,4 @@ scores cannot stop a calculation.
 - The fixed constants are `TYPICAL_SCORE_WINDOW_RUNS` (20),
   `TYPICAL_SCORE_MIN_RUNS` (10), `TYPICAL_SCORE_MIN_SESSIONS` (2), and
   `TYPICAL_SCORE_RECENT_AGE` (30 days). There are no settings for them.
-- Nothing is cached or persisted. There is no production caller yet.
+- No value is cached or persisted. There is no production caller yet.
