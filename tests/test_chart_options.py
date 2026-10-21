@@ -29,7 +29,9 @@ from source.plot.plot_service import (
     MIDDLE_80_TRACE_NAME,
     TYPICAL_SCORE_TRACE_NAME,
     generate_score_vs_run_plot,
+    generate_score_vs_time_plot,
     generated_point_color,
+    typical_score_hold_traces,
     typical_score_traces,
 )
 from tests.rendered_text import rendered_text
@@ -152,23 +154,20 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
             "overlay line tracks your current personal best. A run is judged "
             "against the personal best you had before the run."
         ),
-        # Until Score vs Time draws the line, each names both modes that
-        # don't show it.
         IDS.typical_score_overlay: (
             "Draws your typical score: the median of your last 20 runs, or of "
             "all your runs if you have fewer. It's faded where too few of them "
-            "are recent. **Score vs Time** and **Score vs Sensitivity** don't "
-            "show the line or bands."
+            "are recent. **Score vs Sensitivity** doesn't show the line or bands."
         ),
         IDS.middle_50_overlay: (
             "Shades the middle 50% of the runs behind your typical score. A "
-            "narrower band means more consistent scores. **Score vs Time** and "
-            "**Score vs Sensitivity** don't show this band."
+            "narrower band means more consistent scores. **Score vs "
+            "Sensitivity** doesn't show this band."
         ),
         IDS.middle_80_overlay: (
             "Shades the middle 80% of the runs behind your typical score, in a "
-            "lighter shade than the middle 50%. **Score vs Time** and **Score "
-            "vs Sensitivity** don't show this band."
+            "lighter shade than the middle 50%. **Score vs Sensitivity** "
+            "doesn't show this band."
         ),
     }
 
@@ -653,6 +652,53 @@ def test_the_cached_figure_is_built_with_the_light_colors():
     assert {
         trace.fillcolor for trace in figure.data if trace.name == MIDDLE_50_TRACE_NAME
     } == {"rgba(52, 58, 64, 0.14)"}
+
+
+@pytest.mark.parametrize(
+    ("scheme", "line", "middle_50", "middle_80"),
+    [
+        ("light", "#343a40", "rgba(52, 58, 64, 0.14)", "rgba(52, 58, 64, 0.07)"),
+        ("dark", "#dee2e6", "rgba(222, 226, 230, 0.14)", "rgba(222, 226, 230, 0.07)"),
+    ],
+)
+def test_score_vs_times_only_value_takes_each_themes_gray(
+    scheme, line, middle_50, middle_80
+):
+    """The stroke and the bars that mark it are colored by their line, not a fill.
+
+    Ten runs from two sessions: only the tenth is known.
+    """
+    runs = [
+        RunData(
+            datetime_object=datetime(2026, 10, 11 + index // 5, 10, index % 5),
+            score=100.0 + index,
+            sens_scale="cm/360",
+            horizontal_sens=40.0,
+            scenario="Scenario",
+            accuracy=0.5,
+        )
+        for index in range(10)
+    ]
+    figure = generate_score_vs_time_plot(runs, "Scenario", False, [], False, ())
+    figure.add_traces(
+        typical_score_hold_traces(
+            build_typical_scores(runs, split_into_play_sessions(runs)),
+            date(2026, 10, 12),
+            line=True,
+            middle_50=True,
+            middle_80=True,
+        )
+    )
+
+    themed = chart_options.apply_graph_appearance(
+        scheme, figure.to_json(), "Default", ""
+    )
+
+    (stroke,) = [t for t in themed.data if t.name == TYPICAL_SCORE_TRACE_NAME]
+    assert (stroke.marker.color, stroke.marker.line.color) == (line, line)
+    bars = {t.name: t.line.color for t in themed.data if t.fill == "none"}
+    assert bars == {MIDDLE_50_TRACE_NAME: middle_50, MIDDLE_80_TRACE_NAME: middle_80}
+    assert themed.data[0].marker.color is None
 
 
 # --- The stylesheet rules that open and collapse the panel ---------------------------

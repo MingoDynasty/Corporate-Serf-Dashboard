@@ -20,6 +20,7 @@ from source.kovaaks.typical_score import (
     TypicalScore,
     TypicalScoreRecency,
     format_typical_score,
+    typical_score_fade_time,
     typical_score_recency,
 )
 from source.utilities.utilities import (
@@ -106,6 +107,9 @@ _TYPICAL_SCORE_COLORS = {
 # A stretch whose values weren't recent at their runs.
 _TYPICAL_SCORE_FADED_OPACITY = 0.35
 _TYPICAL_SCORE_LINE_WIDTH_PX = 2.5
+# How wide the stroke and the bars are that mark Score vs Time's only value,
+# about a New PB star's width.
+_TYPICAL_SCORE_MOMENT_WIDTH_PX = 14
 
 # The run points' sensitivity hover line. ``customdata[3]`` is empty for a run
 # that wasn't converted, so the line then ends at the sensitivity itself.
@@ -400,11 +404,16 @@ def show_latest_run_ring(
 
 
 class _TypicalScorePoint(NamedTuple):
-    """A known typical score at its plotted run, judged recent or not there."""
+    """A known typical score at one place on the chart, judged recent at its run.
 
-    x: float
+    ``aged_out`` marks a point on the faded part of a Score vs Time hold whose
+    value was recent at its run: its count at the run would read as recent.
+    """
+
+    x: float | datetime
     value: TypicalScore
     recency: TypicalScoreRecency
+    aged_out: bool = False
 
 
 def _typical_score_stretches(
@@ -453,16 +462,21 @@ def _typical_score_stretches(
     return full, faded
 
 
-def _typical_score_hover_template(*, middle_50: bool, middle_80: bool) -> str:
+def _typical_score_hover_template(
+    *, middle_50: bool, middle_80: bool, held: bool = False
+) -> str:
     """Return the line's hover, its words fixed and its figures from ``customdata``.
 
     A band's line shows only with its band. The figures are each point's
-    ``_typical_score_hover_data``, in this order.
+    ``_typical_score_hover_data``, in this order. ``held`` is Score vs Time,
+    whose Recent line is a whole figure: a hold's faded part reads otherwise.
     """
     lines = [
         "<b>Typical score</b>: %{customdata[0]}",
         "<b>Runs</b>: %{customdata[1]}",
-        "<b>Recent</b>: %{customdata[2]} in the 30 days up to this run",
+        "<b>Recent</b>: %{customdata[2]}"
+        if held
+        else "<b>Recent</b>: %{customdata[2]} in the 30 days up to this run",
     ]
     index = 3
     for shown, label in ((middle_50, "Middle 50%"), (middle_80, "Middle 80%")):
@@ -476,7 +490,12 @@ def _typical_score_hover_template(*, middle_50: bool, middle_80: bool) -> str:
 
 
 def _typical_score_hover_data(
-    point: _TypicalScorePoint, today: date, *, middle_50: bool, middle_80: bool
+    point: _TypicalScorePoint,
+    today: date,
+    *,
+    middle_50: bool,
+    middle_80: bool,
+    held: bool = False,
 ) -> list[str]:
     """Return the figures the line's hover shows at one point, rounded for display."""
     value = point.value
@@ -492,11 +511,17 @@ def _typical_score_hover_data(
         else f"{format_short_date(first, today)} to {format_short_date(last, today)}"
     )
     sessions = value.session_count
+    recent = f"{point.recency.run_count} of {value.run_count}"
+    if point.aged_out:
+        # The count changes along the hold, so none is given.
+        recent = f"too few · last run {format_short_date(last, today)}"
+    elif held:
+        recent += " in the 30 days up to this run"
     data = [
         shown(value.median),
         f"{value.run_count} in {sessions} "
         f"{'session' if sessions == 1 else 'sessions'} · {span}",
-        f"{point.recency.run_count} of {value.run_count}",
+        recent,
     ]
     if middle_50:
         data += [shown(value.p25), shown(value.p75)]
@@ -507,7 +532,7 @@ def _typical_score_hover_data(
 
 def _typical_score_trace(
     name: str,
-    xs: list[float | None],
+    xs: list[float | datetime | None],
     ys: list[float | None],
     *,
     faded: bool,
@@ -539,9 +564,10 @@ def _typical_score_line(  # noqa: PLR0913
     show_legend: bool,
     middle_50: bool,
     middle_80: bool,
+    held: bool,
 ) -> go.Scatter:
     """Build the line through the stretches' values, with its hover at each point."""
-    xs: list[float | None] = []
+    xs: list[float | datetime | None] = []
     ys: list[float | None] = []
     hover_data: list[list[str] | None] = []
     for stretch in stretches:
@@ -554,7 +580,11 @@ def _typical_score_line(  # noqa: PLR0913
             ys.append(point.value.median)
             hover_data.append(
                 _typical_score_hover_data(
-                    point, today, middle_50=middle_50, middle_80=middle_80
+                    point,
+                    today,
+                    middle_50=middle_50,
+                    middle_80=middle_80,
+                    held=held,
                 )
             )
     trace = _typical_score_trace(
@@ -567,7 +597,7 @@ def _typical_score_line(  # noqa: PLR0913
         },
         customdata=hover_data,
         hovertemplate=_typical_score_hover_template(
-            middle_50=middle_50, middle_80=middle_80
+            middle_50=middle_50, middle_80=middle_80, held=held
         ),
         hoverlabel={"font_size": 16},
     )
@@ -583,7 +613,7 @@ def _typical_score_band(
     show_legend: bool,
 ) -> go.Scatter:
     """Build a band between two percentiles, one filled shape per stretch."""
-    xs: list[float | None] = []
+    xs: list[float | datetime | None] = []
     ys: list[float | None] = []
     for stretch in stretches:
         if xs:
@@ -632,7 +662,7 @@ def typical_score_traces(  # noqa: PLR0913
     legend entry only when the metric has no full-strength stretch.
     """
     full, faded = _typical_score_stretches(x_values, values)
-    if len(full) + len(faded) == 1 and len((full or faded)[0]) == 1:
+    if _is_one_point(full, faded):
         # The only known value, as on the run that first makes it known.
         # plotly's lines mode draws a one-point trace as nothing, and its
         # bands would have no width, so it is drawn flat for half a run on
@@ -640,12 +670,170 @@ def typical_score_traces(  # noqa: PLR0913
         # the zoom fit counts only points inside the zoomed window, so a
         # zoom on the run alone would otherwise leave the value out of view.
         (point,) = (full or faded)[0]
+        run_number = cast("float", point.x)
         stub = [
-            point._replace(x=point.x - 0.5),
+            point._replace(x=run_number - 0.5),
             point,
-            point._replace(x=point.x + 0.5),
+            point._replace(x=run_number + 0.5),
         ]
         full, faded = ([stub], []) if full else ([], [stub])
+    return _typical_score_trace_set(
+        full,
+        faded,
+        today,
+        line=line,
+        middle_50=middle_50,
+        middle_80=middle_80,
+        held=False,
+    )
+
+
+def _is_one_point(
+    full: list[list[_TypicalScorePoint]], faded: list[list[_TypicalScorePoint]]
+) -> bool:
+    """Return whether the stretches hold one point between them, which no line shows."""
+    return len(full) + len(faded) == 1 and len((full or faded)[0]) == 1
+
+
+def _typical_score_hold_parts(
+    values: Sequence[TypicalScore],
+) -> list[tuple[bool, list[_TypicalScorePoint]]]:
+    """Return each known value's hold, in parts, each with whether it is recent.
+
+    Each value sits at its own newest run's time, never at a position in a
+    list of runs, and holds flat to the next value's. The newest value is
+    one point, the line's last. A value recent at its run holds at full
+    strength up to and including ``typical_score_fade_time`` and faded after
+    it; one that wasn't holds faded throughout. A value whose next run ended
+    in the same second holds for no time and has no part: the step there
+    goes straight to the later run's value, the one the line holds from that
+    second on.
+    """
+    known = [value for value in values if value.known]
+    parts: list[tuple[bool, list[_TypicalScorePoint]]] = []
+    for index, value in enumerate(known):
+        start = value.last_date
+        point = _TypicalScorePoint(start, value, typical_score_recency(value, start))
+        if index + 1 == len(known):
+            parts.append((point.recency.recent, [point]))
+            break
+        end = known[index + 1].last_date
+        if end == start:
+            continue
+        # A known value always has a fade time.
+        fade = cast("datetime", typical_score_fade_time(value))
+        if not point.recency.recent:
+            parts.append((False, [point, point._replace(x=end)]))
+        elif fade >= end:
+            parts.append((True, [point, point._replace(x=end)]))
+        else:
+            # Recent at its run, so the fade comes at or after it.
+            parts.append(
+                (True, [point, *([point._replace(x=fade)] if fade > start else [])])
+            )
+            aged_out = point._replace(aged_out=True)
+            parts.append((False, [aged_out._replace(x=fade), aged_out._replace(x=end)]))
+    return parts
+
+
+def _typical_score_holds(
+    values: Sequence[TypicalScore],
+) -> tuple[list[list[_TypicalScorePoint]], list[list[_TypicalScorePoint]]]:
+    """Join the values' holds into full-strength and faded stretches.
+
+    Parts of one strength in a row make one stretch, with a step at each run.
+    A faded stretch takes in the full-strength point on each side of it, so
+    the two kinds meet with no gap.
+    """
+    full: list[list[_TypicalScorePoint]] = []
+    faded: list[list[_TypicalScorePoint]] = []
+    previous: bool | None = None
+    for recent, points in _typical_score_hold_parts(values):
+        if recent == previous:
+            (full if recent else faded)[-1].extend(points)
+        elif recent:
+            if previous is not None:
+                faded[-1].append(points[0])
+            full.append(points)
+        else:
+            before = [] if previous is None else [full[-1][-1]]
+            first = points[0]
+            # A hold that fades part way already starts its faded part where
+            # its full-strength part ends.
+            if before and before[0].x == first.x and before[0].value is first.value:
+                before = []
+            faded.append([*before, *points])
+        previous = recent
+    return full, faded
+
+
+def typical_score_hold_traces(
+    values: Sequence[TypicalScore],
+    today: date,
+    *,
+    line: bool,
+    middle_50: bool,
+    middle_80: bool,
+) -> list[go.Scatter]:
+    """Build the typical score's line and bands as holds over the plotted runs' times.
+
+    ``values`` is the value after each plotted run, in play order, worked out
+    over the scenario's whole history. The traces, their order, legend
+    entries and switches are ``typical_score_traces``' own. The line's hover
+    on the faded part of a hold whose runs aged out after its run gives no
+    count, since the count changes along the hold. ``today`` only decides
+    which hover dates carry a year.
+    """
+    full, faded = _typical_score_holds(values)
+    traces = _typical_score_trace_set(
+        full,
+        faded,
+        today,
+        line=line,
+        middle_50=middle_50,
+        middle_80=middle_80,
+        held=True,
+    )
+    if _is_one_point(full, faded):
+        # The only value drawn, as on the run that first makes it known. The
+        # line ends at the newest run, so it holds for no time, and a flat
+        # stretch either side of it would draw it at times before it existed.
+        # So it is marked at its run: the line by a short level stroke, each
+        # band by a bar from its bottom to its top.
+        for trace in traces:
+            if trace.name == TYPICAL_SCORE_TRACE_NAME:
+                color = trace.line.color
+                trace.update(
+                    mode="markers",
+                    marker={
+                        "symbol": "line-ew",
+                        "size": _TYPICAL_SCORE_MOMENT_WIDTH_PX,
+                        "color": color,
+                        "line": {"color": color, "width": _TYPICAL_SCORE_LINE_WIDTH_PX},
+                    },
+                )
+            else:
+                trace.update(
+                    fill="none",
+                    line={
+                        "color": trace.fillcolor,
+                        "width": _TYPICAL_SCORE_MOMENT_WIDTH_PX,
+                    },
+                )
+    return traces
+
+
+def _typical_score_trace_set(  # noqa: PLR0913
+    full: list[list[_TypicalScorePoint]],
+    faded: list[list[_TypicalScorePoint]],
+    today: date,
+    *,
+    line: bool,
+    middle_50: bool,
+    middle_80: bool,
+    held: bool,
+) -> list[go.Scatter]:
+    """Build the traces of the metrics switched on, in drawing order."""
     traces: list[go.Scatter] = []
     bands = [
         (middle_80, MIDDLE_80_TRACE_NAME, lambda value: (value.p10, value.p90)),
@@ -674,6 +862,7 @@ def typical_score_traces(  # noqa: PLR0913
                 show_legend=not is_faded or not full,
                 middle_50=middle_50,
                 middle_80=middle_80,
+                held=held,
             )
             for is_faded, stretches in ((True, faded), (False, full))
             if stretches
@@ -684,15 +873,24 @@ def typical_score_traces(  # noqa: PLR0913
 def apply_typical_score_colors(figure: go.Figure, color_scheme: str) -> go.Figure:
     """Color the typical score's line and bands for a color scheme, in place.
 
-    A figure without them, such as an empty state's, is left as it is.
+    A figure without them, such as an empty state's, is left as it is. The
+    stroke and the bars that mark Score vs Time's only value are recolored
+    too.
     """
     colors = _TYPICAL_SCORE_COLORS.get(color_scheme, _TYPICAL_SCORE_COLORS["light"])
+    line_color = colors[TYPICAL_SCORE_TRACE_NAME]
     figure.update_traces(
-        line={"color": colors[TYPICAL_SCORE_TRACE_NAME]},
-        selector={"name": TYPICAL_SCORE_TRACE_NAME},
+        line={"color": line_color}, selector={"name": TYPICAL_SCORE_TRACE_NAME}
+    )
+    figure.update_traces(
+        marker={"color": line_color, "line": {"color": line_color}},
+        selector={"name": TYPICAL_SCORE_TRACE_NAME, "mode": "markers"},
     )
     for name in (MIDDLE_50_TRACE_NAME, MIDDLE_80_TRACE_NAME):
         figure.update_traces(fillcolor=colors[name], selector={"name": name})
+        figure.update_traces(
+            line={"color": colors[name]}, selector={"name": name, "fill": "none"}
+        )
     return figure
 
 

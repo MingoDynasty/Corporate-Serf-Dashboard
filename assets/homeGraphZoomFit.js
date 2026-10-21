@@ -10,8 +10,10 @@
 
     // Only traces are fitted: the run points; the New PB stars and the latest
     // run's ring, which repeat run points and so never move the fit; and the
-    // typical score's line and bands. A band's trace holds its top and its
-    // bottom as points, so a refit keeps the band in view rather than
+    // typical score's line and bands. Those are drawn as lines, a band as its
+    // outline, so they count where they cross the window as well as their
+    // points inside it: on Score vs Time a value held flat across the whole
+    // window has no point in it, and a refit keeps it in view rather than
     // clipping it. Overlay lines are shapes and stay out on purpose: the PB
     // score line sits at or above every run, so fitting it would pin the axis
     // top there and undo most of the refit.
@@ -36,16 +38,37 @@
                 continue;
             }
             const length = Math.min(trace.x.length, trace.y.length);
+            const xs = [];
             for (let i = 0; i < length; i++) {
                 const x = toLinear(trace.x[i]);
                 const y = trace.y[i];
+                xs.push(x);
                 if (x >= start && x <= end && Number.isFinite(y)) {
                     low = Math.min(low, y);
                     high = Math.max(high, y);
                 }
             }
+            if (!trace.mode || !trace.mode.includes("lines")) {
+                continue;
+            }
+            // Each segment's part inside the window, its ends interpolated.
+            // A gap in the line is a null point, which ends a segment, and an
+            // upright segment's ends are points already counted.
+            for (let i = 1; i < length; i++) {
+                const [x0, x1, y0, y1] = [xs[i - 1], xs[i], trace.y[i - 1], trace.y[i]];
+                if (![x0, x1, y0, y1].every(Number.isFinite) || x0 === x1) {
+                    continue;
+                }
+                const left = Math.max(Math.min(x0, x1), start);
+                const right = Math.min(Math.max(x0, x1), end);
+                for (const x of left <= right ? [left, right] : []) {
+                    const y = y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+                    low = Math.min(low, y);
+                    high = Math.max(high, y);
+                }
+            }
         }
-        // A window with no runs in it, such as the gap between two
+        // A window with nothing in it, such as the gap between two
         // categories, leaves y alone.
         if (low > high) {
             return null;
