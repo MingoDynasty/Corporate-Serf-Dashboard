@@ -304,6 +304,7 @@ flowchart LR
         EvxlSnapshot["kovaaks/<br/>evxl_snapshot.py"]
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlaySessions["kovaaks/<br/>play_sessions.py"]
+        TypicalScore["kovaaks/<br/>typical_score.py"]
         ScenarioNotes["kovaaks/<br/>scenario_notes_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
@@ -402,6 +403,7 @@ flowchart LR
     ScenarioGroups --> EvxlSnapshot
     DataService --> ScenarioGroups
     DataService --> PlaySessions
+    TypicalScore --> PlaySessions
     PlaylistService --> ScenarioGroups
     Journey --> DataService
     Journey --> PlotService
@@ -1263,6 +1265,16 @@ flowchart LR
   `components/run_history_list.py`.
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
+- `typical_score.py` — the typical score's pure definition, with no production
+  caller yet. `build_typical_scores` takes one scenario's runs and the play
+  sessions split across every scenario from the same snapshot, returning a
+  frozen `TypicalScore` after each run. `typical_score_recency` judges a
+  value at a supplied moment, with recent run and session counts;
+  `typical_score_fade_time` gives a held value's inclusive recency boundary.
+  `format_typical_score` applies the window's display precision and half-up
+  rounding without changing its statistics. Nothing reads the store, reads
+  the clock, or persists a value. Rules in
+  [specs/typical_score.md](specs/typical_score.md).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
