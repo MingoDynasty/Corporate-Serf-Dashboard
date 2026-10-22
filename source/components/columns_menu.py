@@ -80,34 +80,70 @@ _APPLY_COLUMNS = """
             if (run !== latestRun) {
                 return noUpdate;
             }
-            const shown = [];
-            const hidden = [];
-            ids.forEach((id, index) => (checked[index] ? shown : hidden).push(id.column));
-            const shownBefore = new Set(
-                gridApi.getAllDisplayedColumns().map((column) => column.getColId())
-            );
-            gridApi.setColumnsVisible(shown, true);
-            gridApi.setColumnsVisible(hidden, false);
-            // A hidden column keeps its sort, which would leave the rows
-            // ordered by a column that is off screen, with no header to show
-            // why.
-            gridApi.applyColumnState({
-                state: hidden.map((colId) => ({colId, sort: null})),
-            });
-            // The quick filter matches visible columns only, but a visibility
-            // change makes AG Grid drop the filter's cached text and nothing
-            // more. Without this, the rows keep the answer for the columns as
-            // they were until the filter text is next edited.
-            gridApi.onFilterChanged();
-            // setColumnsVisible does not size the column it shows, and one
-            // shown as the page opens comes up at its minimum width. Only
-            // the columns this run showed are fitted, so a toggle never
-            // undoes a width the user set by hand. The other columns are
-            // the grid's own autosize to fit, which it can because the grid
-            // renders every column: see COLUMNS_MENU_GRID_OPTIONS.
-            const added = shown.filter((colId) => !shownBefore.has(colId));
-            if (added.length) {
-                gridApi.autoSizeColumns(added, false);
+            try {
+                const shown = [];
+                const hidden = [];
+                ids.forEach((id, index) => (checked[index] ? shown : hidden).push(id.column));
+                const shownBefore = new Set(
+                    gridApi.getAllDisplayedColumns().map((column) => column.getColId())
+                );
+                gridApi.setColumnsVisible(shown, true);
+                gridApi.setColumnsVisible(hidden, false);
+                // A hidden column keeps its sort, which would leave the rows
+                // ordered by a column that is off screen, with no header to show
+                // why.
+                gridApi.applyColumnState({
+                    state: hidden.map((colId) => ({colId, sort: null})),
+                });
+                // The quick filter matches visible columns only, but a visibility
+                // change makes AG Grid drop the filter's cached text and nothing
+                // more. Without this, the rows keep the answer for the columns as
+                // they were until the filter text is next edited.
+                gridApi.onFilterChanged();
+                // setColumnsVisible does not size the column it shows, and one
+                // shown as the page opens comes up at its minimum width. Only
+                // the columns this run showed are fitted, so a toggle never
+                // undoes a width the user set by hand. The other columns are
+                // the grid's own autosize to fit, which it can because the grid
+                // renders every column: see COLUMNS_MENU_GRID_OPTIONS.
+                const added = shown.filter((colId) => !shownBefore.has(colId));
+                if (added.length) {
+                    gridApi.autoSizeColumns(added, false);
+                }
+            } finally {
+                // A failed apply must not strand an otherwise usable grid.
+                const grid = document.getElementById(GRID_ID);
+                if (grid?.classList.contains("columns-pending")) {
+                    // The API returns before React commits the headers and
+                    // cells. Revealing on that return still flashes defaults.
+                    const reveal = () => {
+                        if (gridApi.isDestroyed()) {
+                            observer.disconnect();
+                            return;
+                        }
+                        if (gridApi.getGridOption("rowData") == null) {
+                            return;
+                        }
+                        const columns = new Set(
+                            gridApi.getAllDisplayedColumns().map((column) => column.getColId())
+                        );
+                        const headers = [...grid.querySelectorAll(".ag-header-cell")];
+                        const cells = [...grid.querySelectorAll(".ag-cell")];
+                        if (headers.length !== columns.size ||
+                            [...headers, ...cells].some((cell) => !columns.has(cell.getAttribute("col-id"))) ||
+                            (gridApi.getDisplayedRowCount() > 0 && !cells.length)) {
+                            return;
+                        }
+                        observer.disconnect();
+                        gridApi.removeEventListener("rowDataUpdated", reveal);
+                        gridApi.setGridOption("loading", false);
+                        grid.classList.remove("columns-pending");
+                    };
+                    const observer = new MutationObserver(reveal);
+                    observer.observe(grid, {childList: true, subtree: true});
+                    gridApi.addEventListener("rowDataUpdated", reveal);
+                    reveal();
+                }
             }
         } catch (error) {
             console.warn("Failed to apply the Columns menu to the grid.", GRID_ID, error);
@@ -233,7 +269,9 @@ def register_columns_menu(menu_id: str, grid_id: str) -> None:
     Only the newest run applies anything, so a run that waited longer for the
     grid cannot undo a later one. The grid itself must be built with
     ``COLUMNS_MENU_GRID_OPTIONS``, or a stored choice can open the table with
-    clipped headers. Call once per menu, at import.
+    clipped headers. A grid with the ``columns-pending`` class starts with
+    ``loading=True``; this callback reveals it once its columns and rows are
+    ready, including an empty result. Call once per menu, at import.
     """
     clientside_callback(
         _APPLY_COLUMNS.replace("GRID_ID", json.dumps(grid_id)),

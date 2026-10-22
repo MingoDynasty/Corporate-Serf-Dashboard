@@ -2250,6 +2250,19 @@ def test_playlist_scenarios_grid_has_no_initial_row_data():
     assert "rowData" not in ag_grid.to_plotly_json()["props"]
 
 
+def test_playlist_scenarios_grid_keeps_loading_until_its_columns_and_rows_are_ready():
+    grid = playlist_scenarios.layout("KovaaKsTestCode").children[-1]
+
+    assert grid.dashGridOptions["loading"] is True
+    assert "columns-pending" in grid.className.split()
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
+    selector = ".playlist-scenarios-grid.columns-pending :is(.ag-header, .ag-body)"
+    body = stylesheet.split(selector + " {", 1)[1].split("}", 1)[0]
+    # Hiding the root would hide its loading overlay too; display:none would
+    # leave no rendered cells for the Columns callback to size.
+    assert body.strip() == "visibility: hidden;"
+
+
 def test_playlist_scenarios_grid_uses_bounded_viewport_layout():
     page = playlist_scenarios.layout("KovaaKsTestCode")
     ag_grid = page.children[-1]
