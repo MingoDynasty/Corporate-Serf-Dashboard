@@ -36,11 +36,11 @@ differently:
 | Pin | Where it lives | How to see what is new |
 | --- | --- | --- |
 | Locked packages | `uv.lock` | `uv lock --upgrade --dry-run` |
-| Dependency floors | `dependencies` and the `dev` group in `pyproject.toml` | `uv tree --depth 1` prints the locked version of each |
+| Dependency floors | `dependencies` and the `dev` and `screenshots` groups in `pyproject.toml` | `uv tree --all-groups --depth 1` prints the locked version of each |
 | `pandas-stubs` | the `dev` group, as a `~=` pin | follows pandas' major.minor line |
 | pre-commit ruff | `rev` in `.pre-commit-config.yaml` | must equal the locked ruff |
 | uv | `required-version` and the `uv_build` range in `pyproject.toml` | the latest release; see [uv](#uv) |
-| GitHub Actions | each `uses:` line in `.github/workflows/ci.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
+| GitHub Actions | each `uses:` line in `.github/workflows/*.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
 The Python version is not part of a refresh. Moving it is its own change, with
@@ -141,7 +141,7 @@ The spec carries these exact SHAs, so moving them here alone makes this copy
 drift from the spec. A pin bump is a new version of the spec, which each
 repository then adopts.
 
-1. For each action in `.github/workflows/ci.yml`, find the latest release:
+1. For each action in `.github/workflows/*.yml`, find the latest release:
 
    ```powershell
    gh api repos/<owner>/<action>/releases/latest --jq .tag_name
@@ -176,7 +176,9 @@ bump can change things they do not cover, so add the check for whatever moved.
 plotly, dash, dash-ag-grid, dash-mantine-components, and dash-extensions ship
 the JavaScript the browser runs. Dash serves plotly.js from inside the plotly
 package, so a plotly bump changes the charting library and not only the Python
-API. CI never opens a browser, so the gates see none of it.
+API. The standard CI gates never open a browser, so they see none of it. The
+[on-demand screenshot workflow](screenshots/README.md#refresh-in-github-actions)
+captures three pages for documentation; it does not replace these checks.
 
 When one of them moves, run the app (`uv run python source/app.py`) and look at
 every page: the chart toolbars, the grids, the menus, and the browser console

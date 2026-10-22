@@ -9,6 +9,8 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
 
 ![Run History page](docs/screenshots/run_history.png "Run History page")
 
+Screenshots show sample data.
+
 ## Features
 
 - **Scenario plots**: every run of a scenario as Score vs Run, Score vs Time, or Score vs
@@ -142,7 +144,8 @@ uv run python source/app.py
 ## Development
 
 The app is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components). See the
-documentation in [docs/](docs/).
+documentation in [docs/](docs/) and the
+[screenshot refresh instructions](docs/screenshots/README.md).
 
 This app is built with AI coding agents. Every change is reviewed and must pass the tests
 and CI before it merges.
