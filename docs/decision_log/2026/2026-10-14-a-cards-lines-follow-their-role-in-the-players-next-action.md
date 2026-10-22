@@ -2,8 +2,10 @@
 
 Status: Accepted
 
-The top row's cards emphasize facts by their role in the player's next action.
-A card's defining figure leads, with supporting context in a quieter style.
+The top row's cards order and emphasize facts by their role in the player's
+next action. A fact needed at a glance stays on screen, and supporting
+context follows it in a quieter but readable style. A time that tells how
+old something is reads relative, with the exact time on hover and focus.
 How often a fact changes decides neither its order nor its weight.
 
 **Superseded in part (2026-10-21).** [TS8 gives Scenario Stats a lead fact](2026-10-20-scenario-stats-leads-with-the-typical-score.md): its typical score, followed by Category and Total runs. The payload's importance order for a card with no lead still governs cards with no lead; its earlier application to Scenario Stats is historical. The other cards' order and relative-age rules stand.

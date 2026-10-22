@@ -2,9 +2,11 @@
 
 Status: Accepted
 
-Scenario Stats keeps the selected benchmark's category beside the scenario's performance summary.
-The Playlist filter decides which benchmark supplies that category.
-The row disappears when that benchmark has no usable group for the scenario.
+Scenario Stats names the selected scenario's benchmark category above its
+history. The Playlist filter determines which benchmark's
+category it names, because a scenario can belong to several benchmarks.
+When that benchmark has no groups or does not list the scenario, the row
+disappears so the card holds only useful facts.
 
 **Superseded in part (2026-10-21).** [Scenario Stats now leads with the typical score](2026-10-20-scenario-stats-leads-with-the-typical-score.md), then Category and Total runs. The earlier no-lead ordering and the label Number of runs are historical. Category's selected-benchmark rules and the no-selection message stand; Last played remains on the latest-run card.
 

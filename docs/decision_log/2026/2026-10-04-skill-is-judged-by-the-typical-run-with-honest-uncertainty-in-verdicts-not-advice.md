@@ -2,9 +2,14 @@
 
 Status: Accepted
 
-The app's skill judgments are heading toward typical performance while a personal best remains an achievement.
-A judgment the runs cannot support stays unknown, and the app states findings without prescribing training.
-The shared score summary now gives later features one definition to build on.
+The app's judgments about a player's skill are heading toward the typical
+run, what their recent runs usually score, and away from the personal best,
+which stays the achievement. A judgment the runs can't support says so
+instead of guessing, and the app reports what it found without telling the
+player what to do in training. One lucky run can make a scenario look
+stronger than it usually plays, and the evidence behind any training method
+is still thin. Every later proposal is held to these three rules, and Run
+history now builds sessions first.
 
 **Superseded in part (2026-10-21).** The Terms passage's working name is now [Typical score](2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md) on screen, in the glossary and in code. D1, D2 and D3 stand; defining the figure does not authorize a later judgment to use a dimmed value without choosing its evidence bar.
 
