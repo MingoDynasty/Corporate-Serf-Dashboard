@@ -88,11 +88,12 @@ cell's hover, `+10.3% to Viridian · 45 to go`.**
   scenarios across 23 of the maintainer's benchmarks, the mean is −0.68
   (`claude-fable-5-1`'s count; the Viscose figures were reproduced
   independently).
-- **The position is the benchmark's own scale.** Its author set the
-  thresholds so that a rank means the same level on every scenario, which a
-  score does not. A scenario sitting exactly on its rank's threshold reads
-  `Viridian · 0%` whatever its score scale; by gap it would rank by how wide
-  its score bands happen to be.
+- **The position is the benchmark's own scale.** A benchmark's ranks are
+  meant to mark the same level on every one of its scenarios, which a score
+  cannot. How evenly a given benchmark's thresholds achieve that is
+  [not checked](#not-checked). A scenario sitting exactly on its rank's
+  threshold reads `Viridian · 0%` whatever its score scale; by gap it would
+  rank by how wide its score bands happen to be.
 - **The name, not the ordinal.** `Celadon 4.07` and `4.07` sort the same, but
   a player knows rank names, and the ordinal shifts between ladders: Celadon
   is fourth of nine on Viscose, while a four-rank ladder ends at 4.
@@ -256,6 +257,11 @@ display, not that they improve training.
 
 ### Not checked
 
+- **Whether a benchmark's ranks mark the same level on all its scenarios.**
+  TB2's weakness order assumes they do, as ranks are meant to. A scenario
+  whose thresholds sit harder or easier than the others' would sort weaker or
+  stronger than it plays. Nothing here measures how even a benchmark's
+  thresholds are.
 - **Keyboard access to the hovers.** The table's existing cell hovers (Next
   Rank's points, Last Played's exact time) open on mouse hover only. One
   probe of AG Grid's `tooltipTrigger` option, changed on a live grid, showed
