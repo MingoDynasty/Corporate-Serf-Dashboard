@@ -357,7 +357,7 @@ the same form as the finished ones under it.
 
 ### Planning: what should I train
 
-- **Typical score on the scenario table** (PR #PRNUM; design in #408). Each
+- **Typical score on the scenario table** (PR #414; design in #408). Each
   scenario table shows the typical score beside the PB, and a benchmark's
   also shows the rank it reaches with how far toward the next, such as
   `Celadon · 7%`. Sorting that Typical Rank column lists the scenarios from

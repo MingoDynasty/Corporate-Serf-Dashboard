@@ -22,7 +22,7 @@ because it doesn't lead to good UI/UX"; the hovers explain it instead. A
 third consult endorsed the result and asked that the user guide name the
 clock, since the page explains it only on hover. Asked once more, the
 maintainer kept it: "No, let's keep it as is." Shipped in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#414](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/414).
 
 **The mark.**
 

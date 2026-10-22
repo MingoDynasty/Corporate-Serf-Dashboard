@@ -12,7 +12,7 @@ and old is not the same as unknown.
 [proposal #408](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/408),
 ratified by the maintainer on 2026-10-22. Their lean before that, on
 2026-10-21: "2: I agree." Shipped in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#414](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/414).
 
 **The evidence bar.** The
 [2026-10-04 principles](2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md)

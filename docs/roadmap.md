@@ -34,7 +34,7 @@ sequence.
   Celadon · 7%. Sorting that column lists the scenarios from weakest to
   strongest by the player's usual play. An old value is marked with a clock,
   and every value's hover explains it, from the mouse or the keyboard. (PR
-  #PRNUM; design in #408) Design rationale distilled into
+  #414; design in #408) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
 - **Typical score** — Scenario Stats leads with the median of the scenario's
   last 20 runs, and Score vs Run and Score vs Time chart it inside two bands

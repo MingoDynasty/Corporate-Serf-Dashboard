@@ -18,7 +18,7 @@ after trying three on the prototype: "I'm leaning toward 'Celadon 7%' option,
 simply because it is more user friendly." The review wave amended the
 below-first key (it followed a ratio of scores, which a time-scored
 scenario's constant moves) and capped the percent at 99. Shipped in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#414](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/414).
 
 **The rank position**, the column's sort key, is computed from the exact
 median and never rounded.

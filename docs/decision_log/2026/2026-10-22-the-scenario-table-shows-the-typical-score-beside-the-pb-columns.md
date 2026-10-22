@@ -13,7 +13,7 @@ ratified by the maintainer on 2026-10-22: "I ratify the proposal." Their lean
 before that, after comparing this layout with a PB / Typical switch on a live
 prototype: "two columns, Typical Rank as Celadon · 7% sorted by rank position
 with the gap in its hover, no Typical Next Rank column." Shipped in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#414](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/414).
 What the table does today is in
 [playlists.md](../../specs/playlists.md#the-per-playlist-scenario-table).
 
