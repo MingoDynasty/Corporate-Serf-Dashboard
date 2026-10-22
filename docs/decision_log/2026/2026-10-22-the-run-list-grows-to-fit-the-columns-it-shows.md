@@ -9,6 +9,12 @@ page doesn't move. Past the chart's floor the list scrolls sideways inside
 its own box, and its session rows and the other full-width rows stay whole
 in view while the run rows scroll under them.
 
+**Superseded in part (2026-10-22).**
+[The narrower minimum](2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md)
+lets hidden columns reduce the list to 480px. The default columns still
+need 500px, and the latest-run card keeps its independent 500px width. The
+remaining contract stands.
+
 **Ruling.** RC2 of
 [#403](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/403),
 ratified by the maintainer on 2026-10-22: "I ratify the run list columns

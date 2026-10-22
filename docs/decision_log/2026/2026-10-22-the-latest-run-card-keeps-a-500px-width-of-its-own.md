@@ -8,6 +8,12 @@ are still the same width and line up, because the list is at its 500px
 minimum. Once a player turns a column on and the list grows, the list reaches
 further left than the card, and the top row doesn't wrap.
 
+**Superseded in part (2026-10-22).**
+[The narrower minimum](2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md)
+lets hidden columns reduce the list to 480px. The default columns still
+need 500px, and the latest-run card keeps its independent 500px width. The
+remaining contract stands.
+
 **Ruling.** RC3 of
 [#403](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/403),
 ratified by the maintainer on 2026-10-22: "I ratify the run list columns
