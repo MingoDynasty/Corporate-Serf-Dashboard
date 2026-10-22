@@ -19,8 +19,10 @@ score, PB, then Latest run."
 - The first column's DOM order is the dropdowns' column, the scenario note
   card, then Scenario Stats and the PB card in one pair. CSS `order` does
   not reorder them, so keyboard focus and screen-reader order follow the
-  screen. The latest-run card stays alone in the second column over the
-  run list.
+  screen. The latest-run card stays alone in the second column at its
+  [own 500px width](2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md).
+  It aligns over the run list while the list is at its default 500px minimum;
+  the list can grow without changing the top row.
 - Spare room sits between the note and Scenario Stats, never between the
   two score cards. The PB card stays at the first column's right end,
   beside the latest-run card.
@@ -73,10 +75,12 @@ from the PB card's content instead of the 582 px occupied by the two cards
 and gap, narrowing the note and making the pair wrap early. The explicit
 PB width avoids restating both card widths in a wrapper `calc()` basis.
 
-**Measurements.** The implementation is compared with `main` at `e08cbd5`,
-whose runtime code and assets match the original `eb97872` baseline. Edge
+**Measurements.** After merging [#406](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/406),
+the implementation is compared with `main` at `abcf938`. All reading heights
+and card widths below reproduce the earlier `e08cbd5` baseline. Edge
 155.0.4283.62 and Firefox 158.0.1 use isolated state, the same local stats
-folder, no username, and percentile warmup disabled. Reading states include a saved note, no note, no scenario, and a playlist
+folder, no username, and percentile warmup disabled. Reading states include
+a saved note, no note, no scenario, and a playlist
 scenario with no local runs (`shimPressure Micro` in playlist
 `KovaaKsTimewarpingWetHero`). All 14 window widths below are remeasured on
 both builds, browsers and themes after review. The editor is opened through
@@ -151,3 +155,24 @@ browsers cover 1,800 px, the wrap transition at 1,880/1,878 px, a column too
 narrow for both scores, and page areas of 901, 900 and 767 px. The 900 px
 container rule flattens the wrappers and keeps DOM order packed from the
 line's start.
+
+**Integration with the growing run list (2026-10-22).** The list's new width
+callback and the latest-run card's independent 500px width from #406 coexist
+with the score pair. Default, all three new columns on, and default restored
+are checked at window widths 3,840, 2,560, 1,920, 1,707, 1,536, 1,354,
+1,158, 1,157 and 900px, on both builds, browsers and themes, in all four
+reading states. No choice moves or resizes any top-row card. At 2,560 and
+1,920px the list grows from 500 to 744px while the latest-run card stays
+500px and the played row stays 143.4px in Edge and 143.1px in Firefox.
+The two samples around the 900px page-area threshold retain the wrapper
+flattening and DOM order.
+
+The actual Columns menu supplies choices on played scenarios. With no
+scenario or no local runs the menu is hidden, so the same checkbox props
+are supplied to Dash and the production width callback is awaited. All
+864 column-choice observations pass. The 448 reading observations match
+the earlier measurements, and all 256 editor observations match merged
+main at 2,560 and 3,840px, now with both default columns and all three on.
+The waiting-run message, character count, save error and every combination
+keep the heights in the editor table above. No change to the ruled layout
+or product trade-off was needed for this integration.

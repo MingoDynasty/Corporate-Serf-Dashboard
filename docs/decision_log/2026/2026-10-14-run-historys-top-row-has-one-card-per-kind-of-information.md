@@ -20,6 +20,15 @@ in one pair. Spare room sits before that pair, which wraps first, together,
 to the next line's right end. The narrow row reads dropdowns, note, Scenario
 Stats, PB, latest run. The PB still sits beside the latest-run card.
 
+**Superseded in part (2026-10-22).** [The latest-run card's own width](2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md)
+replaces "The latest-run card aligns over the run list instead of filling
+the remaining width" and the row and the chart and list sharing "two
+columns, the second 500px wide". The card keeps its 500px and its place at
+the row's right end, as a width of its own, and lines up with the list only
+while the list is at its 500px minimum, which it is by default: the list now
+grows to fit the columns it shows. This width change preserves the other
+parts of T1, subject to the score-strip supersession above.
+
 **Rulings and delivery.** T1 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`: "I ratify Proposal 1,
 rows T1 to T4, as amended at 7329c23." The layout shipped in

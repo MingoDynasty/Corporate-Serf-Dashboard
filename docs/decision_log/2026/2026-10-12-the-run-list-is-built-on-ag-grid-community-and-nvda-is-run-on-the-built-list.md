@@ -209,6 +209,14 @@ Edge and Firefox there.
    id. The grid holds focus by position, so a landed run otherwise leaves a
    keyboard user on a different run.
 
+**Added 2026-10-22.** [The width rule](2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md)
+adds an eleventh piece, after the All scenarios entry's tenth: where the
+list scrolls sideways, a full-width row's content is held in view by CSS
+sticky, which needs the row's `overflow` turned from the grid's `hidden` to
+`clip`. Item 8's fixed widths now also set the list's width. A column turned
+on is a change to what a screen reader is told about a row, so the walk is
+repeated with the new columns on, in the PR that ships them.
+
 One variation could have removed items 1, 4, and 6: ordinary rows whose
 first cell spans every column. The proposal allowed it as a first try, and
 PR #371 did not try it. NVDA was run on full-width rows, and R4 was ratified

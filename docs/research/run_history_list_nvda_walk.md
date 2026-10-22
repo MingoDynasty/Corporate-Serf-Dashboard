@@ -17,8 +17,10 @@ focus goes. A change to how the list looks does not need it.
 
 **It was run again on 2026-10-14,** when the list gained a second view, All
 scenarios. That walk has its own section,
-[the last in this file](#2026-10-14-the-walk-again-with-the-all-scenarios-tree).
-Everything before it is the first record, as it was written.
+[after the first record](#2026-10-14-the-walk-again-with-the-all-scenarios-tree).
+**And on 2026-10-22,** with the list's three optional columns on, in
+[the last section](#2026-10-22-the-walk-again-with-reloads-fov-and-avg-fps-on).
+Everything before them is the first record, as it was written.
 
 ## Summary
 
@@ -475,3 +477,148 @@ Not in the repository. The walk's scripts, each browser's console output, a
 file of every step per walk, and NVDA's own logs are scratch files on the
 maintainer's machine, under `ignore/scripts/run-history-all-scenarios/impl/nvda/`,
 with a README that says how to run the walk again.
+
+## 2026-10-22: The walk again, with Reloads, FOV and Avg FPS on
+
+Date: 2026-10-22
+Author: claude-opus-5-5 · effort: high
+Source revision: `f98a0a5` on pull request #406's branch
+
+The run list's Columns menu gained three columns, Reloads, FOV and Avg FPS,
+each off to start
+([the entry](../decision_log/2026/2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md)).
+A column a player turns on changes what a screen reader is told about a row,
+so the grid's rule required the walk again before the change merges, with the
+columns on. Every earlier walk was run again with all three on, and one new
+walk turns them on from the keyboard and reads a run's new cells. As before,
+it is a measurement and not a decision, and a task that fails goes to the
+maintainer.
+
+### Summary of the third walk
+
+- **All fourteen tasks can be done in Firefox, Chrome, and Edge:** the
+  thirteen of the earlier walks, now with ten columns, and the new one. None
+  failed.
+- **The new columns are read like the others.** Each new cell says its value
+  and its column's heading, such as `103 Overwatch  row 4  FOV  column 9`. The
+  FOV cell says the scale with the number. The menu's three new checkboxes
+  say their names and their state, and Space says `checked`.
+- **Nothing else got harder.** Every other difference from the 2026-10-14
+  walk is the new columns, two changes merged since then, the window's
+  height, or the order of two announcements. Two pieces of noise from the
+  earlier records are gone.
+- **Nothing new fails to work.** The thirteen things listed under the two
+  earlier "What still does not work" sections still hold, and the new
+  columns add none.
+- **Not covered,** as before: Narrator, JAWS, and a person listening.
+
+### How the third walk was run
+
+| | |
+|---|---|
+| Screen reader | NVDA 2026.2, the same unpacked copy, muted, started and stopped by the script |
+| Browsers | Firefox 158.0, Chrome 155.0.8059.85, Edge 155.0.4283.62, visible and maximized, at 1.5x scaling |
+| App | The pull request's build at `f98a0a5`, on the same scratch copy of five scenarios' stats files, 1,051 runs. The page showed VT DotTS Intermediate S5 |
+| Keys | Real key presses to the foreground window over fifteen walks, about 520 recorded steps in each browser, then 37 in a sixteenth, NVDA's table keys |
+| Runs landed | Five in each browser, as on 2026-10-14 |
+| Checks | The script checked where focus was, what the live region was given, and which view the list held, against a rehearsal without NVDA. All 312 checks held in Chrome and in Edge. In Firefox, 298 held on the first pass and 14 did not, all in the new walk: see below |
+
+Every walk but the new one starts with the three columns stored on, as a
+player who turned them on would have them. The new walk starts with them off.
+Each browser took about ten minutes. The walk was run from the author's
+session, not a subagent as its kickoff said: it is one script that runs in
+the background, so a subagent would have saved no waiting.
+
+**What went wrong on the way.** In Firefox, Enter on Columns in the new walk
+opened nothing on the first pass, so the keys after it went into the grid
+instead of the menu. The page was still loading when Enter was pressed:
+NVDA read the document as it finished, after the key. The same Enter in the
+same Firefox opened the menu in the Median and best walk. The new walk was
+run again alone in Firefox, and all its checks held. A first start of the
+whole walk, before these, was stopped before any key reached the page.
+
+**The harness had drifted since 2026-10-14,** in three ways that came from
+changes to the app and not from this one. Its click into the page aimed at
+the list's heading, which is a 1px line for screen readers since
+[2026-10-18](../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md),
+so it now clicks the empty gap in the list's header. A session row's figures
+became split parts on 2026-10-18, which one check now reads. And the scratch
+stats folder is now built without seven files the real folder gained since,
+so the list the walks were written against is the same.
+
+### The new task: turning the three columns on, and reading a run's new cells
+
+**It works.** Enter on Columns opens its menu. Tab reaches each checkbox in
+table order, Space checks it, and Escape closes the menu and puts focus back
+on Columns. The grid shows the three columns at once. All three browsers said
+the same words, apart from the row's number, which is 3 in Firefox and 4 in
+Chrome and Edge:
+
+| Key | NVDA |
+|---|---|
+| Enter on Columns | `Columns  dialog`, `Shots Fired  check box  checked`, `Columns  dialog`, then the checkbox again |
+| Tab | `Reloads  check box  not checked` |
+| Space | `checked` |
+| Tab, Tab | `Sensitivity  check box  checked`, then `FOV  check box  not checked` |
+| Space, Tab, Space | `checked`, `Avg FPS  check box  not checked`, `checked` |
+| Escape | `button  Columns`, then `Columns  button` |
+
+Then the newest run of the session Feb 13, 10:50 PM, cell by cell, in focus
+mode:
+
+| Key | NVDA, in Chrome and Edge |
+|---|---|
+| Right, from Shots Fired | `0  row 4  Reloads  column 7` |
+| Right | `45.0 cm/360  row 4  Sensitivity  column 8` |
+| Right | `103 Overwatch  row 4  FOV  column 9` |
+| Right | `721  row 4  Avg FPS  column 10` |
+| Left, then Insert+Tab | `103 Overwatch  row 4  FOV  column 9`, then `103 Overwatch  cell  focused` |
+
+In browse mode, NVDA's table keys move across the new columns and say each
+heading with its value: `Reloads  column 7  0`, `FOV  column 9  103
+Overwatch`, `Avg FPS  column 10  721`.
+
+### The thirteen earlier tasks again
+
+**All thirteen can still be done, and nothing they say got harder to follow,
+in all three browsers.** Each step's speech was compared with the 2026-10-14
+record's, with every number set aside, since times, counts and row numbers
+differ between runs. What differs:
+
+- **The new columns.** A run read cell by cell, in the tree's task 3 and
+  R4's task 2, now passes Reloads, FOV and Avg FPS, and the Median and
+  best walk tabs past three more checkboxes, each read `checked`.
+- **Two changes merged since 2026-10-14.** Accuracy is read to two decimals
+  ([2026-10-18](../decision_log/2026/2026-10-18-a-runs-accuracy-shows-two-decimals.md)).
+  A row's figures are read after the scenario's name and before its count,
+  such as `Scenario 2. Show VT Controlsphere Viscose Median 3,036 · Best 3,126 · 8 runs  row`
+  ([2026-10-18](../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md)).
+- **The window's height.** PageDown moves by a window of rows, 32 or 33 this
+  time where it was 31, so the long walk passed other rows on its way to
+  Show older sessions, which it reached at the same place.
+- **Order.** Firefox sometimes said `Expanded` before the row it opened and
+  sometimes after it, and what NVDA reads while the page loads varied.
+- **Less noise.** In browse mode a run's cells no longer say `clickable`
+  before their value, and asked where focus is, Chrome and Edge no longer
+  call the view switch's radio buttons `off screen`. What removed them was
+  not traced.
+- **Edge read the run toast in the tree's landing task,** which the
+  2026-10-14 record listed as not captured. Firefox and Chrome read it as
+  before.
+
+### Not captured in the third walk
+
+- **A scale too long for the FOV column.** The runs walked are all at 103
+  Overwatch. A long scale is cut short on screen, and the cell's text holds
+  it whole, so it would most likely be read whole. That is an inference.
+- **The list scrolled sideways.** The walk's window was 2,560 wide, where
+  the list fits all ten columns.
+- **A voice, Narrator, JAWS, and a person listening,** as before.
+
+### Where the third walk's raw output is
+
+Not in the repository. The walk's scripts, each browser's console output, a
+file of every step per walk, the comparison with the 2026-10-14 record, and
+NVDA's own logs are scratch files on the maintainer's machine, under
+`ignore/scripts/run-list-columns/nvda-walk/`, with a README that says how to
+run the walk again.

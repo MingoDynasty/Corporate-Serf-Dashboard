@@ -117,6 +117,8 @@ logger = logging.getLogger(__name__)
 # two pages cannot share part of a callback. The browser also stores each
 # remembered control's value under its id, so changing one of these resets
 # that value for every user.
+# The page's root, whose style the run list writes its width to.
+PAGE_ID = "run-history-page"
 RUN_EVENTS_STORE_ID = "run-history-run-events"
 POLLING_INTERVAL_ID = "run-history-polling-interval"
 RELATIVE_TIME_INTERVAL_ID = "run-history-relative-time-interval"
@@ -620,7 +622,7 @@ clientside_callback(
 )
 
 register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
-register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
+register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID, page=PAGE_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
 register_scenario_selection_clearing_filter(
     SCENARIO_SELECTION_IDS,
@@ -744,11 +746,11 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
 
 
 def _top_row(playlist_code: str | None) -> dmc.Box:
-    """Build the row above the chart, in the columns of the chart and the run list.
+    """Build the selectors, note and score cards above the chart.
 
     The first column holds the dropdowns, the scenario note card, then
     Scenario Stats and the PB card in a pair at its right end. The second
-    holds the latest-run card, over the run list, beside the PB card.
+    holds the latest-run card at its own fixed width, beside the PB card.
     """
     return dmc.Box(
         className="run-history-top-row",
@@ -852,6 +854,7 @@ def layout(
     """
     config = get_config()
     return dmc.Box(
+        id=PAGE_ID,
         className="run-history-page",
         children=[
             dcc.Store(id=RUN_EVENTS_STORE_ID),

@@ -7,9 +7,14 @@ Status: Superseded in part, 2026-10-14, by the
 "Version 1 has one view" no longer holds, and the list's two levels become
 three in the second view. A session row's count under This scenario is a link
 and no longer plain text. "The first row alone gives a session's length"
-holds under This scenario only. The Columns menu has three checkboxes. R3,
-the list as a second column 500px wide, and every rule of the list under This
-scenario stand.
+holds under This scenario only. The Columns menu gained a third checkbox.
+Superseded in part again, 2026-10-22, by
+[the width rule](2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md)
+and [the three new columns](2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md):
+the list is 500px at least and as wide as its shown columns need, a run row
+has seven columns by default and up to ten, and the Columns menu has six
+checkboxes. R3, the list as a second column beside the chart, and every
+other rule of the list under This scenario stand.
 
 Run History lists the selected scenario's runs in a column of its own, to the
 right of the chart and always shown. The chart is narrower than the old
@@ -30,6 +35,16 @@ takes the list's heading off the screen, in both views, and keeps it for
 screen readers. So it no longer sits on a line of its own above the buttons:
 the switch and the buttons are the header's first line. The heading's words
 and every other rule of the list stand.
+
+**Superseded in part (2026-10-22).** [The width rule](2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md)
+and [the three new columns](2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md)
+replace R3's "500 px wide", the 2026-10-15 note's "their shared 500px
+column", "A run row has seven columns", and "The Columns menu shows or hides
+Shots Fired and Sensitivity". The list is 500px at least and as wide as its
+shown columns need, up to a 480px floor for the chart. A run row has seven
+columns by default and up to ten, and the menu also shows or hides Reloads,
+FOV and Avg FPS, each off to start. The list's place beside the chart, its
+narrow-window rules, and every rule of what it shows stand.
 
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):

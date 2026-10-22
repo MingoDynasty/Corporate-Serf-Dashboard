@@ -93,10 +93,13 @@ them in a quieter readable style. Change frequency decides neither order
 nor weight; ages read relative with exact times on hover and focus, while
 times that name or order runs remain absolute ([T4][card-order]).
 
-- The row takes the two columns of the chart and the run list under it, with
-  the same gap, and one value sets the list's 500px width for both. The
-  second column holds the latest-run card alone, so the card sits over the
-  run list and its edges are the list's at every zoom level. The first holds,
+- The row takes two columns with the gap of the chart and the run list under
+  it. The second column holds the latest-run card alone, at its own 500px
+  ([2026-10-22][card-width]). The list's minimum is also 500px, and the two
+  values are equal on purpose: with the default columns the list is at its
+  minimum, so the card sits over the run list and its edges are the list's at
+  every zoom level. A list widened by a column turned on reaches further left
+  than the card, under the PB card, and the row doesn't change. The first holds,
   in DOM order, the dropdowns' column, the scenario note card
   ([below](#the-scenario-note-card)), then Scenario Stats and the PB card in
   one score pair at its right end, beside the latest-run card. Spare room
@@ -385,7 +388,8 @@ it is saved is in [2026-10-18][note-store].
   ([2026-10-13][nearest-minute]).
   A time that rounds to zero reads `<1 min`, so that form means under 30
   seconds.
-- The card is 500px wide, the run list's width, and as tall as the top row,
+- The card is 500px wide, a width of its own that equals the run list's
+  minimum ([2026-10-22][card-width]), and as tall as the top row,
   and never less than 135px, which holds its tallest state: the second line
   on two lines in a narrow card, over the third and fourth. So nothing that
   changes between runs changes its height, and the page doesn't jump. Its
@@ -787,16 +791,25 @@ The card's lines, local-record scope and leaderboard presentation follow
 
 ## The run list
 
-- The list is a second column to the right of the chart, 500px wide and
-  always shown ([2026-10-12][column]). It has two views, This scenario and
-  All scenarios ([2026-10-14][all-scenarios]).
+- The list is a second column to the right of the chart, always shown
+  ([2026-10-12][column]). It is as wide as its shown columns need, 64px plus
+  each shown column's fixed width, never narrower than 500px, and never so
+  wide that the chart drops under 480px. When those two bounds cross, in a
+  narrow window, the 500px wins and the chart gives. With the default columns
+  the need is exactly 500px; with Reloads or Avg FPS on it is 564px, with FOV
+  616px, and with all three 744px. A browser with a column stored on draws
+  the list at 500px for a moment as the page opens. Past the chart's floor the
+  list scrolls sideways inside its own box, and its session rows, scenario
+  rows and other full-width rows stay whole in view while the run rows
+  scroll under them ([2026-10-22][list-width]). It has two views, This
+  scenario and All scenarios ([2026-10-14][all-scenarios]).
 - Its header is one line: a switch between the two views at the left, with
   the "Expand all" button and the "Columns" menu at the right. The switch is
   a segmented control whose accessible name is `Run list view`. The list
   starts on This scenario, the browser remembers the switch, and pressing it
   shows the other view from its top with keyboard focus left on the switch.
-  At the list's 500px the switch and both buttons share one line, 56px tall
-  at 2560px; where they don't fit, the buttons wrap under the switch
+  At the list's 500px minimum the switch and both buttons share one line,
+  56px tall at 2560px; where they don't fit, the buttons wrap under the switch
   ([2026-10-14][all-scenarios], [2026-10-18][heading-line]).
 - The header also holds a heading line, before the switch, for screen
   readers only: it is hidden from view in both views, and it is a line of
@@ -836,16 +849,25 @@ The card's lines, local-record scope and leaderboard presentation follow
   the last one listed. The switch moves with the jump, so a reload afterwards
   opens on All scenarios. A tree that does not hold the session shows from its
   top, with focus on its first row ([2026-10-14][count-link]).
-- A run row has seven columns: `#`, the run's number among this scenario's
-  runs in its session, counted in the order they were played, "Time", a time
-  of day with no seconds, "Score", the marks, "Accuracy" to two decimals
-  with trailing zeros kept, such as `82.31%` or `100.00%`
-  ([2026-10-18][accuracy]), "Shots Fired", and "Sensitivity". The marks
+- A run row has seven columns by default and up to ten: `#`, the run's
+  number among this scenario's runs in its session, counted in the order they
+  were played, "Time", a time of day with no seconds, "Score", the marks,
+  "Accuracy" to two decimals with trailing zeros kept, such as `82.31%` or
+  `100.00%` ([2026-10-18][accuracy]), "Shots Fired", "Reloads",
+  "Sensitivity", "FOV", and "Avg FPS". Reloads, FOV and Avg FPS are hidden
+  until turned on in the Columns menu ([2026-10-22][new-columns]). The marks
   column has no visible header, and its accessible name is "Marks". Shots
   Fired is shown on every scenario and counts the shots of the first weapon
   the stats file lists. Sensitivity is the run's normalized
   sensitivity-and-scale string, as on the chart's axis. Columns don't sort
   ([2026-10-12][column]).
+- Reloads is the stats file's count, such as `0` or `12`. FOV is the FOV the
+  run was played at, the number with trailing zeros dropped, then its scale,
+  such as `103 Overwatch`, or the number alone where the file names no scale.
+  A scale too long for the column is cut after the number, and the cell's
+  native hover gives its whole text. Nothing is converted. Avg FPS is rounded
+  to a whole number, such as `676` or `1,024`. A field the file lacks or
+  can't be read shows an empty cell, never a zero ([2026-10-22][new-columns]).
 - A divider marks where the scenario was left and returned to within a
   session, and counts what was played between: `10 runs on 3 other
   scenarios`, or `1 run on 1 other scenario`.
@@ -896,8 +918,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   press on the selected scenario's own name changes nothing. The live region
   says `Selected scenario: {scenario}`, and keyboard focus stays on the
   name's button ([2026-10-14][all-scenarios]).
-- Under a scenario row are its runs, newest first, in the seven columns of
-  This scenario with the same marks. `#` is the run's number among its
+- Under a scenario row are its runs, newest first, in the columns of This
+  scenario with the same marks. `#` is the run's number among its
   scenario's runs in the session and carries on into a second visit, so a run
   has the same number in both views. Every listed scenario's runs are marked
   ([2026-10-14][all-scenarios]).
@@ -936,9 +958,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   all open. It opens no runs, and "Collapse all" leaves the scenario rows'
   own state alone. Both buttons read what a press would do, following every
   way a row can open or close.
-- The "Columns" menu shows or hides Shots Fired and Sensitivity, both shown
-  to start ([2026-10-05][columns-menu]), and after them has a "Median and
-  best" checkbox, off to start. The browser remembers each
+- The "Columns" menu shows or hides, in table order, Shots Fired, Reloads,
+  Sensitivity, FOV and Avg FPS ([2026-10-05][columns-menu]). Shots Fired and
+  Sensitivity are shown to start, and the other three are off
+  ([2026-10-22][new-columns]). After them it has a "Median and best"
+  checkbox, off to start. The browser remembers each
   ([2026-10-14][median-best]).
 - With "Median and best" on, a scenario row under All scenarios and a session
   row under This scenario show the median and best of the runs under the row,
@@ -1360,7 +1384,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   groups side by side
   ([2026-10-12][column]).
 - There is no phone design. At phone width the list scrolls sideways
-  ([2026-10-12][column]).
+  ([2026-10-12][column]), with its full-width rows held in view
+  ([2026-10-22][list-width]).
+- In a stacked page the list is the page's full width and holds every column
+  shown, and scrolls sideways only where the page is narrower than their need
+  ([2026-10-22][list-width]).
 
 ## What the page keeps and forgets
 
@@ -1376,7 +1404,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   ([2026-08-08][rank-history]).
 - The browser remembers the Playlist filter, the Selected scenario, the
   Follow switch, the chart mode, the two ranges, the Chart options controls,
-  the run list's switch, and the Columns menu's three checkboxes, each under
+  the run list's switch, and the Columns menu's six checkboxes, each under
   the control's own id. It does not remember whether Chart options is open,
   which rows of the list are open in either view, or how many sessions either
   view has loaded
@@ -1448,6 +1476,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 [all-scenarios]: ../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md
 [count-link]: ../decision_log/2026/2026-10-14-a-sessions-count-jumps-to-it-in-the-tree-and-an-open-session-row-has-show-all-runs.md
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
+[new-columns]: ../decision_log/2026/2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md
+[list-width]: ../decision_log/2026/2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md
+[card-width]: ../decision_log/2026/2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md
 [figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
 [figure-columns]: ../decision_log/2026/2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md

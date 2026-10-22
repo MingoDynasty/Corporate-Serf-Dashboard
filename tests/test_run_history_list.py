@@ -4,6 +4,7 @@ The row model is one pure function over run records, so these tests build
 records and read rows. What marks a run is ``tests/test_run_marks.py``.
 """
 
+from dataclasses import replace
 from datetime import datetime, timedelta
 
 import dash
@@ -660,7 +661,10 @@ def test_a_run_row_formats_each_value_for_its_column():
         "new_pb": True,
         "accuracy": "54.50%",
         "shots": "1,234",
+        "reloads": "",
         "sens": "40.8 cm/360",
+        "fov": "",
+        "avg_fps": "",
     }
 
 
@@ -678,6 +682,39 @@ def test_a_run_with_no_shot_count_shows_none_and_not_zero():
     run = _run(A, EVENING, shots=None)
 
     assert _of_kind(_build([run]), "run")[0]["shots"] == ""
+
+
+def _run_row_with(**fields) -> dict:
+    run = replace(_run(A, EVENING), **fields)
+    return _of_kind(_build([run]), "run")[0]
+
+
+@pytest.mark.parametrize(
+    ("fov", "scale", "shown"),
+    [
+        pytest.param(103.0, "Overwatch", "103 Overwatch", id="a whole number"),
+        pytest.param(106.5, "Quake/Source", "106.5 Quake/Source", id="a decimal"),
+        pytest.param(103.0, None, "103", id="no scale"),
+        pytest.param(None, "Overwatch", "", id="no fov"),
+    ],
+)
+def test_the_fov_cell_reads_the_number_then_its_scale(fov, scale, shown):
+    assert _run_row_with(fov=fov, fov_scale=scale)["fov"] == shown
+
+
+@pytest.mark.parametrize(
+    ("reloads", "shown"), [(0, "0"), (12, "12"), (1234, "1,234"), (None, "")]
+)
+def test_reloads_is_a_count_and_unknown_is_never_zero(reloads, shown):
+    assert _run_row_with(reloads=reloads)["reloads"] == shown
+
+
+@pytest.mark.parametrize(
+    ("avg_fps", "shown"),
+    [(676.4, "676"), (689.6, "690"), (1024.2, "1,024"), (0.0, "0"), (None, "")],
+)
+def test_avg_fps_is_rounded_to_a_whole_number_with_a_separator(avg_fps, shown):
+    assert _run_row_with(avg_fps=avg_fps)["avg_fps"] == shown
 
 
 def test_a_score_drops_trailing_zeros_and_keeps_two_decimals():
