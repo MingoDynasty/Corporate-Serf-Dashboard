@@ -1479,6 +1479,7 @@ def test_the_score_pair_wraps_together_with_spare_room_before_both_cards():
     assert "justify-content: flex-end;" in pair
     assert "margin-left: auto;" in pair
     assert "max-width: 100%;" in pair
+    assert "min-height: 132px;" in pair
     assert "align-items" not in pair
     assert "margin-left" not in _css_block(css, ".scenario-stats-card")
     assert "margin-left" not in _css_block(css, ".pb-card")
@@ -1591,7 +1592,6 @@ def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
     assert "flex-wrap: wrap;" in row.group(1)
     assert left and "display: contents;" in left.group(1)
     assert pair and "display: contents;" in pair.group(1)
-    assert "margin-left: 0;" in pair.group(1)
     assert card and "flex: 1 1 380px;" in card.group(1)
 
 

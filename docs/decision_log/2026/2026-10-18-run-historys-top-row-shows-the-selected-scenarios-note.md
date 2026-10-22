@@ -19,9 +19,11 @@ under the buttons need the room.
 **Superseded in part (2026-10-21).** [The score-strip entry](2026-10-21-run-historys-score-cards-stay-together-after-the-note.md)
 moves the note after the dropdowns, before the score pair. Room beyond the
 note's cap sits before both scores, and the pair wraps before the note.
-The note still stretches to its line and keeps its 132px floor; with no
-scenario selected a wrapped row can be shorter than with one selected.
-The existing long-note supersession and the rest of this entry stand.
+The note still stretches to its line, and the score pair shares its 132px
+floor. Beyond that floor, the wrapped score line takes its cards' height,
+which varies with the selection and can grow when the pair itself stacks.
+At a page area of 900px or less the pair has no box and its floor has no
+effect. The existing long-note supersession and the rest of this entry stand.
 
 **Ruling and delivery.** SN2, SN4, SN5, SN7 and SN8's line of the scenario
 notes proposal

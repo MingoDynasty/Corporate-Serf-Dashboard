@@ -265,7 +265,9 @@ a.run-toast-link:hover {
 /* Put spare room before both scores, so it never separates them. Keeping
    them in one wrapping box also prevents the PB alone starting a new line
    while the pair fits. End each inner line at the column edge if even the
-   pair must wrap. Default stretch keeps each card as tall as its line. */
+   pair must wrap. Default stretch keeps each card as tall as its line.
+   Match the note card's 132px floor so quiet score states keep that room
+   when the pair moves to its own line. */
 .run-history-score-pair {
     display: flex;
     flex: 0 1 auto;
@@ -274,6 +276,7 @@ a.run-toast-link:hover {
     justify-content: flex-end;
     margin-left: auto;
     max-width: 100%;
+    min-height: 132px;
 }
 
 /* The playlist filter over the scenario dropdown, and the Follow switch under
@@ -1366,7 +1369,6 @@ a.run-toast-link:hover {
 
     .run-history-score-pair {
         display: contents;
-        margin-left: 0;
     }
 
     .run-history-card {

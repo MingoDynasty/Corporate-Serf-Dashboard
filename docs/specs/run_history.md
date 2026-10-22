@@ -2,10 +2,10 @@
 
 Run History charts one scenario's runs and their typical score beside a list
 grouped by session.
-Its top row puts the player's note beside the scenario selectors, followed
-by adjacent cards for its typical score, personal best and latest run. The
-page receives new runs without a reload and can follow the scenario just
-played. A check marks a run that met its score threshold and a star marks a new personal best, each
+Its top row keeps the player's note by the selectors and groups the score
+cards with a minimum height when they wrap. The page receives new runs
+without a reload and can follow the scenario just played. A check marks a
+run that met its score threshold and a star marks a new personal best, each
 judged when the run was played.
 
 Statements below describe what the app does today and link the
@@ -161,9 +161,11 @@ times that name or order runs remain absolute ([T4][card-order]).
   window's ([2026-08-03][content-area]).
   Where they don't fit on one line, Scenario Stats and the PB card move
   together to the next line's right end, then the scenario note card wraps.
-  The score pair itself can wrap if the column is too narrow to hold both
-  cards, with each inner line packed to its right end
-  ([2026-10-21][score-strip]).
+  The score pair has the note card's 132px minimum height, so a quiet score
+  state still holds room when the pair moves to its own line. Its height
+  beyond that floor follows the cards. The pair itself can wrap if the
+  column is too narrow to hold both cards, with each inner line packed to
+  its right end ([2026-10-21][score-strip]).
   The latest-run card stays in the second column, as tall as the row.
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
@@ -187,8 +189,12 @@ it is saved is in [2026-10-18][note-store].
 - What it shows while reading is out of the layout's flow, so its contents
   never set its height: a note, a long note, no note, a broken file and no
   scenario. Its minimum height and the other pieces on its line set its box
-  ([2026-10-18][note-card]). A wrapped row can be shorter with no scenario
-  selected ([2026-10-21][score-strip]).
+  ([2026-10-18][note-card]). A wrapped score line takes the score cards'
+  height, with a 132px floor matching the note's, so its height can vary with
+  no scenario selected or one that has no local runs. Stacking the score
+  pair can make a selected row taller. At a page area of 900px or less the
+  score-pair wrapper has no box, so its floor has no effect
+  ([2026-10-21][score-strip]).
 - With a note: a frame, the first line `Scenario note · edited {age}` in the
   other cards' quiet style with **Edit** at its right end, and the note at
   14px, its line breaks kept, broken anywhere a word is too long, centered in
