@@ -180,7 +180,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   control name rendered bold
   ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - Both grids feed their quick filter into AG Grid's built-in one client-side.
-  The overview logs AG Grid's `columnSizeOptions` warning on every mount
+  Both log AG Grid's `columnSizeOptions` warning on every mount
   ([2026-07-18](../decision_log/2026/2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning.md)).
 - Both tables have a **Columns** button: on the overview between the **Show
   hidden** switch and the **Import** button, and on the scenario table at the

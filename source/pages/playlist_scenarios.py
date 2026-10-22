@@ -81,6 +81,11 @@ AUTO_SIZE_COLUMN_KEYS = [
     "pb_accuracy_sort",
 ]
 
+COLUMN_SIZE_OPTIONS: dag.AgGrid.ColumnSizeOptions = {
+    "keys": AUTO_SIZE_COLUMN_KEYS,
+    "skipHeader": False,
+}
+
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Scenario",
@@ -1029,6 +1034,8 @@ def layout(
                         )
                     },
                 },
+                columnSize="autoSize",
+                columnSizeOptions=COLUMN_SIZE_OPTIONS,
                 dangerously_allow_code=True,
                 style={
                     "flex": 1,

@@ -2247,8 +2247,8 @@ def test_playlist_scenarios_grid_sizes_to_its_first_rendered_rows(
 
     # Dash supplies the rows after the grid initializes. The wrapper's
     # ``columnSize`` fits empty columns and does not fit them again on arrival.
-    assert "columnSize" not in props
-    assert "columnSizeOptions" not in props
+    assert props["columnSize"] == "autoSize"
+    assert props["columnSizeOptions"] == playlist_scenarios.COLUMN_SIZE_OPTIONS
     assert grid.dashGridOptions["autoSizeStrategy"] == {
         "type": "fitCellContents",
         "colIds": playlist_scenarios.AUTO_SIZE_COLUMN_KEYS,
