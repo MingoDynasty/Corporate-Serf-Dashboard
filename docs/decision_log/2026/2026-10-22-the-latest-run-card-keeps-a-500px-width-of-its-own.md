@@ -21,7 +21,7 @@ supersedes in part
 its "The latest-run card aligns over the run list instead of filling the
 remaining width" and the shared 500px column; the rest of T1 stands. Shipped
 in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#406](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/406).
 What the page does today is in
 [run_history.md](../../specs/run_history.md#the-top-row).
 

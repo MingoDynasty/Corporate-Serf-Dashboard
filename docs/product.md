@@ -99,7 +99,7 @@ the same form as the finished ones under it.
   best score to its line. *Problem solved:* what else was played in a
   session was a count and a divider that named nothing, so the order of a
   session, and how it went across scenarios, was nowhere on screen.
-- **Reloads, FOV and Avg FPS in the run list** (Run History page, PR #PRNUM;
+- **Reloads, FOV and Avg FPS in the run list** (Run History page, PR #406;
   design in #403). The run list's Columns menu can add each run's reloads,
   its FOV with the scale it was set on, such as `103 Overwatch`, and its
   average frame rate, each off to start, and the list widens to fit the

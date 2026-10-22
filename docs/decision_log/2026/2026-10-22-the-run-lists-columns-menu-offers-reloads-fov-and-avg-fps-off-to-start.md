@@ -15,7 +15,7 @@ proposal, rows RC1 to RC3, as amended at 20f6619." As first written, the row
 also said no other stats-file field would ever reach the list. The first
 review wave asked for a bar that a later column has to meet instead, and the
 row was amended to it at `20f6619`. Shipped in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#406](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/406).
 The proposal is in those PRs and git history. What the list does today is in
 [run_history.md](../../specs/run_history.md#the-run-list).
 

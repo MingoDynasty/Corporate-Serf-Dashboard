@@ -19,7 +19,7 @@ on top of Option 1 later, if/when we have so many columns that we end up
 hiding the chart anyways." The requester: "i really like how much bigger the
 right panel is on the 'fits its column' choice". The two numbers and the
 mechanism were author-owned, and the ratification covered them. Shipped in
-[#PRNUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PRNUM).
+[#406](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/406).
 What the list does today is in
 [run_history.md](../../specs/run_history.md#the-run-list).
 
