@@ -14,15 +14,20 @@ fills the room this entry kept between Scenario Stats and the PB card: the
 240 px to 800 px wide. Where the column wraps, the PB card still goes first,
 then the note card, then Scenario Stats. The rest of this entry stands.
 
+**Superseded in part (2026-10-21).** [The score-strip entry](2026-10-21-run-historys-score-cards-stay-together-after-the-note.md)
+puts the note after the dropdowns and keeps Scenario Stats and the PB card
+in one pair. Spare room sits before that pair, which wraps first, together,
+to the next line's right end. The narrow row reads dropdowns, note, Scenario
+Stats, PB, latest run. The PB still sits beside the latest-run card.
+
 **Superseded in part (2026-10-22).** [The latest-run card's own width](2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md)
 replaces "The latest-run card aligns over the run list instead of filling
 the remaining width" and the row and the chart and list sharing "two
 columns, the second 500px wide". The card keeps its 500px and its place at
 the row's right end, as a width of its own, and lines up with the list only
 while the list is at its 500px minimum, which it is by default: the list now
-grows to fit the columns it shows. The dropdowns' column, the cards and
-their order, the PB card beside the latest-run card, the Follow switch, and
-the narrow-window line stand.
+grows to fit the columns it shows. This width change preserves the other
+parts of T1, subject to the score-strip supersession above.
 
 **Rulings and delivery.** T1 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`: "I ratify Proposal 1,

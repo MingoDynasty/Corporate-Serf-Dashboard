@@ -152,8 +152,9 @@ one row's runs and has no typical-score minimum.
 ### Scenario notes
 
 Each scenario can hold one note of your own, such as a reminder about
-technique, and Run History shows it between Scenario Stats and the PB card
-whenever the scenario is selected, with how long ago you last edited it.
+technique, and Run History shows it after the scenario selectors and before
+the three score cards whenever the scenario is selected, with how long ago
+you last edited it.
 Click **Add a scenario note**, or **Edit** on a note, type, and click
 **Save**. **Cancel** puts the saved text back, and Ctrl+Z undoes while you
 type. Saving the note empty deletes it. A note holds up to 2,000 characters.

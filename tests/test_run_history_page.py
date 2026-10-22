@@ -268,12 +268,11 @@ def test_the_layout_takes_a_query_parameter_it_does_not_name():
     }
 
 
-def test_the_top_row_holds_the_dropdowns_stats_note_and_pb_then_the_latest_run_card():
-    """Two columns: the first holds the dropdowns, Scenario Stats, the note and PB.
+def test_the_top_row_holds_the_dropdowns_note_and_score_pair_then_the_latest_run_card():
+    """Keep the note by the selection and the three score cards adjacent.
 
-    The latest-run card is the second column on its own, so it sits over
-    the run list, and the PB card is last in the first, beside it. The
-    scenario note card is in the room between the stats card and the PB card.
+    DOM order is also keyboard and screen-reader order. The latest-run card
+    keeps its own column over the run list.
     """
     row = _by_class(run_history.layout(), "run-history-top-row")
 
@@ -281,10 +280,12 @@ def test_the_top_row_holds_the_dropdowns_stats_note_and_pb_then_the_latest_run_c
     assert left.className == "run-history-top-row-left"
     assert card.className == latest_run_card.CARD_CLASS
     assert _ids(card) == set(run_history.LATEST_RUN_CARD_IDS)
-    dropdowns, stats, note, pb = left.children
+    dropdowns, note, pair = left.children
     assert dropdowns.className == "run-history-dropdown-column"
-    assert stats.className == "scenario-stats-card"
     assert note.id == run_history.NOTE_CARD_IDS.card
+    assert pair.className == "run-history-score-pair"
+    stats, pb = pair.children
+    assert stats.className == "scenario-stats-card"
     # Position is the PB card's now.
     assert run_history.PB_CARD_IDS.rank in _ids(pb)
     assert run_history.PB_CARD_IDS.rank not in _ids(stats)
@@ -1468,6 +1469,23 @@ def test_the_first_column_wraps_its_pieces_on_its_own_width():
     assert "align-items" not in left
 
 
+def test_the_score_pair_wraps_together_with_spare_room_before_both_cards():
+    """Keep the PB beside Typical score when the first column wraps."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    pair = _css_block(css, ".run-history-score-pair")
+
+    assert "display: flex;" in pair
+    assert "flex-wrap: wrap;" in pair
+    assert "gap: var(--mantine-spacing-sm);" in pair
+    assert "justify-content: flex-end;" in pair
+    assert "margin-left: auto;" in pair
+    assert "max-width: 100%;" in pair
+    assert "min-height: 132px;" in pair
+    assert "align-items" not in pair
+    assert "margin-left" not in _css_block(css, ".scenario-stats-card")
+    assert "margin-left" not in _css_block(css, ".pb-card")
+
+
 def test_the_dropdowns_column_grows_from_260px_to_420px():
     column = _css_block(
         STYLESHEET.read_text(encoding="utf-8"), ".run-history-dropdown-column"
@@ -1557,11 +1575,11 @@ def test_the_columns_stack_when_the_page_itself_is_900px_or_narrower():
 
 
 def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
-    """The dropdowns, Scenario Stats, PB, then the latest-run card, in the page's order.
+    """Pack dropdowns, note, Scenario Stats, PB and latest run in DOM order.
 
     With the list above the chart there is nothing for the card to line up
     with, so the first column's pieces and the card share one line, packed
-    from its start: the PB card no longer keeps to the column's right end.
+    from its start: the score pair no longer keeps to the column's right end.
     """
     narrow = _container_block(
         STYLESHEET.read_text(encoding="utf-8"), "run-history-page (max-width: 900px)"
@@ -1569,12 +1587,12 @@ def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
 
     row = re.search(r"\.run-history-top-row \{(.*?)\}", narrow, re.DOTALL)
     left = re.search(r"\.run-history-top-row-left \{(.*?)\}", narrow, re.DOTALL)
-    pb = re.search(r"\.pb-card \{(.*?)\}", narrow, re.DOTALL)
+    pair = re.search(r"\.run-history-score-pair \{(.*?)\}", narrow, re.DOTALL)
     card = re.search(r"\.run-history-card \{(.*?)\}", narrow, re.DOTALL)
     assert row and "display: flex;" in row.group(1)
     assert "flex-wrap: wrap;" in row.group(1)
     assert left and "display: contents;" in left.group(1)
-    assert pb and "margin-left: 0;" in pb.group(1)
+    assert pair and "display: contents;" in pair.group(1)
     assert card and "flex: 1 1 380px;" in card.group(1)
 
 
@@ -1622,7 +1640,7 @@ def test_the_stats_card_is_270px_and_adds_only_its_border_to_the_height():
 
 
 def test_the_pb_card_is_300px_at_the_first_columns_right_end():
-    """Beside the latest-run card, after the scenario note card.
+    """Keep the PB beside the latest run, after Scenario Stats in their wrapper.
 
     Its frame adds only its border to its height, so the row stays the height
     the dropdowns' column sets in every state that changes between runs.
@@ -1631,7 +1649,8 @@ def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     card = _css_block(css, ".pb-card")
 
     assert "flex: 0 0 300px;" in card
-    assert "margin-left: auto;" in card
+    assert "width: 300px;" in card
+    assert "margin-left" not in card
     assert "padding: 0 var(--mantine-spacing-sm);" in card
     assert "justify-content: center;" in card
     assert "max-width: 100%;" in card
