@@ -758,7 +758,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   scenario on screen ([2026-10-18][heading-line]).
   Under This scenario the line reads `{scenario} · {n} runs`, or `1 run`,
   where `{n}` counts every run of the scenario in the run store, the figure
-  Scenario Stats shows as Number of runs. Under All scenarios it reads
+  Scenario Stats shows as Total runs. Under All scenarios it reads
   `All scenarios · {n} runs`, where `{n}` counts every run in the store
   ([2026-10-14][all-scenarios]).
 
@@ -1187,10 +1187,14 @@ The card's lines, local-record scope and leaderboard presentation follow
 ## Scenario Stats
 
 - A card in the top row, framed as the latest-run card is, in the theme's
-  tokens. Its first line is plain text, "Typical score", with a help icon
-  named "About the typical score". Its lead is the typical score in the
-  same large-number style as the PB and latest-run cards, with a dotted
-  underline and a hover. Category and Total runs follow at one weight.
+  tokens. Its first line is plain text, "Typical score", and is not a heading
+  ([2026-10-18][stats-last-played]). A help icon named "About the typical
+  score" follows it. Its lead is the typical score in the same large-number
+  style as the PB and latest-run cards, with a dotted underline and a hover.
+  Category and Total runs follow at one weight. The personal best and the
+  leaderboard position are [the PB card's](#the-pb-card), and when the
+  scenario was last played is [the latest-run card's](#the-latest-run-card)
+  ([2026-10-18][stats-last-played]).
 - The lead is the value after the scenario's newest run, built by the same
   function as the chart's last point from one snapshot of the whole run
   store. Recency is judged against the app's own clock as of now, and a

@@ -144,7 +144,13 @@ def get_scenario_typical_score(
     current_lead=None,
     current_readout=None,
 ) -> tuple[Any, Any, bool]:
-    """Build the lead from one run snapshot, keeping unchanged tooltips mounted."""
+    """Build the lead from one run snapshot, keeping unchanged tooltips mounted.
+
+    Return the lead's children, the recency readout and whether to hide the
+    lead. Unchanged children or readout are ``no_update``; visibility is
+    always written. The run-event payload and interval count trigger the
+    call and are not read.
+    """
     lead: Any = []
     readout: Any = ""
     if selected_scenario:

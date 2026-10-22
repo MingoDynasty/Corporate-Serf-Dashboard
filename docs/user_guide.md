@@ -93,7 +93,7 @@ have cleared, starts with run notifications on and on Confetti.
 Run History's top row puts the selected scenario's stats beside its
 personal best and its latest run. The **Playlist filter** sets the benchmark
 context: Scenario Stats shows that benchmark's category and subcategory
-above Number of runs. Category disappears when the filter is empty, holds
+above Total runs. Category disappears when the filter is empty, holds
 an ordinary playlist, or has no grouping for the scenario.
 
 The PB card shows the local record, its rank and the next rank's score, then
