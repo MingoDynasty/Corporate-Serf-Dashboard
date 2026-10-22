@@ -127,7 +127,7 @@ _APPLY_COLUMNS = """
                         const columns = new Set(
                             gridApi.getAllDisplayedColumns().map((column) => column.getColId())
                         );
-                        const headers = [...grid.querySelectorAll(".ag-header-cell")];
+                        const headers = [...grid.querySelectorAll(".ag-header-row-column .ag-header-cell")];
                         const cells = [...grid.querySelectorAll(".ag-cell")];
                         if (headers.length !== columns.size ||
                             [...headers, ...cells].some((cell) => !columns.has(cell.getAttribute("col-id"))) ||

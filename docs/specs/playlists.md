@@ -8,9 +8,9 @@ playlist's name opens its scenario table, which paints local stats and a
 benchmark's ranks and categories immediately and streams leaderboard positions
 in behind them, while a background worker keeps the overview's percentile
 columns warm.
-Each table remembers which columns the browser shows, applies a scenario
-table's saved choice before revealing it, and draws selectable rows that the
-browser's own text search finds.
+Each table remembers its Columns menu choice in the browser, a scenario
+table applies that choice before revealing its rows, and every row is
+selectable text that the browser's own text search finds.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
