@@ -11,9 +11,9 @@ is weak. This proposal adds two columns beside the PB ones: the typical
 score, the median of the scenario's last 20 runs, and the rank it reaches
 with how far it sits toward the next one, such as Celadon · 7%. Sorting that
 rank column lists the scenarios from weakest to strongest by the player's
-usual play, while the PB columns beside it keep the record. Old typical
-scores show greyed out, and each value's hover explains it, as on Run
-History's Scenario Stats card.
+usual play, while the PB columns beside it keep the record. An old typical
+score is marked with a clock and stays readable, and each value's hover
+explains it, from the mouse or the keyboard.
 
 ## Decisions needed
 
@@ -22,7 +22,9 @@ lean from the design discussion of 2026-10-21 and 2026-10-22, worked out on
 three versions of a live prototype built from their own stats, with two
 rounds of advice from `claude-fable-5-1`. A lean is not a ruling: every row,
 and every premise in Problem, is open to challenge. Everything else is
-author-owned, in [Design](#design).
+author-owned, in [Design](#design). TB2 and TB4 were amended after the first
+review; TB4's recommendation now departs from the maintainer's lean, and its
+status line says how.
 
 ### TB1. Two typical columns beside the PB columns
 
@@ -44,7 +46,8 @@ keeps what it reports.**
   Cerulean by its PB and Celadon by its typical score, while Celadon beside
   Celadon means the scenario plays at its rank.
 - **It fits the maintainer's window.** At 2560 px both columns fit with no
-  sideways scroll; the Scenario column narrows from 400 to 393 px. At 1920
+  sideways scroll; the Scenario column narrows from 400 to 333 px, and no
+  scenario name is cut on Viscose Benchmark S2 Medium. At 1920
   px the table already scrolls today, and the Columns menu hides what a
   player never reads.
 - **Each typical value has a hover,** the one Scenario Stats gives its lead
@@ -75,8 +78,8 @@ gap to the next rank.
 **Recommendation: Typical Rank sorts by its rank position, the number of
 ranks the typical score has reached plus the fraction of the way to the
 next one. The cell shows the rank's name and that fraction as a whole
-percent, `Celadon · 7%`, rounded down. The gap to the next rank goes in the
-cell's hover, `+10.3% to Viridian · 45 to go`.**
+percent, `Celadon · 7%`, rounded down and never above 99%. The gap to the
+next rank goes in the cell's hover, `+10.3% to Viridian · 45 to go`.**
 
 - **The gap sorts against weakness inside a rank.** A scenario that has just
   reached a rank is the farthest from the next one, so sorting by the gap
@@ -98,9 +101,13 @@ cell's hover, `+10.3% to Viridian · 45 to go`.**
   a player knows rank names, and the ordinal shifts between ladders: Celadon
   is fourth of nine on Viscose, while a four-rank ladder ends at 4.
 - **Below the first rank** there is no lower threshold. The cell reads
-  `No rank`, with no number, and sorts by the typical score over the first
-  threshold, which is the gap's own order there. A number would have to rest
-  on an invented floor. This is common on harder benchmarks: 6 of the 7 known
+  `No rank`, with no number, and sorts by how far the typical score falls
+  short of the first rank, measured as the Next Rank gap measures it: the
+  score over the first threshold, or, on a time-scored scenario where pace
+  applies, the first rank's time over the typical time. A ratio of scores
+  would move with a time-scored scenario's arbitrary starting constant; a
+  ratio of times doesn't. A displayed number would have to rest on an
+  invented floor. This is common on harder benchmarks: 6 of the 7 known
   typical scores on Aimspeed Benchmark 2 Normal.
 - **At the top rank** the cell reads the rank's name alone, and sorts last
   ascending.
@@ -118,8 +125,8 @@ still gets a Typical Rank and sorts among the others.
 
 **Recommendation: a known typical score gets its Typical Rank whether or not
 it is recent, and sorts with the known values. A known value that is not
-recent is greyed in both typical cells (TB4). A typical score below the
-minimum is never greyed: unknown is not the same as old. It reads
+recent is marked Not recent in both typical cells (TB4). A typical score
+below the minimum is never marked: unknown is not the same as old. It reads
 `Too few runs`, and its row sorts after every known value in both
 directions.**
 
@@ -138,34 +145,51 @@ directions.**
 - **Unknown is never weak,** per the same principles. Too few runs rows are
   never ranked among the known ones, so they sort last whichever way the
   column sorts, as `N/A` already does.
+- **Admitting an old value rests on its qualification reaching every
+  reader.** So the mark is visible without the grey, read aloud by a screen
+  reader, and explained from the keyboard (TB4,
+  [The hovers](#the-hovers)).
 
-### TB4. Old values are greyed with the card's grey
+### TB4. Old values are marked Not recent, in a grey that stays readable
 
-Status: Proposed. The maintainer's lean, 2026-10-22, after comparing two
-greys on the prototype: the darker one "doesn't seem faded enough, and looks
-too similar to regular text. The 'Card's grey' option, however, is faded
-enough to see a difference."
+Status: Proposed, amended after the first review. The maintainer's lean,
+2026-10-22, after comparing two greys on the prototype: the darker one
+"doesn't seem faded enough, and looks too similar to regular text. The
+'Card's grey' option, however, is faded enough to see a difference." This
+recommendation departs from that lean. It keeps the darker grey and adds a
+mark, so the difference no longer rests on the grey; the prototype's panel
+switches between the two.
 
-The material consequence: greyed values sit below the 4.5:1 contrast WCAG AA
-asks of text this size.
+The material consequence: an old value carries a small clock, a key line
+explains it, and the numbers stay at 4.5:1 or more. Choosing the card's grey
+instead leaves the old figures under 4.5:1, with the difference in color
+alone.
 
-**Recommendation: grey a known typical score that is not recent in
-Mantine's dimmed color, the one Scenario Stats dims its lead with, in both
-typical cells. Accept its contrast and record it.**
+**Recommendation: show a known typical score that is not recent in a muted
+grey that clears 4.5:1 on every row, with a clock after the value in both
+typical cells. While any row on the table is old, a key beside the table's
+status line reads `Not recent: fewer than 10 runs from the last 30 days`. A
+screen reader hears `Not recent` after the value.**
 
-- **Measured from the rendered table:** 3.32:1 light and 4.04:1 dark on the
-  plain row, 3.15:1 and 3.53:1 on the alternating one. Normal text is 21:1
-  and 9.37:1.
-- **A grey that clears 4.5:1 on every row** (`#676d75` light, `#a6a6a6`
-  dark) reads too close to normal text, worst in the dark theme, where
-  normal text is `#c9c9c9`. The maintainer judged it on the prototype.
-- **The app already accepts this contrast.** The playlist code under the
-  table's title and the status line beside the filter box use the same grey.
-  The 2026-10-13 navbar entry accepted a marked label at 3.17:1, with the
-  cost written down.
-- **The grey is not the only signal.** The Typical Score hover's Recent line
-  states the count in words. Whether that hover can open from the keyboard is
-  [not checked](#not-checked).
+- **These are the figures the table is for.** The typical cells are what the
+  player compares to find weakness, and TB3 admits old values on the
+  condition that they are qualified. In the card's grey they measure 3.32:1
+  light and 4.04:1 dark on the plain row, 3.15:1 and 3.53:1 on the
+  alternating one, under the 4.5:1 WCAG AA asks of text this size. And the
+  difference is color alone, which a reader who can't tell the grey, or
+  doesn't see the table, misses.
+- **The card's precedent doesn't carry over.** Scenario Stats dims a 30 px,
+  weight-600 lead, held to 3:1 for large text, and its first line states the
+  recent count in words. The playlist code and the status line, which use the
+  same grey, are not figures anyone compares.
+- **The darker grey alone read too close to normal text,** worst in the dark
+  theme, where normal text is `#c9c9c9`. The clock carries the difference
+  instead. On the prototype, `#676d75` light and `#a6a6a6` dark measure
+  5.22:1, 4.95:1 and 4.7:1 on the plain, alternating and hovered rows in the
+  light theme, and 6.38:1, 5.58:1 and 4.6:1 in the dark.
+- **It costs no width.** Both typical columns are as wide as their headers,
+  so the clock widens neither, and the table's overflow is unchanged at every
+  width measured.
 
 ## Problem
 
@@ -222,10 +246,21 @@ display, not that they improve training.
 - Building every row's newest typical value for a 39-scenario benchmark
   costs about 35 ms to split the whole store into sessions and 69 ms to build
   the values, measured in-process on the maintainer's store.
-- Widths, headless Edge, prototype at the maintainer's data: the two columns
-  fit at 2560 px; a third, the typical Next Rank, would scroll the table by
-  152 px there. With the two, the table scrolls by 587 px at 1920 and 971 px
-  at 1536.
+- Widths, headless Edge at 1300 px tall with the navigation open, prototype
+  at the maintainer's data, 2026-10-22: the two columns fit at 2560 px, where
+  the Scenario column narrows from 400 to 333 px; a third, the typical Next
+  Rank, would scroll the table by 152 px there. With the two, the table
+  scrolls by 587 px at 1920 and 971 px at 1536. The Not recent clock changes
+  none of these.
+- AG Grid's `tooltipTrigger` is one grid-wide option with two values, and
+  each wires its own listeners: `hover` the mouse's, `focus` the focus's
+  instead. Setting `focus` would end every mouse hover in the table
+  (dash-ag-grid 35.3.0's bundle).
+- On the prototype, the Chromium accessibility tree names an old Typical
+  Score cell `873.11, Not recent` with its hover's text as the description,
+  a recent one by its value alone, and a Too few runs cell by those words
+  with the below-minimum text. Arrowing onto a typical cell opens its hover;
+  Escape closes it; the mouse hover still opens as before.
 - In dash-ag-grid's `{"function": ...}` strings, `Boolean(...)` silently
   fails, as `dagfuncs.` does: the scope holds the registered functions,
   `params` and a few named libraries, not the browser's globals (found on the
@@ -241,14 +276,10 @@ display, not that they improve training.
   whose thresholds sit harder or easier than the others' would sort weaker or
   stronger than it plays. Nothing here measures how even a benchmark's
   thresholds are.
-- **Keyboard access to the hovers.** The table's existing cell hovers (Next
-  Rank's points, Last Played's exact time) open on mouse hover only. One
-  probe of AG Grid's `tooltipTrigger` option, changed on a live grid, showed
-  no hover on keyboard focus; set at creation it may behave differently.
 - **Firefox.** The maintainer looked at the prototype in Firefox; the
   measurements above are headless Edge.
-- **What a screen reader says about a greyed value.** The grey has no text
-  equivalent outside the hover.
+- **What a screen reader says.** The accessibility tree reads as specified
+  on the prototype; no screen reader has spoken the table yet.
 
 ## Design
 
@@ -265,7 +296,7 @@ ranks, so it gains Typical Score alone, after PB Score.
 
 The typical columns are computed as the page opens and, like PB Score, do
 not change when a run lands until the page reopens. Neither does whether a
-value is greyed, nor what its hover counts. Run History's card, which
+value is marked Not recent, nor what its hover counts. Run History's card, which
 updates every 30 seconds, can disagree with a table left open for a long
 time.
 
@@ -277,9 +308,18 @@ time.
 - **Typical Rank:** `{rank} · {percent}%`; the rank name alone at the top
   rank; `No rank` below the first rank; `N/A` with Too few runs, with no
   runs, or for a benchmark scenario without a ladder.
-- **Greyed:** both typical cells of a row whose typical score is known and
-  not recent, as of the page opening (TB3, TB4). Too few runs and `N/A` are
-  never greyed.
+- **Not recent:** both typical cells of a row whose typical score is known
+  and not recent, as of the page opening (TB3, TB4). The value shows in a
+  muted grey that clears 4.5:1 on the plain, alternating and hovered rows in
+  both themes, with a clock after it that a screen reader skips, and
+  `Not recent` is read after the value. Too few runs and `N/A` are never
+  marked.
+- **The key:** a clock and `Not recent: fewer than 10 runs from the last 30
+  days`, in the same grey, beside the table's status line while any row on
+  the table is old, and absent otherwise. The value is the median of the
+  newest runs, so fewer than 10 of its runs from the last 30 days is the same
+  as fewer than 10 runs of the scenario in that time, which is what the key
+  says.
 
 ### Rank position
 
@@ -288,20 +328,31 @@ time.
   threshold)`. The walk stops at the first threshold above the score, so the
   fraction is always at least 0 and below 1, even on the corpus's ladders
   that tie or dip.
-- **Below the first rank:** the typical score over the first threshold,
-  floored at zero, and 0 when the first threshold is zero or less (4 of the
-  corpus's 4,384 ladders start at zero). Always below 1, so it sorts under
-  every ranked row.
+- **Below the first rank:** `1 / (1 + gap / 100)`, where `gap` is the
+  unrounded gap from the typical score to the first rank by the Next Rank
+  rule: by pace where it applies, a percentage of the score otherwise. On
+  score math that is the typical score over the first threshold; by pace it
+  is the first rank's time over the typical time. Where the gap is
+  undefined, a score of zero or less with no pace, the key is 0. Always below
+  1, so it sorts under every ranked row.
 - **At the top rank:** the rank count.
-- **The percent:** the fraction times 100, rounded down,
-  `floor(round(x * 100, 6))`. The inner round strips float noise, as the Next
-  Rank gap's does before it rounds up. So 99% is the most a cell reads, a
-  score on a threshold reads `0%`, and no cell reads as the next rank.
-- **Pace:** the fraction is the same whether measured in score or in time,
-  since a time-scored score is a constant minus the time. Pace only changes
-  the hover's gap, which follows the rule the PB's gap already follows: it
-  uses pace when every run behind the typical score is of the version the
-  constant was read from, and a percentage of the score otherwise.
+- **The percent:** the fraction times 100, rounded down and capped at 99
+  while a next rank remains: `min(99, floor(round(x * 100, 6)))`. The inner
+  round strips float noise, as the Next Rank gap's does before it rounds up,
+  but it can carry a score a hair under the next threshold to 100: between
+  thresholds of 1,000 and 10,000, a typical score of 9,999.999999 would read
+  100% without the cap. So no cell reads as the next rank, and `0%` means on
+  the threshold or just above it: 500.5 between 500 and 600 reads `0%`. The
+  sort key and the ladder walk use the unrounded fraction.
+- **Pace:** between two thresholds the fraction is the same whether measured
+  in score or in time, since a time-scored score is a constant minus the time
+  and the constant cancels. Below the first rank it doesn't cancel: with a
+  120-second typical run and a 100-second first rank, the ratio of scores is
+  0.98 when the constant is 1,000 and 0.8 when it is 200, either side of an
+  ordinary row at 90 against 100, while the ratio of times is 0.83 for both.
+  That is why the below-first key follows the gap's rule. Pace applies, as
+  for the PB's gap, when every run behind the typical score is of the version
+  the constant was read from; the hover's gap follows the same rule.
 
 ### The hovers
 
@@ -315,6 +366,16 @@ time.
   Rank's Top rank has none.
 - Both cells carry the dotted underline the table uses for a cell with a
   hover.
+- **From the keyboard:** when keyboard focus lands on a typical cell, its
+  hover opens beside it with the same content. It closes when focus moves on,
+  on Escape, on a click, and when focus leaves the table. A click that
+  focuses a cell opens nothing extra; the mouse hover stays the grid's own.
+  AG Grid's `tooltipTrigger` can't do this without ending every mouse hover
+  ([Verified facts](#verified-facts)), so the build opens it from the grid's
+  cell-focus event, as the prototype does.
+- **For a screen reader:** each typical cell's hover text is its accessible
+  description, read after the value and, on an old value, after
+  `Not recent`.
 
 ### Sorting and the address
 
@@ -334,24 +395,32 @@ value holding it is not valid there, as `rank` already is not.
   accept that discrepancy." It can show on the 49 of 226 known typical
   scores whose median falls halfway between two runs. The fix, if it is ever
   wanted, belongs to the typical score's rounding rule, not to this table.
-- **Greyed values sit under 4.5:1** (TB4).
+- **Header tooltips stay mouse-only,** as every column's are today. The key
+  line says what the Typical Score header says about the clock, and the cell
+  hovers open from the keyboard.
 
 ### How it is built
 
 - **Row fields.** Each row gains `typical_score_display`,
-  `typical_score_sort`, `typical_dimmed`, the Typical Score hover's text, and
+  `typical_score_sort`, `typical_not_recent`, the Typical Score hover's text, and
   on a benchmark `typical_tier_display`, the rank position, the percent and
   the Typical Rank hover's text. They come from one whole-store snapshot per
   table build, as Scenario Stats takes one, and every row path (phase 1, the
   fill, and a cancelled fill's rebuild) carries them, as all three already
   carry the ladder.
-- **Column defs.** Two plain columns with their own IDs, `typical_score_sort`
-  and `typical_tier_sort`, added after `next_tier_sort` (or `pb_score_sort`),
-  in the auto-size keys and the Columns menu. Their formatters read their
-  own row fields; no column changes another's meaning.
+- **Column defs.** Two columns with their own IDs, `typical_score_sort` and
+  `typical_tier_sort`, added after `next_tier_sort` (or `pb_score_sort`), in
+  the auto-size keys and the Columns menu. Their formatters read their own
+  row fields; no column changes another's meaning. Both draw their cells with
+  one cell renderer: the value, the clock and `Not recent` on an old value,
+  and the hover's text as the grid cell's accessible description.
 - **The Typical Score hover** is a custom tooltip component that wears the
   `ag-tooltip` class and is as wide as its text, up to the card's 360 px. The
   Typical Rank hover is the grid's plain text tooltip.
+- **The keyboard hover** opens from the grid's cell-focus event when the
+  focus came from a key, with the same content and the same tooltip styles.
+- **The key** sits beside the status line and shows while any row's typical
+  value is old.
 
 The prototype that settled the rows lives outside the repository, with its
 versions; it is a reference for the build, not its code.
@@ -364,14 +433,20 @@ Every string this proposal adds. The rest of the table is unchanged.
 
 **Header tooltips:**
 - Typical Score: `The median of your last 20 runs of this scenario, or of
-  all your runs if you have fewer. A dimmed number means fewer than 10 of
-  those runs are from the last 30 days, so it may be out of date.`
+  all your runs if you have fewer. A clock beside the number means fewer
+  than 10 of those runs are from the last 30 days, so it may be out of
+  date.`
 - Typical Rank: `The highest rank your typical score reaches on this
-  scenario, and how far it is toward the next rank. 0% is on the rank's
-  threshold and 99% is just under the next one. Lower is weaker.`
+  scenario, and how far it is toward the next rank. The percent rounds down,
+  so 0% can be just above the rank's threshold. Lower is weaker on this
+  benchmark's rank ladder.`
 
 **Cells:** `{rank} · {percent}%`, `Too few runs`, and the existing `N/A` and
 `No rank`.
+
+**Not recent:** the key, after a clock, `Not recent: fewer than 10 runs from
+the last 30 days`; and `Not recent`, read by a screen reader after an old
+value.
 
 **The Typical Score hover**, verbatim from Scenario Stats:
 - `The median of your last {n} runs.`, or `The median of your {n} runs.`
@@ -404,6 +479,10 @@ which is never read as weak.
 - In code: `typical_tier`; its sort key is the rank position, the ranks
   reached plus that fraction.
 - Not Rank.
+
+The existing **Recent** entry gains the table: on the scenario table, an old
+value shows in a muted grey with a clock after it and `Not recent` for a
+screen reader, explained by a key beside the status line.
 
 ### Decisions this changes
 
@@ -467,7 +546,8 @@ likely one run is to clear the next rank is a different question.
 ## Delivery plan
 
 **One PR,** which also ships this proposal: the row fields, the two columns,
-the hovers, the rank position, the Columns menu entries and sort names, and
+the hovers and their keyboard route, the Not recent mark and its key, the
+rank position, the Columns menu entries and sort names, and
 the shipping checklist (decision-log entries TB1 to TB4, the playlists and
 typical score specs, the glossary, the roadmap, the product inventory, the
 user guide).
@@ -479,19 +559,33 @@ nothing.
 ## Testing
 
 - **Unit:** the rank position and percent on a four-rank ladder (500 is
-  `Bronze · 0%`, 540 is `Bronze · 40%`, 599.999 is `Bronze · 99%`), below
-  the first rank, at the top rank, and on a ladder that ties and one that
-  dips; the typical row fields for a known, a not-recent, a below-minimum
-  (singular and plural counts) and a no-runs scenario; pace on one version
-  and score math on mixed versions; all three row paths carry the fields.
+  `Bronze · 0%`, 540 is `Bronze · 40%`, 599.999 is `Bronze · 99%`), at the
+  top rank, and on a ladder that ties and one that dips; the cap, where a
+  typical score of 9,999.999999 between thresholds of 1,000 and 10,000 reads
+  99% and 10,000 reads the next rank at 0%; below the first rank by score
+  math and by pace, where an ordinary row at 90 against 100 and a time-scored
+  row whose 120-second typical run misses a 100-second first rank keep the
+  same order whether the scenario's constant is 1,000 or 200, and a score of
+  zero or less with no pace keys 0; the typical row fields for a known, a
+  not-recent, a below-minimum (singular and plural counts) and a no-runs
+  scenario; pace on one version and score math on mixed versions; all three
+  row paths carry the fields.
 - **Column defs:** the two columns' placement on both kinds of table, the
   Columns menu entries, and the `?sort=` names, including `typical-rank` not
   valid on a playlist's table.
 - **Browser** (headless Edge, then the maintainer's Firefox), on Viscose
   Benchmark S2 Medium in both themes: Typical Rank sorted ascending starts
   Ground Plaza Sparky V3, Pasu Voltaic Reload Easy, CatClick Medium; both
-  hovers read as specified; Flower 50cm greys both cells; Aimspeed Benchmark
-  2 Normal's below-first rows read `No rank` and sort first; no header is
+  hovers read as specified; Flower 50cm marks both cells Not recent and the
+  key shows, and a table with no old value shows no key; an old value
+  measures 4.5:1 or more on the plain, alternating and hovered rows in both
+  themes; arrowing onto Flower 50cm's typical cells opens each hover, Escape
+  closes it, and a click opens only the mouse hover; Aimspeed Benchmark 2
+  Normal's below-first rows read `No rank` and sort first; no header is
   clipped at 1536, 1920, 2560 and 3840 px.
+- **Screen reader** (NVDA, in the maintainer's Firefox): on Viscose Benchmark
+  S2 Medium, arrowing across the typical cells reads a recent value as its
+  value, an old one with `Not recent`, and Too few runs as those words, each
+  followed by its hover's text. The ordinary gates can't establish this.
 - **Gates:** pytest, ruff format and lint, mypy, compileall, as AGENTS.md
   lists.
