@@ -24,6 +24,8 @@ jobs:
               run: uv sync --locked --group screenshots
             - name: Install Chromium
               run: uv run --group screenshots playwright install chromium
+            - name: Check capture error handling
+              run: uv run --group screenshots pytest tests/test_capture_screenshots_browser.py --basetemp=ignore/pt-screenshot-browser
             - name: Capture the current app
               run: uv run --group screenshots python -m scripts.capture_screenshots
             - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0

@@ -270,7 +270,6 @@ def capture(origin: str, destination: Path) -> None:
                 {"scenario": SCENARIO, "playlist_code": RUN_HISTORY_PLAYLIST_CODE}
             )
         )
-        page.reload()
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         responses = []
@@ -280,6 +279,7 @@ def capture(origin: str, destination: Path) -> None:
                 responses.append(response.status) if response.status >= 400 else None
             ),
         )
+        page.reload()
         expect(page.locator("#run-history-scenario")).to_have_value(SCENARIO)
         page.wait_for_function("""() => {
             const graph = document.querySelector('#run-history-graph .js-plotly-plot');

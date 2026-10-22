@@ -34,6 +34,20 @@ branch to capture. Download the `readme-screenshots-<commit>` artifact, inspect
 the images, then replace these PNGs in a normal pull request. The workflow has
 read-only repository permissions and does not commit or push images.
 
+## Validate capture behavior
+
+The on-demand workflow runs the Chromium regression checks before capturing the
+images. To run them locally after installing the screenshot tools and browser:
+
+```powershell
+uv run --group screenshots pytest tests/test_capture_screenshots_browser.py
+```
+
+They check that errors on the clean reload fail capture without replacing
+existing images, while noise on the initial load is ignored. The standard test
+suite skips these browser checks when the optional screenshot tools aren't
+installed.
+
 ## Capture contract
 
 [The capture script](../../scripts/capture_screenshots.py) starts the app from
@@ -56,11 +70,12 @@ at least that width plus the page padding, and checks that the table has no
 horizontal overflow. This includes new default columns added by later changes.
 Table images are cropped to their headers and up to twelve rows.
 
-The script reloads once for the known initial Dash Pages race, waits for the
-chart, note, grid and leaderboard callbacks, then waits for two matching frames
-with animations disabled before saving each screenshot. It fails on subsequent
-browser exceptions, HTTP errors,
-or attempted outbound requests. All three captures must succeed before any
+The script ignores the first load's known Dash Pages race, then attaches error
+listeners before reloading so failures during the clean reload are captured.
+It waits for the chart, note, grid and leaderboard callbacks, then waits for
+two matching frames with animations disabled before saving each screenshot.
+It fails on subsequent browser exceptions, HTTP errors, or attempted outbound
+requests. All three captures must succeed before any
 checked-in image is replaced, and the temporary server and state are removed
 on success or failure.
 
