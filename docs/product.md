@@ -99,6 +99,14 @@ the same form as the finished ones under it.
   best score to its line. *Problem solved:* what else was played in a
   session was a count and a divider that named nothing, so the order of a
   session, and how it went across scenarios, was nowhere on screen.
+- **Reloads, FOV and Avg FPS in the run list** (Run History page, PR #PRNUM;
+  design in #403). The run list's Columns menu can add each run's reloads,
+  its FOV with the scale it was set on, such as `103 Overwatch`, and its
+  average frame rate, each off to start, and the list widens to fit the
+  columns it shows. *Problem solved:* a player who changes FOV between runs
+  couldn't see which runs were played at which FOV, and a PB set at an
+  unusual one looked like any other run. The list stays a short panel for
+  picking out a run: these are for the player who asks.
 - **The latest run, on a card** (Run History page, PR #372; design in #356).
   A card at the top of the page reports the selected scenario's latest run:
   its score, whether it passed your threshold or set a new personal best, its
