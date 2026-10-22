@@ -2,11 +2,11 @@
 
 Run History charts one scenario's runs and their typical score beside a list
 grouped by session.
-Its top row keeps the player's note by the selectors and groups the score
-cards with a minimum height when they wrap. The page receives new runs
-without a reload and can follow the scenario just played. A check marks a
-run that met its score threshold and a star marks a new personal best, each
-judged when the run was played.
+Its top row puts the player's note beside the scenario selectors, followed
+by adjacent cards for its typical score, personal best and latest run. The
+page receives new runs without a reload and can follow the scenario just
+played. A check marks a run that met its score threshold and a star marks a
+new personal best, each judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
