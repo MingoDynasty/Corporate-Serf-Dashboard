@@ -644,14 +644,9 @@ a.run-toast-link:hover {
 /* Edit and Add a scenario note: buttons, since each opens the editor and
    goes nowhere, drawn as the app draws a link. */
 .run-history-note-link {
-    background: none;
-    border: 0;
     color: var(--mantine-color-anchor);
-    cursor: pointer;
     flex: 0 0 auto;
     font: inherit;
-    padding: 0;
-    text-align: left;
 }
 
 .run-history-note-link:hover {
