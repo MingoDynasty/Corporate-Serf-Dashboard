@@ -224,11 +224,15 @@ a.run-toast-link:hover {
    wide, so it narrows the page without touching the viewport, and a media
    query would keep two columns in a page too narrow for them.
 
-   The run list's column width is one value, which the top row's second
-   column takes too, so the latest-run card's edges are the list's at every
-   zoom level. */
+   The run list's minimum width and the latest-run card's width are two
+   values, equal on purpose: the list is at its minimum with the default
+   columns, so on the default page the card's edges are the list's at every
+   zoom level. A change to one asks whether the other follows. The list grows
+   past its minimum to the width its shown columns need, which the page's
+   script writes here as --run-history-list-need. */
 .run-history-page {
     --run-history-list-width: 500px;
+    --run-history-card-width: 500px;
 
     container: run-history-page / inline-size;
     display: flex;
@@ -249,7 +253,7 @@ a.run-toast-link:hover {
     display: grid;
     flex: 0 0 auto;
     gap: var(--mantine-spacing-md);
-    grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);
+    grid-template-columns: minmax(0, 1fr) var(--run-history-card-width);
     margin-bottom: var(--mantine-spacing-md);
 }
 
@@ -810,13 +814,21 @@ a.run-toast-link:hover {
     overflow-wrap: anywhere;
 }
 
-/* The chart beside the run list. The list's column is as wide as its seven
-   columns need, and the chart takes the rest. */
+/* The chart beside the run list. The list's column is as wide as its shown
+   columns need, never narrower than its minimum, and never so wide that the
+   chart drops under 480px; past that the list scrolls sideways. Where the
+   two bounds cross, in a narrow window, the minimum wins and the chart
+   gives, as it did before the list could grow. Before the script has
+   written the need, the list is at its minimum. */
 .run-history-columns {
     display: grid;
     flex: 1 1 0;
     gap: var(--mantine-spacing-md);
-    grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);
+    grid-template-columns: minmax(0, 1fr) clamp(
+            var(--run-history-list-width),
+            var(--run-history-list-need, var(--run-history-list-width)),
+            calc(100% - var(--mantine-spacing-md) - 480px)
+        );
     min-height: 0;
 }
 
@@ -850,7 +862,7 @@ a.run-toast-link:hover {
 /* The chart and its options panel share this area, and the row inside it is
    .home-chart-row. The stacking threshold measures the area and never the
    window: the AppShell navbar is fixed-position and 225px wide, and the run
-   list takes 500px more, so both narrow the chart without touching the
+   list takes 500px or more, so both narrow the chart without touching the
    viewport, and a media query would keep the panel beside a chart it has
    already crushed. A container query cannot match on the element that
    declares the container, hence the wrapper around the row. It is the flex
@@ -1080,6 +1092,30 @@ a.run-toast-link:hover {
     height: 100%;
     padding: 0 4px 0 6px;
     width: 100%;
+}
+
+/* Where the list scrolls sideways, a full-width row is as wide as all the
+   columns, so its name or its count would scroll out of view. Its content
+   is held to the list's visible width and stays put while the run rows
+   scroll under it. Where nothing scrolls, that width is the row's own. The
+   scrolling areas are the containers it is measured against, and 100cqw is
+   their width less their padding, so an overlay scrollbar's room stays
+   clear. */
+.run-history-list-grid :is(.ag-center-cols-viewport, .ag-floating-top-viewport) {
+    container-type: inline-size;
+}
+
+/* AG Grid gives a row overflow: hidden, which makes the row the scroll
+   container of what is inside it, so the content could never stay put.
+   clip cuts the same way and makes no scroll container. */
+.run-history-list-grid .ag-full-width-row {
+    overflow: clip;
+}
+
+.run-history-list-grid .ag-full-width-row .run-list-wide {
+    left: 0;
+    position: sticky;
+    width: 100cqw;
 }
 
 /* A session row or a scenario row: its line, and under it the row's figures

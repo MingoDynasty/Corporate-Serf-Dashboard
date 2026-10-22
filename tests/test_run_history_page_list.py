@@ -8,6 +8,7 @@ No test runs the script, as none runs any script in the repository. Its
 behavior is checked in a browser.
 """
 
+import json
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -53,8 +54,9 @@ STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
 LIST_SCRIPT = REPO_ROOT / "assets" / "runHistoryList.js"
 IDS = run_history.RUN_LIST_IDS
 SCENARIO = "Scenario A"
-# The list's column is 500px. Its border takes 2px, and a classic scrollbar
-# is 17px in the widest browser the app is used in.
+# The list's column is 500px with the default columns, and its minimum. Its
+# border takes 2px, and a classic scrollbar is 17px in the widest browser the
+# app is used in.
 LIST_COLUMN_PX = 500
 BORDER_PX = 2
 SCROLLBAR_PX = 17
@@ -260,7 +262,7 @@ def test_every_function_the_grid_names_is_named_bare_and_defined_by_the_script()
 # --- The columns ---------------------------------------------------------------
 
 
-def test_the_seven_columns_are_headed_as_the_copy_has_them():
+def test_the_ten_columns_are_headed_as_the_copy_has_them():
     assert [column["headerName"] for column in _grid().columnDefs] == [
         "#",
         "Time",
@@ -268,8 +270,60 @@ def test_the_seven_columns_are_headed_as_the_copy_has_them():
         "Marks",
         "Accuracy",
         "Shots Fired",
+        "Reloads",
         "Sensitivity",
+        "FOV",
+        "Avg FPS",
     ]
+
+
+def _shown_widths() -> dict[str, int]:
+    return {
+        column.get("colId", column.get("field")): column["width"]
+        for column in _grid().columnDefs
+        if "width" in column
+    }
+
+
+def test_each_fixed_column_has_the_width_its_header_and_values_need():
+    assert _shown_widths() == {
+        "n": 50,
+        "time": 66,
+        "score": 72,
+        "accuracy": 70,
+        "shots": 82,
+        "reloads": 64,
+        "sens": 96,
+        "fov": 116,
+        "avg_fps": 64,
+    }
+
+
+def test_the_three_new_columns_are_right_aligned_and_hidden_to_start():
+    columns = {c.get("field"): c for c in _grid().columnDefs}
+
+    for field in ("reloads", "fov", "avg_fps"):
+        assert columns[field]["hide"] is True
+        assert columns[field]["type"] == "rightAligned"
+    assert [c["field"] for c in _grid().columnDefs if c.get("hide")] == [
+        "reloads",
+        "fov",
+        "avg_fps",
+    ]
+
+
+def test_the_fov_cell_gives_its_whole_text_as_the_browsers_own_hover():
+    """A long scale is cut short, and the hover gives it whole.
+
+    The browser's title, as a scenario row's name has, and not a popup the
+    grid draws. No other column has a hover.
+    """
+    columns = _grid().columnDefs
+
+    assert [
+        (c["field"], c["tooltipField"]) for c in columns if "tooltipField" in c
+    ] == [("fov", "fov")]
+    assert _options()["enableBrowserTooltips"] is True
 
 
 def test_the_marks_column_has_a_name_and_shows_no_header():
@@ -291,7 +345,7 @@ def test_every_column_but_the_marks_has_one_allowed_width():
     """
     fixed = [c for c in _grid().columnDefs if c.get("colId") != "marks"]
 
-    assert len(fixed) == 6
+    assert len(fixed) == 9
     for column in fixed:
         assert column["width"] == column["minWidth"] == column["maxWidth"]
     (marks,) = [c for c in _grid().columnDefs if c.get("colId") == "marks"]
@@ -300,17 +354,25 @@ def test_every_column_but_the_marks_has_one_allowed_width():
 
 
 def test_the_columns_leave_room_for_the_scrollbar():
-    columns = _grid().columnDefs
-    narrowest = sum(column.get("width", column.get("minWidth")) for column in columns)
+    """The list needs its shown columns' widths and room for the rest.
 
-    assert narrowest <= LIST_COLUMN_PX - BORDER_PX - SCROLLBAR_PX
+    That room holds the borders, a classic scrollbar, and the marks column
+    at its minimum, whatever columns are shown.
+    """
+    (marks,) = [c for c in _grid().columnDefs if c.get("colId") == "marks"]
+
+    assert (
+        run_history_list.RUN_LIST_ROOM - BORDER_PX - SCROLLBAR_PX >= marks["minWidth"]
+    )
+    default_shown = sum(
+        column["width"]
+        for column in _grid().columnDefs
+        if "width" in column and not column.get("hide")
+    )
+    assert default_shown + run_history_list.RUN_LIST_ROOM == LIST_COLUMN_PX
     css = STYLESHEET.read_text(encoding="utf-8")
     assert f"--run-history-list-width: {LIST_COLUMN_PX}px;" in _css_block(
         css, ".run-history-page"
-    )
-    assert (
-        "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
-        in _css_block(css, ".run-history-columns")
     )
 
 
@@ -329,11 +391,83 @@ def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
     )
 
     assert f"padding-right: {OVERLAY_SCROLLBAR_PX}px;" in room
-    columns = _grid().columnDefs
-    fixed = sum(column["width"] for column in columns if "width" in column)
-    (marks,) = [c for c in columns if c.get("colId") == "marks"]
-    marks_room = LIST_COLUMN_PX - BORDER_PX - OVERLAY_SCROLLBAR_PX - fixed
+    (marks,) = [c for c in _grid().columnDefs if c.get("colId") == "marks"]
+    marks_room = run_history_list.RUN_LIST_ROOM - BORDER_PX - OVERLAY_SCROLLBAR_PX
     assert marks_room >= marks["minWidth"]
+
+
+# --- The list's width ----------------------------------------------------------
+
+
+def test_the_list_needs_its_room_and_the_widths_of_the_columns_it_shows():
+    """Read from the column list, so a width changed there moves the list's."""
+    need, widths = run_history_list.run_list_widths()
+    fixed = _shown_widths()
+    menu = [column.column_id for column in run_history_list.RUN_LIST_MENU_COLUMNS]
+
+    assert widths == {column_id: fixed[column_id] for column_id in menu}
+    assert need == run_history_list.RUN_LIST_ROOM + sum(
+        width for column_id, width in fixed.items() if column_id not in menu
+    )
+    # The proposal's figures: the default columns, each new one alone, and all.
+    default = need + widths["shots"] + widths["sens"]
+    assert default == LIST_COLUMN_PX
+    assert [
+        default + widths[column_id] for column_id in ("reloads", "fov", "avg_fps")
+    ] == [564, 616, 564]
+    assert default + widths["reloads"] + widths["fov"] + widths["avg_fps"] == 744
+
+
+def test_the_menus_checkboxes_write_the_lists_need_to_the_pages_style():
+    """Every column checkbox, with its stored value as the page mounts."""
+    registration = _registration(f"{run_history.PAGE_ID}.style")
+    source = _inline_script(registration)
+    need, widths = run_history_list.run_list_widths()
+    pattern = '{"column":["ALL"],"type":"' + IDS.columns_menu + '"}'
+
+    assert _keys(registration["inputs"]) == [f"{pattern}.checked"]
+    assert _keys(registration["state"]) == [f"{pattern}.id"]
+    assert not registration.get("prevent_initial_call")
+    assert f"let need = {need};" in source
+    assert json.dumps(widths) in source
+    assert '"--run-history-list-need": `${need}px`' in source
+
+
+def test_the_list_grows_to_its_need_between_its_minimum_and_the_charts_floor():
+    """Where the bounds cross, the minimum wins and the chart gives."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+    columns = _css_block(css, ".run-history-columns")
+
+    assert (
+        "grid-template-columns: minmax(0, 1fr) clamp(\n"
+        "            var(--run-history-list-width),\n"
+        "            var(--run-history-list-need, var(--run-history-list-width)),\n"
+        "            calc(100% - var(--mantine-spacing-md) - 480px)\n"
+        "        );"
+    ) in columns
+
+
+def test_a_full_width_rows_content_is_held_in_view_when_the_list_scrolls_sideways():
+    """Sticky does nothing until the row's own overflow stops being a scroller."""
+    css = STYLESHEET.read_text(encoding="utf-8")
+
+    assert "container-type: inline-size;" in _css_block(
+        css,
+        ".run-history-list-grid :is(.ag-center-cols-viewport, "
+        ".ag-floating-top-viewport)",
+    )
+    assert "overflow: clip;" in _css_block(
+        css, ".run-history-list-grid .ag-full-width-row"
+    )
+    held = _css_block(css, ".run-history-list-grid .ag-full-width-row .run-list-wide")
+    assert "position: sticky;" in held
+    assert "left: 0;" in held
+    assert "width: 100cqw;" in held
+    # Pinned columns would draw every full-width row twice.
+    assert not [c for c in _grid().columnDefs if "pinned" in c]
+    assert "11. Where the list scrolls sideways" in LIST_SCRIPT.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_the_run_numbers_room_moves_with_its_indent():
@@ -382,12 +516,15 @@ def _choice_checkboxes(page=None) -> list[dmc.Checkbox]:
     ]
 
 
-def test_the_columns_menu_offers_two_columns_both_shown_and_median_and_best_off():
+def test_the_columns_menu_offers_five_columns_in_table_order_and_then_median_and_best():
     checkboxes = _menu_checkboxes()
 
     assert [(box.label, box.checked, box.persistence) for box in checkboxes] == [
         ("Shots Fired", True, True),
+        ("Reloads", False, True),
         ("Sensitivity", True, True),
+        ("FOV", False, True),
+        ("Avg FPS", False, True),
     ]
     # Not a column, so not a checkbox the column callback hears.
     assert [
@@ -409,19 +546,36 @@ def test_the_columns_menu_offers_two_columns_both_shown_and_median_and_best_off(
     }
     assert [headers[box.id["column"]] for box in checkboxes] == [
         "Shots Fired",
+        "Reloads",
         "Sensitivity",
+        "FOV",
+        "Avg FPS",
     ]
+    # In the grid's own order.
+    order = [c.get("field") for c in _grid().columnDefs]
+    assert [box.id["column"] for box in checkboxes] == sorted(
+        (box.id["column"] for box in checkboxes), key=order.index
+    )
 
 
 def test_the_menus_ids_are_the_ones_browsers_store_its_choices_under():
+    """Renaming one resets that choice for every user, so none may change."""
     assert [box.id for box in _menu_checkboxes()] == [
         {"type": "run-history-list-columns", "column": "shots"},
+        {"type": "run-history-list-columns", "column": "reloads"},
         {"type": "run-history-list-columns", "column": "sens"},
+        {"type": "run-history-list-columns", "column": "fov"},
+        {"type": "run-history-list-columns", "column": "avg_fps"},
     ]
 
 
-def test_no_column_starts_hidden_so_the_menus_defaults_match_the_grid():
-    assert not [column for column in _grid().columnDefs if column.get("hide")]
+def test_each_column_starts_shown_as_its_menu_entry_starts_checked():
+    hidden = {
+        c["field"]: c.get("hide", False) for c in _grid().columnDefs if "field" in c
+    }
+
+    for entry in run_history_list.RUN_LIST_MENU_COLUMNS:
+        assert hidden[entry.column_id] is not entry.shown_by_default, entry.column_id
 
 
 @pytest.mark.parametrize(
@@ -432,7 +586,13 @@ def test_no_column_starts_hidden_so_the_menus_defaults_match_the_grid():
 def test_the_menus_layout_default_never_varies(query):
     page = run_history.layout(**query)
 
-    assert [box.checked for box in _menu_checkboxes(page)] == [True, True]
+    assert [box.checked for box in _menu_checkboxes(page)] == [
+        True,
+        False,
+        True,
+        False,
+        False,
+    ]
     assert [box.checked for box in _choice_checkboxes(page)] == [False]
 
 

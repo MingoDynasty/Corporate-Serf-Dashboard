@@ -117,6 +117,8 @@ logger = logging.getLogger(__name__)
 # two pages cannot share part of a callback. The browser also stores each
 # remembered control's value under its id, so changing one of these resets
 # that value for every user.
+# The page's root, whose style the run list writes its width to.
+PAGE_ID = "run-history-page"
 RUN_EVENTS_STORE_ID = "run-history-run-events"
 POLLING_INTERVAL_ID = "run-history-polling-interval"
 RELATIVE_TIME_INTERVAL_ID = "run-history-relative-time-interval"
@@ -620,7 +622,7 @@ clientside_callback(
 )
 
 register_chart_options(CHART_OPTIONS_IDS, latest_run=LATEST_RUN_STORE_ID)
-register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID)
+register_run_list(RUN_LIST_IDS, follow_switch=FOLLOW_SWITCH_ID, page=PAGE_ID)
 register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
 register_scenario_selection_clearing_filter(
     SCENARIO_SELECTION_IDS,
@@ -847,6 +849,7 @@ def layout(
     """
     config = get_config()
     return dmc.Box(
+        id=PAGE_ID,
         className="run-history-page",
         children=[
             dcc.Store(id=RUN_EVENTS_STORE_ID),

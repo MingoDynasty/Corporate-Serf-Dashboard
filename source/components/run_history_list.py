@@ -28,6 +28,7 @@ from typing import Any, NamedTuple, TypedDict
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
 from dash import (
+    ALL,
     Input,
     Output,
     State,
@@ -43,6 +44,7 @@ from source.components.columns_menu import (
     MenuChoice,
     MenuColumn,
     choice_checkbox_id,
+    column_checkbox_id,
     columns_menu,
     columns_menu_sink,
     register_columns_menu,
@@ -323,6 +325,17 @@ def _figure_columns(
 RUN_ROW_ID_PREFIX = "r:"
 
 
+def _fov_text(run: RunData) -> str:
+    """Write a run's FOV as the player typed it, then its scale if the file names one.
+
+    A whole number drops its ``.0``, as the game's own setting reads.
+    """
+    if run.fov is None:
+        return ""
+    number = str(int(run.fov)) if run.fov.is_integer() else str(run.fov)
+    return f"{number} {run.fov_scale}" if run.fov_scale else number
+
+
 def _run_row(
     run: RunData,
     number: int,
@@ -344,7 +357,10 @@ def _run_row(
         "new_pb": mark.is_new_pb,
         "accuracy": format_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
+        "reloads": "" if run.reloads is None else f"{run.reloads:,}",
         "sens": f"{run.horizontal_sens} {run.sens_scale}",
+        "fov": _fov_text(run),
+        "avg_fps": "" if run.avg_fps is None else f"{run.avg_fps:,.0f}",
     }
 
 
@@ -797,11 +813,17 @@ RUN_LIST_GRID_CLASS = "run-history-list-grid"
 LATEST_ROW_CLASS = "run-list-row-latest"
 SELECTED_ROW_CLASS = "run-list-row-selected"
 
-# The two columns the Columns menu shows or hides. Both are shown to start,
-# and the browser remembers each choice under the checkbox's id.
+# The columns the Columns menu shows or hides, in table order. Shots Fired
+# and Sensitivity are shown to start, and the other three are off, so the
+# list looks as it did until someone asks for more. The browser remembers
+# each choice under an id built from the column's, and drops it if the
+# column's default ever changes, so neither may change.
 RUN_LIST_MENU_COLUMNS = (
     MenuColumn("shots", "Shots Fired"),
+    MenuColumn("reloads", "Reloads", shown_by_default=False),
     MenuColumn("sens", "Sensitivity"),
+    MenuColumn("fov", "FOV", shown_by_default=False),
+    MenuColumn("avg_fps", "Avg FPS", shown_by_default=False),
 )
 # The choice that is not a column: the median and best of the runs under a
 # row that stands for one scenario's runs. Off to start, so the list looks as
@@ -851,17 +873,22 @@ class RunListIds(NamedTuple):
 def _fixed_width(width: int) -> dict[str, int]:
     """Hold a column to one width.
 
-    The columns add up to the list's own width less a scrollbar, so the last
-    column is not clipped once enough rows are open to scroll. The minimum
-    and the maximum are what hold it: the shared Columns menu fits a column
-    to its content when it shows one, and a column with one allowed width
-    comes out of that fit unchanged.
+    The list's width is worked out from these widths, in
+    ``run_list_widths``, so the columns shown fit it with a scrollbar's room
+    to spare and the last one is not clipped once enough rows are open to
+    scroll. The minimum and the maximum are what hold it: the shared Columns
+    menu fits a column to its content when it shows one, and a column with
+    one allowed width comes out of that fit unchanged.
     """
     return {"width": width, "minWidth": width, "maxWidth": width}
 
 
 def run_list_column_defs() -> list[dict[str, Any]]:
-    """Build the list's seven columns, each named for the row field it shows."""
+    """Build the list's ten columns, each named for the row field it shows.
+
+    Reloads, FOV and Avg FPS are hidden to start, as their menu entries are
+    unchecked.
+    """
     return [
         {
             "field": "n",
@@ -898,12 +925,66 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             **_fixed_width(82),
         },
         {
+            "field": "reloads",
+            "headerName": "Reloads",
+            "type": "rightAligned",
+            "hide": True,
+            **_fixed_width(64),
+        },
+        {
             "field": "sens",
             "headerName": "Sensitivity",
             "type": "rightAligned",
             **_fixed_width(96),
         },
+        {
+            "field": "fov",
+            "headerName": "FOV",
+            "type": "rightAligned",
+            "hide": True,
+            # A long scale is cut short, so the hover gives the whole text.
+            "tooltipField": "fov",
+            **_fixed_width(116),
+        },
+        {
+            "field": "avg_fps",
+            "headerName": "Avg FPS",
+            "type": "rightAligned",
+            "hide": True,
+            **_fixed_width(64),
+        },
     ]
+
+
+# The room the list takes beyond its fixed columns: its two borders, a
+# classic scrollbar, and the marks column at the width it had when the list
+# was always 500px. So the default columns need exactly 500px, and no
+# browser sees its marks column change.
+RUN_LIST_ROOM = 64
+
+
+def run_list_widths() -> tuple[int, dict[str, int]]:
+    """Return what the list needs before its menu's columns, and what each adds.
+
+    The list needs ``RUN_LIST_ROOM`` plus the fixed width of every column it
+    shows. The first value counts the columns the menu can't hide, and the
+    second maps each menu column's id to the width it adds when shown. Both
+    are read from ``run_list_column_defs``, so a width changed there moves
+    the list's.
+    """
+    menu_ids = {column.column_id for column in RUN_LIST_MENU_COLUMNS}
+    need = RUN_LIST_ROOM
+    widths: dict[str, int] = {}
+    for column in run_list_column_defs():
+        if "maxWidth" not in column:
+            # The marks column, which flexes inside RUN_LIST_ROOM.
+            continue
+        column_id = column.get("colId", column["field"])
+        if column_id in menu_ids:
+            widths[column_id] = column["maxWidth"]
+        else:
+            need += column["maxWidth"]
+    return need, widths
 
 
 def run_list_stores(ids: RunListIds) -> list[dcc.Store]:
@@ -1000,6 +1081,9 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
                 dashGridOptions={
                     **COLUMNS_MENU_GRID_OPTIONS,
                     "animateRows": False,
+                    # A cell's hover is the browser's own title, as a scenario
+                    # row's name is, and not a popup the grid draws.
+                    "enableBrowserTooltips": True,
                     "headerHeight": 28,
                     # A run that lands must not move what the reader is
                     # looking at. The script scrolls to the top itself, when
@@ -1150,6 +1234,24 @@ _APPLY_FIGURES = """
 """
 
 
+# The width the list's shown columns need, written to the page as a CSS
+# variable that the stylesheet clamps between the list's minimum and the
+# chart's floor. It runs as the page mounts, with the stored choices, and on
+# every change. The widths come from the server's column list and not from
+# the grid: the marks column's width follows the list's, which this sets.
+_LIST_NEED = """
+(checked, ids) => {
+    let need = BASE_NEED;
+    ids.forEach((id, index) => {
+        if (checked[index]) {
+            need += WIDTHS[id.column] || 0;
+        }
+    });
+    return {"--run-history-list-need": `${need}px`};
+}
+"""
+
+
 def jump_to_session(jump: dict | None, held_limit: int | None) -> tuple:
     """Switch the list to All scenarios, loaded far enough back to hold a session.
 
@@ -1175,12 +1277,15 @@ def jump_to_session(jump: dict | None, held_limit: int | None) -> tuple:
     )
 
 
-def register_run_list(ids: RunListIds, *, follow_switch: str) -> None:
+def register_run_list(ids: RunListIds, *, follow_switch: str, page: str) -> None:
     """Register the scripts that draw the list, and the jump, for one page's ids.
 
     Call once per page, at import. ``follow_switch`` is the id of the page's
     Follow switch: while it is on, a run that lands scrolls the list back to
-    the top. It is read as state, so flipping it applies nothing.
+    the top. It is read as state, so flipping it applies nothing. ``page`` is
+    the id of the page's root: its ``style`` holds the width the list's shown
+    columns need, as ``--run-history-list-need``, and nothing else may write
+    that ``style``.
 
     The rows reach the grid through its API and never as Dash components or
     through its ``rowData`` prop. Which rows are open is kept by the script
@@ -1217,4 +1322,13 @@ def register_run_list(ids: RunListIds, *, follow_switch: str) -> None:
         # move the switch.
         prevent_initial_call=True,
     )(jump_to_session)
+    base_need, widths = run_list_widths()
+    clientside_callback(
+        _LIST_NEED.replace("BASE_NEED", str(base_need)).replace(
+            "WIDTHS", json.dumps(widths)
+        ),
+        Output(page, "style"),
+        Input(column_checkbox_id(ids.columns_menu, ALL), "checked"),
+        State(column_checkbox_id(ids.columns_menu, ALL), "id"),
+    )
     register_columns_menu(ids.columns_menu, ids.grid)

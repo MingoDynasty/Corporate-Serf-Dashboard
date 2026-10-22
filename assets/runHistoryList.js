@@ -30,7 +30,8 @@
 //      the grid's own, which skips from a full-width row to the next cell.
 //   7. Sorting is off on every column, set with the grid.
 //   8. The column widths are fixed and leave room for the scrollbar, set
-//      with the grid.
+//      with the grid. The list's width is worked out from them on the
+//      server, so it grows with the columns shown.
 //   9. After new rows are applied, focus goes back to the same row id, and to
 //      the same button in it. The grid holds focus by position, so a run that
 //      lands would otherwise leave a keyboard user on a different run, and a
@@ -39,6 +40,11 @@
 //  10. The height of a row whose figures go on a line of their own follows
 //      the Median and best checkbox. The grid measures the body's rows again
 //      when asked, and the pinned row only when its rows are handed in again.
+//  11. Where the list scrolls sideways, a full-width row's content is held
+//      in view by CSS sticky, which needs the row's overflow turned from the
+//      grid's hidden to clip (the stylesheet's .ag-full-width-row rule).
+//      Pinned columns are no way out: with embedded full-width rows the grid
+//      draws each such row twice, once in each part.
 (function () {
   var dagfuncs = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
   var dagcomponentfuncs = (window.dashAgGridComponentFunctions =
