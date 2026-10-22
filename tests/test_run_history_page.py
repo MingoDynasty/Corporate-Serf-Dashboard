@@ -374,7 +374,7 @@ def test_the_three_cards_first_lines_are_plain_text_and_not_headings():
     assert "Scenario Stats" not in titles
     assert "Scenario stats" not in titles
     assert isinstance(first_line, html.Div)
-    assert first_line.children == "Scenario stats"
+    assert first_line.children[0].children[0] == "Typical score"
 
 
 def test_the_chart_sits_left_of_the_run_list():

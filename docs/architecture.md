@@ -593,17 +593,17 @@ flowchart LR
   size alone to the New PB stars and the latest run's ring. Before it,
   `apply_graph_appearance` recolors the typical score's line and bands for
   the theme (`plot_service.apply_typical_score_colors`).
-  The Scenario Stats card (Category and Number of runs, or "No scenario
-  selected") is built
+  The Scenario Stats card (the typical-score lead, Category and Total runs,
+  or "No scenario selected") is built
   by `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
   `register_scenario_stats` wires that module's callbacks to the same ids.
   The PB card, with Position as its leaderboard line, is built the same way
   by `components/pb_card.py` from `PB_CARD_IDS`, wired by
   `register_pb_card`. The position's ids are the ones it had in the
   Scenario Stats card. The page builds what the two cards only read: the
-  summary store, the scenario dropdown, the playlist filter, and, for the PB
-  card, the polling interval and the 30-second interval that keeps the
-  relative times current.
+  summary store, the scenario dropdown, the playlist filter, and the
+  30-second interval that keeps recency and relative times current. The PB
+  card also reads the polling interval.
   The run list is `components/run_history_list.py`'s, and the page holds the
   two callbacks that decide when it is rebuilt. A session row counts every
   scenario's runs, and the summary store is not written for a run the page
@@ -929,15 +929,21 @@ flowchart LR
   threshold line is drawn at, from the current personal best.
   `normalize_score_threshold_percentage()` reads the percentage input, which
   is empty while the user is clearing it.
-- `components/scenario_stats.py` — the Scenario Stats card: Category and
-  Number of runs, or "No scenario selected" with nothing selected. A page
+- `components/scenario_stats.py` — the Scenario Stats card: the typical-score
+  lead and its recency readout, Category and Total runs, or "No scenario
+  selected" with nothing selected. A page
   fills in a `ScenarioStatsIds`: an id for each component the card builds,
   plus the page's own run-events store, scenario dropdown, and playlist
-  filter, which the card only reads. It puts `scenario_stats_panel()` in its
+  filter and 30-second interval, which the card only reads. It puts
+  `scenario_stats_panel()` in its
   layout and calls `register_scenario_stats()` with the ids once, at import,
-  which registers `get_scenario_category` and `get_scenario_num_runs`; the
-  second writes the count and which of its line and the no-selection line
-  shows, in one answer. Category reads the selected
+  which registers `get_scenario_category`, `get_scenario_num_runs` and
+  `get_scenario_typical_score`. The count and no-selection visibility are
+  written together. The lead takes one `get_all_runs()` snapshot, splits
+  its sessions, builds the scenario's newest typical score, and judges its
+  recency with the app's clock. It reads its current rendered content as
+  State and returns `no_update` for unchanged content, preserving a held
+  tooltip across ticks. Category reads the selected
   benchmark's group through the table's `playlist_scenario_groups` length
   guard. What the card shows is specified in
   [run_history.md](specs/run_history.md#scenario-stats).
@@ -1281,7 +1287,8 @@ flowchart LR
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `typical_score.py` — the typical score's pure definition, which the Run
-  History chart draws on Score vs Run and Score vs Time.
+  History chart draws on Score vs Run and Score vs Time, and Scenario Stats
+  leads with.
   `build_typical_scores` takes one
   scenario's runs and the play
   sessions split across every scenario from the same snapshot, returning a

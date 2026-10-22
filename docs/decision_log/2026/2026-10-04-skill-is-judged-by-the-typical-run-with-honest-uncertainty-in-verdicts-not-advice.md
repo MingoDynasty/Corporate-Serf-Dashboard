@@ -11,6 +11,8 @@ stronger than it usually plays, and the evidence behind any training method
 is still thin. Every later proposal is held to these three rules, and Run
 history now builds sessions first.
 
+**Superseded in part (2026-10-21).** The Terms passage's working name is now [Typical score](2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md) on screen, in the glossary and in code. D1, D2 and D3 stand; defining the figure does not authorize a later judgment to use a dimmed value without choosing its evidence bar.
+
 **Ruling.** Ruled (user) 2026-10-04, in chat, after both reviewers endorsed
 each row:
 [rows D1 to D5 of PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#issuecomment-5986985763)

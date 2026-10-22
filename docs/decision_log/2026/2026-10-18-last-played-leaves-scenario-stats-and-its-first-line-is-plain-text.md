@@ -10,6 +10,8 @@ says so in place of its other lines, where it showed a run count of zero. The
 row held the app's one allowed em dash, so the copy rule against em dashes now
 has no exception.
 
+**Superseded in part (2026-10-21).** [TS8](2026-10-20-scenario-stats-leads-with-the-typical-score.md) changes the plain-text first line from Scenario stats to Typical score, adds the lead, and renames Number of runs to Total runs. The first line remains plain text rather than a heading, Last played remains on the latest-run card, and the no-selection message and em-dash rule stand.
+
 **Ruling and delivery.** R2 of
 [#388](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/388),
 ratified by the maintainer on 2026-10-18 at `0fcac03`, "I ratify the

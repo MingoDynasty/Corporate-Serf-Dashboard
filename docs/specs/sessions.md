@@ -4,8 +4,8 @@ The app groups a player's runs into sessions: the runs separated by breaks of
 no more than 30 minutes. To measure a break it works out when each run began
 and how long it took, from two lines of the run's stats file. Inside a
 session it also finds each visit, the consecutive runs on one scenario. One
-page shows sessions so far, in its run list and its latest-run card: the Run
-History page.
+page shows sessions so far, Run History, where a player can read a run in
+the context of their practice.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in
@@ -20,9 +20,10 @@ Two words are kept apart throughout. A **break** is time between runs. A
 
 ## Where sessions show
 
-- The Run History page is the one page that shows a session, in three
-  places: its run list, its latest-run card, and the hover of the chart's
-  typical score line, which counts the sessions behind a value.
+- The Run History page is the one page that shows a session, in four
+  places: its run list, its latest-run card, the chart's typical-score hover,
+  and the Scenario Stats lead's hover. Both typical-score hovers count the
+  sessions behind a value ([TS3][typical-chart], [TS5][typical-card-value]).
 - The run list has two views. Under This scenario it lists a scenario's runs
   under the session each was played in, names a session by when it started,
   and counts the session's runs, and it gives the length of the newest session
@@ -197,3 +198,7 @@ as written. What follows is accepted ([2026-10-11][entry]).
 - A manual clock change, or a trip across time zones, does the same.
 
 [entry]: ../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md
+
+[typical-card-value]: ../decision_log/2026/2026-10-18-scenario-stats-shows-the-newest-typical-score-at-any-age.md
+
+[typical-chart]: ../decision_log/2026/2026-10-18-the-typical-score-is-drawn-after-each-run.md

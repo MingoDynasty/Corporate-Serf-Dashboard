@@ -297,10 +297,20 @@ the same form as the finished ones under it.
 
 ### Standing: where do I rank
 
+- **Typical score and its spread** (PRs #398, #400, #402 and #401; design in
+  #382). Run History leads Scenario Stats with the median of the scenario's
+  last 20 runs, known after enough runs and sessions, and charts its history
+  inside bands for the middle half and middle 80% of those scores. Old
+  support dims the card and fades the chart, with supporting counts and dates
+  available on hover. *Problem solved:* a PB records one achievement but
+  cannot show the level a player's runs usually reach or how consistent
+  those runs are. The shared summary makes that level visible before later
+  judgments depend on it, while the recent-run count discloses a return
+  that still includes older play.
 - **The target and result together on Run History** (PRs #380, #383 and #384;
   design in #379). The top row gives the selected
   scenario's personal best and its next rank's score a card beside the latest
-  run. The benchmark category and Number of runs stay together in Scenario
+  run. The benchmark category and total run count stay together in Scenario
   Stats, and the leaderboard percentile moves beside the PB.
   *Problem solved:* the record to beat used to be only a chart line that
   could be hidden, the next rank was on another page, and the latest-run
