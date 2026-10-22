@@ -34,7 +34,11 @@ latest-run card take the run list's width. The rest of T1 stands.
 
 ### RC1. Three optional columns, all off to start: FOV with its scale, Reloads, and Avg FPS
 
-Status: proposed.
+Status: amended — awaiting reviewer confirmation. As first written, the row
+also ruled that no other stats-file field would ever reach the list. The
+first review wave asked for that to be this proposal's scope instead, with a
+criterion a later column has to meet, and the recommendation below now says
+so. The three columns, their defaults and their order are unchanged.
 
 **The maintainer's calls.** "Avg FPS in the menu, disabled by default."
 "Reloads in the menu, disabled by default." Of FOV, asking for the third
@@ -46,8 +50,8 @@ think this should be the default for most users ... 2: Possibly useful, but
 perhaps some users might want to add this to their view ... 3: Probably not
 useful, and we don't think it is worth adding clutter to the UI". Tier 1 is
 today's columns. FOV, Reloads and Avg FPS are tier 2. Everything else in a
-stats file, from Kills and Avg TTK to the crosshair and Overshots, is tier
-3: the future Run Viewer's, never the list's.
+stats file, from Kills and Avg TTK to the crosshair and Overshots, is tier 3
+today: not proposed for the list, and the future Run Viewer's to show.
 
 FOV and Reloads both started in tier 1 that day and moved to tier 2. FOV
 moved after the requester's answer: "see it when i open a run. i dont think
@@ -60,9 +64,16 @@ track of".
 **Recommendation.** The run list's **Columns** menu gains three entries, each
 unchecked to start: Reloads, FOV and Avg FPS, listed with today's Shots Fired
 and Sensitivity in the columns' own order and followed, as today, by Median
-and best. A checked entry shows its column in both views. Nothing else from
-the stats file reaches the list. With every new entry off, the list a player
-meets is today's: seven columns, 500px wide.
+and best. A checked entry shows its column in both views. With every new
+entry off, the list a player meets is today's: seven columns, 500px wide.
+
+**This proposal adds only these three. A later column needs a concrete use
+for choosing or comparing runs before opening one, information the existing
+columns don't adequately supply, and a width and menu cost worth paying.
+Detailed inspection of one run belongs in the Run Viewer.** That is the bar,
+not a list of fields that may never be shown: a field doesn't earn a column
+because the stats file holds it, and a later request is judged on its task
+and its cost. The decision-log entry that ships this row records the bar.
 
 - **Off, because each is for a player who asks.** FOV is 103 on 9,177 of the
   maintainer's 9,212 runs. Reloads is 0 on every run of 648 of their 810
@@ -81,7 +92,9 @@ default list for every player: Reloads alone takes it to 564px and puts a
 column of zeros on four scenarios in five. Offering every field turns the
 list into the run's whole file, which the run navigation framing rejects:
 the maintainer, "Short and sweet, and solely the information needed to help
-identify a run of interest", and the requester, "100%".
+identify a run of interest", and the requester, "100%". A permanent rule in
+place of the bar would cost the other way: a later request as well argued as
+FOV's would first have to reverse a product rule.
 
 ### RC2. The list grows to fit the columns it shows
 
@@ -244,7 +257,9 @@ data.
 ### Verified facts
 
 Read at `8eda2b6` (PR #400's merge), the base of this proposal, on
-2026-10-21. Each was found by name.
+2026-10-21. Each was found by name. Checked again at `8606c1f`, after #401,
+#402 and #405 merged: every statement quoted from a spec or a decision-log
+entry still holds, and Scenario Stats is still 270px.
 
 - `extract_data_from_file` in `source/kovaaks/data_service.py` reads a stats
   file line by line, in any order. `Reloads:` is in the block before
@@ -275,8 +290,9 @@ Read at `8eda2b6` (PR #400's merge), the base of this proposal, on
   `embedFullWidthRows` on so a screen reader reads a session row with the
   runs under it.
 - The top row's other cards: the scenario note card flexes from 240px to
-  800px, Scenario Stats is 270px and the PB card 300px. PR #401, open at
-  `11e0477`, rewrites Scenario Stats' contents and keeps its 270px.
+  800px, Scenario Stats is 270px and the PB card 300px. PR #401 merged after
+  this proposal opened (`1c10bc2`, 2026-10-21): it rewrote Scenario Stats'
+  contents and kept its 270px.
 
 ## Design
 
@@ -561,12 +577,14 @@ Measured with the card following a list that fits its columns, as it would
 without RC3: at 1920 the top row goes from 143px to 297px as soon as the
 list passes 500px, with Reloads alone, the PB card dropping to a second line,
 and the chart loses 154px of height. At 2560 it stays one line even at
-744px. With RC3, the row is 143px at 1920 with every column set. The first column, the dropdowns, Scenario Stats, the note card and the
-PB card, is unchanged, and so is the order in which it wraps.
+744px. With RC3, the row is 143px at 1920 with every column set. The first
+column, the dropdowns, Scenario Stats, the note card and the PB card, is
+unchanged, and so is the order in which it wraps.
 
-PR #401, open at `11e0477`, rewrites Scenario Stats' contents and keeps its
-270px, so it doesn't move this row. Whichever of the two implementations
-merges second measures the top row again at 1920 and 2560.
+PR #401 merged after these measurements (`1c10bc2`): it rewrote Scenario
+Stats' contents and kept its 270px, so it doesn't change this row's widths.
+The implementation PR starts from a main that has it and measures the top
+row again at 1920 and 2560.
 
 ### Beyond the rows
 
@@ -652,7 +670,9 @@ not marked, because nothing in them stops holding.
   [The Run List Is Built On AG Grid Community, And NVDA Is Run On The Built List](../decision_log/2026/2026-10-12-the-run-list-is-built-on-ag-grid-community-and-nvda-is-run-on-the-built-list.md):**
   nothing in it stops holding, so it isn't marked. Its list of grid-specific
   work gains the held group rows, and item 8's fixed widths now also set the
-  list's width.
+  list's width. Its rule that a change to what a screen reader is told about
+  a row repeats the walk applies, and the implementation PR repeats it (see
+  [Testing](#testing)).
 - **The 2026-10-05 Columns menu entry stands.** The three new entries follow
   its rule, every column the table can work without, in table order.
 - **The spec,** [run_history.md](../specs/run_history.md): "one value sets the
@@ -689,7 +709,8 @@ not marked, because nothing in them stops holding.
   "Probably no sort."
 - **"Add all columns".** Most of the stats file's fields are constant for a
   player or worked out from others, such as Avg TTK from the run's length and
-  kills, and Kills, which follows Score or Hits. Tier 3 is the Run Viewer's.
+  kills, and Kills, which follows Score or Hits. A later column meets RC1's
+  bar on its own case.
 - **Reloads on by default.** A column of zeros on four scenarios in five, and
   a wider default list for every player.
 - **Pinning `#`, Time, Score and the marks.** Measured: session rows drawn
@@ -734,9 +755,11 @@ product.md's inventory, and the deletion of this file.
 - **Review:** the Codex seat at xhigh, with the connector. The maintainer
   tries it in their own Firefox at 2560 and 1920, from the PR's instance,
   before marking it ready.
-- **Depends on:** this proposal's ratification. PR #401 touches the same
-  spec section and stylesheet, so whichever merges second merges main and
-  measures the top row again.
+- **Depends on:** this proposal's ratification. PR #401, which touched the
+  same spec section and stylesheet, has merged, so the implementation starts
+  from a main that has it and measures the top row again there.
+- **The NVDA walk** runs on the built list with all three columns on, on the
+  maintainer's word (see [Testing](#testing)).
 
 ## Out of scope
 
@@ -757,12 +780,17 @@ product.md's inventory, and the deletion of this file.
 
 ## Testing
 
-- **The parser.** For each of `Reloads:`, `FOV:`, `FOVScale:` and
+- **The parser's numeric fields.** For each of `Reloads:`, `FOV:` and
   `Avg FPS:`: present, missing, a line with no value, and a value that isn't
-  a number. A file with no `FOVScale:` keeps its FOV and has no scale. A
-  missing or malformed field costs that field only, never the run. Built on
-  real line order: the test helper writes the sensitivity lines first, the
-  reverse of a real file, which the parser doesn't mind.
+  a number, plus a value out of its range (a reload count that is negative or
+  has a fraction, an FOV of zero or less, an Avg FPS that is negative or not
+  finite). Each bad case leaves that field `None`.
+- **The scale, which is text.** `FOVScale:` with a name such as `Overwatch`,
+  kept as the file writes it; with an empty value; and with no line at all.
+  A file with no `FOVScale:` keeps its FOV and has no scale.
+- **Every bad case costs that field only, never the run.** Built on real line
+  order: the test helper writes the sensitivity lines first, the reverse of a
+  real file, which the parser doesn't mind.
 - **The row.** `_run_row`'s FOV cell with a scale, without one, and with a
   decimal; Reloads and Avg FPS formats; an empty cell for each missing value.
 - **The columns and the menu.** The ten columns in order, each fixed width as
@@ -779,13 +807,17 @@ product.md's inventory, and the deletion of this file.
   Firefox with overlay scrollbars and with classic ones.
 - **A stored choice on load.** A browser with FOV stored on opens with the
   list at 616px, and the moment it spends at 500px is measured and reported.
-- **A screen reader.** The grid's entry repeats its NVDA walk for "any later
-  change to what a screen reader hears". By default nothing a screen reader
-  hears changes. With a column on, it hears one more cell per run, of the
-  kind it already hears as Shots Fired, and the held rows change only CSS.
-  So the recommendation is one NVDA pass, in browse mode, over a run row with
-  all three on, rather than the full walk. It needs the maintainer's
-  hands-off time, so the maintainer decides at the implementation PR.
+- **A screen reader: the NVDA walk is repeated.** The grid's entry says that
+  "a change to what a screen reader is told about a row" repeats the walk
+  first. A column turned on is such a change, and the default being off
+  doesn't exempt the state a player can turn on. So the implementation PR
+  runs the existing walk, every task of it, on the built list with all three
+  columns on. Its tasks cover more than reading a row: a session's context,
+  reaching rows not yet drawn, and focus staying put when a run lands. The
+  walk takes the keyboard and the window for about four and a half minutes a
+  browser, so it runs on the maintainer's word, scheduled at the
+  implementation PR. A shorter check would be an exception to that rule,
+  which would need the maintainer's ruling first.
 - **Gates:** `uv run pytest`, `uv run ruff format --check .`,
   `uv run ruff check`, `uv run mypy source`, and
   `uv run python -m compileall source tests`.
