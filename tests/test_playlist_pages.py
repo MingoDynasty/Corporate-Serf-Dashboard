@@ -2601,12 +2601,15 @@ def test_playlist_scenarios_rank_column_defs():
             "The highest rank your PB score has reached on this scenario."
         ),
         "valueFormatter": {"function": "params.data.tier_display"},
+        "tooltipField": "tier_display",
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 100,
+        "maxWidth": 240,
     }
     assert next_rank["headerName"] == "Next Rank"
     assert next_rank["field"] == "next_tier_sort"
+    assert next_rank["maxWidth"] == 320
     # One header for both measures the column holds, on every benchmark table.
     assert next_rank["headerTooltip"] == (
         "How much your PB score has to grow to reach the next rank. A row that "

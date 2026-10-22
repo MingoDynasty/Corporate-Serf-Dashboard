@@ -1760,6 +1760,14 @@ a.playlist-scenarios-evxl-link {
     cursor: pointer;
 }
 
+/* Capped rank cells still need a readable full name on hover, even when an
+   imported name is one unbroken word wider than the window. */
+.playlist-scenarios-grid .ag-tooltip {
+    max-width: min(32rem, calc(100vw - 2rem));
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
 /* The overview's Last Played tooltip is two lines (exact time + stalest
    scenario); pre-line renders the \n the tooltip getter emits. */
 .playlist-overview-grid .ag-tooltip {

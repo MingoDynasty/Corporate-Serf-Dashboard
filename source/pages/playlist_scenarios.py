@@ -241,16 +241,19 @@ TABLE_COLUMN_DEFS = [
 ]
 
 # Only a benchmark's table has these, directly after PB Score, the value both
-# compute from.
+# compute from. Cap both widths so a long rank name cannot dominate horizontal
+# scrolling; their tooltips keep the full names readable.
 BENCHMARK_COLUMN_DEFS = [
     {
         "headerName": "Rank",
         "field": "tier_sort",
         "headerTooltip": "The highest rank your PB score has reached on this scenario.",
         "valueFormatter": {"function": "params.data.tier_display"},
+        "tooltipField": "tier_display",
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 100,
+        "maxWidth": 240,
     },
     {
         "headerName": "Next Rank",
@@ -272,6 +275,7 @@ BENCHMARK_COLUMN_DEFS = [
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 150,
+        "maxWidth": 320,
     },
 ]
 
