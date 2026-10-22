@@ -45,13 +45,21 @@ never read or changed.
 
 The sample clock is fixed to October 21, 2026, at 18:00 UTC in both Python and
 the browser. Chromium uses English, UTC, a light theme and a fresh browser
-context. Run History is captured at 1920 by 1080; the playlist overview uses
-the same viewport and the scenario table uses a width of 2400 so all columns
-fit. Table images are cropped to their headers and up to twelve rows.
+context. Run History shows VT ww5t Intermediate S5 at 1920 by 1080 in Score vs
+Time with All time selected. Its sample history includes long breaks, so the
+Typical score line and bands visibly change between full-strength and faded
+support.
+
+For both table screenshots, the capture tool collapses the left navigation and
+measures the total width of every displayed column. It expands the viewport to
+at least that width plus the page padding, and checks that the table has no
+horizontal overflow. This includes new default columns added by later changes.
+Table images are cropped to their headers and up to twelve rows.
 
 The script reloads once for the known initial Dash Pages race, waits for the
-chart, note, grid and leaderboard callbacks, then waits for two matching frames with
-animations disabled before saving each screenshot. It fails on subsequent browser exceptions, HTTP errors,
+chart, note, grid and leaderboard callbacks, then waits for two matching frames
+with animations disabled before saving each screenshot. It fails on subsequent
+browser exceptions, HTTP errors,
 or attempted outbound requests. All three captures must succeed before any
 checked-in image is replaced, and the temporary server and state are removed
 on success or failure.

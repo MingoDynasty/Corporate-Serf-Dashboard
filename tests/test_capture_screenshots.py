@@ -1,16 +1,23 @@
 """Exercise screenshot sample data through the production run parser."""
 
 from collections import Counter
+from datetime import timedelta
 
 from scripts import capture_screenshots
 from source.kovaaks.data_service import extract_data_from_file
 from source.kovaaks.play_sessions import split_into_play_sessions
-from source.kovaaks.typical_score import build_typical_scores
+from source.kovaaks.typical_score import (
+    build_typical_scores,
+    typical_score_fade_time,
+    typical_score_recency,
+)
 
 
 def _sample_runs(monkeypatch, tmp_path):
     monkeypatch.setattr(
-        capture_screenshots, "PLAYLIST_NAMES", ("Viscose Benchmark S2 - Medium",)
+        capture_screenshots,
+        "PLAYLIST_NAMES",
+        ("Viscose Benchmark S2 - Medium", "Voltaic Intermediate Benchmarks S5.5"),
     )
     samples = capture_screenshots.write_sample_state(tmp_path, 12345)
     runs = [
@@ -51,3 +58,31 @@ def test_sample_sessions_have_no_overlapping_runs(monkeypatch, tmp_path):
     )
     assert max(run.datetime_object for run in runs) < capture_screenshots.NOW
     assert Counter(run.scenario for run in runs)[capture_screenshots.SCENARIO] == 96
+
+
+def test_sample_chart_contains_gaps_with_faded_and_full_strength_support(
+    monkeypatch, tmp_path
+):
+    _, runs = _sample_runs(monkeypatch, tmp_path)
+    featured = sorted(
+        (run for run in runs if run.scenario == capture_screenshots.SCENARIO),
+        key=lambda run: run.datetime_object,
+    )
+    values = build_typical_scores(featured, split_into_play_sessions(runs))
+    recency = {
+        typical_score_recency(value, run.datetime_object).recent
+        for run, value in zip(featured, values)
+        if value.known
+    }
+    assert recency == {False, True}
+    fading_holds = [
+        (run, following, typical_score_fade_time(value))
+        for run, following, value in zip(featured, featured[1:], values)
+        if value.known
+        and following.datetime_object - run.datetime_object > timedelta(days=30)
+    ]
+    assert len(fading_holds) >= 2
+    assert all(
+        run.datetime_object < fade_time < following.datetime_object
+        for run, following, fade_time in fading_holds
+    )

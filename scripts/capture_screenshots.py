@@ -22,8 +22,14 @@ from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 NOW = datetime(2026, 10, 21, 18)
-SCENARIO = "VT Controlsphere Viscose"
-PLAYLIST_CODE = "KovaaKsPeakingNarrowImpact"
+SCENARIO = "VT ww5t Intermediate S5"
+RUN_HISTORY_PLAYLIST_CODE = "KovaaKsCarryingNarrowCt"
+TABLE_PLAYLIST_CODE = "KovaaKsPeakingNarrowImpact"
+SESSION_AGES = (140, 137, 134, 131, 45, 42, 39, 0)
+NOTE_TEXT = (
+    "Keep the click rhythm steady. Reset the aim between targets and avoid "
+    "rushing the final shots."
+)
 USERNAME = "Sample player"
 PLAYLIST_NAMES = (
     "Voltaic Novice Benchmarks S5.5",
@@ -92,7 +98,7 @@ def write_sample_state(state: Path, port: int) -> list[dict]:
         for run in range(count):
             session, in_session = divmod(run, 12)
             ended = NOW - timedelta(
-                days=(count // 12 - session - 1) * 3
+                days=SESSION_AGES[session]
                 if name == SCENARIO
                 else 1 + (index // 3) * 2 + (1 - session),
                 hours=2 if name == SCENARIO else 4 + index % 3 * 3,
@@ -164,8 +170,7 @@ def serve_sample(state: Path, port: int) -> None:
             api_service.save_leaderboard_total(leaderboard_id, sample["total"])
         scenario_notes_service.save_scenario_note(
             SCENARIO,
-            "Keep the movement smooth. Relax the grip and follow the target "
-            "through direction changes.",
+            NOTE_TEXT,
         )
         main()
 
@@ -198,6 +203,32 @@ def save_stable_screenshot(page, destination: Path, **options) -> None:
         previous = current
         page.wait_for_timeout(200)
     raise TimeoutError("The screenshot did not settle within 10 seconds.")
+
+
+def fit_table_columns(page, grid: str) -> int:
+    """Fit every displayed column with navigation collapsed, without horizontal scrolling."""
+    column_width = page.evaluate(
+        """async grid => {
+        const api = await window.dash_ag_grid.getApiAsync(grid);
+        return api.getAllDisplayedColumns().reduce(
+            (width, column) => width + column.getActualWidth(), 0);
+    }""",
+        grid,
+    )
+    # Measure the actual shown columns so later additions get space
+    # without squeezing their labels or cropping the last column.
+    width = max(1920, math.ceil(column_width + 48))
+    page.set_viewport_size({"width": width, "height": 1080})
+    page.wait_for_function(
+        """grid => {
+        const viewport = document.querySelector(
+            `#${grid} .ag-body-horizontal-scroll-viewport`);
+        return viewport && viewport.scrollWidth <= viewport.clientWidth + 1;
+    }""",
+        arg=grid,
+    )
+    print(f"{grid}: all displayed columns fit at {width}px with navigation collapsed")
+    return width
 
 
 def capture(origin: str, destination: Path) -> None:
@@ -235,7 +266,9 @@ def capture(origin: str, destination: Path) -> None:
         page.goto(
             origin
             + "/run-history?"
-            + urlencode({"scenario": SCENARIO, "playlist_code": PLAYLIST_CODE})
+            + urlencode(
+                {"scenario": SCENARIO, "playlist_code": RUN_HISTORY_PLAYLIST_CODE}
+            )
         )
         page.reload()
         errors = []
@@ -256,23 +289,39 @@ def capture(origin: str, destination: Path) -> None:
         expect(
             page.locator("#run-history-list-grid .run-list-row-latest").first
         ).to_be_visible()
-        expect(
-            page.get_by_text("Keep the movement smooth.", exact=False)
-        ).to_be_visible()
+        expect(page.get_by_text(NOTE_TEXT, exact=True)).to_be_visible()
+        page.get_by_text("Score vs Time", exact=True).click()
+        page.locator("#run-history-day-range").click()
+        page.get_by_role("option", name="All time", exact=True).click()
+        page.wait_for_function("""() => {
+            const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+            const typical = graph?.data?.filter(trace => trace.name === 'Typical score') || [];
+            return graph?._fullLayout?.xaxis.type === 'date'
+                && graph.data[0].x.length === 96
+                && typical.some(trace => trace.opacity === 0.35)
+                && typical.some(trace => trace.opacity === 1);
+        }""")
+        page.locator("#run-history-graph").click(position={"x": 5, "y": 5})
         page.mouse.move(0, 0)
         page.evaluate("document.fonts.ready")
         save_stable_screenshot(page, destination / IMAGE_NAMES[0])
+        page.get_by_role("button", name="Show or hide navigation").click()
+        page.wait_for_function("""() =>
+            document.getElementById('navbar')?.getBoundingClientRect().right <= 1
+        """)
         for path, grid, filename in (
             ("/playlists", "playlists-overview-grid", IMAGE_NAMES[1]),
-            (f"/playlists/{PLAYLIST_CODE}", "playlist-scenarios-grid", IMAGE_NAMES[2]),
+            (
+                f"/playlists/{TABLE_PLAYLIST_CODE}",
+                "playlist-scenarios-grid",
+                IMAGE_NAMES[2],
+            ),
         ):
-            page.set_viewport_size(
-                {
-                    "width": 2400 if grid == "playlist-scenarios-grid" else 1920,
-                    "height": 1080,
-                }
-            )
+            page.set_viewport_size({"width": 1920, "height": 1080})
             page.goto(origin + path)
+            page.wait_for_function("""() =>
+                document.getElementById('navbar')?.getBoundingClientRect().right <= 1
+            """)
             expect(page.locator(f"#{grid} .ag-row").first).to_be_visible()
             # Cached leaderboard values arrive in a second callback. Wait for
             # the percentile cells as well as the first paint of local stats.
@@ -284,6 +333,7 @@ def capture(origin: str, destination: Path) -> None:
             )
             if grid == "playlist-scenarios-grid":
                 expect(page.locator("#playlist-scenarios-status")).to_have_text("")
+            fit_table_columns(page, grid)
             page.mouse.move(0, 0)
             page.evaluate("document.fonts.ready")
             main_box = page.locator("main").bounding_box()
@@ -297,7 +347,10 @@ def capture(origin: str, destination: Path) -> None:
                 destination / filename,
                 clip={
                     **main_box,
-                    "height": last_row["y"] + last_row["height"] - main_box["y"] + 16,
+                    "height": last_row["y"]
+                    + last_row["height"]
+                    - main_box["y"]
+                    + (1 if rows.count() > 12 else 16),
                 },
             )
         browser.close()
