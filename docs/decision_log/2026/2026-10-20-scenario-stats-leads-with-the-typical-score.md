@@ -16,4 +16,4 @@ With no scenario selected, `No scenario selected` replaces the lead and lines. W
 
 **Help and terms.** The help explains the last-20 median, the darker middle-half and lighter middle-eighty bands, their switches, why the value dims, and why the card and chart can disagree about recency. Both targets accept keyboard focus and preserve word separation in the accessibility tree. The card keeps the Scenario Stats name in code and documentation. Typical score, Recent, Middle 50% and Middle 80% are defined in [the glossary](../../glossary.md#typical-score).
 
-The PB card's use of the typical score remains a separate Backlog item; this decision adds no such comparison. Current behavior is in [Run History](../../specs/run_history.md#scenario-stats).
+This decision adds no comparison to the PB card. Current behavior is in [Run History](../../specs/run_history.md#scenario-stats).
