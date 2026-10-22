@@ -370,6 +370,20 @@ How the gap is computed and shown is in
 - On screen: the Next Rank column.
 - In code: `next_tier`.
 
+### Typical Rank
+
+The benchmark tier a scenario's typical score reaches on its ladder, found
+the way Rank is found from the PB, with how far the typical score sits
+toward the next tier. It is never a rank the player has earned: KovaaK's
+ranks the PB. It is unknown while the typical score is, which is never read
+as weak
+([2026-10-22](decision_log/2026/2026-10-22-typical-rank-sorts-by-rank-position-and-reads-the-rank-and-a-percent.md)).
+
+- On screen: the Typical Rank column, such as `Celadon · 7%`.
+- In code: `typical_tier`; its sort key is the rank position, the ranks
+  reached plus that fraction.
+- Not Rank.
+
 ### Rank overlay
 
 The chart's lines for a scenario's rank thresholds
@@ -417,7 +431,10 @@ than 30 days, up to half of them.
 - On Scenario Stats: an undimmed lead number; not recent, a dimmed one.
   Whenever some of the value's runs are older than 30 days, recent or not,
   `{k} of {n} recent runs` follows `Typical score`.
-- In code: `recent`.
+- On the scenario table: judged once, as the page opens. Not recent, a
+  muted grey with a clock after the value in both typical cells, and
+  `Not recent` for a screen reader, explained in the cells' hovers.
+- In code: `recent`; the table's row field is `typical_not_recent`.
 
 ### Middle 50%
 

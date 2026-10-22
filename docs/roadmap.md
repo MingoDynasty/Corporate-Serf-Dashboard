@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Typical score on the scenario table** — a playlist's scenario table
+  shows each scenario's typical score beside its PB, and a benchmark's table
+  also shows the rank it reaches and how far toward the next, such as
+  Celadon · 7%. Sorting that column lists the scenarios from weakest to
+  strongest by the player's usual play. An old value is marked with a clock,
+  and every value's hover explains it, from the mouse or the keyboard. (PR
+  #PRNUM; design in #408) Design rationale distilled into
+  [`decision_log/`](./decision_log/README.md).
 - **Typical score** — Scenario Stats leads with the median of the scenario's
   last 20 runs, and Score vs Run and Score vs Time chart it inside two bands
   showing the scores' spread. A minimum guards the first value, and older
@@ -59,24 +67,6 @@ sequence.
   cards show relative ages with exact times on hover and focus. (PRs #380,
   #383 and #384; design in #379) Design rationale
   distilled into [`decision_log/`](./decision_log/README.md).
-- **The Run History page** — the page that charts a scenario's scores now
-  shows every run, and where each run fits in a session. Its chart plots
-  every run in a range, in the order the runs were played, by time, or by
-  sensitivity, where it used to keep only each day's top few. Beside it a
-  list groups the scenario's runs by session, with a check on each run that
-  met the score threshold and a star on each new personal best, and a card
-  above reports the last run played. The page has a new name and an address
-  of its own, and the app now opens on a small Home page that holds
-  first-time setup. Each browser's remembered chart settings started over
-  once. A new run now shows one plain toast on every page, with a link to
-  its scenario on Run History, in place of a toast that judged the run
-  while the page was open. The switch that turns it off is on the Settings
-  page. A switch above the list then turns it into All scenarios, each
-  session whole, its scenarios in the order they were played with their runs
-  under them, and a session's run count links there. (PRs #370, #371, #372,
-  #373, #376, #378; design in #356 and #375; run toasts design in #354;
-  sessions in #359, design in #355) Design rationale distilled into
-  [`decision_log/`](./decision_log/README.md).
 
 ---
 
@@ -129,12 +119,6 @@ next.
   overview → scenario table → Run History drill chain covers
   playlist-first navigation; this would answer "show me this scenario
   regardless of playlist."
-- **Weakness by the typical run** — columns on the playlist scenario table
-  that rank weakness by the typical run instead of the personal best. A
-  re-check on 2026-10-14 still found the typical run ordering weaknesses
-  better, on thin evidence. The
-  [typical score definition](./specs/typical_score.md) is now available; the
-  judgment and its evidence bar still need their own proposal.
 - **An overview** — time spent and activity across all scenarios. No design
   yet. Home, the page the app opens on, holds its place.
 - **KovaaK's own log** — the game's log records what stats files usually

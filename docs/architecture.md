@@ -165,7 +165,9 @@ The sanctioned channels, each typed and single-purpose:
   line. Each generation's state holds its scenario names and, captured with
   them, each scenario's rank ladder and its group, which the cancelled-fill
   rebuild needs so its rows keep Rank, Next Rank, Category, and Subcategory;
-  all three are released on terminal consumption. It carries grid rows, not notifications: the fill emits no
+  all three are released on terminal consumption. It also holds the table
+  build's typical-score snapshot, so the fill's rows and the rebuild show the
+  typical values phase 1 showed. It carries grid rows, not notifications: the fill emits no
   toast at all
   ([2026-08-22](decision_log/2026/2026-08-22-the-playlist-fill-reports-degradation-in-place-only.md)).
 
@@ -420,6 +422,8 @@ flowchart LR
     PlaylistService --> ApiService
     PlaylistService --> TimeScored
     PlaylistService --> Pace
+    PlaylistService --> PlaySessions
+    PlaylistService --> TypicalScore
     OverviewService --> DataService
     OverviewService --> ApiService
     OverviewService --> Visibility
@@ -735,9 +739,14 @@ flowchart LR
   the column defs from a value valid for that page's columns, and a
   clientside callback on the grid's `columnState` rewrites the key with a raw
   `history.replaceState`, never through `dcc.Location` (see decision log).
+  Typical Score follows the PB columns on every table, and Typical Rank
+  follows it on a benchmark's. `load_playlist_scenario_rows` takes one
+  `take_typical_snapshot` per open and gives it to phase 1 and to the fill.
+  Both columns draw through `assets/typicalScoreCells.js`, and the grid's
+  `eventListeners` call it to open a typical cell's hover on keyboard focus.
   The Columns menu ends the filter row, built by `components/columns_menu.py`
-  from this page's `MENU_COLUMNS` plus, on a benchmark,
-  `BENCHMARK_MENU_COLUMNS`. The Leaderboard ID column starts hidden
+  from this page's `MENU_COLUMNS` plus the typical entries and, on a
+  benchmark, `BENCHMARK_MENU_COLUMNS`. The Leaderboard ID column starts hidden
   (`initialHide`) and is not sortable, so it has no `?sort=` name. A table
   whose playlist has groups (`data_service.get_scenario_groups`) also gets
   the group columns in `GROUP_COLUMNS`, Category and Subcategory, ahead of
@@ -1210,6 +1219,14 @@ flowchart LR
   and run number. `playlist_scenario_groups` shares the length guard with
   Scenario Stats so both omit misaligned groups. The fill state captures the
   groups at registration, beside the ladders, so all three row paths carry them.
+  The typical columns' fields come from `typical_row_fields`, and on a
+  benchmark `typical_tier_fields` walks the same ladder from the typical
+  score, with `rank_position` as Typical Rank's sort key. Both read a
+  `TypicalSnapshot`, which `take_typical_snapshot` builds from one
+  `get_all_runs()` copy split into play sessions once, judged at one moment;
+  `_build_row` reads it and never the store, so every row path agrees. The
+  pace basis is read once per row and serves the PB's gap and the typical
+  one.
 - `performance_file.py` — pure reader for a KovaaK's performance file and the
   countdown check (`read_performance_file`): bytes in, one of three answers
   out (`Scoring`: time-scored, not time-scored, can't answer), with the
@@ -1297,8 +1314,10 @@ flowchart LR
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `typical_score.py` — the typical score's pure definition, which the Run
-  History chart draws on Score vs Run and Score vs Time, and Scenario Stats
-  leads with.
+  History chart draws on Score vs Run and Score vs Time, Scenario Stats
+  leads with, and the playlist scenario table ranks by. `typical_score_hover`
+  and `below_minimum_text` word a value's hover for the card and the table
+  alike.
   `build_typical_scores` takes one
   scenario's runs and the play
   sessions split across every scenario from the same snapshot, returning a
@@ -1456,6 +1475,15 @@ flowchart LR
   (`playlists.py`, `playlist_scenarios.py`) reference these from their column
   defs and run with `dangerously_allow_code=True`. Custom grid sort/format
   behavior belongs here — see the decision log.
+- `assets/typicalScoreCells.js` — the scenario table's typical cells: the
+  `TypicalCell` renderer (the value, an old value's clock and its
+  screen-reader `Not recent`, and the hover's words as the cell's
+  `aria-describedby`), the `TypicalScoreTooltip` and `TypicalRankTooltip`
+  components, the `typicalCellClass` function, and the keyboard popup that
+  `showTypicalFocusTip` opens from the grid's `cellFocused` event when the
+  last input was a key. AG Grid's `tooltipTrigger` is grid-wide and either
+  hover or focus, so the popup is the page's own (see decision log). Every
+  word it shows comes from the row or the column def.
 - `assets/gridSelectionGuard.js` — keeps a text selection made by dragging
   inside either playlist grid from also counting as a click. One capture
   listener on the document swallows a click when the pointer moved during
@@ -1580,7 +1608,7 @@ flowchart LR
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`); `playlist_filter_options()` in `components/scenario_selection.py` for the hidden playlist the Run History filter holds |
-| The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
+| The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js`, the typical columns' cells and hovers in `assets/typicalScoreCells.js` |
 | A benchmark's categories and subcategories on that table | `kovaaks/evxl_snapshot.py` for the read of `resources/evxl/benchmarks.json`; `kovaaks/scenario_groups.py` for the join and the exclusion list; `kovaaks/data_service.py` (`get_scenario_groups`) for the side table; `pages/playlist_scenarios.py` for the columns, the grouped state, and the merged-cell workaround; `scripts/benchmark_importer/script.py` (`find_group_crossings`) for the comparison with KovaaK's categories; the rules are in `docs/specs/playlists.md` |
 | The Chart options panel, its help text, or the theme and point appearance callback | `components/chart_options.py` for the panel, the help text, and the callbacks; the hosting page's `ChartOptionsIds` (`CHART_OPTIONS_IDS` in `pages/run_history.py`) for the component ids |
 | What `?scenario=` and `?playlist_code=` select, what the two dropdowns list, or the link from the playlist filter to its scenario table | `components/scenario_selection.py` for the callbacks and the layout helpers, `reach_scenario` and `reach_scenario_or_the_one_asked_for` there for the rule that clears a filter in the way of a scenario; the hosting page's `ScenarioSelectionIds` (`SCENARIO_SELECTION_IDS` in `pages/run_history.py`) for the component ids |

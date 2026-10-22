@@ -190,9 +190,10 @@ and [product.md](../product.md). Leaderboard placement is worded
   table can work without, in table order, labelled in sentence case. The
   overview's menu lists Type, Benchmark ID, Played, Runs, Last played, Median
   percentile, and Lowest percentile. The scenario table's lists Leaderboard
-  ID, Last played, Runs, Position, Total players, Percentile, PB score, PB
-  date, PB cm/360, and PB accuracy, with Rank and Next rank after PB score on
-  a benchmark's table only, and Category and Subcategory first on a table
+  ID, Last played, Runs, Position, Total players, Percentile, PB score,
+  Typical score, PB date, PB cm/360, and PB accuracy, with Rank and Next rank
+  after PB score and Typical rank after Typical score on a benchmark's table
+  only, and Category and Subcategory first on a table
   that has those [groups](#categories-and-subcategories-on-a-benchmarks-table).
   The Playlist column, the Scenario column, and the
   overview's action cells are never listed. A checked column is shown, a
@@ -300,7 +301,8 @@ and [product.md](../product.md). Leaderboard placement is worded
 
 - Columns: Scenario, Leaderboard ID (hidden until the Columns menu shows it),
   Last Played, Runs, Position, Total Players, Percentile, PB Score, then Rank
-  and Next Rank on a benchmark's table only, then PB Date, PB cm/360, PB
+  and Next Rank on a benchmark's table only, then Typical Score, then Typical
+  Rank on a benchmark's table only, then PB Date, PB cm/360, PB
   Accuracy. A benchmark that has groups adds Category and Subcategory ahead
   of Scenario
   ([below](#categories-and-subcategories-on-a-benchmarks-table)). Position
@@ -377,9 +379,57 @@ and [product.md](../product.md). Leaderboard placement is worded
   How a scenario is recognized, and when its PB can be measured by pace, is
   in
   [run_history.md](run_history.md#time-scored-scenarios).
-  Only a row with a ladder and a PB asks, so a playlist's table reads no
-  performance file, and a lookup that fails costs the pace gap, never the
-  row.
+  Only a row with a ladder and a PB or a known typical score asks, so a
+  playlist's table reads no performance file, and a lookup that fails costs
+  the pace gaps, never the row.
+- Typical Score is the scenario's newest typical score
+  ([typical_score.md](typical_score.md)), shown as Scenario Stats rounds it
+  and sorted by the unrounded median. It reads `Too few runs` below the
+  existence minimum and `N/A` with no local runs. Typical Rank, on a
+  benchmark's table only, reads `{rank} · {percent}%`, the rank's name alone
+  at the top rank, `No rank` below the first rank, and `N/A` with Too few
+  runs, with no runs, or for a scenario without a ladder. It sorts by rank
+  position: the ranks passed plus `(typical - last passed threshold) / (next
+  threshold - last passed threshold)`; below the first rank `1 / (1 + gap /
+  100)`, the gap to the first rank by the Next Rank rule, pace included, or
+  0 with no gap; at the top rank the rank count. The percent is `min(99,
+  floor(round(fraction * 100, 6)))`, so `0%` can be just above a threshold
+  and no cell reads 100%. Too few runs and `N/A` sort last in both directions
+  in both columns. Pace applies when every run behind the value is of the
+  basis's version
+  ([2026-10-22](../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md),
+  [2026-10-22](../decision_log/2026/2026-10-22-typical-rank-sorts-by-rank-position-and-reads-the-rank-and-a-percent.md)).
+- Both typical columns come from one snapshot per table build: one copy of
+  the run store split into play sessions once, recency judged at the moment
+  it was taken. Phase 1, the fill, and a cancelled fill's rebuild all carry
+  the same cells, and like PB Score they stay as they were until the page
+  reopens. A known value that is not recent gets a Typical Rank and sorts
+  with the others
+  ([2026-10-22](../decision_log/2026/2026-10-22-every-known-typical-score-gets-a-typical-rank-old-or-not.md)).
+- A known value that is not recent shows in `#676d75` (dark `#a6a6a6`) with a
+  13 px clock after it in both typical cells, hidden from assistive
+  technology, and `, Not recent` for a screen reader. Too few runs and `N/A`
+  are never marked. The Typical Score hover is Scenario Stats' lead hover,
+  from the same strings; below the minimum, the card's below-minimum text. An
+  old value's adds `Fewer than 10 of them are from the last 30 days, so it
+  may be out of date.` after its opening sentence. The Typical Rank hover is
+  `+{gap}% to {rank} · {points} to go`, or `+{gap}% faster to …` by pace, in
+  Next Rank's figures; none at the top rank; an old value's adds a line,
+  `Fewer than 10 of the typical score's runs are from the last 30 days, so it
+  may be out of date.`, which is the whole hover at the top rank. Both
+  columns carry the dotted hover underline where a hover exists. When
+  keyboard focus lands on a typical cell its hover opens beside it, closing
+  on Escape, a pointer press, a table scroll, and focus moving on or leaving
+  the table; a click opens nothing extra. Each typical cell's hover text is
+  its accessible description. Header tooltips stay mouse-only. Typical
+  Score's reads "The median of your last 20 runs of this scenario, or of all
+  your runs if you have fewer. A clock beside the number means fewer than 10
+  of those runs are from the last 30 days, so it may be out of date."; Typical
+  Rank's reads "The highest rank your typical score reaches on this scenario,
+  and how far it is toward the next rank. The percent rounds down, so 0% can
+  be just above the rank's threshold. Lower is weaker on this benchmark's
+  rank ladder."
+  ([2026-10-22](../decision_log/2026/2026-10-22-an-old-typical-value-on-the-table-is-marked-with-a-clock-in-a-readable-grey.md)).
 - A benchmark's page header carries a link to its Evxl page after the title
   and the playlist code, opening in a new tab, when Evxl's benchmark snapshot
   (`resources/evxl/benchmarks.json`) lists the playlist code, compared
@@ -428,8 +478,8 @@ and [product.md](../product.md). Leaderboard placement is worded
 - The table's sort lives in the page URL as
   `?sort=<name>.<dir>[,<name>.<dir>…]`, in priority order, with `dir` `asc`
   or `desc` and the names `scenario`, `last-played`, `runs`, `position`,
-  `total-players`, `percentile`, `pb-score`, `pb-date`, `pb-cm360`, and
-  `pb-accuracy`. Back and Forward restore each history entry's own sort, and
+  `total-players`, `percentile`, `pb-score`, `typical-score`, `pb-date`,
+  `pb-cm360`, and `pb-accuracy`. Back and Forward restore each history entry's own sort, and
   a reload or a copied link keeps it. A fresh visit through the Playlists page
   starts unsorted, in playlist order. Sorting rewrites the current entry and
   adds none. A value that is not entirely valid opens the table unsorted and
@@ -441,9 +491,11 @@ and [product.md](../product.md). Leaderboard placement is worded
   other sort in the value is kept, as are the other query parameters and the
   hash
   ([2026-10-05](../decision_log/2026/2026-10-05-a-columns-menu-shows-and-hides-table-columns-and-kovaaks-ids-are-optional-ones.md)).
-  A benchmark's table also takes `rank` and `next-rank`. On a playlist's
-  table they name no column, so a value holding either is not valid there
-  ([2026-09-27](../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md)).
+  A benchmark's table also takes `rank`, `next-rank` and `typical-rank`. On
+  a playlist's table they name no column, so a value holding any of them is
+  not valid there
+  ([2026-09-27](../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md),
+  [2026-10-22](../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md)).
 - The scenarios grid owns vertical scrolling inside the AppShell viewport
   with a 300px minimum height
   ([2026-07-06](../decision_log/2026/2026-07-06-let-the-playlist-scenarios-grid-own-vertical-scrolling.md));
