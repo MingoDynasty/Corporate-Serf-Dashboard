@@ -17,18 +17,21 @@ explains it, from the mouse or the keyboard.
 
 ## Decisions needed
 
-Four rows: TB1 to TB4. **Nothing is ratified.** Each row is the maintainer's
-lean from the design discussion of 2026-10-21 and 2026-10-22, worked out on
-three versions of a live prototype built from their own stats, with two
-rounds of advice from `claude-fable-5-1`. A lean is not a ruling: every row,
-and every premise in Problem, is open to challenge. Everything else is
-author-owned, in [Design](#design). TB2 and TB4 were amended after the first
-review; TB4's recommendation now departs from the maintainer's lean, and its
-status line says how.
+Four rulings: TB1 to TB4. The maintainer ratified this proposal on
+2026-10-22: "I ratify the proposal." That settles each row as its
+recommendation, TB2 and TB4 as amended in review. Before that, each row was
+the maintainer's lean from the design discussion of 2026-10-21 and
+2026-10-22, worked out on five versions of a live prototype built from their
+own stats, with two rounds of advice from `claude-fable-5-1` before review
+and a third, on TB4, during it. Each row keeps what was said, for the record.
+Everything else is author-owned, in [Design](#design), and the ratification
+covers it too. TB4's recommendation departs from the maintainer's first
+lean, and its status line says how.
 
 ### TB1. Two typical columns beside the PB columns
 
-Status: Proposed. The maintainer's lean, 2026-10-22, after comparing this
+Status: Ratified (user), 2026-10-22: accept the recommendation below. The
+maintainer's lean before that, 2026-10-22, after comparing this
 layout with a PB / Typical switch on the prototype: "two columns, Typical
 Rank as Celadon · 7% sorted by rank position with the gap in its hover, no
 Typical Next Rank column."
@@ -63,7 +66,9 @@ maintainer's first lean), and a third column for the typical Next Rank gap.
 
 ### TB2. Typical Rank sorts by rank position and reads `Celadon · 7%`
 
-Status: Proposed. The maintainer, 2026-10-22, on what the table is for: the
+Status: Ratified (user), 2026-10-22: accept the recommendation below, as
+amended in review. Before that, the maintainer, 2026-10-22, on what the
+table is for: the
 typical Next Rank "essentially allows me to 'Sort by weakness'. Since Score
 is not really comparable across scenarios", and the alternative, "convert
 the Rank and Next Rank into numerical steps": Bronze is 2.0, and 40% of the
@@ -118,7 +123,8 @@ that decision did not weigh.
 
 ### TB3. Every known typical score gets a rank, old or not
 
-Status: Proposed. The maintainer's lean, 2026-10-21: "2: I agree."
+Status: Ratified (user), 2026-10-22: accept the recommendation below. The
+maintainer's lean before that, 2026-10-21: "2: I agree."
 
 The material consequence: a typical score with few recent runs behind it
 still gets a Typical Rank and sorts among the others.
@@ -152,8 +158,9 @@ directions.**
 
 ### TB4. Old values are marked Not recent, in a grey that stays readable
 
-Status: Proposed, amended after the first review. The maintainer's lean,
-2026-10-22, after comparing two greys on the prototype: the darker one
+Status: Ratified (user), 2026-10-22: accept the recommendation below, as
+amended in review. The maintainer's first lean, 2026-10-22, after comparing
+two greys on the prototype: the darker one
 "doesn't seem faded enough, and looks too similar to regular text. The
 'Card's grey' option, however, is faded enough to see a difference." This
 recommendation departs from that lean. It keeps the darker grey and adds a
@@ -560,7 +567,9 @@ likely one run is to clear the next rank is a different question.
 
 ## Delivery plan
 
-**One PR,** which also ships this proposal: the row fields, the two columns,
+**One PR, unblocked:** the proposal was ratified on 2026-10-22, and the PR
+starts once this proposal merges. It also ships this proposal: the row
+fields, the two columns,
 the hovers and their keyboard route, the Not recent mark, the
 rank position, the Columns menu entries and sort names, and
 the shipping checklist (decision-log entries TB1 to TB4, the playlists and
