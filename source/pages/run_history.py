@@ -205,6 +205,9 @@ LATEST_RUN_CARD_IDS = LatestRunCardIds(
     body="run-history-card-body",
 )
 SCENARIO_STATS_IDS = ScenarioStatsIds(
+    lead="run-history-typical-lead",
+    recent_readout="run-history-typical-recency",
+    relative_time_interval=RELATIVE_TIME_INTERVAL_ID,
     category_row="run-history-category-row",
     category="run-history-category",
     num_runs_row="run-history-num-runs-row",

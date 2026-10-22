@@ -496,9 +496,10 @@ The card's lines, local-record scope and leaderboard presentation follow
 - Each mode plots every run of the scenario in its range as a point, legend
   "Run data point"
   ([2026-10-12][every-run]).
-  Score vs Run also draws the [typical score](../glossary.md#typical-score)
-  over its runs, as a line inside two bands, below. Score vs Time and Score vs
-  Sensitivity draw no summary line
+  Score vs Run and Score vs Time also draw the
+  [typical score](../glossary.md#typical-score) over their runs, as a line
+  inside two bands, below ([TS3][typical-chart], [TS4][typical-bands]).
+  Score vs Sensitivity draws no summary line
   ([2026-10-12][every-run]).
 - Score vs Run plots the runs in the order they were played, evenly spaced.
   The order is the one [sessions.md](sessions.md#sessions) sets, so the chart
@@ -567,13 +568,38 @@ The card's lines, local-record scope and leaderboard presentation follow
   range applied, so the value at the range's first run counts the runs the
   range leaves out, as the stars do. A value's sessions are split over every
   scenario's runs, taken from the same copy of the run store as the
-  scenario's own.
-- A point is drawn at full strength when its value was recent at its run, and
-  faded, at 35% opacity, when it wasn't. A faded stretch starts at the last
-  full-strength point before it and ends at the first after it, so the line
-  and the bands run on with no gap and no step. A point's strength never
-  changes after its run. How recent the value is now is not the chart's to
-  say.
+  scenario's own
+  ([TS1][typical-definition], [TS3][typical-chart], [TS4][typical-bands]).
+- On Score vs Run a point is drawn at full strength when its value was recent
+  at its run, and faded, at 35% opacity, when it wasn't. A faded stretch
+  starts at the last full-strength point before it and ends at the first
+  after it, so the line and the bands run on with no gap and no step. A
+  point's strength never changes after its run. How recent the value is now
+  is not the chart's to say
+  ([TS6][typical-recency]).
+- Score vs Time draws the same values, each worked out over the scenario's
+  whole history, so the value at the range's first run counts the runs the
+  range leaves out. Each value holds flat from its run to the next plotted
+  run, with a step at each run, and the line ends at the newest plotted run,
+  on that run's value: how recent the value is now is not the chart's to say
+  here either. A value sits at its own run's time, so of two runs that ended
+  in the same second, which the chart can draw in another order, the line
+  holds the later-played run's value from that second on, and the earlier
+  one's value, held for no time, has no point
+  ([TS3][typical-chart]).
+- A hold is at full strength while its value is recent, and faded, at 35%
+  opacity, from the moment fewer than 10 of its runs are recent: when its
+  10th-newest run turns 30 days old. It is still recent at that moment and
+  faded after it. A value that wasn't recent at its run holds faded
+  throughout. A faded part ends where the next run's value begins, and starts
+  where the full-strength part before it ends, so the line and the bands run
+  on with no gap
+  ([TS6][typical-recency]).
+- When the plotted range holds only one value to draw, as on the run that
+  first makes a value known or in a range that holds one run, that value
+  holds for no time. It is marked at its run instead: the line by a level
+  stroke and each band by a bar from its bottom to its top, both 14px wide
+  ([TS3][typical-chart]).
 - The line and the bands draw under the run points, the stars and the ring,
   by plotly's `zorder` −1, although they come after them in the figure: the
   run trace stays first and keeps the template's first color. Among
@@ -582,14 +608,15 @@ The card's lines, local-record scope and leaderboard presentation follow
   "Typical score", "Middle 50%", "Middle 80%". A faded stretch has no entry of
   its own, unless the figure holds only faded stretches of that metric.
   Clicking an entry hides the metric whole, faded stretches included. As with
-  the stars the click is not remembered. The switches are
-  ([Chart options panel](#chart-options-panel)).
+  the stars the click is not remembered ([TS3][typical-chart]). The switches
+  are in [Chart options panel](#chart-options-panel).
 - They are gray in both themes, with no color setting. On the light
   background the line is `#343a40`, 2.5px wide, the middle 50% that gray at
   14% opacity, and the middle 80% at 7%. On the dark one they are `#dee2e6` at
   the same strengths. The figure is built with the light colors, and the
   presentation step recolors the traces by name with the theme, as it does
-  the ring.
+  the ring
+  ([TS3][typical-chart], [TS4][typical-bands]).
 - The line has a hover of its own at each point, its labels bold:
   `Typical score: {score}`, then `Runs: {n} in {s} sessions · {first} to
   {last}`, then `Recent: {k} of {n} in the 30 days up to this run`, then
@@ -598,7 +625,14 @@ The card's lines, local-record scope and leaderboard presentation follow
   on one date reads `on {date}`, and a date carries its year only in another
   year than this one. Each figure is rounded as
   [typical_score.md](typical_score.md#display-rounding) says. The bands take
-  no hover, and the run points' hover is unchanged.
+  no hover, and the run points' hover is unchanged
+  ([TS3][typical-chart]).
+- On Score vs Time a hold has a point at each end, both with its value's
+  hover, the counts as they were at its run. On the faded part of a hold
+  whose value was recent at its run, the Recent line reads
+  `Recent: too few · last run {date}` instead, with the date of the value's
+  newest run, since the count changes along the hold
+  ([TS3][typical-chart], [TS6][typical-recency]).
 - A run recorded under a game's own sensitivity scale is normalized to cm/360
   when its file is parsed, from the file's own `Sens Increment` and `DPI`
   fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`. A run whose
@@ -654,16 +688,18 @@ The card's lines, local-record scope and leaderboard presentation follow
   threshold line. The rank lines redraw at once when the Playlist filter
   changes
   ([2026-10-12][every-run]).
-- Zooming the x axis refits the score axis to the points in view: every
+- Zooming the x axis refits the score axis to what is in view: every
   visible trace's points inside the x window, padded by 5% of their span. The
   stars and the ring repeat run points, so they never change the fit. The
-  typical score's line and bands take part: a band's trace holds its top and
-  its bottom at each run as points, so the band at every run in the window
-  stays in view. Overlay lines are not
+  typical score's line and bands take part, drawn as lines, a band as its
+  outline: their points inside the window, and the part of each of their
+  segments that crosses it, up to the window's edges. So the line and the
+  bands stay in view, a Score vs Time hold that spans the whole window
+  included ([TS3][typical-chart]). Overlay lines are not
   part of the fit, so a line beyond the fitted range is out of view while
   zoomed. A trace hidden from the legend is left out too, and showing or
-  hiding one while zoomed refits. A window holding no runs leaves the score
-  axis as it was. Double-clicking the plot, "Reset axes", "Autoscale", and
+  hiding one while zoomed refits. A window with none of these in it leaves
+  the score axis as it was. Double-clicking the plot, "Reset axes", "Autoscale", and
   any new figure (a rebuild or an appearance change) return both axes to the
   full autorange. Double-clicking the x axis alone also returns a refit score
   axis to its full autorange, but leaves a score range the user dragged
@@ -730,10 +766,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   accuracy, sensitivity, and x value, the setting a converted run was
   recorded at, the New PB stars and the ring, which repeat the position and
   score of runs already in it, the label and value of each overlay line
-  drawn, and on Score vs Run the typical score's line and bands with what
-  the line's hover shows at each point. Neither the button nor the flow is
-  app code: the graph passes no
-  `config`, so both are plotly.js 4 defaults, kept on purpose.
+  drawn, and on Score vs Run and Score vs Time the typical score's line and
+  bands with what the line's hover shows at each point
+  ([TS3][typical-chart]). Neither the button nor the flow is app code: the
+  graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow. Its figure is the playlist lines, their dates and
   progress percentages, and the aim-training-hours checkpoint labels
@@ -758,7 +794,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   scenario on screen ([2026-10-18][heading-line]).
   Under This scenario the line reads `{scenario} · {n} runs`, or `1 run`,
   where `{n}` counts every run of the scenario in the run store, the figure
-  Scenario Stats shows as Number of runs. Under All scenarios it reads
+  Scenario Stats shows as Total runs. Under All scenarios it reads
   `All scenarios · {n} runs`, where `{n}` counts every run in the store
   ([2026-10-14][all-scenarios]).
 
@@ -1062,7 +1098,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   the rank lines, and the Rank column. No completion time is shown anywhere
   ([2026-10-05][pace]).
   The typical score's line and bands are among them: a median and its
-  percentiles order scores, so they divide no times.
+  percentiles order scores, so they divide no times
+  ([TS1][typical-definition]).
 - Pace applies to a comparison only when three things hold: the scenario is
   recognized as time-scored, every score in the comparison is eligible, and
   both times are positive. Otherwise the surface behaves exactly as it does
@@ -1140,27 +1177,28 @@ The card's lines, local-record scope and leaderboard presentation follow
   [2026-10-13][retired];
   label casing as amended by [2026-09-14][copy]).
   Overlays ends with the typical score's three switches, after "PB score":
-  "Typical score", "Middle 50%" and "Middle 80%", all on.
+  "Typical score", "Middle 50%" and "Middle 80%", all on
+  ([TS7][typical-switches]).
   A help text that names another control renders the name bold: "Needs
   **Rank thresholds** turned on."
   ([2026-09-14][copy]).
 - Each of the typical score's switches shows or hides its metric on Score vs
-  Run, faded stretches included, and a band's switch also its line in the
-  line's hover. A band can show without the line. They are inputs of the
-  chart rebuild, as "PB score" is, and change nothing on the other two modes.
-  Their ids are `run-history-typical-score-overlay-switch`,
+  Run and Score vs Time, faded stretches included, and a band's switch also
+  its line in the line's hover. A band can show without the line. They are
+  inputs of the chart rebuild, as "PB score" is, and change nothing on Score
+  vs Sensitivity. Their ids are `run-history-typical-score-overlay-switch`,
   `run-history-middle-50-overlay-switch` and
   `run-history-middle-80-overlay-switch`, and like every remembered control's
-  their ids and defaults never change. Until Score vs Time draws the typical
-  score, each help text names both modes that don't: "Draws your typical
-  score: the median of your last 20 runs, or of all your runs if you have
-  fewer. It's faded where too few of them are recent. **Score vs Time** and
-  **Score vs Sensitivity** don't show the line or bands.", "Shades the middle
-  50% of the runs behind your typical score. A narrower band means more
-  consistent scores. **Score vs Time** and **Score vs Sensitivity** don't
-  show this band.", and "Shades the middle 80% of the runs behind your
-  typical score, in a lighter shade than the middle 50%. **Score vs Time**
-  and **Score vs Sensitivity** don't show this band."
+  their ids and defaults never change. Each help text names the mode that
+  doesn't show its metric ([TS7][typical-switches]): "Draws your typical
+  score: the median of your
+  last 20 runs, or of all your runs if you have fewer. It's faded where too
+  few of them are recent. **Score vs Sensitivity** doesn't show the line or
+  bands.", "Shades the middle 50% of the runs behind your typical score. A
+  narrower band means more consistent scores. **Score vs Sensitivity**
+  doesn't show this band.", and "Shades the middle 80% of the runs behind
+  your typical score, in a lighter shade than the middle 50%. **Score vs
+  Sensitivity** doesn't show this band."
 - The Score threshold percentage help text reads the same on every scenario:
   "Sets the score goal as a percentage of your personal best. On a scenario
   scored by completion time, it's a percentage of your personal best's pace
@@ -1187,18 +1225,47 @@ The card's lines, local-record scope and leaderboard presentation follow
 ## Scenario Stats
 
 - A card in the top row, framed as the latest-run card is, in the theme's
-  tokens. Its first line is plain text, "Scenario stats", in sentence case
-  and drawn as the other two cards' quiet first lines are; it is not a
-  heading ([2026-10-18][stats-last-played]). Under it, at one weight, are
-  "Category:" and "Number of runs:" for the selected scenario
-  ([T2][category], [T4][card-order]). The personal best and the leaderboard
-  position are [the PB card's](#the-pb-card), and when the scenario was last
-  played is [the latest-run card's](#the-latest-run-card)
+  tokens. Its first line is plain text, "Typical score", and is not a heading
+  ([TS8][typical-card-lead], [2026-10-18][stats-last-played]). A help icon
+  named "About the typical score" follows it, and its lead is the typical
+  score in the same large-number style as the PB and latest-run cards, with
+  a dotted underline and a hover ([TS8][typical-card-lead]). Category and
+  Total runs follow at one weight ([TS8][typical-card-lead]). The personal best and the
+  leaderboard position are [the PB card's](#the-pb-card), and when the
+  scenario was last played is [the latest-run card's](#the-latest-run-card)
   ([2026-10-18][stats-last-played]).
+- The lead is the value after the scenario's newest run, built by the same
+  function as the chart's last point from one snapshot of the whole run
+  store. Recency is judged against the app's own clock as of now, and a
+  value that isn't recent is dimmed in the theme's dimmed color
+  ([TS5][typical-card-value]).
+- Whenever some supporting runs are older than 30 days, the first line adds
+  ` · {k} of {n} recent runs`, including zero, whether the lead is dimmed or
+  at full strength. It adds no readout when every supporting run is recent
+  ([TS6][typical-recency]).
+- The lead's hover gives the median's supporting count, the run and session
+  counts and short dates, the number from the last 30 days, and both the
+  middle 50% and middle 80%. A single date reads `on {date}`, and only a
+  date outside the current year shows its year. Chart switches change
+  neither this hover nor the card
+  ([TS5][typical-card-value]).
 - With no scenario selected, the card reads "No scenario selected" under its
-  first line, in the PB card's empty-title style, in place of Category and
-  Number of runs. A selected scenario with no local runs reads `Number of
-  runs: 0` ([2026-10-18][stats-last-played]).
+  first line, in the PB card's empty-title style, in place of the lead,
+  Category and Total runs. A scenario with no local runs reads "No runs yet"
+  over `Total runs: 0`. Below the existence minimum the lead reads "Too few
+  runs", whose hover gives the minimum and the scenario's run and session
+  counts, with singular wording for one
+  ([TS8][typical-card-lead]).
+- The first line's help explains the median, both bands and their switches,
+  the dimming, and why the card's recency can differ from the chart's last
+  point. The help icon and the hovered lead accept keyboard focus
+  ([TS8][typical-card-lead]).
+- A selected-scenario run, a scenario change, and the page's 30-second
+  relative-time tick update the lead and readout. The tick dims a value
+  within 30 seconds of its recency test failing. Unchanged rendered content
+  returns `no_update` so a held tooltip stays mounted across ticks. The
+  card builds no interval of its own
+  ([TS5][typical-card-value]).
 - Category is `{category} · {subcategory}`, or `{category}` with one level,
   using the selected benchmark table's own group labels and length guard.
   It is shown only while the Playlist filter holds a benchmark with groups
@@ -1208,7 +1275,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   placeholder. A scenario or filter change rewrites it, including a filter
   change alone ([T2][category]).
 - Its frame is 270px wide and adds only a border to its height.
-  The card fits in the row the dropdowns' column sets, its lines centered.
+  The card fits in the row the dropdowns' column sets, its lines centered
+  ([TS8][typical-card-lead]).
 
 ## Run delivery
 
@@ -1386,3 +1454,17 @@ The card's lines, local-record scope and leaderboard presentation follow
 [note-card]: ../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md
 [long-note]: ../decision_log/2026/2026-10-19-a-long-scenario-note-scrolls-in-its-card.md
 [note-unsaved]: ../decision_log/2026/2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md
+
+[typical-definition]: ../decision_log/2026/2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md
+
+[typical-chart]: ../decision_log/2026/2026-10-18-the-typical-score-is-drawn-after-each-run.md
+
+[typical-bands]: ../decision_log/2026/2026-10-18-two-percentile-bands-show-the-typical-scores-spread.md
+
+[typical-card-value]: ../decision_log/2026/2026-10-18-scenario-stats-shows-the-newest-typical-score-at-any-age.md
+
+[typical-recency]: ../decision_log/2026/2026-10-20-a-typical-score-is-recent-with-ten-runs-from-the-last-thirty-days.md
+
+[typical-switches]: ../decision_log/2026/2026-10-20-the-typical-score-and-both-bands-have-independent-switches.md
+
+[typical-card-lead]: ../decision_log/2026/2026-10-20-scenario-stats-leads-with-the-typical-score.md

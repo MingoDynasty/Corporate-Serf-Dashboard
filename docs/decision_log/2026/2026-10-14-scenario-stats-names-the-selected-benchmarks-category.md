@@ -8,6 +8,8 @@ category it names, because a scenario can belong to several benchmarks.
 When that benchmark has no groups or does not list the scenario, the row
 disappears so the card holds only useful facts.
 
+**Superseded in part (2026-10-21).** [Scenario Stats now leads with the typical score](2026-10-20-scenario-stats-leads-with-the-typical-score.md), then Category and Total runs. The earlier no-lead ordering and the label Number of runs are historical. Category's selected-benchmark rules and the no-selection message stand; Last played remains on the latest-run card.
+
 **Superseded in part (2026-10-18).** [Last played leaves Scenario Stats](2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md):
 the card holds Category and Number of runs, under a first line that is
 plain text, `Scenario stats`, and no longer an `h2`. With no scenario
