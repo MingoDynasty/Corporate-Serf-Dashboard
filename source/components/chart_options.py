@@ -95,7 +95,6 @@ CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
 # move: changing a persisted control's layout default silently discards every
 # value the browser already stored under its id.
 CHART_OPTIONS_FIELD_CLASS = "chart-options-field"
-CHART_OPTIONS_FIELD_LABEL_CLASS = "chart-options-field-label"
 POINT_COLOR_DEFAULT = ""
 # The empty field previews the generated point color. Mantine paints the
 # preview of an empty ColorInput white, so the stylesheet repaints it from
@@ -381,29 +380,24 @@ def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
             _chart_options_group(
                 "Run Data Points",
                 [
-                    # SegmentedControl has no Mantine label slot, so the field
-                    # carries its own and points the control at it -- the
-                    # visible text is then the control's accessible name
-                    # rather than a second one announced beside it.
-                    dmc.Box(
+                    # ``SegmentedControl`` doesn't read ``InputWrapper``'s label
+                    # context, so its accessible name still needs the label id.
+                    dmc.InputWrapper(
                         className=CHART_OPTIONS_FIELD_CLASS,
-                        children=[
-                            dmc.Text(
-                                "Point size",
-                                id=ids.point_size_label,
-                                className=CHART_OPTIONS_FIELD_LABEL_CLASS,
-                            ),
-                            dmc.SegmentedControl(
-                                id=ids.point_size,
-                                data=list(POINT_SIZE_OPTIONS),
-                                value=POINT_SIZE_DEFAULT,
-                                fullWidth=True,
-                                persistence=True,
-                                radius="sm",
-                                size="sm",
-                                **{"aria-labelledby": ids.point_size_label},
-                            ),
-                        ],
+                        label="Point size",
+                        labelElement="div",
+                        labelProps={"id": ids.point_size_label},
+                        size="sm",
+                        children=dmc.SegmentedControl(
+                            id=ids.point_size,
+                            data=list(POINT_SIZE_OPTIONS),
+                            value=POINT_SIZE_DEFAULT,
+                            fullWidth=True,
+                            persistence=True,
+                            radius="sm",
+                            size="sm",
+                            **{"aria-labelledby": ids.point_size_label},
+                        ),
                     ),
                     dmc.Box(
                         className=f"{CHART_OPTIONS_FIELD_CLASS} {POINT_COLOR_FIELD_CLASS}",

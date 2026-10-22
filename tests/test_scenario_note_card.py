@@ -15,7 +15,7 @@ from pathlib import Path
 import dash
 import dash_mantine_components as dmc
 import pytest
-from dash import dcc, html, no_update
+from dash import dcc, no_update
 from dash._callback import GLOBAL_CALLBACK_LIST
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -291,12 +291,16 @@ def test_the_card_and_the_editor_carry_the_copy_block_words():
     edit = _by_id(page_card, IDS.edit)
     draft = _by_id(page_card, IDS.draft)
 
-    assert isinstance(edit, html.Button)
+    # ``UnstyledButton`` supplies Mantine's keyboard focus ring; a plain
+    # ``html.Button`` gets Chromium's near-black default on the dark theme.
+    assert isinstance(edit, dmc.UnstyledButton)
     assert (edit.children, getattr(edit, "aria-label")) == (
         "Edit",
         "Edit scenario note",
     )
-    assert _by_id(page_card, IDS.add).children == "Add a scenario note"
+    add = _by_id(page_card, IDS.add)
+    assert isinstance(add, dmc.UnstyledButton)
+    assert add.children == "Add a scenario note"
     assert isinstance(draft, dmc.Textarea)
     assert draft.placeholder == "Note for this scenario"
     assert getattr(draft, "aria-label") == "Scenario note"
@@ -306,14 +310,6 @@ def test_the_card_and_the_editor_carry_the_copy_block_words():
     assert _by_id(page_card, IDS.cancel).children == "Cancel"
     # The waiting line is announced as it appears.
     assert getattr(_by_id(page_card, IDS.waiting_line), "aria-live") == "polite"
-
-
-def test_edit_and_add_wear_mantines_focus_ring():
-    """Drawn as links on plain buttons, they would otherwise get the browser's ring."""
-    page_card = card.scenario_note_card(IDS, toast_link_class="toast-link")
-
-    for button_id in (IDS.edit, IDS.add):
-        assert "mantine-focus-auto" in _by_id(page_card, button_id).className.split()
 
 
 def test_a_long_note_scrolls_in_a_scroll_area_that_draws_its_own_scrollbar():
