@@ -3295,7 +3295,7 @@ def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
     ],
     ids=["overview", "scenarios"],
 )
-def test_playlist_grids_draw_every_row(page_module, grid_id):
+def test_playlist_grids_draw_every_row_in_screen_order(page_module, grid_id):
     grid = _component_by_id(page_module.layout(), grid_id)
 
     # The browser's own text search finds only rows that are in the page. With
@@ -3305,6 +3305,9 @@ def test_playlist_grids_draw_every_row(page_module, grid_id):
     # With the cap left on, a table of 600 rows drew 501 and never the rest,
     # even when scrolled to its end.
     assert grid.dashGridOptions["suppressMaxRenderedRowRestriction"] is True
+    # A sort must also reorder the page nodes: browser search and text
+    # selection otherwise follow the old order, skipping rows on screen.
+    assert grid.dashGridOptions["ensureDomOrder"] is True
     # The grid still scrolls inside itself, which keeps its header in view.
     assert "domLayout" not in grid.dashGridOptions
 

@@ -1019,6 +1019,9 @@ def layout(
                     # even when scrolled to.
                     "suppressRowVirtualisation": True,
                     "suppressMaxRenderedRowRestriction": True,
+                    # Browser search and text selection follow page order,
+                    # so a sort must reorder the nodes as well as the rows.
+                    "ensureDomOrder": True,
                     "getRowId": {
                         "function": (
                             "params.data.generation_token + ':' + "
