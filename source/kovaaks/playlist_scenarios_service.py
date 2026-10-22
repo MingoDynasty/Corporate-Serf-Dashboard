@@ -3,10 +3,12 @@
 import logging
 import math
 import threading
-from collections import Counter
+from collections import Counter, defaultdict
+from collections.abc import Iterable, Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from typing import Literal, TypeAlias
+from datetime import datetime
+from typing import Any, Literal, TypeAlias
 from urllib.parse import urlencode
 
 import requests
@@ -22,6 +24,7 @@ from source.kovaaks.api_service import (
 )
 from source.kovaaks.data_models import PlaylistData, Rank, RunData, ScenarioStats
 from source.kovaaks.data_service import (
+    get_all_runs,
     get_personal_best_run,
     get_playlist_by_code,
     get_scenario_groups,
@@ -30,23 +33,87 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
 )
 from source.kovaaks.pace import percent_faster
+from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.request_logging import request_exception_summary
 from source.kovaaks.scenario_groups import ScenarioGroup
-from source.kovaaks.time_scored_service import eligible_pace_constant, get_pace_basis
+from source.kovaaks.time_scored_service import (
+    PaceBasis,
+    eligible_pace_constant,
+    get_pace_basis,
+)
+from source.kovaaks.typical_score import (
+    TOO_FEW_RUNS_TEXT,
+    TypicalScore,
+    below_minimum_text,
+    build_typical_scores,
+    format_typical_score,
+    typical_score_hover,
+    typical_score_recency,
+)
 from source.utilities.stopwatch import Stopwatch
 from source.utilities.utilities import format_percent, format_score
 
 PLAYLIST_RANK_MAX_WORKERS = 4
 FILL_TOMBSTONE_LIMIT = 8
 
+TYPICAL_SCORE_OLD_SENTENCE = (
+    "Fewer than 10 of them are from the last 30 days, so it may be out of date."
+)
+TYPICAL_RANK_OLD_LINE = (
+    "Fewer than 10 of the typical score's runs are from the last 30 days, "
+    "so it may be out of date."
+)
+
 FillTerminal: TypeAlias = Literal["complete", "cancelled"]
-RowValue: TypeAlias = str | int | float | bool | None
+# A dict holds a hover whose lines a tooltip draws with bold labels.
+RowValue: TypeAlias = str | int | float | bool | dict[str, Any] | None
 PlaylistScenarioRow: TypeAlias = dict[str, RowValue]
 
 logger = logging.getLogger(__name__)
 _FILL_REGISTRY_LOCK = threading.Lock()
 _FILL_REGISTRY: dict[str, "_FillState"] = {}
 _terminal_sequence = 0
+
+
+@dataclass(frozen=True)
+class TypicalSnapshot:
+    """Each scenario's newest typical score, from one copy of the run store.
+
+    ``values`` maps a scenario with runs to its newest value and how many runs
+    it has; a scenario with none is absent. Recency is judged at ``moment``,
+    when the copy was taken, so every row built from one snapshot agrees.
+    """
+
+    moment: datetime
+    values: Mapping[str, tuple[TypicalScore, int]]
+
+
+def take_typical_snapshot(scenario_names: Iterable[str]) -> TypicalSnapshot:
+    """Build the newest typical score of each named scenario from one store copy.
+
+    A table build takes one and gives it to every row it builds, the fill's
+    and a cancelled fill's rebuild included, so a run landing while the
+    table opens can't give its rows two different values.
+    """
+    # The sessions are split from the same copy the scenarios' runs come
+    # from: a run must never appear in a window without its session.
+    snapshot = get_all_runs()
+    moment = datetime.now()
+    wanted = set(scenario_names)
+    runs_by_scenario: defaultdict[str, list[RunData]] = defaultdict(list)
+    for run in snapshot:
+        if run.scenario in wanted:
+            runs_by_scenario[run.scenario].append(run)
+    if not runs_by_scenario:
+        return TypicalSnapshot(moment, {})
+    sessions = split_into_play_sessions(snapshot)
+    return TypicalSnapshot(
+        moment,
+        {
+            name: (build_typical_scores(runs, sessions)[-1], len(runs))
+            for name, runs in runs_by_scenario.items()
+        },
+    )
 
 
 @dataclass
@@ -62,6 +129,9 @@ class _FillState:
     # Captured the same way, for the same reason: a row built without its
     # group would blank its Category and Subcategory cells.
     scenario_groups: tuple[ScenarioGroup | None, ...]
+    # Phase 1's snapshot, for the same reason: a row rebuilt from a later one
+    # could change its typical cells while the page is open.
+    typical: TypicalSnapshot
     total: int
     unresolved_indices: set[int]
     cancel_event: threading.Event = field(default_factory=threading.Event)
@@ -329,6 +399,141 @@ def benchmark_rank_fields(
     return fields
 
 
+def rank_position(ladder: list[Rank], score: float, standing: LadderStanding) -> float:
+    """Return where a score sits on its ladder: the ranks reached plus a fraction.
+
+    The fraction is how far the score is from the last rank reached to the
+    next one, at least 0 and below 1, because the walk stops at the first
+    threshold above the score. At the top rank the position is the rank
+    count. Below the first rank there is no lower threshold, so the position
+    is ``1 / (1 + gap / 100)``, ``gap`` being the next-rank gap by its own
+    rule. On a time-scored scenario that gap is a ratio of times, which the
+    scenario's arbitrary starting constant doesn't move, where a ratio of
+    scores would. With no gap, a score of zero or less on score math, it is 0.
+    """
+    if standing.at_top:
+        return float(standing.passed)
+    if standing.passed == 0:
+        if standing.next_gap is None:
+            return 0.0
+        return 1 / (1 + standing.next_gap.gap / 100)
+    lower = ladder[standing.passed - 1].threshold
+    upper = ladder[standing.passed].threshold
+    return standing.passed + (score - lower) / (upper - lower)
+
+
+def band_percent(fraction: float) -> int:
+    """Show how far a score is toward the next rank, in whole percent rounded down.
+
+    The inner round strips float noise, as the Next Rank gap's does, but it
+    can carry a score a hair under the next threshold to 100, which would
+    read as the next rank. The cap keeps it at 99.
+    """
+    return min(99, math.floor(round(fraction * 100, 6)))
+
+
+def typical_tier_fields(
+    ladder: list[Rank],
+    typical_score: float | None,
+    pace_constant: float | None = None,
+    *,
+    not_recent: bool = False,
+) -> PlaylistScenarioRow:
+    """Compute a benchmark row's Typical Rank fields from its typical score.
+
+    ``typical_tier_sort`` is the unrounded rank position, and ``N/A`` sorts as
+    null. The hover is the gap to the next rank, as Next Rank's figures read,
+    then, on a value that is not recent, a line saying so. The rank, the
+    percent and the gap all count from the exact median, never the rounded
+    value the Typical Score cell shows.
+    """
+    fields: PlaylistScenarioRow = {
+        "typical_tier_display": "N/A",
+        "typical_tier_sort": None,
+        "typical_tier_hover": None,
+    }
+    if typical_score is None:
+        return fields
+    standing = ladder_standing(ladder, typical_score, pace_constant)
+    if standing is None:
+        return fields
+    position = rank_position(ladder, typical_score, standing)
+    fields["typical_tier_sort"] = position
+    if standing.reached is None:
+        fields["typical_tier_display"] = "No rank"
+    elif standing.at_top:
+        fields["typical_tier_display"] = standing.reached.name
+    else:
+        percent = band_percent(position - standing.passed)
+        fields["typical_tier_display"] = f"{standing.reached.name} · {percent}%"
+    lines = []
+    if standing.next_gap is not None:
+        next_gap = standing.next_gap
+        lines.append(
+            f"{next_gap.gap_text} to {next_gap.rank.name} · "
+            f"{next_gap.points_text} to go"
+        )
+    if not_recent:
+        lines.append(TYPICAL_RANK_OLD_LINE)
+    fields["typical_tier_hover"] = "\n".join(lines) or None
+    return fields
+
+
+def typical_row_fields(
+    scenario_name: str,
+    ladder: list[Rank] | None,
+    typical: TypicalSnapshot,
+    pace_basis: PaceBasis | None = None,
+) -> PlaylistScenarioRow:
+    """Compute a row's Typical Score fields, and on a benchmark its Typical Rank's.
+
+    ``ladder`` is ``None`` on a playlist's table, whose rows carry no Typical
+    Rank fields. ``pace_basis`` is the scenario's, read once for the row; the
+    rank is measured by pace only when every run behind the value is of its
+    version. A value is marked not recent only when it is known: an unknown
+    one reads Too few runs, and unknown is not the same as old.
+    """
+    fields: PlaylistScenarioRow = {
+        "typical_score_display": "N/A",
+        "typical_score_sort": None,
+        "typical_not_recent": False,
+        "typical_score_hover": None,
+    }
+    median = None
+    pace_constant = None
+    not_recent = False
+    entry = typical.values.get(scenario_name)
+    if entry is not None:
+        value, total = entry
+        median = value.median
+        if median is None:
+            fields["typical_score_display"] = TOO_FEW_RUNS_TEXT
+            fields["typical_score_hover"] = {
+                "lead": below_minimum_text(value),
+                "lines": [],
+            }
+        else:
+            not_recent = not typical_score_recency(value, typical.moment).recent
+            hover = typical_score_hover(value, total, typical.moment)
+            fields["typical_score_display"] = format_typical_score(median, value.runs)
+            fields["typical_score_sort"] = median
+            fields["typical_not_recent"] = not_recent
+            fields["typical_score_hover"] = {
+                "lead": (
+                    f"{hover.opening} {TYPICAL_SCORE_OLD_SENTENCE}"
+                    if not_recent
+                    else hover.opening
+                ),
+                "lines": [list(line) for line in hover.lines],
+            }
+            pace_constant = eligible_pace_constant(pace_basis, *value.runs)
+    if ladder is not None:
+        fields.update(
+            typical_tier_fields(ladder, median, pace_constant, not_recent=not_recent)
+        )
+    return fields
+
+
 def _get_local_stats(scenario_name: str) -> ScenarioStats | None:
     if not is_scenario_in_database(scenario_name):
         return None
@@ -536,9 +741,14 @@ def _build_row(  # noqa: PLR0913
     *,
     ladder: list[Rank] | None,
     group: ScenarioGroup | None,
+    typical: TypicalSnapshot,
     mark_unresolved_pending: bool,
 ) -> PlaylistScenarioRow:
-    """Re-read local data and build a complete transaction-safe row."""
+    """Re-read local data and build a complete transaction-safe row.
+
+    The typical fields come from ``typical``, never from a fresh read, so
+    every row path gives a scenario the same typical cells.
+    """
     try:
         scenario_stats = _get_local_stats(scenario_name)
     except Exception:  # noqa: BLE001
@@ -569,25 +779,31 @@ def _build_row(  # noqa: PLR0913
             exc_info=True,
         )
         leaderboard_id = None
-    pace_constant = None
-    # Only a row with a ladder and a PB shows a gap, so a playlist's table
-    # never reads a performance file.
-    if ladder and personal_best_run is not None:
+    pace_basis = None
+    entry = typical.values.get(scenario_name)
+    # Only a row with a ladder and a PB or a typical score shows a gap, so a
+    # playlist's table never reads a performance file.
+    if ladder and (
+        personal_best_run is not None
+        or (entry is not None and entry[0].median is not None)
+    ):
         try:
-            pace_constant = eligible_pace_constant(
-                get_pace_basis(scenario_name),
-                personal_best_run,
-            )
+            pace_basis = get_pace_basis(scenario_name)
         except Exception:  # noqa: BLE001 -- a fill worker's exception ends the fill.
             # The lookup handles a missing or unreadable performance file
-            # itself. Anything else must cost the pace gap only, never the
-            # row, so the cell falls back to the gap as a percentage of the PB.
+            # itself. Anything else must cost the pace gaps only, never the
+            # row, so each falls back to a percentage of its score.
             logger.warning(
                 'Failed to tell whether "%s" is time-scored',
                 scenario_name,
                 exc_info=True,
             )
-    return format_playlist_scenario_rank_row(
+    pace_constant = (
+        eligible_pace_constant(pace_basis, personal_best_run)
+        if ladder and personal_best_run is not None
+        else None
+    )
+    row = format_playlist_scenario_rank_row(
         scenario_name,
         playlist_order,
         rank_info,
@@ -601,13 +817,20 @@ def _build_row(  # noqa: PLR0913
         playlist_code=playlist_code,
         mark_unresolved_pending=mark_unresolved_pending,
     )
+    row.update(typical_row_fields(scenario_name, ladder, typical, pace_basis))
+    return row
 
 
 def build_playlist_scenario_rank_rows(
     playlist_code: str,
     generation_token: str,
+    *,
+    typical: TypicalSnapshot,
 ) -> list[PlaylistScenarioRow]:
-    """Build phase-1 rows from local data and TTL-ignored disk caches only."""
+    """Build phase-1 rows from local data and TTL-ignored disk caches only.
+
+    ``typical`` is the table build's snapshot, which its fill gets too.
+    """
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
         return []
@@ -631,6 +854,7 @@ def build_playlist_scenario_rank_rows(
                 playlist_code,
                 ladder=ladder,
                 group=group,
+                typical=typical,
                 mark_unresolved_pending=True,
             )
         )
@@ -682,8 +906,13 @@ def _cancel_live_fills_locked() -> None:
 def start_playlist_scenario_fill(
     playlist_code: str,
     generation_token: str,
+    *,
+    typical: TypicalSnapshot,
 ) -> bool:
-    """Cancel older fills, register this generation, and start its daemon."""
+    """Cancel older fills, register this generation, and start its daemon.
+
+    ``typical`` is the snapshot phase 1 built its rows from.
+    """
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
         return False
@@ -693,6 +922,7 @@ def start_playlist_scenario_fill(
         scenario_names=scenario_names,
         scenario_ladders=_scenario_ladders(playlist),
         scenario_groups=playlist_scenario_groups(playlist),
+        typical=typical,
         total=len(scenario_names),
         unresolved_indices=set(range(len(scenario_names))),
     )
@@ -707,6 +937,7 @@ def start_playlist_scenario_fill(
             scenario_names,
             state.scenario_ladders,
             state.scenario_groups,
+            typical,
             state.cancel_event,
         ),
         name=f"playlist-fill-{generation_token[:8]}",
@@ -723,6 +954,7 @@ def _fetch_fill_row(  # noqa: PLR0913
     scenario_name: str,
     ladder: list[Rank] | None,
     group: ScenarioGroup | None,
+    typical: TypicalSnapshot,
     cancel_event: threading.Event,
 ) -> tuple[int, ScenarioRankInfo, PlaylistScenarioRow] | None:
     if cancel_event.is_set():
@@ -739,6 +971,7 @@ def _fetch_fill_row(  # noqa: PLR0913
         playlist_code,
         ladder=ladder,
         group=group,
+        typical=typical,
         mark_unresolved_pending=False,
     )
     return playlist_order, rank_info, row
@@ -763,11 +996,12 @@ def _record_fill_result(
             state.stale_count += 1
 
 
-def _run_playlist_scenario_fill(
+def _run_playlist_scenario_fill(  # noqa: PLR0913
     generation_token: str,
     scenario_names: tuple[str, ...],
     scenario_ladders: tuple[list[Rank] | None, ...],
     scenario_groups: tuple[ScenarioGroup | None, ...],
+    typical: TypicalSnapshot,
     cancel_event: threading.Event,
 ) -> None:
     """Hydrate once, fan out rank lookups, and stream results to the registry."""
@@ -799,6 +1033,7 @@ def _run_playlist_scenario_fill(
                         scenario_name,
                         ladder,
                         group,
+                        typical,
                         cancel_event,
                     )
                     for index, (scenario_name, ladder, group) in enumerate(
@@ -868,6 +1103,7 @@ def _build_cancelled_finalization_rows(  # noqa: PLR0913
     scenario_names: tuple[str, ...],
     scenario_ladders: tuple[list[Rank] | None, ...],
     scenario_groups: tuple[ScenarioGroup | None, ...],
+    typical: TypicalSnapshot,
     generation_token: str,
     unresolved_indices: list[int],
 ) -> list[PlaylistScenarioRow]:
@@ -887,6 +1123,7 @@ def _build_cancelled_finalization_rows(  # noqa: PLR0913
                 playlist_code,
                 ladder=scenario_ladders[index],
                 group=scenario_groups[index],
+                typical=typical,
                 mark_unresolved_pending=False,
             )
         )
@@ -941,6 +1178,7 @@ def drain_playlist_scenario_fill(
             scenario_names,
             scenario_ladders,
             scenario_groups,
+            state.typical,
             generation_token,
             unresolved_indices,
         )

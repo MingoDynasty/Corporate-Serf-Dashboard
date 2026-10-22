@@ -3,6 +3,8 @@
 The caller supplies one scenario's runs and the play sessions split from the
 same snapshot of every scenario's runs. Nothing reads the run store, holds a
 clock, or persists a value. The contract is in ``docs/specs/typical_score.md``.
+The words of a value's hover are here too, so every surface that explains a
+value says the same thing.
 """
 
 from collections.abc import Iterable
@@ -14,12 +16,13 @@ from statistics import median, quantiles
 
 from source.kovaaks.data_models import RunData
 from source.kovaaks.play_sessions import PlaySession, in_play_order
-from source.utilities.utilities import format_score
+from source.utilities.utilities import format_score, format_short_date
 
 TYPICAL_SCORE_WINDOW_RUNS = 20
 TYPICAL_SCORE_MIN_RUNS = 10
 TYPICAL_SCORE_MIN_SESSIONS = 2
 TYPICAL_SCORE_RECENT_AGE = timedelta(days=30)
+TOO_FEW_RUNS_TEXT = "Too few runs"
 
 
 @dataclass(frozen=True)
@@ -138,6 +141,68 @@ def typical_score_recency(value: TypicalScore, moment: datetime) -> TypicalScore
         recent=value.known and len(session_ids) >= TYPICAL_SCORE_MIN_RUNS,
         run_count=len(session_ids),
         session_count=len(set(session_ids)),
+    )
+
+
+@dataclass(frozen=True)
+class TypicalScoreHover:
+    """The words of a known value's hover, for any surface to draw.
+
+    ``lines`` pairs each labeled line's label with the text after it, which
+    starts with a space.
+    """
+
+    opening: str
+    lines: tuple[tuple[str, str], ...]
+
+
+def typical_score_hover(
+    value: TypicalScore, total: int, moment: datetime
+) -> TypicalScoreHover:
+    """Describe a known value's supporting runs, their recency and both bands.
+
+    ``total`` is how many runs the scenario has, which tells the median of
+    the last ``n`` runs from the median of all of them. The recent count and
+    the dates are as of ``moment``.
+    """
+    recent = typical_score_recency(value, moment)
+    count = value.run_count
+    sessions = value.session_count
+    first = format_short_date(value.first_date.date(), moment.date())
+    last = format_short_date(value.last_date.date(), moment.date())
+    dates = (
+        f"on {first}"
+        if value.first_date.date() == value.last_date.date()
+        else f"{first} to {last}"
+    )
+
+    def formatted(score: float | None) -> str:
+        assert score is not None
+        return format_typical_score(score, value.runs)
+
+    return TypicalScoreHover(
+        opening=f"The median of your {'last ' if total > count else ''}{count} runs.",
+        lines=(
+            (
+                "Runs:",
+                f" {count} in {sessions} "
+                f"{'session' if sessions == 1 else 'sessions'} · {dates}",
+            ),
+            ("Recent:", f" {recent.run_count} of {count} from the last 30 days"),
+            ("Middle 50%:", f" {formatted(value.p25)} to {formatted(value.p75)}"),
+            ("Middle 80%:", f" {formatted(value.p10)} to {formatted(value.p90)}"),
+        ),
+    )
+
+
+def below_minimum_text(value: TypicalScore) -> str:
+    """Say what an unknown value needs and how many runs and sessions it has."""
+    n, sessions = value.run_count, value.session_count
+    return (
+        "A typical score needs 10 runs across 2 or more sessions, "
+        f"or 20 in one session. You have {n} "
+        f"{'run' if n == 1 else 'runs'} in {sessions} "
+        f"{'session' if sessions == 1 else 'sessions'}."
     )
 
 

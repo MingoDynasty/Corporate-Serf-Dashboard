@@ -1707,10 +1707,17 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
 
-    def fake_build_rows(playlist_code, generation_token):
+    snapshots = []
+
+    def fake_build_rows(playlist_code, generation_token, *, typical):
         assert playlist_code == "KovaaKsTestCode"
         assert generation_token == "generation-1"
+        snapshots.append(typical)
         return expected_rows
+
+    def fake_start_fill(playlist_code, generation_token, *, typical):
+        snapshots.append(typical)
+        return playlist_code == "KovaaKsTestCode" and generation_token == "generation-1"
 
     monkeypatch.setattr(
         playlist_scenarios,
@@ -1723,9 +1730,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
         lambda: SimpleNamespace(hex="generation-1"),
     )
     monkeypatch.setattr(
-        playlist_scenarios,
-        "start_playlist_scenario_fill",
-        lambda code, token: code == "KovaaKsTestCode" and token == "generation-1",
+        playlist_scenarios, "start_playlist_scenario_fill", fake_start_fill
     )
 
     rows, status, generation, disabled = playlist_scenarios.load_playlist_scenario_rows(
@@ -1740,6 +1745,10 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
     assert status == "Updating positions from KovaaK's… 0/1"
     assert generation == "generation-1"
     assert disabled is False
+    # One snapshot per table build: the fill's rows must show the typical
+    # values phase 1 showed.
+    first, second = snapshots
+    assert first is second
     assert playlist_scenarios.layout("KovaaKsTestCode") is not None
 
 
@@ -1754,7 +1763,7 @@ def test_playlist_scenarios_row_href_encodes_scenario_with_space(monkeypatch):
     monkeypatch.setattr(
         playlist_scenarios,
         "build_playlist_scenario_rank_rows",
-        lambda _code, _token: [
+        lambda _code, _token, *, typical: [
             {
                 "scenario": "VT Pasu Air",
                 "href": playlist_scenarios.scenario_run_history_href(
@@ -1764,7 +1773,9 @@ def test_playlist_scenarios_row_href_encodes_scenario_with_space(monkeypatch):
         ],
     )
     monkeypatch.setattr(
-        playlist_scenarios, "start_playlist_scenario_fill", lambda *_args: True
+        playlist_scenarios,
+        "start_playlist_scenario_fill",
+        lambda *_args, **_kwargs: True,
     )
 
     rows, _status, _generation, _disabled = (
@@ -1888,7 +1899,7 @@ def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
     monkeypatch.setattr(
         playlist_scenarios,
         "build_playlist_scenario_rank_rows",
-        lambda _code, _token: [
+        lambda _code, _token, *, typical: [
             {
                 "scenario": "First",
                 "position_pending": True,
@@ -1900,7 +1911,7 @@ def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
     monkeypatch.setattr(
         playlist_scenarios,
         "start_playlist_scenario_fill",
-        lambda *_args: False,
+        lambda *_args, **_kwargs: False,
     )
 
     rows, status, generation, disabled = playlist_scenarios.load_playlist_scenario_rows(
@@ -1928,7 +1939,7 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
     monkeypatch.setattr(
         playlist_scenarios,
         "build_playlist_scenario_rank_rows",
-        lambda _code, _token: [
+        lambda _code, _token, *, typical: [
             {
                 "scenario": "First",
                 "position_display": "N/A",
@@ -1943,7 +1954,9 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
     monkeypatch.setattr(
         playlist_scenarios,
         "start_playlist_scenario_fill",
-        lambda *_args: pytest.fail("an unset username must not start a fill"),
+        lambda *_args, **_kwargs: pytest.fail(
+            "an unset username must not start a fill"
+        ),
     )
 
     rows, status, generation, disabled = playlist_scenarios.load_playlist_scenario_rows(
@@ -1979,7 +1992,7 @@ def test_playlist_scenarios_without_a_username_registers_no_fill(monkeypatch):
     monkeypatch.setattr(
         playlist_scenarios,
         "build_playlist_scenario_rank_rows",
-        lambda _code, _token: [{"scenario": "First"}],
+        lambda _code, _token, *, typical: [{"scenario": "First"}],
     )
     registered_before = set(playlist_scenarios_service._FILL_REGISTRY)
 
@@ -2223,6 +2236,8 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
         for column in (
             *playlist_scenarios.TABLE_COLUMN_DEFS,
             *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
+            playlist_scenarios.TYPICAL_SCORE_COLUMN_DEF,
+            playlist_scenarios.TYPICAL_RANK_COLUMN_DEF,
         )
         if "headerTooltip" in column
     }
@@ -2233,6 +2248,8 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
         "next_tier_sort",
         "percentile_sort",
         "pb_cm360_sort",
+        "typical_score_sort",
+        "typical_tier_sort",
     }
 
 
@@ -2417,6 +2434,8 @@ def test_playlist_scenarios_sort_names_cover_every_sortable_column_once(
         "pb-score": "pb_score_sort",
         "rank": "tier_sort",
         "next-rank": "next_tier_sort",
+        "typical-score": "typical_score_sort",
+        "typical-rank": "typical_tier_sort",
         "pb-date": "pb_timestamp_sort",
         "pb-cm360": "pb_cm360_sort",
         "pb-accuracy": "pb_accuracy_sort",
@@ -2428,6 +2447,8 @@ def test_playlist_scenarios_sort_names_cover_every_sortable_column_once(
         for column in (
             *playlist_scenarios.TABLE_COLUMN_DEFS,
             *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
+            playlist_scenarios.TYPICAL_SCORE_COLUMN_DEF,
+            playlist_scenarios.TYPICAL_RANK_COLUMN_DEF,
         )
         if column["sortable"]
     ]
@@ -2474,7 +2495,6 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
     benchmark_fields = _column_fields(playlist_scenarios.layout(BENCHMARK_CODE))
     plain_fields = _column_fields(playlist_scenarios.layout(PLAIN_PLAYLIST_CODE))
     unknown_fields = _column_fields(playlist_scenarios.layout("KovaaKsMissingCode"))
-    table_fields = [column["field"] for column in playlist_scenarios.TABLE_COLUMN_DEFS]
 
     assert benchmark_fields == [
         "scenario",
@@ -2487,12 +2507,20 @@ def test_playlist_scenarios_benchmark_table_puts_rank_columns_after_pb_score(
         "pb_score_sort",
         "tier_sort",
         "next_tier_sort",
+        "typical_score_sort",
+        "typical_tier_sort",
         "pb_timestamp_sort",
         "pb_cm360_sort",
         "pb_accuracy_sort",
     ]
-    assert plain_fields == table_fields
-    assert unknown_fields == table_fields
+    # A playlist has no ranks, so Typical Score follows PB Score alone.
+    plain_expected = [
+        field
+        for field in benchmark_fields
+        if field not in {"tier_sort", "next_tier_sort", "typical_tier_sort"}
+    ]
+    assert plain_fields == plain_expected
+    assert unknown_fields == plain_expected
 
 
 def _evxl_links(page) -> list:
@@ -2627,7 +2655,14 @@ def test_playlist_scenarios_next_rank_sort_seeds_a_benchmark(benchmark_playlists
     "code", [PLAIN_PLAYLIST_CODE, "KovaaKsMissingCode"], ids=["plain", "unknown"]
 )
 @pytest.mark.parametrize(
-    "sort", ["rank.asc", "next-rank.asc", "percentile.desc,next-rank.asc"]
+    "sort",
+    [
+        "rank.asc",
+        "next-rank.asc",
+        "percentile.desc,next-rank.asc",
+        "typical-rank.asc",
+        "typical-score.desc,typical-rank.asc",
+    ],
 )
 def test_playlist_scenarios_rank_sort_opens_a_plain_table_unsorted(
     benchmark_playlists, code, sort
@@ -2635,6 +2670,102 @@ def test_playlist_scenarios_rank_sort_opens_a_plain_table_unsorted(
     page = playlist_scenarios.layout(code, sort=sort)
 
     assert _sort_seeds(page) == {}
+
+
+def test_playlist_scenarios_typical_score_sort_seeds_a_plain_table(
+    benchmark_playlists,
+):
+    page = playlist_scenarios.layout(PLAIN_PLAYLIST_CODE, sort="typical-score.asc")
+
+    assert _sort_seeds(page) == {"typical_score_sort": ("asc", 0)}
+
+
+def test_playlist_scenarios_typical_column_defs():
+    score = playlist_scenarios.TYPICAL_SCORE_COLUMN_DEF
+    rank = playlist_scenarios.TYPICAL_RANK_COLUMN_DEF
+
+    assert score["headerName"] == "Typical Score"
+    assert score["headerTooltip"] == (
+        "The median of your last 20 runs of this scenario, or of all your runs if "
+        "you have fewer. A clock beside the number means fewer than 10 of those "
+        "runs are from the last 30 days, so it may be out of date."
+    )
+    assert rank["headerName"] == "Typical Rank"
+    assert rank["headerTooltip"] == (
+        "The highest rank your typical score reaches on this scenario, and how far "
+        "it is toward the next rank. The percent rounds down, so 0% can be just "
+        "above the rank's threshold. Lower is weaker on this benchmark's rank "
+        "ladder."
+    )
+    for column, prefix, tooltip in (
+        (score, "typical_score", "TypicalScoreTooltip"),
+        (rank, "typical_tier", "TypicalRankTooltip"),
+    ):
+        # The field is the sort key; the cell shows the row's own text.
+        assert column["field"] == f"{prefix}_sort"
+        assert column["valueFormatter"] == {"function": f"params.data.{prefix}_display"}
+        assert column["cellRenderer"] == "TypicalCell"
+        assert column["cellRendererParams"] == {"notRecentText": "Not recent"}
+        assert column["tooltipComponent"] == tooltip
+        # The underline only where the row has a hover.
+        assert column["cellClass"] == {
+            "function": f"typicalCellClass(params, params.data.{prefix}_hover != null)"
+        }
+        assert column["comparator"] == {"function": "nullsLastComparator"}
+        assert column["sortable"] is True
+        assert column["field"] in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+    assert rank["tooltipValueGetter"] == {"function": "params.data.typical_tier_hover"}
+
+
+def test_playlist_scenarios_grid_opens_typical_hovers_from_the_keyboard():
+    grid = _scenario_grid(playlist_scenarios.layout("KovaaKsTestCode"))
+
+    assert grid.eventListeners == {
+        "cellFocused": ["showTypicalFocusTip(params)"],
+        "bodyScroll": ["hideTypicalFocusTip()"],
+        "gridPreDestroyed": ["hideTypicalFocusTip()"],
+    }
+
+
+def test_the_typical_cells_functions_are_registered_under_the_names_used():
+    # A function string naming nothing fails silently: the cell would draw
+    # with no mark, no class and no hover, and nothing would say why.
+    script = (STYLESHEET.parent / "typicalScoreCells.js").read_text(encoding="utf-8")
+
+    for name in (
+        "dagfuncs.typicalCellClass",
+        "dagfuncs.showTypicalFocusTip",
+        "dagfuncs.hideTypicalFocusTip",
+        "dagcomponentfuncs.TypicalCell",
+        "dagcomponentfuncs.TypicalScoreTooltip",
+        "dagcomponentfuncs.TypicalRankTooltip",
+    ):
+        assert f"{name} = function" in script, name
+    for column_id in ("typical_score_sort", "typical_tier_sort"):
+        assert f'"{column_id}"' in script
+
+
+def test_an_old_typical_value_has_a_readable_grey_and_a_clock():
+    lines = STYLESHEET.read_text(encoding="utf-8").splitlines()
+    mark = _stylesheet_rule(".typical-old-mark")
+
+    def color_after(selector: str) -> str:
+        return lines[lines.index(f"{selector} {{") + 1].strip()
+
+    # Each clears 4.5:1 on the plain, alternating and hovered rows.
+    assert (
+        color_after(".playlist-scenarios-grid .ag-cell.typical-not-recent")
+        == "color: #676d75;"
+    )
+    assert (
+        color_after(
+            '[data-mantine-color-scheme="dark"] .playlist-scenarios-grid '
+            ".ag-cell.typical-not-recent"
+        )
+        == "color: #a6a6a6;"
+    )
+    assert 'url("icons/material-symbols-history.svg")' in mark
+    assert (STYLESHEET.parent / "icons" / "material-symbols-history.svg").is_file()
 
 
 def _column_state_spec(sink_id: str):
@@ -2888,15 +3019,17 @@ def test_playlist_scenarios_columns_menu_lists_every_hideable_column_in_order(
         ("pb_score_sort", "PB score"),
         ("tier_sort", "Rank"),
         ("next_tier_sort", "Next rank"),
+        ("typical_score_sort", "Typical score"),
+        ("typical_tier_sort", "Typical rank"),
         ("pb_timestamp_sort", "PB date"),
         ("pb_cm360_sort", "PB cm/360"),
         ("pb_accuracy_sort", "PB accuracy"),
     ]
-    # Rank and Next rank are a benchmark's alone.
+    # Rank, Next rank and Typical rank are a benchmark's alone.
     assert plain_entries == [
         entry
         for entry in benchmark_entries
-        if entry[0] not in {"tier_sort", "next_tier_sort"}
+        if entry[0] not in {"tier_sort", "next_tier_sort", "typical_tier_sort"}
     ]
     for page, entries in (
         (benchmark_page, benchmark_entries),
@@ -3051,10 +3184,14 @@ def test_id_column_is_hidden_unsortable_and_selectable(
     )
 
 
-def test_benchmark_columns_are_shown_by_default():
+def test_benchmark_and_typical_columns_are_shown_by_default():
     assert all(
         "hide" not in column and "initialHide" not in column
-        for column in playlist_scenarios.BENCHMARK_COLUMN_DEFS
+        for column in (
+            *playlist_scenarios.BENCHMARK_COLUMN_DEFS,
+            playlist_scenarios.TYPICAL_SCORE_COLUMN_DEF,
+            playlist_scenarios.TYPICAL_RANK_COLUMN_DEF,
+        )
     )
 
 

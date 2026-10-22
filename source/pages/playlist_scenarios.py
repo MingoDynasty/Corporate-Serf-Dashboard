@@ -42,6 +42,7 @@ from source.kovaaks.playlist_scenarios_service import (
     drain_playlist_scenario_fill,
     scenario_run_history_href,
     start_playlist_scenario_fill,
+    take_typical_snapshot,
 )
 from source.pages.page_title import page_title
 
@@ -76,6 +77,8 @@ AUTO_SIZE_COLUMN_KEYS = [
     "pb_score_sort",
     "tier_sort",
     "next_tier_sort",
+    "typical_score_sort",
+    "typical_tier_sort",
     "pb_timestamp_sort",
     "pb_cm360_sort",
     "pb_accuracy_sort",
@@ -275,6 +278,70 @@ BENCHMARK_COLUMN_DEFS = [
     },
 ]
 
+# The typical pair follows the PB columns: after Next Rank on a benchmark's
+# table, and Typical Score alone after PB Score on a playlist's, which has no
+# ranks. Both cells draw through ``TypicalCell``, which marks a value that is
+# not recent and gives the cell its hover's words as its description.
+NOT_RECENT_TEXT = "Not recent"
+TYPICAL_SCORE_COLUMN_DEF = {
+    "headerName": "Typical Score",
+    "field": "typical_score_sort",
+    "headerTooltip": (
+        "The median of your last 20 runs of this scenario, or of all your runs "
+        "if you have fewer. A clock beside the number means fewer than 10 of "
+        "those runs are from the last 30 days, so it may be out of date."
+    ),
+    "valueFormatter": {"function": "params.data.typical_score_display"},
+    "cellRenderer": "TypicalCell",
+    "cellRendererParams": {"notRecentText": NOT_RECENT_TEXT},
+    # The tooltip draws the row's whole hover. The value only tells the grid
+    # that the row has one.
+    "tooltipValueGetter": {
+        "function": (
+            "params.data.typical_score_hover == null"
+            " ? null : params.data.typical_score_hover.lead"
+        )
+    },
+    "tooltipComponent": "TypicalScoreTooltip",
+    "cellClass": {
+        "function": "typicalCellClass(params, params.data.typical_score_hover != null)"
+    },
+    "comparator": {"function": "nullsLastComparator"},
+    "sortable": True,
+    "minWidth": 120,
+}
+TYPICAL_RANK_COLUMN_DEF = {
+    "headerName": "Typical Rank",
+    "field": "typical_tier_sort",
+    "headerTooltip": (
+        "The highest rank your typical score reaches on this scenario, and how "
+        "far it is toward the next rank. The percent rounds down, so 0% can be "
+        "just above the rank's threshold. Lower is weaker on this benchmark's "
+        "rank ladder."
+    ),
+    # The field is the rank position, so the column sorts by it.
+    "valueFormatter": {"function": "params.data.typical_tier_display"},
+    "cellRenderer": "TypicalCell",
+    "cellRendererParams": {"notRecentText": NOT_RECENT_TEXT},
+    "tooltipValueGetter": {"function": "params.data.typical_tier_hover"},
+    "tooltipComponent": "TypicalRankTooltip",
+    "cellClass": {
+        "function": "typicalCellClass(params, params.data.typical_tier_hover != null)"
+    },
+    "comparator": {"function": "nullsLastComparator"},
+    "sortable": True,
+    "minWidth": 120,
+}
+# The grid's own focus event opens a typical cell's hover from the keyboard.
+# AG Grid's ``tooltipTrigger`` can't: set to "focus", it ends every mouse
+# hover in the grid.
+TYPICAL_FOCUS_LISTENERS = {
+    "cellFocused": ["showTypicalFocusTip(params)"],
+    "bodyScroll": ["hideTypicalFocusTip()"],
+    # The popup lives on the page's body, which outlives the grid.
+    "gridPreDestroyed": ["hideTypicalFocusTip()"],
+}
+
 
 class GroupColumn(NamedTuple):
     """One of the two group columns a benchmark's table can show.
@@ -375,6 +442,9 @@ BENCHMARK_MENU_COLUMNS = [
     MenuColumn("tier_sort", "Rank"),
     MenuColumn("next_tier_sort", "Next rank"),
 ]
+# Placed after the PB columns as the typical columns are, by ``_menu_columns``.
+TYPICAL_SCORE_MENU_COLUMN = MenuColumn("typical_score_sort", "Typical score")
+TYPICAL_RANK_MENU_COLUMN = MenuColumn("typical_tier_sort", "Typical rank")
 
 # The names ``?sort=`` uses in the address bar, mapped to column IDs. Other code
 # keys on the column IDs, so the names exist only where the URL is read and
@@ -390,6 +460,8 @@ SORT_URL_NAMES = {
     "pb-score": "pb_score_sort",
     "rank": "tier_sort",
     "next-rank": "next_tier_sort",
+    "typical-score": "typical_score_sort",
+    "typical-rank": "typical_tier_sort",
     "pb-date": "pb_timestamp_sort",
     "pb-cm360": "pb_cm360_sort",
     "pb-accuracy": "pb_accuracy_sort",
@@ -447,19 +519,22 @@ def _column_defs(
 ) -> list[dict]:
     """Copy the column defs, seeding the grid's opening sort from ``?sort=``.
 
-    A benchmark's table adds Rank and Next Rank directly after PB Score, and
-    ``group_columns`` ahead of Scenario. A fresh copy per call, because the
+    A benchmark's table adds Rank, Next Rank, Typical Score and Typical Rank
+    directly after PB Score, and ``group_columns`` ahead of Scenario. A
+    playlist's table adds Typical Score alone there. A fresh copy per call, because the
     module's column defs are shared across requests. The seed is
     ``initialSort``, never ``sort``: AG Grid reapplies ``sort`` whenever
     column defs arrive again, overriding the user's header clicks.
     """
     column_defs: list[dict] = copy.deepcopy(TABLE_COLUMN_DEFS)
+    fields = [column["field"] for column in column_defs]
+    after_pb_score = fields.index("pb_score_sort") + 1
+    typical_column_defs = [TYPICAL_SCORE_COLUMN_DEF]
     if benchmark:
-        fields = [column["field"] for column in column_defs]
-        after_pb_score = fields.index("pb_score_sort") + 1
-        column_defs[after_pb_score:after_pb_score] = copy.deepcopy(
-            BENCHMARK_COLUMN_DEFS
-        )
+        typical_column_defs.append(TYPICAL_RANK_COLUMN_DEF)
+    column_defs[after_pb_score:after_pb_score] = copy.deepcopy(
+        [*(BENCHMARK_COLUMN_DEFS if benchmark else []), *typical_column_defs]
+    )
     columns_by_id = {column["field"]: column for column in column_defs}
     for sort_index, (column_id, direction) in enumerate(
         _parse_sort(sort, columns_by_id)
@@ -496,10 +571,13 @@ def _menu_columns(
 ) -> list[MenuColumn]:
     """List the Columns menu's entries in the order the table shows them."""
     columns = list(MENU_COLUMNS)
-    if benchmark:
-        column_ids = [column.column_id for column in columns]
-        after_pb_score = column_ids.index("pb_score_sort") + 1
-        columns[after_pb_score:after_pb_score] = BENCHMARK_MENU_COLUMNS
+    column_ids = [column.column_id for column in columns]
+    after_pb_score = column_ids.index("pb_score_sort") + 1
+    columns[after_pb_score:after_pb_score] = (
+        [*BENCHMARK_MENU_COLUMNS, TYPICAL_SCORE_MENU_COLUMN, TYPICAL_RANK_MENU_COLUMN]
+        if benchmark
+        else [TYPICAL_SCORE_MENU_COLUMN]
+    )
     # Rendered only for the levels the table has, as Rank and Next rank are
     # only on a benchmark's table, so a table without groups leaves the stored
     # choices alone. The labels are the headers' own words.
@@ -544,7 +622,10 @@ def load_playlist_scenario_rows(playlist_code):
         return [], f"No imported playlist has the code {playlist_code}.", None, True
 
     generation_token = uuid4().hex
-    rows = build_playlist_scenario_rank_rows(playlist_code, generation_token)
+    typical = take_typical_snapshot(scenario.name for scenario in playlist.scenarios)
+    rows = build_playlist_scenario_rank_rows(
+        playlist_code, generation_token, typical=typical
+    )
     if not get_kovaaks_username():
         # Without a username every per-scenario lookup short-circuits offline
         # to UNKNOWN, so phase 2 would fetch nothing and settle every position
@@ -556,7 +637,9 @@ def load_playlist_scenario_rows(playlist_code):
         return rows, _username_unset_status(), None, True
     # Registration deliberately happens only after the phase-1 rows exist. A
     # spurious/fast interval tick must never drain updates into an empty grid.
-    if not start_playlist_scenario_fill(playlist_code, generation_token):
+    if not start_playlist_scenario_fill(
+        playlist_code, generation_token, typical=typical
+    ):
         # A concurrent delete can remove the playlist between phase 1 and
         # registration. With no fill to settle the rows, clear every pending
         # flag here so the disabled interval cannot strand animation forever.
@@ -1028,6 +1111,7 @@ def layout(
                 },
                 columnSize="autoSize",
                 columnSizeOptions=COLUMN_SIZE_OPTIONS,
+                eventListeners=TYPICAL_FOCUS_LISTENERS,
                 dangerously_allow_code=True,
                 style={
                     "flex": 1,

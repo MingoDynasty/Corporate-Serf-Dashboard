@@ -143,6 +143,7 @@ def _next_rank() -> str:
         "KovaaKsTestCode",
         ladder=LADDER,
         group=None,
+        typical=playlist_scenarios_service.TypicalSnapshot(datetime.now(), {}),
         mark_unresolved_pending=False,
     )
     return row["next_tier_display"]

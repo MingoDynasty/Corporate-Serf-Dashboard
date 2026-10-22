@@ -963,7 +963,8 @@ a.run-toast-link:hover {
 
 /* In the page for a screen reader and for nothing else: the run list's
    heading line, the name of its marks column, the reason a run has no check,
-   and the line that says a row was opened or closed. */
+   the line that says a row was opened or closed, and an old typical value's
+   Not recent. */
 .visually-hidden {
     clip-path: inset(50%);
     height: 1px;
@@ -1540,6 +1541,62 @@ a.run-toast-link:hover {
     text-decoration-line: underline;
     text-decoration-style: dotted;
     text-underline-offset: 0.15em;
+}
+
+/* A typical value that is not recent, in the scenario table's Typical Score
+   and Typical Rank cells. Not the card's dimmed grey: that measures 3.3:1 on
+   a light row, under the 4.5:1 text this size needs. These two clear 4.5:1
+   on the plain, alternating and hovered rows in both themes (measured
+   2026-10-22). Dark text is barely fainter than normal text, so the clock
+   carries the difference. */
+.playlist-scenarios-grid .ag-cell.typical-not-recent {
+    color: #676d75;
+}
+
+[data-mantine-color-scheme="dark"] .playlist-scenarios-grid .ag-cell.typical-not-recent {
+    color: #a6a6a6;
+}
+
+/* The clock after an old typical value: a masked SVG in the text's color, as
+   the table's other icons are drawn. */
+.typical-old-mark {
+    -webkit-mask: url("icons/material-symbols-history.svg") no-repeat center / contain;
+    background-color: currentColor;
+    display: inline-block;
+    height: 13px;
+    margin-left: 4px;
+    mask: url("icons/material-symbols-history.svg") no-repeat center / contain;
+    vertical-align: -2px;
+    width: 13px;
+}
+
+/* The typical cells' hovers. The grid's tooltip popup shrinks a custom
+   tooltip to its narrowest, so each sets its own width, up to the Scenario
+   Stats card's 360px. */
+.typical-score-tooltip,
+.typical-rank-tooltip {
+    max-width: 360px;
+    width: max-content;
+}
+
+.typical-score-tooltip {
+    white-space: normal;
+}
+
+.typical-score-tooltip p {
+    margin: 0 0 8px;
+}
+
+/* An old value's Typical Rank hover has a second line. */
+.typical-rank-tooltip {
+    white-space: pre-line;
+}
+
+/* The same hovers opened from the keyboard, placed beside the focused cell
+   by assets/typicalScoreCells.js. */
+.typical-focus-tip {
+    position: fixed;
+    z-index: 1000;
 }
 
 /* Navigation anchors rendered inside the playlist/scenario grid cells
