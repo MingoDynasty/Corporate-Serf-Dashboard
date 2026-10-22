@@ -4,7 +4,8 @@ Status: Accepted
 
 The typical score is the median of a scenario's last twenty runs, whatever their age.
 A minimum keeps a first short sitting from being mistaken for an established level.
-Every version and sensitivity counts, so a scenario change can temporarily mix scores that are no longer comparable.
+Every version and sensitivity counts, so after a rework a value can mix two
+versions' scores, which it treats as comparable.
 
 **Ruling and amendments.** TS1 of [proposal #382](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/382), ruled by the maintainer on 2026-10-15: pool every version with the assumption stated, recorded at [47acc33](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/commit/47acc33). TS6, ruled 2026-10-20 at [7908d00](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/commit/7908d00), removes the age window and carry-forward from the value. This entry records TS1 as amended. Delivered by #398, #400, #402 and #401.
 

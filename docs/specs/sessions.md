@@ -23,8 +23,7 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - The Run History page is the one page that shows a session, in four
   places: its run list, its latest-run card, the chart's typical-score hover,
   and the Scenario Stats lead's hover. Both typical-score hovers count the
-  sessions behind a value.
-  ([TS5][typical-card-value]).
+  sessions behind a value ([TS3][typical-chart], [TS5][typical-card-value]).
 - The run list has two views. Under This scenario it lists a scenario's runs
   under the session each was played in, names a session by when it started,
   and counts the session's runs, and it gives the length of the newest session
@@ -201,3 +200,5 @@ as written. What follows is accepted ([2026-10-11][entry]).
 [entry]: ../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md
 
 [typical-card-value]: ../decision_log/2026/2026-10-18-scenario-stats-shows-the-newest-typical-score-at-any-age.md
+
+[typical-chart]: ../decision_log/2026/2026-10-18-the-typical-score-is-drawn-after-each-run.md

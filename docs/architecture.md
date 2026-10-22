@@ -1287,7 +1287,7 @@ flowchart LR
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `typical_score.py` — the typical score's pure definition, which the Run
-  History chart draws on Score vs Run and Score vs Time and Scenario Stats
+  History chart draws on Score vs Run and Score vs Time, and Scenario Stats
   leads with.
   `build_typical_scores` takes one
   scenario's runs and the play
