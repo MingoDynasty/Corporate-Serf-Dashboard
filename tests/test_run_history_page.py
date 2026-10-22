@@ -1596,14 +1596,14 @@ def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
     assert card and "flex: 1 1 380px;" in card.group(1)
 
 
-def test_every_card_in_the_row_has_the_same_frame():
+def test_card_frames_keep_the_existing_color():
     frame = _css_block(
         STYLESHEET.read_text(encoding="utf-8"),
-        ".run-history-card,\n.scenario-stats-card,\n.pb-card",
+        ".run-history-card,\n.scenario-stats-card,\n.pb-card,\n"
+        ".run-history-list,\n.chart-options-panel",
     )
 
-    assert "border: 1px solid var(--mantine-color-default-border);" in frame
-    assert "border-radius: var(--mantine-radius-sm);" in frame
+    assert "border-color: var(--mantine-color-default-border);" in frame
 
 
 def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
