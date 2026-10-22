@@ -1,10 +1,9 @@
 # Home
 
 Home is the page the app opens on. It shows the stats-folder hint and the
-setup card when either applies, and one line that says how many runs the app
-found in the stats folder. It reads no link parameter and lists no links,
-because the navbar already leads to every page. It stands in for an Overview
-page that is planned and not yet designed.
+setup card when either applies, plus a count of the runs and scenarios found.
+Its setup links stay underlined so their actions are recognizable without
+color. The navbar leads to the app's other pages.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -88,6 +87,9 @@ rationale in [product.md](../product.md).
   awaits a restart. Its key-presence semantics are specified in
   [settings.md](settings.md#the-setup-card)
   ([2026-08-11][fresh-install]).
+- The Settings link stays underlined and uses the shared text-link color,
+  with at least 4.5:1 contrast against the yellow panel in each theme
+  ([2026-10-22](../decision_log/2026/2026-10-22-text-links-use-readable-colors-and-persistent-underlines.md)).
 - Both branches of the hint are a yellow panel wearing the same alert
   treatment as the card, with the warning icon beside the sentence, no title
   above it, and the card's width. A sentence too long for one line wraps

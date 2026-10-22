@@ -1,3 +1,9 @@
+/* The default blue misses 4.5:1 on white and on the notice tints.
+   Darken text links without changing the filled controls' primary color. */
+:root[data-mantine-color-scheme="light"] {
+    --mantine-color-anchor: var(--mantine-color-blue-9);
+}
+
 /* Every Mantine field label, bolded once. Enumerating per-component label
    classes instead (Select, TextInput, ...) silently missed whichever
    component was added next: the stats-directory field lost its bold when it
@@ -61,10 +67,6 @@
    color from here. */
 a.run-toast-link {
     color: var(--mantine-color-anchor);
-    text-decoration: none;
-}
-
-a.run-toast-link:hover {
     text-decoration: underline;
 }
 
@@ -1545,18 +1547,14 @@ a.run-toast-link:hover {
 /* Navigation anchors rendered inside the playlist/scenario grid cells
    (PlaylistNameLink / ScenarioLink in dashAgGridComponentFunctions.js). The
    class carries the link styling on the anchor itself, overriding the UA
-   default link color for every state; the --mantine-color-blue-* variables are
-   theme-aware, so the color stays legible in dark mode. */
+   default link color for every state. Use the shared text-link color rather
+   than the filled-control color, which misses text contrast in light mode. */
 a.playlist-scenario-link-cell,
 a.playlist-scenario-link-cell:visited {
-    color: var(--mantine-color-blue-filled);
+    color: var(--mantine-color-anchor);
     cursor: pointer;
     text-decoration-line: underline;
     text-underline-offset: 0.15em;
-}
-
-a.playlist-scenario-link-cell:hover {
-    color: var(--mantine-color-blue-filled-hover);
 }
 
 /* The Scenario cell while the table is ungrouped: the scenario's name over

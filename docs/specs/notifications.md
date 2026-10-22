@@ -7,7 +7,8 @@ popping up again on every trigger. A message answering something you did
 replaces its own previous copy and pops back onto the screen, so a retry
 always gets a visible answer, while messages about different things stack
 side by side. Toasts and the notices printed into the page share one severity
-color scale, so a color means the same thing wherever it appears.
+color scale, and their text links stay underlined and readable against the
+background.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -465,6 +466,8 @@ toasts under, and it applies to every toast the app adds from here on
   `dmc.Anchor` would decode the address and cut a name holding `&` short,
   and an `html.A` would reload the app and lose the toast
   ([2026-10-13](../decision_log/2026/2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)).
+- The run link stays underlined and uses the shared text-link color
+  ([2026-10-22](../decision_log/2026/2026-10-22-text-links-use-readable-colors-and-persistent-underlines.md)).
 - On Run History, while a scenario note has unsaved changes, the link is
   stopped before the page is drawn again and asks in the note's dialog. Save
   or Discard then selects the scenario in place, clearing a Playlist filter
