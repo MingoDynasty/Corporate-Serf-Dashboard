@@ -158,18 +158,20 @@ Status: Proposed, amended after the first review. The maintainer's lean,
 'Card's grey' option, however, is faded enough to see a difference." This
 recommendation departs from that lean. It keeps the darker grey and adds a
 mark, so the difference no longer rests on the grey; the prototype's panel
-switches between the two.
+switches between the two. A key line beside the status line, in the first
+amendment, is gone: the maintainer, 2026-10-22, "I push back on this because
+it doesn't lead to good UI/UX", and chose the prototype's version that
+explains the clock in the hovers instead.
 
-The material consequence: an old value carries a small clock, a key line
-explains it, and the numbers stay at 4.5:1 or more. Choosing the card's grey
-instead leaves the old figures under 4.5:1, with the difference in color
-alone.
+The material consequence: an old value carries a small clock, its hover says
+why, and the numbers stay at 4.5:1 or more. Choosing the card's grey instead
+leaves the old figures under 4.5:1, with the difference in color alone.
 
 **Recommendation: show a known typical score that is not recent in a muted
 grey that clears 4.5:1 on every row, with a clock after the value in both
-typical cells. While any row on the table is old, a key beside the table's
-status line reads `Not recent: fewer than 10 runs from the last 30 days`. A
-screen reader hears `Not recent` after the value.**
+typical cells. Each old cell's hover says why it is marked, counting the
+runs behind the value. A screen reader hears `Not recent` after the
+value.**
 
 - **These are the figures the table is for.** The typical cells are what the
   player compares to find weakness, and TB3 admits old values on the
@@ -190,6 +192,11 @@ screen reader hears `Not recent` after the value.**
 - **It costs no width.** Both typical columns are as wide as their headers,
   so the clock widens neither, and the table's overflow is unchanged at every
   width measured.
+- **The explanation sits where the clock is.** The whole cell opens its
+  hover, by mouse or keyboard, so the clock needs no target of its own; a
+  tooltip on the 13 px clock alone would be hard to hit, would fight the
+  cell's hover, and couldn't take keyboard focus inside the grid. A key line
+  for one mark would be clutter that comes and goes with the data.
 
 ## Problem
 
@@ -314,12 +321,11 @@ time.
   both themes, with a clock after it that a screen reader skips, and
   `Not recent` is read after the value. Too few runs and `N/A` are never
   marked.
-- **The key:** a clock and `Not recent: fewer than 10 runs from the last 30
-  days`, in the same grey, beside the table's status line while any row on
-  the table is old, and absent otherwise. The value is the median of the
-  newest runs, so fewer than 10 of its runs from the last 30 days is the same
-  as fewer than 10 runs of the scenario in that time, which is what the key
-  says.
+- **What explains the clock:** each old cell's hover ([The hovers](#the-hovers))
+  and the Typical Score header's tooltip. There is no key line. The
+  explanation counts the runs behind the value, as recency does, never the
+  scenario's runs: they differ when the store holds runs dated after the
+  page opened, such as after a system clock correction.
 
 ### Rank position
 
@@ -359,11 +365,16 @@ time.
 - **Typical Score:** the Scenario Stats lead's hover, built from the same
   strings ([Copy](#copy)): the median's run count, the run and session counts
   with their dates, the recent count, and the middle 50% and middle 80%.
-  Below the minimum, the card's below-minimum hover.
+  Below the minimum, the card's below-minimum hover. On an old value, the
+  opening sentence is followed by `Fewer than 10 of them are from the last
+  30 days, so it may be out of date.`, "them" being the runs the opening
+  sentence counts.
 - **Typical Rank:** the gap from the typical score to the next rank,
   `+{gap}% to {rank} · {points} to go`, or `+{gap}% faster to {rank} ·
   {points} to go` where pace applies. No hover at the top rank, as Next
-  Rank's Top rank has none.
+  Rank's Top rank has none. On an old value, a second line, `Fewer than 10 of
+  the typical score's runs are from the last 30 days, so it may be out of
+  date.`; at the top rank that line is the whole hover.
 - Both cells carry the dotted underline the table uses for a cell with a
   hover.
 - **From the keyboard:** when keyboard focus lands on a typical cell, its
@@ -395,9 +406,12 @@ value holding it is not valid there, as `rank` already is not.
   accept that discrepancy." It can show on the 49 of 226 known typical
   scores whose median falls halfway between two runs. The fix, if it is ever
   wanted, belongs to the typical score's rounding rule, not to this table.
-- **Header tooltips stay mouse-only,** as every column's are today. The key
-  line says what the Typical Score header says about the clock, and the cell
-  hovers open from the keyboard.
+- **Header tooltips stay mouse-only,** as every column's are today. The cell
+  hovers, which open from the keyboard, say what the Typical Score header
+  says about the clock.
+- **The clock's meaning takes a hover the first time.** Nothing on the page
+  names it until a cell or the header is hovered or focused; the mark itself
+  stays visible on every old value.
 
 ### How it is built
 
@@ -416,11 +430,10 @@ value holding it is not valid there, as `rank` already is not.
   and the hover's text as the grid cell's accessible description.
 - **The Typical Score hover** is a custom tooltip component that wears the
   `ag-tooltip` class and is as wide as its text, up to the card's 360 px. The
-  Typical Rank hover is the grid's plain text tooltip.
+  Typical Rank hover is a small one of the same kind, so an old value's
+  second line breaks.
 - **The keyboard hover** opens from the grid's cell-focus event when the
   focus came from a key, with the same content and the same tooltip styles.
-- **The key** sits beside the status line and shows while any row's typical
-  value is old.
 
 The prototype that settled the rows lives outside the repository, with its
 versions; it is a reference for the build, not its code.
@@ -444,13 +457,14 @@ Every string this proposal adds. The rest of the table is unchanged.
 **Cells:** `{rank} · {percent}%`, `Too few runs`, and the existing `N/A` and
 `No rank`.
 
-**Not recent:** the key, after a clock, `Not recent: fewer than 10 runs from
-the last 30 days`; and `Not recent`, read by a screen reader after an old
-value.
+**Not recent:** `Not recent`, read by a screen reader after an old value.
 
-**The Typical Score hover**, verbatim from Scenario Stats:
+**The Typical Score hover**, verbatim from Scenario Stats, plus one
+sentence:
 - `The median of your last {n} runs.`, or `The median of your {n} runs.`
   when the scenario has no runs outside the window.
+- On an old value, after it: `Fewer than 10 of them are from the last 30
+  days, so it may be out of date.`
 - **`Runs:`** `{n} in {s} sessions · {first} to {last}`, with `on {date}`
   for a single date and `session` for one.
 - **`Recent:`** `{k} of {n} from the last 30 days`
@@ -462,7 +476,8 @@ value.
 
 **The Typical Rank hover:** `+{gap}% to {rank} · {points} to go`, or
 `+{gap}% faster to {rank} · {points} to go`, each figure formatted as Next
-Rank's are.
+Rank's are. On an old value, a second line: `Fewer than 10 of the typical
+score's runs are from the last 30 days, so it may be out of date.`
 
 **Columns menu:** `Typical score`, `Typical rank`.
 
@@ -482,7 +497,7 @@ which is never read as weak.
 
 The existing **Recent** entry gains the table: on the scenario table, an old
 value shows in a muted grey with a clock after it and `Not recent` for a
-screen reader, explained by a key beside the status line.
+screen reader, explained in its hover.
 
 ### Decisions this changes
 
@@ -546,7 +561,7 @@ likely one run is to clear the next rank is a different question.
 ## Delivery plan
 
 **One PR,** which also ships this proposal: the row fields, the two columns,
-the hovers and their keyboard route, the Not recent mark and its key, the
+the hovers and their keyboard route, the Not recent mark, the
 rank position, the Columns menu entries and sort names, and
 the shipping checklist (decision-log entries TB1 to TB4, the playlists and
 typical score specs, the glossary, the roadmap, the product inventory, the
@@ -568,16 +583,19 @@ nothing.
   same order whether the scenario's constant is 1,000 or 200, and a score of
   zero or less with no pace keys 0; the typical row fields for a known, a
   not-recent, a below-minimum (singular and plural counts) and a no-runs
-  scenario; pace on one version and score math on mixed versions; all three
-  row paths carry the fields.
+  scenario; a scenario with 10 runs in the last 30 days and 11 dated after
+  the judging moment, which is not recent, and whose hover counts 9 of its
+  20 runs as recent, not the scenario's 10; pace on one version and score
+  math on mixed versions; all three row paths carry the fields.
 - **Column defs:** the two columns' placement on both kinds of table, the
   Columns menu entries, and the `?sort=` names, including `typical-rank` not
   valid on a playlist's table.
 - **Browser** (headless Edge, then the maintainer's Firefox), on Viscose
   Benchmark S2 Medium in both themes: Typical Rank sorted ascending starts
   Ground Plaza Sparky V3, Pasu Voltaic Reload Easy, CatClick Medium; both
-  hovers read as specified; Flower 50cm marks both cells Not recent and the
-  key shows, and a table with no old value shows no key; an old value
+  hovers read as specified; Flower 50cm marks both cells Not recent and each
+  hover adds its old-value line, which a recent value's hover never has; an
+  old value
   measures 4.5:1 or more on the plain, alternating and hovered rows in both
   themes; arrowing onto Flower 50cm's typical cells opens each hover, Escape
   closes it, and a click opens only the mouse hover; Aimspeed Benchmark 2
