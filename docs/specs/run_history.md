@@ -2,11 +2,10 @@
 
 Run History charts one scenario's runs and their typical score beside a list
 grouped by session.
-Its top row gives the scenario's benchmark category and run count their own
-card, beside the player's own note on it and cards for its personal best and
-its latest run. The page receives new runs
-without a reload and can follow the scenario just played. A check marks a
-run that met its score threshold and a star marks a new personal best, each
+Its top row puts the player's note beside the scenario selectors, followed
+by adjacent cards for its typical score, personal best and latest run. The
+page receives new runs without a reload and can follow the scenario just
+played. A check marks a run that met its score threshold and a star marks a new personal best, each
 judged when the run was played.
 
 Statements below describe what the app does today and link the
@@ -98,9 +97,11 @@ times that name or order runs remain absolute ([T4][card-order]).
   the same gap, and one value sets the list's 500px width for both. The
   second column holds the latest-run card alone, so the card sits over the
   run list and its edges are the list's at every zoom level. The first holds,
-  in order, the dropdowns' column, the Scenario Stats card, the scenario note
-  card ([below](#the-scenario-note-card)), and the PB card at its right end,
-  beside the latest-run card. Every card is as tall as the row.
+  in DOM order, the dropdowns' column, the scenario note card
+  ([below](#the-scenario-note-card)), then Scenario Stats and the PB card in
+  one score pair at its right end, beside the latest-run card. Spare room
+  sits before the score pair, never between its cards. Every card stretches
+  to its line's height ([2026-10-21][score-strip]).
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under
@@ -158,9 +159,11 @@ times that name or order runs remain absolute ([T4][card-order]).
   ([2026-10-12][hidden-filter]).
 - The first column wraps its pieces on its own width and never on the
   window's ([2026-08-03][content-area]).
-  Where they don't fit on one line, the PB card goes to a second line of the
-  column first, at that line's right end, then the scenario note card, and
-  then the Scenario Stats card ([2026-10-18][note-card]).
+  Where they don't fit on one line, Scenario Stats and the PB card move
+  together to the next line's right end, then the scenario note card wraps.
+  The score pair itself can wrap if the column is too narrow to hold both
+  cards, with each inner line packed to its right end
+  ([2026-10-21][score-strip]).
   The latest-run card stays in the second column, as tall as the row.
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the scenarios with at least one run loaded from the stats
@@ -177,14 +180,15 @@ The player's own plain-text note on the selected scenario, read in place and
 edited with Save and Cancel ([2026-10-18][note-card]). What a note is and how
 it is saved is in [2026-10-18][note-store].
 
-- The card sits between the Scenario Stats card and the PB card, taking the
-  room the row leaves, from 240px to 800px wide; past 800px the rest of the
-  room sits before the PB card. It is as tall as the row and never less than
-  132px ([2026-10-18][note-card]).
-- What it shows while reading is out of the layout's flow, so its box is the
-  row's in every reading state: a note, a long note, no note, a broken file
-  and no scenario. The chart under the row doesn't move between them
-  ([2026-10-18][note-card]).
+- The card sits after the dropdowns and before the score pair, taking the
+  room the row leaves, from 240px to 800px wide; past 800px the rest sits
+  before the score pair. It is as tall as its line and never less than
+  132px ([2026-10-21][score-strip], [2026-10-18][note-card]).
+- What it shows while reading is out of the layout's flow, so its contents
+  never set its height: a note, a long note, no note, a broken file and no
+  scenario. Its minimum height and the other pieces on its line set its box
+  ([2026-10-18][note-card]). A wrapped row can be shorter with no scenario
+  selected ([2026-10-21][score-strip]).
 - With a note: a frame, the first line `Scenario note · edited {age}` in the
   other cards' quiet style with **Edit** at its right end, and the note at
   14px, its line breaks kept, broken anywhere a word is too long, centered in
@@ -413,10 +417,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   card is. The PB is the earliest run to reach the scenario's high score,
   the run the playlist scenario table's PB columns read
   ([2026-10-05][stars]).
-- It is 300px wide, at the right end of the top row's first column, beside
-  the latest-run card, and as tall as the row. Its frame is the other cards'
-  and adds only its border to its height, and its lines are centered in that
-  height.
+- It is 300px wide, after Scenario Stats in the score pair at the first
+  column's right end, beside the latest-run card, and as tall as its line
+  ([2026-10-21][score-strip]). Its frame is the other cards' and adds only
+  its border to its height, and its lines are centered in that height.
 - Its first line reads `PB · set {age}`: how long ago the PB run ended,
   worded as the playlist tables' Last played words it, such as `5 days ago`,
   and worded again
@@ -1340,10 +1344,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   at up to 600px tall, and the page scrolls. The order is then the top row,
   the list, and the chart
   ([2026-10-12][column]).
-  The top row is then one wrapping line, in order: the dropdowns' column,
-  the Scenario Stats card, the scenario note card, at least 240px wide, the
-  PB card, and the latest-run card, which joins a line at 380px and takes the
-  room left on it.
+  The top row is then one wrapping line packed from its start, in DOM
+  order: the dropdowns' column, the scenario note card, at least 240px wide,
+  Scenario Stats, the PB card, and the latest-run card, which joins a line at
+  380px and takes the room left on it. The score pair's wrapper has no box
+  there ([2026-10-21][score-strip]).
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side
@@ -1468,3 +1473,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [typical-switches]: ../decision_log/2026/2026-10-20-the-typical-score-and-both-bands-have-independent-switches.md
 
 [typical-card-lead]: ../decision_log/2026/2026-10-20-scenario-stats-leads-with-the-typical-score.md
+
+[score-strip]: ../decision_log/2026/2026-10-21-run-historys-score-cards-stay-together-after-the-note.md

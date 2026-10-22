@@ -253,14 +253,27 @@ a.run-toast-link:hover {
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* The first column: the dropdowns, the Scenario Stats card, the scenario
-   note card, and the PB card at its right end. It wraps on its own width, so
-   it needs no breakpoint, and the PB card is the first piece to wrap. */
+/* The first column wraps on its own width: the score pair leaves the line
+   together before the note, keeping the PB beside Typical score. */
 .run-history-top-row-left {
     display: flex;
     flex-wrap: wrap;
     gap: var(--mantine-spacing-sm);
     min-width: 0;
+}
+
+/* Put spare room before both scores, so it never separates them. Keeping
+   them in one wrapping box also prevents the PB alone starting a new line
+   while the pair fits. End each inner line at the column edge if even the
+   pair must wrap. Default stretch keeps each card as tall as its line. */
+.run-history-score-pair {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-sm);
+    justify-content: flex-end;
+    margin-left: auto;
+    max-width: 100%;
 }
 
 /* The playlist filter over the scenario dropdown, and the Follow switch under
@@ -498,21 +511,22 @@ a.run-toast-link:hover {
     font-size: 13px;
 }
 
-/* The PB card, 300px wide at the first column's right end, so it sits beside
-   the latest-run card, after the scenario note card. Its frame adds only its
-   border to its height, as the Scenario Stats card's does, and its lines are
-   centered in the row's height. It shares the latest-run card's lines: the
-   score row, the line under it, and the empty state. */
+/* The PB card, 300px wide after Scenario Stats in the score pair, beside
+   the latest-run card. Its frame adds only its border to its height, as the
+   Scenario Stats card's does, and its lines are centered in that height.
+   It shares the latest-run card's lines: the score row, the line under it,
+   and the empty state. The explicit width keeps Firefox from sizing the
+   pair from the PB's content instead of its flex basis. */
 .pb-card {
     display: flex;
     flex: 0 0 300px;
     flex-direction: column;
     gap: 2px;
     justify-content: center;
-    margin-left: auto;
     max-width: 100%;
     min-width: 0;
     padding: 0 var(--mantine-spacing-sm);
+    width: 300px;
 }
 
 /* "PB · set" and the PB's age, as the latest-run card's first line is drawn.
@@ -604,13 +618,12 @@ a.run-toast-link:hover {
     display: none;
 }
 
-/* The scenario note card, between Scenario Stats and the PB card. It takes
-   the room the row leaves, from 240px, and stops at 800px so a line stays
-   readable on a wide screen: the rest of the room sits before the PB card.
+/* The scenario note card sits after the dropdowns, before both scores. It
+   takes the room the row leaves, from 240px, and stops at 800px so a line
+   stays readable on a wide screen: the rest sits before the score pair.
 
-   While reading, what it shows is out of the flow, so its box is the row's
-   and never the note's: the chart under the row stays where it is between a
-   note, no note, a broken file and no scenario. A card alone on a wrapped
+   While reading, what it shows is out of the flow, so the note's length
+   never sets its box: it stretches to its line. A card alone on a wrapped
    line still gets five lines. While editing, the editor is in the flow and
    holds the row's height where it fits, and the card grows only where the
    lines under the buttons need more room than the row leaves. */
@@ -1337,8 +1350,9 @@ a.run-toast-link:hover {
    there: it would otherwise give all its height to the list. The list has no
    column to fill any more, so it takes a height of its own, short enough
    that the chart under it is still in reach. The top row has no list to line
-   up with either, so it is one wrapping line: the dropdowns, Scenario Stats,
-   the PB card, and the latest-run card, packed from the line's start. */
+   up with either, so it is one wrapping line: the dropdowns, the note,
+   Scenario Stats, the PB card and the latest-run card, packed from its start.
+   Flatten the score pair too, so each card uses the room that line leaves. */
 @container run-history-page (max-width: 900px) {
     .run-history-top-row {
         display: flex;
@@ -1350,7 +1364,8 @@ a.run-toast-link:hover {
         display: contents;
     }
 
-    .pb-card {
+    .run-history-score-pair {
+        display: contents;
         margin-left: 0;
     }
 

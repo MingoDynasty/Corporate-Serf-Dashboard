@@ -14,6 +14,12 @@ fills the room this entry kept between Scenario Stats and the PB card: the
 240 px to 800 px wide. Where the column wraps, the PB card still goes first,
 then the note card, then Scenario Stats. The rest of this entry stands.
 
+**Superseded in part (2026-10-21).** [The score-strip entry](2026-10-21-run-historys-score-cards-stay-together-after-the-note.md)
+puts the note after the dropdowns and keeps Scenario Stats and the PB card
+in one pair. Spare room sits before that pair, which wraps first, together,
+to the next line's right end. The narrow row reads dropdowns, note, Scenario
+Stats, PB, latest run. The PB still sits beside the latest-run card.
+
 **Rulings and delivery.** T1 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`: "I ratify Proposal 1,
 rows T1 to T4, as amended at 7329c23." The layout shipped in

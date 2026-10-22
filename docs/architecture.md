@@ -504,11 +504,14 @@ flowchart LR
   chart and the list, one CSS value (`--run-history-list-width`) setting the
   list's width for both, so the latest-run card, alone in the second column,
   sits over the list. The first column (`_top_row`, `_dropdown_column`) is a
-  wrapping row of the dropdowns' column, the Scenario Stats card, the
-  scenario note card, and the PB card, which a left margin of `auto` pins to
-  the column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
-  Select's own box lays out nothing, so the stylesheet places the Select's
-  siblings, never in its label: the link on the playlist filter label's line,
+  wrapping row of the dropdowns' column, the scenario note card, and a
+  `run-history-score-pair` wrapper holding Scenario Stats then the PB card.
+  The wrapper carries `margin-left: auto`, so spare room sits before both
+  scores and they wrap together to the column's right end, beside the
+  latest-run card. At a page area of 900px or less both wrappers become
+  `display: contents`, leaving one wrapping row in DOM order. Each dropdown's
+  field is a grid in which the Select's own box lays out nothing, so the
+  stylesheet places the Select's siblings, never in its label: the link on the playlist filter label's line,
   and the Follow switch under the scenario dropdown, small
   (`settings_help_label`'s `icon_size`) so the row is 141px at 2560px. It
   never imports another page's module: what it shares with Home is under

@@ -746,9 +746,9 @@ def _dropdown_column(playlist_code: str | None) -> dmc.Box:
 def _top_row(playlist_code: str | None) -> dmc.Box:
     """Build the row above the chart, in the columns of the chart and the run list.
 
-    The first column holds the dropdowns, the Scenario Stats card, the
-    scenario note card, and the PB card at its right end. The second holds
-    the latest-run card, over the run list, so the PB card sits beside it.
+    The first column holds the dropdowns, the scenario note card, then
+    Scenario Stats and the PB card in a pair at its right end. The second
+    holds the latest-run card, over the run list, beside the PB card.
     """
     return dmc.Box(
         className="run-history-top-row",
@@ -756,11 +756,16 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
             dmc.Box(
                 [
                     _dropdown_column(playlist_code),
-                    scenario_stats_panel(SCENARIO_STATS_IDS),
                     scenario_note_card(
                         NOTE_CARD_IDS, toast_link_class=RUN_TOAST_LINK_CLASS
                     ),
-                    pb_card(PB_CARD_IDS),
+                    dmc.Box(
+                        [
+                            scenario_stats_panel(SCENARIO_STATS_IDS),
+                            pb_card(PB_CARD_IDS),
+                        ],
+                        className="run-history-score-pair",
+                    ),
                 ],
                 className="run-history-top-row-left",
             ),
