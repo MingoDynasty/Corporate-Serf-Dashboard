@@ -1,10 +1,10 @@
 """Choose what the Run History chart plots: its modes, its ranges, and its figure.
 
 The chart plots every run of one scenario inside a range. Score vs Run counts
-its range in runs and draws the typical score over them. Score vs Time and
-Score vs Sensitivity count theirs in calendar days. The page holds the
-controls and the callback, and asks ``build_run_history_figure`` for the
-figure. Nothing here has a component id or registers a callback.
+its range in runs. Score vs Time and Score vs Sensitivity count theirs in
+calendar days. The first two draw the typical score over the runs. The page
+holds the controls and the callback, and asks ``build_run_history_figure``
+for the figure. Nothing here has a component id or registers a callback.
 """
 
 import logging
@@ -26,6 +26,7 @@ from source.plot.plot_service import (
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
     generate_score_vs_time_plot,
+    typical_score_hold_traces,
     typical_score_traces,
 )
 
@@ -131,8 +132,10 @@ def build_run_history_figure(  # noqa: PLR0913
     shows only while that run is also the last one played on any scenario,
     and a run on another scenario changes that with no new figure.
 
-    Score vs Run also draws the typical score's line and bands, each while
-    its switch is on. The other two modes draw neither yet.
+    Score vs Run and Score vs Time also draw the typical score's line and
+    bands, each while its switch is on: at each run on Score vs Run, and on
+    Score vs Time each value held flat to the next run. Score vs Sensitivity
+    draws neither.
     """
     # One copy of the store for the scenario's runs and, when the typical
     # score is drawn, the play sessions: a run that lands mid-build is then in
@@ -192,10 +195,11 @@ def build_run_history_figure(  # noqa: PLR0913
         )
 
     day_count = _range_count(day_range, DAY_RANGE_OPTIONS, DAY_RANGE_DEFAULT)
+    plotted = runs
     if day_count is not None:
         first_moment = first_moment_of_day_range(day_count, today)
-        runs = [run for run in runs if run.datetime_object >= first_moment]
-    if not runs:
+        plotted = [run for run in runs if run.datetime_object >= first_moment]
+    if not plotted:
         return (
             generate_empty_plot(
                 NO_RUNS_IN_RANGE_PLOT_TITLE,
@@ -206,21 +210,32 @@ def build_run_history_figure(  # noqa: PLR0913
 
     rank_data = _rank_data(selected_playlist, selected_scenario)
     if mode == SCORE_VS_TIME:
-        return (
-            generate_score_vs_time_plot(
-                runs,
-                selected_scenario,
-                rank_overlay_switch,
-                rank_data,
-                show_all_ranks_switch,
-                new_pbs,
-                newest,
-                newest_id,
-            ),
-            True,
+        figure = generate_score_vs_time_plot(
+            plotted,
+            selected_scenario,
+            rank_overlay_switch,
+            rank_data,
+            show_all_ranks_switch,
+            new_pbs,
+            newest,
+            newest_id,
         )
+        if typical_score_switch or middle_50_switch or middle_80_switch:
+            # Over the whole history, as on Score vs Run. The range keeps the
+            # newest runs, so the last values are the plotted runs'.
+            values = build_typical_scores(runs, split_into_play_sessions(all_runs))
+            figure.add_traces(
+                typical_score_hold_traces(
+                    values[-len(plotted) :],
+                    today,
+                    line=typical_score_switch,
+                    middle_50=middle_50_switch,
+                    middle_80=middle_80_switch,
+                )
+            )
+        return figure, True
 
-    in_range = set(runs)
+    in_range = set(plotted)
     return (
         generate_score_vs_sensitivity_plot(
             # The store keeps the sensitivities sorted, which is the order

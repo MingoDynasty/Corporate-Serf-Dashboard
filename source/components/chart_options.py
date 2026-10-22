@@ -56,26 +56,20 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         "Draws your typical score: the median of your last 20 runs, or of all "
         "your runs if you have fewer. It's faded where too few of them are "
         "recent. ",
-        control_name("Score vs Time"),
-        " and ",
         control_name("Score vs Sensitivity"),
-        " don't show the line or bands.",
+        " doesn't show the line or bands.",
     ],
     "middle-50-overlay": [
         "Shades the middle 50% of the runs behind your typical score. A "
         "narrower band means more consistent scores. ",
-        control_name("Score vs Time"),
-        " and ",
         control_name("Score vs Sensitivity"),
-        " don't show this band.",
+        " doesn't show this band.",
     ],
     "middle-80-overlay": [
         "Shades the middle 80% of the runs behind your typical score, in a "
         "lighter shade than the middle 50%. ",
-        control_name("Score vs Time"),
-        " and ",
         control_name("Score vs Sensitivity"),
-        " don't show this band.",
+        " doesn't show this band.",
     ],
     "score-threshold-overlay": (
         "Shows a score goal line based on the selected percentage of your "
