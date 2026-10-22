@@ -7,9 +7,14 @@ Status: Superseded in part, 2026-10-14, by the
 "Version 1 has one view" no longer holds, and the list's two levels become
 three in the second view. A session row's count under This scenario is a link
 and no longer plain text. "The first row alone gives a session's length"
-holds under This scenario only. The Columns menu has three checkboxes. R3,
-the list as a second column 500px wide, and every rule of the list under This
-scenario stand.
+holds under This scenario only. The Columns menu gained a third checkbox.
+Superseded in part again, 2026-10-22, by
+[the width rule](2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md)
+and [the three new columns](2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md):
+the list is 500px at least and as wide as its shown columns need, a run row
+has seven columns by default and up to ten, and the Columns menu has six
+checkboxes. R3, the list as a second column beside the chart, and every
+other rule of the list under This scenario stand.
 
 Run History lists the selected scenario's runs in a column of its own, to the
 right of the chart and always shown. The chart is narrower than the old
