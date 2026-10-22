@@ -994,7 +994,7 @@ def layout(
             ),
             dag.AgGrid(
                 id="playlist-scenarios-grid",
-                className="ag-theme-quartz playlist-scenarios-grid",
+                className="ag-theme-quartz columns-pending playlist-scenarios-grid",
                 columnDefs=_column_defs(
                     sort, benchmark=benchmark, group_columns=group_columns
                 ),
@@ -1009,6 +1009,9 @@ def layout(
                 },
                 dashGridOptions={
                     **grid_options,
+                    # The Columns callback releases this after the stored
+                    # choice and rows are ready, whichever arrives last.
+                    "loading": True,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     # Every row is drawn, in view or not. The browser's own

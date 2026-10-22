@@ -8,11 +8,10 @@ playlist's name opens its scenario table, which paints local stats and a
 benchmark's ranks and categories immediately and streams leaderboard positions
 in behind them, while a background worker keeps the overview's percentile
 columns warm.
-Each table has a Columns menu that shows or hides its columns and remembers
-the choice in the browser, with one KovaaK's ID column that starts hidden,
-and each draws every row as text that can be selected and that the browser's
-own text search finds, with matches and text selections following the displayed
-row order after sorting.
+Each table remembers its Columns menu choice in the browser, a scenario
+table applies that choice before revealing its rows, and every row is
+selectable text that the browser's own text search finds, with matches and
+selections following the displayed row order after sorting.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -452,6 +451,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   `minHeight` style. Neither declares initial `rowData`, so the loading
   overlay owns the gap
   ([2026-07-16](../decision_log/2026/2026-07-16-keep-pre-hydration-states-honest.md)).
+  The scenario table keeps its header and body hidden and its loading overlay
+  visible until its initial Columns choice and row data have both applied.
+  An empty result then shows the grid's normal empty state.
 - Both grids draw every row, in view or not, so the browser's own text
   search (Ctrl+F) finds any row and scrolls the grid to it, with the header
   still in view. After a sort, a search steps through its matches in the

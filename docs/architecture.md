@@ -844,7 +844,9 @@ flowchart LR
   checkboxes through the grid API as the page mounts and on every change: it
   sets visibility, clears the sort of every hidden column, re-runs the quick
   filter, and sizes the columns it just showed. Only the newest run applies
-  anything. A grid with a menu also takes `COLUMNS_MENU_GRID_OPTIONS`, which
+  anything. It reveals a `columns-pending` grid once its rows and rendered
+  columns are ready, keeping the loading overlay visible until then.
+  A grid with a menu also takes `COLUMNS_MENU_GRID_OPTIONS`, which
   turns column virtualization off, so the grid's own autosize can fit every
   column a stored choice brings into the window. It never writes the grid's
   `columnState` prop and
