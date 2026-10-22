@@ -176,11 +176,8 @@ a.run-toast-link:hover {
     transition: display var(--chart-options-collapse-duration) allow-discrete;
 }
 
-/* A labelled field inside the inspector, for controls Mantine does not give
-   a label slot of its own (the point-size segmented control) and for the
-   action that belongs to the field above it rather than to the group (Use
-   default). Tighter than the group's own gap, so the pair reads as one
-   control rather than as two. */
+/* A field's label and control, or its control and Use default, sit closer
+   together than the surrounding groups so they read as one control. */
 .chart-options-field {
     display: flex;
     flex-direction: column;

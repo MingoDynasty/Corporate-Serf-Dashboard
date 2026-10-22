@@ -291,6 +291,8 @@ def test_the_card_and_the_editor_carry_the_copy_block_words():
     edit = _by_id(page_card, IDS.edit)
     draft = _by_id(page_card, IDS.draft)
 
+    # ``UnstyledButton`` supplies Mantine's keyboard focus ring; a plain
+    # ``html.Button`` gets Chromium's near-black default on the dark theme.
     assert isinstance(edit, dmc.UnstyledButton)
     assert (edit.children, getattr(edit, "aria-label")) == (
         "Edit",
