@@ -499,11 +499,15 @@ flowchart LR
   the startup playlist warnings on a one-shot interval, so a warning raised
   at startup shows on the page the launcher opens.
 - `run_history.py` (`/run-history`) — the Run History page: the top row, the
-  chart with its Chart options panel, and the run list in a 500px column
-  beside the chart. The top row is a grid of the same two columns as the
-  chart and the list, one CSS value (`--run-history-list-width`) setting the
-  list's width for both, so the latest-run card, alone in the second column,
-  sits over the list. The first column (`_top_row`, `_dropdown_column`) is a
+  chart with its Chart options panel, and the run list in a column beside the
+  chart. The list's column is as wide as its shown columns need, which a
+  clientside callback registered by `register_run_list()` writes to the
+  page root's `style` as `--run-history-list-need`; the stylesheet clamps it
+  between `--run-history-list-width`, the list's 500px minimum, and a 480px
+  floor for the chart. The top row is a grid with the same gap, whose second
+  column is the latest-run card's own `--run-history-card-width`, also
+  500px, so the card sits over the list while the list is at its minimum.
+  The first column (`_top_row`, `_dropdown_column`) is a
   wrapping row of the dropdowns' column, the Scenario Stats card, the
   scenario note card, and the PB card, which a left margin of `auto` pins to
   the column's right end, beside the latest-run card. Each dropdown's field is a grid in which the
@@ -1064,9 +1068,12 @@ flowchart LR
   given no rows: the page's callback writes the model to a store, and a
   clientside callback hands it to `assets/runHistoryList.js`, which puts the
   rows in through the grid's API. A second clientside callback hands it the
-  Median and best checkbox. The grid's options, its seven fixed-width
-  columns, and every string the script shows are set here, the strings
-  through the grid's `context` and the rows.
+  Median and best checkbox, and a third adds up the fixed widths of the
+  columns the Columns menu shows, from `run_list_widths()`, and writes the
+  list's need to the page root's `style`. The grid's options, its ten
+  fixed-width columns, three of them hidden to start, and every string the
+  script shows are set here, the strings through the grid's `context` and
+  the rows.
 - `components/latest_run_card.py` — the Run History page's latest-run card.
   `latest_run()` is one pure function from a copy of the run store and the
   selected scenario to the text the card shows for that scenario's latest

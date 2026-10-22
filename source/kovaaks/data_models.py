@@ -44,6 +44,15 @@ class RunData:
     the parser returns has one, because a file with no shots is not a run.
     It is ``None`` only on a record built some other way, and unknown is
     never read as zero.
+
+    ``reloads``, ``fov``, ``fov_scale`` and ``avg_fps`` are shown as they
+    were recorded and never join a comparison. Each is ``None`` when its line
+    is missing, has no value, or holds a value that can't be read:
+    ``reloads`` that isn't a whole number of zero or more, ``fov`` that
+    isn't a finite number above zero, ``fov_scale`` that is empty, and
+    ``avg_fps`` that isn't a finite number of zero or more. A file with no
+    ``FOVScale:`` line, as older files have, keeps its ``fov``. Unknown is
+    never read as zero.
     """
 
     datetime_object: datetime.datetime
@@ -58,6 +67,10 @@ class RunData:
     run_start: datetime.datetime | None = None
     run_length: datetime.timedelta | None = None
     shots_fired: int | None = None
+    reloads: int | None = None
+    fov: float | None = None
+    fov_scale: str | None = None
+    avg_fps: float | None = None
 
 
 @dataclass()

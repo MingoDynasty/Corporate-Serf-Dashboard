@@ -14,6 +14,16 @@ fills the room this entry kept between Scenario Stats and the PB card: the
 240 px to 800 px wide. Where the column wraps, the PB card still goes first,
 then the note card, then Scenario Stats. The rest of this entry stands.
 
+**Superseded in part (2026-10-22).** [The latest-run card's own width](2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md)
+replaces "The latest-run card aligns over the run list instead of filling
+the remaining width" and the row and the chart and list sharing "two
+columns, the second 500px wide". The card keeps its 500px and its place at
+the row's right end, as a width of its own, and lines up with the list only
+while the list is at its 500px minimum, which it is by default: the list now
+grows to fit the columns it shows. The dropdowns' column, the cards and
+their order, the PB card beside the latest-run card, the Follow switch, and
+the narrow-window line stand.
+
 **Rulings and delivery.** T1 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`: "I ratify Proposal 1,
 rows T1 to T4, as amended at 7329c23." The layout shipped in

@@ -6,6 +6,10 @@ the figures sit in the row's own line, ahead of its count, and only the first
 row under This scenario keeps a second line. The checkbox, its default, and
 which rows carry figures stand.
 
+**Superseded in part (2026-10-22).** [Three new column entries](2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md)
+come before it, so "a third checkbox" is now the sixth, still after the
+columns. Its default, its rows and its figures stand.
+
 The Columns menu on Run History has a third checkbox, Median and best, which
 is off until a player turns it on. With it on, a row that stands for one
 scenario's runs gains a second line with the median score and the best score

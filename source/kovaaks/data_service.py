@@ -665,7 +665,7 @@ def _parse_optional_positive(raw_value: str | None) -> float | None:
 
     Missing, empty, zero, negative, or malformed all read as "not available".
     These fields never join the required-field check, and a bad value must cost
-    the conversion only -- never the run, and never the scan that hit it.
+    that field only -- never the run, and never the scan that hit it.
     """
     if not raw_value:
         return None
@@ -679,6 +679,38 @@ def _parse_optional_positive(raw_value: str | None) -> float | None:
     if not math.isfinite(value) or value <= 0:
         return None
     return value
+
+
+def _parse_optional_non_negative(raw_value: str | None) -> float | None:
+    """Read one optional numeric field whose zero is a real reading, or None.
+
+    Missing, empty, negative, not finite, or malformed read as "not
+    available", for the reasons ``_parse_optional_positive`` gives.
+    """
+    if not raw_value:
+        return None
+    try:
+        value = float(raw_value)
+    except ValueError:
+        return None
+    if not math.isfinite(value) or value < 0:
+        return None
+    return value
+
+
+def _parse_optional_count(raw_value: str | None) -> int | None:
+    """Read one optional count, a whole number of zero or more, or None.
+
+    A fraction reads as "not available" rather than rounded: a count with a
+    fraction is not a count the game wrote.
+    """
+    if not raw_value:
+        return None
+    try:
+        value = int(raw_value)
+    except ValueError:
+        return None
+    return value if value >= 0 else None
 
 
 def _parse_pause_duration(raw_value: str | None) -> timedelta | None:
@@ -756,6 +788,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     raw_scenario_hash = None
     raw_challenge_start = None
     raw_pause_duration = None
+    raw_reloads = None
+    raw_fov = None
+    raw_fov_scale = None
+    raw_avg_fps = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -813,6 +849,14 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 # no line at all: the first is an unknown pause, the second
                 # is no pause.
                 raw_pause_duration = _optional_field_value(line) or ""
+            elif line.startswith("Reloads:"):
+                raw_reloads = _optional_field_value(line)
+            elif line.startswith("FOV:"):
+                raw_fov = _optional_field_value(line)
+            elif line.startswith("FOVScale:"):
+                raw_fov_scale = _optional_field_value(line)
+            elif line.startswith("Avg FPS:"):
+                raw_avg_fps = _optional_field_value(line)
     except OSError, ValueError, IndexError:
         # OSError: the CSV can be locked by a still-running KovaaK's or vanish
         # between listing and open. IndexError: a mid-write line like "Score:"
@@ -884,6 +928,10 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         run_start=run_start,
         run_length=run_length,
         shots_fired=shots_fired,
+        reloads=_parse_optional_count(raw_reloads),
+        fov=_parse_optional_positive(raw_fov),
+        fov_scale=raw_fov_scale or None,
+        avg_fps=_parse_optional_non_negative(raw_avg_fps),
     )
 
 

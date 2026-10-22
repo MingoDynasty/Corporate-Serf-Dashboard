@@ -278,6 +278,181 @@ def test_extract_data_from_file_loads_a_file_with_no_usable_hash(hash_line) -> N
     assert run.scenario_hash is None
 
 
+# --- Reloads, FOV, its scale, and Avg FPS ------------------------------------
+
+REAL_ORDER_DEFAULTS = {
+    "reloads": "Reloads:,3",
+    "fov": "FOV:,103.0",
+    "fov_scale": "FOVScale:,Overwatch",
+    "avg_fps": "Avg FPS:,689.233032",
+}
+
+
+def _extract_real_order_file(tmp_path: Path, **lines: str | None) -> RunData | None:
+    """Parse a stats file written in the order KovaaK's writes one.
+
+    ``Reloads:`` is before ``Score:``, and ``FOV:``, ``FOVScale:`` and
+    ``Avg FPS:`` follow the sensitivity lines, as in a real file and unlike
+    ``_write_stats_file``. Each keyword names one of those four lines, and
+    replaces it with its raw text, or leaves it out with ``None``.
+    """
+    chosen = {**REAL_ORDER_DEFAULTS, **lines}
+    body = [
+        "Kill #,Timestamp,Bot,Weapon,TTK,Shots,Hits,Accuracy",
+        "",
+        SUB_CSV_HEADER,
+        DAMAGE_SUB_CSV_ROW,
+        "",
+        "Kills:,0",
+        chosen["reloads"],
+        "Score:,123.45",
+        f"Scenario:,{SCENARIO_NAME}",
+        "Challenge Start:,09:59:00.000",
+        "",
+        "Sens Scale:,cm/360",
+        "Horiz Sens:,40.8",
+        "DPI:,1600",
+        chosen["fov"],
+        chosen["fov_scale"],
+        "Resolution:,3840x2160",
+        chosen["avg_fps"],
+        "",
+    ]
+    file_path = (
+        tmp_path / f"{SCENARIO_NAME} - Challenge - 2025.01.01-10.00.00 Stats.csv"
+    )
+    file_path.write_text(
+        "\n".join(line for line in body if line is not None), encoding="utf-8"
+    )
+    return extract_data_from_file(str(file_path))
+
+
+def test_a_real_file_reads_its_reloads_fov_scale_and_avg_fps(tmp_path) -> None:
+    run = _extract_real_order_file(tmp_path)
+
+    assert run is not None
+    assert (run.reloads, run.fov, run.fov_scale, run.avg_fps) == (
+        3,
+        103.0,
+        "Overwatch",
+        689.233032,
+    )
+
+
+# Each bad case: the line missing, the line with no value column yet, an
+# empty value, a value that is not a number, and values out of the field's
+# range.
+UNUSABLE_COUNTS = [
+    None,
+    "Reloads:",
+    "Reloads:,",
+    "Reloads:,abc",
+    "Reloads:,-1",
+    "Reloads:,1.5",
+]
+UNUSABLE_FOVS = [
+    None,
+    "FOV:",
+    "FOV:,",
+    "FOV:,abc",
+    "FOV:,0",
+    "FOV:,-103",
+    "FOV:,inf",
+    "FOV:,nan",
+]
+UNUSABLE_FPS = [
+    None,
+    "Avg FPS:",
+    "Avg FPS:,",
+    "Avg FPS:,abc",
+    "Avg FPS:,-1",
+    "Avg FPS:,inf",
+    "Avg FPS:,nan",
+]
+
+
+@pytest.mark.parametrize(
+    ("field", "line"),
+    [("reloads", line) for line in UNUSABLE_COUNTS]
+    + [("fov", line) for line in UNUSABLE_FOVS]
+    + [("avg_fps", line) for line in UNUSABLE_FPS],
+)
+def test_an_unusable_line_costs_its_field_only_and_never_the_run(
+    tmp_path, field, line
+) -> None:
+    """Unknown is never read as zero, and the run keeps everything else."""
+    run = _extract_real_order_file(tmp_path, **{field: line})
+
+    assert run is not None
+    assert run.score == 123.45
+    assert run.run_length == timedelta(minutes=1)
+    assert getattr(run, field) is None
+    others = {
+        "reloads": 3,
+        "fov": 103.0,
+        "fov_scale": "Overwatch",
+        "avg_fps": 689.233032,
+    }
+    del others[field]
+    assert {name: getattr(run, name) for name in others} == others
+
+
+@pytest.mark.parametrize(
+    ("line", "value"),
+    [
+        ("Reloads:,0", 0),
+        ("Reloads:,22", 22),
+    ],
+)
+def test_zero_reloads_is_a_real_count(tmp_path, line, value) -> None:
+    run = _extract_real_order_file(tmp_path, reloads=line)
+
+    assert run is not None
+    assert run.reloads == value
+
+
+@pytest.mark.parametrize(
+    ("line", "value"),
+    [("FOV:,106.5", 106.5), ("FOV:,70.0", 70.0)],
+)
+def test_an_fov_keeps_its_decimals(tmp_path, line, value) -> None:
+    run = _extract_real_order_file(tmp_path, fov=line)
+
+    assert run is not None
+    assert run.fov == value
+
+
+def test_an_avg_fps_of_zero_is_a_real_reading(tmp_path) -> None:
+    run = _extract_real_order_file(tmp_path, avg_fps="Avg FPS:,0")
+
+    assert run is not None
+    assert run.avg_fps == 0
+
+
+@pytest.mark.parametrize(
+    ("line", "scale"),
+    [
+        pytest.param("FOVScale:,Overwatch", "Overwatch", id="a name"),
+        pytest.param(
+            "FOVScale:,Battlefield V/1/Hardline",
+            "Battlefield V/1/Hardline",
+            id="a name as the file writes it",
+        ),
+        pytest.param("FOVScale:,", None, id="an empty value"),
+        pytest.param("FOVScale:", None, id="no value column yet"),
+        pytest.param(None, None, id="no line, as in older files"),
+    ],
+)
+def test_a_scale_is_kept_as_the_file_writes_it_and_never_costs_the_fov(
+    tmp_path, line, scale
+) -> None:
+    run = _extract_real_order_file(tmp_path, fov_scale=line)
+
+    assert run is not None
+    assert run.fov_scale == scale
+    assert run.fov == 103.0
+
+
 # --- Run start and run length ------------------------------------------------
 
 

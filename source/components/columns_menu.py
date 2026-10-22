@@ -118,9 +118,12 @@ _APPLY_COLUMNS = """
 """
 
 
-def _checkbox_id(menu_id: str, column: object) -> dict:
-    # The ID is the checkbox's local-storage key, so renaming a menu or a
-    # column ID resets that stored choice once.
+def column_checkbox_id(menu_id: str, column: object) -> dict:
+    """Return the id of a column's checkbox, or with ``ALL``, of every one.
+
+    The id is the checkbox's local-storage key, so renaming a menu or a
+    column id resets that stored choice once.
+    """
     return {"type": menu_id, "column": column}
 
 
@@ -196,7 +199,7 @@ def columns_menu(
                         # them.
                         *[
                             dmc.Checkbox(
-                                id=_checkbox_id(menu_id, column.column_id),
+                                id=column_checkbox_id(menu_id, column.column_id),
                                 label=column.label,
                                 checked=column.shown_by_default,
                                 persistence=True,
@@ -235,6 +238,6 @@ def register_columns_menu(menu_id: str, grid_id: str) -> None:
     clientside_callback(
         _APPLY_COLUMNS.replace("GRID_ID", json.dumps(grid_id)),
         Output(f"{menu_id}-sink", "data"),
-        Input(_checkbox_id(menu_id, ALL), "checked"),
-        State(_checkbox_id(menu_id, ALL), "id"),
+        Input(column_checkbox_id(menu_id, ALL), "checked"),
+        State(column_checkbox_id(menu_id, ALL), "id"),
     )

@@ -77,6 +77,18 @@ The scale the app shows sensitivity in: centimeters of mouse travel per full
 are converted, and which ones can't be, is in
 [run_history.md](specs/run_history.md#the-chart).
 
+### FOV
+
+The field of view a run was played at: a number on a scale, such as 103 on
+the Overwatch scale. The same number is a different width on different
+scales, so 103 on Overwatch is narrower than 103 on Apex Legends. The app
+shows the FOV and the scale as the run's stats file records them and
+converts nothing.
+
+- On screen: the run list's FOV column, as `103 Overwatch`.
+- In code: `fov` and `fov_scale`, from the stats file's `FOV:` and
+  `FOVScale:` lines.
+
 ### Session
 
 One stretch of play, including the breaks between runs, as

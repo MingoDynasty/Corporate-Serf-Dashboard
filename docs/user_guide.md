@@ -113,6 +113,10 @@ as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
 off, a run on another scenario doesn't reach the card: the run's toast links
 to it, and the run list's **All scenarios** view lists it.
 
+The run list's **Columns** menu can also add **Reloads**, **FOV** and
+**Avg FPS**, each off to start, and the list widens to fit the columns you
+turn on.
+
 ### Typical score
 
 Scenario Stats leads with your typical score: the median of this scenario's

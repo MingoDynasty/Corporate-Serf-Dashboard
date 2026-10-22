@@ -196,6 +196,7 @@ def test_the_layout_builds_every_id_the_blocks_are_registered_for():
         run_history.SETUP_CARD_ID,
         run_history.RUN_LANDED_STORE_ID,
         run_history.SESSION_IN_PROGRESS_STORE_ID,
+        run_history.PAGE_ID,
     } <= mounted
     assert set(run_history.LATEST_RUN_CARD_IDS) <= mounted
     assert set(run_history.PB_CARD_IDS) <= mounted
@@ -1423,38 +1424,38 @@ def _container_block(css, query):
     return match.group(1)
 
 
-def test_the_list_takes_a_column_of_500px_beside_the_chart():
+def test_the_list_takes_a_column_of_at_least_500px_beside_the_chart():
     css = STYLESHEET.read_text(encoding="utf-8")
     columns = _css_block(css, ".run-history-columns")
 
     assert "--run-history-list-width: 500px;" in _css_block(css, ".run-history-page")
-    assert (
-        "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
-        in columns
-    )
+    assert "grid-template-columns: minmax(0, 1fr) clamp(" in columns
     assert "flex: 1 1 0;" in columns
 
 
-def test_the_top_row_takes_the_columns_and_the_gap_of_the_chart_and_the_list():
-    """So the latest-run card's edges are the run list's at every zoom level.
+def test_the_top_row_takes_the_cards_own_width_and_the_gap_of_the_columns():
+    """The card's width is its own, so a wider list never wraps the top row.
 
-    One value sets the list's width for both, and the row stretches each
-    column, and every card in it, to its own height.
+    It equals the list's minimum, so on the default page the card's edges
+    are the list's at every zoom level. The row stretches each column, and
+    every card in it, to its own height.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
+    page = _css_block(css, ".run-history-page")
     row = _css_block(css, ".run-history-top-row")
     columns = _css_block(css, ".run-history-columns")
 
+    assert "--run-history-card-width: 500px;" in page
+    assert "--run-history-list-width: 500px;" in page
+    assert "grid-template-columns: minmax(0, 1fr) var(--run-history-card-width);" in row
     for rule in (row, columns):
-        assert (
-            "grid-template-columns: minmax(0, 1fr) var(--run-history-list-width);"
-            in rule
-        )
         assert "    gap: var(--mantine-spacing-md);" in rule
     assert "display: grid;" in row
     assert "align-items" not in row
     assert "500px" not in row
+    assert "--run-history-list" not in row
     assert css.count("--run-history-list-width: ") == 1
+    assert css.count("--run-history-card-width: ") == 1
 
 
 def test_the_first_column_wraps_its_pieces_on_its_own_width():
