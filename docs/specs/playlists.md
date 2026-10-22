@@ -4,10 +4,8 @@ The Playlists page is the one place playlists and benchmarks are managed, and
 it lists the playlists the user has chosen to see, with local aggregates. A
 benchmark is a playlist that also carries rank thresholds, and the bundled
 library ships with the app with only the popular ones visible. Clicking a
-playlist's name opens its scenario table, which paints local stats and a
-benchmark's ranks and categories immediately and streams leaderboard positions
-in behind them, while a background worker keeps the overview's percentile
-columns warm.
+playlist's name opens its scenario table, whose columns fit their contents
+after the first rows appear.
 Each table has a Columns menu that shows or hides its columns and remembers
 the choice in the browser, with one KovaaK's ID column that starts hidden,
 and each draws every row as text that can be selected and that the browser's
@@ -182,7 +180,7 @@ and [product.md](../product.md). Leaderboard placement is worded
   control name rendered bold
   ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
 - Both grids feed their quick filter into AG Grid's built-in one client-side.
-  Both log AG Grid's `columnSizeOptions` warning on every mount
+  The overview logs AG Grid's `columnSizeOptions` warning on every mount
   ([2026-07-18](../decision_log/2026/2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning.md)).
 - Both tables have a **Columns** button: on the overview between the **Show
   hidden** switch and the **Import** button, and on the scenario table at the
@@ -208,7 +206,10 @@ and [product.md](../product.md). Leaderboard placement is worded
   table. A browser with no stored choice shows the defaults. Column widths
   and column order are not remembered. Both grids render every column,
   whatever the window's width, so each column is sized to its header and its
-  content as the page opens, with a stored choice or without one.
+  content as the page opens, with a stored choice or without one. A scenario
+  table fits its columns once its first rows render, including long Next Rank
+  gaps. Later position fills and relative-time refreshes preserve manual
+  column widths.
 - Hiding a column is display only. Rows carry every field, no fetch stops,
   and each status line reads the same with its columns hidden. The quick
   filter matches visible columns only, so a hidden column's values find no

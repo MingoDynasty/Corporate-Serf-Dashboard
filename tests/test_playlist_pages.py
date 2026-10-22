@@ -2236,12 +2236,24 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
     }
 
 
-def test_playlist_scenarios_grid_uses_content_auto_size():
-    page = playlist_scenarios.layout("KovaaKsTestCode")
-    ag_grid = page.children[-1]
+@pytest.mark.parametrize(
+    "playlist_code", ["KovaaKsPlaylistCode", "KovaaKsBenchmarkCode"]
+)
+def test_playlist_scenarios_grid_sizes_to_its_first_rendered_rows(
+    benchmark_playlists, playlist_code
+):
+    grid = playlist_scenarios.layout(playlist_code).children[-1]
+    props = grid.to_plotly_json()["props"]
 
-    assert ag_grid.columnSize == "autoSize"
-    assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
+    # Dash supplies the rows after the grid initializes. The wrapper's
+    # ``columnSize`` fits empty columns and does not fit them again on arrival.
+    assert "columnSize" not in props
+    assert "columnSizeOptions" not in props
+    assert grid.dashGridOptions["autoSizeStrategy"] == {
+        "type": "fitCellContents",
+        "colIds": playlist_scenarios.AUTO_SIZE_COLUMN_KEYS,
+        "skipHeader": False,
+    }
 
 
 def test_playlist_scenarios_grid_has_no_initial_row_data():
@@ -3284,7 +3296,6 @@ def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
     # The option rides beside the grid's own, and replaces none of them.
     assert grid.dashGridOptions["animateRows"] is False
     assert "getRowId" in grid.dashGridOptions
-    assert grid.columnSize == "autoSize"
 
 
 @pytest.mark.parametrize(

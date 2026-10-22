@@ -81,11 +81,6 @@ AUTO_SIZE_COLUMN_KEYS = [
     "pb_accuracy_sort",
 ]
 
-COLUMN_SIZE_OPTIONS: dag.AgGrid.ColumnSizeOptions = {
-    "keys": AUTO_SIZE_COLUMN_KEYS,
-    "skipHeader": False,
-}
-
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Scenario",
@@ -1009,6 +1004,14 @@ def layout(
                 },
                 dashGridOptions={
                     **grid_options,
+                    # Dash supplies the rows after grid initialization. Fit
+                    # after their first render so long cells are measured,
+                    # once only so later updates keep a user's own widths.
+                    "autoSizeStrategy": {
+                        "type": "fitCellContents",
+                        "colIds": AUTO_SIZE_COLUMN_KEYS,
+                        "skipHeader": False,
+                    },
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     # Every row is drawn, in view or not. The browser's own
@@ -1026,8 +1029,6 @@ def layout(
                         )
                     },
                 },
-                columnSize="autoSize",
-                columnSizeOptions=COLUMN_SIZE_OPTIONS,
                 dangerously_allow_code=True,
                 style={
                     "flex": 1,
