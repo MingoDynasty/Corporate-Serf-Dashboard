@@ -1000,11 +1000,12 @@ flowchart LR
   takes one copy of the run store (`data_service.get_all_runs`), puts the
   scenario's runs from it in play order, judges the new PBs over all of
   them, applies the range the mode counts in, and hands the runs to one of
-  `plot_service`'s three builders. On Score vs Run, while any of the typical
-  score's switches is on, it also splits that copy into play sessions,
-  builds the typical score after every run of the scenario
-  (`typical_score.build_typical_scores`), and adds
-  `plot_service.typical_score_traces()` for the plotted runs' values: the
+  `plot_service`'s three builders. On Score vs Run and Score vs Time, while
+  any of the typical score's switches is on, it also splits that copy into
+  play sessions, builds the typical score after every run of the scenario
+  (`typical_score.build_typical_scores`), and adds the plotted runs' values
+  as `plot_service.typical_score_traces()` on Score vs Run or
+  `plot_service.typical_score_hold_traces()` on Score vs Time: the
   scenario's runs and the sessions come from one copy, so a run that lands
   mid-build is in both or neither. A range of N days starts at the midnight
   N minus 1 days before the app's own date
@@ -1286,7 +1287,8 @@ flowchart LR
   Rules in [specs/sessions.md](specs/sessions.md)
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `typical_score.py` — the typical score's pure definition, which the Run
-  History chart draws on Score vs Run and Scenario Stats leads with.
+  History chart draws on Score vs Run and Score vs Time and Scenario Stats
+  leads with.
   `build_typical_scores` takes one
   scenario's runs and the play
   sessions split across every scenario from the same snapshot, returning a
@@ -1311,8 +1313,9 @@ flowchart LR
   `generate_score_vs_sensitivity_plot`.
   Each plots every run it is given as one point, titles the figure with the
   scenario's name alone, and draws no summary line: the typical score's
-  traces come from `typical_score_traces()`, which the chart module adds to
-  the Score vs Run figure. Score vs Run puts a
+  traces come from `typical_score_traces()` and
+  `typical_score_hold_traces()`, which the chart module adds to the Score vs
+  Run and Score vs Time figures. Score vs Run puts a
   run at its number in the scenario's whole history on a numeric axis and
   writes the axis ticks itself, a date at the first plotted run of each day,
   thinned for an assumed plot width since the server does not know the real
@@ -1331,7 +1334,12 @@ flowchart LR
   traces share its name, which is their legend group and the handle
   `apply_typical_score_colors()` recolors them by with the theme. The line's
   hover takes its figures from `customdata`, rounded by
-  `format_typical_score`.
+  `format_typical_score`. `typical_score_hold_traces()` builds the same
+  traces for Score vs Time from the values alone, each placed at its own
+  newest run's time: each value held to the next run, a hold split where
+  `typical_score_fade_time` says it fades, and a value that holds for no
+  time, between two runs that ended in the same second, left out. When only
+  one value is left to draw, its line is a marker stroke and its bands bars.
 
 ### Infrastructure
 - `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its
@@ -1492,10 +1500,12 @@ flowchart LR
   axis of Score vs Run alike. It listens on
   each `.home-graph` plot div for `plotly_relayout` events that carry an x
   range and, while x is zoomed, for `plotly_restyle` events that change trace
-  visibility. It fits visible trace points only, never the overlay shapes. The
-  fit's relayout re-sends the current x range: dcc.Graph copies every
-  relayout into its `figure` prop from props that can predate the user's
-  zoom, so a y-only relayout would snap x back to the full range. An
+  visibility. It fits visible traces only, never the overlay shapes: their
+  points in view, and for a trace drawn as lines, such as the typical score's
+  line and bands, the part of each segment inside the window, interpolated at
+  its edges. The fit's relayout re-sends the current x range: dcc.Graph
+  copies every relayout into its `figure` prop from props that can predate
+  the user's zoom, so a y-only relayout would snap x back to the full range. An
   x-only autorange (a double-click on the x-axis drag handle) also
   autoranges y, in the same relayout, when y still holds the last fit.
 - `assets/pbCelebration.js` — the personal best celebration's animation:

@@ -496,9 +496,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 - Each mode plots every run of the scenario in its range as a point, legend
   "Run data point"
   ([2026-10-12][every-run]).
-  Score vs Run also draws the [typical score](../glossary.md#typical-score)
-  over its runs, as a line inside two bands, below. Score vs Time and Score vs
-  Sensitivity draw no summary line
+  Score vs Run and Score vs Time also draw the
+  [typical score](../glossary.md#typical-score) over their runs, as a line
+  inside two bands, below. Score vs Sensitivity draws no summary line
   ([2026-10-12][every-run]).
 - Score vs Run plots the runs in the order they were played, evenly spaced.
   The order is the one [sessions.md](sessions.md#sessions) sets, so the chart
@@ -568,12 +568,32 @@ The card's lines, local-record scope and leaderboard presentation follow
   range leaves out, as the stars do. A value's sessions are split over every
   scenario's runs, taken from the same copy of the run store as the
   scenario's own.
-- A point is drawn at full strength when its value was recent at its run, and
-  faded, at 35% opacity, when it wasn't. A faded stretch starts at the last
-  full-strength point before it and ends at the first after it, so the line
-  and the bands run on with no gap and no step. A point's strength never
-  changes after its run. How recent the value is now is not the chart's to
-  say.
+- On Score vs Run a point is drawn at full strength when its value was recent
+  at its run, and faded, at 35% opacity, when it wasn't. A faded stretch
+  starts at the last full-strength point before it and ends at the first
+  after it, so the line and the bands run on with no gap and no step. A
+  point's strength never changes after its run. How recent the value is now
+  is not the chart's to say.
+- Score vs Time draws the same values, each worked out over the scenario's
+  whole history, so the value at the range's first run counts the runs the
+  range leaves out. Each value holds flat from its run to the next plotted
+  run, with a step at each run, and the line ends at the newest plotted run,
+  on that run's value: how recent the value is now is not the chart's to say
+  here either. A value sits at its own run's time, so of two runs that ended
+  in the same second, which the chart can draw in another order, the line
+  holds the later-played run's value from that second on, and the earlier
+  one's value, held for no time, has no point.
+- A hold is at full strength while its value is recent, and faded, at 35%
+  opacity, from the moment fewer than 10 of its runs are recent: when its
+  10th-newest run turns 30 days old. It is still recent at that moment and
+  faded after it. A value that wasn't recent at its run holds faded
+  throughout. A faded part ends where the next run's value begins, and starts
+  where the full-strength part before it ends, so the line and the bands run
+  on with no gap.
+- When the plotted range holds only one value to draw, as on the run that
+  first makes a value known or in a range that holds one run, that value
+  holds for no time. It is marked at its run instead: the line by a level
+  stroke and each band by a bar from its bottom to its top, both 14px wide.
 - The line and the bands draw under the run points, the stars and the ring,
   by plotly's `zorder` −1, although they come after them in the figure: the
   run trace stays first and keeps the template's first color. Among
@@ -599,6 +619,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   year than this one. Each figure is rounded as
   [typical_score.md](typical_score.md#display-rounding) says. The bands take
   no hover, and the run points' hover is unchanged.
+- On Score vs Time a hold has a point at each end, both with its value's
+  hover, the counts as they were at its run. On the faded part of a hold
+  whose value was recent at its run, the Recent line reads
+  `Recent: too few · last run {date}` instead, with the date of the value's
+  newest run, since the count changes along the hold.
 - A run recorded under a game's own sensitivity scale is normalized to cm/360
   when its file is parsed, from the file's own `Sens Increment` and `DPI`
   fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`. A run whose
@@ -654,16 +679,18 @@ The card's lines, local-record scope and leaderboard presentation follow
   threshold line. The rank lines redraw at once when the Playlist filter
   changes
   ([2026-10-12][every-run]).
-- Zooming the x axis refits the score axis to the points in view: every
+- Zooming the x axis refits the score axis to what is in view: every
   visible trace's points inside the x window, padded by 5% of their span. The
   stars and the ring repeat run points, so they never change the fit. The
-  typical score's line and bands take part: a band's trace holds its top and
-  its bottom at each run as points, so the band at every run in the window
-  stays in view. Overlay lines are not
+  typical score's line and bands take part, drawn as lines, a band as its
+  outline: their points inside the window, and the part of each of their
+  segments that crosses it, up to the window's edges. So the line and the
+  bands stay in view, a Score vs Time hold that spans the whole window
+  included. Overlay lines are not
   part of the fit, so a line beyond the fitted range is out of view while
   zoomed. A trace hidden from the legend is left out too, and showing or
-  hiding one while zoomed refits. A window holding no runs leaves the score
-  axis as it was. Double-clicking the plot, "Reset axes", "Autoscale", and
+  hiding one while zoomed refits. A window with none of these in it leaves
+  the score axis as it was. Double-clicking the plot, "Reset axes", "Autoscale", and
   any new figure (a rebuild or an appearance change) return both axes to the
   full autorange. Double-clicking the x axis alone also returns a refit score
   axis to its full autorange, but leaves a score range the user dragged
@@ -730,8 +757,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   accuracy, sensitivity, and x value, the setting a converted run was
   recorded at, the New PB stars and the ring, which repeat the position and
   score of runs already in it, the label and value of each overlay line
-  drawn, and on Score vs Run the typical score's line and bands with what
-  the line's hover shows at each point. Neither the button nor the flow is
+  drawn, and on Score vs Run and Score vs Time the typical score's line and
+  bands with what the line's hover shows at each point. Neither the button nor the flow is
   app code: the graph passes no
   `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
@@ -1145,22 +1172,21 @@ The card's lines, local-record scope and leaderboard presentation follow
   **Rank thresholds** turned on."
   ([2026-09-14][copy]).
 - Each of the typical score's switches shows or hides its metric on Score vs
-  Run, faded stretches included, and a band's switch also its line in the
-  line's hover. A band can show without the line. They are inputs of the
-  chart rebuild, as "PB score" is, and change nothing on the other two modes.
-  Their ids are `run-history-typical-score-overlay-switch`,
+  Run and Score vs Time, faded stretches included, and a band's switch also
+  its line in the line's hover. A band can show without the line. They are
+  inputs of the chart rebuild, as "PB score" is, and change nothing on Score
+  vs Sensitivity. Their ids are `run-history-typical-score-overlay-switch`,
   `run-history-middle-50-overlay-switch` and
   `run-history-middle-80-overlay-switch`, and like every remembered control's
-  their ids and defaults never change. Until Score vs Time draws the typical
-  score, each help text names both modes that don't: "Draws your typical
-  score: the median of your last 20 runs, or of all your runs if you have
-  fewer. It's faded where too few of them are recent. **Score vs Time** and
-  **Score vs Sensitivity** don't show the line or bands.", "Shades the middle
-  50% of the runs behind your typical score. A narrower band means more
-  consistent scores. **Score vs Time** and **Score vs Sensitivity** don't
-  show this band.", and "Shades the middle 80% of the runs behind your
-  typical score, in a lighter shade than the middle 50%. **Score vs Time**
-  and **Score vs Sensitivity** don't show this band."
+  their ids and defaults never change. Each help text names the mode that
+  doesn't show its metric: "Draws your typical score: the median of your
+  last 20 runs, or of all your runs if you have fewer. It's faded where too
+  few of them are recent. **Score vs Sensitivity** doesn't show the line or
+  bands.", "Shades the middle 50% of the runs behind your typical score. A
+  narrower band means more consistent scores. **Score vs Sensitivity**
+  doesn't show this band.", and "Shades the middle 80% of the runs behind
+  your typical score, in a lighter shade than the middle 50%. **Score vs
+  Sensitivity** doesn't show this band."
 - The Score threshold percentage help text reads the same on every scenario:
   "Sets the score goal as a percentage of your personal best. On a scenario
   scored by completion time, it's a percentage of your personal best's pace

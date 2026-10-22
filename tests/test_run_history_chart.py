@@ -11,6 +11,7 @@ import re
 import statistics
 from dataclasses import replace
 from datetime import date, datetime, timedelta
+from itertools import pairwise
 
 import pytest
 from sortedcontainers import SortedList
@@ -25,6 +26,13 @@ from source.components.run_history_chart import (
 )
 from source.kovaaks import data_service
 from source.kovaaks.data_models import Rank, RunData
+from source.kovaaks.play_sessions import split_into_play_sessions
+from source.kovaaks.typical_score import (
+    TypicalScore,
+    build_typical_scores,
+    typical_score_fade_time,
+    typical_score_recency,
+)
 from source.plot.plot_service import (
     LATEST_RUN_TRACE_NAME,
     MIDDLE_50_TRACE_NAME,
@@ -794,13 +802,10 @@ def test_the_sessions_are_split_over_every_scenarios_runs(load_runs, bridged) ->
     assert (_typical_traces(figure) == []) is bridged
 
 
-@DAY_MODES
-def test_score_vs_time_and_score_vs_sensitivity_draw_no_typical_score_yet(
-    load_runs, mode
-) -> None:
+def test_score_vs_sensitivity_draws_no_typical_score(load_runs) -> None:
     load_runs(*_daily_runs(40))
 
-    figure, _supports_overlays = _figure(mode, day_range="all")
+    figure, _supports_overlays = _figure(SCORE_VS_SENSITIVITY, day_range="all")
 
     assert _typical_traces(figure) == []
 
@@ -980,3 +985,413 @@ def test_the_hover_dates_carry_the_year_only_in_another_year(load_runs) -> None:
     assert _hover_lines(full, 30)[1] == (
         "<b>Runs</b>: 20 in 3 sessions · Aug 1, 2026 to Oct 1, 2026"
     )
+
+
+# --- The typical score on Score vs Time ------------------------------------------
+
+
+def _known_at_ten(first: datetime) -> list[RunData]:
+    """Build ten runs in two sittings a day apart, so the tenth is the first known.
+
+    Scored 100 to 118 by twos, so the value after the tenth is 109.
+    """
+    scores = [100.0 + 2 * n for n in range(10)]
+    return [
+        *_sitting(first, scores[:5]),
+        *_sitting(first + timedelta(days=1), scores[5:]),
+    ]
+
+
+def _values(runs: list[RunData]) -> list[TypicalScore]:
+    """Work out the value after each of one scenario's runs, as the chart does."""
+    return build_typical_scores(runs, split_into_play_sessions(runs))
+
+
+def _held(trace) -> list[tuple]:
+    """Return a trace's points as (time, value) pairs, a gap as (None, None)."""
+    return list(zip(trace.x, trace.y, strict=True))
+
+
+def _hover_at(trace, index: int) -> list[str]:
+    """Render a line trace's hover at its point ``index``, as plotly would."""
+    text = re.sub(
+        r"%\{customdata\[(\d+)\]\}",
+        lambda match: str(trace.customdata[index][int(match.group(1))]),
+        trace.hovertemplate.removesuffix("<extra></extra>"),
+    )
+    return text.split("<br>")
+
+
+def test_score_vs_time_holds_each_value_flat_to_the_next_run(load_runs) -> None:
+    """A step at each run, and the line ends at the newest run, on its value."""
+    runs = [
+        *_known_at_ten(datetime(2026, 10, 1, 10)),
+        _run(150.0, datetime(2026, 10, 5, 10)),
+        _run(160.0, datetime(2026, 10, 8, 10)),
+    ]
+    load_runs(*runs)
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="all")
+    faded, full = _line_traces(figure)
+
+    t10, t11, t12 = (run.datetime_object for run in runs[-3:])
+    v10, v11, v12 = _values(runs)[-3:]
+    assert faded is None
+    assert _held(full) == [
+        (t10, v10.median),
+        (t11, v10.median),
+        (t11, v11.median),
+        (t12, v11.median),
+        (t12, v12.median),
+    ]
+    # The middle 50% steps with it, along its top and back along its bottom.
+    (band,) = [trace for trace in figure.data if trace.name == MIDDLE_50_TRACE_NAME]
+    assert list(band.x) == [t10, t11, t11, t12, t12, t12, t12, t11, t11, t10]
+    assert list(band.y) == [
+        v10.p75,
+        v10.p75,
+        v11.p75,
+        v11.p75,
+        v12.p75,
+        v12.p25,
+        v11.p25,
+        v11.p25,
+        v10.p25,
+        v10.p25,
+    ]
+    # Nothing is drawn past the newest run.
+    assert max(x for trace in _typical_traces(figure) for x in trace.x if x) == t12
+
+
+def test_a_hold_fades_when_its_tenth_newest_run_turns_30_days_old(load_runs) -> None:
+    """Full strength up to that moment, faded after it, then the next value.
+
+    The tenth run's value is recent while its oldest run, its tenth newest,
+    ended in the last 30 days. The next run comes a month after that.
+    """
+    runs = [
+        *_known_at_ten(datetime(2026, 8, 1, 10)),
+        _run(150.0, datetime(2026, 10, 1, 10)),
+    ]
+    load_runs(*runs)
+
+    faded, full = _line_traces(_figure(SCORE_VS_TIME, day_range="all")[0])
+
+    values = _values(runs)
+    fade = typical_score_fade_time(values[9])
+    assert fade == datetime(2026, 8, 31, 10)
+    assert typical_score_recency(values[9], fade).recent
+    assert not typical_score_recency(values[9], fade + timedelta(seconds=1)).recent
+    tenth, eleventh = (run.datetime_object for run in runs[-2:])
+    assert _held(full) == [(tenth, 109.0), (fade, 109.0)]
+    # The faded part starts where the full strength ends and meets the next
+    # value where it begins.
+    assert _held(faded) == [
+        (fade, 109.0),
+        (eleventh, 109.0),
+        (eleventh, values[10].median),
+    ]
+
+
+def test_a_holds_hover_is_its_values_at_both_ends_and_its_faded_part_has_no_count(
+    load_runs,
+) -> None:
+    """The count changes along a hold whose runs age out, so it isn't given."""
+    load_runs(
+        *_known_at_ten(datetime(2026, 8, 1, 10)),
+        _run(150.0, datetime(2026, 10, 1, 10)),
+    )
+
+    faded, full = _line_traces(_figure(SCORE_VS_TIME, day_range="all")[0])
+
+    value = [
+        "<b>Typical score</b>: 109",
+        "<b>Runs</b>: 10 in 2 sessions · Aug 1 to Aug 2",
+    ]
+    bands = ["<b>Middle 50%</b>: 105 to 114", "<b>Middle 80%</b>: 102 to 116"]
+    for end in (0, 1):
+        assert _hover_at(full, end) == [
+            *value,
+            "<b>Recent</b>: 10 of 10 in the 30 days up to this run",
+            *bands,
+        ]
+        assert _hover_at(faded, end) == [
+            *value,
+            "<b>Recent</b>: too few · last run Aug 2",
+            *bands,
+        ]
+    # Where the faded part meets the next value, the point is that value's.
+    assert _hover_at(faded, 2)[:3] == [
+        "<b>Typical score</b>: 110",
+        "<b>Runs</b>: 11 in 3 sessions · Aug 1 to Oct 1",
+        "<b>Recent</b>: 1 of 11 in the 30 days up to this run",
+    ]
+    assert full.hoverlabel.font.size == faded.hoverlabel.font.size == 16
+
+
+@pytest.mark.parametrize(
+    ("after_the_fade", "fades"), [(timedelta(0), False), (timedelta(seconds=1), True)]
+)
+def test_a_hold_is_recent_at_its_fade_time_and_faded_a_second_later(
+    load_runs, after_the_fade, fades
+) -> None:
+    """The next run lands on the tenth run's fade time, or one second after it."""
+    fade = datetime(2026, 8, 31, 10)
+    runs = [
+        *_known_at_ten(datetime(2026, 8, 1, 10)),
+        _run(150.0, fade + after_the_fade),
+    ]
+    load_runs(*runs)
+
+    faded, full = _line_traces(_figure(SCORE_VS_TIME, day_range="all")[0])
+
+    eleventh = runs[-1].datetime_object
+    after = _values(runs)[-1].median
+    if not fades:
+        assert faded is None
+        assert _held(full) == [
+            (runs[9].datetime_object, 109.0),
+            (fade, 109.0),
+            (eleventh, after),
+        ]
+    else:
+        # A second of faded hold, and the eleventh value is recent again.
+        assert _held(faded) == [(fade, 109.0), (eleventh, 109.0), (eleventh, after)]
+        assert _held(full)[-1] == (eleventh, after)
+
+
+def test_a_value_not_recent_at_its_run_holds_faded_throughout(load_runs) -> None:
+    """A run every four days never has 10 in the last 30 days.
+
+    Each hold is faded from its run, so both its ends keep the count at its
+    run: none of them is a hold whose runs aged out after it.
+    """
+    runs = [
+        _run(100.0 + index, MIDNIGHT_TODAY - timedelta(days=4 * (19 - index)))
+        for index in range(20)
+    ]
+    load_runs(*runs)
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="all")
+    faded, full = _line_traces(figure)
+
+    times = [run.datetime_object for run in runs]
+    assert full is None
+    # Known from the tenth run, each value held to the next run's time.
+    assert list(faded.x) == [times[9], *[time for time in times[10:] for _ in "lr"]]
+    assert _hover_at(faded, 0) == _hover_at(faded, 1)
+    assert _hover_at(faded, 0)[2] == (
+        "<b>Recent</b>: 8 of 10 in the 30 days up to this run"
+    )
+    assert all(
+        _hover_at(faded, index)[2].endswith("in the 30 days up to this run")
+        for index in range(len(faded.x))
+    )
+    assert all(trace.showlegend for trace in _typical_traces(figure))
+
+
+def test_after_a_break_the_faded_part_meets_the_next_full_strength_value(
+    load_runs,
+) -> None:
+    """Run 20's hold fades over the break, 21 to 29 come back faded, 30 is full."""
+    runs = _return_after_a_break()
+    load_runs(*runs)
+
+    faded, full = _line_traces(_figure(SCORE_VS_TIME, day_range="all")[0])
+
+    gap = list(full.x).index(None)
+    fade = typical_score_fade_time(_values(runs)[19])
+    assert fade == datetime(2026, 8, 31, 10, 10)
+    assert _held(full)[gap - 1] == _held(faded)[0] == (fade, full.y[gap - 1])
+    assert _held(faded)[-1] == _held(full)[gap + 1]
+    assert _held(faded)[-1] == (runs[29].datetime_object, 160.5)
+    assert full.x[-1] == runs[-1].datetime_object
+
+
+def test_score_vs_time_values_at_the_ranges_left_edge_count_the_runs_it_hides(
+    load_runs,
+) -> None:
+    """Judged over the whole history first, as on Score vs Run."""
+    load_runs(*_daily_runs(120))
+
+    _faded, full = _line_traces(_figure(SCORE_VS_TIME, day_range="90")[0])
+
+    # The range starts at run 31's midnight; its last 20 runs score 12 to 31.
+    assert (full.x[0], full.y[0]) == (first_moment_of_day_range(90, TODAY), 21.5)
+
+
+def test_of_two_runs_in_one_second_the_later_played_ones_value_holds(
+    load_runs,
+) -> None:
+    """The first one's value holds for no time, so the step skips it.
+
+    The pair is drawn with its new PB last, the other way round from play
+    order, so pairing a value with a place on the chart would hold the
+    wrong one.
+    """
+    ended = datetime(2026, 10, 12, 12)
+    new_pb = replace(_run(200.0, ended, seconds=90), accuracy=0.25)
+    tie = replace(_run(200.0, ended, seconds=30), accuracy=0.75)
+    runs = [
+        *_known_at_ten(datetime(2026, 10, 10, 10)),
+        new_pb,
+        tie,
+        _run(150.0, ended + timedelta(hours=2)),
+    ]
+    load_runs(*runs)
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="all")
+    _faded, full = _line_traces(figure)
+
+    assert [data[1] for data in _points(figure).customdata[10:12]] == [75.0, 25.0]
+    v10, v11, v12, v13 = (value.median for value in _values(runs)[-4:])
+    assert v11 not in {v10, v12}
+    assert _held(full) == [
+        (runs[9].datetime_object, v10),
+        (ended, v10),
+        (ended, v12),
+        (runs[-1].datetime_object, v12),
+        (runs[-1].datetime_object, v13),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("runs", "day_range", "opacity"),
+    [
+        # Ten runs from two sessions: only the tenth, the newest, is known.
+        (_known_at_ten(datetime(2026, 10, 11, 10)), "all", 1),
+        # A range that holds one run, whose value counts runs before it.
+        (
+            [
+                *_known_at_ten(datetime(2026, 8, 1, 10)),
+                _run(150.0, datetime(2026, 10, 12, 10)),
+            ],
+            "7",
+            0.35,
+        ),
+    ],
+)
+def test_score_vs_times_only_value_is_marked_at_its_run(
+    load_runs, runs, day_range, opacity
+) -> None:
+    """It holds for no time, so the line is a level stroke and each band a bar."""
+    load_runs(*runs)
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range=day_range)
+    typical = _typical_traces(figure)
+
+    value = _values(runs)[-1]
+    when = runs[-1].datetime_object
+    assert [trace.name for trace in typical] == [
+        MIDDLE_80_TRACE_NAME,
+        MIDDLE_50_TRACE_NAME,
+        TYPICAL_SCORE_TRACE_NAME,
+    ]
+    stroke = typical[-1]
+    assert (stroke.mode, stroke.marker.symbol, stroke.marker.size) == (
+        "markers",
+        "line-ew",
+        14,
+    )
+    assert (list(stroke.x), list(stroke.y)) == ([when], [value.median])
+    assert len(stroke.customdata) == 1
+    for bar, (bottom, top) in zip(
+        typical[:2], [(value.p10, value.p90), (value.p25, value.p75)], strict=True
+    ):
+        assert (bar.fill, bar.line.width, bar.line.color) == ("none", 14, bar.fillcolor)
+        assert (list(bar.x), list(bar.y)) == ([when, when], [top, bottom])
+    assert {(trace.opacity, trace.showlegend) for trace in typical} == {(opacity, True)}
+
+
+def test_score_vs_time_draws_the_traces_as_score_vs_run_does(load_runs) -> None:
+    """Under the runs, in the same order, legend groups and entries."""
+    load_runs(*_return_after_a_break())
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="all")
+    typical = _typical_traces(figure)
+
+    assert figure.data[0].name == RUN_DATA_POINT_TRACE_NAME
+    assert [(trace.name, trace.opacity, trace.showlegend) for trace in typical] == [
+        (MIDDLE_80_TRACE_NAME, 0.35, False),
+        (MIDDLE_50_TRACE_NAME, 0.35, False),
+        (MIDDLE_80_TRACE_NAME, 1, True),
+        (MIDDLE_50_TRACE_NAME, 1, True),
+        (TYPICAL_SCORE_TRACE_NAME, 0.35, False),
+        (TYPICAL_SCORE_TRACE_NAME, 1, True),
+    ]
+    assert {trace.zorder for trace in typical} == {-1}
+    assert all(trace.legendgroup == trace.name for trace in typical)
+    assert {trace.hoverinfo for trace in typical if trace.fill == "toself"} == {"skip"}
+
+
+@pytest.mark.parametrize(
+    ("switches", "drawn", "band_lines"),
+    [
+        ((True, False, False), {TYPICAL_SCORE_TRACE_NAME}, 0),
+        ((True, True, False), {TYPICAL_SCORE_TRACE_NAME, MIDDLE_50_TRACE_NAME}, 1),
+        ((False, False, True), {MIDDLE_80_TRACE_NAME}, None),
+        ((False, False, False), set(), None),
+    ],
+)
+def test_score_vs_time_draws_each_metric_only_while_its_switch_is_on(
+    load_runs, switches, drawn, band_lines
+) -> None:
+    """A band's line in the hover shows only with its band."""
+    load_runs(*_return_after_a_break())
+    typical_score, middle_50, middle_80 = switches
+
+    figure, _supports_overlays = _figure(
+        SCORE_VS_TIME,
+        day_range="all",
+        typical_score=typical_score,
+        middle_50=middle_50,
+        middle_80=middle_80,
+    )
+
+    names = [trace.name for trace in _typical_traces(figure)]
+    assert set(names) == drawn
+    assert all(names.count(name) == 2 for name in drawn)
+    if band_lines is not None:
+        _faded, full = _line_traces(figure)
+        assert len(_hover_at(full, 0)) == 3 + band_lines
+
+
+def _fitted_scores(
+    figure, start: datetime, end: datetime, *, crossings: bool = True
+) -> tuple[float, float] | None:
+    """Return the scores the zoom fit counts in an x window, before its padding.
+
+    Mirrors ``assets/homeGraphZoomFit.js``: every trace's points inside the
+    window and, unless ``crossings`` is off, the part inside it of each
+    segment of a trace drawn as lines. The live check runs the asset itself.
+    """
+    low, high = start.timestamp(), end.timestamp()
+    scores: list[float] = []
+    for trace in figure.data:
+        xs = [x.timestamp() if x else None for x in trace.x]
+        ys = list(trace.y)
+        scores += [
+            y for x, y in zip(xs, ys, strict=True) if x is not None and low <= x <= high
+        ]
+        if not crossings or "lines" not in (trace.mode or ""):
+            continue
+        for (x0, y0), (x1, y1) in pairwise(zip(xs, ys, strict=True)):
+            if x0 is None or x1 is None or x0 == x1:
+                continue
+            left, right = max(min(x0, x1), low), min(max(x0, x1), high)
+            if left <= right:
+                scores += [y0 + (y1 - y0) * (x - x0) / (x1 - x0) for x in (left, right)]
+    return (min(scores), max(scores)) if scores else None
+
+
+def test_a_zoom_inside_a_hold_keeps_its_line_and_bands_in_view(load_runs) -> None:
+    """A window in the break holds no run and no point, only run 20's held value."""
+    runs = _return_after_a_break()
+    load_runs(*runs)
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="all")
+    window = (datetime(2026, 9, 10), datetime(2026, 9, 20))
+
+    value = _values(runs)[19]
+    assert _fitted_scores(figure, *window, crossings=False) is None
+    assert _fitted_scores(figure, *window) == (value.p10, value.p90)

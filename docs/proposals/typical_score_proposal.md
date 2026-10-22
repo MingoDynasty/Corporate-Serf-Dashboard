@@ -1092,6 +1092,12 @@ Overlays
   moment fewer than 10 of its runs are recent, when its 10th-newest run turns
   30 days old; a value that wasn't recent at its run holds faded throughout.
   The faded part ends where the next run's value begins, so the two meet.
+- **A value that holds for no time,** added 2026-10-21 in PR 2c, which this
+  design didn't foresee. Between two runs that ended in the same second, the
+  earlier one's value has no point, and the step goes to the later one's.
+  When the plotted range holds only one value to draw, as on the run that
+  first makes it known or in a range that holds one run, it is marked at its
+  run: the line by a level stroke and each band by a bar.
 - **Why the line ends at the newest run, and not now,** as TS3 ruled and v8
   does not: held to now, the time axis stretches to today. A scenario last
   played in 2020 would then draw its runs at the left edge of six empty years
@@ -1148,9 +1154,10 @@ order along a sensitivity axis. The three switches change nothing there.
 fits every visible trace, so a refit keeps the band inside the view instead of
 clipping it, and a hidden band leaves the fit as today. The script's
 comment, which names only the runs, the stars and the ring, is updated, and
-so is the spec's sentence. One case is left: on Score vs Time a flat hold that
-spans the whole zoomed window has no point inside it, so it doesn't widen the
-fit; the line is a median of runs and almost always sits among them.
+so is the spec's sentence. One case was left: on Score vs Time a flat hold
+that spans the whole zoomed window has no point inside it, so it doesn't widen
+the fit. **Corrected 2026-10-21, PR 2c:** the fit also counts the part of each
+line and band segment that crosses the window, so such a hold stays in view.
 
 #### The switches
 
