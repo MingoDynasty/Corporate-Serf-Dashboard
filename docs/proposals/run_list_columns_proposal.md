@@ -18,27 +18,32 @@ following the list, so a wider list never wraps the top row.
 
 ## Decisions needed
 
-Three rows, RC1 to RC3. **Nothing in this proposal is ratified.** Each row is
-the maintainer's call from the design discussion of 2026-10-21, which began
-with another player's request and went through five mockup versions built on
-the maintainer's own runs, two of them shared with that player (the
-requester, below). Each row quotes what was said, all on 2026-10-21. A lean
-is not a ruling. Where the discussing session presented a point and met no
-objection, rather than an explicit yes, the row says "presented, not
-answered". Reviewers are invited to challenge any row, and any author-owned
-choice in [Design](#design).
+Three rulings: RC1 to RC3. The maintainer ratified this proposal on
+2026-10-22: "I ratify the run list columns proposal, rows RC1 to RC3, as
+amended at 20f6619." That settles each row as its recommendation, RC1 as
+amended in review. Before that, each row was the maintainer's call from the
+design discussion of 2026-10-21, which began with another player's request
+and went through five mockup versions built on the maintainer's own runs, two
+of them shared with that player (the requester, below). Each keeps what was
+said, all on 2026-10-21, its argument, and what the alternatives would have
+changed, for the record. Where the discussing session had presented a point
+and met no objection, rather than an explicit yes, the row still says
+"presented, not answered": the ratification settled those too. Everything
+else is author-owned, in [Design](#design), and the ratification covers it
+too.
 
-One row reverses part of a ratified decision: RC3 asks the maintainer to
-supersede the part of T1 of the top row cards proposal that makes the
-latest-run card take the run list's width. The rest of T1 stands.
+One row reverses part of a ratified decision: RC3 supersedes the part of T1
+of the top row cards proposal that makes the latest-run card take the run
+list's width. The rest of T1 stands.
 
 ### RC1. Three optional columns, all off to start: FOV with its scale, Reloads, and Avg FPS
 
-Status: amended — awaiting reviewer confirmation. As first written, the row
-also ruled that no other stats-file field would ever reach the list. The
-first review wave asked for that to be this proposal's scope instead, with a
-criterion a later column has to meet, and the recommendation below now says
-so. The three columns, their defaults and their order are unchanged.
+Status: Ratified (user), 2026-10-22: accept the recommendation below, as
+amended. As first written, the row also said that no other stats-file field
+would ever reach the list. The first review wave asked for that to be this
+proposal's scope instead, with a criterion a later column has to meet, and
+the recommendation below says so. The three columns, their defaults and
+their order are unchanged.
 
 **The maintainer's calls.** "Avg FPS in the menu, disabled by default."
 "Reloads in the menu, disabled by default." Of FOV, asking for the third
@@ -98,7 +103,7 @@ FOV's would first have to reverse a product rule.
 
 ### RC2. The list grows to fit the columns it shows
 
-Status: proposed.
+Status: Ratified (user), 2026-10-22: accept the recommendation below.
 
 **The maintainer's call.** Of the four list widths in the first mockup, they
 chose the one that fits its columns ("option 1") over a full-width mode:
@@ -135,7 +140,9 @@ leaving it, for a case no common column set reaches at 2560.
 
 ### RC3. The latest-run card keeps a 500px width of its own
 
-Status: proposed. The width itself was presented, not answered.
+Status: Ratified (user), 2026-10-22: accept the recommendation below, the
+fixed 500px included. Before that, the width itself was presented, not
+answered.
 
 **The maintainer's call.** "my initial thought is to remove Latest Run
 card's width's dependency, and allow it to size on its own based on the Top
@@ -734,8 +741,8 @@ not marked, because nothing in them stops holding.
 
 ## Delivery plan
 
-One implementation PR, after this proposal is ratified and merged. The list
-can't grow without RC3, or the top row wraps at 1920, and the three columns
+One implementation PR, unblocked: the proposal was ratified on 2026-10-22,
+and the PR starts once this proposal merges. The list can't grow without RC3, or the top row wraps at 1920, and the three columns
 are what make it grow, so the parts can't usefully ship apart. The parser
 alone could, with nothing on screen, but it would cost a review round for no
 change a player sees.
@@ -755,9 +762,10 @@ product.md's inventory, and the deletion of this file.
 - **Review:** the Codex seat at xhigh, with the connector. The maintainer
   tries it in their own Firefox at 2560 and 1920, from the PR's instance,
   before marking it ready.
-- **Depends on:** this proposal's ratification. PR #401, which touched the
-  same spec section and stylesheet, has merged, so the implementation starts
-  from a main that has it and measures the top row again there.
+- **Depends on:** this proposal merging; it is ratified. PR #401, which
+  touched the same spec section and stylesheet, has merged, so the
+  implementation starts from a main that has it and measures the top row
+  again there.
 - **The NVDA walk** runs on the built list with all three columns on, on the
   maintainer's word (see [Testing](#testing)).
 
