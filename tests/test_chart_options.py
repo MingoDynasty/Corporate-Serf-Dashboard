@@ -359,15 +359,21 @@ def test_the_page_registers_the_block_for_its_own_ids():
 
 def test_a_second_page_builds_a_panel_that_shares_no_id_with_the_first(monkeypatch):
     first_page_ids = set(_layout_components(monkeypatch)) - {None}
+    first_page_ids.add(IDS.point_size_label)
 
+    # Mantine renders ``labelProps`` ids without a separate Dash component.
     built = {
-        component.id
+        component_id
         for tree in (
             chart_options.chart_options_toggle(SECOND_PAGE_IDS),
             chart_options.chart_options_panel(SECOND_PAGE_IDS),
         )
         for component in _walk_components(tree)
-        if getattr(component, "id", None) is not None
+        for component_id in (
+            getattr(component, "id", None),
+            getattr(component, "labelProps", {}).get("id"),
+        )
+        if component_id is not None
     }
 
     # Every id in the tree came from the ids passed in, apart from the graph

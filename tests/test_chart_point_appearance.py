@@ -234,10 +234,15 @@ def test_point_size_is_named_by_its_own_visible_label(components):
     # SegmentedControl has no Mantine label slot, so the visible text becomes
     # the control's accessible name by reference rather than by proximity.
     size = components[IDS.point_size].to_plotly_json()["props"]
-    label = components[IDS.point_size_label]
+    wrapper = next(
+        component
+        for component in _walk_components(components[IDS.panel])
+        if isinstance(component, dmc.InputWrapper)
+    )
 
-    assert label.children == "Point size"
-    assert size["aria-labelledby"] == IDS.point_size_label
+    assert wrapper.label == "Point size"
+    assert wrapper.labelElement == "div"
+    assert wrapper.labelProps["id"] == size["aria-labelledby"] == IDS.point_size_label
 
 
 def test_default_size_and_empty_color_leave_the_cached_figure_untouched(

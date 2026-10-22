@@ -78,10 +78,15 @@ def _by_class(page, class_name):
 
 
 def _ids(page) -> set[str]:
+    # Mantine renders ``labelProps`` ids without a separate Dash component.
     return {
-        component.id
+        component_id
         for component in _walk_components(page)
-        if isinstance(getattr(component, "id", None), str)
+        for component_id in (
+            getattr(component, "id", None),
+            getattr(component, "labelProps", {}).get("id"),
+        )
+        if isinstance(component_id, str)
     }
 
 
