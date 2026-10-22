@@ -5,7 +5,8 @@ Status: Accepted
 A browser's own text search, Ctrl+F, could not find a row of either playlist
 table unless that row was on screen or just off it. Both tables now draw
 every row, so the search finds any of them and the browser scrolls the table
-to the match. Each table still scrolls inside itself with its header in view.
+to the match. Each table still scrolls inside itself with its header in view. Search
+matches and text selections follow the displayed row order after sorting.
 
 **Go-ahead.** The maintainer agreed to it in chat on 2026-10-12, with no
 proposal, after the investigating session and a second-opinion consult had
@@ -85,6 +86,28 @@ option fixes it, measured as 0, 1, 3, 13, 27. It is left for a change of its
 own, because in one Firefox run the two builds that set it opened a table
 with Next Rank at its minimum width, clipping the text, and a second run did
 not repeat that.
+
+**Follow-up, 2026-10-22.** The ordering limit is superseded: both grids now
+set `ensureDomOrder`. On unchanged `120fc17`, five fresh browser contexts
+for each of the overview, a 60-row table, and a grouped 39-row table
+reproduced the wrong search order in Chromium 156 and Firefox 157. The
+initial-layout controls passed. Chromium also reproduced the wrong
+four-row drag selections in all 15 cases. With the option set, all 15
+search and drag cases passed in Chromium, and all 15 search cases passed
+in Firefox. Sorts used header clicks, drags used mouse input, and search
+used `window.find`; the browser toolbar was not driven. Firefox's initial
+mouse-drag control selected only two of four rows, so its cross-row drag
+behavior remains unverified.
+
+The Firefox sizing concern did not recur on either build in repeated
+checks at viewport widths 1024, 1366, and 1920, including a persisted hidden
+Next Rank column, showing it again, reloading, and sorting. Synthetic
+one-point runs made the next-rank text wide enough to require more than the
+column's 150px minimum. Chromium clipped some of that text on both builds
+until the column was hidden and shown again; this is a separate existing
+autosize issue, not evidence against `ensureDomOrder`. No sizing workaround
+is added here. The original Firefox observation remains part of the
+history, with its cause unknown.
 
 **Rejected.**
 
