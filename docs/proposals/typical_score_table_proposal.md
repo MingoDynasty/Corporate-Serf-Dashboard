@@ -17,7 +17,7 @@ History's Scenario Stats card.
 
 ## Decisions needed
 
-Five rows: TB1 to TB5. **Nothing is ratified.** Each row is the maintainer's
+Four rows: TB1 to TB4. **Nothing is ratified.** Each row is the maintainer's
 lean from the design discussion of 2026-10-21 and 2026-10-22, worked out on
 three versions of a live prototype built from their own stats, with two
 rounds of advice from `claude-fable-5-1`. A lean is not a ruling: every row,
@@ -117,8 +117,9 @@ The material consequence: a typical score with few recent runs behind it
 still gets a Typical Rank and sorts among the others.
 
 **Recommendation: a known typical score gets its Typical Rank whether or not
-it is recent, and sorts with the known values. A value that is not recent is
-greyed in both typical cells (TB4). A typical score below the minimum reads
+it is recent, and sorts with the known values. A known value that is not
+recent is greyed in both typical cells (TB4). A typical score below the
+minimum is never greyed: unknown is not the same as old. It reads
 `Too few runs`, and its row sorts after every known value in both
 directions.**
 
@@ -148,9 +149,9 @@ enough to see a difference."
 The material consequence: greyed values sit below the 4.5:1 contrast WCAG AA
 asks of text this size.
 
-**Recommendation: grey a value that is not recent in Mantine's dimmed color,
-the one Scenario Stats dims its lead with, in both typical cells. Accept its
-contrast and record it.**
+**Recommendation: grey a known typical score that is not recent in
+Mantine's dimmed color, the one Scenario Stats dims its lead with, in both
+typical cells. Accept its contrast and record it.**
 
 - **Measured from the rendered table:** 3.32:1 light and 4.04:1 dark on the
   plain row, 3.15:1 and 3.53:1 on the alternating one. Normal text is 21:1
@@ -165,28 +166,6 @@ contrast and record it.**
 - **The grey is not the only signal.** The Typical Score hover's Recent line
   states the count in words. Whether that hover can open from the keyboard is
   [not checked](#not-checked).
-
-### TB5. This takes over the roadmap's weakness item and amends nothing
-
-Status: Proposed. On 2026-10-21 the maintainer asked what an earlier version
-of this row asked of them; it records, for ratification, what TB1 and TB2
-imply.
-
-The material consequence: the roadmap's "Weakness by the typical run" entry
-leaves the Future list when this ships.
-
-**Recommendation: ratifying this proposal settles that entry, which asked
-for columns that "rank weakness by the typical run" with "the judgment and
-its evidence bar" in a proposal of their own. TB2 is the ranking and TB3 its
-evidence bar.**
-
-- **The entry leaves [the roadmap's Future list](../roadmap.md#future-briefly)
-  when this ships.** The rank-up chance entry stays: how likely one run is to
-  clear the next rank is a different question.
-- **No decision is amended.** The 2026-10-04 principles keep Rank, Next
-  Rank, Position and Percentile on the PB, and they stay there. The
-  2026-09-27 rank columns keep the local all-time high. The typical score's
-  rounding is unchanged ([Accepted costs](#accepted-costs)).
 
 ## Problem
 
@@ -298,8 +277,9 @@ time.
 - **Typical Rank:** `{rank} · {percent}%`; the rank name alone at the top
   rank; `No rank` below the first rank; `N/A` with Too few runs, with no
   runs, or for a benchmark scenario without a ladder.
-- **Greyed:** both typical cells of a row whose value is not recent, as of
-  the page opening (TB3, TB4).
+- **Greyed:** both typical cells of a row whose typical score is known and
+  not recent, as of the page opening (TB3, TB4). Too few runs and `N/A` are
+  never greyed.
 
 ### Rank position
 
@@ -427,8 +407,21 @@ which is never read as weak.
 
 ### Decisions this changes
 
-None ([TB5](#tb5-this-takes-over-the-roadmaps-weakness-item-and-amends-nothing)).
-The shipping PR records TB1 to TB4 as new decision-log entries.
+None. The 2026-10-04 principles keep Rank, Next Rank, Position and
+Percentile on the PB, and they stay there. The 2026-09-27 rank columns keep
+the local all-time high. The typical score's rounding is unchanged
+([Accepted costs](#accepted-costs)). The shipping PR records TB1 to TB4 as
+new decision-log entries.
+
+### The roadmap
+
+This proposal is the one the roadmap's "Weakness by the typical run" entry
+asked for: columns that "rank weakness by the typical run", with "the
+judgment and its evidence bar" in a proposal of their own. TB2 is the
+ranking and TB3 its evidence bar, so the entry leaves
+[the roadmap's Future list](../roadmap.md#future-briefly) when this ships,
+as a step of the shipping checklist. The rank-up chance entry stays: how
+likely one run is to clear the next rank is a different question.
 
 ### Alternatives rejected
 
