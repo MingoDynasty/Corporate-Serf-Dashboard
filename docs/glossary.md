@@ -397,8 +397,9 @@ when recent and faded when not. The rules are in
 ### Recent
 
 The state of a typical score at least 10 of whose runs are from the 30 days
-up to a moment, from any number of sessions. A recent value can still hold
-runs older than 30 days, up to half of them.
+up to a moment, from any number of sessions. Scenario Stats judges it as of
+now, and the chart at each point. A recent value can still hold runs older
+than 30 days, up to half of them.
 
 - On the chart: a full-strength stretch; not recent, a faded one.
 - On Scenario Stats: an undimmed lead number; not recent, a dimmed one.

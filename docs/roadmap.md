@@ -28,6 +28,13 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Typical score** — Scenario Stats leads with the median of the scenario's
+  last 20 runs, and Score vs Run and Score vs Time chart it inside two bands
+  showing the scores' spread. A minimum guards the first value, and older
+  support dims the card and fades the chart, with recent-run counts shown.
+  The three chart metrics have independent remembered switches, all on at
+  first. (PRs #398, #400, #402 and #401; design in #382) Design rationale
+  distilled into [`decision_log/`](./decision_log/README.md).
 - **Scenario notes** — Run History's top row now holds the player's own
   note on the selected scenario, such as a reminder about technique, read
   with no click between runs and edited in place with Save and Cancel. A
@@ -70,15 +77,6 @@ sequence.
   #373, #376, #378; design in #356 and #375; run toasts design in #354;
   sessions in #359, design in #355) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
-- **Categories and subcategories on benchmarks** — a benchmark's scenario
-  table now draws the groups its author sorted the scenarios into: two narrow
-  columns of merged, colored cells ahead of the scenario names, each labeled
-  with its category or subcategory the way the benchmark's own sheet and Evxl
-  do. A sorted or filtered table can't keep a group's rows together, so there
-  each row names its group under its scenario instead, and the filter box
-  matches group names either way. The grouping already shipped with the app,
-  so nothing new is fetched. (PR #352; design in #338) Design rationale
-  distilled into [`decision_log/`](./decision_log/README.md).
 
 ---
 
@@ -86,28 +84,8 @@ sequence.
 
 What we plan to do now or very soon, each with the reasons it comes next.
 
-- One proposal is in review: Typical score in Scenario Stats (#382). It
-  adds its milestone here when it merges. Current behavior is in
-  [`specs/run_history.md`](./specs/run_history.md).
-
-- **Typical score** — what a player's recent runs on a scenario usually
-  score, defined once for every later judgment of skill. Its
-  [proposal](./proposals/typical_score_proposal.md), in review, recommends
-  the median of a scenario's last 20 runs at any age, known once those runs
-  number 10 from two sessions or fill all 20, and drawn at full strength only
-  where enough of them are from the last 30 days. Run History's chart would
-  draw it after every run, as a gray line inside bands for the middle half
-  and the middle 80% of the runs, and Scenario Stats would lead with it.
-  Five implementation PRs build it: the definition, the chart in three (its
-  legend, then each mode), and the Scenario Stats lead. Showing it in the top
-  row's PB card, beside the PB, is
-  a later change that neither proposal makes.
-
-  Why it's next:
-  - The guiding principles judge skill by the typical run, and no page shows
-    it: the chart draws no line for it, and nothing names it.
-  - Three Future entries wait on its definition: the score trend verdict,
-    weakness by the typical run, and the rank-up chance.
+No further milestone is scheduled. The Future list holds candidates for the
+maintainer to prioritize next.
 
 ---
 
@@ -134,9 +112,8 @@ next.
   per scenario, answering "is my current training working?" It's built on
   session medians, the middle of a scenario's runs in each session, and shown
   with a chart of the typical run over time. A scenario without enough
-  sessions gets no verdict rather than a guess. That chart, and the
-  definition of the typical run, are in the
-  [typical score proposal](./proposals/typical_score_proposal.md).
+  sessions gets no verdict rather than a guess. That chart and the
+  [typical score definition](./specs/typical_score.md) are shipped prerequisites.
 - **Difficulty measured against the player's own runs** — the shipped
   next-rank gap counts every percent as equal. Two scenarios can both need
   +5%, but if one's runs vary by 8% and the other's by 2%, only the first is
@@ -145,8 +122,8 @@ next.
   and by recent form rather than the all-time personal best, and so rank
   "closest" by what the player can actually reach. The app holds every local
   run, which external tools don't, so this could beat them rather than match
-  them. The recent spread it reads is proposed in the
-  [typical score proposal](./proposals/typical_score_proposal.md).
+  them. The spread it would read now ships with the
+  [typical score](./specs/typical_score.md).
 - **Scenarios page** — scenario-first navigation for scenarios that live in
   several playlists or in none, parked from the playlist-overview design. The
   overview → scenario table → Run History drill chain covers
@@ -155,8 +132,9 @@ next.
 - **Weakness by the typical run** — columns on the playlist scenario table
   that rank weakness by the typical run instead of the personal best. A
   re-check on 2026-10-14 still found the typical run ordering weaknesses
-  better, on thin evidence. They wait on its definition, in the
-  [typical score proposal](./proposals/typical_score_proposal.md).
+  better, on thin evidence. The
+  [typical score definition](./specs/typical_score.md) is now available; the
+  judgment and its evidence bar still need their own proposal.
 - **An overview** — time spent and activity across all scenarios. No design
   yet. Home, the page the app opens on, holds its place.
 - **KovaaK's own log** — the game's log records what stats files usually

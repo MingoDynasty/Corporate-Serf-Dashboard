@@ -2,13 +2,11 @@
 
 Status: Accepted
 
-The chart on Run History plots every run in its range, where the old chart
-kept only the top few scores of each day or each sensitivity. A list of every
-run beside a chart of the best few would have contradicted each other. The
-two controls that trimmed the chart are gone with its Average score line, and
-the chart opens on a new mode that spaces runs evenly in the order they were
-played. Score vs Sensitivity now shows every run at each sensitivity with
-nothing that sums one up, until that mode is redesigned.
+Run History plots every run in its range rather than keeping only the best few.
+Its ordered modes now also show a shared summary of typical performance.
+The sensitivity view still has no summary until its redesign.
+
+**Superseded in part (2026-10-21).** The clauses saying no mode draws a summary line, and that such a line would invent a second definition, are superseded by the [shared definition](2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md) and [per-run summary](2026-10-18-the-typical-score-is-drawn-after-each-run.md). Score vs Run and Score vs Time draw that summary and both bands; Score vs Sensitivity still draws none. Every-run plotting, stars, the ring and the existing legend position stand.
 
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):

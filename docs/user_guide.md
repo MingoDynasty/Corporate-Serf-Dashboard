@@ -113,6 +113,38 @@ as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
 off, a run on another scenario doesn't reach the card: the run's toast links
 to it, and the run list's **All scenarios** view lists it.
 
+### Typical score
+
+Scenario Stats leads with your typical score: the median of this scenario's
+last 20 runs, or all of its runs if you have fewer, regardless of age. It
+needs at least 10 runs across 2 or more sessions, or 20 in one session.
+Before that it reads "Too few runs"; with no local runs, "No runs yet".
+**Total runs** counts the whole scenario history, not only the runs behind
+the typical score. Hover or focus the number to see its supporting runs,
+sessions, dates and both bands; the help icon explains the figure.
+
+A dimmed number means fewer than 10 supporting runs are from the last
+30 days, so it may be out of date. Whenever any supporting runs are older,
+the first line says how many are recent, including over an undimmed value.
+Every sensitivity, scenario version and warm-up run counts. A version that
+changes the scoring scale can therefore mix older and newer scales until
+its runs leave the last 20.
+
+The chart draws the same figure on **Score vs Run** and **Score vs Time**.
+The darker band holds the middle 50% of the supporting scores and the lighter
+band the middle 80%; narrower bands mean more consistent scores. In
+**Chart options**, the **Typical score**, **Middle 50%** and **Middle 80%**
+switches start on, remember their choices independently, and change only
+the chart. **Score vs Sensitivity** shows none of these metrics.
+
+On **Score vs Run**, each point shows how recent its value was at that run.
+On **Score vs Time**, a value holds until the next run and fades when its
+support ages out. The line ends at the newest run, while the card checks
+recency as of now, so a dimmed card can sit beside a full-strength last point.
+The card updates at least every 30 seconds. A lone known value is still
+marked on either chart. The run list's **Median and best** describes just
+one row's runs and has no typical-score minimum.
+
 ### Scenario notes
 
 Each scenario can hold one note of your own, such as a reminder about
