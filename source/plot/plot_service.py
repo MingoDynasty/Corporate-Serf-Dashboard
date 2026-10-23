@@ -321,6 +321,9 @@ def _new_high_scores_last(
 def _new_pb_trace(
     x_values: Sequence[float | str | date],
     scores: Sequence[float],
+    *,
+    ids: Sequence[str],
+    customdata: Sequence[Sequence[float | str]],
 ) -> go.Scatter:
     """Build the trace of stars drawn over the runs that set a new PB."""
     return go.Scatter(
@@ -328,10 +331,13 @@ def _new_pb_trace(
         y=list(scores),
         mode="markers",
         name=NEW_PB_TRACE_NAME,
-        # The run point under each star already answers a hover with that
-        # run's time, sensitivity, and accuracy. A label from this trace
-        # would compete for the same point with less to say.
-        hoverinfo="skip",
+        ids=list(ids),
+        meta="run-history-run",
+        # Stars remain identifiable with the run-points trace hidden.
+        # Reuse each run's tooltip so overlap still names that run.
+        customdata=list(customdata),
+        hovertemplate=_RUN_POINT_HOVER,
+        hoverlabel={"font_size": 16},
         marker={
             "symbol": "star",
             "size": NEW_PB_SIZE_DEFAULT_PX,
@@ -918,7 +924,7 @@ def _generate_run_history_plot(  # noqa: PLR0913
     in a trace of its own that comes last so the ring is drawn over a star.
     """
     scores = [run.score for run in runs]
-    hover_data = {
+    hover_data: dict[RunData, list[float | str]] = {
         run: [
             format_absolute_timestamp(run.datetime_object, include_seconds=True),
             round(100 * run.accuracy, 2),
@@ -954,15 +960,8 @@ def _generate_run_history_plot(  # noqa: PLR0913
             _new_pb_trace(
                 [x_value for x_value, _run in starred],
                 [run.score for _x_value, run in starred],
-            ).update(
                 ids=[run_id(run) for _x_value, run in starred],
-                meta="run-history-run",
-                # Stars remain identifiable with the run-points trace hidden.
-                # Reuse each run's tooltip so overlap still names that run.
                 customdata=[hover_data[run] for _x_value, run in starred],
-                hoverinfo=None,
-                hovertemplate=_RUN_POINT_HOVER,
-                hoverlabel={"font_size": 16},
             )
         )
     ringed_at = next(

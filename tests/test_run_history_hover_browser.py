@@ -133,6 +133,27 @@ def wait_for_history(page):
             && Math.abs(graph._fullLayout.width - graph.getBoundingClientRect().width) < 2;
     }""")
 
+    wait_for_chart_quiet(page)
+
+
+def wait_for_chart_quiet(page):
+    # Settling redraws clear hover by contract, so the first markers are not
+    # enough to start a pointer assertion. Restart the quiet interval on each draw.
+    page.evaluate("""() => {
+        const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+        if (!graph.__hoverTestQuietListener) {
+            graph.__hoverTestQuietListener = true;
+            graph.on('plotly_afterplot', () => {
+                graph.__hoverTestLastPlot = performance.now();
+            });
+        }
+        graph.__hoverTestLastPlot = performance.now();
+    }""")
+    page.wait_for_function("""() => {
+        const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+        return graph && performance.now() - graph.__hoverTestLastPlot >= 500;
+    }""")
+
 
 def run_rows(page):
     return page.evaluate("""() => {
@@ -205,6 +226,7 @@ def test_chart_hover_links_the_exact_visible_run_without_requests_or_movement(
         "title => document.querySelector('#run-history-graph .js-plotly-plot')._fullLayout.xaxis.title.text === title",
         arg=title,
     )
+    wait_for_chart_quiet(page)
     row = next(row for row in run_rows(page) if row["displayed"])
     before = list_snapshot(page)
     requests = []
@@ -288,6 +310,7 @@ def test_star_hover_still_links_when_ordinary_dots_are_hidden(hover_page):
         const gd = document.querySelector('#run-history-graph .js-plotly-plot');
         return Plotly.restyle(gd, {visible: 'legendonly'}, [0]);
     }""")
+    wait_for_chart_quiet(page)
     hover_point(page, row, star=True)
     playwright.expect(page.locator(".ag-row.run-list-row-linked")).to_have_count(1)
     assert linked_rows(page) == [row["id"]]
@@ -345,6 +368,7 @@ def test_plot_redraw_and_page_remount_clear_old_highlights(hover_page, hover_ser
     playwright.expect(page.locator(".run-list-row-linked")).to_have_count(1)
     page.evaluate("""() => Plotly.restyle(document.querySelector(
         '#run-history-graph .js-plotly-plot'), {'marker.size': 10}, [0])""")
+    wait_for_chart_quiet(page)
     playwright.expect(page.locator(".run-list-row-linked")).to_have_count(0)
     page.mouse.move(0, 0)
     page.goto(hover_server + "/")

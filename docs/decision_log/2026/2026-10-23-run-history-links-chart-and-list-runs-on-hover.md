@@ -38,6 +38,8 @@ sessions, and click actions remain out of scope.
 - The interaction runs in the browser with no hover callback to the server.
   Only SVG run markers are styled, with their IDs re-indexed after a plot.
   Plotly's SVG calcdata binding is covered by real-browser tests against the
-  locked renderer; a renderer change needs those tests again.
+  locked renderer. The [dependency refresh playbook](../../dependency_refresh.md#packages-that-ship-browser-code)
+  requires them for plotly and dash-ag-grid bumps; skipped tests do not count
+  as a pass.
 
 Current behavior is specified in [Run History](../../specs/run_history.md).

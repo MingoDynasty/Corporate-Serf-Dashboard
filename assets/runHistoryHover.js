@@ -63,7 +63,7 @@
         row.getAttribute("row-id") !== params.data.id) {
       return;
     }
-    if (!params.data || params.data.kind !== "run") {
+    if (params.data.kind !== "run") {
       clear();
       return;
     }

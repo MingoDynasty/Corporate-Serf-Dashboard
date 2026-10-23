@@ -206,6 +206,26 @@ compare the two. Run this in the browser console on a page with a chart drawn:
 JSON.stringify(document.querySelector(".js-plotly-plot")._context)
 ```
 
+For plotly or dash-ag-grid bumps, run the linked-hover browser regressions.
+They exercise Plotly's SVG marker bindings and AG Grid's mouse events, which
+the standard gates skip. The screenshots dependency group installs
+Playwright; this command uses an installed Microsoft Edge browser:
+
+```powershell
+$env:CSD_HOVER_BROWSER = 'msedge'
+uv run --group screenshots pytest tests/test_run_history_hover_browser.py
+Remove-Item Env:CSD_HOVER_BROWSER
+```
+
+All 12 tests must pass. A run that skips the module or its tests does not
+count as a pass. If Edge is unavailable, install Playwright's Chromium and
+run with no browser channel set:
+
+```powershell
+uv run --group screenshots playwright install chromium
+uv run --group screenshots pytest tests/test_run_history_hover_browser.py
+```
+
 A plotly bump also needs one look that no test can take. On Score vs Time,
 hover a New PB star that shares its point with a later run that tied it the
 same day. The hover must give the time of the run that set the PB, the earlier

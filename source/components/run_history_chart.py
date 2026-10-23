@@ -12,7 +12,7 @@ from datetime import date, datetime, time, timedelta
 
 import plotly.graph_objects as go
 
-from source.components.run_history_list import run_id
+from source.kovaaks.data_models import run_id
 from source.kovaaks.data_service import (
     get_all_runs,
     get_rank_data_from_playlist_code,
