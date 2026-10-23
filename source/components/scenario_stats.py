@@ -33,15 +33,16 @@ from source.kovaaks.data_service import (
 from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.playlist_scenarios_service import playlist_scenario_groups
 from source.kovaaks.typical_score import (
+    TOO_FEW_RUNS_TEXT,
     TypicalScore,
+    below_minimum_text,
     build_typical_scores,
     format_typical_score,
+    typical_score_hover,
     typical_score_recency,
 )
-from source.utilities.utilities import format_short_date
 
 SCENARIO_STATS_LABEL = "Typical score"
-TOO_FEW_RUNS_TEXT = "Too few runs"
 NO_RUNS_TEXT = "No runs yet"
 TOOLTIP_TARGET_CLASS = "scenario-stats-tooltip-target"
 WORD_END_CLASS = "scenario-stats-word-end"
@@ -88,50 +89,11 @@ def _help() -> dmc.Tooltip:
 
 def _value_hover(value: TypicalScore, total: int, now: datetime) -> html.Div:
     """Describe the supporting runs, their recency and both bands."""
-    recent = typical_score_recency(value, now)
-    count = value.run_count
-    sessions = value.session_count
-    first = format_short_date(value.first_date.date(), now.date())
-    last = format_short_date(value.last_date.date(), now.date())
-    dates = (
-        f"on {first}"
-        if value.first_date.date() == value.last_date.date()
-        else f"{first} to {last}"
-    )
-
-    def formatted(score: float | None) -> str:
-        assert score is not None
-        return format_typical_score(score, value.runs)
-
+    hover = typical_score_hover(value, total, now)
     return html.Div(
         [
-            html.P(
-                f"The median of your {'last ' if total > count else ''}{count} runs."
-            ),
-            html.Div(
-                [
-                    control_name("Runs:"),
-                    f" {count} in {sessions} {'session' if sessions == 1 else 'sessions'} · {dates}",
-                ]
-            ),
-            html.Div(
-                [
-                    control_name("Recent:"),
-                    f" {recent.run_count} of {count} from the last 30 days",
-                ]
-            ),
-            html.Div(
-                [
-                    control_name("Middle 50%:"),
-                    f" {formatted(value.p25)} to {formatted(value.p75)}",
-                ]
-            ),
-            html.Div(
-                [
-                    control_name("Middle 80%:"),
-                    f" {formatted(value.p10)} to {formatted(value.p90)}",
-                ]
-            ),
+            html.P(hover.opening),
+            *(html.Div([control_name(label), text]) for label, text in hover.lines),
         ],
         className="scenario-stats-value-help",
     )
@@ -176,13 +138,7 @@ def get_scenario_typical_score(
             else:
                 text = TOO_FEW_RUNS_TEXT
                 css = f"{EMPTY_TITLE_CLASS} {TIME_CLASS}"
-                n, sessions = value.run_count, value.session_count
-                label = (
-                    "A typical score needs 10 runs across 2 or more sessions, "
-                    f"or 20 in one session. You have {n} "
-                    f"{'run' if n == 1 else 'runs'} in {sessions} "
-                    f"{'session' if sessions == 1 else 'sessions'}."
-                )
+                label = below_minimum_text(value)
             lead = dmc.Tooltip(
                 html.Span(
                     [text, html.Span(" ", className=WORD_END_CLASS)],
