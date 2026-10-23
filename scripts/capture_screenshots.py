@@ -31,10 +31,9 @@ RUN_HISTORY_PLAYLIST_CODE = "KovaaKsCarryingNarrowCt"
 TABLE_PLAYLIST_CODE = RUN_HISTORY_PLAYLIST_CODE
 NOTE_TEXT = (
     "Take the Bardpill:\n"
-    "1. Learn aiming like you would learn a musical instrument; master the technique "
-    "slowly at first.\n"
-    "2. Flick fast but take your time on the micro correction.\n"
-    "3. Restart if you miss in the first 10 seconds.\n"
+    "1. Learn slowly, then speed up.\n"
+    "2. Flick fast. Micro-correct slowly.\n"
+    "3. Restart if you miss in first 10s.\n"
     "4. Restart on 4th miss."
 )
 USERNAME = "Sample player"
@@ -461,6 +460,11 @@ def capture(origin: str, destination: Path) -> None:
         page.locator("#run-history-graph").click(position={"x": 5, "y": 5})
         page.mouse.move(0, 0)
         page.evaluate("document.fonts.ready")
+        page.wait_for_function("""() => {
+            const viewport = document.querySelector(
+                '.run-history-note-scroll .mantine-ScrollArea-viewport');
+            return viewport && viewport.scrollHeight <= viewport.clientHeight + 1;
+        }""")
         save_stable_screenshot(page, destination / IMAGE_NAMES[0])
         for path, grid, filename in (
             ("/playlists", "playlists-overview-grid", IMAGE_NAMES[1]),

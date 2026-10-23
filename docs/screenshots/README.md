@@ -42,18 +42,21 @@ sessions so it cannot bridge their boundaries. The latest run follows a long
 break: only one of its twenty Typical score supporting runs is within thirty
 days. Its faded presentation is intentional.
 
-The scenario note is the maintainer's chosen bardOZ advice, staged verbatim:
+The scenario note is the maintainer's shortened version of bardOZ's advice:
 
 ```text
 Take the Bardpill:
-1. Learn aiming like you would learn a musical instrument; master the technique slowly at first.
-2. Flick fast but take your time on the micro correction.
-3. Restart if you miss in the first 10 seconds.
+1. Learn slowly, then speed up.
+2. Flick fast. Micro-correct slowly.
+3. Restart if you miss in first 10s.
 4. Restart on 4th miss.
 ```
 
-The note uses the app's normal scrollable card. Do not enlarge or restyle the
-card just to expose the whole note in one image.
+The note uses the app's normal card. At the selected 1920 by 1080 viewport,
+five complete rendered lines fit, including the title; wrapped text consumes
+another line. Keep each point short enough to fit on one line. Capture checks
+that the entire note fits without scrolling. Do not enlarge or restyle the
+card just to expose more text in one image.
 
 ### Review an updated set
 
