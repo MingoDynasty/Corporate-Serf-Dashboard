@@ -1719,8 +1719,6 @@ def test_median_and_best_reaches_the_script_by_a_callback_of_the_lists_own():
     # It runs as the page mounts, with the remembered value.
     assert registration["prevent_initial_call"] is False
     assert "window.runHistoryList.setFigures(Boolean(checked));" in source
-    assert f'getApiAsync("{IDS.grid}")' in source
-    assert "if (run === latestRun) {" in source
 
 
 def test_the_column_callback_never_hears_median_and_best():

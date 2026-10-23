@@ -1195,27 +1195,15 @@ async (clicks) => {
 }
 """
 
-# The Median and best checkbox, handed to the script. It runs as the page
-# mounts, with the remembered value, and on every change. Only the newest
-# run applies, for the reason the rows' own script gives.
+# The checkbox runs as the page mounts, with the remembered value, and on
+# every change. Its state belongs to the list's script, not a grid.
 _APPLY_FIGURES = """
-(() => {
-    let latestRun = 0;
-
-    return async (checked) => {
-        const noUpdate = window.dash_clientside.no_update;
-        if (!window.runHistoryList || !window.dash_ag_grid) {
-            return noUpdate;
-        }
-        latestRun += 1;
-        const run = latestRun;
-        await window.dash_ag_grid.getApiAsync(GRID_ID);
-        if (run === latestRun) {
-            window.runHistoryList.setFigures(Boolean(checked));
-        }
-        return noUpdate;
-    };
-})()
+(checked) => {
+    if (window.runHistoryList) {
+        window.runHistoryList.setFigures(Boolean(checked));
+    }
+    return window.dash_clientside.no_update;
+}
 """
 
 
@@ -1291,7 +1279,7 @@ def register_run_list(ids: RunListIds, *, follow_switch: str, page: str) -> None
         prevent_initial_call=True,
     )
     clientside_callback(
-        _APPLY_FIGURES.replace("GRID_ID", grid_id),
+        _APPLY_FIGURES,
         Output(ids.figures_sink, "data"),
         Input(
             choice_checkbox_id(ids.columns_menu, MEDIAN_AND_BEST_CHOICE.choice_id),
