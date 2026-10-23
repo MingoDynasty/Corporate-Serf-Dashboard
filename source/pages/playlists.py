@@ -1255,6 +1255,9 @@ def layout(**kwargs):  # noqa: ARG001
                     # even when scrolled to.
                     "suppressRowVirtualisation": True,
                     "suppressMaxRenderedRowRestriction": True,
+                    # Browser search and text selection follow page order,
+                    # so a sort must reorder the nodes as well as the rows.
+                    "ensureDomOrder": True,
                     # Row ids carry the playlist code, which is how a click in
                     # the name cell knows where to navigate.
                     "getRowId": {"function": "params.data.code"},

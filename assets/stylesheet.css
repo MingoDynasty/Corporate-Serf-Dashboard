@@ -1,3 +1,10 @@
+/* The default blue misses 4.5:1 on white and on the notice tints.
+   Darken text links without changing the filled controls' primary color.
+   The repeated root outranks Mantine's rule even if its styles load later. */
+:root:root[data-mantine-color-scheme="light"] {
+    --mantine-color-anchor: var(--mantine-color-blue-9);
+}
+
 /* Every Mantine field label, bolded once. Enumerating per-component label
    classes instead (Select, TextInput, ...) silently missed whichever
    component was added next: the stats-directory field lost its bold when it
@@ -61,10 +68,6 @@
    color from here. */
 a.run-toast-link {
     color: var(--mantine-color-anchor);
-    text-decoration: none;
-}
-
-a.run-toast-link:hover {
     text-decoration: underline;
 }
 
@@ -146,11 +149,6 @@ a.run-toast-link:hover {
 }
 
 .chart-options-panel {
-    /* Opaque: for the frame or two before Plotly catches up with its
-       container, the wider plot would otherwise show through the panel. */
-    background-color: var(--mantine-color-body);
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
     display: flex;
     flex-direction: column;
     gap: var(--mantine-spacing-md);
@@ -224,14 +222,11 @@ a.run-toast-link:hover {
    wide, so it narrows the page without touching the viewport, and a media
    query would keep two columns in a page too narrow for them.
 
-   The run list's minimum width and the latest-run card's width are two
-   values, equal on purpose: the list is at its minimum with the default
-   columns, so on the default page the card's edges are the list's at every
-   zoom level. A change to one asks whether the other follows. The list grows
-   past its minimum to the width its shown columns need, which the page's
-   script writes here as --run-history-list-need. */
+   The latest-run card keeps the default list's 500px width independently.
+   Hiding columns can narrow the list to 480px without moving the cards. The
+   page's script writes the shown columns' need as --run-history-list-need. */
 .run-history-page {
-    --run-history-list-width: 500px;
+    --run-history-list-width: 480px;
     --run-history-card-width: 500px;
 
     container: run-history-page / inline-size;
@@ -353,12 +348,14 @@ a.run-toast-link:hover {
     display: flex;
 }
 
-/* The frame every card in the row has, in the theme's tokens. */
+/* Paper's light-theme border is paler than the app's existing frames.
+   Keep their color while Paper supplies the border and radius. */
 .run-history-card,
 .scenario-stats-card,
-.pb-card {
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
+.pb-card,
+.run-history-list,
+.chart-options-panel {
+    border-color: var(--mantine-color-default-border);
 }
 
 /* The frame adds only its border to the height, so with Category's line the
@@ -697,8 +694,8 @@ a.run-toast-link:hover {
     white-space: pre;
 }
 
-/* Edit and Add a scenario note: buttons, since each opens the editor and
-   goes nowhere, drawn as the app draws a link. */
+/* Edit and Add a scenario note open the editor rather than navigate, so they
+   are buttons with the shared text-link color and an underline on hover. */
 .run-history-note-link {
     color: var(--mantine-color-anchor);
     flex: 0 0 auto;
@@ -833,17 +830,18 @@ a.run-toast-link:hover {
 /* The chart beside the run list. The list's column is as wide as its shown
    columns need, never narrower than its minimum, and never so wide that the
    chart drops under 480px; past that the list scrolls sideways. Where the
-   two bounds cross, in a narrow window, the minimum wins and the chart
-   gives, as it did before the list could grow. Before the script has
-   written the need, the list is at its minimum. */
+   window is narrow, the maximum's 500px floor keeps the default columns
+   from losing room: only hiding columns can narrow the list below 500px.
+   Before the script writes the need, keep the default width to avoid a
+   horizontal shift as the page mounts. */
 .run-history-columns {
     display: grid;
     flex: 1 1 0;
     gap: var(--mantine-spacing-md);
     grid-template-columns: minmax(0, 1fr) clamp(
             var(--run-history-list-width),
-            var(--run-history-list-need, var(--run-history-list-width)),
-            calc(100% - var(--mantine-spacing-md) - 480px)
+            var(--run-history-list-need, 500px),
+            max(500px, calc(100% - var(--mantine-spacing-md) - 480px))
         );
     min-height: 0;
 }
@@ -878,7 +876,7 @@ a.run-toast-link:hover {
 /* The chart and its options panel share this area, and the row inside it is
    .home-chart-row. The stacking threshold measures the area and never the
    window: the AppShell navbar is fixed-position and 225px wide, and the run
-   list takes 500px or more, so both narrow the chart without touching the
+   list takes 480px or more, so both narrow the chart without touching the
    viewport, and a media query would keep the panel beside a chart it has
    already crushed. A container query cannot match on the element that
    declares the container, hence the wrapper around the row. It is the flex
@@ -903,8 +901,6 @@ a.run-toast-link:hover {
 /* The run list fills its column: the header, then the grid, which scrolls
    inside its own box so the chart beside it never moves. */
 .run-history-list {
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -1206,9 +1202,9 @@ a.run-toast-link:hover {
     white-space: nowrap;
 }
 
-/* A scenario's name, a session's count, and Show all runs: buttons, since
-   each changes what the page shows and goes nowhere, drawn as the app draws
-   a link. */
+/* A scenario's name, a session's count, and Show all runs change the current
+   view rather than navigate, so they are buttons with the shared text-link
+   color and an underline on hover. */
 .run-list-link {
     background: none;
     border: 0;
@@ -1533,6 +1529,13 @@ a.run-toast-link:hover {
     font-size: var(--mantine-font-size-xs);
 }
 
+/* A stored Columns choice can arrive after the first rows. Keep the default
+   columns out of sight without hiding the loading overlay beside the body.
+   Visibility preserves the measurements column autosizing needs. */
+.playlist-scenarios-grid.columns-pending :is(.ag-header, .ag-body) {
+    visibility: hidden;
+}
+
 /* Grid cells whose value carries hover-only detail (exact timestamps on Last
    Played, the weakest scenario on Lowest Percentile). The dotted underline
    plus help cursor signals "there is more on hover". */
@@ -1602,18 +1605,14 @@ a.run-toast-link:hover {
 /* Navigation anchors rendered inside the playlist/scenario grid cells
    (PlaylistNameLink / ScenarioLink in dashAgGridComponentFunctions.js). The
    class carries the link styling on the anchor itself, overriding the UA
-   default link color for every state; the --mantine-color-blue-* variables are
-   theme-aware, so the color stays legible in dark mode. */
+   default link color for every state. Use the shared text-link color rather
+   than the filled-control color, which misses text contrast in light mode. */
 a.playlist-scenario-link-cell,
 a.playlist-scenario-link-cell:visited {
-    color: var(--mantine-color-blue-filled);
+    color: var(--mantine-color-anchor);
     cursor: pointer;
     text-decoration-line: underline;
     text-underline-offset: 0.15em;
-}
-
-a.playlist-scenario-link-cell:hover {
-    color: var(--mantine-color-blue-filled-hover);
 }
 
 /* The Scenario cell while the table is ungrouped: the scenario's name over
@@ -1815,6 +1814,14 @@ a.playlist-scenarios-evxl-link {
    anywhere in it navigates, not only a click on the link's text. */
 .ag-cell.cell-navigates {
     cursor: pointer;
+}
+
+/* Capped rank cells still need a readable full name on hover, even when an
+   imported name is one unbroken word wider than the window. */
+.playlist-scenarios-grid .ag-tooltip {
+    max-width: min(32rem, calc(100vw - 2rem));
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 /* The overview's Last Played tooltip is two lines (exact time + stalest

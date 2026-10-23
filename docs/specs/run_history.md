@@ -95,11 +95,11 @@ times that name or order runs remain absolute ([T4][card-order]).
 
 - The row takes two columns with the gap of the chart and the run list under
   it. The second column holds the latest-run card alone, at its own 500px
-  ([2026-10-22][card-width]). The list's minimum is also 500px, and the two
-  values are equal on purpose: with the default columns the list is at its
-  minimum, so the card sits over the run list and its edges are the list's at
-  every zoom level. A list widened by a column turned on reaches further left
-  than the card, under the PB card, and the row doesn't change. The first holds,
+  ([2026-10-22][card-width]). With the default columns the list is also
+  500px, so the card sits over it with matching edges at every zoom level.
+  Hiding columns can narrow the list to 480px, and adding columns can widen
+  it under the PB card; neither changes the top row
+  ([2026-10-22][list-minimum]). The first holds,
   in DOM order, the dropdowns' column, the scenario note card
   ([below](#the-scenario-note-card)), then Scenario Stats and the PB card in
   one score pair at its right end, beside the latest-run card. Spare room
@@ -389,7 +389,8 @@ it is saved is in [2026-10-18][note-store].
   A time that rounds to zero reads `<1 min`, so that form means under 30
   seconds.
 - The card is 500px wide, a width of its own that equals the run list's
-  minimum ([2026-10-22][card-width]), and as tall as the top row,
+  default width ([2026-10-22][card-width], [2026-10-22][list-minimum]),
+  and as tall as the top row,
   and never less than 135px, which holds its tallest state: the second line
   on two lines in a narrow card, over the third and fourth. So nothing that
   changes between runs changes its height, and the page doesn't jump. Its
@@ -793,12 +794,14 @@ The card's lines, local-record scope and leaderboard presentation follow
 
 - The list is a second column to the right of the chart, always shown
   ([2026-10-12][column]). It is as wide as its shown columns need, 64px plus
-  each shown column's fixed width, never narrower than 500px, and never so
-  wide that the chart drops under 480px. When those two bounds cross, in a
-  narrow window, the 500px wins and the chart gives. With the default columns
-  the need is exactly 500px; with Reloads or Avg FPS on it is 564px, with FOV
-  616px, and with all three 744px. A browser with a column stored on draws
-  the list at 500px for a moment as the page opens. Past the chart's floor the
+  each shown column's fixed width, never narrower than 480px. Hiding
+  Sensitivity or Shots Fired lets it reach that minimum. Its default columns
+  still need exactly 500px; with Reloads or Avg FPS on it needs 564px, with
+  FOV 616px, and with all three 744px. Growth is capped so the chart keeps
+  480px where possible. In a narrow window, the default columns retain
+  their 500px and the chart gives, while a list with fewer columns can still
+  shrink to 480px ([2026-10-22][list-minimum]). The page draws the list at
+  500px until the stored column choices load. Past the chart's floor the
   list scrolls sideways inside its own box, and its session rows, scenario
   rows and other full-width rows stay whole in view while the run rows
   scroll under them ([2026-10-22][list-width]). It has two views, This
@@ -808,9 +811,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   a segmented control whose accessible name is `Run list view`. The list
   starts on This scenario, the browser remembers the switch, and pressing it
   shows the other view from its top with keyboard focus left on the switch.
-  At the list's 500px minimum the switch and both buttons share one line,
-  56px tall at 2560px; where they don't fit, the buttons wrap under the switch
-  ([2026-10-14][all-scenarios], [2026-10-18][heading-line]).
+  At the list's 480px minimum the switch and both buttons share one line,
+  including the wider "Collapse all" label. In a narrower stacked page the
+  buttons wrap under the switch ([2026-10-14][all-scenarios],
+  [2026-10-18][heading-line], [2026-10-22][list-minimum]).
 - The header also holds a heading line, before the switch, for screen
   readers only: it is hidden from view in both views, and it is a line of
   text, not an HTML heading. The latest-run card above the list names its
@@ -1478,6 +1482,7 @@ The card's lines, local-record scope and leaderboard presentation follow
 [median-best]: ../decision_log/2026/2026-10-14-the-run-lists-columns-menu-offers-median-and-best-off-to-start.md
 [new-columns]: ../decision_log/2026/2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md
 [list-width]: ../decision_log/2026/2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md
+[list-minimum]: ../decision_log/2026/2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md
 [card-width]: ../decision_log/2026/2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md
 [figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
 [figure-columns]: ../decision_log/2026/2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md
