@@ -45,8 +45,8 @@ to build a 39-scenario benchmark's values.
 
 **Width.** A benchmark's table is about 320 px wider: Typical Score measured
 163 px and Typical Rank 159 px, as wide as their headers. At 2560 px both
-fit with no sideways scroll, the Scenario column narrowing from 400 to 393
-px; at 1920 px the table already scrolled, by 527 px now, and the Columns
+fit with no sideways scroll, the Scenario column narrowing from 400 to 333
+px; at 1920 px the table already scrolled, by 587 px now, and the Columns
 menu hides what a player never reads (Edge and Firefox, Viscose Benchmark S2
 Medium, 2026-10-22).
 
