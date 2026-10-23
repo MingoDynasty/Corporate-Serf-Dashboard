@@ -37,9 +37,8 @@
 //      lands would otherwise leave a keyboard user on a different run, and a
 //      press on a scenario's name, which rebuilds the rows, on the row's
 //      first button.
-//  10. The height of a row whose figures go on a line of their own follows
-//      the Median and best checkbox. The grid measures the body's rows again
-//      when asked, and the pinned row only when its rows are handed in again.
+//  10. Median and best stays in each row's line. Changing the checkbox does
+//      not change row height, so body and pinned rows need no remeasurement.
 //  11. Where the list scrolls sideways, a full-width row's content is held
 //      in view by CSS sticky, which needs the row's overflow turned from the
 //      grid's hidden to clip (the stylesheet's .ag-full-width-row rule).
