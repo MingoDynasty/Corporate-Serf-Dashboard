@@ -6,7 +6,8 @@ A click anywhere in a row of the Playlists table opened that playlist, while
 on a playlist's scenario table only the scenario's name did anything, and on
 both tables almost no text could be selected. Now one cell in each row
 navigates on both tables, the name, and the text of every other cell can be
-selected and copied. Dragging across a name to select it does not open it.
+selected and copied in displayed row order after sorting. Dragging across
+a name to select it does not open it.
 A Ctrl+click anywhere in a name's cell opens it in a new tab.
 
 **Ruling.** By the maintainer, in chat on 2026-10-12: "Agreed on R1,R2,R3."
@@ -185,6 +186,13 @@ name from the empty space still selected it without opening it.
   rows for 4 dragged over, because the grid leaves rows in the page in their
   old order. `ensureDomOrder` fixes that and is left for a change of its own,
   for the reason the browser-search entry gives.
+  **Follow-up, 2026-10-22:** this ordering limitation is superseded. Both
+  grids set `ensureDomOrder`; a four-row drag selected exactly the four
+  displayed rows in all 15 Chromium cases after sorting, against the
+  overview, a 60-row table, and a grouped 39-row table. The same checks
+  failed on unchanged `120fc17`. Firefox's cross-row drag remains unverified
+  because its initial-layout mouse control did not select all four rows.
+  The browser-search entry records the follow-up sizing checks.
 - One console line. The first of four Firefox runs logged a bare "Error"
   with every check passing. The three runs after it were clean, and it was
   not traced. One Firefox run of the modified-click checks logged it too, on

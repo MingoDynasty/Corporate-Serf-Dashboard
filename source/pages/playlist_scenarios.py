@@ -1000,7 +1000,7 @@ def layout(
             ),
             dag.AgGrid(
                 id="playlist-scenarios-grid",
-                className="ag-theme-quartz playlist-scenarios-grid",
+                className="ag-theme-quartz columns-pending playlist-scenarios-grid",
                 columnDefs=_column_defs(
                     sort, benchmark=benchmark, group_columns=group_columns
                 ),
@@ -1023,6 +1023,9 @@ def layout(
                         "colIds": AUTO_SIZE_COLUMN_KEYS,
                         "skipHeader": False,
                     },
+                    # The Columns callback releases this after the stored
+                    # choice and rows are ready, whichever arrives last.
+                    "loading": True,
                     "animateRows": False,
                     "tooltipShowDelay": 0,
                     # Every row is drawn, in view or not. The browser's own
@@ -1033,6 +1036,9 @@ def layout(
                     # even when scrolled to.
                     "suppressRowVirtualisation": True,
                     "suppressMaxRenderedRowRestriction": True,
+                    # Browser search and text selection follow page order,
+                    # so a sort must reorder the nodes as well as the rows.
+                    "ensureDomOrder": True,
                     "getRowId": {
                         "function": (
                             "params.data.generation_token + ':' + "

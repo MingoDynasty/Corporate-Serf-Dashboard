@@ -146,11 +146,6 @@ a.run-toast-link:hover {
 }
 
 .chart-options-panel {
-    /* Opaque: for the frame or two before Plotly catches up with its
-       container, the wider plot would otherwise show through the panel. */
-    background-color: var(--mantine-color-body);
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
     display: flex;
     flex-direction: column;
     gap: var(--mantine-spacing-md);
@@ -353,12 +348,14 @@ a.run-toast-link:hover {
     display: flex;
 }
 
-/* The frame every card in the row has, in the theme's tokens. */
+/* Paper's light-theme border is paler than the app's existing frames.
+   Keep their color while Paper supplies the border and radius. */
 .run-history-card,
 .scenario-stats-card,
-.pb-card {
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
+.pb-card,
+.run-history-list,
+.chart-options-panel {
+    border-color: var(--mantine-color-default-border);
 }
 
 /* The frame adds only its border to the height, so with Category's line the
@@ -903,8 +900,6 @@ a.run-toast-link:hover {
 /* The run list fills its column: the header, then the grid, which scrolls
    inside its own box so the chart beside it never moves. */
 .run-history-list {
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -1530,6 +1525,13 @@ a.run-toast-link:hover {
 .scenario-rank-hint {
     color: var(--mantine-color-dimmed);
     font-size: var(--mantine-font-size-xs);
+}
+
+/* A stored Columns choice can arrive after the first rows. Keep the default
+   columns out of sight without hiding the loading overlay beside the body.
+   Visibility preserves the measurements column autosizing needs. */
+.playlist-scenarios-grid.columns-pending :is(.ag-header, .ag-body) {
+    visibility: hidden;
 }
 
 /* Grid cells whose value carries hover-only detail (exact timestamps on Last

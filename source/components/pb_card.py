@@ -1018,7 +1018,7 @@ def _leaderboard_line(ids: PbCardIds) -> html.Div:
     )
 
 
-def pb_card(ids: PbCardIds) -> dmc.Box:
+def pb_card(ids: PbCardIds) -> dmc.Paper:
     """Build the card with nothing in it yet.
 
     The page's callbacks write what it shows. What a script writes, the PB's
@@ -1026,7 +1026,9 @@ def pb_card(ids: PbCardIds) -> dmc.Box:
     come and go under the script if the server's answer drew it. So is the
     leaderboard line, whose callbacks a page must hold every input of.
     """
-    return dmc.Box(
+    return dmc.Paper(
+        withBorder=True,
+        radius="sm",
         className=CARD_CLASS,
         children=[
             dcc.Store(id=ids.set_at),
