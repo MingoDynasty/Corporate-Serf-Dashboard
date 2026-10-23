@@ -11,6 +11,10 @@ whole page, by the rule Follow and a scenario link already follow. What a
 player notices is that the order of a session is on screen, where before it
 was a count on a row.
 
+**2026-10-23 amendment.** The global last-played highlight in **What the tree marks**
+is superseded by [selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
+The original text is retained as history; the other rules stand.
+
 **Superseded in part (2026-10-18).** [The heading line's entry](2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md)
 takes the heading off the screen, in both views, and keeps it for screen
 readers, so the switch, **Expand all** and **Columns** sit on the header's

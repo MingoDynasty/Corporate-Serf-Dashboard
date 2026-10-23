@@ -906,7 +906,7 @@ def test_the_model_carries_the_limit_it_was_loaded_up_to():
     assert build_run_list([], A, 90, EVENING, {})["session_limit"] == SESSIONS_PER_LOAD
 
 
-# --- The row of the last run played --------------------------------------------
+# --- The selected scenario's latest run ---------------------------------------
 
 
 def _latest_rows(model) -> list[str]:
@@ -926,14 +926,14 @@ def test_the_row_of_the_last_run_played_is_the_one_marked_latest():
     assert len(_of_kind(model, "run")) == 5
 
 
-def test_no_row_is_marked_latest_while_another_scenario_was_the_last_played():
-    """The last run played is then not in the list at all."""
+def test_the_selected_scenarios_latest_run_is_marked_when_another_was_last_played():
+    """The global newest run remains the expansion token, separate from the highlight."""
     runs = [*_minutes(0, 5), *_minutes(10, scenario=B)]
 
     model = _build(runs)
 
     assert model["newest_run"] == run_id(runs[-1])
-    assert _latest_rows(model) == []
+    assert _latest_rows(model) == [f"r:{run_id(runs[1])}"]
     assert _latest_rows(_build(runs, B)) == [f"r:{run_id(runs[-1])}"]
 
 
@@ -1576,13 +1576,18 @@ def test_a_run_that_lands_older_than_the_newest_and_splits_a_visit():
     assert after["forced_open"][1] == f"v:{run_id(runs[2])}"
 
 
-def test_the_last_run_played_is_marked_latest_in_the_tree_whatever_is_selected():
+@pytest.mark.parametrize(
+    ("selected", "index"), [(A, 1), (B, 2), (None, None), (C, None)]
+)
+def test_the_tree_highlights_only_the_selected_scenarios_latest_run(selected, index):
     runs = [*_minutes(0, 2), *_minutes(4, scenario=B)]
+    model = _tree(runs, selected)
 
-    for selected in (A, B, None):
-        model = _tree(runs, selected)
-        latest = [row["id"] for row in _of_kind(model, "run") if row["latest"]]
-        assert latest == [f"r:{run_id(runs[-1])}"]
+    assert _latest_rows(model) == (
+        [] if index is None else [f"r:{run_id(runs[index])}"]
+    )
+    assert model["newest_run"] == run_id(runs[-1])
+    assert model["forced_open"] == _tree(runs, B)["forced_open"]
 
 
 # --- All scenarios: thirty sessions at a time ------------------------------------
@@ -1734,3 +1739,28 @@ def test_each_view_is_built_with_the_count_of_sessions_it_was_given(store):
 
     assert run_list_from_store(VIEW_ALL, A, 60, 95, EVENING)["session_limit"] == 60
     assert run_list_from_store(VIEW_SCENARIO, A, 30, 95, EVENING)["session_limit"] == 30
+
+
+@pytest.mark.parametrize("reversed_input", [False, True])
+def test_late_runs_and_same_second_ties_keep_both_views_on_the_selected_latest(
+    reversed_input,
+):
+    first = _run(A, EVENING, score=100.0)
+    tied = _run(A, EVENING + timedelta(minutes=2), score=90.0)
+    later_start = replace(
+        tied,
+        stats_file_name="later-start.csv",
+        run_start=tied.datetime_object - timedelta(seconds=30),
+        run_length=timedelta(seconds=30),
+    )
+    global_newest = _run(B, EVENING + timedelta(minutes=5))
+    runs = [first, tied, global_newest]
+    late = _run(A, EVENING + timedelta(minutes=3), score=80.0)
+    older = _run(A, EVENING + timedelta(minutes=1), score=95.0)
+    for added, expected in [(later_start, later_start), (late, late), (older, tied)]:
+        stored = [*runs, added]
+        if reversed_input:
+            stored.reverse()
+        for model in (_build(stored), _tree(stored)):
+            assert _latest_rows(model) == [f"r:{run_id(expected)}"]
+            assert model["newest_run"] == run_id(global_newest)

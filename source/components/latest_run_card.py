@@ -300,8 +300,8 @@ class StoreRuns(NamedTuple):
 
     ``shown`` is what the card says about the selected scenario's latest run,
     or ``None``. ``newest_run_id`` is the id of the newest run on any
-    scenario, the run the chart's ring and the run list's highlight mark, or
-    ``None`` with no runs in the store.
+    scenario, or ``None`` with no runs in the store. It distinguishes a
+    missing selection from a store with no runs for the card's empty state.
     """
 
     shown: LatestRun | None

@@ -66,7 +66,7 @@ NEW_PB_SIZE_DEFAULT_PX = 12
 NEW_PB_SIZE_PRESET_PX = {"Small": 9, "Large": 16}
 
 # The trace that rings one run on a Run History figure: the scenario's newest
-# run, which is ringed while it is also the last run played on any scenario.
+# run, matched to the selected scenario's latest run on the card.
 # The name is the handle the ring is shown, hidden, and sized by. It is never
 # a legend entry.
 LATEST_RUN_TRACE_NAME = "Latest run"
@@ -370,7 +370,7 @@ def _latest_run_ring_trace(
 
 
 def latest_run_ring_opacity(ringed_run_id: object, latest_run_id: str | None) -> int:
-    """Return the ring's opacity: shown only round the last run played.
+    """Return the ring's opacity: shown only round the run the card reports.
 
     The ring is hidden by its opacity and never by ``visible``. plotly.js
     leaves a trace that is not visible out of its axis ranges, and the ring
@@ -385,11 +385,11 @@ def show_latest_run_ring(
     latest_run_id: str | None,
     color_scheme: str,
 ) -> go.Figure:
-    """Show a figure's ring if it is round the last run played, in place.
+    """Show a figure's ring if it matches the card's run, in place.
 
     A Run History figure rings its scenario's newest run. ``latest_run_id``
-    is the id of the newest run on any scenario, so the two match only while
-    the figure's scenario is the one last played. A figure with no ring, as
+    is the id of the selected scenario's latest run, so the two match while
+    the figure and card show the same scenario and run. A figure with no ring, as
     when the newest run is outside the range, is left as it is.
     """
     color = _LATEST_RUN_RING_COLORS.get(color_scheme, _LATEST_RUN_RING_COLORS["light"])
