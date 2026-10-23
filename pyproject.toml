@@ -119,3 +119,7 @@ dev = [
     "ruff>=0.17.2",
     "scipy-stubs>=1.18.1.1",
 ]
+screenshots = [
+    "freezegun>=1.5.5",
+    "playwright>=1.64.0",
+]
