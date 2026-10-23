@@ -2236,12 +2236,24 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
     }
 
 
-def test_playlist_scenarios_grid_uses_content_auto_size():
-    page = playlist_scenarios.layout("KovaaKsTestCode")
-    ag_grid = page.children[-1]
+@pytest.mark.parametrize(
+    "playlist_code", ["KovaaKsPlaylistCode", "KovaaKsBenchmarkCode"]
+)
+def test_playlist_scenarios_grid_sizes_to_its_first_rendered_rows(
+    benchmark_playlists, playlist_code
+):
+    grid = playlist_scenarios.layout(playlist_code).children[-1]
+    props = grid.to_plotly_json()["props"]
 
-    assert ag_grid.columnSize == "autoSize"
-    assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
+    # Dash supplies the rows after the grid initializes. The wrapper's
+    # ``columnSize`` fits empty columns and does not fit them again on arrival.
+    assert props["columnSize"] == "autoSize"
+    assert props["columnSizeOptions"] == playlist_scenarios.COLUMN_SIZE_OPTIONS
+    assert grid.dashGridOptions["autoSizeStrategy"] == {
+        "type": "fitCellContents",
+        "colIds": playlist_scenarios.AUTO_SIZE_COLUMN_KEYS,
+        "skipHeader": False,
+    }
 
 
 def test_playlist_scenarios_grid_has_no_initial_row_data():
@@ -2602,12 +2614,17 @@ def test_playlist_scenarios_rank_column_defs():
             "The highest rank your PB score has reached on this scenario."
         ),
         "valueFormatter": {"function": "params.data.tier_display"},
+        "tooltipValueGetter": {
+            "function": "params.data.tier_sort ? params.data.tier_display : null"
+        },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 100,
+        "maxWidth": 240,
     }
     assert next_rank["headerName"] == "Next Rank"
     assert next_rank["field"] == "next_tier_sort"
+    assert next_rank["maxWidth"] == 320
     # One header for both measures the column holds, on every benchmark table.
     assert next_rank["headerTooltip"] == (
         "How much your PB score has to grow to reach the next rank. A row that "
@@ -3297,7 +3314,6 @@ def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
     # The option rides beside the grid's own, and replaces none of them.
     assert grid.dashGridOptions["animateRows"] is False
     assert "getRowId" in grid.dashGridOptions
-    assert grid.columnSize == "autoSize"
 
 
 @pytest.mark.parametrize(

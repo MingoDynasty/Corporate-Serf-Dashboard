@@ -241,16 +241,21 @@ TABLE_COLUMN_DEFS = [
 ]
 
 # Only a benchmark's table has these, directly after PB Score, the value both
-# compute from.
+# compute from. Cap both widths so a long rank name cannot dominate horizontal
+# scrolling; their tooltips keep the full names readable.
 BENCHMARK_COLUMN_DEFS = [
     {
         "headerName": "Rank",
         "field": "tier_sort",
         "headerTooltip": "The highest rank your PB score has reached on this scenario.",
         "valueFormatter": {"function": "params.data.tier_display"},
+        "tooltipValueGetter": {
+            "function": "params.data.tier_sort ? params.data.tier_display : null"
+        },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 100,
+        "maxWidth": 240,
     },
     {
         "headerName": "Next Rank",
@@ -272,6 +277,7 @@ BENCHMARK_COLUMN_DEFS = [
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 150,
+        "maxWidth": 320,
     },
 ]
 
@@ -1009,6 +1015,14 @@ def layout(
                 },
                 dashGridOptions={
                     **grid_options,
+                    # Dash supplies the rows after grid initialization. Fit
+                    # after their first render so long cells are measured,
+                    # once only so later updates keep a user's own widths.
+                    "autoSizeStrategy": {
+                        "type": "fitCellContents",
+                        "colIds": AUTO_SIZE_COLUMN_KEYS,
+                        "skipHeader": False,
+                    },
                     # The Columns callback releases this after the stored
                     # choice and rows are ready, whichever arrives last.
                     "loading": True,
