@@ -2,11 +2,10 @@
 
 Status: Accepted
 
-The latest-run card on Run History keeps the 500px it had, as a width of its
-own, instead of following the run list's width. On the default page the two
-are still the same width and line up, because the list is at its 500px
-minimum. Once a player turns a column on and the list grows, the list reaches
-further left than the card, and the top row doesn't wrap.
+The latest-run card keeps its own 500px width so the run list can resize
+without wrapping the top row. The default list still lines up with the
+card. The list can now shrink to 480px when columns are hidden while the
+card stays 500px.
 
 **Superseded in part (2026-10-22).**
 [The narrower minimum](2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md)
