@@ -58,6 +58,7 @@ REQUIRED_ARCHIVE_ENTRIES = (
     "docs/screenshots/playlists.png",  # the shipped README embeds it
     "docs/screenshots/playlist_scenarios.png",  # the shipped README embeds it
     "docs/screenshots/README.md",  # the shipped README links it
+    "docs/screenshots/ww5t_history.json",  # the capture uses the sanitized snapshot
     "docs/roadmap.md",  # the shipped README links it
     "docs/user_guide.md",  # the shipped README links it
     "install.ps1",  # the manual-install entry point the user guide documents

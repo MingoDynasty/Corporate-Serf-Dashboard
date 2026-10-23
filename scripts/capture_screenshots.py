@@ -1,4 +1,4 @@
-"""Refresh README images from an isolated app with synthetic sample data.
+"""Refresh README images from isolated, curated documentation data.
 
 Run with ``uv run --group screenshots python -m scripts.capture_screenshots``.
 """
@@ -22,25 +22,20 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-NOW = datetime(2026, 10, 21, 18)
-SCENARIO = "VT ww5t Intermediate S5"
+HISTORY = json.loads(
+    (ROOT / "docs" / "screenshots" / "ww5t_history.json").read_text(encoding="utf-8")
+)
+NOW = datetime.fromisoformat(HISTORY["capture_clock"])
+SCENARIO = HISTORY["scenario"]
 RUN_HISTORY_PLAYLIST_CODE = "KovaaKsCarryingNarrowCt"
 TABLE_PLAYLIST_CODE = RUN_HISTORY_PLAYLIST_CODE
-# An early lucky PB, a plateau, and uneven gains keep the typical-score
-# story distinct from the personal-best story. Long breaks expose fading.
-HISTORY_SESSIONS = (
-    (140, (1230, 1118, 1147, 1158, 1095, 1136, 1162, 1129, 1171, 1144, 1107, 1151)),
-    (137, (1164, 1198, 1140, 1212, 1177, 1159, 1185, 1205, 1168, 1224, 1191, 1174)),
-    (134, (1189, 1165, 1208, 1179, 1151, 1217, 1182, 1197, 1162, 1201, 1174, 1192)),
-    (80, (1340, 1234, 1272, 1256, 1328, 1291, 1260, 1308, 1280, 1317, 1275, 1299)),
-    (77, (1290, 1321, 1277, 1340, 1302, 1285, 1335, 1312, 1297, 1353, 1324, 1307)),
-    (6, (1463, 1372, 1401, 1425, 1388, 1448, 1414, 1395, 1451, 1422, 1406, 1438)),
-    (2, (1498, 1482, 1431, 1489, 1468, 1447, 1489, 1473, 1429, 1512, 1461, 1494)),
-    (0, (1478, 1450, 1505, 1486, 1442, 1538, 1470, 1518, 1492, 1459, 1526, 1503)),
-)
 NOTE_TEXT = (
-    "Keep the click rhythm steady. Reset the aim between targets and avoid "
-    "rushing the final shots."
+    "Take the Bardpill:\n"
+    "1. Learn aiming like you would learn a musical instrument; master the technique "
+    "slowly at first.\n"
+    "2. Flick fast but take your time on the micro correction.\n"
+    "3. Restart if you miss in the first 10 seconds.\n"
+    "4. Restart on 4th miss."
 )
 USERNAME = "Sample player"
 PLAYLIST_SAMPLES = (
@@ -100,8 +95,26 @@ WEAPON_HEADER = (
 )
 
 
+def write_run(stats: Path, scenario: str, record: dict) -> None:
+    """Write only the gameplay fields used by the documentation capture."""
+    ended = datetime.fromisoformat(record["ended"])
+    start = datetime.fromisoformat(record["started"]) if record["started"] else None
+    timing = ""
+    if start is not None:
+        pause = (ended - start).total_seconds() - record["duration_seconds"]
+        timing = f"Challenge Start:,{start:%H:%M:%S.%f}\nPause Duration:,{pause:.6f}\n"
+    content = (
+        f"Score:,{record['score']}\nSens Scale:,cm/360\nHoriz Sens:,{record['cm360']}\n"
+        f"Scenario:,{scenario}\n{timing}{WEAPON_HEADER}\n"
+        f"Rifle,{record['shots']},{record['hits']},0,0\n"
+    )
+    (
+        stats / f"{scenario} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv"
+    ).write_text(content, encoding="utf-8")
+
+
 def write_sample_state(state: Path, port: int) -> list[dict]:
-    """Write synthetic runs and settings only beneath the supplied scratch root."""
+    """Write the sanitized history, synthetic runs and scratch settings."""
     stats = state / "stats"
     data = state / "data"
     stats.mkdir(parents=True)
@@ -157,7 +170,7 @@ def write_sample_state(state: Path, port: int) -> list[dict]:
                 threshold + (next_threshold - threshold) * (0.35, 0.9, 0.6)[index % 3]
             )
             if name == SCENARIO:
-                sessions = HISTORY_SESSIONS
+                records = HISTORY["runs"]
             else:
                 per_session = 6 + 3 * (index % 5)
                 sessions = tuple(
@@ -170,50 +183,52 @@ def write_sample_state(state: Path, port: int) -> list[dict]:
                     )
                     for session in range(2)
                 )
-                # Give the rank and next-rank columns deliberate targets,
-                # independent of how many illustrative runs happen to be drawn.
                 sessions = (
                     sessions[0],
                     (sessions[1][0], (*sessions[1][1][:-1], round(target, 2))),
                 )
-            best = 0.0
-            for age, scores in sessions:
-                for in_session, score in enumerate(scores):
-                    if name == SCENARIO:
-                        ended = NOW - timedelta(
-                            days=age,
-                            hours=2,
-                            minutes=(len(scores) - 1 - in_session) * 2 + index % 15,
+                records = []
+                for age, scores in sessions:
+                    for score in scores:
+                        ended = practice_slots.get(
+                            age,
+                            NOW.replace(hour=4, minute=0, second=0)
+                            - timedelta(days=age),
                         )
-                    else:
-                        # Shared daily slots keep this fictional player's
-                        # practice from overlapping across different scenarios.
-                        slot = practice_slots.get(age, 0)
-                        ended = (
-                            NOW.replace(hour=4)
-                            - timedelta(days=age)
-                            + timedelta(minutes=slot * 2)
+                        # Keep synthetic practice clear of the real sessions,
+                        # so it cannot bridge their 30-minute boundaries.
+                        while True:
+                            conflicts = [
+                                datetime.fromisoformat(run["ended"])
+                                for run in HISTORY["runs"]
+                                if datetime.fromisoformat(
+                                    run["started"] or run["ended"]
+                                )
+                                - timedelta(minutes=31)
+                                <= ended
+                                and datetime.fromisoformat(run["ended"])
+                                + timedelta(minutes=31)
+                                >= ended - timedelta(seconds=60)
+                            ]
+                            if not conflicts:
+                                break
+                            ended = max(conflicts) + timedelta(minutes=33)
+                        practice_slots[age] = ended + timedelta(minutes=2)
+                        shots = 6000
+                        records.append(
+                            {
+                                "ended": ended.isoformat(),
+                                "started": (ended - timedelta(seconds=60)).isoformat(),
+                                "duration_seconds": 60,
+                                "score": score,
+                                "cm360": 40 + index % 3 * 5,
+                                "shots": shots,
+                                "hits": round(shots * rng.uniform(0.535, 0.625)),
+                            }
                         )
-                        practice_slots[age] = slot + 1
-                    best = max(best, score)
-                    start = ended - timedelta(seconds=60)
-                    accuracy = (
-                        rng.uniform(0.87, 0.96)
-                        if name == SCENARIO
-                        else rng.uniform(0.535, 0.625)
-                    )
-                    shots = round(score / 10 / accuracy) if name == SCENARIO else 6000
-                    content = (
-                        f"Score:,{score}\nSens Scale:,cm/360\nHoriz Sens:,{40 + index % 3 * 5}\n"
-                        f"Scenario:,{name}\nChallenge Start:,{start:%H:%M:%S}.000\n"
-                        "Pause Duration:,0\nReloads:,0\nFOV:,103\nFOVScale:,Overwatch\n"
-                        f"Avg FPS:,240\n{WEAPON_HEADER}\n"
-                        f"Rifle,{shots},{round(shots * accuracy)},0,0\n"
-                    )
-                    (
-                        stats
-                        / f"{name} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv"
-                    ).write_text(content, encoding="utf-8")
+            for record in records:
+                write_run(stats, name, record)
+            best = max(record["score"] for record in records)
             total = 18000 + index * 1379
             samples.append(
                 {
@@ -300,7 +315,7 @@ def save_stable_screenshot(page, destination: Path, **options) -> None:
 
 
 def fit_table_columns(page, grid: str) -> int:
-    """Fit every displayed column with navigation collapsed, without horizontal scrolling."""
+    """Fit every displayed column and the navigation when it is shown."""
     # Cached cells can arrive after the first rows. Use normal header
     # auto-sizing once they're ready so startup widths don't widen the image.
     page.evaluate("document.fonts.ready")
@@ -328,7 +343,10 @@ def fit_table_columns(page, grid: str) -> int:
     )
     # Measure the actual shown columns so later additions get space
     # without squeezing their labels or cropping the last column.
-    width = math.ceil(column_width + 48)
+    navigation = page.evaluate(
+        "Math.max(0, document.getElementById('navbar').getBoundingClientRect().right)"
+    )
+    width = math.ceil(column_width + navigation + 48)
     page.set_viewport_size({"width": width, "height": 1080})
     page.wait_for_function(
         """grid => {
@@ -338,7 +356,9 @@ def fit_table_columns(page, grid: str) -> int:
     }""",
         arg=grid,
     )
-    print(f"{grid}: all displayed columns fit at {width}px with navigation collapsed")
+    print(
+        f"{grid}: all displayed columns fit at {width}px; navigation width={navigation}px"
+    )
     return width
 
 
@@ -401,6 +421,15 @@ def capture(origin: str, destination: Path) -> None:
             page.locator("#run-history-list-grid .run-list-row-latest").first
         ).to_be_visible()
         expect(page.get_by_text(NOTE_TEXT, exact=True)).to_be_visible()
+        page.get_by_role("button", name="Columns", exact=True).click()
+        page.get_by_role("checkbox", name="Median and best", exact=True).check()
+        page.get_by_role("button", name="Columns", exact=True).click()
+        for label in ("Median", "Best"):
+            expect(
+                page.locator("#run-history-list-grid .run-list-slot > span:visible")
+                .filter(has_text=label)
+                .first
+            ).to_be_visible()
         page.get_by_text("Score vs Run", exact=True).click()
         page.locator("#run-history-run-range").click()
         page.get_by_role("option", name="All runs", exact=True).click()
@@ -416,24 +445,23 @@ def capture(origin: str, destination: Path) -> None:
                 const graph = document.querySelector('#run-history-graph .js-plotly-plot');
                 return Math.abs(graph._fullLayout.width - graph.getBoundingClientRect().width) < 2;
             }""")
-        page.wait_for_function("""() => {
+        page.wait_for_function(
+            """count => {
             const graph = document.querySelector('#run-history-graph .js-plotly-plot');
             const typical = graph?.data?.filter(trace => trace.name === 'Typical score') || [];
             return graph?._fullLayout?.xaxis.type === 'linear'
-                && graph.data[0].x.length === 96
+                && graph.data[0].x.length === count
                 && typical.some(trace => trace.opacity === 0.35)
-                && typical.some(trace => trace.opacity === 1 && trace.x.includes(96))
-                && graph.data.find(trace => trace.name === 'New PB')?.x.length <= 10
+                && typical.some(trace => trace.opacity === 1)
+                && typical.some(trace => trace.x.includes(count))
                 && graph.layout.shapes.length === 2;
-        }""")
+        }""",
+            arg=len(HISTORY["runs"]),
+        )
         page.locator("#run-history-graph").click(position={"x": 5, "y": 5})
         page.mouse.move(0, 0)
         page.evaluate("document.fonts.ready")
         save_stable_screenshot(page, destination / IMAGE_NAMES[0])
-        page.get_by_role("button", name="Show or hide navigation").click()
-        page.wait_for_function("""() =>
-            document.getElementById('navbar')?.getBoundingClientRect().right <= 1
-        """)
         for path, grid, filename in (
             ("/playlists", "playlists-overview-grid", IMAGE_NAMES[1]),
             (
@@ -444,14 +472,20 @@ def capture(origin: str, destination: Path) -> None:
         ):
             page.set_viewport_size(
                 {
-                    "width": 1440 if grid == "playlists-overview-grid" else 1920,
+                    "width": 1680 if grid == "playlists-overview-grid" else 1920,
                     "height": 1080,
                 }
             )
             page.goto(origin + path)
-            page.wait_for_function("""() =>
-                document.getElementById('navbar')?.getBoundingClientRect().right <= 1
-            """)
+            if grid == "playlist-scenarios-grid":
+                page.get_by_role("button", name="Show or hide navigation").click()
+                page.wait_for_function("""() =>
+                    document.getElementById('navbar')?.getBoundingClientRect().right <= 1
+                """)
+            else:
+                page.wait_for_function("""() =>
+                    document.getElementById('navbar')?.getBoundingClientRect().right > 1
+                """)
             expect(page.locator(f"#{grid} .ag-row").first).to_be_visible()
             # Cached leaderboard values arrive in a second callback. Wait for
             # the percentile cells as well as the first paint of local stats.

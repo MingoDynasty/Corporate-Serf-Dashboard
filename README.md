@@ -10,7 +10,8 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
 [![Run History showing ww5t progress, typical score bands and session runs](docs/screenshots/run_history.png)](docs/screenshots/run_history.png)
 
 Track your usual score across sessions, with individual runs and PBs for context.
-Screenshots show sample data. Open an image for full-resolution detail.
+Run History uses sanitized real ww5t history. Other scenarios and leaderboard values
+are sample data. Open an image for full-resolution detail.
 
 ## Features
 
@@ -37,13 +38,18 @@ Screenshots show sample data. Open an image for full-resolution detail.
 See what's next in
 [docs/roadmap.md](docs/roadmap.md).
 
-[![Playlists comparing benchmark coverage and leaderboard standing](docs/screenshots/playlists.png)](docs/screenshots/playlists.png)
-
-Compare benchmark coverage and standing to decide where to focus.
-
-[![Voltaic Intermediate scenario table showing strengths, weaknesses and next-rank targets](docs/screenshots/playlist_scenarios.png)](docs/screenshots/playlist_scenarios.png)
-
-Find weaker scenarios and see how close each is to its next rank.
+<table>
+<tr>
+<td width="50%" valign="top">
+<a href="docs/screenshots/playlists.png"><img src="docs/screenshots/playlists.png" width="360" alt="Playlists comparing benchmark coverage and leaderboard standing"></a>
+<p>Compare benchmark coverage and standing to decide where to focus.</p>
+</td>
+<td width="50%" valign="top">
+<a href="docs/screenshots/playlist_scenarios.png"><img src="docs/screenshots/playlist_scenarios.png" width="360" alt="Voltaic Intermediate scenarios showing strengths, weaknesses and next-rank targets"></a>
+<p>Find weaker scenarios and see how close each is to its next rank.</p>
+</td>
+</tr>
+</table>
 
 ## Install
 

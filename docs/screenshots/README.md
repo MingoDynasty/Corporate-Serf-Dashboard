@@ -1,37 +1,70 @@
 # README screenshots
 
-The three PNGs in this folder show the real app with synthetic runs, notes and
-leaderboard values. They contain no player history or account details.
+The three PNGs show the real app with curated documentation data. Run History
+uses a maintainer-approved, sanitized snapshot of real ww5t history. Other
+scenario histories and all leaderboard positions and percentiles are synthetic.
 
 ## Screenshot stories
 
 The README introduces the app through three questions: am I improving, where
 am I weak, and what should I train next? Each image answers one part of that
-story. One fictional player's Voltaic Intermediate benchmark connects the
-overview, the scenario table and the ww5t history.
+story. The same Voltaic Intermediate benchmark connects the overview, the
+scenario table and the ww5t history.
 
-| Image | Story | Sample and framing |
+| Image | Story | Data and framing |
 | --- | --- | --- |
-| `run_history.png` | Usual performance improves despite variation between runs. | ww5t in Score vs Run with All runs. An early lucky PB, a plateau and uneven gains distinguish typical performance from records. Older stretches fade after long breaks; all twenty latest supporting runs are recent. Keep the note and one session expanded. Show PB and score-threshold lines, with rank overlays off so the trend remains prominent. |
-| `playlists.png` | Compare coverage and standing to choose a benchmark to work on. | A completed novice benchmark, an active intermediate benchmark, and partially explored advanced and Viscose benchmarks. Vary run counts, activity dates, medians and weakest percentiles. Use a compact viewport with navigation collapsed and every column visible. |
-| `playlist_scenarios.png` | Identify weaknesses and achievable next targets. | Show the same Voltaic Intermediate benchmark, including ww5t near Master. Mix ranks and percentiles, with both strengths and weaknesses and several small gaps to the next rank. Include the whole benchmark so every category is visible and no merged group ends at a crop. Collapse navigation and fit every default column. |
+| `run_history.png` | Separate usual performance from individual results, across practice and long breaks. | Real ww5t history in Score vs Run with All runs: 169 runs across 24 sessions, from August 2025 to August 2026. Preserve the uneven progress and actual gaps. Typical score support is faded after long breaks, including the latest point. Select Median and best for session summaries. Keep the useful Bardpill technique note and one session expanded. Show PB and score-threshold lines, with rank overlays off so the trend remains prominent. |
+| `playlists.png` | Compare coverage and standing to choose a benchmark to work on. | A completed novice benchmark, an active intermediate benchmark, and partially explored advanced and Viscose benchmarks. Vary run counts, activity dates, medians and weakest percentiles. Keep navigation visible and fit every column. |
+| `playlist_scenarios.png` | Identify weaknesses and achievable next targets. | Show the same Voltaic Intermediate benchmark, including ww5t's real 1470 PB, twenty points below Jade. Mix ranks and synthetic percentiles, with both strengths and weaknesses and several small gaps to the next rank. Include the whole benchmark so every category is visible and no merged group ends at a crop. Collapse navigation and fit every default column. |
 
-The histories and cached leaderboard values share the same scores and
-positions across views. These are illustrative examples, not a claim about
-how fast a player will improve. The fixture stays synthetic and uses the
-app's real parser, components, statistics and controls.
+Run History is the only full-width image in the README. The two tables appear
+as compact, linked previews side by side; full-resolution viewing supplies
+their dense detail without making the front page a wall of screenshots.
+
+The histories and cached leaderboard values share the same PB scores across
+views. Synthetic standings illustrate comparison, rather than the player's
+actual leaderboard position. The app supplies the real parser, components,
+statistics and controls.
+
+### Data provenance
+
+[ww5t_history.json](ww5t_history.json) contains only the selected scenario and
+its run end and start times, effective durations, scores, normalized cm/360
+sensitivity, shots and hits. The maintainer authorized this public snapshot,
+including its real dates and scores. It contains no account names, IDs,
+original CSVs, file paths or scenario hashes. Capture and CI read this committed
+snapshot; they never read the maintainer's private installation or stats folder.
+
+The snapshot retains all 169 available ww5t runs and their recorded local
+wall-clock times. It does not smooth scores, shorten gaps or manufacture
+improvement. Synthetic practice on other scenarios stays clear of these
+sessions so it cannot bridge their boundaries. The latest run follows a long
+break: only one of its twenty Typical score supporting runs is within thirty
+days. Its faded presentation is intentional.
+
+The scenario note is the maintainer's chosen bardOZ advice, staged verbatim:
+
+```text
+Take the Bardpill:
+1. Learn aiming like you would learn a musical instrument; master the technique slowly at first.
+2. Flick fast but take your time on the micro correction.
+3. Restart if you miss in the first 10 seconds.
+4. Restart on 4th miss.
+```
+
+The note uses the app's normal scrollable card. Do not enlarge or restyle the
+card just to expose the whole note in one image.
 
 ### Review an updated set
 
 - Inspect the images at their displayed README width as well as full size.
   The main trend, comparison or next target should be apparent quickly.
-  Full-resolution viewing supplies the dense table detail.
-- Keep one main point per image. Use realistic variation and deliberate
-  contrasts; avoid identical completion counts, repeated score waves or a
-  procession of new PBs that makes the sample look mechanical.
-- Preserve continuity: benchmark names, ww5t's PB and standing, and run counts
-  agree wherever they recur. Keep both faded and full-strength history, with
-  the latest typical-score point at full strength.
+- Keep one main point per image. Preserve real variation and gaps; avoid
+  fabricating a rapid improvement curve for a recognizable scenario.
+- Preserve continuity: benchmark names, ww5t's PB, and run counts agree
+  wherever they recur. Keep both faded and full-strength history, with recency
+  reflecting the snapshot faithfully rather than forcing the latest point
+  to full strength.
 - Close menus, dismiss tooltips and move the pointer off content. Keep useful
   headings and complete rows and category groups, with every column in view.
   Use viewport sizing and normal app controls; don't restyle the app or add
@@ -43,6 +76,8 @@ app's real parser, components, statistics and controls.
 Automation preserves these curated states and checks rendering and column
 fit. A person still checks the story and composition when reviewing a refresh.
 Update this brief with the fixture when the intended demonstration changes.
+Any replacement real-data snapshot needs the same explicit public-data scope
+and field review; never copy raw personal CSVs into the repository.
 
 ## Refresh locally
 
@@ -96,22 +131,25 @@ default development environment.
 
 [The capture script](../../scripts/capture_screenshots.py) starts the app from
 its own checkout on a free loopback port. It creates a temporary state root
-beneath `ignore/screenshots/`, loads sample CSVs through the production parser,
-and seeds sample leaderboard caches. Both the server and the browser refuse
-outbound HTTP requests. Existing app settings, notes, caches and stats are
-never read or changed.
+beneath `ignore/screenshots/`, loads the sanitized and synthetic CSVs through
+the production parser, and seeds synthetic leaderboard caches. Both the server
+and the browser refuse outbound HTTP requests. Existing app settings, notes,
+caches and stats are never read or changed.
 
-The sample clock is fixed to October 21, 2026, at 18:00 UTC in both Python and
-the browser. Chromium uses English, UTC, a light theme and a fresh browser
-context. Captures use a 2× device scale. Run History shows VT ww5t Intermediate
-S5 at 1920 by 1080 in Score vs Run with All runs selected. Its sample history
-includes long breaks, so the Typical score line and bands visibly change
-between full-strength and faded support.
+The sample clock is fixed to August 7, 2026, at 01:02:02, two hours after the
+last snapshot run. Python uses these recorded wall-clock values; the browser
+uses UTC for repeatability. Chromium uses English, a light theme and a fresh
+browser context. Captures use a 2× device scale. Run History shows VT ww5t
+Intermediate S5 at 1920 by 1080 in Score vs Run with All runs selected and
+Median and best session summaries. Its history includes long breaks, so the
+Typical score line and bands visibly change between full-strength and faded
+support.
 
-For both table screenshots, the capture tool collapses the left navigation,
-waits for every cached row and the fonts, then auto-sizes columns through the
-normal header controls. It measures the total width of every displayed column. It expands the viewport to
-at least that width plus the page padding, and checks that the table has no
+For table screenshots, the capture tool leaves navigation open on Playlists
+and collapses it on the scenario table. It waits for every cached row and the
+fonts, then auto-sizes columns through the normal header controls. It measures
+the width of every displayed column and any visible navigation, expands the
+viewport to include them plus page padding, and checks that the table has no
 horizontal overflow. This includes new default columns added by later changes.
 Table images are cropped to their headings, headers and all sample rows.
 The viewport grows vertically to include the selected benchmark whole.
@@ -121,17 +159,18 @@ listeners before reloading so failures during the clean reload are captured.
 After closing Chart options, it resizes the viewport and checks that Plotly's
 canvas fills its container. It waits for the chart, note, grid and leaderboard
 callbacks, then waits for two matching frames with animations disabled before
-saving each screenshot.
-It fails on subsequent browser exceptions, HTTP errors, or attempted outbound
-requests. All three captures must succeed before any
-checked-in image is replaced, and the temporary server and state are removed
-on success or failure.
+saving each screenshot. It fails on subsequent browser exceptions, HTTP
+errors, or attempted outbound requests. All three captures must succeed before
+any checked-in image is replaced, and the temporary server and state are
+removed on success or failure.
 
 These are documentation captures, not pixel-diff test baselines. Fixed data,
 time and browser settings reduce incidental changes; font rendering can still
 vary across operating systems. Use Windows, as the workflow does, when
 refreshing the committed images.
 
-To change the pictured scenario, playlists or sample history, edit the constants
-and sample generator in the capture script. App layout and copy come directly
-from production components; the capture tool does not replace or restyle them.
+To change the pictured scenario, playlists or synthetic practice, edit the
+constants and sample generator in the capture script. To refresh the real
+history, update the sanitized JSON snapshot and its capture clock. App layout
+and copy come directly from production components; the capture tool does not
+replace or restyle them.
