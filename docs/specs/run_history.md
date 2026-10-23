@@ -4,9 +4,9 @@ Run History charts one scenario's runs and their typical score beside a
 session list, with matching highlights for its latest run.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
-page receives new runs without a reload and can follow the scenario just
-played. A check marks a run that met its score threshold and a star marks a
-new personal best, each judged when the run was played.
+page receives each new run once without a reload and can follow the
+scenario just played. A check marks a run that met its score threshold and
+a star marks a new personal best, each judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -1323,6 +1323,11 @@ The card's lines, local-record scope and leaderboard presentation follow
 
 ## Run delivery
 
+- A successfully imported run CSV appears once in the stores and run lists.
+  Duplicate create events and deletion/recreation of that filename during
+  the same app session do not add runs or increase scenario counts. The
+  filename identity and retry rules are in
+  [notifications.md](notifications.md#run-notifications).
 - The app shell drains the run-event deque, on its own interval and on every
   page, and publishes one batch per tick. This page's `forward_run_events`
   consumes that batch store as its only `Input` and writes two stores in one
