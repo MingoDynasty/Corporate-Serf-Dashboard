@@ -656,22 +656,21 @@ flowchart LR
   and waits for the selection as the list does. The card reports the
   selected scenario's latest run: `latest_run_from_store` copies the run
   store once and works out from that copy both the card's run and the
-  newest run on any scenario. The callback writes when the card's run ended,
-  in epoch seconds, to the card's `run-history-card-played-at` store. A
+  newest run on any scenario, whose presence helps choose the card's empty
+  state. The callback writes when the card's run ended, in epoch seconds, to
+  the card's `run-history-card-played-at` store. A
   clientside callback (`latest_run_card.AGE_SCRIPT`, which the PB card
   registers for its own age too) words that as the run's age with the shared
   `relativeTime` and `absoluteTime`, on the store's change and on the
   30-second tick, and with no run hides the words that hold the age, so the
   first line reads `Latest run` alone. `show_latest_run` also writes
-  `run-history-latest-run`, the id of the store's newest run on any
-  scenario, only when that is another run than the one held. The
-  graph takes that store: `register_chart_options()` is called with
-  `latest_run`, so the one callback that styles the figure also shows or
-  hides the ring round the latest run. A figure rings its own scenario's
-  newest run, and the ring shows while that is the store's newest run. A run
-  on another scenario with Follow off rebuilds no chart, and that callback
-  then answers with a patch of the ring's opacity alone, which leaves a zoom
-  as it was.
+  `run-history-latest-run`, the card's run id (`shown.run_id`) or `None`,
+  only when the answer differs from the one held. The graph takes that
+  store: `register_chart_options()` is called with `latest_run`, so the one
+  callback that styles the figure also shows the ring when its run id
+  matches the card's. On a scenario change it waits for both that store and
+  the new cached figure. A run on another scenario with Follow off rebuilds
+  no chart and leaves the store unchanged, preserving the ring and zoom.
   With no runs to read it draws `stats_dir_hint` and the setup card's two
   caution states, and never the account offer, so it registers no Skip
   callback. It registers the two flushes of `components/queued_notices.py`
@@ -875,12 +874,13 @@ flowchart LR
   which registers `toggle_chart_options`, `clear_point_color`, and the
   graph's one styling callback for those ids. The functions are module-level
   and stay unregistered until a page asks, so tests call them directly. The
-  page passes `latest_run`, the id of a store holding the id of the last run
-  played. The graph's callback takes that store as an input beside the
-  theme, the cached figure, and the two point preferences, and runs
-  `apply_graph_appearance_ringing_latest_run()`: it styles the figure with
-  `apply_graph_appearance()`, shows the ring only round the last run played,
-  and answers a change of that store alone with `latest_run_ring_patch()`.
+  page passes `latest_run`, the id of a store holding the selected scenario's
+  latest run id, or `None` with no such run. The graph's callback takes that
+  store as an input beside the theme, the cached figure, and the two point
+  preferences, and runs `apply_graph_appearance_ringing_latest_run()`: it
+  styles the figure with `apply_graph_appearance()`, shows the ring when its
+  run matches the card's, and answers a change of that store alone with
+  `latest_run_ring_patch()`, preserving the chart's zoom.
   The module also holds the controls' help text (`SETTINGS_HELP_TEXT`) and
   `settings_help_label()`, the label with a help icon, which the hosting
   page also uses for the Follow switch outside the panel. The Score
@@ -1068,13 +1068,13 @@ flowchart LR
   carries `figures_below`, which keeps them on a second line under it. Every
   value a
   row shows is formatted here, and every model names its view, the store's
-  newest run, even with nothing to list, and the rows that run opens. That
-  run's row
-  carries `latest`, and a row class rule of the grid's highlights it: a rule
-  and not part of the class `getRowClass` returns. The grid adds what that
-  function returns again when a row is refreshed and never takes off a class
-  it added before, where it both adds and removes a rule's class, and the run
-  that was the latest stays in the list and has to lose the highlight.
+  newest run as `newest_run`, even with nothing to list, and the rows that
+  run opens. That expansion token stays separate from the highlight:
+  `_latest_scenario_run_id()` finds the selected scenario's latest run in
+  the whole-store session order, and that run's row carries `latest`. The
+  grid's row class rule adds and removes the highlight when row data changes.
+  `getRowClass` only adds classes during refresh, so it would leave the
+  highlight on the previous latest run.
   `run_list_from_store()` copies the store once and works the sessions and
   the marks out from that one copy, marking under All scenarios every
   scenario the listed sessions hold, and `is_session_in_progress()` answers
@@ -1106,9 +1106,11 @@ flowchart LR
   on the scenario is the sum of its visits in the session, and reads as
   unknown where a visit's first run has no usable start.
   `latest_run_from_store()` copies the store once and returns the card's run
-  with the id of the newest run on any scenario, which the chart's ring and
-  the run list's highlight read. A page fills in a `LatestRunCardIds`, puts
-  `latest_run_card()` in its layout, and writes what
+  with the id of the newest run on any scenario. The latter only tells the
+  card's empty-state logic whether the store has runs. The page writes the
+  card's own run id to the chart's store; the run list finds that scenario's
+  latest run independently from its session snapshot. A page fills in a
+  `LatestRunCardIds`, puts `latest_run_card()` in its layout, and writes what
   `latest_run_card_content()` returns to it from a callback of its own; with
   no run, that function chooses one of the card's three empty states from
   the selection and whether the store has runs. `AGE_SCRIPT` is the
