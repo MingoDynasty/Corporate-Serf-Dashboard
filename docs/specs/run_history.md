@@ -5,8 +5,8 @@ grouped by session.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
-played. A check marks a run that met its score threshold and a star marks a
-new personal best, each judged when the run was played.
+played. Session rows keep their score summaries inline, and each run's marks
+show whether it met its score threshold or set a personal best.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -836,12 +836,12 @@ The card's lines, local-record scope and leaderboard presentation follow
 - A session row is named by when the session started: `Oct 4, 9:45 PM`, or
   `Dec 30, 2025, 9:45 PM` in an earlier year. Its right side reads how many
   of the session's runs were on this scenario, such as `7 of 47 runs` or
-  `1 of 1 run`. The first row's right side also gives the session's length,
-  as `1 hr 6 min · 7 of 47 runs`, and carries an "In progress" badge while
-  its session is in progress. Hovering the length reads "The length runs from
-  the first run to the last run. It doesn't count the time since your last
-  run." With the selected scenario not played in the first row's session, the
-  row reads `0 of 47 runs` and, opened, "Not played in this session"
+  `1 of 1 run`. The first row carries an "In progress" badge while its
+  session is in progress. No session row in this view gives its length;
+  every session's length is available in All scenarios
+  ([2026-10-23][inline-summaries]). With the selected scenario not played in
+  the first row's session, the row reads `0 of 47 runs` and, opened, "Not
+  played in this session"
   ([2026-10-12][column]).
 - The count on every session row is a button drawn as a link, `0 of 47 runs`
   included. Its hover reads "Show the whole session". A click on it does not
@@ -976,10 +976,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   formatted as a score is, and show whether the row is open or closed. A
   session row under All scenarios has none. Turning the checkbox on or off
   makes no request ([2026-10-14][median-best]).
-- The figures sit in the row's own line, just before its count. The first
-  row under This scenario, which gives the session's length and says In
-  progress, keeps them on a second line under it, and is the one row that
-  grows when the checkbox turns on ([2026-10-18][figures-line]).
+- The figures sit in the row's own line, just before its count, including
+  the first row under This scenario. No row's height changes when the
+  checkbox turns on or off ([2026-10-23][inline-summaries]).
 - A scenario row reads `Median {median} · Best {best} · 4 runs`, or `Score
   {score} · 1 run` ([2026-10-18][figures-line]).
 - Under This scenario, a session row's Median, Best, and count line up in
@@ -988,9 +987,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   against its value. Every value lines up on its decimal point: whole numbers
   end at one place, and decimals stick out to the right. A one-run session
   reads `Score {score}` in Best's column, with Median's column blank and
-  silent to a screen reader. The first row's second line ends short by the
-  count's column, so its Median and Best sit over the rows below, or at the
-  row's edge with no row below. Each column is as wide as its widest value
+  silent to a screen reader ([2026-10-18][figure-columns]). Every session
+  row's count, including the newest, contributes to the count column's width
+  ([2026-10-23][inline-summaries]). Each column is as wide as its widest value
   in any session of the scenario, loaded or not, so Show older sessions
   never moves a column ([2026-10-18][figure-columns]).
 - Each view loads 30 sessions and counts its own. A "Show older sessions"
@@ -1486,6 +1485,7 @@ The card's lines, local-record scope and leaderboard presentation follow
 [card-width]: ../decision_log/2026/2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md
 [figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
 [figure-columns]: ../decision_log/2026/2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md
+[inline-summaries]: ../decision_log/2026/2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md
 [coalesce]: ../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md
 [threads]: ../decision_log/2026/2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating.md
 [rank-history]: ../decision_log/2026/2026-08-08-rank-history-capture-is-deferred-until-a-position-over-time-feature-is-designed.md

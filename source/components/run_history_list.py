@@ -119,11 +119,10 @@ ALL_SCENARIOS_GRID_NAME = "Runs of all scenarios, by session"
 SHOW_SCENARIO_LABEL = "Show {scenario}"
 SELECTED_SCENARIO_TEXT = "Selected scenario: {scenario}"
 # The figures of a row that stands for one scenario's runs, while Median and
-# best is on: in the row's line ahead of its count, or under it on a row that
-# carries ``figures_below``. Never worded as typical, usual, average, or
-# normal: it describes the runs under the row and compares nothing. Under This
-# scenario the script draws a session row's words in columns, so it is handed
-# them alone.
+# best is on: in the row's line ahead of its count. Never worded as typical,
+# usual, average, or normal: it describes the runs under the row and compares
+# nothing. Under This scenario the script draws a session row's words in
+# columns, so it is handed them alone.
 MEDIAN_LABEL = "Median"
 BEST_LABEL = "Best"
 SCORE_LABEL = "Score"
@@ -156,10 +155,8 @@ class FigureColumns(TypedDict):
 
     ``median`` and ``best`` are each a whole number and its decimals, either
     of them ``""`` where no session has one. Best's column also holds a
-    one-run session's score. ``count`` is the widest count of the rows whose
-    figures sit in their line, every row but the first, and ``None`` with no
-    such row. The first row's count is left out: it is in no column, and it
-    grows with every run played. ``one_run`` tells whether any session's
+    one-run session's score. ``count`` is the widest count of every session
+    row, including the newest. ``one_run`` tells whether any session's
     figures are one run's score, so Best's label has room for Score.
     """
 
@@ -308,7 +305,7 @@ def _figure_columns(
     """Find the widest text of each part of the figure columns.
 
     ``figures`` is every listed session's ``_figure_parts``, and ``counts``
-    the counts of the rows whose figures sit in their line.
+    is every listed session's count.
     """
     medians = [parts["median"] for parts in figures if parts and "median" in parts]
     bests = [parts.get("best") or parts["score"] for parts in figures if parts]
@@ -500,22 +497,9 @@ def build_run_list(
                 "sid": session_id,
                 "name": format_short_timestamp(session.start, today),
                 "in_progress": is_first_row and in_progress,
-                # Only the first row gives its length: the session being
-                # played is the one whose length matters at a glance.
-                "length": (
-                    format_elapsed_duration(session.length.total_seconds())
-                    if is_first_row
-                    else None
-                ),
-                "length_help": is_first_row,
                 "counts": counts[index],
                 "place": place,
                 "figures": figures[index],
-                # Only the first row gives its length, and while the session
-                # is played it says so: with the figures too, its line can
-                # run past a 500px list (by about 10px, measured 2026-10-18),
-                # so it keeps them on a line of their own.
-                "figures_below": is_first_row,
             }
         )
         rows.extend(
@@ -533,8 +517,7 @@ def build_run_list(
         "newest_run": newest_run,
         "forced_open": [rows[0]["id"]],
         "session_limit": session_limit,
-        # The first listed session is the first row, whose figures go below.
-        "columns": _figure_columns(figures, counts[1:]),
+        "columns": _figure_columns(figures, counts),
         "heading": f"{scenario} · {_count(scenario_run_count, 'run')}",
         "grid_name": f"Runs of {scenario}, by session",
         "empty": None,
@@ -1226,9 +1209,9 @@ _APPLY_FIGURES = """
         }
         latestRun += 1;
         const run = latestRun;
-        const gridApi = await window.dash_ag_grid.getApiAsync(GRID_ID);
+        await window.dash_ag_grid.getApiAsync(GRID_ID);
         if (run === latestRun) {
-            window.runHistoryList.setFigures(gridApi, Boolean(checked));
+            window.runHistoryList.setFigures(Boolean(checked));
         }
         return noUpdate;
     };

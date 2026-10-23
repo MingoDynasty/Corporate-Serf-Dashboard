@@ -1131,8 +1131,7 @@ a.run-toast-link {
     width: 100cqw;
 }
 
-/* A session row or a scenario row: its line, and under it the row's figures
-   while Median and best is on, on the one row that keeps them below. */
+/* Session and scenario rows keep their facts on one line. */
 .run-list-group {
     align-items: stretch;
     cursor: pointer;
@@ -1152,13 +1151,6 @@ a.run-toast-link {
    up with the runs' numbers under it. */
 .run-list-scenario {
     padding-left: 18px;
-}
-
-.run-list-figures {
-    color: var(--mantine-color-dimmed);
-    font-size: 12px;
-    text-align: right;
-    white-space: nowrap;
 }
 
 .run-list-session-name {

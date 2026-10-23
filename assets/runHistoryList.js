@@ -66,10 +66,6 @@
     note: 26,
     more: 44,
   };
-  // What a row's second line adds, while Median and best is on, on a row
-  // whose figures go below.
-  var SECOND_LINE_HEIGHT = 16;
-
   var state = (window.runHistoryList = {
     // The grid the state below belongs to. The page is drawn again on every
     // visit, with a new grid, and which rows are open is not remembered.
@@ -212,15 +208,8 @@
     var open = openRows();
     return open.has(data.sid) && (data.vid == null || open.has(data.vid));
   };
-  // The figures are on a row whether it is open or closed, so a row's height
-  // follows the checkbox and never a click. Only a row that keeps them on a
-  // line of their own grows.
   dagfuncs.runListRowHeight = function (params) {
-    var data = params.data;
-    var height = ROW_HEIGHTS[data.kind] || ROW_HEIGHTS.run;
-    return state.figures && data.figures && data.figures_below
-      ? height + SECOND_LINE_HEIGHT
-      : height;
+    return ROW_HEIGHTS[params.data.kind] || ROW_HEIGHTS.run;
   };
   dagfuncs.runListRowClass = function (params) {
     return "run-list-row-" + params.data.kind;
@@ -359,18 +348,9 @@
     return h("span", { className: "run-list-part-end" }, " ");
   }
 
-  // A group row: its line, and under it the parts of a line of figures, on
-  // the one row whose figures go below. The figures line is told from the
-  // first by its own part end, for the reason partEnd gives. The part end
-  // opens the figures line: put after the line's last part, it was a flex
-  // item of the line, and the line's gap before it left the facts that far
-  // short of the columns' edge.
-  function groupRow(props, className, toggle, line, below) {
+  function groupRow(props, className, toggle, line) {
     return wideCell(props, "run-list-group " + className, { onClick: toggle }, [
       h.apply(null, ["div", { className: "run-list-line" }].concat(line)),
-      below
-        ? h.apply(null, ["div", { className: "run-list-figures" }, partEnd()].concat(below))
-        : null,
     ]);
   }
 
@@ -562,12 +542,11 @@
         : data.counts;
     // Only This scenario's session rows carry figures.
     var figures = state.figures && data.figures;
-    var below = figures && data.figures_below;
     // On a row whose figures are in its line, the count's part is as wide as
     // the widest count, so Best's column ends in one place on every row. A
     // count alone already ends at the row's edge.
     var figuresAndCount =
-      figures && !below
+      figures
         ? figureColumns(data.figures, labels).concat([columnGap(), slot("end", [state.columns.count], counts)])
         : [counts];
     var line = [
@@ -607,20 +586,7 @@
         )
       );
     }
-    // The first row's figures line ends short by the count's part and the
-    // space before it, so its columns sit over the rows below. With no row
-    // below to line up with, it ends at the row's edge.
-    return groupRow(
-      props,
-      "run-list-session",
-      toggle,
-      line,
-      below
-        ? figureColumns(data.figures, labels).concat(
-            state.columns.count ? [blank([columnGap(), slot("end", [state.columns.count], "")])] : []
-          )
-        : null
-    );
+    return groupRow(props, "run-list-session", toggle, line);
   }
 
   dagcomponentfuncs.RunListWideRow = function (props) {
@@ -899,21 +865,12 @@
   };
 
   // Median and best turned on or off. The figures are always in the rows, so
-  // this makes no request: the rows are drawn again, and the grid measures
-  // their heights again.
-  state.setFigures = function (api, on) {
+  // this makes no request and keeps their heights: the rows are drawn again.
+  state.setFigures = function (on) {
     if (state.figures === on) {
       return;
     }
     state.figures = on;
     notify();
-    api.resetRowHeights();
-    // That call measures the body's rows and leaves the pinned row alone,
-    // which is in a row model of its own. Handed in again, it is measured
-    // too (AG Grid 35.3, 2026-10-14).
-    var pinned = api.getPinnedTopRow(0);
-    if (pinned && pinned.data) {
-      api.updateGridOptions({ pinnedTopRowData: [pinned.data] });
-    }
   };
 })();

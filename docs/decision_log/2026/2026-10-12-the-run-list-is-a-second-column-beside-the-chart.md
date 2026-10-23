@@ -15,6 +15,10 @@ the list is 500px at least and as wide as its shown columns need, a run row
 has seven columns by default and up to ten, and the Columns menu has six
 checkboxes. R3, the list as a second column beside the chart, and every
 other rule of the list under This scenario stand.
+Superseded in part again, 2026-10-23, by
+[the inline session summaries entry](2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md):
+This scenario no longer shows the newest session's length. All scenarios
+continues to show every session's length.
 
 Run History lists the selected scenario's runs in a column of its own, to the
 right of the chart and always shown. The chart is narrower than the old
