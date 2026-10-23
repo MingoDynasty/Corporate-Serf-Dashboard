@@ -168,23 +168,21 @@ def test_the_first_row_is_in_progress_until_thirty_minutes_after_its_last_run():
 
     assert playing["rows"][0]["in_progress"] is True
     assert ended["rows"][0]["in_progress"] is False
-    # It is still the first row, and still gives its length.
-    assert ended["rows"][0]["length"] == "11 min"
+    assert ended["rows"][0].get("length") is None
     assert [row["id"] for row in ended["rows"]] == [
         row["id"] for row in playing["rows"]
     ]
 
 
-def test_only_the_first_row_gives_its_length_and_can_be_in_progress():
+def test_no_scenario_session_row_gives_its_length_and_only_the_first_is_in_progress():
     day = timedelta(days=1)
     runs = [*_minutes(0, 20, start=EVENING - day), *_minutes(0, 25, 50, 65)]
 
     model = _build(runs)
 
     first, older = _of_kind(model, "session")
-    # From the first run's start, a minute before it ended, to the last run's end.
-    assert (first["length"], first["in_progress"]) == ("1 hr 6 min", True)
-    assert (older["length"], older["in_progress"]) == (None, False)
+    assert (first.get("length"), first["in_progress"]) == (None, True)
+    assert (older.get("length"), older["in_progress"]) == (None, False)
 
 
 @pytest.mark.parametrize(
@@ -197,7 +195,7 @@ def test_only_the_first_row_gives_its_length_and_can_be_in_progress():
     ],
 )
 def test_the_session_length_is_given_in_minutes_and_hours(offsets, length):
-    assert _build(_minutes(*offsets))["rows"][0]["length"] == length
+    assert _tree(_minutes(*offsets))["rows"][0]["length"] == length
 
 
 @pytest.mark.parametrize(
@@ -214,7 +212,7 @@ def test_the_session_length_is_given_in_minutes_and_hours(offsets, length):
 def test_a_session_of_one_short_run_rounds_to_the_nearest_minute(seconds, length):
     run = _run(A, EVENING, length=timedelta(seconds=seconds))
 
-    assert _build([run])["rows"][0]["length"] == length
+    assert _tree([run])["rows"][0]["length"] == length
 
 
 # --- A session row's counts, and its runs --------------------------------------
@@ -948,7 +946,7 @@ def test_a_run_that_lands_takes_the_mark_from_the_run_before_it():
     assert _latest_rows(after) == [f"r:{run_id(landed)}"]
 
 
-# --- This scenario: what a session row's link and second line need --------------
+# --- This scenario: a session row's link and inline figures --------------------
 
 
 def test_a_session_row_gives_its_place_among_all_sessions_for_its_link():
@@ -972,23 +970,27 @@ def test_a_session_row_gives_its_place_among_all_sessions_for_its_link():
     ]
 
 
-def test_only_the_first_row_takes_the_lengths_hover():
+def test_scenario_session_rows_have_no_length_hover():
     day = timedelta(days=1)
     runs = [*_minutes(0, start=EVENING - day), *_minutes(0, 2)]
 
     first, older = _of_kind(_build(runs), "session")
 
-    assert (first["length_help"], older["length_help"]) == (True, False)
+    assert not first.get("length_help")
+    assert not older.get("length_help")
 
 
-def test_only_the_first_row_keeps_its_figures_below_its_line():
-    """It alone gives its length and In progress, which leave the figures no room."""
+@pytest.mark.parametrize("in_progress", [True, False])
+def test_every_scenario_session_row_keeps_its_figures_in_its_line(in_progress):
     day = timedelta(days=1)
     runs = [*_minutes(0, start=EVENING - day), *_minutes(0, 2)]
 
-    first, older = _of_kind(_build(runs), "session")
+    now = runs[-1].datetime_object + timedelta(minutes=0 if in_progress else 31)
+    first, older = _of_kind(_build(runs, now=now), "session")
 
-    assert (first["figures_below"], older["figures_below"]) == (True, False)
+    assert first["in_progress"] is in_progress
+    assert not first.get("figures_below")
+    assert not older.get("figures_below")
 
 
 FIGURES_CASES = [
@@ -1116,8 +1118,7 @@ def test_with_every_session_one_run_the_median_column_holds_nothing():
     assert columns["best"] == ["100", ""]
 
 
-def test_the_count_column_leaves_out_the_first_row_whose_count_is_in_no_column():
-    """Its figures go below, and its count grows with every run played."""
+def test_the_count_column_includes_the_first_rows_count():
     runs = [
         *_session(EVENING - timedelta(days=1), 10.0),
         *_session(EVENING, *[10.0] * 12),
@@ -1126,11 +1127,11 @@ def test_the_count_column_leaves_out_the_first_row_whose_count_is_in_no_column()
     model = _build(runs)
 
     assert model["rows"][0]["counts"] == "12 of 12 runs"
-    assert model["columns"]["count"] == "1 of 1 run"
+    assert model["columns"]["count"] == "12 of 12 runs"
 
 
-def test_with_the_first_row_alone_no_row_has_a_count_to_line_up():
-    assert _build(_minutes(0, 2))["columns"]["count"] is None
+def test_with_the_first_row_alone_the_count_column_holds_its_count():
+    assert _build(_minutes(0, 2))["columns"]["count"] == "2 of 2 runs"
 
 
 def test_of_two_counts_as_long_the_one_with_more_digits_is_the_widest():

@@ -1064,9 +1064,8 @@ flowchart LR
   worded; a session row's are split at the decimal point, and This
   scenario's model carries `columns`, the widest text of each part over
   every session the view can list, which the script lines the session rows'
-  figures and counts up by. The first session row under This scenario also
-  carries `figures_below`, which keeps them on a second line under it. Every
-  value a
+  figures and counts up by, including the newest row's count. Session lengths
+  are carried by All scenarios alone. Every value a
   row shows is formatted here, and every model names its view, the store's
   newest run, even with nothing to list, and the rows that run opens. That
   run's row

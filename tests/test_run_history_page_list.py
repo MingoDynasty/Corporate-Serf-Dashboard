@@ -1062,18 +1062,15 @@ def test_a_view_not_on_screen_shows_from_its_top_and_older_sessions_load_into_it
     )
 
 
-def test_a_rows_height_follows_median_and_best_and_the_pinned_row_is_measured_too():
-    """Row heights that change with a checkbox, with a pinned top row."""
+def test_median_and_best_keeps_row_heights_and_the_pinned_row_model():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
     setting = script[script.index("state.setFigures = function") :]
 
-    assert (
-        "return state.figures && data.figures && data.figures_below\n"
-        "      ? height + SECOND_LINE_HEIGHT\n"
-        "      : height;"
-    ) in script
-    assert "api.resetRowHeights();" in setting
-    assert "api.updateGridOptions({ pinnedTopRowData: [pinned.data] });" in setting
+    assert "return ROW_HEIGHTS[params.data.kind] || ROW_HEIGHTS.run;" in script
+    assert "state.figures = on;" in setting
+    assert "notify();" in setting
+    assert "resetRowHeights" not in setting
+    assert "pinnedTopRowData" not in setting
 
 
 def _function(script: str, name: str) -> str:
@@ -1094,44 +1091,20 @@ def test_a_scenario_rows_figures_go_ahead_of_its_count():
     )
 
 
-def test_a_session_rows_figures_and_count_go_in_columns_in_its_line_or_below():
-    """Under This scenario, Median, Best, and the count line up across the rows.
-
-    The count takes a column only on a row whose figures are in its line. The
-    first row's figures go below, and that line ends short by the count's
-    column, so its Median and Best sit over the rows below.
-    """
+def test_a_session_rows_figures_and_count_go_in_columns_in_its_line():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
     session = _function(script, "sessionRow")
     grouping = _function(script, "groupRow")
 
     assert "var figures = state.figures && data.figures;" in session
-    assert "var below = figures && data.figures_below;" in session
+    assert "figures_below" not in session
     assert (
         "figureColumns(data.figures, labels).concat([columnGap(), "
         'slot("end", [state.columns.count], counts)])\n        : [counts];'
     ) in session
-    assert (
-        'state.columns.count ? [blank([columnGap(), slot("end", '
-        '[state.columns.count], "")])] : []'
-    ) in session
-    assert "function groupRow(props, className, toggle, line, below) {" in grouping
-    assert (
-        '? h.apply(null, ["div", { className: "run-list-figures" }, partEnd()]'
-        ".concat(below))"
-    ) in grouping
-
-
-def test_the_part_end_opens_the_figures_below_so_the_line_ends_with_the_columns():
-    """The part end that tells the figures line from the first starts it.
-
-    After the line's last part, it was one of the line's flex items, and the
-    line's gap before it left the facts short of the columns' edge.
-    """
-    grouping = _function(LIST_SCRIPT.read_text(encoding="utf-8"), "groupRow")
-
+    assert "function groupRow(props, className, toggle, line) {" in grouping
     assert '["div", { className: "run-list-line" }].concat(line)),' in grouping
-    assert '["div", { className: "run-list-figures" }, partEnd()]' in grouping
+    assert "run-list-figures" not in grouping
 
 
 def test_a_columns_part_is_as_wide_as_the_widest_text_it_holds_drawn_unseen():
@@ -1745,9 +1718,7 @@ def test_median_and_best_reaches_the_script_by_a_callback_of_the_lists_own():
     ]
     # It runs as the page mounts, with the remembered value.
     assert registration["prevent_initial_call"] is False
-    assert "window.runHistoryList.setFigures(gridApi, Boolean(checked));" in source
-    assert f'getApiAsync("{IDS.grid}")' in source
-    assert "if (run === latestRun) {" in source
+    assert "window.runHistoryList.setFigures(Boolean(checked));" in source
 
 
 def test_the_column_callback_never_hears_median_and_best():

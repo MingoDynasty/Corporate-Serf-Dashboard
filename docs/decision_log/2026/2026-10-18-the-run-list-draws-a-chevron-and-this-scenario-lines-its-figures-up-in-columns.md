@@ -1,6 +1,10 @@
 # 2026-10-18: The Run List Draws A Chevron, And This Scenario Lines Its Figures Up In Columns
 
-Status: Accepted
+Status: Superseded in part, 2026-10-23, by
+[the inline session summaries entry](2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md):
+the first row's figures now sit in its line, and its count contributes to
+the count column's width. The chevron, decimal alignment, one-run placement
+and All scenarios stand.
 
 A session row and a scenario row now open and close on the app's own
 chevron, which points right when the row is closed and down when it is open,

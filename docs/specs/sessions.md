@@ -26,8 +26,9 @@ Two words are kept apart throughout. A **break** is time between runs. A
   sessions behind a value ([TS3][typical-chart], [TS5][typical-card-value]).
 - The run list has two views. Under This scenario it lists a scenario's runs
   under the session each was played in, names a session by when it started,
-  and counts the session's runs, and it gives the length of the newest session
-  alone. Under All scenarios it lists every session whole, with its length,
+  and counts the session's runs, with no session length in this view
+  ([2026-10-23](../decision_log/2026/2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md)).
+  Under All scenarios it lists every session whole, with its length,
   its runs, and its scenarios, and under each session a row per visit, in the
   order played, with that visit's runs under it
   ([2026-10-14](../decision_log/2026/2026-10-14-the-run-list-has-a-second-view-all-scenarios-that-shows-each-session-whole.md)).

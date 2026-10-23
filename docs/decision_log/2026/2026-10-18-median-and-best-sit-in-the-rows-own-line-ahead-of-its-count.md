@@ -5,6 +5,10 @@ Status: Superseded in part by the
 under This scenario, a session row's median, best, and count sit in columns
 with no dot between them, and a one-run row's score sits in Best's column.
 The line's placement, the first row's second line, and All scenarios stand.
+Superseded in part again, 2026-10-23, by
+[the inline session summaries entry](2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md):
+the first row under This scenario drops its session length and keeps its
+figures on the same line as its count. No row grows with the checkbox.
 
 With Median and best on, a row's median and best now sit in the row's own
 line, just before its run count, instead of on a second line under it. That
