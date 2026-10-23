@@ -4,8 +4,10 @@ The Playlists page is the one place playlists and benchmarks are managed, and
 it lists the playlists the user has chosen to see, with local aggregates. A
 benchmark is a playlist that also carries rank thresholds, and the bundled
 library ships with the app with only the popular ones visible. Clicking a
-playlist's name opens its scenario table, whose columns fit their contents
-after the first rows appear, with width limits on the rank columns.
+playlist's name opens its scenario table, which paints local stats and a
+benchmark's ranks and categories immediately and streams leaderboard positions
+in behind them, while a background worker keeps the overview's percentile
+columns warm.
 Each table has a Columns menu that shows or hides its columns and remembers
 the choice in the browser, with one KovaaK's ID column that starts hidden,
 and each draws every row as text that can be selected and that the browser's
@@ -212,9 +214,10 @@ and [product.md](../product.md). Leaderboard placement is worded
   column widths.
 - On a benchmark's scenario table, Rank is at most 240 px wide and Next Rank
   is at most 320 px wide, including manual resizing. Longer values end in an
-  ellipsis. Rank's tooltip shows its full cell value, and Next Rank's existing
-  tooltip includes the full target rank name. Scenario-table tooltips wrap
-  long text within the window, including names with no spaces.
+  ellipsis. Rank's tooltip shows a reached rank's full name and is absent for
+  `N/A` and `No rank`. Next Rank's existing tooltip includes the full target
+  rank name. Scenario-table tooltips wrap long text within the window,
+  including names with no spaces.
 - Hiding a column is display only. Rows carry every field, no fetch stops,
   and each status line reads the same with its columns hidden. The quick
   filter matches visible columns only, so a hidden column's values find no

@@ -2601,7 +2601,9 @@ def test_playlist_scenarios_rank_column_defs():
             "The highest rank your PB score has reached on this scenario."
         ),
         "valueFormatter": {"function": "params.data.tier_display"},
-        "tooltipField": "tier_display",
+        "tooltipValueGetter": {
+            "function": "params.data.tier_sort ? params.data.tier_display : null"
+        },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 100,
