@@ -4,8 +4,8 @@ The Playlists page is the one place playlists and benchmarks are managed, and
 it lists the playlists the user has chosen to see, with local aggregates. A
 benchmark is a playlist that also carries rank thresholds, and the bundled
 library ships with the app with only the popular ones visible. Clicking a
-playlist's name opens its scenario table, which paints local stats and a
-benchmark's ranks and categories immediately and streams leaderboard positions
+playlist's underlined name opens its scenario table, which paints local stats
+and a benchmark's ranks and categories immediately and streams leaderboard positions
 in behind them, while a background worker keeps the overview's percentile
 columns warm.
 Each table remembers its Columns menu choice in the browser, a scenario
@@ -78,6 +78,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   reaches `cellClicked` either: with Ctrl or Cmd it opens the name in a new
   tab, and with Shift or Alt alone it opens nothing
   ([2026-10-12](../decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
+- Playlist and scenario names use the shared text-link color, retain their
+  underlines, and keep the same color on hover and after visiting
+  ([2026-10-22](../decision_log/2026/2026-10-22-text-links-use-readable-colors-and-persistent-underlines.md)).
 - The Run History page links back to the table: while its Playlist
   filter holds a loaded playlist, the "Open scenario table" link on the
   filter's label line leads to `/playlists/{code}`. The link carries no `?sort=`, so the
