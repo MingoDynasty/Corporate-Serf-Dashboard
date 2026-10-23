@@ -48,10 +48,10 @@ The scenario note is the maintainer's shortened version of bardOZ's advice:
 
 ```text
 Take the Bardpill:
-1. Learn slowly, then speed up.
-2. Flick fast. Micro-correct slowly.
-3. Restart if you miss in first 10s.
-4. Restart on 4th miss.
+1. Learn technique slowly, then speed up.
+2. Flick fast. Micro-correct smoothly.
+3. Restart if you miss in the first 10s.
+4. Restart on the 4th miss.
 ```
 
 The note uses the app's normal card. At the selected 1960 by 1080 viewport,

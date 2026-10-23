@@ -31,10 +31,10 @@ RUN_HISTORY_PLAYLIST_CODE = "KovaaKsCarryingNarrowCt"
 TABLE_PLAYLIST_CODE = RUN_HISTORY_PLAYLIST_CODE
 NOTE_TEXT = (
     "Take the Bardpill:\n"
-    "1. Learn slowly, then speed up.\n"
-    "2. Flick fast. Micro-correct slowly.\n"
-    "3. Restart if you miss in first 10s.\n"
-    "4. Restart on 4th miss."
+    "1. Learn technique slowly, then speed up.\n"
+    "2. Flick fast. Micro-correct smoothly.\n"
+    "3. Restart if you miss in the first 10s.\n"
+    "4. Restart on the 4th miss."
 )
 USERNAME = "Sample player"
 PLAYLIST_SAMPLES = (
