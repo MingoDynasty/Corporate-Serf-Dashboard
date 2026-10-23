@@ -40,7 +40,7 @@ differently:
 | `pandas-stubs` | the `dev` group, as a `~=` pin | follows pandas' major.minor line |
 | pre-commit ruff | `rev` in `.pre-commit-config.yaml` | must equal the locked ruff |
 | uv | `required-version` and the `uv_build` range in `pyproject.toml` | the latest release; see [uv](#uv) |
-| GitHub Actions | each `uses:` line in `.github/workflows/*.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; report only, see [GitHub Actions](#github-actions) |
+| GitHub Actions | each `uses:` line in `.github/workflows/*.yml` | `gh api repos/<owner>/<action>/releases/latest --jq .tag_name`, per action; see [GitHub Actions](#github-actions) |
 | Vendored browser libraries | `assets/vendor/` | the upstream project; steps in [assets/vendor/README.md](../assets/vendor/README.md) |
 
 The Python version is not part of a refresh. Moving it is its own change, with
@@ -133,13 +133,17 @@ CI needs no edit, because `setup-uv` reads the pin from `pyproject.toml`.
 
 ### GitHub Actions
 
-A refresh reports these pins and does not move them. They move through the
+A refresh reports pins carried by the tooling spec and does not move them.
+They move through the
 [cross-repo tooling spec](decision_log/2026/2026-10-05-adopt-the-cross-repo-python-v3-tooling-spec.md),
-which the maintainer keeps outside this repository. The workflow's top-level
-settings and its `test` job are this repository's copy of the spec's workflow.
+which the maintainer keeps outside this repository. The top-level settings
+and `test` job in `ci.yml` are this repository's copy of the spec's workflow.
 The spec carries these exact SHAs, so moving them here alone makes this copy
 drift from the spec. A pin bump is a new version of the spec, which each
-repository then adopts.
+repository then adopts. Pins the spec doesn't carry, such as
+`actions/upload-artifact` in the screenshot workflow, are updated in this
+repository during a refresh, using the same release-note and SHA-against-tag
+checks below.
 
 1. For each action in `.github/workflows/*.yml`, find the latest release:
 
@@ -147,11 +151,12 @@ repository then adopts.
    gh api repos/<owner>/<action>/releases/latest --jq .tag_name
    ```
 
-2. Name any pin that is behind in the PR body, as material for the next
-   version of the spec.
+2. Name any spec-owned pin that is behind in the PR body, as material for the
+   next version of the spec. Update repository-owned pins to the latest release.
 
-When this repository adopts a spec version that moves a pin, read the release
-notes for each major version crossed, and check the new SHA against its tag:
+For a repository-owned pin bump or adoption of a spec version that moves a pin,
+read the release notes for each major version crossed, and check the new SHA
+against its tag:
 
 ```powershell
 gh api repos/<owner>/<action>/commits/<tag> --jq .sha
@@ -160,11 +165,13 @@ gh api repos/<owner>/<action>/commits/<tag> --jq .sha
 Replace the SHA and the version comment on every `uses:` line for that action,
 the release jobs' lines included, and commit as `ci: bump pinned actions`.
 
-The PR's CI runs a bumped action only in the `test` job. The first run on
-`main` after the merge adds `release-gate`. The `release` job is skipped for a
-workflow-only change, so its first run with the new pins is the next merge
+For pins in `ci.yml`, the PR's CI runs a bumped action only in the `test`
+job. The first run on `main` after the merge adds `release-gate`. The
+`release` job is skipped for a workflow-only change, so its first run with the
+new pins is the next merge
 that cuts a release: watch that one. A failed release job can be rerun: it
-reuses its tag and resumes its draft.
+reuses its tag and resumes its draft. Validate pins in other workflows by
+running the workflow that uses them.
 
 ## Verify by what moved
 

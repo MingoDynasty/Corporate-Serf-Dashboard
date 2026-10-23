@@ -290,13 +290,14 @@ def capture(origin: str, destination: Path) -> None:
             page.locator("#run-history-list-grid .run-list-row-latest").first
         ).to_be_visible()
         expect(page.get_by_text(NOTE_TEXT, exact=True)).to_be_visible()
-        page.get_by_text("Score vs Time", exact=True).click()
-        page.locator("#run-history-day-range").click()
-        page.get_by_role("option", name="All time", exact=True).click()
+        page.get_by_text("Score vs Run", exact=True).click()
+        page.locator("#run-history-run-range").click()
+        page.get_by_role("option", name="All runs", exact=True).click()
+        expect(page.locator("#run-history-run-range")).to_have_value("All runs")
         page.wait_for_function("""() => {
             const graph = document.querySelector('#run-history-graph .js-plotly-plot');
             const typical = graph?.data?.filter(trace => trace.name === 'Typical score') || [];
-            return graph?._fullLayout?.xaxis.type === 'date'
+            return graph?._fullLayout?.xaxis.type === 'linear'
                 && graph.data[0].x.length === 96
                 && typical.some(trace => trace.opacity === 0.35)
                 && typical.some(trace => trace.opacity === 1);

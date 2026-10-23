@@ -45,8 +45,11 @@ uv run --group screenshots pytest tests/test_capture_screenshots_browser.py
 
 They check that errors on the clean reload fail capture without replacing
 existing images, while noise on the initial load is ignored. The standard test
-suite skips these browser checks when the optional screenshot tools aren't
-installed.
+suite skips these browser checks when the optional screenshot Python packages
+aren't installed. Once the screenshots group is installed, `uv run pytest tests`
+also runs these checks and requires Chromium from the installation step above.
+`uv run` retains installed optional packages; `uv sync --locked` restores the
+default development environment.
 
 ## Capture contract
 
@@ -59,10 +62,10 @@ never read or changed.
 
 The sample clock is fixed to October 21, 2026, at 18:00 UTC in both Python and
 the browser. Chromium uses English, UTC, a light theme and a fresh browser
-context. Run History shows VT ww5t Intermediate S5 at 1920 by 1080 in Score vs
-Time with All time selected. Its sample history includes long breaks, so the
-Typical score line and bands visibly change between full-strength and faded
-support.
+context. Captures use a 1× device scale. Run History shows VT ww5t Intermediate
+S5 at 1920 by 1080 in Score vs Run with All runs selected. Its sample history
+includes long breaks, so the Typical score line and bands visibly change
+between full-strength and faded support.
 
 For both table screenshots, the capture tool collapses the left navigation and
 measures the total width of every displayed column. It expands the viewport to
