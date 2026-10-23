@@ -68,7 +68,7 @@ INTERMEDIATE_PERCENTILES = (
     76,
     68,
     71,
-    61,
+    88.79,
     54,
     89,
     84,
@@ -368,7 +368,7 @@ def capture(origin: str, destination: Path) -> None:
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
         context = browser.new_context(
-            viewport={"width": 1920, "height": 1080},
+            viewport={"width": 1960, "height": 1080},
             device_scale_factor=2,
             locale="en-US",
             timezone_id="UTC",
@@ -429,6 +429,20 @@ def capture(origin: str, destination: Path) -> None:
                 .filter(has_text=label)
                 .first
             ).to_be_visible()
+        for date in ("Apr 12,", "Apr 11,"):
+            session = page.locator("#run-history-list-grid .ag-row").filter(
+                has_text=date
+            )
+            toggle = session.get_by_role("button", name="Session", exact=True)
+            toggle.click()
+            expect(toggle).to_have_attribute("aria-expanded", "true")
+        for mark in (".run-list-check", ".run-list-star"):
+            expect(
+                page.locator(
+                    f"#run-history-list-grid .ag-center-cols-container {mark}"
+                ).first
+            ).to_be_in_viewport(ratio=1)
+        expect(page.get_by_text("88.79% percentile", exact=True)).to_be_visible()
         page.get_by_text("Score vs Run", exact=True).click()
         page.locator("#run-history-run-range").click()
         page.get_by_role("option", name="All runs", exact=True).click()
@@ -438,7 +452,7 @@ def capture(origin: str, destination: Path) -> None:
         page.get_by_role("button", name="Chart options", exact=True).click()
         # Plotly can retain the inspector's narrower canvas after it closes.
         # A normal viewport resize retriggers its responsive layout.
-        for width in (1919, 1920):
+        for width in (1959, 1960):
             page.set_viewport_size({"width": width, "height": 1080})
             page.wait_for_function("""() => {
                 const graph = document.querySelector('#run-history-graph .js-plotly-plot');
@@ -505,10 +519,12 @@ def capture(origin: str, destination: Path) -> None:
             page.mouse.move(0, 0)
             page.evaluate("document.fonts.ready")
             rows = page.locator(f"#{grid} .ag-center-cols-container .ag-row")
-            # Keep the selected benchmark whole so no merged category label
-            # ends at an arbitrary row cutoff. Let normal viewport sizing
-            # reveal its rows, without changing the production grid layout.
-            last_row = rows.last.bounding_box()
+            # End the excerpt after Clicking so its merged category labels
+            # stay whole while the README preview remains short.
+            last_row_locator = (
+                rows.nth(6) if grid == "playlist-scenarios-grid" else rows.last
+            )
+            last_row = last_row_locator.bounding_box()
             assert last_row
             viewport = page.viewport_size
             assert viewport
@@ -520,20 +536,26 @@ def capture(origin: str, destination: Path) -> None:
                     ),
                 }
             )
-            expect(rows.last).to_be_in_viewport(ratio=1)
+            expect(last_row_locator).to_be_in_viewport(ratio=1)
             if grid == "playlist-scenarios-grid":
                 expect(
                     page.get_by_role("link", name=SCENARIO, exact=True)
                 ).to_be_visible()
             main_box = page.locator("main").bounding_box()
-            last_row = rows.last.bounding_box()
-            assert main_box and last_row
+            last_row = last_row_locator.bounding_box()
+            banner = page.get_by_role("banner").bounding_box()
+            assert main_box and last_row and banner
+            top = math.ceil(banner["y"] + banner["height"])
             save_stable_screenshot(
                 page,
                 destination / filename,
                 clip={
                     **main_box,
-                    "height": last_row["y"] + last_row["height"] - main_box["y"] + 16,
+                    "y": top,
+                    "height": last_row["y"]
+                    + last_row["height"]
+                    - top
+                    + (0 if grid == "playlist-scenarios-grid" else 16),
                 },
             )
         browser.close()

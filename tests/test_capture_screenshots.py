@@ -4,6 +4,7 @@ from collections import Counter
 from datetime import datetime, timedelta
 
 from scripts import capture_screenshots
+from source.kovaaks.api_service import calculate_percentile
 from source.kovaaks.data_service import extract_data_from_file
 from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.typical_score import (
@@ -29,7 +30,12 @@ def test_sample_history_uses_valid_runs_and_matching_leaderboard_scores(tmp_path
         local_runs = [run for run in runs if run.scenario == sample["name"]]
         assert max(run.score for run in local_runs) == sample["score"]
         assert 0 < sample["rank"] <= sample["total"]
-        if sample["name"] != capture_screenshots.SCENARIO:
+        if sample["name"] == capture_screenshots.SCENARIO:
+            assert (
+                f"{calculate_percentile(sample['rank'], sample['total']):.2f}"
+                == "88.79"
+            )
+        else:
             assert all(run.run_length.total_seconds() == 60 for run in local_runs)
     featured = sorted(
         [run for run in runs if run.scenario == capture_screenshots.SCENARIO],

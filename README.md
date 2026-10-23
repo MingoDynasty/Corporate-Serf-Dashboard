@@ -10,7 +10,7 @@ The name of this app is in honor of [Corporate Serf](https://www.youtube.com/wat
 [![Run History showing ww5t progress, typical score bands and session runs](docs/screenshots/run_history.png)](docs/screenshots/run_history.png)
 
 Track your usual score across sessions, with individual runs and PBs for context.
-Run History uses sanitized real ww5t history. Other scenarios and leaderboard values
+Run History uses sanitized real ww5t history. Other scenarios and leaderboard counts
 are sample data. Open an image for full-resolution detail.
 
 ## Features
@@ -45,8 +45,8 @@ See what's next in
 <p>Compare benchmark coverage and standing to decide where to focus.</p>
 </td>
 <td width="50%" valign="top">
-<a href="docs/screenshots/playlist_scenarios.png"><img src="docs/screenshots/playlist_scenarios.png" width="360" alt="Voltaic Intermediate scenarios showing strengths, weaknesses and next-rank targets"></a>
-<p>Find weaker scenarios and see how close each is to its next rank.</p>
+<a href="docs/screenshots/playlist_scenarios.png"><img src="docs/screenshots/playlist_scenarios.png" width="360" alt="Clicking scenario excerpt showing typical scores, PBs and next-rank targets"></a>
+<p>Compare typical scores and PBs to choose your next target.</p>
 </td>
 </tr>
 </table>

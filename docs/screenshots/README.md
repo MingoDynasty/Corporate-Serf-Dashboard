@@ -2,7 +2,8 @@
 
 The three PNGs show the real app with curated documentation data. Run History
 uses a maintainer-approved, sanitized snapshot of real ww5t history. Other
-scenario histories and all leaderboard positions and percentiles are synthetic.
+scenario histories and leaderboard positions and totals are synthetic. The
+ww5t percentile is the maintainer-provided 88.79%; other percentiles are synthetic.
 
 ## Screenshot stories
 
@@ -13,18 +14,19 @@ scenario table and the ww5t history.
 
 | Image | Story | Data and framing |
 | --- | --- | --- |
-| `run_history.png` | Separate usual performance from individual results, across practice and long breaks. | Real ww5t history in Score vs Run with All runs: 169 runs across 24 sessions, from August 2025 to August 2026. Preserve the uneven progress and actual gaps. Typical score support is faded after long breaks, including the latest point. Select Median and best for session summaries. Keep the useful Bardpill technique note and one session expanded. Show PB and score-threshold lines, with rank overlays off so the trend remains prominent. |
-| `playlists.png` | Compare coverage and standing to choose a benchmark to work on. | A completed novice benchmark, an active intermediate benchmark, and partially explored advanced and Viscose benchmarks. Vary run counts, activity dates, medians and weakest percentiles. Keep navigation visible and fit every column. |
-| `playlist_scenarios.png` | Identify weaknesses and achievable next targets. | Show the same Voltaic Intermediate benchmark, including ww5t's real 1470 PB, twenty points below Jade. Mix ranks and synthetic percentiles, with both strengths and weaknesses and several small gaps to the next rank. Include the whole benchmark so every category is visible and no merged group ends at a crop. Collapse navigation and fit every default column. |
+| `run_history.png` | Separate usual performance from individual results, across practice and long breaks. | Real ww5t history in Score vs Run with All runs: 169 runs across 24 sessions, from August 2025 to August 2026. Preserve the uneven progress and actual gaps. Typical score support is faded after long breaks, including the latest point. Select Median and best for session summaries. Keep the useful Bardpill technique note. Expand the latest session and the April 12 and April 11 sessions. Show run-level green checks for meeting the threshold and a star for a new PB. Show PB and score-threshold lines, with rank overlays off so the trend remains prominent. |
+| `playlists.png` | Compare coverage and standing to choose a benchmark to work on. | A completed novice benchmark, an active intermediate benchmark, and partially explored advanced and Viscose benchmarks. Vary run counts, activity dates, medians and weakest percentiles. Keep navigation visible, crop out the app banner and fit every column. |
+| `playlist_scenarios.png` | Identify weaknesses and achievable next targets. | Show the same Voltaic Intermediate benchmark, including ww5t's real 1470 PB, twenty points below Jade. Show its 88.79% percentile beside varied illustrative standings. Crop to the complete seven-row Clicking category so the image itself stays short and merged labels remain whole. Include Typical Score, Typical Rank and every other default column. Collapse navigation and crop out the app banner. |
 
 Run History is the only full-width image in the README. The two tables appear
 as compact, linked previews side by side; full-resolution viewing supplies
 their dense detail without making the front page a wall of screenshots.
 
 The histories and cached leaderboard values share the same PB scores across
-views. Synthetic standings illustrate comparison, rather than the player's
-actual leaderboard position. The app supplies the real parser, components,
-statistics and controls.
+views. ww5t uses the maintainer-provided 88.79% percentile; its illustrative
+position and player total are chosen to reproduce that displayed value. Other
+standings illustrate comparison rather than actual leaderboard positions. The
+app supplies the real parser, components, statistics and controls.
 
 ### Data provenance
 
@@ -52,7 +54,7 @@ Take the Bardpill:
 4. Restart on 4th miss.
 ```
 
-The note uses the app's normal card. At the selected 1920 by 1080 viewport,
+The note uses the app's normal card. At the selected 1960 by 1080 viewport,
 five complete rendered lines fit, including the title; wrapped text consumes
 another line. Keep each point short enough to fit on one line. Capture checks
 that the entire note fits without scrolling. Do not enlarge or restyle the
@@ -142,9 +144,13 @@ caches and stats are never read or changed.
 The sample clock is fixed to August 7, 2026, at 01:02:02, two hours after the
 last snapshot run. Python uses these recorded wall-clock values; the browser
 uses UTC for repeatability. Chromium uses English, a light theme and a fresh
-browser context. Captures use a 2× device scale. Run History shows VT ww5t
-Intermediate S5 at 1920 by 1080 in Score vs Run with All runs selected and
-Median and best session summaries. Its history includes long breaks, so the
+browser context at 100% zoom. Captures use a 2× device scale for sharper pixels;
+this does not enlarge the app's CSS text or controls. Run History shows VT ww5t
+Intermediate S5 at 1960 by 1080 in Score vs Run with All runs selected and
+Median and best session summaries. The slightly wider frame gives the playlist
+field enough room for its full selected name at normal font size. The latest
+session and the April 12 and April 11 sessions are expanded, with actual green
+checks and a new-PB star in view. Its history includes long breaks, so the
 Typical score line and bands visibly change between full-strength and faded
 support.
 
@@ -154,8 +160,11 @@ fonts, then auto-sizes columns through the normal header controls. It measures
 the width of every displayed column and any visible navigation, expands the
 viewport to include them plus page padding, and checks that the table has no
 horizontal overflow. This includes new default columns added by later changes.
-Table images are cropped to their headings, headers and all sample rows.
-The viewport grows vertically to include the selected benchmark whole.
+Both table crops start below the app banner. Playlists includes all four
+profiles and the visible navigation. The scenario table ends exactly after
+the seventh row, at the complete Clicking category boundary, with no sliver
+of the next category. All 21 scenarios remain in the sample dataset; the PNG
+is a compact excerpt rather than the entire benchmark.
 
 The script ignores the first load's known Dash Pages race, then attaches error
 listeners before reloading so failures during the clean reload are captured.
