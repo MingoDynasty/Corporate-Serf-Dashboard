@@ -2,14 +2,18 @@
 
 Status: Accepted
 
-The chart on Run History plots every run in its range, so it agrees with
-the list beside it. It opens with runs spaced evenly in play order.
-When the selected scenario's latest run is plotted, its ring matches the
-card and highlighted list row. This makes the latest result easy to find
-during manual browsing as well as play.
+The chart on Run History plots every run in its range, where the old chart
+kept only the top few scores of each day or each sensitivity. A list of every
+run beside a chart of the best few would have contradicted each other. The
+two controls that trimmed the chart are gone with its Average score line, and
+the chart opens on a new mode that spaces runs evenly in the order they were
+played. Score vs Sensitivity now shows every run at each sensitivity with
+nothing that sums one up, until that mode is redesigned.
 
-**2026-10-23 amendment.** The global last-played scope of **The latest run is ringed**, including hiding the ring when another scenario is played with Follow off
-is superseded by [selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
+**Superseded in part (2026-10-23).** The global last-played scope of
+**The latest run is ringed**, including hiding the ring when another
+scenario is played with Follow off, is superseded by
+[selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
 The original text is retained as history; the other rules stand.
 
 **Superseded in part (2026-10-21).** The clauses saying no mode draws a summary line, and that such a line would invent a second definition, are superseded by the [shared definition](2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md) and [per-run summary](2026-10-18-the-typical-score-is-drawn-after-each-run.md). Score vs Run and Score vs Time draw that summary and both bands; Score vs Sensitivity still draws none. Every-run plotting, stars, the ring and the existing legend position stand.

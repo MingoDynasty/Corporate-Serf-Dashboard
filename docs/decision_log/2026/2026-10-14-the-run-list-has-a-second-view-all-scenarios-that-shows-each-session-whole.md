@@ -2,14 +2,18 @@
 
 Status: Accepted
 
-The All scenarios view lists each session with the scenarios played in it
-and their runs. Selecting a scenario name updates the whole page without
-moving the list. The selected scenario's latest run is highlighted to
-match the card and chart ring. This makes its latest result easy to locate
-while preserving the session being browsed.
+The run list on Run History has a second view, All scenarios, which lists
+each session whole: the scenarios played in it, in the order they were
+played, with each one's runs under it. A switch above the list chooses the
+view, the list starts on This scenario, and the browser remembers the switch.
+A click on a scenario's name in the new view selects that scenario for the
+whole page, by the rule Follow and a scenario link already follow. What a
+player notices is that the order of a session is on screen, where before it
+was a count on a row.
 
-**2026-10-23 amendment.** The global last-played highlight in **What the tree marks**
-is superseded by [selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
+**Superseded in part (2026-10-23).** The global last-played highlight in
+**What the tree marks** is superseded by
+[selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
 The original text is retained as history; the other rules stand.
 
 **Superseded in part (2026-10-18).** [The heading line's entry](2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md)
