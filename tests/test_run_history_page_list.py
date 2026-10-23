@@ -437,8 +437,9 @@ def test_the_list_grows_to_its_need_between_its_minimum_and_the_charts_floor():
     assert (
         "grid-template-columns: minmax(0, 1fr) clamp(\n"
         "            var(--run-history-list-width),\n"
-        "            var(--run-history-list-need, 500px),\n"
-        "            max(500px, calc(100% - var(--mantine-spacing-md) - 480px))\n"
+        f"            var(--run-history-list-need, {LIST_COLUMN_PX}px),\n"
+        f"            max({LIST_COLUMN_PX}px, "
+        "calc(100% - var(--mantine-spacing-md) - 480px))\n"
         "        );"
     ) in columns
 

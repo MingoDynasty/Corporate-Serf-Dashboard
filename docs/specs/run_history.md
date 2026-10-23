@@ -1,7 +1,7 @@
 # Run History
 
 Run History charts one scenario's runs and their typical score beside a list
-that groups runs by session and shrinks when columns are hidden.
+grouped by session.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just

@@ -873,7 +873,7 @@ a.run-toast-link:hover {
 /* The chart and its options panel share this area, and the row inside it is
    .home-chart-row. The stacking threshold measures the area and never the
    window: the AppShell navbar is fixed-position and 225px wide, and the run
-   list takes 500px or more, so both narrow the chart without touching the
+   list takes 480px or more, so both narrow the chart without touching the
    viewport, and a media query would keep the panel beside a chart it has
    already crushed. A container query cannot match on the element that
    declares the container, hence the wrapper around the row. It is the flex

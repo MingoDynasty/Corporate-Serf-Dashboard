@@ -5,7 +5,7 @@ Status: Accepted
 Hiding run-list columns can now return a little more room to the chart.
 The list can shrink to 480px while its controls stay on one line.
 Its default columns still need 500px, and changing the list's width leaves
-the top-row cards in place.
+the top-row cards in place. Long scenario names can be cut short sooner.
 
 **Maintainer direction, 2026-10-22.** After asking whether hidden columns
 should reduce the list further, the maintainer authorized the measured
@@ -36,8 +36,10 @@ shift on the default page.
 wide. A list reduced to 480px starts 20px further right than that card;
 its freed width goes to the chart. No top-row card moves or resizes.
 At a page area of 900px or less, the list still stacks above the chart and
-takes the page's full width. Column persistence, row content, marks,
-scrollbar room and control labels are unchanged.
+takes the page's full width. Rows keep the same data, but long scenario
+names in All scenarios can be cut short sooner at 480px. Hovering a scenario
+name still gives its full text. Column persistence, marks, scrollbar room
+and control labels are unchanged.
 
 **Verification.** Edge 155.0.4283.62 and Firefox 158.0.1 each pass 128
 geometry observations: window widths 2,560, 1,920, 1,536, 1,280, 1,200,

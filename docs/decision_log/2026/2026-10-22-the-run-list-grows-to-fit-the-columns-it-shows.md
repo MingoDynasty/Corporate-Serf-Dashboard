@@ -1,18 +1,16 @@
 # 2026-10-22: The Run List Grows To Fit The Columns It Shows
 
-Status: Accepted
+Status: Superseded in part, 2026-10-22, by
+[the narrower minimum](2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md):
+the list can shrink to 480px when columns are hidden. The default columns
+still need 500px, and the latest-run card keeps its independent 500px width.
+The remaining contract stands.
 
 The run list grows to fit its visible columns while leaving room for the
 chart. Its original minimum was 500px, preserving the default layout.
 Hidden columns can now reduce it to 480px while the default columns still
 need 500px. When columns don't fit, run rows scroll sideways while session
 rows stay in view.
-
-**Superseded in part (2026-10-22).**
-[The narrower minimum](2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md)
-lets hidden columns reduce the list to 480px. The default columns still
-need 500px, and the latest-run card keeps its independent 500px width. The
-remaining contract stands.
 
 **Ruling.** RC2 of
 [#403](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/403),
