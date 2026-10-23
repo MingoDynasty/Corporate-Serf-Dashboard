@@ -168,9 +168,9 @@ is a compact excerpt rather than the entire benchmark.
 
 The script ignores the first load's known Dash Pages race, then attaches error
 listeners before reloading so failures during the clean reload are captured.
-After closing Chart options, it resizes the viewport and checks that Plotly's
-canvas fills its container. It waits for the chart, note, grid and leaderboard
-callbacks, then waits for two matching frames with animations disabled before
+After closing Chart options, it waits for the control to report closed and for
+Plotly's canvas to fill its container. It waits for the chart, note, grid and
+leaderboard callbacks, then waits for two matching frames with animations disabled before
 saving each screenshot. It fails on subsequent browser exceptions, HTTP
 errors, or attempted outbound requests. All three captures must succeed before
 any checked-in image is replaced, and the temporary server and state are
