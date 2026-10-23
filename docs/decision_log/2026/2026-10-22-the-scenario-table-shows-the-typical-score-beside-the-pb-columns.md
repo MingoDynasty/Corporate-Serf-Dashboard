@@ -50,6 +50,16 @@ px; at 1920 px the table already scrolled, by 587 px now, and the Columns
 menu hides what a player never reads (Edge and Firefox, Viscose Benchmark S2
 Medium, 2026-10-22).
 
+**Typical Rank's cap.** Typical Rank is at most 240 px wide, as Rank is,
+including manual resizing. The maintainer chose it on 2026-10-22, after
+Rank and Next Rank were capped for long rank names: "Let's go with the
+proposed 240px cap." Rank may one day read like Typical Rank, such as
+`Viridian · 15%`, and the two would then share one limit. Every bundled rank
+name fits: the widest Typical Rank cell, `Orange Belt|橙帯 · 99%` with the
+clock, measures 191 px, and a name is cut only past about 154 px of text,
+around 20 characters. A name that long would end in an ellipsis with no
+tooltip giving it whole, since the cell's hover is the gap to the next rank.
+
 **Rejected.**
 
 - **A PB / Typical switch that changed PB Score, Rank and Next Rank in

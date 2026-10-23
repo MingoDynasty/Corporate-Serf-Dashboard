@@ -337,6 +337,11 @@ TYPICAL_RANK_COLUMN_DEF = {
     "comparator": {"function": "nullsLastComparator"},
     "sortable": True,
     "minWidth": 120,
+    # Rank's cap, as the maintainer chose: the same kind of text, a rank name
+    # and a percent once Rank shows one too. Every bundled name fits with room
+    # to spare; one that didn't would end in an ellipsis, since the hover is
+    # the gap and not the name.
+    "maxWidth": 240,
 }
 # The grid's own focus event opens a typical cell's hover from the keyboard.
 # AG Grid's ``tooltipTrigger`` can't: set to "focus", it ends every mouse

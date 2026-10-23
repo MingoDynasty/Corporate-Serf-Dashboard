@@ -2745,6 +2745,10 @@ def test_playlist_scenarios_typical_column_defs():
         assert column["sortable"] is True
         assert column["field"] in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
     assert rank["tooltipValueGetter"] == {"function": "params.data.typical_tier_hover"}
+    # Rank's cap; Typical Score holds only a number or "Too few runs".
+    rank_def, _next_rank = playlist_scenarios.BENCHMARK_COLUMN_DEFS
+    assert rank["maxWidth"] == rank_def["maxWidth"] == 240
+    assert "maxWidth" not in score
 
 
 def test_playlist_scenarios_grid_opens_typical_hovers_from_the_keyboard():

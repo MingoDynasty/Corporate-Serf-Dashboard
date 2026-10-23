@@ -216,9 +216,12 @@ and [product.md](../product.md). Leaderboard placement is worded
   table fits its columns once its first rows render, including long Next Rank
   gaps. Later position fills and relative-time refreshes preserve manual
   column widths.
-- On a benchmark's scenario table, Rank is at most 240 px wide and Next Rank
-  is at most 320 px wide, including manual resizing. Longer values end in an
-  ellipsis. Rank's tooltip shows a reached rank's full name and is absent for
+- On a benchmark's scenario table, Rank and Typical Rank are at most 240 px
+  wide and Next Rank is at most 320 px wide, including manual resizing.
+  Longer values end in an ellipsis; a cut Typical Rank has no tooltip with
+  the full name, since its hover is the gap, and no bundled rank name is long
+  enough to be cut
+  ([2026-10-22](../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md)). Rank's tooltip shows a reached rank's full name and is absent for
   `N/A` and `No rank`. Next Rank's existing tooltip includes the full target
   rank name. Scenario-table tooltips wrap long text within the window,
   including names with no spaces.
