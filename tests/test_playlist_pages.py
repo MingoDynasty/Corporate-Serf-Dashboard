@@ -2795,6 +2795,14 @@ def test_an_old_typical_value_has_a_readable_grey_and_a_clock():
         == "color: #a6a6a6;"
     )
     assert 'url("icons/material-symbols-history.svg")' in mark
+    # The scenario grid's own tooltip rule sets a wider cap and plain
+    # wrapping; scoped like tooltips.css, the typical hovers outrank it, so
+    # an old value's Typical Rank hover keeps its second line.
+    rank_tip = "[data-mantine-color-scheme] .ag-tooltip.typical-rank-tooltip {"
+    assert any(
+        line == rank_tip and lines[index + 1].strip() == "white-space: pre-line;"
+        for index, line in enumerate(lines)
+    )
     assert (STYLESHEET.parent / "icons" / "material-symbols-history.svg").is_file()
 
 

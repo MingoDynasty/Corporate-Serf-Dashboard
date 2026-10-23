@@ -1575,14 +1575,16 @@ a.run-toast-link {
 
 /* The typical cells' hovers. The grid's tooltip popup shrinks a custom
    tooltip to its narrowest, so each sets its own width, up to the Scenario
-   Stats card's 360px. */
-.typical-score-tooltip,
-.typical-rank-tooltip {
-    max-width: 360px;
+   Stats card's 360px. Scoped as tooltips.css scopes the app's tooltips, so
+   these outrank the scenario grid's own tooltip rule wherever they sit in
+   this file: that rule's wider cap and plain wrapping would otherwise win. */
+[data-mantine-color-scheme] .ag-tooltip.typical-score-tooltip,
+[data-mantine-color-scheme] .ag-tooltip.typical-rank-tooltip {
+    max-width: min(360px, calc(100vw - 2rem));
     width: max-content;
 }
 
-.typical-score-tooltip {
+[data-mantine-color-scheme] .ag-tooltip.typical-score-tooltip {
     white-space: normal;
 }
 
@@ -1591,7 +1593,7 @@ a.run-toast-link {
 }
 
 /* An old value's Typical Rank hover has a second line. */
-.typical-rank-tooltip {
+[data-mantine-color-scheme] .ag-tooltip.typical-rank-tooltip {
     white-space: pre-line;
 }
 
