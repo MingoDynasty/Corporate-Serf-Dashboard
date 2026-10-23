@@ -3,6 +3,47 @@
 The three PNGs in this folder show the real app with synthetic runs, notes and
 leaderboard values. They contain no player history or account details.
 
+## Screenshot stories
+
+The README introduces the app through three questions: am I improving, where
+am I weak, and what should I train next? Each image answers one part of that
+story. One fictional player's Voltaic Intermediate benchmark connects the
+overview, the scenario table and the ww5t history.
+
+| Image | Story | Sample and framing |
+| --- | --- | --- |
+| `run_history.png` | Usual performance improves despite variation between runs. | ww5t in Score vs Run with All runs. An early lucky PB, a plateau and uneven gains distinguish typical performance from records. Older stretches fade after long breaks; all twenty latest supporting runs are recent. Keep the note and one session expanded. Show PB and score-threshold lines, with rank overlays off so the trend remains prominent. |
+| `playlists.png` | Compare coverage and standing to choose a benchmark to work on. | A completed novice benchmark, an active intermediate benchmark, and partially explored advanced and Viscose benchmarks. Vary run counts, activity dates, medians and weakest percentiles. Use a compact viewport with navigation collapsed and every column visible. |
+| `playlist_scenarios.png` | Identify weaknesses and achievable next targets. | Show the same Voltaic Intermediate benchmark, including ww5t near Master. Mix ranks and percentiles, with both strengths and weaknesses and several small gaps to the next rank. Include the whole benchmark so every category is visible and no merged group ends at a crop. Collapse navigation and fit every default column. |
+
+The histories and cached leaderboard values share the same scores and
+positions across views. These are illustrative examples, not a claim about
+how fast a player will improve. The fixture stays synthetic and uses the
+app's real parser, components, statistics and controls.
+
+### Review an updated set
+
+- Inspect the images at their displayed README width as well as full size.
+  The main trend, comparison or next target should be apparent quickly.
+  Full-resolution viewing supplies the dense table detail.
+- Keep one main point per image. Use realistic variation and deliberate
+  contrasts; avoid identical completion counts, repeated score waves or a
+  procession of new PBs that makes the sample look mechanical.
+- Preserve continuity: benchmark names, ww5t's PB and standing, and run counts
+  agree wherever they recur. Keep both faded and full-strength history, with
+  the latest typical-score point at full strength.
+- Close menus, dismiss tooltips and move the pointer off content. Keep useful
+  headings and complete rows and category groups, with every column in view.
+  Use viewport sizing and normal app controls; don't restyle the app or add
+  screenshot-only UI.
+- Capture at 2× for crisp full-size inspection. Choose the logical viewport
+  and crop for readability; a larger pixel count alone doesn't enlarge text
+  within the README.
+
+Automation preserves these curated states and checks rendering and column
+fit. A person still checks the story and composition when reviewing a refresh.
+Update this brief with the fixture when the intended demonstration changes.
+
 ## Refresh locally
 
 From the repository root, install the optional capture tools and their browser
@@ -62,7 +103,7 @@ never read or changed.
 
 The sample clock is fixed to October 21, 2026, at 18:00 UTC in both Python and
 the browser. Chromium uses English, UTC, a light theme and a fresh browser
-context. Captures use a 1× device scale. Run History shows VT ww5t Intermediate
+context. Captures use a 2× device scale. Run History shows VT ww5t Intermediate
 S5 at 1920 by 1080 in Score vs Run with All runs selected. Its sample history
 includes long breaks, so the Typical score line and bands visibly change
 between full-strength and faded support.
@@ -71,7 +112,8 @@ For both table screenshots, the capture tool collapses the left navigation and
 measures the total width of every displayed column. It expands the viewport to
 at least that width plus the page padding, and checks that the table has no
 horizontal overflow. This includes new default columns added by later changes.
-Table images are cropped to their headers and up to twelve rows.
+Table images are cropped to their headings, headers and all sample rows.
+The viewport grows vertically to include the selected benchmark whole.
 
 The script ignores the first load's known Dash Pages race, then attaches error
 listeners before reloading so failures during the clean reload are captured.

@@ -13,12 +13,7 @@ from source.kovaaks.typical_score import (
 )
 
 
-def _sample_runs(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        capture_screenshots,
-        "PLAYLIST_NAMES",
-        ("Viscose Benchmark S2 - Medium", "Voltaic Intermediate Benchmarks S5.5"),
-    )
+def _sample_runs(tmp_path):
     samples = capture_screenshots.write_sample_state(tmp_path, 12345)
     runs = [
         extract_data_from_file(str(path)) for path in (tmp_path / "stats").glob("*.csv")
@@ -27,10 +22,8 @@ def _sample_runs(monkeypatch, tmp_path):
     return samples, runs
 
 
-def test_sample_history_uses_valid_runs_and_matching_leaderboard_scores(
-    monkeypatch, tmp_path
-):
-    samples, runs = _sample_runs(monkeypatch, tmp_path)
+def test_sample_history_uses_valid_runs_and_matching_leaderboard_scores(tmp_path):
+    samples, runs = _sample_runs(tmp_path)
     assert {run.scenario for run in runs} == {sample["name"] for sample in samples}
     for sample in samples:
         local_runs = [run for run in runs if run.scenario == sample["name"]]
@@ -49,8 +42,8 @@ def test_sample_history_uses_valid_runs_and_matching_leaderboard_scores(
     )
 
 
-def test_sample_sessions_have_no_overlapping_runs(monkeypatch, tmp_path):
-    _, runs = _sample_runs(monkeypatch, tmp_path)
+def test_sample_sessions_have_no_overlapping_runs(tmp_path):
+    _, runs = _sample_runs(tmp_path)
     chronological = sorted(runs, key=lambda run: run.datetime_object)
     assert all(
         previous.datetime_object <= following.run_start
@@ -60,15 +53,15 @@ def test_sample_sessions_have_no_overlapping_runs(monkeypatch, tmp_path):
     assert Counter(run.scenario for run in runs)[capture_screenshots.SCENARIO] == 96
 
 
-def test_sample_chart_contains_gaps_with_faded_and_full_strength_support(
-    monkeypatch, tmp_path
-):
-    _, runs = _sample_runs(monkeypatch, tmp_path)
+def test_sample_chart_contains_gaps_with_faded_and_full_strength_support(tmp_path):
+    _, runs = _sample_runs(tmp_path)
     featured = sorted(
         (run for run in runs if run.scenario == capture_screenshots.SCENARIO),
         key=lambda run: run.datetime_object,
     )
     values = build_typical_scores(featured, split_into_play_sessions(runs))
+    latest = typical_score_recency(values[-1], capture_screenshots.NOW)
+    assert latest.recent and latest.run_count == 20
     recency = {
         typical_score_recency(value, run.datetime_object).recent
         for run, value in zip(featured, values)

@@ -7,9 +7,10 @@ improving, where you're weak, and what to train next.
 
 The name of this app is in honor of [Corporate Serf](https://www.youtube.com/watch?v=a-MShVYe3kY).
 
-![Run History page](docs/screenshots/run_history.png "Run History page")
+[![Run History showing ww5t progress, typical score bands and session runs](docs/screenshots/run_history.png)](docs/screenshots/run_history.png)
 
-Screenshots show sample data.
+Track your usual score across sessions, with individual runs and PBs for context.
+Screenshots show sample data. Open an image for full-resolution detail.
 
 ## Features
 
@@ -36,9 +37,13 @@ Screenshots show sample data.
 See what's next in
 [docs/roadmap.md](docs/roadmap.md).
 
-![Playlists page](docs/screenshots/playlists.png "Playlists page")
+[![Playlists comparing benchmark coverage and leaderboard standing](docs/screenshots/playlists.png)](docs/screenshots/playlists.png)
 
-![Playlist scenarios table](docs/screenshots/playlist_scenarios.png "Playlist scenarios table")
+Compare benchmark coverage and standing to decide where to focus.
+
+[![Voltaic Intermediate scenario table showing strengths, weaknesses and next-rank targets](docs/screenshots/playlist_scenarios.png)](docs/screenshots/playlist_scenarios.png)
+
+Find weaker scenarios and see how close each is to its next rank.
 
 ## Install
 
