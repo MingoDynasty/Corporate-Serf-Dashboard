@@ -222,14 +222,11 @@ a.run-toast-link {
    wide, so it narrows the page without touching the viewport, and a media
    query would keep two columns in a page too narrow for them.
 
-   The run list's minimum width and the latest-run card's width are two
-   values, equal on purpose: the list is at its minimum with the default
-   columns, so on the default page the card's edges are the list's at every
-   zoom level. A change to one asks whether the other follows. The list grows
-   past its minimum to the width its shown columns need, which the page's
-   script writes here as --run-history-list-need. */
+   The latest-run card keeps the default list's 500px width independently.
+   Hiding columns can narrow the list to 480px without moving the cards. The
+   page's script writes the shown columns' need as --run-history-list-need. */
 .run-history-page {
-    --run-history-list-width: 500px;
+    --run-history-list-width: 480px;
     --run-history-card-width: 500px;
 
     container: run-history-page / inline-size;
@@ -833,17 +830,18 @@ a.run-toast-link {
 /* The chart beside the run list. The list's column is as wide as its shown
    columns need, never narrower than its minimum, and never so wide that the
    chart drops under 480px; past that the list scrolls sideways. Where the
-   two bounds cross, in a narrow window, the minimum wins and the chart
-   gives, as it did before the list could grow. Before the script has
-   written the need, the list is at its minimum. */
+   window is narrow, the maximum's 500px floor keeps the default columns
+   from losing room: only hiding columns can narrow the list below 500px.
+   Before the script writes the need, keep the default width to avoid a
+   horizontal shift as the page mounts. */
 .run-history-columns {
     display: grid;
     flex: 1 1 0;
     gap: var(--mantine-spacing-md);
     grid-template-columns: minmax(0, 1fr) clamp(
             var(--run-history-list-width),
-            var(--run-history-list-need, var(--run-history-list-width)),
-            calc(100% - var(--mantine-spacing-md) - 480px)
+            var(--run-history-list-need, 500px),
+            max(500px, calc(100% - var(--mantine-spacing-md) - 480px))
         );
     min-height: 0;
 }
@@ -878,7 +876,7 @@ a.run-toast-link {
 /* The chart and its options panel share this area, and the row inside it is
    .home-chart-row. The stacking threshold measures the area and never the
    window: the AppShell navbar is fixed-position and 225px wide, and the run
-   list takes 500px or more, so both narrow the chart without touching the
+   list takes 480px or more, so both narrow the chart without touching the
    viewport, and a media query would keep the panel beside a chart it has
    already crushed. A container query cannot match on the element that
    declares the container, hence the wrapper around the row. It is the flex
