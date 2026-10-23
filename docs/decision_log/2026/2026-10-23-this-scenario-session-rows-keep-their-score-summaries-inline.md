@@ -2,8 +2,8 @@
 
 Status: Accepted
 
-Under This scenario, every session row shows its optional score summary
-beside its run count. Session duration appears in All scenarios, where the
+Under This scenario, every session row can show Median and best beside
+its run count. Session duration appears in All scenarios, where the
 whole session is the subject. The newest row keeps its In progress badge
 and the same height as older rows.
 

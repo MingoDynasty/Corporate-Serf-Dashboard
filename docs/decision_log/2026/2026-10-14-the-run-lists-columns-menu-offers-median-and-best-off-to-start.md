@@ -5,6 +5,9 @@ Status: Superseded in part by the
 the figures sit in the row's own line, ahead of its count, and only the first
 row under This scenario keeps a second line. The checkbox, its default, and
 which rows carry figures stand.
+Superseded in part again, 2026-10-23, by
+[the inline session summaries entry](2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md):
+the first row under This scenario also keeps its figures in the count's line.
 
 **Superseded in part (2026-10-22).** [Three new column entries](2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md)
 come before it, so "a third checkbox" is now the sixth, still after the

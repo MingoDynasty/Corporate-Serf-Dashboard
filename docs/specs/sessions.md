@@ -3,9 +3,9 @@
 The app groups a player's runs into sessions: the runs separated by breaks of
 no more than 30 minutes. To measure a break it works out when each run began
 and how long it took, from two lines of the run's stats file. Inside a
-session it also finds each visit, the consecutive runs on one scenario. Run
-History shows each run in its practice context and session lengths in All
-scenarios.
+session it also finds each visit, the consecutive runs on one scenario. One
+page shows sessions so far, Run History, where a player can read a run in
+the context of their practice.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in

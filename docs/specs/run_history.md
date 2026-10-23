@@ -5,8 +5,8 @@ grouped by session.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
-played. Session rows keep their score summaries inline, and each run's marks
-show whether it met its score threshold or set a personal best.
+played. A check marks a run that met its score threshold and a star marks a
+new personal best, each judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
