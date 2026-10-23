@@ -108,8 +108,9 @@ S5 at 1920 by 1080 in Score vs Run with All runs selected. Its sample history
 includes long breaks, so the Typical score line and bands visibly change
 between full-strength and faded support.
 
-For both table screenshots, the capture tool collapses the left navigation and
-measures the total width of every displayed column. It expands the viewport to
+For both table screenshots, the capture tool collapses the left navigation,
+waits for every cached row and the fonts, then auto-sizes columns through the
+normal header controls. It measures the total width of every displayed column. It expands the viewport to
 at least that width plus the page padding, and checks that the table has no
 horizontal overflow. This includes new default columns added by later changes.
 Table images are cropped to their headings, headers and all sample rows.
@@ -117,8 +118,10 @@ The viewport grows vertically to include the selected benchmark whole.
 
 The script ignores the first load's known Dash Pages race, then attaches error
 listeners before reloading so failures during the clean reload are captured.
-It waits for the chart, note, grid and leaderboard callbacks, then waits for
-two matching frames with animations disabled before saving each screenshot.
+After closing Chart options, it resizes the viewport and checks that Plotly's
+canvas fills its container. It waits for the chart, note, grid and leaderboard
+callbacks, then waits for two matching frames with animations disabled before
+saving each screenshot.
 It fails on subsequent browser exceptions, HTTP errors, or attempted outbound
 requests. All three captures must succeed before any
 checked-in image is replaced, and the temporary server and state are removed

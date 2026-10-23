@@ -301,6 +301,23 @@ def save_stable_screenshot(page, destination: Path, **options) -> None:
 
 def fit_table_columns(page, grid: str) -> int:
     """Fit every displayed column with navigation collapsed, without horizontal scrolling."""
+    # Cached cells can arrive after the first rows. Use normal header
+    # auto-sizing once they're ready so startup widths don't widen the image.
+    page.evaluate("document.fonts.ready")
+    page.wait_for_function(
+        """async grid => {
+        const api = await window.dash_ag_grid.getApiAsync(grid);
+        const rows = [];
+        api.forEachNode(node => rows.push(node.data));
+        return rows.length && rows.every(row => grid === 'playlists-overview-grid'
+            ? row.percentile_aggregates_resolved
+            : !row.position_pending && !row.total_pending && !row.percentile_pending);
+    }""",
+        arg=grid,
+    )
+    for handle in page.locator(f"#{grid} .ag-header-cell-resize").all():
+        if handle.is_visible():
+            handle.dblclick()
     column_width = page.evaluate(
         """async grid => {
         const api = await window.dash_ag_grid.getApiAsync(grid);
@@ -391,6 +408,14 @@ def capture(origin: str, destination: Path) -> None:
         page.get_by_role("button", name="Chart options", exact=True).click()
         page.locator("#run-history-rank-overlay-switch").uncheck()
         page.get_by_role("button", name="Chart options", exact=True).click()
+        # Plotly can retain the inspector's narrower canvas after it closes.
+        # A normal viewport resize retriggers its responsive layout.
+        for width in (1919, 1920):
+            page.set_viewport_size({"width": width, "height": 1080})
+            page.wait_for_function("""() => {
+                const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+                return Math.abs(graph._fullLayout.width - graph.getBoundingClientRect().width) < 2;
+            }""")
         page.wait_for_function("""() => {
             const graph = document.querySelector('#run-history-graph .js-plotly-plot');
             const typical = graph?.data?.filter(trace => trace.name === 'Typical score') || [];
