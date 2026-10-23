@@ -55,7 +55,7 @@ from source.components.score_threshold import (
     Unjudged,
     normalize_score_threshold_percentage,
 )
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import get_all_runs
 from source.kovaaks.play_sessions import (
     PlaySession,
@@ -217,16 +217,6 @@ def empty_run_list(
         "grid_name": "",
         "empty": text,
     }
-
-
-def run_id(run: RunData) -> str:
-    """Return the id a run's row is keyed by: its stats file's name.
-
-    A run event's ``run_id`` is the same value, so a run that just landed can
-    be found in the list. A record that was not read from a stats file has no
-    name, and is keyed by its scenario and its end.
-    """
-    return run.stats_file_name or f"{run.scenario} {run.datetime_object.isoformat()}"
 
 
 def _count(count: int, noun: str) -> str:
@@ -1121,6 +1111,7 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                     # data changes, but not for a full-width row, so a rule's
                     # band stayed on the scenario selected before.
                     "rowClassRules": {
+                        "run-list-row-linked": "params.data.linked === true",
                         LATEST_ROW_CLASS: "params.data.latest",
                         SELECTED_ROW_CLASS: (
                             f"params.data.sel && params.data.kind === '{RUN_ROW}'"
@@ -1162,7 +1153,12 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                         },
                     },
                 },
-                eventListeners={"cellKeyDown": ["runListKeyDown(params)"]},
+                eventListeners={
+                    "cellKeyDown": ["runListKeyDown(params)"],
+                    "cellMouseOver": ["runHistoryHoverOver(params)"],
+                    "cellMouseOut": ["runHistoryHoverOut(params)"],
+                    "bodyScroll": ["runHistoryHoverClear(params)"],
+                },
                 getRowId="params.data.id",
                 dangerously_allow_code=True,
                 style={"flex": 1, "minHeight": 0, "width": "100%"},

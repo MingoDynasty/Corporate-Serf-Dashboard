@@ -7,6 +7,7 @@ Which runs they are given is ``tests/test_run_history_chart.py``.
 """
 
 import json
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 
 import plotly.graph_objs as go
@@ -305,8 +306,9 @@ def test_score_vs_run_stars_each_plotted_run_that_was_a_new_pb() -> None:
     stars = _trace(figure, NEW_PB_TRACE_NAME)
     assert (list(stars.x), list(stars.y)) == ([6], [120.0])
     assert stars.marker.symbol == "star"
-    # The run point under the star answers the hover.
-    assert stars.hoverinfo == "skip"
+    # A star answers for its own run even with ordinary run points hidden.
+    assert stars.hovertemplate == RUN_POINT_HOVER
+    assert stars.ids == (_trace(figure, RUN_DATA_POINT_TRACE_NAME).ids[1],)
     assert [trace.name for trace in figure.data] == [
         RUN_DATA_POINT_TRACE_NAME,
         NEW_PB_TRACE_NAME,
@@ -649,3 +651,28 @@ def test_the_default_point_size_leaves_the_rings_own() -> None:
     apply_point_appearance(figure, "Default", "")
 
     assert _ring(figure).marker.size == LATEST_RUN_RING_SIZE_DEFAULT_PX
+
+
+@EVERY_MODE
+def test_linked_hover_uses_file_identity_even_when_runs_share_a_position(build):
+    runs = [
+        replace(_run(100.0, NOON), stats_file_name="first.csv"),
+        replace(_run(100.0, NOON), stats_file_name="second.csv"),
+    ]
+    points = _trace(build(runs), RUN_DATA_POINT_TRACE_NAME)
+    assert points.ids == ("first.csv", "second.csv")
+    assert points.meta == "run-history-run"
+
+
+def test_a_pb_stars_identity_and_tooltip_follow_its_run_after_time_reordering():
+    first = replace(_run(90.0, NOON), stats_file_name="first.csv")
+    pb = replace(_run(100.0, NOON), stats_file_name="pb.csv")
+    tie = replace(_run(100.0, NOON), stats_file_name="tie.csv", accuracy=0.9)
+    figure = _score_vs_time([first, pb, tie], new_pbs=[pb])
+    points = _trace(figure, RUN_DATA_POINT_TRACE_NAME)
+    star = _trace(figure, NEW_PB_TRACE_NAME)
+    assert points.ids == ("first.csv", "tie.csv", "pb.csv")
+    assert star.ids == ("pb.csv",)
+    assert star.customdata == (points.customdata[-1],)
+    assert star.hovertemplate == points.hovertemplate
+    assert star.meta == "run-history-run"

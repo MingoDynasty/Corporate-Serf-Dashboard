@@ -15,7 +15,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 import plotly.io as pio
 
-from source.kovaaks.data_models import Rank, RunData
+from source.kovaaks.data_models import Rank, RunData, run_id
 from source.kovaaks.typical_score import (
     TypicalScore,
     TypicalScoreRecency,
@@ -918,6 +918,15 @@ def _generate_run_history_plot(  # noqa: PLR0913
     in a trace of its own that comes last so the ring is drawn over a star.
     """
     scores = [run.score for run in runs]
+    hover_data = {
+        run: [
+            format_absolute_timestamp(run.datetime_object, include_seconds=True),
+            round(100 * run.accuracy, 2),
+            f"{run.horizontal_sens} {run.sens_scale}",
+            _recorded_sensitivity_suffix(run),
+        ]
+        for run in runs
+    }
     figure = go.Figure(
         go.Scatter(
             x=list(x_values),
@@ -926,23 +935,15 @@ def _generate_run_history_plot(  # noqa: PLR0913
             name=RUN_DATA_POINT_TRACE_NAME,
             # One trace is not given a legend entry unless it asks for one.
             showlegend=True,
-            customdata=[
-                [
-                    format_absolute_timestamp(
-                        run.datetime_object, include_seconds=True
-                    ),
-                    round(100 * run.accuracy, 2),
-                    f"{run.horizontal_sens} {run.sens_scale}",
-                    _recorded_sensitivity_suffix(run),
-                ]
-                for run in runs
-            ],
+            ids=[run_id(run) for run in runs],
+            meta="run-history-run",
+            customdata=[hover_data[run] for run in runs],
             hovertemplate=_RUN_POINT_HOVER,
             hoverlabel={"font_size": 16},
         )
     )
     starred = [
-        (x_value, run.score)
+        (x_value, run)
         for x_value, run in zip(x_values, runs, strict=True)
         # Matched on the run, never on where it is plotted: two runs can
         # share a point, and only one of them beat the PB.
@@ -951,8 +952,17 @@ def _generate_run_history_plot(  # noqa: PLR0913
     if starred:
         figure.add_trace(
             _new_pb_trace(
-                [x_value for x_value, _score in starred],
-                [score for _x_value, score in starred],
+                [x_value for x_value, _run in starred],
+                [run.score for _x_value, run in starred],
+            ).update(
+                ids=[run_id(run) for _x_value, run in starred],
+                meta="run-history-run",
+                # Stars remain identifiable with the run-points trace hidden.
+                # Reuse each run's tooltip so overlap still names that run.
+                customdata=[hover_data[run] for _x_value, run in starred],
+                hoverinfo=None,
+                hovertemplate=_RUN_POINT_HOVER,
+                hoverlabel={"font_size": 16},
             )
         )
     ringed_at = next(

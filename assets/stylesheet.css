@@ -1029,6 +1029,30 @@ a.run-toast-link {
     box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);
 }
 
+/* A temporary run link uses grape so the latest-run blue and the selected
+   scenario's band keep their own meanings. No border changes row geometry. */
+.run-history-page {
+    --run-history-link-color: #862e9c;
+}
+
+:root[data-mantine-color-scheme="dark"] .run-history-page {
+    --run-history-link-color: #e599f7;
+}
+
+.run-history-list-grid .ag-row.run-list-row-linked,
+.run-history-list-grid .run-list-session.run-list-row-linked {
+    outline: 2px solid var(--run-history-link-color);
+    outline-offset: -2px;
+}
+
+/* Plotly writes marker strokes inline; the temporary class takes precedence
+   and removing it restores the actual point preference or PB-star outline. */
+.run-history-page .point.run-history-point-linked {
+    stroke: var(--run-history-link-color) !important;
+    stroke-width: 3px !important;
+    filter: drop-shadow(0 0 2px var(--run-history-link-color));
+}
+
 /* The current session, held under the column headings while the list
    scrolls. Beside it the grid keeps a scrollbar of the row's own, so its
    columns stay in line with the body's. It scrolls nothing, so it is drawn
