@@ -448,7 +448,9 @@ def capture(origin: str, destination: Path) -> None:
         page.get_by_role("option", name="All runs", exact=True).click()
         expect(page.locator("#run-history-run-range")).to_have_value("All runs")
         page.get_by_role("button", name="Chart options", exact=True).click()
-        page.locator("#run-history-rank-overlay-switch").uncheck()
+        page.locator("#run-history-rank-overlay-switch").check()
+        # The score-threshold label would overlap Diamond's nearby rank label.
+        page.locator("#run-history-score-threshold-overlay-switch").uncheck()
         page.get_by_role("button", name="Chart options", exact=True).click()
         # Plotly can retain the inspector's narrower canvas after it closes.
         # A normal viewport resize retriggers its responsive layout.
@@ -467,7 +469,9 @@ def capture(origin: str, destination: Path) -> None:
                 && typical.some(trace => trace.opacity === 0.35)
                 && typical.some(trace => trace.opacity === 1)
                 && typical.some(trace => trace.x.includes(count))
-                && graph.layout.shapes.length === 2;
+                && ['PB Score', 'Platinum', 'Diamond', 'Jade'].every(
+                    name => graph.layout.shapes.some(shape => shape.name === name))
+                && !graph.layout.shapes.some(shape => shape.name === 'Score Threshold');
         }""",
             arg=len(HISTORY["runs"]),
         )
