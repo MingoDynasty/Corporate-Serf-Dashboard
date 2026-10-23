@@ -3,9 +3,9 @@
 The typical score defines what a player's runs on a scenario usually score.
 It uses the median of the last twenty runs, with a minimum before the value
 is known and a separate test of how recent its runs are.
-The definition and its display rounding are pure functions, and the Run
-History chart draws the value on Score vs Run and Score vs Time, and
-Scenario Stats leads with it, each faded or dimmed where it isn't recent.
+The definition and its display rounding are pure functions; the Run History
+chart draws the value, Scenario Stats leads with it, and the playlist
+scenario table ranks by it, each marking it where it isn't recent.
 Stats files with non-finite scores are skipped during import so malformed
 scores cannot stop a calculation.
 
@@ -130,6 +130,19 @@ scores cannot stop a calculation.
   rounding and both bands, independently of the chart's switches
   ([TS5][typical-card-value], [TS8][typical-card-lead]). The card is specified
   in [run_history.md](run_history.md#scenario-stats).
+- `typical_score_hover(value, total, moment)` and `below_minimum_text(value)`
+  word a value's hover: the opening sentence and the Runs, Recent, Middle 50%
+  and Middle 80% lines, or what an unknown value needs. Scenario Stats and the
+  scenario table both draw from them, so the two hovers can't drift apart.
+- The playlist scenario table is a caller. Each table build takes one
+  whole-store snapshot, builds every listed scenario's newest value from it,
+  and judges recency once, at the moment it was taken; the cells don't change
+  until the page reopens. It ranks the value on a benchmark's ladder and
+  marks one that isn't recent with a clock
+  ([2026-10-22][typical-table]). The columns are specified in
+  [playlists.md](playlists.md#the-per-playlist-scenario-table).
+
+[typical-table]: ../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md
 
 [typical-definition]: ../decision_log/2026/2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md
 

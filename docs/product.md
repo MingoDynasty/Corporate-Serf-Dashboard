@@ -357,6 +357,16 @@ the same form as the finished ones under it.
 
 ### Planning: what should I train
 
+- **Typical score on the scenario table** (PR #414; design in #408). Each
+  scenario table shows the typical score beside the PB, and a benchmark's
+  also shows the rank it reaches with how far toward the next, such as
+  `Celadon · 7%`. Sorting that Typical Rank column lists the scenarios from
+  weakest to strongest by usual play, on the benchmark's own ladder. An old
+  value keeps its place, marked with a clock and explained in its hover.
+  *Problem solved:* the table judged every scenario by its personal best, so
+  one lucky run decided its rank, and scores can't be compared across
+  scenarios, so nothing on the table showed where a player is weak. The PB
+  columns beside it keep the record.
 - **Playlist-level overview** (PRs #78, #83). A sortable table at `/playlists`,
   one row per imported playlist with coverage, runs, last-played, and
   aggregate-percentile stats; each row drills into that playlist's scenario

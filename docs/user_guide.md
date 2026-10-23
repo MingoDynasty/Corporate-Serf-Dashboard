@@ -229,6 +229,23 @@ on a current version of KovaaK's, and once your personal best is from the
 scenario's current version. Until then, that scenario reads as every other
 one does, in percent of your score.
 
+Every scenario table also shows **Typical Score**, your typical score on that
+scenario: the median of your last 20 runs, as the Scenario Stats card on Run
+History shows it. Hover the cell for the runs behind it and their spread.
+Until a scenario has enough runs it reads "Too few runs", and the hover says
+how many it needs. On a benchmark's table, **Typical Rank** follows it: the
+rank your typical score reaches and how far it is toward the next rank, such
+as "Celadon · 7%". Click the **Typical Rank** header once to sort it
+ascending, and your weakest scenarios on that benchmark come first, judged by
+how you usually play rather than by your best run. Hover the cell to see how
+much your typical score has to grow to reach the next rank.
+
+A small clock after a typical value means fewer than 10 of the runs behind it
+are from the last 30 days, so it may be out of date. The value is shown in a
+lighter grey, still ranks, and still sorts with the others; its hover says
+the same. Like PB Score, the typical columns are worked out when the table
+opens, so a run you play shows up in them when you reopen the table.
+
 A benchmark's scenario table also has Evxl's logo beside its title. It is a
 link, and hovering it shows **View on Evxl**. It opens that benchmark on
 [Evxl.app](https://evxl.app) in a new tab, where you can see what this app

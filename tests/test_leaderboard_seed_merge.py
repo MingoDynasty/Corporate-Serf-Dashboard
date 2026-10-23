@@ -7,6 +7,7 @@ refresh / remove-absent, never touch learned).
 
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -14,6 +15,7 @@ import pytest
 from source.kovaaks import api_service, data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
 from source.kovaaks.playlist_scenarios_service import (
+    TypicalSnapshot,
     build_playlist_scenario_rank_rows,
 )
 
@@ -332,7 +334,9 @@ def test_a_name_the_seed_leaves_out_shows_no_leaderboard_id_until_one_is_learned
     data_service.seed_leaderboard_ids_from_bundled_corpus()
 
     def leaderboard_ids() -> dict:
-        rows = build_playlist_scenario_rank_rows("CodeOne", "generation-1")
+        rows = build_playlist_scenario_rank_rows(
+            "CodeOne", "generation-1", typical=TypicalSnapshot(datetime.now(), {})
+        )
         return {row["scenario"]: row["leaderboard_id"] for row in rows}
 
     assert leaderboard_ids() == {"Alpha": "184106", "Dup": "N/A"}

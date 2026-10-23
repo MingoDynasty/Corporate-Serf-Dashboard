@@ -1,7 +1,7 @@
 import logging
 import threading
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
@@ -18,13 +18,19 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.playlist_scenarios_service import (
+    TypicalSnapshot,
     benchmark_rank_fields,
     build_playlist_scenario_rank_rows,
     format_playlist_scenario_rank_row,
 )
 from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import PaceBasis
+from source.kovaaks.typical_score import build_typical_scores
+
+# A table build's snapshot of a store with no runs.
+NO_TYPICAL = TypicalSnapshot(datetime(2026, 10, 22, 12, 0, 0), {})
 
 
 def test_playlist_helpers_find_playlist_by_code(monkeypatch):
@@ -369,7 +375,9 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         personal_best_runs.__getitem__,
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        "KovaaKsTestCode", "generation-1", typical=NO_TYPICAL
+    )
 
     assert {row["scenario"] for row in rows} == {"First", "Second", "Third"}
     assert set(seen) == {"First", "Second", "Third"}
@@ -390,7 +398,9 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
 
 
 def test_build_playlist_scenario_rank_rows_returns_empty_for_unknown_playlist():
-    rows = build_playlist_scenario_rank_rows("MissingCode", "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        "MissingCode", "generation-1", typical=NO_TYPICAL
+    )
 
     assert rows == []
 
@@ -498,7 +508,9 @@ def test_hydration_failure_still_yields_full_rows(monkeypatch):
     )
 
     playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        "KovaaKsTestCode", "generation-1", typical=NO_TYPICAL
+    )
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
 
@@ -519,7 +531,9 @@ def test_hydration_unexpected_error_still_yields_full_rows(monkeypatch):
     )
 
     playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        "KovaaKsTestCode", "generation-1", typical=NO_TYPICAL
+    )
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
 
@@ -595,7 +609,9 @@ def test_hydration_probe_error_still_yields_full_rows(monkeypatch):
     )
 
     playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        "KovaaKsTestCode", "generation-1", typical=NO_TYPICAL
+    )
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
 
@@ -642,6 +658,7 @@ def test_fill_drain_consumes_terminal_updates_once(isolated_fill_registry):
         scenario_names=("First",),
         scenario_ladders=(None,),
         scenario_groups=(None,),
+        typical=NO_TYPICAL,
         total=1,
         unresolved_indices=set(),
         pending_updates=[{"scenario": "First"}],
@@ -670,6 +687,7 @@ def test_fill_outcomes_use_structural_stale_marker(isolated_fill_registry):
         scenario_names=("Mismatch", "Stale", "Unknown"),
         scenario_ladders=(None, None, None),
         scenario_groups=(None, None, None),
+        typical=NO_TYPICAL,
         total=3,
         unresolved_indices={0, 1, 2},
     )
@@ -723,6 +741,7 @@ def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
         scenario_names=scenario_names,
         scenario_ladders=scenario_ladders,
         scenario_groups=scenario_groups,
+        typical=NO_TYPICAL,
         total=len(scenario_names),
         unresolved_indices=set(range(len(scenario_names))),
     )
@@ -754,6 +773,7 @@ def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
             scenario_names,
             scenario_ladders,
             scenario_groups,
+            NO_TYPICAL,
             state.cancel_event,
         )
 
@@ -791,6 +811,7 @@ def test_tombstone_retention_evicts_consumed_before_unconsumed(
                 scenario_names=(),
                 scenario_ladders=(),
                 scenario_groups=(),
+                typical=NO_TYPICAL,
                 total=0,
                 unresolved_indices=set(),
                 consumed=consumed,
@@ -871,6 +892,7 @@ def test_new_fill_cancels_synchronously_and_banks_inflight_fetch(
     assert playlist_scenarios_service.start_playlist_scenario_fill(
         playlist.code,
         "generation-1",
+        typical=NO_TYPICAL,
     )
     assert network_started.wait(timeout=2)
 
@@ -885,6 +907,7 @@ def test_new_fill_cancels_synchronously_and_banks_inflight_fetch(
     assert playlist_scenarios_service.start_playlist_scenario_fill(
         playlist.code,
         "generation-2",
+        typical=NO_TYPICAL,
     )
 
     with playlist_scenarios_service._FILL_REGISTRY_LOCK:
@@ -1639,8 +1662,12 @@ def rank_row_sources(monkeypatch):
 
 
 def test_phase_one_rows_carry_rank_fields_only_on_a_benchmark(rank_row_sources):
-    benchmark_rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
-    playlist_rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+    benchmark_rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
+    playlist_rows = build_playlist_scenario_rank_rows(
+        _PLAYLIST.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert [
         (row["scenario"], row["tier_display"], row["next_tier_display"])
@@ -1657,8 +1684,12 @@ def test_phase_one_rows_carry_rank_fields_only_on_a_benchmark(rank_row_sources):
 def test_phase_one_rows_carry_group_fields_only_on_a_grouped_benchmark(
     rank_row_sources,
 ):
-    benchmark_rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
-    playlist_rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+    benchmark_rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
+    playlist_rows = build_playlist_scenario_rank_rows(
+        _PLAYLIST.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert [tuple(row[field] for field in GROUP_FIELDS) for row in benchmark_rows] == [
         ("Clicking", "#111111", 0, "Static", "#aaaaaa", 0),
@@ -1682,7 +1713,9 @@ def test_a_benchmark_without_groups_carries_no_group_fields(
         playlist_scenarios_service, "get_scenario_groups", lambda _code: None
     )
 
-    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert all(not set(GROUP_FIELDS) & set(row) for row in rows)
     assert all(set(RANK_FIELDS) <= set(row) for row in rows)
@@ -1697,13 +1730,15 @@ def test_groups_of_another_length_are_dropped_and_never_shifted(
         lambda _code: _BENCHMARK_GROUPS[:-1],
     )
 
-    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert len(rows) == len(_BENCHMARK.scenarios)
     assert all(not set(GROUP_FIELDS) & set(row) for row in rows)
 
 
-def _register_fill(monkeypatch, playlist_code, generation_token):
+def _register_fill(monkeypatch, playlist_code, generation_token, typical=NO_TYPICAL):
     """Register a fill without starting its daemon; return the daemon's call.
 
     Only the fill's own thread is held back. Patching ``threading.Thread`` for
@@ -1721,7 +1756,7 @@ def _register_fill(monkeypatch, playlist_code, generation_token):
     with monkeypatch.context() as patch:
         patch.setattr(threading, "Thread", HeldThread)
         assert playlist_scenarios_service.start_playlist_scenario_fill(
-            playlist_code, generation_token
+            playlist_code, generation_token, typical=typical
         )
     [(target, args)] = calls
     return target, args
@@ -1736,7 +1771,9 @@ def test_fill_rows_equal_phase_one_rows(
     isolated_fill_registry,
     playlist,
 ):
-    phase_one = build_playlist_scenario_rank_rows(playlist.code, "generation-1")
+    phase_one = build_playlist_scenario_rank_rows(
+        playlist.code, "generation-1", typical=NO_TYPICAL
+    )
     target, args = _register_fill(monkeypatch, playlist.code, "generation-1")
 
     target(*args)
@@ -1762,7 +1799,9 @@ def test_cancelled_fill_rebuild_rows_equal_phase_one_rows(
     isolated_fill_registry,
     playlist,
 ):
-    phase_one = build_playlist_scenario_rank_rows(playlist.code, "generation-1")
+    phase_one = build_playlist_scenario_rank_rows(
+        playlist.code, "generation-1", typical=NO_TYPICAL
+    )
     _register_fill(monkeypatch, playlist.code, "generation-1")
     # Opening any playlist in another tab cancels this fill before it fetches.
     _register_fill(monkeypatch, _PLAYLIST.code, "generation-2")
@@ -1803,7 +1842,9 @@ def test_every_row_path_carries_the_leaderboard_id(
         "Top": "97841",
     }
 
-    phase_one = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    phase_one = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
     target, args = _register_fill(monkeypatch, _BENCHMARK.code, "generation-1")
     target(*args)
     streamed = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
@@ -1845,7 +1886,9 @@ def test_a_streamed_row_carries_the_leaderboard_id_its_lookup_learned(
 
     monkeypatch.setattr(playlist_scenarios_service, "_lookup_rank_info", lookup)
 
-    phase_one = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+    phase_one = build_playlist_scenario_rank_rows(
+        _PLAYLIST.code, "generation-1", typical=NO_TYPICAL
+    )
     target, args = _register_fill(monkeypatch, _PLAYLIST.code, "generation-1")
     target(*args)
     streamed = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
@@ -1866,7 +1909,9 @@ def test_a_failed_mapping_read_still_builds_the_row(
     )
 
     with caplog.at_level(logging.WARNING, logger=playlist_scenarios_service.__name__):
-        rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+        rows = build_playlist_scenario_rank_rows(
+            _PLAYLIST.code, "generation-1", typical=NO_TYPICAL
+        )
 
     assert _leaderboard_ids_by_scenario(rows) == {"Ranked": "N/A", "Unplayed": "N/A"}
     assert 'Failed to read the leaderboard ID for "Ranked"' in caplog.messages
@@ -1924,7 +1969,9 @@ def test_phase_one_rows_measure_a_time_scored_scenario_by_pace(
 ):
     asked = _serve_pace(monkeypatch)
 
-    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert _next_ranks(rows) == _PACE_NEXT_RANKS
     assert rows[0]["next_tier_sort"] == pytest.approx((895 / 890 - 1) * 100)
@@ -1937,7 +1984,9 @@ def test_fill_rows_carry_the_same_pace_gap_as_phase_one(
     monkeypatch, rank_row_sources, isolated_fill_registry
 ):
     _serve_pace(monkeypatch)
-    phase_one = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    phase_one = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
     target, args = _register_fill(monkeypatch, _BENCHMARK.code, "generation-1")
 
     target(*args)
@@ -1954,7 +2003,9 @@ def test_a_cancelled_fills_rebuild_carries_the_same_pace_gap_as_phase_one(
     monkeypatch, rank_row_sources, isolated_fill_registry
 ):
     _serve_pace(monkeypatch)
-    phase_one = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    phase_one = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
     _register_fill(monkeypatch, _BENCHMARK.code, "generation-1")
     _register_fill(monkeypatch, _PLAYLIST.code, "generation-2")
 
@@ -1973,7 +2024,9 @@ def test_a_pb_from_another_version_keeps_the_gap_as_a_share_of_the_pb(
     """The constant was read from one version, and the PB is not of it."""
     _serve_pace(monkeypatch, pb_hash=pb_hash)
 
-    rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert _next_ranks(rows)[0] == ("Ranked", "+4.8% to Bronze")
 
@@ -1983,7 +2036,9 @@ def test_a_playlists_table_never_asks_whether_a_scenario_is_time_scored(
 ):
     asked = _serve_pace(monkeypatch)
 
-    rows = build_playlist_scenario_rank_rows(_PLAYLIST.code, "generation-1")
+    rows = build_playlist_scenario_rank_rows(
+        _PLAYLIST.code, "generation-1", typical=NO_TYPICAL
+    )
 
     assert len(rows) == 2
     assert asked == []
@@ -2000,7 +2055,9 @@ def test_a_failed_pace_lookup_costs_the_pace_gap_and_never_the_row(
     monkeypatch.setattr(playlist_scenarios_service, "get_pace_basis", fail)
 
     with caplog.at_level(logging.WARNING, logger=playlist_scenarios_service.__name__):
-        rows = build_playlist_scenario_rank_rows(_BENCHMARK.code, "generation-1")
+        rows = build_playlist_scenario_rank_rows(
+            _BENCHMARK.code, "generation-1", typical=NO_TYPICAL
+        )
 
     assert _next_ranks(rows)[0] == ("Ranked", "+4.8% to Bronze")
     failures = [
@@ -2010,3 +2067,494 @@ def test_a_failed_pace_lookup_costs_the_pace_gap_and_never_the_row(
     ]
     assert len(failures) == 1
     assert failures[0].exc_info is not None
+
+
+# --- the typical score's two columns ---
+
+TYPICAL_MOMENT = datetime(2026, 10, 22, 12, 0, 0)
+# Iron, Bronze, Silver and Gold.
+FOUR_RANKS = _ladder(400, 500, 600, 700)
+
+
+class _FrozenClock(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return TYPICAL_MOMENT
+
+
+def _typical_run(
+    end: datetime,
+    score: float,
+    scenario: str = "Ranked",
+    scenario_hash: str | None = None,
+) -> RunData:
+    return RunData(
+        datetime_object=end,
+        score=score,
+        scenario=scenario,
+        sens_scale="cm/360",
+        horizontal_sens=40.0,
+        accuracy=0.5,
+        run_start=end - timedelta(seconds=60),
+        run_length=timedelta(seconds=60),
+        scenario_hash=scenario_hash,
+    )
+
+
+def _daily_runs(scores, *, last: datetime, scenario: str = "Ranked") -> list[RunData]:
+    """One run a day, each its own session, the newest ending at ``last``."""
+    scores = list(scores)
+    return [
+        _typical_run(last - timedelta(days=len(scores) - 1 - index), score, scenario)
+        for index, score in enumerate(scores)
+    ]
+
+
+def _typical(monkeypatch, runs, names=("Ranked",)):
+    """Take a table build's snapshot of ``runs`` at ``TYPICAL_MOMENT``."""
+    store = sorted(runs, key=lambda run: run.datetime_object)
+    monkeypatch.setattr(playlist_scenarios_service, "get_all_runs", lambda: list(store))
+    monkeypatch.setattr(playlist_scenarios_service, "datetime", _FrozenClock)
+    return playlist_scenarios_service.take_typical_snapshot(names)
+
+
+@pytest.mark.parametrize(
+    ("score", "display", "position"),
+    [
+        (500, "Bronze · 0%", 2.0),
+        (500.5, "Bronze · 0%", 2.005),
+        (540, "Bronze · 40%", 2.4),
+        (599.999, "Bronze · 99%", 2.99999),
+        (700, "Gold", 4.0),
+        (750, "Gold", 4.0),
+    ],
+)
+def test_typical_rank_reads_the_rank_and_how_far_toward_the_next(
+    score, display, position
+):
+    fields = playlist_scenarios_service.typical_tier_fields(FOUR_RANKS, score)
+
+    assert fields["typical_tier_display"] == display
+    # The sort key is unrounded, so two rows that both read 0% still order.
+    assert fields["typical_tier_sort"] == pytest.approx(position)
+
+
+def test_typical_rank_hover_is_the_gap_and_an_old_values_line():
+    recent = playlist_scenarios_service.typical_tier_fields(FOUR_RANKS, 540)
+    old = playlist_scenarios_service.typical_tier_fields(
+        FOUR_RANKS, 540, not_recent=True
+    )
+
+    assert recent["typical_tier_hover"] == "+11.2% to Silver · 60 to go"
+    assert old["typical_tier_hover"] == (
+        "+11.2% to Silver · 60 to go\n"
+        "Fewer than 10 of the typical score's runs are from the last 30 days, "
+        "so it may be out of date."
+    )
+
+
+def test_typical_rank_at_the_top_has_a_hover_only_when_old():
+    recent = playlist_scenarios_service.typical_tier_fields(FOUR_RANKS, 750)
+    old = playlist_scenarios_service.typical_tier_fields(
+        FOUR_RANKS, 750, not_recent=True
+    )
+
+    assert recent["typical_tier_hover"] is None
+    assert old["typical_tier_hover"] == playlist_scenarios_service.TYPICAL_RANK_OLD_LINE
+
+
+@pytest.mark.parametrize(
+    ("thresholds", "score", "display", "position"),
+    [
+        # A tie: the walk passes both equal thresholds.
+        ((400, 500, 500, 600), 550, "Silver · 50%", 3.5),
+        # A dip: the walk stops at the first threshold above the score.
+        ((400, 600, 500, 700), 550, "Iron · 75%", 1.75),
+    ],
+    ids=["tie", "dip"],
+)
+def test_typical_rank_on_a_ladder_that_ties_or_dips(
+    thresholds, score, display, position
+):
+    fields = playlist_scenarios_service.typical_tier_fields(_ladder(*thresholds), score)
+
+    assert fields["typical_tier_display"] == display
+    assert fields["typical_tier_sort"] == pytest.approx(position)
+
+
+@pytest.mark.parametrize(
+    "thresholds",
+    [(400, 500, 600), (400, 500, 500, 600), (400, 600, 500, 700), (500, 500, 500)],
+)
+def test_the_fraction_toward_the_next_rank_is_never_a_whole_rank(thresholds):
+    ladder = _ladder(*thresholds)
+    for score in [quarter / 4 for quarter in range(1600, 2900)]:
+        standing = playlist_scenarios_service.ladder_standing(ladder, score)
+        assert standing is not None
+        position = playlist_scenarios_service.rank_position(ladder, score, standing)
+        if standing.at_top:
+            assert position == len(ladder)
+        elif standing.passed:
+            assert standing.passed <= position < standing.passed + 1
+
+
+def test_the_percent_never_reads_as_the_next_rank():
+    ladder = _ladder(1000, 10000, 20000)
+
+    under = playlist_scenarios_service.typical_tier_fields(ladder, 9999.999999)
+    at = playlist_scenarios_service.typical_tier_fields(ladder, 10000)
+
+    # The noise-stripping round alone would carry this to 100%.
+    assert under["typical_tier_display"] == "Iron · 99%"
+    assert under["typical_tier_sort"] < 2
+    assert at["typical_tier_display"] == "Bronze · 0%"
+    assert at["typical_tier_sort"] == 2.0
+
+
+@pytest.mark.parametrize("constant", [1000.0, 200.0])
+def test_below_the_first_rank_a_pace_row_sorts_by_time_whatever_its_constant(
+    constant,
+):
+    # A 120-second typical run against a 100-second first rank, and an
+    # ordinary row at 90 against 100.
+    pace = playlist_scenarios_service.typical_tier_fields(
+        _ladder(constant - 100, constant), constant - 120, constant
+    )
+    ordinary = playlist_scenarios_service.typical_tier_fields(_ladder(100, 200), 90)
+
+    assert pace["typical_tier_display"] == "No rank"
+    assert pace["typical_tier_sort"] == pytest.approx(1 / 1.2)
+    assert ordinary["typical_tier_display"] == "No rank"
+    assert ordinary["typical_tier_sort"] == pytest.approx(0.9)
+    # A ratio of scores would put the pace row above the ordinary one at a
+    # constant of 1,000 and below it at 200.
+    assert pace["typical_tier_sort"] < ordinary["typical_tier_sort"]
+    assert pace["typical_tier_hover"] == "+20.0% faster to Iron · 20 to go"
+
+
+@pytest.mark.parametrize("score", [0, -5])
+def test_below_the_first_rank_with_no_gap_keys_zero(score):
+    fields = playlist_scenarios_service.typical_tier_fields(_ladder(100, 200), score)
+
+    assert fields["typical_tier_display"] == "No rank"
+    assert fields["typical_tier_sort"] == 0.0
+    assert fields["typical_tier_hover"] is None
+
+
+def test_every_below_first_row_sorts_under_every_ranked_row():
+    ladder = _ladder(100, 200)
+    below = playlist_scenarios_service.typical_tier_fields(ladder, 99.999)
+    on_the_first = playlist_scenarios_service.typical_tier_fields(ladder, 100)
+
+    assert below["typical_tier_sort"] < 1 <= on_the_first["typical_tier_sort"]
+
+
+def test_a_known_recent_value_fills_both_typical_cells(monkeypatch):
+    runs = _daily_runs(range(500, 520), last=TYPICAL_MOMENT - timedelta(hours=1))
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", FOUR_RANKS, _typical(monkeypatch, runs)
+    )
+
+    assert fields == {
+        "typical_score_display": "510",
+        "typical_score_sort": 509.5,
+        "typical_not_recent": False,
+        "typical_score_hover": {
+            "lead": "The median of your 20 runs.",
+            "lines": [
+                ["Runs:", " 20 in 20 sessions · Oct 3 to Oct 22"],
+                ["Recent:", " 20 of 20 from the last 30 days"],
+                ["Middle 50%:", " 505 to 514"],
+                ["Middle 80%:", " 502 to 517"],
+            ],
+        },
+        "typical_tier_display": "Bronze · 9%",
+        "typical_tier_sort": pytest.approx(2.095),
+        "typical_tier_hover": "+17.8% to Silver · 90.5 to go",
+    }
+
+
+def test_a_value_from_the_last_of_more_runs_says_so(monkeypatch):
+    runs = _daily_runs(range(500, 525), last=TYPICAL_MOMENT - timedelta(hours=1))
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", None, _typical(monkeypatch, runs)
+    )
+
+    assert fields["typical_score_hover"]["lead"] == "The median of your last 20 runs."
+
+
+def test_an_old_value_is_marked_and_its_hovers_say_why(monkeypatch):
+    runs = _daily_runs(range(500, 520), last=TYPICAL_MOMENT - timedelta(days=40))
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", FOUR_RANKS, _typical(monkeypatch, runs)
+    )
+
+    assert fields["typical_not_recent"] is True
+    assert fields["typical_score_display"] == "510"
+    assert fields["typical_score_hover"]["lead"] == (
+        "The median of your 20 runs. Fewer than 10 of them are from the last 30 "
+        "days, so it may be out of date."
+    )
+    assert fields["typical_score_hover"]["lines"][1] == [
+        "Recent:",
+        " 0 of 20 from the last 30 days",
+    ]
+    # An old value still has its rank, and sorts with the others.
+    assert fields["typical_tier_display"] == "Bronze · 9%"
+    assert fields["typical_tier_hover"].splitlines() == [
+        "+17.8% to Silver · 90.5 to go",
+        playlist_scenarios_service.TYPICAL_RANK_OLD_LINE,
+    ]
+
+
+def test_runs_dated_after_the_build_never_make_a_value_recent(monkeypatch):
+    # 10 runs in the last 30 days and 11 dated after the build's moment, as
+    # after a system clock correction. The window is the newest 20: 9 recent
+    # and the 11 later ones.
+    earlier = _daily_runs(range(500, 510), last=TYPICAL_MOMENT - timedelta(hours=1))
+    later = [
+        _typical_run(TYPICAL_MOMENT + timedelta(days=day), 510 + day)
+        for day in range(1, 12)
+    ]
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", None, _typical(monkeypatch, earlier + later)
+    )
+
+    assert fields["typical_not_recent"] is True
+    # The hover counts the runs behind the value, not the scenario's 10.
+    assert fields["typical_score_hover"]["lines"][1] == [
+        "Recent:",
+        " 9 of 20 from the last 30 days",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("days", "runs_per_day", "text"),
+    [
+        (1, 1, "You have 1 run in 1 session."),
+        (1, 3, "You have 3 runs in 1 session."),
+        (2, 4, "You have 8 runs in 2 sessions."),
+    ],
+)
+def test_a_value_below_the_minimum_reads_too_few_runs_and_is_never_old(
+    monkeypatch, days, runs_per_day, text
+):
+    start = TYPICAL_MOMENT - timedelta(days=60)
+    runs = [
+        _typical_run(start + timedelta(days=day, minutes=2 * index), 500)
+        for day in range(days)
+        for index in range(runs_per_day)
+    ]
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", FOUR_RANKS, _typical(monkeypatch, runs)
+    )
+
+    assert fields == {
+        "typical_score_display": "Too few runs",
+        "typical_score_sort": None,
+        "typical_not_recent": False,
+        "typical_score_hover": {
+            "lead": "A typical score needs 10 runs across 2 or more sessions, "
+            f"or 20 in one session. {text}",
+            "lines": [],
+        },
+        "typical_tier_display": "N/A",
+        "typical_tier_sort": None,
+        "typical_tier_hover": None,
+    }
+
+
+def test_a_scenario_with_no_runs_reads_na_in_both_cells(monkeypatch):
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", FOUR_RANKS, _typical(monkeypatch, [])
+    )
+
+    assert fields == {
+        "typical_score_display": "N/A",
+        "typical_score_sort": None,
+        "typical_not_recent": False,
+        "typical_score_hover": None,
+        "typical_tier_display": "N/A",
+        "typical_tier_sort": None,
+        "typical_tier_hover": None,
+    }
+
+
+def test_a_playlists_row_carries_no_typical_rank(monkeypatch):
+    runs = _daily_runs(range(500, 520), last=TYPICAL_MOMENT - timedelta(hours=1))
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", None, _typical(monkeypatch, runs)
+    )
+
+    assert not any(key.startswith("typical_tier") for key in fields)
+
+
+def test_a_benchmark_scenario_without_a_ladder_reads_na_in_typical_rank(monkeypatch):
+    runs = _daily_runs(range(500, 520), last=TYPICAL_MOMENT - timedelta(days=40))
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked", [], _typical(monkeypatch, runs)
+    )
+
+    assert fields["typical_tier_display"] == "N/A"
+    assert fields["typical_tier_sort"] is None
+    assert fields["typical_tier_hover"] is None
+
+
+@pytest.mark.parametrize(
+    ("hashes", "hover"),
+    [
+        ((_PACE_HASH,) * 20, "+10.0% faster to Silver · 10 to go"),
+        ((_PACE_HASH,) * 19 + ("another-version",), "+2.1% to Silver · 10 to go"),
+    ],
+    ids=["one-version", "mixed-versions"],
+)
+def test_typical_rank_is_measured_by_pace_only_on_one_version(
+    monkeypatch, hashes, hover
+):
+    # A constant of 600: the typical 490 took 110 s, and Silver at 500 is 100 s.
+    runs = [
+        _typical_run(
+            TYPICAL_MOMENT - timedelta(days=20 - index),
+            490,
+            scenario_hash=scenario_hash,
+        )
+        for index, scenario_hash in enumerate(hashes)
+    ]
+
+    fields = playlist_scenarios_service.typical_row_fields(
+        "Ranked",
+        _ladder(300, 400, 500),
+        _typical(monkeypatch, runs),
+        PaceBasis(600.0, _PACE_HASH),
+    )
+
+    assert fields["typical_tier_hover"] == hover
+
+
+def test_a_snapshot_splits_sessions_from_the_whole_store(monkeypatch):
+    # Two runs 49 minutes apart are one session only because another
+    # scenario was played between them.
+    start = TYPICAL_MOMENT - timedelta(days=1)
+    runs = [
+        _typical_run(start, 500),
+        _typical_run(start + timedelta(minutes=25), 10, scenario="Other"),
+        _typical_run(start + timedelta(minutes=50), 510),
+    ]
+
+    typical = _typical(monkeypatch, runs, names=("Ranked", "Unplayed"))
+
+    assert typical.moment == TYPICAL_MOMENT
+    assert set(typical.values) == {"Ranked"}
+    value, total = typical.values["Ranked"]
+    assert total == 2
+    assert value.session_count == 1
+
+
+def _row_path_runs():
+    """Runs for two of the shared fixture's scenarios: Ranked recent, Top old."""
+    return [
+        *_daily_runs(range(100, 120), last=TYPICAL_MOMENT - timedelta(hours=1)),
+        *_daily_runs(
+            range(120, 140), last=TYPICAL_MOMENT - timedelta(days=40), scenario="Top"
+        ),
+    ]
+
+
+def _typical_cells(rows):
+    return [
+        {key: value for key, value in row.items() if key.startswith("typical_")}
+        for row in rows
+    ]
+
+
+def test_phase_one_rows_carry_the_typical_fields(monkeypatch, rank_row_sources):
+    names = [scenario.name for scenario in _BENCHMARK.scenarios]
+    typical = _typical(monkeypatch, _row_path_runs(), names)
+
+    rows = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=typical
+    )
+
+    by_scenario = {row["scenario"]: row for row in rows}
+    assert by_scenario["Ranked"]["typical_tier_display"] == "Iron · 95%"
+    assert by_scenario["Ranked"]["typical_not_recent"] is False
+    assert by_scenario["Top"]["typical_tier_display"] == "Silver"
+    assert by_scenario["Top"]["typical_not_recent"] is True
+    assert by_scenario["Unplayed"]["typical_score_display"] == "N/A"
+    assert by_scenario["No Ladder"]["typical_tier_display"] == "N/A"
+
+
+def test_fill_and_cancelled_rows_carry_phase_ones_typical_fields(
+    monkeypatch, rank_row_sources, isolated_fill_registry
+):
+    names = [scenario.name for scenario in _BENCHMARK.scenarios]
+    typical = _typical(monkeypatch, _row_path_runs(), names)
+    phase_one = build_playlist_scenario_rank_rows(
+        _BENCHMARK.code, "generation-1", typical=typical
+    )
+    # A run landing after phase 1 must not reach the fill's rows: they take
+    # phase 1's snapshot, never a new one.
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_all_runs",
+        lambda: pytest.fail("a fill row read the run store"),
+    )
+    target, args = _register_fill(monkeypatch, _BENCHMARK.code, "generation-1", typical)
+    target(*args)
+    _register_fill(monkeypatch, _BENCHMARK.code, "generation-2", typical)
+    # Opening any playlist in another tab cancels the second fill unstarted.
+    _register_fill(monkeypatch, _PLAYLIST.code, "generation-3")
+
+    filled = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+    cancelled = playlist_scenarios_service.drain_playlist_scenario_fill("generation-2")
+
+    assert filled is not None
+    assert filled.terminal == "complete"
+    assert cancelled is not None
+    assert cancelled.terminal == "cancelled"
+    filled_rows = sorted(filled.updates, key=lambda row: row["playlist_order"])
+    assert _typical_cells(filled_rows) == _typical_cells(phase_one)
+    assert _typical_cells(cancelled.updates) == _typical_cells(phase_one)
+
+
+def test_a_snapshot_value_equals_the_newest_one_built_from_the_whole_history(
+    monkeypatch,
+):
+    # Three scenarios played in turn over 12 days, so sessions hold runs of
+    # several scenarios, one scenario has more than a window of runs, and two
+    # runs end in the same second.
+    start = TYPICAL_MOMENT - timedelta(days=40)
+    runs = []
+    for day in range(12):
+        for index, scenario in enumerate(("Ranked", "Other", "Ranked", "Third")):
+            end = start + timedelta(days=day * 3, minutes=4 * index)
+            runs.append(_typical_run(end, 500 + day * 7 + index, scenario))
+    runs.append(_typical_run(runs[-1].datetime_object, 900, "Ranked"))
+    names = ("Ranked", "Other", "Third")
+
+    typical = _typical(monkeypatch, runs, names)
+
+    store = sorted(runs, key=lambda run: run.datetime_object)
+    sessions = split_into_play_sessions(store)
+    for name in names:
+        own = [run for run in store if run.scenario == name]
+        whole = build_typical_scores(own, sessions)[-1]
+        value, total = typical.values[name]
+        assert total == len(own)
+        assert value.runs == whole.runs
+        assert value.session_count == whole.session_count
+        assert (value.median, value.p25, value.p75, value.p10, value.p90) == (
+            whole.median,
+            whole.p25,
+            whole.p75,
+            whole.p10,
+            whole.p90,
+        )
+    assert typical.values["Ranked"][1] > 20
