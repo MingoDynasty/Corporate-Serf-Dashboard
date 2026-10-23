@@ -18,6 +18,7 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.playlist_scenarios_service import (
     TypicalSnapshot,
     benchmark_rank_fields,
@@ -26,6 +27,7 @@ from source.kovaaks.playlist_scenarios_service import (
 )
 from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import PaceBasis
+from source.kovaaks.typical_score import build_typical_scores
 
 # A table build's snapshot of a store with no runs.
 NO_TYPICAL = TypicalSnapshot(datetime(2026, 10, 22, 12, 0, 0), {})
@@ -2520,3 +2522,39 @@ def test_fill_and_cancelled_rows_carry_phase_ones_typical_fields(
     filled_rows = sorted(filled.updates, key=lambda row: row["playlist_order"])
     assert _typical_cells(filled_rows) == _typical_cells(phase_one)
     assert _typical_cells(cancelled.updates) == _typical_cells(phase_one)
+
+
+def test_a_snapshot_value_equals_the_newest_one_built_from_the_whole_history(
+    monkeypatch,
+):
+    # Three scenarios played in turn over 12 days, so sessions hold runs of
+    # several scenarios, one scenario has more than a window of runs, and two
+    # runs end in the same second.
+    start = TYPICAL_MOMENT - timedelta(days=40)
+    runs = []
+    for day in range(12):
+        for index, scenario in enumerate(("Ranked", "Other", "Ranked", "Third")):
+            end = start + timedelta(days=day * 3, minutes=4 * index)
+            runs.append(_typical_run(end, 500 + day * 7 + index, scenario))
+    runs.append(_typical_run(runs[-1].datetime_object, 900, "Ranked"))
+    names = ("Ranked", "Other", "Third")
+
+    typical = _typical(monkeypatch, runs, names)
+
+    store = sorted(runs, key=lambda run: run.datetime_object)
+    sessions = split_into_play_sessions(store)
+    for name in names:
+        own = [run for run in store if run.scenario == name]
+        whole = build_typical_scores(own, sessions)[-1]
+        value, total = typical.values[name]
+        assert total == len(own)
+        assert value.runs == whole.runs
+        assert value.session_count == whole.session_count
+        assert (value.median, value.p25, value.p75, value.p10, value.p90) == (
+            whole.median,
+            whole.p25,
+            whole.p75,
+            whole.p10,
+            whole.p90,
+        )
+    assert typical.values["Ranked"][1] > 20

@@ -33,7 +33,7 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
 )
 from source.kovaaks.pace import percent_faster
-from source.kovaaks.play_sessions import split_into_play_sessions
+from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.request_logging import request_exception_summary
 from source.kovaaks.scenario_groups import ScenarioGroup
 from source.kovaaks.time_scored_service import (
@@ -43,6 +43,7 @@ from source.kovaaks.time_scored_service import (
 )
 from source.kovaaks.typical_score import (
     TOO_FEW_RUNS_TEXT,
+    TYPICAL_SCORE_WINDOW_RUNS,
     TypicalScore,
     below_minimum_text,
     build_typical_scores,
@@ -107,13 +108,21 @@ def take_typical_snapshot(scenario_names: Iterable[str]) -> TypicalSnapshot:
     if not runs_by_scenario:
         return TypicalSnapshot(moment, {})
     sessions = split_into_play_sessions(snapshot)
-    return TypicalSnapshot(
-        moment,
-        {
-            name: (build_typical_scores(runs, sessions)[-1], len(runs))
-            for name, runs in runs_by_scenario.items()
-        },
-    )
+    session_of = {
+        run: index for index, session in enumerate(sessions) for run in session.runs
+    }
+    values = {}
+    for name, runs in runs_by_scenario.items():
+        # Only the newest value is kept, and it depends on the last window of
+        # runs in play order and their sessions alone. Built from the whole
+        # history, each scenario would map every run in the store to its
+        # session again and build every older value too.
+        window = in_play_order(runs)[-TYPICAL_SCORE_WINDOW_RUNS:]
+        window_sessions = [
+            sessions[index] for index in sorted({session_of[run] for run in window})
+        ]
+        values[name] = (build_typical_scores(window, window_sessions)[-1], len(runs))
+    return TypicalSnapshot(moment, values)
 
 
 @dataclass
