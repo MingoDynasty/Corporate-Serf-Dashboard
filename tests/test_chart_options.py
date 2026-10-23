@@ -442,9 +442,7 @@ def _ring(figure):
     ("latest_run", "opacity"),
     [("newest.csv", 1), ("on-another-scenario.csv", 0), (None, 0)],
 )
-def test_styling_the_graph_shows_the_ring_only_round_the_last_run_played(
-    latest_run, opacity
-):
+def test_styling_the_graph_rings_only_the_run_reported_by_the_card(latest_run, opacity):
     figure = chart_options.apply_graph_appearance_ringing_latest_run(
         "dark",
         _ringed_plot(),

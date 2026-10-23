@@ -218,9 +218,9 @@ def latest_run_ring_patch(plot_json: str | None, latest_run_id: str | None):
     ring. ``plot_json`` is the cached figure, read only for where the ring is
     and which run it is round.
 
-    A patch, and not the figure again: a run on a scenario the page does not
-    show takes the ring off this chart, and a whole new figure would also
-    undo a zoom the player had made on a chart that run did not change.
+    A patch preserves the player's zoom when only the highlighted run's
+    identity changes. A stale cached figure must not ring another run while
+    the selection's new figure is on its way.
     """
     if not plot_json:
         return no_update
@@ -245,15 +245,12 @@ def apply_graph_appearance_ringing_latest_run(  # noqa: PLR0913
 ) -> go.Figure | Patch | NoUpdate:
     """Style the graph as ``apply_graph_appearance`` does, and ring the latest run.
 
-    ``latest_run_id`` is the id of the newest run on any scenario. The cached
-    figure rings its own scenario's newest run, and the ring shows while the
-    two are the same run.
-
-    Which run is the latest is an input here and not something the page's
-    chart callback bakes into the figure. A run on a scenario the page does
-    not show rebuilds no chart, and it still has to take the ring off this
-    one. With ``only_the_latest_run_changed`` the answer is a patch of the
-    ring alone.
+    ``latest_run_id`` is the id of the selected scenario's latest run, as
+    reported by the card. The cached figure rings its own scenario's newest
+    run, and the ring shows while the two are the same run. A figure from a
+    different selection cannot ring a run the card no longer reports.
+    With ``only_the_latest_run_changed`` the answer is a patch of the ring
+    alone, preserving the chart's zoom.
     """
     if only_the_latest_run_changed:
         return latest_run_ring_patch(plot_json, latest_run_id)
@@ -511,9 +508,10 @@ def register_chart_options(ids: ChartOptionsIds, *, latest_run: str) -> None:
     Call once per page, at import, with the ids its layout is built from. The
     theme comes from the shell's color scheme switch, which every page shares.
 
-    ``latest_run`` is the id of a store holding the id of the newest run on
-    any scenario. The page's figures ring their scenario's newest run, and
-    the graph's one callback takes the store as an input, so the ring is
+    ``latest_run`` is the id of a store holding the selected scenario's
+    latest run id, or ``None`` with no such run. The page's figures ring
+    their scenario's newest run, and the graph's one callback takes the store
+    as an input, so the ring is
     shown or hidden when the latest run changes. It is one callback and not a
     second writer of the figure, because Dash holds a callback back for a
     queued writer of one of its inputs: when a run lands on the chart's own

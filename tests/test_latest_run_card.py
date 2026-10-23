@@ -168,7 +168,7 @@ def test_the_cards_run_is_the_one_the_run_list_names_as_the_newest():
 
     model = build_run_list(runs, A, 30, now, _marks(runs, A))
     assert _shown(runs, scenario=A, now=now).run_id == model["newest_run"]
-    # B's run is its own latest, and not the newest the list highlights.
+    # B's run is its own latest, and both views highlight it when B is selected.
     assert _shown(runs, scenario=B, now=now).run_id == run_id(runs[1])
     assert run_id(runs[1]) != model["newest_run"]
 

@@ -333,19 +333,34 @@ def _fov_text(run: RunData) -> str:
     return f"{number} {run.fov_scale}" if run.fov_scale else number
 
 
+def _latest_scenario_run_id(
+    sessions: Sequence[PlaySession], scenario: str | None
+) -> str | None:
+    """Find the selected scenario's latest run in the same order as the card."""
+    return next(
+        (
+            run_id(run)
+            for session in reversed(sessions)
+            for run in reversed(session.runs)
+            if run.scenario == scenario
+        ),
+        None,
+    )
+
+
 def _run_row(
     run: RunData,
     number: int,
     session_id: str,
     mark: RunMark,
-    newest_run: str,
+    highlighted_run: str | None,
 ) -> dict:
     return {
         "id": f"{RUN_ROW_ID_PREFIX}{run_id(run)}",
         "kind": RUN_ROW,
         "sid": session_id,
-        # The last run played, on any scenario: the row the list highlights.
-        "latest": run_id(run) == newest_run,
+        # The selected scenario's latest run, as on the card and chart.
+        "latest": run_id(run) == highlighted_run,
         "n": number,
         "time": format_time_of_day(run.datetime_object),
         "score": format_score(run.score),
@@ -367,7 +382,7 @@ def _session_child_rows(  # noqa: PLR0913
     session_id: str,
     today: date,
     marks: Mapping[RunData, RunMark],
-    newest_run: str,
+    highlighted_run: str | None,
 ) -> list[dict]:
     """Build the rows under one session row, in the order the list shows them.
 
@@ -435,7 +450,7 @@ def _session_child_rows(  # noqa: PLR0913
                     "text": format_short_date(ended_on, today),
                 }
             )
-        rows.append(_run_row(run, index + 1, session_id, marks[run], newest_run))
+        rows.append(_run_row(run, index + 1, session_id, marks[run], highlighted_run))
     return rows
 
 
@@ -469,6 +484,7 @@ def build_run_list(
 
     newest_session = sessions[-1]
     newest_run = run_id(newest_session.runs[-1])
+    highlighted_run = _latest_scenario_run_id(sessions, scenario)
     in_progress = find_play_session_in_progress(sessions, now) is not None
     today = now.date()
     # Each session with its place among all sessions, counting back from the
@@ -503,7 +519,9 @@ def build_run_list(
             }
         )
         rows.extend(
-            _session_child_rows(session, scenario, session_id, today, marks, newest_run)
+            _session_child_rows(
+                session, scenario, session_id, today, marks, highlighted_run
+            )
         )
     if len(listed) > session_limit:
         rows.append(_more_row())
@@ -542,7 +560,7 @@ def _visit_rows(  # noqa: PLR0913
     today: date,
     selected: str | None,
     marks: Mapping[RunData, RunMark],
-    newest_run: str,
+    highlighted_run: str | None,
 ) -> list[dict]:
     """Build one visit's scenario row and the rows under it, as the tree shows them.
 
@@ -586,7 +604,9 @@ def _visit_rows(  # noqa: PLR0913
             )
         rows.append(
             {
-                **_run_row(run, run_numbers[run], session_id, marks[run], newest_run),
+                **_run_row(
+                    run, run_numbers[run], session_id, marks[run], highlighted_run
+                ),
                 "vid": visit_id,
                 "sel": selected_here,
             }
@@ -604,9 +624,9 @@ def build_session_tree(
     """Build the list of every session whole, with the scenarios played in it.
 
     ``all_runs`` is a copy of every run in the run store. ``selected`` is the
-    page's selected scenario, or ``None``: its rows carry ``sel``, which is
-    what draws their band, and nothing else depends on it. ``marks`` holds a
-    mark for every run of every scenario played in the sessions listed.
+    page's selected scenario, or ``None``: its rows carry ``sel``, which
+    draws their band, and its latest run carries the highlight. ``marks``
+    holds a mark for every run of every scenario played in the sessions listed.
     ``session_limit`` and ``now`` are as ``build_run_list`` takes them.
 
     Sessions are listed newest first, every one of them. Under a session, a
@@ -626,6 +646,7 @@ def build_session_tree(
 
     newest_session = sessions[-1]
     newest_run = run_id(newest_session.runs[-1])
+    highlighted_run = _latest_scenario_run_id(sessions, selected)
     in_progress = find_play_session_in_progress(sessions, now) is not None
     today = now.date()
 
@@ -667,7 +688,7 @@ def build_session_tree(
                 today,
                 selected,
                 marks,
-                newest_run,
+                highlighted_run,
             )
             if is_first_row and number == len(visits):
                 # The newest run is the last of the newest visit: it opens
@@ -1087,7 +1108,7 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                     "doesExternalFilterPass": {"function": "runListFilterPass(params)"},
                     "getRowHeight": {"function": "runListRowHeight(params)"},
                     "getRowClass": {"function": "runListRowClass(params)"},
-                    # The highlight of the last run played. A rule, and not
+                    # A rule for the selected scenario's latest run, not
                     # part of the class ``getRowClass`` returns: when a row
                     # is refreshed the grid adds that class again and never
                     # takes off one it added before, where it both adds and

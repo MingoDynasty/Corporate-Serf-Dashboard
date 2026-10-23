@@ -576,14 +576,16 @@ def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
     ("ringed", "latest", "opacity"),
     [
         ("a.csv", "a.csv", 1),
-        # Another scenario's run is the last one played.
+        # The card has moved to another scenario or run.
         ("a.csv", "b.csv", 0),
         # An empty run store names no run.
         ("a.csv", None, 0),
         (None, None, 0),
     ],
 )
-def test_the_ring_shows_only_round_the_last_run_played(ringed, latest, opacity) -> None:
+def test_the_ring_shows_only_round_the_run_reported_by_the_card(
+    ringed, latest, opacity
+) -> None:
     assert latest_run_ring_opacity(ringed, latest) == opacity
 
 

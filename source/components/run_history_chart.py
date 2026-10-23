@@ -128,9 +128,8 @@ def build_run_history_figure(  # noqa: PLR0913
     is the app's own date: a range of days counts back from it.
 
     The scenario's newest run is ringed when the range holds it, in a trace
-    tagged with the run's id. Whether the ring shows is not decided here: it
-    shows only while that run is also the last one played on any scenario,
-    and a run on another scenario changes that with no new figure.
+    tagged with the run's id. The graph matches it to the card's run id so
+    the card and chart identify the same run after a change of scenario.
 
     Score vs Run and Score vs Time also draw the typical score's line and
     bands, each while its switch is on: at each run on Score vs Run, and on

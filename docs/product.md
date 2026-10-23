@@ -337,7 +337,10 @@ the same form as the finished ones under it.
   Now they always describe one scenario, and a lookup shows when it was last
   played and how that run went. With Follow off, a run on another scenario no
   longer reaches the card; its toast's link and the All scenarios view lead
-  to it.
+  to it. The chart ring and the run-list highlight now identify that same
+  selected-scenario run, so finding its point or row while browsing no longer
+  depends on whether it was the last run played across all scenarios
+  ([2026-10-23](decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md)).
 - **Scenario rank and percentile** (PRs #8–#10). The Run History page
   shows your global leaderboard standing for the selected scenario, led by
   its percentile — `82.33% percentile`, with `Position 11,290 of 63,892` on

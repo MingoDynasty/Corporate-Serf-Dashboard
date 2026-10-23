@@ -1,7 +1,7 @@
 # Run History
 
-Run History charts one scenario's runs and their typical score beside a list
-grouped by session.
+Run History charts one scenario's runs and their typical score beside a
+session list, with matching highlights for its latest run.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -413,10 +413,12 @@ it is saved is in [2026-10-18][note-store].
   latest run: a run on it newer than that run becomes the card's run, even
   when it is older than the store's newest, and one older leaves the card as
   it was ([2026-10-18][follows]).
-- With Follow off, a run on another scenario leaves the card's run as it is.
-  The chart's ring and the run list's highlight still mark the newest run on
-  any scenario, so they leave the selected scenario's run
-  ([2026-10-18][follows]).
+- The card, the chart's ring and the run list's highlight identify the
+  selected scenario's latest run, whether the selection comes from the
+  dropdown, a scenario name in the list, a link or Follow. With Follow off,
+  a run on another scenario leaves all three on the selection's run. With
+  no scenario selected or no runs for it, neither highlight marks a run
+  ([2026-10-23][latest-highlights]).
 
 ## The PB card
 
@@ -564,12 +566,13 @@ The card's lines, local-record scope and leaderboard presentation follow
   [2026-10-12][stars-run]).
   New PBs are judged in the order the runs were played, so a star sits on the
   same run of a same-second pair as the axis puts first.
-- The scenario's newest run carries a ring while it is also the last run
-  played on any scenario and the range holds it. The ring has no legend entry
-  and no hover of its own, and is drawn over a star. It is the app's blue,
-  `#1c7ed6` on the light background and `#74c0fc` on the dark one. A run on
-  another scenario takes the ring off with no new figure, so a zoom on the
-  chart is kept
+- The selected scenario's latest run carries a ring when the range holds
+  it, matching the Latest run card and the run list's highlight. The range
+  is never widened to include it. A run on another scenario with Follow off
+  leaves the ring and the chart's zoom as they are
+  ([2026-10-23][latest-highlights]). The ring has no legend entry or hover
+  of its own, and is drawn over a star. It is the app's blue, `#1c7ed6` on
+  the light background and `#74c0fc` on the dark one
   ([2026-10-12][every-run]).
 - Score vs Run draws the typical score, as
   [typical_score.md](typical_score.md) defines it: a line with a point at each
@@ -884,11 +887,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   midnight in a session that started before it, and a single run that started
   before midnight and ended after it. Where a header and a divider fall
   between the same two runs, the divider comes first.
-- The row of the last run played, on any scenario, is highlighted. It is in
-  this view only while the selected scenario is the one that run was on, so
-  the highlight follows the selection and not the chart's range: the row is
-  highlighted where the range leaves the run's point, and its ring, off the
-  chart. The highlight is a look alone and tells a screen reader nothing.
+- The selected scenario's latest run is highlighted, matching the Latest
+  run card. Its row keeps the highlight even when the chart's range leaves
+  its point off the chart. A selection change does not open rows or scroll
+  the list to reach it. The highlight is a look alone and tells a screen
+  reader nothing ([2026-10-23][latest-highlights]).
 - With runs and no scenario selected, this view reads "No scenario selected"
   with the switch still above it, and "Expand all" and "Columns" out of view.
   A selected scenario with no local runs lists the newest session alone
@@ -936,8 +939,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   `aria-current`. With no scenario selected, or one with no run in the listed
   sessions, nothing is marked. The tree never scrolls to the selected
   scenario or loads older sessions to reach it. The band is a look alone. The
-  last run's row keeps its highlight, and a row can carry both
-  ([2026-10-14][all-scenarios]).
+  selected scenario's latest run carries the same highlight as under This
+  scenario, so that row can carry both. Clicking a scenario name in an older
+  visit still highlights its latest run wherever it is listed, leaving open
+  rows and the scroll position as they are
+  ([2026-10-14][all-scenarios], [2026-10-23][latest-highlights]).
 - An open session row carries a "Show all runs" button at the end of its
   facts. It opens every scenario row of that session and reads "Hide all
   runs" once they are all open, which closes them and leaves the session open.
@@ -1517,3 +1523,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [typical-card-lead]: ../decision_log/2026/2026-10-20-scenario-stats-leads-with-the-typical-score.md
 
 [score-strip]: ../decision_log/2026/2026-10-21-run-historys-score-cards-stay-together-after-the-note.md
+
+[latest-highlights]: ../decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md

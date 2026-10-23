@@ -137,11 +137,9 @@ RUN_LANDED_STORE_ID = "run-history-run-landed"
 # when the answer changes, and the run list takes it as an input, which is
 # what takes "In progress" off a session nothing more is played in.
 SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
-# The id of the newest run in the run store, on whatever scenario. The
-# latest-run card's callback writes it from the store it reads the card's run
-# from, only when it is another run than the one held. The graph takes it as
-# an input: a figure rings its own scenario's newest run, and the ring shows
-# while this names the same run.
+# The id of the run the latest-run card reports, or None with no such run.
+# The graph waits for this and its cached figure before drawing the ring,
+# so a change of scenario cannot apply a new run's id to the old figure.
 LATEST_RUN_STORE_ID = "run-history-latest-run"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
 CHART_MODE_ID = "run-history-chart-mode"
@@ -457,10 +455,9 @@ def build_run_list_rows(  # noqa: PLR0913
     Output(LATEST_RUN_CARD_IDS.heading, "children"),
     Output(LATEST_RUN_CARD_IDS.body, "children"),
     Output(LATEST_RUN_STORE_ID, "data"),
-    # Any run, on any scenario. A run on another scenario moves the ring's
-    # store, and can change which session the card's run is in: a new
-    # session makes the old one "last" or older. The card is still worked
-    # out from the run store and never from the batch.
+    # A run on another scenario can change which session the card's run is
+    # in: a new session makes the old one "last" or older. It leaves the
+    # ring's id alone, so a chart the run did not change keeps its zoom.
     Input(RUN_LANDED_STORE_ID, "data"),
     Input(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
     # The percentage decides the badge of a run that is not a new PB.
@@ -489,20 +486,21 @@ def show_latest_run(  # noqa: PLR0913
     scenario the page ends up on.
 
     The first output is when the run ended, which a script words as its age.
-    The last is the id of the newest run on any scenario, which the chart's
-    ring and the run list's highlight mark, so during a lookup they leave the
-    card's run. It is written only when it is another run than the one held.
+    The last is the id of the card's run, which the chart's ring also marks,
+    or ``None`` when the selection has no run. It is written only when it is
+    another run than the one held.
     The graph takes that store as an input, so writing the same id again
     would restyle a chart that nothing had changed.
     """
     shown, newest_run_id = latest_run_from_store(
         selected_scenario, score_threshold_percentage, datetime.now()
     )
+    selected_run_id = shown.run_id if shown is not None else None
     return (
         *latest_run_card_content(
             shown, selected_scenario, store_has_runs=newest_run_id is not None
         ),
-        no_update if newest_run_id == held_latest_run else newest_run_id,
+        no_update if selected_run_id == held_latest_run else selected_run_id,
     )
 
 

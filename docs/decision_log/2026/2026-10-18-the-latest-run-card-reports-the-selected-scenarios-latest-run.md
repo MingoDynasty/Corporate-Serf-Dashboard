@@ -10,6 +10,12 @@ names that session by when it began, and with no run to report the card says
 why. Its **Show {scenario}** button is gone, with the half-follow it gave a
 player who had Follow off.
 
+**Superseded in part (2026-10-23).** The **What stays** rule that reserved
+the chart ring and run-list highlight for the last run played on any
+scenario is superseded by
+[selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
+The original text is retained as history; the other rules stand.
+
 **Ruling and delivery.** R1 of
 [#388](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/388),
 ratified by the maintainer on 2026-10-18 at `0fcac03`, "I ratify the

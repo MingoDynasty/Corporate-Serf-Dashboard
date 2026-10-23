@@ -1833,8 +1833,8 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
         "Run 1 this session",
         "4 min on this scenario",
     ]
-    # The ring's store names the newest run on any scenario, not the card's.
-    assert latest_run_id == "landed.csv"
+    # The card and ring identify the same selected-scenario run.
+    assert latest_run_id == "selected.csv"
     # One value per output, in the outputs' order.
     assert len(answer) == len(_card_registration()["output"].split("..."))
 
@@ -1953,10 +1953,10 @@ def test_a_change_of_scenario_rewrites_the_card_for_the_new_one(monkeypatch):
     assert on_b[1][0] == "612.5"
 
 
-def test_with_follow_off_a_run_on_another_scenario_moves_the_ring_and_not_the_card(
+def test_with_follow_off_a_run_on_another_scenario_keeps_the_ring_and_card(
     monkeypatch,
 ):
-    """The selection stays on A, so the card keeps A's run, and the ring leaves it."""
+    """The selection stays on A, so the card and ring keep identifying A's run."""
     store = _Store(monkeypatch, _record(SCENARIO, EVENING, score=80.0))
     before = _card_at(monkeypatch, EVENING + timedelta(minutes=1), SCENARIO)
     landed = _record(B_SCENARIO, EVENING + timedelta(minutes=5), score=612.5)
@@ -1970,7 +1970,7 @@ def test_with_follow_off_a_run_on_another_scenario_moves_the_ring_and_not_the_ca
     )
 
     assert after[:2] == before[:2]
-    assert after[2] == run_history_list.run_id(landed)
+    assert after[2] is no_update
     assert before[2] == run_history_list.run_id(store.runs[0])
 
 
@@ -2142,37 +2142,24 @@ def test_the_page_holds_no_scenario_button_and_no_script_to_hand_focus_on():
 # --- The latest run's id, and the ring ------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    ("held", "newest", "written"),
-    [
-        # Another run than the one held: on load, and when a run lands.
-        (None, "a.csv", "a.csv"),
-        ("a.csv", "b.csv", "b.csv"),
-        # The same run: a change of scenario, of the percentage, of the
-        # session's state, of the date.
-        ("a.csv", "a.csv", no_update),
-    ],
-)
-@pytest.mark.parametrize("selected", [SCENARIO, None])
-def test_the_newest_runs_id_is_written_only_when_it_is_another_run(
-    monkeypatch, held, newest, written, selected
+@pytest.mark.parametrize("selected", [SCENARIO, B_SCENARIO, None, "Never played"])
+@pytest.mark.parametrize("held_index", [None, 0, 1])
+def test_the_selected_run_id_is_written_only_when_it_changes(
+    monkeypatch, selected, held_index
 ):
-    """The graph takes the store, so the same id again would restyle the chart.
-
-    It is the newest run on any scenario, whatever the card reports, so it is
-    written with no scenario selected too.
-    """
-    monkeypatch.setattr(
-        run_history,
-        "latest_run_from_store",
-        lambda *_arguments: latest_run_card.StoreRuns(None, newest),
+    runs = [
+        _record(SCENARIO, EVENING, score=80.0),
+        _record(B_SCENARIO, EVENING + timedelta(minutes=5), score=612.5),
+    ]
+    _Store(monkeypatch, *runs)
+    expected = next(
+        (run_history_list.run_id(run) for run in runs if run.scenario == selected), None
     )
+    held = None if held_index is None else run_history_list.run_id(runs[held_index])
 
-    *_card, latest_run_id = run_history.show_latest_run(
-        None, selected, 95, True, "2026-10-12", held
-    )
+    written = _card_at(monkeypatch, EVENING + timedelta(minutes=6), selected, held)[2]
 
-    assert latest_run_id == written or latest_run_id is written
+    assert written == (no_update if expected == held else expected)
 
 
 def test_a_run_store_emptied_of_runs_takes_the_held_id_away(monkeypatch):
@@ -2203,8 +2190,8 @@ def test_the_graph_takes_the_latest_run_and_waits_for_both_of_its_writers():
     A run on the chart's own scenario writes a new figure and a new latest
     run. Dash holds a callback back for a queued writer of one of its
     inputs, so the graph is written once, after both. A run on another
-    scenario writes only the latest run, which is what takes the ring off
-    with no new figure.
+    scenario with Follow off leaves the highlighted id alone, so neither
+    the ring nor the chart's zoom changes.
     """
     options = run_history.CHART_OPTIONS_IDS
     graph = _registration(f"{options.graph}.figure")
@@ -2252,3 +2239,135 @@ def test_the_graphs_figure_has_exactly_one_writer_which_takes_the_latest_run():
         getattr(spec.get("callback"), "__name__", None)
         for spec in GLOBAL_CALLBACK_MAP.values()
     }
+
+
+@pytest.mark.parametrize("selected", [SCENARIO, B_SCENARIO])
+@pytest.mark.parametrize(
+    "mode", ["score_vs_run", "score_vs_time", "score_vs_sensitivity"]
+)
+def test_the_card_list_and_chart_identify_the_selected_scenarios_latest_run(
+    monkeypatch, selected, mode
+):
+    runs = [
+        _record(SCENARIO, EVENING - timedelta(days=1), score=70.0),
+        _record(SCENARIO, EVENING, score=80.0),
+        _record(B_SCENARIO, EVENING + timedelta(minutes=5), score=612.5),
+    ]
+    _Store(monkeypatch, *runs)
+    monkeypatch.setattr(run_history_list, "get_all_runs", lambda: list(runs))
+    monkeypatch.setattr(run_history_chart, "get_all_runs", lambda: list(runs))
+    monkeypatch.setattr(
+        run_history_chart,
+        "get_sensitivities_vs_runs",
+        lambda scenario: {
+            "40.8 cm/360": [run for run in runs if run.scenario == scenario]
+        },
+    )
+    monkeypatch.setattr(
+        run_history_list, "get_version_pace_basis", lambda *_arguments: None
+    )
+    now = EVENING + timedelta(minutes=6)
+    expected = runs[1] if selected == SCENARIO else runs[2]
+    expected_id = run_history_list.run_id(expected)
+    _heading, body, highlighted = _card_at(monkeypatch, now, selected)
+
+    assert highlighted == expected_id
+    for view in (run_history_list.VIEW_SCENARIO, run_history_list.VIEW_ALL):
+        model = run_history_list.run_list_from_store(view, selected, 30, 95, now)
+        assert [row["id"] for row in model["rows"] if row.get("latest")] == [
+            f"r:{expected_id}"
+        ]
+        # The expansion token stays tied to new play, so a selection alone
+        # cannot reopen rows the player closed.
+        assert model["newest_run"] == run_history_list.run_id(runs[-1])
+
+    cached, _supports_overlays = run_history_chart.build_run_history_figure(
+        mode,
+        selected,
+        "100",
+        "90",
+        False,
+        False,
+        None,
+        now.date(),
+        typical_score_switch=False,
+        middle_50_switch=False,
+        middle_80_switch=False,
+    )
+    figure = chart_options.apply_graph_appearance_ringing_latest_run(
+        "light",
+        cached.to_json(),
+        None,
+        None,
+        highlighted,
+        only_the_latest_run_changed=False,
+    )
+    (ring,) = [trace for trace in figure.data if trace.name == "Latest run"]
+    assert ring.opacity == 1
+    assert ring.meta == expected_id
+    assert list(ring.y) == [expected.score]
+    assert body[0] == ("80New PB" if selected == SCENARIO else "612.5")
+
+
+@pytest.mark.parametrize("selected", [None, "Never played"])
+def test_no_selected_run_means_no_highlight_even_with_runs_on_other_scenarios(
+    monkeypatch, selected
+):
+    runs = [_record(SCENARIO, EVENING)]
+    _Store(monkeypatch, *runs)
+    monkeypatch.setattr(run_history_list, "get_all_runs", lambda: list(runs))
+    monkeypatch.setattr(
+        run_history_list, "get_version_pace_basis", lambda *_arguments: None
+    )
+
+    assert (
+        _card_at(monkeypatch, EVENING, selected, held_latest_run="old.csv")[2] is None
+    )
+    for view in (run_history_list.VIEW_SCENARIO, run_history_list.VIEW_ALL):
+        model = run_history_list.run_list_from_store(view, selected, 30, 95, EVENING)
+        assert not any(row.get("latest") for row in model["rows"])
+
+
+@pytest.mark.parametrize("mode", ["score_vs_time", "score_vs_sensitivity"])
+def test_a_chart_range_excluding_the_latest_run_keeps_the_card_and_list_on_it(
+    monkeypatch, mode
+):
+    selected_run = _record(SCENARIO, EVENING - timedelta(days=100), score=80.0)
+    runs = [selected_run, _record(B_SCENARIO, EVENING)]
+    _Store(monkeypatch, *runs)
+    monkeypatch.setattr(run_history_list, "get_all_runs", lambda: list(runs))
+    monkeypatch.setattr(run_history_chart, "get_all_runs", lambda: list(runs))
+    monkeypatch.setattr(
+        run_history_list, "get_version_pace_basis", lambda *_arguments: None
+    )
+    highlighted = _card_at(monkeypatch, EVENING, SCENARIO)[2]
+    model = run_history_list.run_list_from_store(
+        run_history_list.VIEW_SCENARIO, SCENARIO, 30, 95, EVENING
+    )
+    cached, _supports_overlays = run_history_chart.build_run_history_figure(
+        mode,
+        SCENARIO,
+        "100",
+        "7",
+        False,
+        False,
+        None,
+        EVENING.date(),
+        typical_score_switch=False,
+        middle_50_switch=False,
+        middle_80_switch=False,
+    )
+    figure = chart_options.apply_graph_appearance_ringing_latest_run(
+        "light",
+        cached.to_json(),
+        None,
+        None,
+        highlighted,
+        only_the_latest_run_changed=False,
+    )
+
+    assert highlighted == run_history_list.run_id(selected_run)
+    assert [row["id"] for row in model["rows"] if row.get("latest")] == [
+        f"r:{highlighted}"
+    ]
+    assert not any(trace.name == "Latest run" for trace in figure.data)

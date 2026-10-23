@@ -113,6 +113,12 @@ as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
 off, a run on another scenario doesn't reach the card: the run's toast links
 to it, and the run list's **All scenarios** view lists it.
 
+The card's run is also highlighted in the run list and circled on the chart.
+Choosing another scenario through **Selected scenario** or a scenario name in
+the list moves all three to that scenario's latest run. The chart keeps its
+range, so an older run can be highlighted in the list while outside the
+chart. Choosing a scenario doesn't scroll or open rows in the list.
+
 The run list's **Columns** menu can also add **Reloads**, **FOV** and
 **Avg FPS**, each off to start, and the list widens to fit the columns you
 turn on.

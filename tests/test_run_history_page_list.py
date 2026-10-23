@@ -746,7 +746,7 @@ def _sample_rows() -> dict[str, dict]:
     return rows
 
 
-def test_the_last_run_played_is_highlighted_by_a_rule_on_a_field_the_rows_carry():
+def test_the_selected_scenarios_latest_run_is_highlighted_by_a_row_rule():
     """A rule, because the grid works a row's class out only when it draws it.
 
     The run that was the latest stays in the list when the next one lands,
