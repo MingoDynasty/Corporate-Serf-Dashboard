@@ -452,14 +452,14 @@ def capture(origin: str, destination: Path) -> None:
         # The score-threshold label would overlap Diamond's nearby rank label.
         page.locator("#run-history-score-threshold-overlay-switch").uncheck()
         page.get_by_role("button", name="Chart options", exact=True).click()
-        # Plotly can retain the inspector's narrower canvas after it closes.
-        # A normal viewport resize retriggers its responsive layout.
-        for width in (1959, 1960):
-            page.set_viewport_size({"width": width, "height": 1080})
-            page.wait_for_function("""() => {
-                const graph = document.querySelector('#run-history-graph .js-plotly-plot');
-                return Math.abs(graph._fullLayout.width - graph.getBoundingClientRect().width) < 2;
-            }""")
+        expect(
+            page.get_by_role("button", name="Chart options", exact=True)
+        ).to_have_attribute("aria-expanded", "false")
+        # Chart width settles asynchronously after the options panel closes.
+        page.wait_for_function("""() => {
+            const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+            return Math.abs(graph._fullLayout.width - graph.getBoundingClientRect().width) < 2;
+        }""")
         page.wait_for_function(
             """count => {
             const graph = document.querySelector('#run-history-graph .js-plotly-plot');
