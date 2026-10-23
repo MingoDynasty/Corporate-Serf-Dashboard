@@ -510,6 +510,7 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         id="mantine-provider",
         defaultColorScheme="light",
+        theme={"components": {"Anchor": {"defaultProps": {"underline": "always"}}}},
         children=[
             dmc.AppShell(
                 children=[

@@ -2236,18 +2236,43 @@ def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
     }
 
 
-def test_playlist_scenarios_grid_uses_content_auto_size():
-    page = playlist_scenarios.layout("KovaaKsTestCode")
-    ag_grid = page.children[-1]
+@pytest.mark.parametrize(
+    "playlist_code", ["KovaaKsPlaylistCode", "KovaaKsBenchmarkCode"]
+)
+def test_playlist_scenarios_grid_sizes_to_its_first_rendered_rows(
+    benchmark_playlists, playlist_code
+):
+    grid = playlist_scenarios.layout(playlist_code).children[-1]
+    props = grid.to_plotly_json()["props"]
 
-    assert ag_grid.columnSize == "autoSize"
-    assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
+    # Dash supplies the rows after the grid initializes. The wrapper's
+    # ``columnSize`` fits empty columns and does not fit them again on arrival.
+    assert props["columnSize"] == "autoSize"
+    assert props["columnSizeOptions"] == playlist_scenarios.COLUMN_SIZE_OPTIONS
+    assert grid.dashGridOptions["autoSizeStrategy"] == {
+        "type": "fitCellContents",
+        "colIds": playlist_scenarios.AUTO_SIZE_COLUMN_KEYS,
+        "skipHeader": False,
+    }
 
 
 def test_playlist_scenarios_grid_has_no_initial_row_data():
     ag_grid = playlist_scenarios.layout("KovaaKsTestCode").children[-1]
 
     assert "rowData" not in ag_grid.to_plotly_json()["props"]
+
+
+def test_playlist_scenarios_grid_keeps_loading_until_its_columns_and_rows_are_ready():
+    grid = playlist_scenarios.layout("KovaaKsTestCode").children[-1]
+
+    assert grid.dashGridOptions["loading"] is True
+    assert "columns-pending" in grid.className.split()
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
+    selector = ".playlist-scenarios-grid.columns-pending :is(.ag-header, .ag-body)"
+    body = stylesheet.split(selector + " {", 1)[1].split("}", 1)[0]
+    # Hiding the root would hide its loading overlay too; display:none would
+    # leave no rendered cells for the Columns callback to size.
+    assert body.strip() == "visibility: hidden;"
 
 
 def test_playlist_scenarios_grid_uses_bounded_viewport_layout():
@@ -2589,12 +2614,17 @@ def test_playlist_scenarios_rank_column_defs():
             "The highest rank your PB score has reached on this scenario."
         ),
         "valueFormatter": {"function": "params.data.tier_display"},
+        "tooltipValueGetter": {
+            "function": "params.data.tier_sort ? params.data.tier_display : null"
+        },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 100,
+        "maxWidth": 240,
     }
     assert next_rank["headerName"] == "Next Rank"
     assert next_rank["field"] == "next_tier_sort"
+    assert next_rank["maxWidth"] == 320
     # One header for both measures the column holds, on every benchmark table.
     assert next_rank["headerTooltip"] == (
         "How much your PB score has to grow to reach the next rank. A row that "
@@ -3284,7 +3314,6 @@ def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
     # The option rides beside the grid's own, and replaces none of them.
     assert grid.dashGridOptions["animateRows"] is False
     assert "getRowId" in grid.dashGridOptions
-    assert grid.columnSize == "autoSize"
 
 
 @pytest.mark.parametrize(
@@ -3295,7 +3324,7 @@ def test_grids_with_a_columns_menu_render_every_column(page_module, grid_id):
     ],
     ids=["overview", "scenarios"],
 )
-def test_playlist_grids_draw_every_row(page_module, grid_id):
+def test_playlist_grids_draw_every_row_in_screen_order(page_module, grid_id):
     grid = _component_by_id(page_module.layout(), grid_id)
 
     # The browser's own text search finds only rows that are in the page. With
@@ -3305,6 +3334,9 @@ def test_playlist_grids_draw_every_row(page_module, grid_id):
     # With the cap left on, a table of 600 rows drew 501 and never the rest,
     # even when scrolled to its end.
     assert grid.dashGridOptions["suppressMaxRenderedRowRestriction"] is True
+    # A sort must also reorder the page nodes: browser search and text
+    # selection otherwise follow the old order, skipping rows on screen.
+    assert grid.dashGridOptions["ensureDomOrder"] is True
     # The grid still scrolls inside itself, which keeps its header in view.
     assert "domLayout" not in grid.dashGridOptions
 

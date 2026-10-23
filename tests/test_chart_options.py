@@ -745,8 +745,6 @@ def test_collapsing_the_inspector_animates_the_track_the_graph_grows_into(
     assert "grid-template-columns: minmax(0, 1fr) 0;" in collapsed
     assert "column-gap: 0;" in collapsed
     assert "width: 20rem;" in panel
-    # Opaque, or the wider plot shows through the panel for a frame.
-    assert "background-color: var(--mantine-color-body);" in panel
 
 
 def test_the_collapsed_panel_leaves_the_tab_order_after_the_animation(stylesheet):

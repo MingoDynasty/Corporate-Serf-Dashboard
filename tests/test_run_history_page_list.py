@@ -54,9 +54,9 @@ STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
 LIST_SCRIPT = REPO_ROOT / "assets" / "runHistoryList.js"
 IDS = run_history.RUN_LIST_IDS
 SCENARIO = "Scenario A"
-# The list's column is 500px with the default columns, and its minimum. Its
-# border takes 2px, and a classic scrollbar is 17px in the widest browser the
-# app is used in.
+# The default columns need 500px even though hiding columns can narrow the
+# list. Its border takes 2px, and a classic scrollbar is 17px in the widest
+# browser the app is used in.
 LIST_COLUMN_PX = 500
 BORDER_PX = 2
 SCROLLBAR_PX = 17
@@ -370,10 +370,6 @@ def test_the_columns_leave_room_for_the_scrollbar():
         if "width" in column and not column.get("hide")
     )
     assert default_shown + run_history_list.RUN_LIST_ROOM == LIST_COLUMN_PX
-    css = STYLESHEET.read_text(encoding="utf-8")
-    assert f"--run-history-list-width: {LIST_COLUMN_PX}px;" in _css_block(
-        css, ".run-history-page"
-    )
 
 
 def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
@@ -434,15 +430,16 @@ def test_the_menus_checkboxes_write_the_lists_need_to_the_pages_style():
 
 
 def test_the_list_grows_to_its_need_between_its_minimum_and_the_charts_floor():
-    """Where the bounds cross, the minimum wins and the chart gives."""
+    """Keep the default columns whole in a narrow window, even at a lower minimum."""
     css = STYLESHEET.read_text(encoding="utf-8")
     columns = _css_block(css, ".run-history-columns")
 
     assert (
         "grid-template-columns: minmax(0, 1fr) clamp(\n"
         "            var(--run-history-list-width),\n"
-        "            var(--run-history-list-need, var(--run-history-list-width)),\n"
-        "            calc(100% - var(--mantine-spacing-md) - 480px)\n"
+        f"            var(--run-history-list-need, {LIST_COLUMN_PX}px),\n"
+        f"            max({LIST_COLUMN_PX}px, "
+        "calc(100% - var(--mantine-spacing-md) - 480px))\n"
         "        );"
     ) in columns
 

@@ -503,10 +503,13 @@ flowchart LR
   chart. The list's column is as wide as its shown columns need, which a
   clientside callback registered by `register_run_list()` writes to the
   page root's `style` as `--run-history-list-need`; the stylesheet clamps it
-  between `--run-history-list-width`, the list's 500px minimum, and a 480px
-  floor for the chart. The top row is a grid with the same gap, whose second
-  column is the latest-run card's own `--run-history-card-width`, also
-  500px, so the card sits over the list while the list is at its minimum.
+  above `--run-history-list-width`, the list's 480px minimum, while reserving
+  480px for the chart where possible. The default columns and mount fallback
+  still need 500px, and a 500px floor on the maximum preserves the default
+  list in narrow windows. The top row is a grid with the same gap, whose
+  second column is the latest-run card's own `--run-history-card-width`,
+  500px, so the card lines up with the default list independently of the
+  list's minimum.
   The first column (`_top_row`, `_dropdown_column`) is a
   wrapping row of the dropdowns' column, the scenario note card, and a
   `run-history-score-pair` wrapper holding Scenario Stats then the PB card.
@@ -844,7 +847,9 @@ flowchart LR
   checkboxes through the grid API as the page mounts and on every change: it
   sets visibility, clears the sort of every hidden column, re-runs the quick
   filter, and sizes the columns it just showed. Only the newest run applies
-  anything. A grid with a menu also takes `COLUMNS_MENU_GRID_OPTIONS`, which
+  anything. It reveals a `columns-pending` grid once its rows and rendered
+  columns are ready, keeping the loading overlay visible until then.
+  A grid with a menu also takes `COLUMNS_MENU_GRID_OPTIONS`, which
   turns column virtualization off, so the grid's own autosize can fit every
   column a stored choice brings into the window. It never writes the grid's
   `columnState` prop and

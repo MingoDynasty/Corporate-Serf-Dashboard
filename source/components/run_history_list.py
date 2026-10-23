@@ -1013,7 +1013,7 @@ def run_list_class(model: RunListModel) -> str:
     return RUN_LIST_NOTHING_CLASS
 
 
-def run_list_panel(ids: RunListIds) -> dmc.Box:
+def run_list_panel(ids: RunListIds) -> dmc.Paper:
     """Build the list: its header, the grid, and the text for nothing to list.
 
     The header is the switch between the two views at the left, with Expand
@@ -1026,7 +1026,9 @@ def run_list_panel(ids: RunListIds) -> dmc.Box:
     them to the grid.
     """
     live_region: dict[str, Any] = {"aria-live": "polite"}
-    return dmc.Box(
+    return dmc.Paper(
+        withBorder=True,
+        radius="sm",
         id=ids.panel,
         className=RUN_LIST_CLASS,
         children=[

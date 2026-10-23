@@ -302,9 +302,13 @@ def _chart_options_group(title: str, controls: list) -> dmc.Stack:
     )
 
 
-def chart_options_panel(ids: ChartOptionsIds) -> dmc.Box:
+def chart_options_panel(ids: ChartOptionsIds) -> dmc.Paper:
     """Build the collapsible inspector that sits beside the chart."""
-    return dmc.Box(
+    # Its opaque background hides the wider plot while Plotly catches up
+    # with the panel opening beside it.
+    return dmc.Paper(
+        withBorder=True,
+        radius="sm",
         id=ids.panel,
         className=_chart_options_panel_class(False),
         children=[

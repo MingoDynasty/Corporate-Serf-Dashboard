@@ -271,9 +271,9 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int | None, bool, bool]
     return get_scenario_stats(selected_scenario).number_of_runs, False, True
 
 
-def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
+def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Paper:
     """Build the Scenario Stats card: its first line and the lines under it."""
-    return dmc.Box(
+    return dmc.Paper(
         [
             # Plain text, as the PB card's and the latest-run card's first
             # lines are, and not a heading: the three are one kind of thing on
@@ -327,6 +327,8 @@ def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Box:
             ),
         ],
         className="scenario-stats-card",
+        withBorder=True,
+        radius="sm",
     )
 
 

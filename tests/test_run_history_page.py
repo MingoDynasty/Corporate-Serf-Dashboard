@@ -1425,11 +1425,11 @@ def _container_block(css, query):
     return match.group(1)
 
 
-def test_the_list_takes_a_column_of_at_least_500px_beside_the_chart():
+def test_the_list_takes_a_column_of_at_least_480px_beside_the_chart():
     css = STYLESHEET.read_text(encoding="utf-8")
     columns = _css_block(css, ".run-history-columns")
 
-    assert "--run-history-list-width: 500px;" in _css_block(css, ".run-history-page")
+    assert "--run-history-list-width: 480px;" in _css_block(css, ".run-history-page")
     assert "grid-template-columns: minmax(0, 1fr) clamp(" in columns
     assert "flex: 1 1 0;" in columns
 
@@ -1437,9 +1437,9 @@ def test_the_list_takes_a_column_of_at_least_500px_beside_the_chart():
 def test_the_top_row_takes_the_cards_own_width_and_the_gap_of_the_columns():
     """The card's width is its own, so a wider list never wraps the top row.
 
-    It equals the list's minimum, so on the default page the card's edges
-    are the list's at every zoom level. The row stretches each column, and
-    every card in it, to its own height.
+    It equals the list's default width, so on the default page the card's
+    edges are the list's at every zoom level. The row stretches each column,
+    and every card in it, to its own height.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     page = _css_block(css, ".run-history-page")
@@ -1447,7 +1447,7 @@ def test_the_top_row_takes_the_cards_own_width_and_the_gap_of_the_columns():
     columns = _css_block(css, ".run-history-columns")
 
     assert "--run-history-card-width: 500px;" in page
-    assert "--run-history-list-width: 500px;" in page
+    assert "--run-history-list-width: 480px;" in page
     assert "grid-template-columns: minmax(0, 1fr) var(--run-history-card-width);" in row
     for rule in (row, columns):
         assert "    gap: var(--mantine-spacing-md);" in rule
@@ -1596,14 +1596,14 @@ def test_the_top_row_is_one_wrapping_line_where_the_columns_stack():
     assert card and "flex: 1 1 380px;" in card.group(1)
 
 
-def test_every_card_in_the_row_has_the_same_frame():
+def test_card_frames_keep_the_existing_color():
     frame = _css_block(
         STYLESHEET.read_text(encoding="utf-8"),
-        ".run-history-card,\n.scenario-stats-card,\n.pb-card",
+        ".run-history-card,\n.scenario-stats-card,\n.pb-card,\n"
+        ".run-history-list,\n.chart-options-panel",
     )
 
-    assert "border: 1px solid var(--mantine-color-default-border);" in frame
-    assert "border-radius: var(--mantine-radius-sm);" in frame
+    assert "border-color: var(--mantine-color-default-border);" in frame
 
 
 def test_the_card_is_as_tall_as_the_row_and_never_under_135px():

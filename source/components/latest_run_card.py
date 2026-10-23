@@ -363,14 +363,16 @@ class CardContent(NamedTuple):
     body: list[Any]
 
 
-def latest_run_card(ids: LatestRunCardIds) -> dmc.Box:
+def latest_run_card(ids: LatestRunCardIds) -> dmc.Paper:
     """Build the card with nothing in it yet.
 
     The page's callbacks write what it shows. The run's age, which a script
     writes, is in the layout from the start: it would come and go under the
     script if the server's answer drew it.
     """
-    return dmc.Box(
+    return dmc.Paper(
+        withBorder=True,
+        radius="sm",
         className=CARD_CLASS,
         children=[
             dcc.Store(id=ids.played_at),
