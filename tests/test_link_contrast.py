@@ -31,7 +31,7 @@ def _luminance(rgb):
 def _anchor_color(scheme):
     css = STYLESHEET.read_text(encoding="utf-8")
     match = re.search(
-        rf':root\[data-mantine-color-scheme="{scheme}"\]\s*\{{([^}}]*)\}}', css
+        rf':root:root\[data-mantine-color-scheme="{scheme}"\]\s*\{{([^}}]*)\}}', css
     )
     override = re.search(
         r"--mantine-color-anchor:\s*var\(--mantine-color-(\w+)-(\d)\)",

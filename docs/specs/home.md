@@ -1,9 +1,11 @@
 # Home
 
-Home is the page the app opens on. It shows the stats-folder hint and the
-setup card when either applies, plus a count of the runs and scenarios found.
-Its setup links stay underlined so their actions are recognizable without
-color. The navbar leads to the app's other pages.
+Home opens with the stats-folder hint and setup card when either applies,
+then one line counting the runs and scenarios in the stats folder. The
+hint's Settings link stays underlined in a blue that is readable on its
+yellow panel. The page reads no link parameter and has no navigation list,
+because the navbar already leads to every page. It stands in for an
+Overview page that is planned and not yet designed.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale

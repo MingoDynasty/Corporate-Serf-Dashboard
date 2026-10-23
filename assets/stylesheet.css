@@ -1,6 +1,7 @@
 /* The default blue misses 4.5:1 on white and on the notice tints.
-   Darken text links without changing the filled controls' primary color. */
-:root[data-mantine-color-scheme="light"] {
+   Darken text links without changing the filled controls' primary color.
+   The repeated root outranks Mantine's rule even if its styles load later. */
+:root:root[data-mantine-color-scheme="light"] {
     --mantine-color-anchor: var(--mantine-color-blue-9);
 }
 
@@ -699,8 +700,8 @@ a.run-toast-link {
     white-space: pre;
 }
 
-/* Edit and Add a scenario note: buttons, since each opens the editor and
-   goes nowhere, drawn as the app draws a link. */
+/* Edit and Add a scenario note open the editor rather than navigate, so they
+   are buttons with the shared text-link color and an underline on hover. */
 .run-history-note-link {
     color: var(--mantine-color-anchor);
     flex: 0 0 auto;
@@ -1207,9 +1208,9 @@ a.run-toast-link {
     white-space: nowrap;
 }
 
-/* A scenario's name, a session's count, and Show all runs: buttons, since
-   each changes what the page shows and goes nowhere, drawn as the app draws
-   a link. */
+/* A scenario's name, a session's count, and Show all runs change the current
+   view rather than navigate, so they are buttons with the shared text-link
+   color and an underline on hover. */
 .run-list-link {
     background: none;
     border: 0;

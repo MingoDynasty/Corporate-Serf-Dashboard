@@ -2,13 +2,12 @@
 
 The app says when it has seen a new run, on whatever page is open, and
 otherwise interrupts only for something the player did, a run worth
-celebrating, or a failure they would act on. A condition that stays true is explained where it happens instead of
-popping up again on every trigger. A message answering something you did
-replaces its own previous copy and pops back onto the screen, so a retry
-always gets a visible answer, while messages about different things stack
-side by side. Toasts and the notices printed into the page share one severity
-color scale, and their text links stay underlined and readable against the
-background.
+celebrating, or a failure they would act on. A condition that stays true is
+explained where it happens, while replies replace their own previous copy
+on every retry and messages about different things stack. Toasts and the
+notices printed into the page share one severity color scale, so a color
+means the same thing wherever it appears. Their text links stay underlined
+and readable against their backgrounds.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
