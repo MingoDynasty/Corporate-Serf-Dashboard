@@ -1,16 +1,13 @@
-"""Crash hooks and the watchdog guard must leave log records, not dead threads.
+"""Keep crash hooks and failed import attempts observable in the logs.
 
-Both of the import-failure shapes on_created itself sees -- an exception that
-escapes to its handler, and a None that extract_data_from_file already
-contained -- have to reach the user, so their notification assertions sit
-together here. The third shape, a store load that fails after the parse
-succeeded, is asserted beside its siblings in test_file_watchdog_rank_refresh.py.
+Unexpected exceptions and contained parse failures both leave the importer
+available for later files. The scheduled worker owns retry exhaustion and
+user notices; those assertions live in test_file_watchdog_ingestion.py.
 """
 
 import logging
 import sys
 import threading
-from types import SimpleNamespace
 
 from source.my_watchdog import file_watchdog
 from source.utilities import crash_logging
@@ -78,45 +75,29 @@ def test_thread_hook_ignores_system_exit(monkeypatch, caplog):
     assert caplog.records == []
 
 
-def test_on_created_survives_unexpected_error(monkeypatch, caplog):
+def test_import_run_file_survives_unexpected_error(monkeypatch, caplog):
     def explode(_path):
         raise OSError("file still locked")
 
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(file_watchdog, "extract_data_from_file", explode)
     file_watchdog.run_import_failure_queue.clear()
 
     with caplog.at_level(logging.ERROR, logger=file_watchdog.logger.name):
-        file_watchdog.NewFileHandler().on_created(
-            SimpleNamespace(is_directory=False, src_path="run.csv")
-        )
+        assert not file_watchdog.import_run_file("run.csv")
 
     assert 'Failed to process new stats file: "run.csv"' in caplog.text
     # exc_info rides along, so the traceback reaches debug.log.
     assert "file still locked" in caplog.text
-    # The watchdog thread has no callback context, so it publishes the failure
-    # for a page's interval callback to drain rather than driving a UI output.
-    assert file_watchdog.drain_run_import_failures() == [
-        "Couldn't process a new run file. See data/logs/debug.log."
-    ]
     assert file_watchdog.drain_run_import_failures() == []
 
 
-def test_on_created_reports_contained_parse_failure(monkeypatch, caplog):
-    """A locked or mid-write CSV returns None instead of raising -- still notify."""
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
+def test_import_run_file_reports_contained_parse_failure(monkeypatch, caplog):
+    """A locked or mid-write CSV returns None instead of raising; the worker decides when to notify."""
     monkeypatch.setattr(file_watchdog, "extract_data_from_file", lambda _path: None)
     file_watchdog.run_import_failure_queue.clear()
 
     with caplog.at_level(logging.WARNING, logger=file_watchdog.logger.name):
-        file_watchdog.NewFileHandler().on_created(
-            SimpleNamespace(is_directory=False, src_path="run.csv")
-        )
+        assert not file_watchdog.import_run_file("run.csv")
 
     assert 'Failed to get run data for CSV file: "run.csv"' in caplog.text
-    # The failure never reaches on_created's handler, so this path has to
-    # publish the toast itself -- once.
-    assert file_watchdog.drain_run_import_failures() == [
-        "Couldn't process a new run file. See data/logs/debug.log."
-    ]
     assert file_watchdog.drain_run_import_failures() == []

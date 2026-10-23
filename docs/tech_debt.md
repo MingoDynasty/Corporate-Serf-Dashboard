@@ -16,8 +16,8 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The four entries below were established by the two 2026-08-12 audits, which
-hold the reproductions, soak measurements, and sequenced fix plans:
+The remaining ingestion entry below was established by the two 2026-08-12
+audits, which hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
 (gitignored, main checkout only — deliberately not linked so a fresh clone's
@@ -26,36 +26,12 @@ already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
 (PR #254), the two cache defects — colliding cache keys and the invalid-UTF-8
 read escape (PR #264) — and the unbounded configured port (PR #266).
 
-### Run files missed until restart on a single failed parse
-
-`source/my_watchdog/file_watchdog.py:136-146` — one fixed 1-second sleep, one
-parse attempt, no retry. A CSV still locked by KovaaK's or mid-write when the
-attempt fires raises a toast but is never imported until a restart rescans the
-directory. The runtime register sequences a stable run/file identity first
-(its step 1, explicitly before retries), then readiness detection plus bounded
-retry (step 2), and removes the blocking sleep separately (step 6); the
-engineering register sequences cache hardening first and pairs the retry with
-zero-PB handling.
-
-### Fixed one-second handler sleep serializes ingestion
-
-`source/my_watchdog/file_watchdog.py:136` — every create event holds the
-handler thread for a full second, so bursts queue behind it: the 2026-08-12
-soak left 391 of 1,000 files unprocessed after a ten-minute adversarial burst
-plus settle.
-
 ### Startup loss window between the initial scan and the watchdog
 
-`source/app.py:369-386` — a run written after `initialize_kovaaks_data`
+`source/app.py:374-402` — a run written after `initialize_kovaaks_data`
 finishes scanning but before `observer.start()` is never imported this
 session; the soak reproduced it with a synchronized arrival. Restart
 reconciles.
-
-### Duplicate create events double-count one logical run
-
-`source/my_watchdog/file_watchdog.py` — the handler has no event dedup, so
-duplicate create events and delete/recreate patterns for one logical run file
-import it twice (observed in the 2026-08-12 soak).
 
 ## Code Smells
 

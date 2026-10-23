@@ -90,7 +90,7 @@ MIN_RUN_LENGTH = timedelta(seconds=1)
 # hour too long, and has to stay out of range whatever the limit becomes.
 MAX_RUN_LENGTH = min(PLAY_SESSION_BREAK_LIMIT, timedelta(hours=1))
 
-# Deliberately unsynchronized: after startup the watchdog thread is the only
+# Deliberately unsynchronized: after startup the ingestion worker is the only
 # writer, and raced reads self-heal on re-render (the Run History page's
 # polling tick, or the next interaction on pages without a data-driving
 # interval).

@@ -15,7 +15,7 @@ so a first detection serves this boot), pins the stats directory for the process
 (`settings_service.resolve_stats_dir`), calls `initialize_kovaaks_data` to build
 the in-memory stores from existing CSVs, lists the `performances` folder beside
 it (`time_scored_service.index_performance_files`, which parses nothing), starts
-a watchdog `Observer` on the stats directory, and serves the Dash app with
+a watchdog `Observer` on the stats directory and one `run-import` writer, and serves the Dash app with
 Waitress (Flask dev server when `config.debug`). With no usable stats directory — unset, or set but missing —
 the scan and the observer are both skipped and the app serves empty pages; only
 `port` is needed to serve.
@@ -24,7 +24,10 @@ Threads at runtime:
 
 - **Server thread(s)** — Waitress (8 workers) or Flask serving Dash; runs the
   page callbacks.
-- **Watchdog observer thread** — `NewFileHandler` fires on each new CSV.
+- **Watchdog observer thread** — `NewFileHandler` queues created, modified,
+  and renamed CSV paths without doing file I/O.
+- **Ingestion worker** — one `run-import` thread waits for per-file deadlines,
+  retries unfinished files, writes the stores, and queues run notifications.
 - **Rank freshness timers** — after a new high score, `api_service.py` uses a
   bounded chain of daemon `threading.Timer` attempts to poll until KovaaK's
   leaderboard reflects the local score.
@@ -40,14 +43,14 @@ Two halves of one flow, split for readability; the `message_queue`,
 `data_service` stores, and JSON cache nodes are the shared state where they
 meet. Each arrow is an action performed by its source node.
 
-Ingest — the watchdog side (writes):
+Ingest — the ingestion worker side (writes):
 
 ```mermaid
 flowchart TD
     Game["KovaaK's writes a new run CSV into stats_dir"]
 
-    subgraph Watchdog["Watchdog observer thread"]
-        Handler["NewFileHandler<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>normalize sensitivity to cm/360,<br/>classify the score,<br/>work out the pace constant"]
+    subgraph Watchdog["Ingestion worker"]
+        Handler["import_run_file<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>normalize sensitivity to cm/360,<br/>classify the score,<br/>work out the pace constant"]
     end
 
     subgraph Timers["Rank-freshness timer chain (daemon threading.Timer)"]
@@ -111,7 +114,7 @@ flowchart TD
     Refresh -->|"authoritative rank write"| Cache
 ```
 
-The watchdog and UI share two channels: `message_queue` (a `deque`) carries
+The ingestion worker and UI share two channels: `message_queue` (a `deque`) carries
 *notifications* that new data exists, while the run data itself is shared through
 the `data_service.py` module-global stores the UI reads directly. Note the order
 above — the run is loaded into the stores before its message becomes visible.
@@ -151,8 +154,9 @@ The sanctioned channels, each typed and single-purpose:
   page read no store for it.
 - `data_service.playlist_startup_warning_queue` — boot-time playlist warnings,
   drained by a one-shot interval callback on Home and on Run History.
-- `file_watchdog.run_import_failure_queue` — run files the watchdog thread
-  could not import, drained by an interval callback on Home and on Run
+- `file_watchdog.run_import_failure_queue` — run files the ingestion worker
+  could not import after bounded retries, drained by an interval callback on
+  Home and on Run
   History into one red toast. The callbacks that drain these two queues are
   defined in `components/queued_notices.py`. Home and Run History each
   register both on intervals of their own, so whichever of the two pages is
@@ -1377,8 +1381,9 @@ flowchart LR
   one value is left to draw, its line is a marker stroke and its bands bars.
 
 ### Infrastructure
-- `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its
-  performance file, work out the run's pace constant, update DBs, push
+- `my_watchdog/file_watchdog.py` — `NewFileHandler`: queue paths from create,
+  modify, and move events for one scheduled writer; `import_run_file`: parse
+  CSV, list its performance file, work out the run's pace constant, update DBs, push
   `NewFileMessage`, and schedule the bounded rank freshness poll on a new
   high score. It judges no run and places none: what it logs for one is
   what it found, a new scenario or a new sensitivity.

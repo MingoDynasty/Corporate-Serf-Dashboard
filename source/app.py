@@ -382,17 +382,21 @@ def main() -> None:
 
     # Monitor for new files
     observer: BaseObserver | None = None
+    run_handler: NewFileHandler | None = None
     if stats_dir is not None:
         observer = Observer()
+        run_handler = NewFileHandler()
         observer.schedule(
-            NewFileHandler(),
+            run_handler,
             stats_dir,
             recursive=False,
         )  # Set recursive=True to monitor subdirectories
-        observer.start()
-        logger.info('Monitoring directory: "%s"', stats_dir)
 
     try:
+        if observer is not None and run_handler is not None:
+            run_handler.start()
+            observer.start()
+            logger.info('Monitoring directory: "%s"', stats_dir)
         # Run the Dash app. `app.run()` uses Flask's development server even when
         # debug is disabled, so switch to Waitress for non-debug runs.
         if config.debug:
@@ -430,7 +434,11 @@ def main() -> None:
     finally:
         if observer is not None:
             observer.stop()
-            observer.join()  # Wait until the observer thread terminates
+            if observer.ident is not None:
+                observer.join()
+        if run_handler is not None:
+            run_handler.stop()
+            run_handler.join()
 
 
 if __name__ == "__main__":

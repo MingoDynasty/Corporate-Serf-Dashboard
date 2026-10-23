@@ -53,13 +53,14 @@ app.main()
 def _run_startup(
     state_root: Path,
     detected: str | None = None,
+    snippet: str = STARTUP_SNIPPET,
 ) -> subprocess.CompletedProcess[str]:
     """Run the app's startup to the point of serving, in ``state_root``."""
     environment = {**os.environ, "PYTHONPATH": str(REPO_ROOT)}
     environment.pop(STATE_DIR_ENV_VAR, None)
     (state_root / "config.toml").write_text("port = 8050\n", encoding="utf-8")
     return subprocess.run(
-        [sys.executable, "-c", STARTUP_SNIPPET.format(detected=detected)],
+        [sys.executable, "-c", snippet.format(detected=detected)],
         cwd=state_root,
         env=environment,
         capture_output=True,
@@ -153,3 +154,43 @@ def test_startup_without_a_usable_stats_dir_serves_anyway(
         assert f'"{configured}" is not an existing directory' in log_text
     else:
         assert "not configured" in log_text
+
+
+@pytest.mark.parametrize("component", ["observer", "worker"])
+def test_startup_failure_joins_the_ingestion_worker(state_root, component):
+    stats_dir = state_root / "stats"
+    stats_dir.mkdir()
+    _write_settings(state_root, {"stats_dir": str(stats_dir)})
+    failure = """
+import threading
+
+class BrokenObserver:
+    ident = None
+    def schedule(self, *args, **kwargs):
+        pass
+    def start(self):
+        raise RuntimeError("observer start failed")
+    def stop(self):
+        pass
+
+def fail_worker_start(self):
+    raise RuntimeError("worker start failed")
+
+"""
+    failure += (
+        "app.Observer = BrokenObserver\n"
+        if component == "observer"
+        else "app.NewFileHandler.start = fail_worker_start\n"
+    )
+    failure += """
+try:
+    app.main()
+except RuntimeError as exc:
+    assert str(exc).endswith("start failed"), str(exc)
+else:
+    raise AssertionError("Startup unexpectedly succeeded")
+assert not any(thread.name == "run-import" for thread in threading.enumerate())
+"""
+    snippet = STARTUP_SNIPPET.replace("app.main()", failure)
+    result = _run_startup(state_root, snippet=snippet)
+    assert result.returncode == 0, result.stdout + result.stderr
