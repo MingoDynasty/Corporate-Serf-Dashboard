@@ -348,7 +348,8 @@ TYPICAL_RANK_COLUMN_DEF = {
 # hover in the grid.
 TYPICAL_FOCUS_LISTENERS = {
     "cellFocused": ["showTypicalFocusTip(params)"],
-    "bodyScroll": ["hideTypicalFocusTip()"],
+    # Moves the hover with its cell when the grid scrolls one into view.
+    "bodyScroll": ["placeTypicalFocusTip()"],
     # The popup lives on the page's body, which outlives the grid.
     "gridPreDestroyed": ["hideTypicalFocusTip()"],
 }

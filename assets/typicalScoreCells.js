@@ -139,13 +139,69 @@
   // grid's cellFocused event only when the last input was a key, so a click
   // that focuses a cell gets the grid's mouse hover alone.
   var lastInputWasKey = false;
+  // The open popup, and the row and column of the cell it explains.
   var focusTip = null;
 
   dagfuncs.hideTypicalFocusTip = function () {
     if (focusTip) {
-      focusTip.remove();
+      focusTip.element.remove();
       focusTip = null;
     }
+  };
+
+  // Found by row and column, not by the focused element: the grid can fire
+  // its focus event before it moves the browser's focus.
+  function cellAt(rowIndex, colId) {
+    return document.querySelector(
+      '.ag-row[row-index="' + rowIndex + '"] .ag-cell[col-id="' + colId + '"]'
+    );
+  }
+
+  // Whether the cell's middle is inside the part of the table on screen.
+  function inView(cell) {
+    var viewport = cell.closest(".ag-body-viewport");
+    var columns = cell.closest(".ag-center-cols-viewport");
+    var rect = cell.getBoundingClientRect();
+    var x = rect.left + rect.width / 2;
+    var y = rect.top + rect.height / 2;
+    return [viewport, columns].every(function (box) {
+      if (!box) {
+        return true;
+      }
+      var bounds = box.getBoundingClientRect();
+      return x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom;
+    });
+  }
+
+  // Below the cell, or above it where the window has no room below, and
+  // never past the window's right edge.
+  function place(tip, cell) {
+    var rect = cell.getBoundingClientRect();
+    var top = rect.bottom + 4;
+    if (top + tip.offsetHeight > window.innerHeight && rect.top - 4 - tip.offsetHeight >= 0) {
+      top = rect.top - 4 - tip.offsetHeight;
+    }
+    var left = Math.max(0, Math.min(rect.left, window.innerWidth - tip.offsetWidth));
+    tip.style.top = top + "px";
+    tip.style.left = left + "px";
+  }
+
+  // On every scroll of the table. The grid scrolls a newly focused cell into
+  // view after it fires the focus event, so a scroll moves the popup with its
+  // cell rather than closing it, or the arrow key that reached an off-screen
+  // column would lose its hover at once. A deliberate scroll closes it before
+  // it gets here: a wheel or touchpad scroll, and the press that starts a
+  // scrollbar drag.
+  dagfuncs.placeTypicalFocusTip = function () {
+    if (!focusTip) {
+      return;
+    }
+    var cell = cellAt(focusTip.rowIndex, focusTip.colId);
+    if (!cell || !inView(cell)) {
+      dagfuncs.hideTypicalFocusTip();
+      return;
+    }
+    place(focusTip.element, cell);
   };
 
   function tipContent(colId, data) {
@@ -188,28 +244,15 @@
     }
     var node = event.api.getDisplayedRowAtIndex(event.rowIndex);
     var tip = node && node.data ? tipContent(colId, node.data) : null;
-    // Found by row and column, not by the focused element: the grid can fire
-    // the event before it moves the browser's focus.
-    var cell = document.querySelector(
-      '.ag-row[row-index="' + event.rowIndex + '"] .ag-cell[col-id="' + colId + '"]'
-    );
+    var cell = cellAt(event.rowIndex, colId);
     if (!tip || !cell) {
       return;
     }
     tip.classList.add("typical-focus-tip");
     tip.setAttribute("role", "tooltip");
     document.body.appendChild(tip);
-    focusTip = tip;
-    // Below the cell, or above it where the window has no room below, and
-    // never past the window's right edge.
-    var rect = cell.getBoundingClientRect();
-    var top = rect.bottom + 4;
-    if (top + tip.offsetHeight > window.innerHeight && rect.top - 4 - tip.offsetHeight >= 0) {
-      top = rect.top - 4 - tip.offsetHeight;
-    }
-    var left = Math.max(0, Math.min(rect.left, window.innerWidth - tip.offsetWidth));
-    tip.style.top = top + "px";
-    tip.style.left = left + "px";
+    focusTip = { element: tip, rowIndex: event.rowIndex, colId: colId };
+    place(tip, cell);
   };
 
   document.addEventListener(
@@ -230,6 +273,10 @@
     },
     true
   );
+  document.addEventListener("wheel", dagfuncs.hideTypicalFocusTip, {
+    capture: true,
+    passive: true,
+  });
   // Focus anywhere but a typical cell closes it: out of the table, onto a
   // header, or onto another cell.
   document.addEventListener("focusin", function (event) {

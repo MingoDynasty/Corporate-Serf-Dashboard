@@ -2756,7 +2756,7 @@ def test_playlist_scenarios_grid_opens_typical_hovers_from_the_keyboard():
 
     assert grid.eventListeners == {
         "cellFocused": ["showTypicalFocusTip(params)"],
-        "bodyScroll": ["hideTypicalFocusTip()"],
+        "bodyScroll": ["placeTypicalFocusTip()"],
         "gridPreDestroyed": ["hideTypicalFocusTip()"],
     }
 
@@ -2770,6 +2770,7 @@ def test_the_typical_cells_functions_are_registered_under_the_names_used():
         "dagfuncs.typicalCellClass",
         "dagfuncs.showTypicalFocusTip",
         "dagfuncs.hideTypicalFocusTip",
+        "dagfuncs.placeTypicalFocusTip",
         "dagcomponentfuncs.TypicalCell",
         "dagcomponentfuncs.TypicalScoreTooltip",
         "dagcomponentfuncs.TypicalRankTooltip",

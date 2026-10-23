@@ -60,8 +60,11 @@ and couldn't take keyboard focus inside the grid.
 
 - **Keyboard.** When keyboard focus lands on a typical cell, its hover opens
   beside it with the same content, and closes on Escape, a pointer press, a
-  scroll of the table, and focus moving on or leaving the table. A click that
-  focuses a cell opens nothing extra. AG Grid's `tooltipTrigger` can't do
+  wheel or touchpad scroll, its cell leaving the table's view, and focus
+  moving on or leaving the table. When the arrow key reaches a column off
+  screen, the grid scrolls it into view after the focus event, so the hover
+  moves with its cell instead of closing (found in review at 1536 px). A
+  click that focuses a cell opens nothing extra. AG Grid's `tooltipTrigger` can't do
   this: it is one grid-wide option, and set to `focus` it ends every mouse
   hover in the table (dash-ag-grid 35.3.0). So the page opens its own popup
   from the grid's cell-focus event, when the last input was a key.

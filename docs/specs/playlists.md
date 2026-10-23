@@ -434,8 +434,10 @@ and [product.md](../product.md). Leaderboard placement is worded
   may be out of date.`, which is the whole hover at the top rank. Both
   columns carry the dotted hover underline where a hover exists. When
   keyboard focus lands on a typical cell its hover opens beside it, closing
-  on Escape, a pointer press, a table scroll, and focus moving on or leaving
-  the table; a click opens nothing extra. Each typical cell's hover text is
+  on Escape, a pointer press, a wheel or touchpad scroll, the cell leaving
+  the table's view, and focus moving on or leaving the table; when the grid
+  scrolls a newly focused cell into view, the hover moves with it. A click
+  opens nothing extra. Each typical cell's hover text is
   its accessible description. Header tooltips stay mouse-only. Typical
   Score's reads "The median of your last 20 runs of this scenario, or of all
   your runs if you have fewer. A clock beside the number means fewer than 10
