@@ -6,8 +6,8 @@ The Score vs Time chart now draws a gold star on each plotted run that beat
 the scenario's personal best when it was played. Every run used to be the same
 dot, and a day's runs share one position, so the runs that set each best could
 only be found by comparing every dot with all the ones before it. The stars
-need no setting and now identify their run on hover even when ordinary dots
-are hidden. They record what the player reached and when, and they don't judge
+need no setting, and the Score vs Sensitivity chart is drawn exactly as
+before. They record what the player reached and when, and they don't judge
 whether the player is improving.
 
 **Superseded in part (2026-10-23).** The [linked-hover decision](2026-10-23-run-history-links-chart-and-list-runs-on-hover.md)
