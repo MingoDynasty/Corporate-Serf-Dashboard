@@ -2,13 +2,11 @@
 
 Status: Accepted
 
-Run History's latest-run card now reports the selected scenario's latest run,
-so it and the PB card beside it always describe one scenario. During play with
-Follow on it shows the same run as before, and during a lookup it shows when
-that scenario was last played and how the run went. A run in an older session
-names that session by when it began, and with no run to report the card says
-why. Its **Show {scenario}** button is gone, with the half-follow it gave a
-player who had Follow off.
+Run History's latest-run card reports the selected scenario's latest
+result beside its personal best. The chart ring and highlighted list row
+identify that same run during both play and manual browsing. An older
+result names the session it came from. An empty card explains why it has
+no run to report.
 
 **2026-10-23 amendment.** The **What stays** rule that reserved the chart ring and run-list highlight for the last run played on any scenario
 is superseded by [selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
