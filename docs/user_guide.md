@@ -297,9 +297,11 @@ visible list stays off-screen.
 
 A chart dot or star's tooltip shows its exact date and time above separate
 labeled lines for its score and two run numbers.
-Both count only the selected scenario: "this session" matches
-the list's **#** column and "overall" counts its whole imported history.
-Neither resets when you change the chart range. **Score vs Sensitivity**
+Both count only the selected scenario: "Session run" matches
+the list's **#** column and gives the total runs of that scenario in the whole
+session, such as "6 of 9". "Overall run" counts its whole imported history.
+Changing the chart range resets neither number nor the total. In an ongoing
+session the total grows as more runs are imported. **Score vs Sensitivity**
 also shows the point's sensitivity. For a converted run's original game
 sensitivity and DPI, hover its **Sensitivity** cell in the list.
 

@@ -42,8 +42,8 @@ LADDER = [
 RUN_POINT_HOVER = (
     "%{customdata[0]}<br><br>"
     "<b>Score</b>: %{y}<br>"
-    "<b>Run</b>: %{customdata[2]} (overall)<br>"
-    "<b>Run</b>: %{customdata[1]} (this session)"
+    "<b>Overall run</b>: %{customdata[2]}<br>"
+    "<b>Session run</b>: %{customdata[1]} of %{customdata[3]}"
 )
 
 
@@ -76,7 +76,9 @@ def _score_vs_run(runs, *, first_run_number=1, new_pbs=(), ranks=(), today=TODAY
         False,
         new_pbs,
         today,
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
 
@@ -88,7 +90,9 @@ def _score_vs_time(runs, *, new_pbs=(), ranks=()):
         list(ranks),
         False,
         new_pbs,
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
 
@@ -99,7 +103,9 @@ def _score_vs_sensitivity(runs, *, ranks=()):
         True,
         list(ranks),
         False,
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
 
@@ -184,6 +190,7 @@ def test_the_point_hover_is_compact_and_keeps_the_exact_timestamp(
         "Oct 10, 2026, 9:04:22 PM",
         "1",
         "1",
+        "1",
     ]
     assert points.hoverlabel.font.size == 16
 
@@ -198,7 +205,7 @@ def test_a_converted_runs_chart_hover_omits_the_recorded_setting(build) -> None:
 
     points = _trace(build([run]), RUN_DATA_POINT_TRACE_NAME)
 
-    assert list(points.customdata[0]) == ["Oct 10, 2026, 12:00:00 PM", "1", "1"]
+    assert list(points.customdata[0]) == ["Oct 10, 2026, 12:00:00 PM", "1", "1", "1"]
     assert "Accuracy" not in points.hovertemplate
 
 
@@ -211,11 +218,12 @@ def test_run_numbers_use_thousands_separators() -> None:
         [],
         False,
         (),
-        run_numbers={run: (1234, 5678)},
+        run_numbers={run: (1234, 5678, 2345)},
     )
     assert list(_trace(figure, RUN_DATA_POINT_TRACE_NAME).customdata[0][1:]) == [
         "1,234",
         "5,678",
+        "2,345",
     ]
 
 
@@ -548,7 +556,9 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         TODAY,
         ringed,
         "ringed.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
     by_time = generate_score_vs_time_plot(
         runs,
@@ -559,7 +569,9 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         (),
         ringed,
         "ringed.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
     by_sensitivity = generate_score_vs_sensitivity_plot(
         runs,
@@ -569,7 +581,9 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         False,
         ringed,
         "ringed.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
     assert (list(_ring(by_run).x), list(_ring(by_run).y)) == ([6], [120.0])
@@ -596,7 +610,9 @@ def test_the_ring_has_no_legend_entry_and_no_hover_of_its_own() -> None:
             TODAY,
             runs[-1],
             "newest.csv",
-            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+            run_numbers={
+                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            },
         )
     )
 
@@ -623,7 +639,9 @@ def test_the_ring_is_drawn_last_so_it_sits_over_a_star() -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
     assert [trace.name for trace in figure.data] == [
@@ -649,7 +667,9 @@ def test_a_run_that_is_not_plotted_gets_no_ring() -> None:
         TODAY,
         outside,
         "outside.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
     assert _ring(figure) is None
@@ -675,7 +695,7 @@ def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
         second,
         "second.csv",
         run_numbers={
-            run: (index, index) for index, run in enumerate([first, second], 1)
+            run: (index, index, 2) for index, run in enumerate([first, second], 1)
         },
     )
 
@@ -719,7 +739,9 @@ def test_the_ring_is_shown_in_the_schemes_blue_and_hidden_by_its_opacity(
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
     shown = show_latest_run_ring(figure, "newest.csv", color_scheme)
@@ -757,7 +779,9 @@ def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
     apply_point_appearance(figure, point_size, "#ff0000")
@@ -783,7 +807,9 @@ def test_the_default_point_size_leaves_the_rings_own() -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
 
     apply_point_appearance(figure, "Default", "")

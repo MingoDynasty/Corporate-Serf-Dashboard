@@ -318,8 +318,9 @@ def test_tooltip_numbers_count_full_scenario_history_and_whole_sessions(
         replace(_run(200.0, boundary), scenario="Other"),
     ]
     returned = _run(102.0, boundary + timedelta(minutes=1), sens=30.0)
+    last_in_session = _run(102.5, boundary + timedelta(minutes=2), sens=60.0)
     next_session = _run(103.0, boundary + timedelta(hours=2), sens=40.0)
-    load_runs(first, older, *bridge, returned, next_session)
+    load_runs(first, older, *bridge, returned, last_in_session, next_session)
 
     # The day range hides the first run of the session in the day modes.
     figure, _ = _figure(mode, day_range="7", run_range="all")
@@ -327,10 +328,10 @@ def test_tooltip_numbers_count_full_scenario_history_and_whole_sessions(
     numbers = {
         score: list(data[1:]) for score, data in zip(points.y, points.customdata)
     }
-    assert numbers[102.0] == ["2", "3"]
-    assert numbers[103.0] == ["1", "4"]
+    assert numbers[102.0] == ["2", "3", "3"]
+    assert numbers[103.0] == ["1", "5", "1"]
     if mode == SCORE_VS_RUN:
-        assert numbers[101.0] == ["1", "2"]
+        assert numbers[101.0] == ["1", "2", "3"]
     else:
         assert 101.0 not in numbers
 
@@ -344,8 +345,24 @@ def test_tooltip_numbers_survive_a_range_starting_mid_session(load_runs):
     figure, _ = _figure(SCORE_VS_RUN, run_range="50")
     points = _points(figure)
     assert points.x[0] == 11
-    assert list(points.customdata[0][1:]) == ["11", "11"]
-    assert list(points.customdata[-1][1:]) == ["60", "60"]
+    assert list(points.customdata[0][1:]) == ["11", "11", "60"]
+    assert list(points.customdata[-1][1:]) == ["60", "60", "60"]
+
+
+def test_session_total_grows_with_new_runs_without_renumbering_earlier_points(
+    monkeypatch,
+):
+    runs = [
+        _run(100.0 + index, MIDNIGHT_TODAY + timedelta(minutes=index))
+        for index in range(3)
+    ]
+    snapshot = runs[:2]
+    monkeypatch.setattr(run_history_chart, "get_all_runs", snapshot.copy)
+    before, _ = _figure(SCORE_VS_RUN)
+    snapshot.append(runs[2])
+    after, _ = _figure(SCORE_VS_RUN)
+    assert list(_points(before).customdata[0][1:]) == ["1", "1", "2"]
+    assert list(_points(after).customdata[0][1:]) == ["1", "1", "3"]
 
 
 # --- New PB stars ---------------------------------------------------------------
@@ -1287,8 +1304,8 @@ def test_of_two_runs_in_one_second_the_later_played_ones_value_holds(
     _faded, full = _line_traces(figure)
 
     assert [list(data[1:]) for data in _points(figure).customdata[10:12]] == [
-        ["2", "12"],
-        ["1", "11"],
+        ["2", "12", "2"],
+        ["1", "11", "2"],
     ]
     v10, v11, v12, v13 = (value.median for value in _values(runs)[-4:])
     assert v11 not in {v10, v12}

@@ -146,13 +146,13 @@ def build_run_history_figure(  # noqa: PLR0913
     # plotted scenario, or only its visible range, would renumber its runs.
     sessions = split_into_play_sessions(all_runs)
     overall_numbers = {run: number for number, run in enumerate(runs, 1)}
-    run_numbers: dict[RunData, tuple[int, int]] = {}
+    run_numbers: dict[RunData, tuple[int, int, int]] = {}
     for session in sessions:
-        scenario_runs = (
+        scenario_runs = [
             run for run in session.runs if run.scenario == selected_scenario
-        )
+        ]
         for number, run in enumerate(scenario_runs, 1):
-            run_numbers[run] = (number, overall_numbers[run])
+            run_numbers[run] = (number, overall_numbers[run], len(scenario_runs))
     newest = runs[-1]
     newest_id = run_id(newest)
     # Judged over the whole history, and only then is the range applied: a

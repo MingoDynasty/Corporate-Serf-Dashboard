@@ -245,8 +245,9 @@ def test_chart_hover_links_the_exact_visible_run_without_requests_or_movement(
     playwright.expect(page.locator(".ag-row.run-list-row-linked")).to_have_count(1)
     tooltip = page.locator("#run-history-graph .hoverlayer .hovertext")
     playwright.expect(tooltip).to_contain_text(f"Score: {row['score']}")
-    playwright.expect(tooltip).to_contain_text(f"Run: {row['n']} (this session)")
-    playwright.expect(tooltip).to_contain_text("(overall)")
+    total = sum(run["sid"] == row["sid"] for run in run_rows(page))
+    playwright.expect(tooltip).to_contain_text(f"Session run: {row['n']} of {total}")
+    playwright.expect(tooltip).to_contain_text("Overall run:")
     playwright.expect(tooltip).not_to_contain_text("Accuracy")
     if mode == "Score vs Sensitivity":
         playwright.expect(tooltip).to_contain_text("Sensitivity: 40.8 cm/360")

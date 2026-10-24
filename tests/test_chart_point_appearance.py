@@ -99,7 +99,9 @@ def cached_plot(request) -> str:
             False,
             (),
             date(2025, 1, 2),
-            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+            run_numbers={
+                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            },
         )
     elif request.param == "score_vs_time":
         figure = generate_score_vs_time_plot(
@@ -109,7 +111,9 @@ def cached_plot(request) -> str:
             [],
             False,
             (),
-            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+            run_numbers={
+                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            },
         )
     else:
         figure = generate_score_vs_sensitivity_plot(
@@ -118,7 +122,9 @@ def cached_plot(request) -> str:
             False,
             [],
             False,
-            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+            run_numbers={
+                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            },
         )
     return figure.to_json()
 
@@ -134,7 +140,9 @@ def starred_plot() -> str:
         [],
         False,
         {runs[1]},
-        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        run_numbers={
+            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        },
     )
     return figure.to_json()
 

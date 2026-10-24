@@ -3,10 +3,10 @@
 Status: Accepted
 
 Chart point tooltips put each value on its own labeled line beneath the
-exact timestamp. Both run numbers count only the selected scenario, so
-the session number matches the run list and the overall number describes
-its whole imported history. Detailed accuracy and recorded sensitivity
-settings are available in the run list.
+exact timestamp. The run numbers refer only to the selected scenario.
+The session readout includes the scenario's total runs in that session.
+Detailed accuracy and recorded sensitivity settings are available in the
+run list.
 
 **Direction.** The maintainer approved this scope in the 2026-10-24
 implementation kickoff after the tooltip direction discussion.
@@ -15,15 +15,19 @@ implementation kickoff after the tooltip direction discussion.
 
 - Run dots and PB stars start with the existing absolute timestamp with
   seconds, then a blank line. Three labeled lines follow:
-  `Score: {score}`, `Run: {overall_number} (overall)` and
-  `Run: {session_number} (this session)`. The labels are bold.
+  `Score: {score}`, `Overall run: {overall_number}` and
+  `Session run: {session_number} of {session_total}`. The labels are bold.
   Counts use thousands separators. The timestamp retains the
   [absolute-format contract](2026-07-11-humanize-the-absolute-timestamp-format.md).
 - Both ordinals count the scenario's runs in play order at every sensitivity
   and version. The session ordinal continues across visits to that scenario
   and resets at a new play session, matching the list's `#` column in both
-  views. The overall ordinal counts the scenario's whole imported history.
-  Counts are computed before range filtering or drawing coincident PBs last.
+  views. Its denominator counts every imported run of that scenario in the
+  whole session, including later runs and returning visits. For an ongoing
+  session this is the total so far, and earlier points' totals grow as runs
+  are imported. The overall ordinal counts the scenario's whole imported
+  history. Ordinals and totals are computed before range filtering or drawing
+  coincident PBs last.
   Other scenarios still contribute to session boundaries, as the
   [session rules](../../specs/sessions.md#sessions) specify.
 - Score vs Sensitivity adds `Sensitivity: {sensitivity}` as a final line,

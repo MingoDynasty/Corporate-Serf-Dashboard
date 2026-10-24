@@ -50,12 +50,13 @@ because their stats files give no usable start. Which runs those are is in
 ### Run number
 
 A run's chronological place among runs of the same scenario, at every
-sensitivity and version. In the chart tooltip, "this session" counts within
-its play session, continuing across returning visits, and "overall" counts
+sensitivity and version. In the chart tooltip, "Session run" counts within
+its play session, continuing across returning visits, and gives the total
+imported runs of that scenario in the whole session. "Overall run" counts
 its whole imported history. The list's `#` column uses the session number.
-Changing the chart range resets neither number.
+Changing the chart range resets neither ordinal nor the session total.
 
-- On screen: `Run: 1,247 (overall)` and `Run: 8 (this session)`, on separate lines.
+- On screen: `Overall run: 1,247` and `Session run: 8 of 12`, on separate lines.
 - Contract: [Run History](specs/run_history.md#the-chart).
 
 ### Stats folder
