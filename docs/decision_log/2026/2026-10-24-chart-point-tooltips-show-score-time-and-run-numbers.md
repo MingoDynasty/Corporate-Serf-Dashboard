@@ -48,9 +48,8 @@ Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)
 - Sensitivity stays in every mode, including the unrounded original setting
   and DPI for converted runs. Native and unconverted runs have no suffix.
   The [2026-09-26 decision](2026-09-26-a-converted-run-keeps-the-setting-it-was-recorded-at-for-display-only.md)
-  remains in force. The PR also exposes the same recorded details on the
-  run list's Sensitivity-cell tooltip, without changing its displayed value
-  or width.
+  remains in force. The run list's Sensitivity-cell tooltip shows the same
+  recorded details, without changing its displayed value or width.
 - PB stars reuse their run's tooltip, including with ordinary dots hidden.
   Coincident points retain the PB tie-order and filename-identity contracts.
   Hover does not scroll, expand or load the list, and adds no click action.

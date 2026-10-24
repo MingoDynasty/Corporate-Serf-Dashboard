@@ -802,12 +802,15 @@ The card's lines, local-record scope and leaderboard presentation follow
   hands that tab the figure only once Plotly Cloud reports the user signed in
   there. A blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
-  accuracy, sensitivity, and x value, the setting a converted run was
-  recorded at, the New PB stars and the ring, which repeat the position and
+  session name (its start time), run number and total within that session,
+  run-age text, sensitivity with the setting a converted run was recorded
+  at, and x value, the New PB stars and the ring, which repeat the position and
   score of runs already in it, the label and value of each overlay line
   drawn, and on Score vs Run and Score vs Time the typical score's line and
   bands with what the line's hover shows at each point
-  ([TS3][typical-chart]). Neither the button nor the flow is app code: the
+  ([TS3][typical-chart]). Run-age text is included even in Score vs Time and
+  Score vs Sensitivity, whose hover does not show it. Accuracy is not included
+  in the figure's run data. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow. Its figure is the playlist lines, their dates and

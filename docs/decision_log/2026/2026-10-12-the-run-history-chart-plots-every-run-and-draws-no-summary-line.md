@@ -4,10 +4,11 @@ Status: Accepted
 
 The chart on Run History plots every run in its range, where the old chart
 kept only the top few scores of each day or each sensitivity. A list of every
-run beside a chart of the best few would have contradicted each other.
-The controls that trimmed the chart are gone with its Average score line,
-and the chart opens in run order. Its point tooltip identifies a run and
-names the session to find in the list.
+run beside a chart of the best few would have contradicted each other. The
+two controls that trimmed the chart are gone with its Average score line, and
+the chart opens on a new mode that spaces runs evenly in the order they were
+played. Score vs Sensitivity now shows every run at each sensitivity with
+nothing that sums one up, until that mode is redesigned.
 
 **Superseded in part (2026-10-24).** The
 [run-point tooltip decision](2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md)
