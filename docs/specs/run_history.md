@@ -1,7 +1,7 @@
 # Run History
 
 Run History charts one scenario's runs and typical score beside a session
-list, with hover links between chart runs and list rows and a separate
+list, with hover linking each chart run to one list row and a separate
 latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
@@ -1047,17 +1047,17 @@ The card's lines, local-record scope and leaderboard presentation follow
 
 ### Linked hover
 
-- Hovering a run point or PB star highlights that run's row in either list
-  view. When a session or scenario group is collapsed over it, its containing
-  Session row is highlighted instead, including the pinned current session.
-  An off-screen or unloaded target produces no visible cross-highlight
-  ([2026-10-23][linked-hover]).
-- Under All scenarios, the exact Scenario visit containing the hovered run
-  also receives the outline while its row is shown in the expanded hierarchy.
-  An open visit highlights its Run and Scenario rows; a collapsed visit
-  highlights its Session and Scenario rows. A collapsed Session shows only
-  its Session highlight. Repeated visits to the same scenario are identified
-  separately ([2026-10-23][scenario-hover]).
+- Hovering a run point or PB star targets one list row. When its Run row is
+  exposed by expansion, that row is outlined. Under All scenarios, a collapsed
+  visit uses its exact Scenario row instead. A collapsed Session uses its
+  Session row, including the pinned current session. The **This scenario**
+  view falls directly from Run to Session
+  ([2026-10-23][linked-hover], [2026-10-23][one-row-hover]).
+- Expansion state chooses the most specific target. A Run in an expanded
+  visit remains the target when off-screen, even when its Scenario header is on-screen.
+  An off-screen or unloaded target produces no visible cross-highlight.
+  Repeated visits to the same scenario are identified separately by visit ID
+  ([2026-10-23][one-row-hover]).
 - Hovering a visible run row emphasizes its dot or star in the current chart.
   A run outside the selected scenario, plotted range, zoom, or visible traces
   has no visible counterpart. Session and Scenario rows do not highlight
@@ -1557,4 +1557,4 @@ The card's lines, local-record scope and leaderboard presentation follow
 
 [linked-hover]: ../decision_log/2026/2026-10-23-run-history-links-chart-and-list-runs-on-hover.md
 
-[scenario-hover]: ../decision_log/2026/2026-10-23-run-history-hover-identifies-the-containing-scenario.md
+[one-row-hover]: ../decision_log/2026/2026-10-23-run-history-hover-outlines-one-list-row.md

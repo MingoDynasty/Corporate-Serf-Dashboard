@@ -1,10 +1,15 @@
 # 2026-10-23: Run History Hover Identifies The Containing Scenario
 
-Status: Accepted
+Status: Superseded by the [one-row hover decision](2026-10-23-run-history-hover-outlines-one-list-row.md)
 
 Hovering a chart run also highlights the Scenario row containing it. This
 identifies the right group when its runs are collapsed. The existing Run or
 Session highlight stays in place, and the list keeps its position and expansion.
+
+**Superseded (2026-10-23).** The maintainer adopted the [one-row rule](2026-10-23-run-history-hover-outlines-one-list-row.md)
+before this extension shipped. It replaces the combined highlights with one
+target chosen by expansion state; the prior direction and cases remain here
+as history.
 
 **Direction.** Ruled (user) 2026-10-23: extend chart hover to identify the
 containing Scenario row under All scenarios. The Session-only fallback

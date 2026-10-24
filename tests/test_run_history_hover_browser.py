@@ -480,18 +480,20 @@ def test_all_scenarios_hover_identifies_the_containing_visit(
         )
     before = list_snapshot(page)
     hover_point(page, row, star=star)
-    expected = {row["sid"]} if collapsed else {row["id"]}
-    if collapsed != "session":
-        expected.add(row["vid"])
+    expected = row["sid"] if collapsed == "session" else row["id"]
+    if collapsed == "scenario":
+        expected = row["vid"]
         scenario = page.locator(".run-list-scenario.run-list-row-linked")
         playwright.expect(scenario).to_have_count(1)
         outline = "rgb(134, 46, 156)" if scheme == "light" else "rgb(229, 153, 247)"
         playwright.expect(scenario).to_have_css("outline-color", outline)
         assert "run-list-scenario-selected" in scenario.get_attribute("class").split()
-    playwright.expect(page.locator(f"{GRID} .run-list-row-linked")).to_have_count(
-        len(expected)
-    )
-    assert set(linked_rows(page)) == expected
+    else:
+        playwright.expect(
+            page.locator(".run-list-scenario.run-list-row-linked")
+        ).to_have_count(0)
+    playwright.expect(page.locator(f"{GRID} .run-list-row-linked")).to_have_count(1)
+    assert linked_rows(page) == [expected]
     assert list_snapshot(page) == before
     page.mouse.move(0, 0)
     playwright.expect(page.locator(".run-list-row-linked")).to_have_count(0)
@@ -517,7 +519,7 @@ def test_hover_distinguishes_repeated_visits_and_clears_an_unloaded_match(hover_
             toggle.click()
         playwright.expect(toggle).to_have_attribute("aria-expanded", "false")
     before = list_snapshot(page)
-    # The Session target stays the same while the exact Scenario visit changes.
+    # Matching a scenario name alone would link the wrong visit.
     for row in (first, second, first):
         hover_point(page, row)
         playwright.expect(
@@ -526,8 +528,8 @@ def test_hover_distinguishes_repeated_visits_and_clears_an_unloaded_match(hover_
                 ".run-list-scenario.run-list-row-linked"
             )
         ).to_have_count(1)
-        playwright.expect(page.locator(".run-list-row-linked")).to_have_count(2)
-        assert set(linked_rows(page)) == {row["sid"], row["vid"]}
+        playwright.expect(page.locator(".run-list-row-linked")).to_have_count(1)
+        assert linked_rows(page) == [row["vid"]]
         assert list_snapshot(page) == before
     missing = page.evaluate("""() => {
         const graph = document.querySelector('#run-history-graph .js-plotly-plot');
@@ -537,6 +539,65 @@ def test_hover_distinguishes_repeated_visits_and_clears_an_unloaded_match(hover_
     hover_point(page, {"id": "r:" + missing})
     playwright.expect(page.locator(".run-list-row-linked")).to_have_count(0)
     assert list_snapshot(page) == before
+
+
+def test_expanded_offscreen_run_keeps_its_target_without_highlighting_its_header(
+    hover_page,
+):
+    page = hover_page
+    page.get_by_text("All scenarios", exact=True).click()
+    page.wait_for_function("window.runHistoryList.view === 'all'")
+    page.get_by_role("button", name="Expand all", exact=True).click()
+    row = next(row for row in reversed(run_rows(page)) if row.get("sel"))
+    page.evaluate(
+        """id => {
+        const api = window.runHistoryList.api;
+        api.ensureIndexVisible(api.getRowNode(id).rowIndex, 'top');
+    }""",
+        row["vid"],
+    )
+    toggle = page.locator(
+        f'{GRID} .ag-row[row-id="{row["vid"]}"] button[data-part="toggle"]'
+    )
+    if toggle.get_attribute("aria-expanded") != "true":
+        toggle.click()
+    playwright.expect(toggle).to_have_attribute("aria-expanded", "true")
+    page.evaluate(
+        """id => {
+        const api = window.runHistoryList.api;
+        api.ensureIndexVisible(api.getRowNode(id).rowIndex, 'bottom');
+    }""",
+        row["vid"],
+    )
+    page.wait_for_function(
+        """({run, visit}) => {
+        const grid = document.querySelector('#run-history-list-grid');
+        const viewport = grid.querySelector('.ag-body-viewport').getBoundingClientRect();
+        const rows = [...grid.querySelectorAll('.ag-row')];
+        const header = rows.find(row => row.getAttribute('row-id') === visit)
+            ?.querySelector('.run-list-scenario')?.getBoundingClientRect();
+        const point = rows.find(row => row.getAttribute('row-id') === run)
+            ?.getBoundingClientRect();
+        return header && header.top >= viewport.top - 1
+            && header.bottom <= viewport.bottom + 1
+            && (!point || point.top >= viewport.bottom || point.bottom <= viewport.top);
+    }""",
+        arg={"run": row["id"], "visit": row["vid"]},
+    )
+    before = list_snapshot(page)
+    hover_point(page, row)
+    page.wait_for_function(
+        "id => window.runHistoryList.linkedRow === id", arg=row["id"]
+    )
+    playwright.expect(
+        page.locator(".run-list-scenario.run-list-row-linked")
+    ).to_have_count(0)
+    playwright.expect(
+        page.locator(".run-list-session.run-list-row-linked")
+    ).to_have_count(0)
+    assert list_snapshot(page) == before
+    page.mouse.move(0, 0)
+    playwright.expect(page.locator(".run-list-row-linked")).to_have_count(0)
 
 
 def test_plot_redraw_and_page_remount_clear_old_highlights(hover_page, hover_server):
@@ -586,9 +647,7 @@ def test_summary_hover_clears_a_previously_linked_run(hover_page, view):
         row for row in run_rows(page) if row["displayed"] and row.get("sel", True)
     )
     hover_point(page, row)
-    playwright.expect(page.locator(".run-list-row-linked")).to_have_count(
-        2 if view == "All scenarios" else 1
-    )
+    playwright.expect(page.locator(".run-list-row-linked")).to_have_count(1)
     page.evaluate("""() => {
         const graph = document.querySelector('#run-history-graph .js-plotly-plot');
         const summary = graph.data.find(trace => trace.name === 'Typical score');

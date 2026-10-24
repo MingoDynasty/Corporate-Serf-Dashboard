@@ -288,9 +288,9 @@ A session's run count, such as "7 of 47 runs", opens that session under
 chart.
 
 Hover a run in the list to emphasize its dot or star on the chart. Hover a
-chart dot or star to highlight its run row, or its Session row when the run
-is inside collapsed content. Under **All scenarios**, its Scenario row also
-gets the outline when shown, including when that Scenario is collapsed.
+chart dot or star to highlight one matching list row. Under **All scenarios**,
+a collapsed Scenario visit uses its Scenario row instead of the Run row.
+A collapsed Session uses its Session row in either view.
 The temporary outline clears when you move away. Hover keeps the list's
 scroll position and groups as they are, so a matching row outside the
 visible list stays off-screen.
