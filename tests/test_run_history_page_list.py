@@ -796,7 +796,7 @@ def test_a_scenario_rows_band_follows_its_row_and_not_the_rows_it_was_drawn_with
     naming = naming[: naming.index("function sessionRow(")]
 
     assert (
-        'data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario",'
+        'data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario";'
         in naming
     )
     assert "redrawRows" not in script

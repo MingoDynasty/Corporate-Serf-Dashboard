@@ -1,7 +1,7 @@
 # Run History
 
-Run History charts one scenario's runs and their typical score beside a
-session list, with matching highlights for its latest run and hovered runs.
+Run History charts one scenario's runs and typical score beside a session
+list, with hover links to Run and Scenario rows and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -1051,6 +1051,12 @@ The card's lines, local-record scope and leaderboard presentation follow
   Session row is highlighted instead, including the pinned current session.
   An off-screen or unloaded target produces no visible cross-highlight
   ([2026-10-23][linked-hover]).
+- Under All scenarios, the exact Scenario visit containing the hovered run
+  also receives the outline while its row is shown in the expanded hierarchy.
+  An open visit highlights its Run and Scenario rows; a collapsed visit
+  highlights its Session and Scenario rows. A collapsed Session shows only
+  its Session highlight. Repeated visits to the same scenario are identified
+  separately ([2026-10-23][scenario-hover]).
 - Hovering a visible run row emphasizes its dot or star in the current chart.
   A run outside the selected scenario, plotted range, zoom, or visible traces
   has no visible counterpart. Session rows do not highlight whole sets of runs.
@@ -1548,3 +1554,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [latest-highlights]: ../decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md
 
 [linked-hover]: ../decision_log/2026/2026-10-23-run-history-links-chart-and-list-runs-on-hover.md
+
+[scenario-hover]: ../decision_log/2026/2026-10-23-run-history-hover-identifies-the-containing-scenario.md

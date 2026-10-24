@@ -289,9 +289,11 @@ chart.
 
 Hover a run in the list to emphasize its dot or star on the chart. Hover a
 chart dot or star to highlight its run row, or its Session row when the run
-is inside collapsed content. The temporary outline clears when you move
-away. Hover keeps the list's scroll position and groups as they are, so a
-matching row outside the visible list stays off-screen.
+is inside collapsed content. Under **All scenarios**, its Scenario row also
+gets the outline when shown, including when that Scenario is collapsed.
+The temporary outline clears when you move away. Hover keeps the list's
+scroll position and groups as they are, so a matching row outside the
+visible list stays off-screen.
 
 A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh, from the Playlists page

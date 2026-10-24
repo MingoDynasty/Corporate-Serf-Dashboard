@@ -1,11 +1,15 @@
 # 2026-10-23: Run History Links Chart And List Runs On Hover
 
-Status: Accepted
+Status: Superseded in part by the [Scenario-hover decision](2026-10-23-run-history-hover-identifies-the-containing-scenario.md)
 
 Hovering a run links its chart marker and visible list row. When the run is
 inside collapsed content, its Session row is highlighted instead. This helps
 players connect scores with session context while keeping their place in
 both views.
+
+**Superseded in part (2026-10-23).** The [Scenario-hover decision](2026-10-23-run-history-hover-identifies-the-containing-scenario.md)
+adds the exact visible Scenario visit alongside the Run or Session target.
+The Session fallback and the remaining interaction rules stay in force.
 
 **Direction.** The maintainer chose bidirectional hover, then limited the
 first implementation to visible run rows and a Session-row fallback for
