@@ -27,7 +27,7 @@ from source.components.run_history_list import (  # noqa: E402
     run_list_from_store,
 )
 from source.components.run_marks import mark_runs  # noqa: E402
-from source.kovaaks.data_models import RunData  # noqa: E402
+from source.kovaaks.data_models import RecordedSensitivity, RunData  # noqa: E402
 from source.kovaaks.play_sessions import in_play_order  # noqa: E402
 
 A, B, C = "Scenario A", "Scenario B", "Scenario C"
@@ -661,6 +661,7 @@ def test_a_run_row_formats_each_value_for_its_column():
         "shots": "1,234",
         "reloads": "",
         "sens": "40.8 cm/360",
+        "sens_detail": "",
         "fov": "",
         "avg_fps": "",
     }
@@ -685,6 +686,28 @@ def test_a_run_with_no_shot_count_shows_none_and_not_zero():
 def _run_row_with(**fields) -> dict:
     run = replace(_run(A, EVENING), **fields)
     return _of_kind(_build([run]), "run")[0]
+
+
+@pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])
+def test_sensitivity_tooltip_preserves_the_original_setting_in_both_views(view):
+    run = replace(
+        _run(A, EVENING),
+        recorded_sensitivity=RecordedSensitivity(
+            value=0.16, scale="Valorant", dpi=1600.0
+        ),
+    )
+    marks = mark_runs([run], 95.0, lambda _version: None)
+    build = build_run_list if view == VIEW_SCENARIO else build_session_tree
+    model = build([run], A, SESSIONS_PER_LOAD, EVENING, marks)
+    row = _of_kind(model, "run")[0]
+    assert row["sens"] == "40.8 cm/360"
+    assert row["sens_detail"] == "40.8 cm/360 (0.16 Valorant at 1600 DPI)"
+    column = next(
+        column
+        for column in run_history_list.run_list_column_defs()
+        if column.get("field") == "sens"
+    )
+    assert column["tooltipField"] == "sens_detail"
 
 
 @pytest.mark.parametrize(

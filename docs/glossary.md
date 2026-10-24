@@ -47,6 +47,29 @@ How long a run took to play, with paused time left out. Some runs have none,
 because their stats files give no usable start. Which runs those are is in
 [sessions.md](specs/sessions.md#run-start-and-run-length).
 
+### Run number
+
+A run's place among the same scenario's runs in its play session, at every
+sensitivity and version and across returning visits. The list's `#` column
+and the chart tooltip's `run 7 of 12` show this number. The total counts the
+scenario's imported runs in that whole session. Changing the chart range
+changes neither number.
+
+- On screen: `Session: Oct 12, 6:40 PM · run 7 of 12`.
+- Distinct from Score vs Run's underlying axis position, which counts the
+  scenario's whole history.
+- Contract: [Run History](specs/run_history.md#the-chart).
+
+### Runs ago
+
+The number of newer imported runs of the selected scenario after a run,
+counted in play order across all sensitivities and versions. Score vs Run's
+point tooltip shows it independently of chart range and zoom. It changes as
+new runs of that scenario are imported.
+
+- On screen: `57 runs ago`, `1 run ago` or `Latest run`.
+- Contract: [Run History](specs/run_history.md#the-chart).
+
 ### Stats folder
 
 The KovaaK's folder of stats files that the app reads runs from.
