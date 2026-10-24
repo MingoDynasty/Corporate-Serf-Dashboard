@@ -132,6 +132,8 @@ ONE_SCORE_TEXT = f"{SCORE_LABEL} {{score}}"
 THRESHOLD_PASSED_TEXT = "Threshold passed"
 BELOW_THRESHOLD_TEXT = "Below threshold"
 NEW_PB_TEXT = "New PB"
+SESSION_PB_TEXT = "A new PB was set in this session."
+SCENARIO_SESSION_PB_TEXT = "A new PB for this scenario was set in this session."
 # What a blank cell says on hover, and to a screen reader, for each reason
 # nothing judges a run. Unknown is not a miss, so each says why.
 UNJUDGED_TEXT = {
@@ -503,7 +505,7 @@ def build_run_list(
     ]
 
     rows: list[dict] = []
-    for index, (place, session, _) in enumerate(listed[:session_limit]):
+    for index, (place, session, played) in enumerate(listed[:session_limit]):
         session_id = f"s:{run_id(session.runs[0])}"
         is_first_row = session is newest_session
         rows.append(
@@ -516,6 +518,7 @@ def build_run_list(
                 "counts": counts[index],
                 "place": place,
                 "figures": figures[index],
+                "new_pb": any(marks[run].is_new_pb for run in played),
             }
         )
         rows.extend(
@@ -666,6 +669,7 @@ def build_session_tree(
                 # session is the subject, and its length one of its facts.
                 "length": format_elapsed_duration(session.length.total_seconds()),
                 "length_help": is_first_row,
+                "new_pb": any(marks[run].is_new_pb for run in session.runs),
                 "counts": (
                     f"{_count(len(session.runs), 'run')} · "
                     f"{_count(len({run.scenario for run in session.runs}), 'scenario')}"
@@ -1158,6 +1162,8 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                             "lengthHelp": SESSION_LENGTH_HELP,
                             "wholeSession": WHOLE_SESSION_HELP,
                             "newPb": NEW_PB_TEXT,
+                            "sessionNewPb": SESSION_PB_TEXT,
+                            "scenarioSessionNewPb": SCENARIO_SESSION_PB_TEXT,
                             "median": MEDIAN_LABEL,
                             "best": BEST_LABEL,
                             "score": SCORE_LABEL,

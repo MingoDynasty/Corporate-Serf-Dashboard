@@ -313,18 +313,18 @@
             "✓"
           )
         : h("span", { className: "visually-hidden" }, data.check_text),
-      data.new_pb ? star(labels) : null
+      data.new_pb ? star(labels.newPb) : null
     );
   };
 
-  function star(labels) {
+  function star(label) {
     return h(
       "span",
       {
         className: "run-list-star",
         role: "img",
-        "aria-label": labels.newPb,
-        title: labels.newPb,
+        "aria-label": label,
+        title: label,
       },
       "★"
     );
@@ -522,7 +522,7 @@
           ["span", { className: "run-list-group-facts" }].concat(figuresInLine(data), [
             data.counts,
             data.new_pb ? " " : null,
-            data.new_pb ? star(labels) : null,
+            data.new_pb ? star(labels.newPb) : null,
           ])
         ),
       ]
@@ -571,7 +571,14 @@
             ? h("span", { title: data.length_help ? labels.lengthHelp : undefined }, data.length)
             : null,
           data.length ? " · " : null,
-        ].concat(figuresAndCount)
+        ].concat(figuresAndCount, [
+          " ",
+          h(
+            "span",
+            { className: "run-list-session-star" },
+            data.new_pb ? star(isTree(context) ? labels.sessionNewPb : labels.scenarioSessionNewPb) : null
+          ),
+        ])
       ),
     ];
     var kids = state.children[data.id] || [];

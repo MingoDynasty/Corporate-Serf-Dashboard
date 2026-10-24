@@ -474,9 +474,10 @@ them is in
 the latest-run card mark them is in
 [run_history.md](specs/run_history.md#marks-the-check-and-the-star).
 
-- On screen: New PB in the chart legend, on a star beside a run's score in
-  the run list, and as the latest-run card's badge. The celebration toast's
-  title says New personal best.
+- On screen: New PB in the chart legend, on stars beside runs and scenario
+  visits in the run list, and as the latest-run card's badge. A session
+  star's hover says a new PB was set in that session, limited to the selected
+  scenario under This scenario. The celebration toast's title says New personal best.
 - In code: `new_high_score`.
 - Not the PB run, the one run that holds the PB now.
 

@@ -1,4 +1,4 @@
-"""Exercise linked hover against the real graph and virtualized run list.
+"""Exercise list marks and linked hover against the real Run History page.
 
 Install the screenshots dependency group to run these browser regressions.
 """
@@ -136,6 +136,66 @@ def wait_for_history(page):
     }""")
 
     wait_for_chart_quiet(page)
+
+
+@pytest.mark.parametrize(
+    ("view", "label"),
+    [
+        ("This scenario", "A new PB for this scenario was set in this session."),
+        ("All scenarios", "A new PB was set in this session."),
+    ],
+)
+@pytest.mark.parametrize("figures", [False, True])
+def test_session_stars_keep_their_view_label_and_unstarred_alignment(
+    hover_page, view, label, figures
+):
+    page = hover_page
+    if view == "All scenarios":
+        page.get_by_text(view, exact=True).click()
+        page.wait_for_function("() => window.runHistoryList.view === 'all'")
+    if page.get_by_role("button", name="Expand all", exact=True).count():
+        page.get_by_role("button", name="Expand all", exact=True).click()
+    page.get_by_role("button", name="Collapse all", exact=True).click()
+    if figures:
+        page.get_by_role("button", name="Columns", exact=True).click()
+        page.get_by_text("Median and best", exact=True).click()
+        page.keyboard.press("Escape")
+        page.wait_for_function("() => window.runHistoryList.figures === true")
+
+    # Give the renderer both mark states without coupling this check to the
+    # sample history's PB progression, which the model tests cover separately.
+    page.evaluate("""() => {
+        const api = window.runHistoryList.api;
+        const sessions = [];
+        api.forEachNode(node => {
+            if (node.data.kind === 'session') sessions.push(node.data);
+        });
+        api.applyTransaction({update: sessions.slice(0, 2).map((row, index) => ({
+            ...row, new_pb: index === 0,
+        }))});
+    }""")
+    sessions = page.locator(f"{GRID} .ag-body-viewport .run-list-session")
+    starred = sessions.nth(0)
+    unstarred = sessions.nth(1)
+    playwright.expect(starred.get_by_role("img", name=label, exact=True)).to_have_count(
+        1
+    )
+    playwright.expect(starred.locator(".run-list-star")).to_have_attribute(
+        "title", label
+    )
+    playwright.expect(unstarred.locator(".run-list-star")).to_have_count(0)
+    for row in (starred, unstarred):
+        slot = row.locator(".run-list-session-star")
+        playwright.expect(slot).to_have_count(1)
+        assert slot.evaluate("slot => slot.getBoundingClientRect().width") > 0
+    if view == "This scenario":
+        count_ends = [
+            row.locator(".run-list-count").evaluate(
+                "count => count.getBoundingClientRect().right"
+            )
+            for row in (starred, unstarred)
+        ]
+        assert abs(count_ends[0] - count_ends[1]) < 1
 
 
 def wait_for_chart_quiet(page):
