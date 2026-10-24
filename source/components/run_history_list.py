@@ -67,13 +67,13 @@ from source.kovaaks.play_sessions import (
 )
 from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.utilities.utilities import (
-    format_decimal,
     format_elapsed_duration,
     format_percent,
     format_score,
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
+    recorded_sensitivity_suffix,
 )
 
 # How many sessions each view loads at first, and how many more each press of
@@ -349,13 +349,8 @@ def _run_row(
     highlighted_run: str | None,
 ) -> dict:
     sensitivity = f"{run.horizontal_sens} {run.sens_scale}"
-    recorded = run.recorded_sensitivity
-    sensitivity_detail = (
-        f"{sensitivity} ({format_decimal(recorded.value)} {recorded.scale}"
-        f" at {format_decimal(recorded.dpi)} DPI)"
-        if recorded is not None
-        else ""
-    )
+    suffix = recorded_sensitivity_suffix(run.recorded_sensitivity)
+    sensitivity_detail = f"{sensitivity}{suffix}" if suffix else ""
     return {
         "id": f"{RUN_ROW_ID_PREFIX}{run_id(run)}",
         "kind": RUN_ROW,

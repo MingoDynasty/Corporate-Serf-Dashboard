@@ -138,10 +138,8 @@ def build_run_history_figure(  # noqa: PLR0913
     Score vs Time each value held flat to the next run. Score vs Sensitivity
     draws neither.
     """
-    # One copy of the store for the scenario's runs and, when the typical
-    # score is drawn, the play sessions: a run that lands mid-build is then in
-    # both or neither, and ``build_typical_scores`` refuses a run its sessions
-    # don't hold.
+    # One snapshot keeps a mid-build import in both runs and sessions or neither:
+    # tooltips need session context, and typical scores require session membership.
     all_runs = get_all_runs()
     runs = in_play_order(run for run in all_runs if run.scenario == selected_scenario)
     # Other scenarios can bridge a session's breaks. Splitting only the
@@ -155,10 +153,10 @@ def build_run_history_figure(  # noqa: PLR0913
         ]
         for number, run in enumerate(scenario_runs, 1):
             run_context[run] = RunPointContext(
-                number,
-                len(runs) - overall_numbers[run],
-                len(scenario_runs),
-                format_short_timestamp(session.start, today),
+                session_number=number,
+                runs_ago=len(runs) - overall_numbers[run],
+                session_total=len(scenario_runs),
+                session_name=format_short_timestamp(session.start, today),
             )
     newest = runs[-1]
     newest_id = run_id(newest)

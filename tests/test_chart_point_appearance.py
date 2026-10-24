@@ -43,6 +43,19 @@ APPEARANCE_INPUT_IDS = {IDS.point_size, IDS.point_color}
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
 
+def _context(runs):
+    """Give figure-builder tests a single-session context."""
+    return {
+        run: RunPointContext(
+            session_number=index,
+            runs_ago=len(runs) - index,
+            session_total=len(runs),
+            session_name="Oct 10, 12:00 PM",
+        )
+        for index, run in enumerate(runs, 1)
+    }
+
+
 def _walk_components(component):
     yield component
     children = getattr(component, "children", None)
@@ -100,12 +113,7 @@ def cached_plot(request) -> str:
             False,
             (),
             date(2025, 1, 2),
-            run_context={
-                run: RunPointContext(
-                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-                )
-                for index, run in enumerate(runs, 1)
-            },
+            run_context=_context(runs),
         )
     elif request.param == "score_vs_time":
         figure = generate_score_vs_time_plot(
@@ -115,12 +123,7 @@ def cached_plot(request) -> str:
             [],
             False,
             (),
-            run_context={
-                run: RunPointContext(
-                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-                )
-                for index, run in enumerate(runs, 1)
-            },
+            run_context=_context(runs),
         )
     else:
         figure = generate_score_vs_sensitivity_plot(
@@ -129,12 +132,7 @@ def cached_plot(request) -> str:
             False,
             [],
             False,
-            run_context={
-                run: RunPointContext(
-                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-                )
-                for index, run in enumerate(runs, 1)
-            },
+            run_context=_context(runs),
         )
     return figure.to_json()
 
@@ -150,12 +148,7 @@ def starred_plot() -> str:
         [],
         False,
         {runs[1]},
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
     return figure.to_json()
 

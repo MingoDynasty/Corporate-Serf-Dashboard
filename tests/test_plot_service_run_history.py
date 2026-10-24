@@ -67,6 +67,19 @@ def _run(
     )
 
 
+def _context(runs):
+    """Give figure-builder tests a single-session context."""
+    return {
+        run: RunPointContext(
+            session_number=index,
+            runs_ago=len(runs) - index,
+            session_total=len(runs),
+            session_name="Oct 10, 12:00 PM",
+        )
+        for index, run in enumerate(runs, 1)
+    }
+
+
 def _score_vs_run(runs, *, first_run_number=1, new_pbs=(), ranks=(), today=TODAY):
     return generate_score_vs_run_plot(
         runs,
@@ -77,12 +90,7 @@ def _score_vs_run(runs, *, first_run_number=1, new_pbs=(), ranks=(), today=TODAY
         False,
         new_pbs,
         today,
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
 
@@ -94,12 +102,7 @@ def _score_vs_time(runs, *, new_pbs=(), ranks=()):
         list(ranks),
         False,
         new_pbs,
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
 
@@ -110,12 +113,7 @@ def _score_vs_sensitivity(runs, *, ranks=()):
         True,
         list(ranks),
         False,
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
 
@@ -597,12 +595,7 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         TODAY,
         ringed,
         "ringed.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
     by_time = generate_score_vs_time_plot(
         runs,
@@ -613,12 +606,7 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         (),
         ringed,
         "ringed.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
     by_sensitivity = generate_score_vs_sensitivity_plot(
         runs,
@@ -628,12 +616,7 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         False,
         ringed,
         "ringed.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
     assert (list(_ring(by_run).x), list(_ring(by_run).y)) == ([6], [120.0])
@@ -660,12 +643,7 @@ def test_the_ring_has_no_legend_entry_and_no_hover_of_its_own() -> None:
             TODAY,
             runs[-1],
             "newest.csv",
-            run_context={
-                run: RunPointContext(
-                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-                )
-                for index, run in enumerate(runs, 1)
-            },
+            run_context=_context(runs),
         )
     )
 
@@ -692,12 +670,7 @@ def test_the_ring_is_drawn_last_so_it_sits_over_a_star() -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
     assert [trace.name for trace in figure.data] == [
@@ -723,12 +696,7 @@ def test_a_run_that_is_not_plotted_gets_no_ring() -> None:
         TODAY,
         outside,
         "outside.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
     assert _ring(figure) is None
@@ -753,10 +721,7 @@ def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
         TODAY,
         second,
         "second.csv",
-        run_context={
-            run: RunPointContext(index, 2 - index, 2, "Oct 10, 12:00 PM")
-            for index, run in enumerate([first, second], 1)
-        },
+        run_context=_context([first, second]),
     )
 
     assert list(_ring(figure).x) == [2]
@@ -799,12 +764,7 @@ def test_the_ring_is_shown_in_the_schemes_blue_and_hidden_by_its_opacity(
         TODAY,
         runs[-1],
         "newest.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
     shown = show_latest_run_ring(figure, "newest.csv", color_scheme)
@@ -842,12 +802,7 @@ def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
     apply_point_appearance(figure, point_size, "#ff0000")
@@ -873,12 +828,7 @@ def test_the_default_point_size_leaves_the_rings_own() -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
 
     apply_point_appearance(figure, "Default", "")

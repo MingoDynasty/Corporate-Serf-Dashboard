@@ -28,6 +28,7 @@ from source.utilities.utilities import (
     format_decimal,
     format_score,
     format_short_date,
+    recorded_sensitivity_suffix,
 )
 
 logger = logging.getLogger(__name__)
@@ -279,17 +280,6 @@ def _add_rank_overlays(
             line_dash="dash",
             line_color=rank.color,
         )
-
-
-def _recorded_sensitivity_suffix(run: RunData) -> str:
-    """Name a converted run's original setting without rounding it."""
-    recorded = run.recorded_sensitivity
-    if recorded is None:
-        return ""
-    return (
-        f" ({format_decimal(recorded.value)} {recorded.scale}"
-        f" at {format_decimal(recorded.dpi)} DPI)"
-    )
 
 
 def _runs_ago_text(count: int) -> str:
@@ -944,7 +934,7 @@ def _generate_run_history_plot(  # noqa: PLR0913
             f"{run_context[run].session_total:,}",
             run_context[run].session_name,
             f"{run.horizontal_sens} {run.sens_scale}"
-            + _recorded_sensitivity_suffix(run),
+            + recorded_sensitivity_suffix(run.recorded_sensitivity),
             format_score(run.score),
         ]
         for run in runs

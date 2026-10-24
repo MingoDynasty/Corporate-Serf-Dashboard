@@ -45,6 +45,19 @@ IDS = run_history.CHART_OPTIONS_IDS
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
 
+def _context(runs):
+    """Give figure-builder tests a single-session context."""
+    return {
+        run: RunPointContext(
+            session_number=index,
+            runs_ago=len(runs) - index,
+            session_total=len(runs),
+            session_name="Oct 10, 12:00 PM",
+        )
+        for index, run in enumerate(runs, 1)
+    }
+
+
 def _walk_components(component):
     yield component
     children = getattr(component, "children", None)
@@ -596,12 +609,7 @@ def _typical_score_plot() -> str:
         False,
         (),
         today,
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
     figure.add_traces(
         typical_score_traces(
@@ -704,12 +712,7 @@ def test_score_vs_times_only_value_takes_each_themes_gray(
         [],
         False,
         (),
-        run_context={
-            run: RunPointContext(
-                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
-            )
-            for index, run in enumerate(runs, 1)
-        },
+        run_context=_context(runs),
     )
     figure.add_traces(
         typical_score_hold_traces(
