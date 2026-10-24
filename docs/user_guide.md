@@ -295,8 +295,9 @@ The temporary outline clears when you move away. Hover keeps the list's
 scroll position and groups as they are, so a matching row outside the
 visible list stays off-screen.
 
-A chart dot or star's tooltip shows its score, exact date and time, and two
-run numbers. Both count only the selected scenario: "this session" matches
+A chart dot or star's tooltip shows its exact date and time above separate
+labeled lines for its score and two run numbers.
+Both count only the selected scenario: "this session" matches
 the list's **#** column and "overall" counts its whole imported history.
 Neither resets when you change the chart range. **Score vs Sensitivity**
 also shows the point's sensitivity. For a converted run's original game

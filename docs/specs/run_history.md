@@ -1,7 +1,7 @@
 # Run History
 
 Run History charts one scenario's runs and typical score beside a session
-list, with compact point tooltips, hover linking each chart run to one list
+list, with labeled point tooltips, hover linking each chart run to one list
 row and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
@@ -669,15 +669,17 @@ The card's lines, local-record scope and leaderboard presentation follow
   A converted run also keeps the value, scale, and DPI its file recorded,
   unrounded, for the run list's Sensitivity tooltip
   ([2026-09-26][recorded]).
-- Point hover shows bold `Score {score}`, the run's absolute timestamp with
-  seconds kept, then `Run {session_number} this session · {overall_number} overall`.
+- Point hover starts with the run's absolute timestamp with seconds kept,
+  then a blank line. Three labeled lines follow: `Score: {score}`,
+  `Run: {overall_number} (overall)` and `Run: {session_number} (this session)`.
+  The labels are bold.
   Both numbers count only that scenario, across every sensitivity and version,
   in play order. The session number matches the list's `#` column, including
   returning visits, and the overall number counts the whole imported history.
   Range filtering and draw order don't reset either number. Counts use
   thousands separators ([2026-10-24][compact-hover]).
   Seconds cross-reference KovaaK's second-stamped CSV filenames
-  ([2026-07-11][timestamps]). Score vs Sensitivity adds a fourth line,
+  ([2026-07-11][timestamps]). Score vs Sensitivity adds a final line,
   `Sensitivity: {sensitivity}`, using the exact axis category. Other modes
   omit sensitivity, and every mode omits accuracy from its point tooltip.
   A star carries the same tooltip as its run point, including when ordinary

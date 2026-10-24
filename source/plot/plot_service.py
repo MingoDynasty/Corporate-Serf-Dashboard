@@ -129,9 +129,10 @@ _LEGEND_ABOVE_PLOT = {
 }
 
 _RUN_POINT_HOVER = (
-    "<b>Score %{y}</b><br>"
-    "%{customdata[0]}<br>"
-    "Run %{customdata[1]} this session · %{customdata[2]} overall"
+    "%{customdata[0]}<br><br>"
+    "<b>Score</b>: %{y}<br>"
+    "<b>Run</b>: %{customdata[2]} (overall)<br>"
+    "<b>Run</b>: %{customdata[1]} (this session)"
 )
 
 # What the Score vs Run axis assumes when it thins its date labels: the width

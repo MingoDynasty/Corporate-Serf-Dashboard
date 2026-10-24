@@ -40,9 +40,10 @@ LADDER = [
     Rank(name="Silver", color="#cccccc", threshold=110.0),
 ]
 RUN_POINT_HOVER = (
-    "<b>Score %{y}</b><br>"
-    "%{customdata[0]}<br>"
-    "Run %{customdata[1]} this session · %{customdata[2]} overall"
+    "%{customdata[0]}<br><br>"
+    "<b>Score</b>: %{y}<br>"
+    "<b>Run</b>: %{customdata[2]} (overall)<br>"
+    "<b>Run</b>: %{customdata[1]} (this session)"
 )
 
 

@@ -2,8 +2,8 @@
 
 Status: Accepted
 
-Chart point tooltips give a compact readout of a run's score, exact time and
-place in practice. Both run numbers count only the selected scenario, so
+Chart point tooltips put each value on its own labeled line beneath the
+exact timestamp. Both run numbers count only the selected scenario, so
 the session number matches the run list and the overall number describes
 its whole imported history. Detailed accuracy and recorded sensitivity
 settings are available in the run list.
@@ -13,9 +13,10 @@ implementation kickoff after the tooltip direction discussion.
 
 **Contract.**
 
-- Run dots and PB stars show three lines: bold `Score {score}`, the existing
-  absolute timestamp with seconds, and
-  `Run {session_number} this session · {overall_number} overall`.
+- Run dots and PB stars start with the existing absolute timestamp with
+  seconds, then a blank line. Three labeled lines follow:
+  `Score: {score}`, `Run: {overall_number} (overall)` and
+  `Run: {session_number} (this session)`. The labels are bold.
   Counts use thousands separators. The timestamp retains the
   [absolute-format contract](2026-07-11-humanize-the-absolute-timestamp-format.md).
 - Both ordinals count the scenario's runs in play order at every sensitivity
@@ -25,7 +26,7 @@ implementation kickoff after the tooltip direction discussion.
   Counts are computed before range filtering or drawing coincident PBs last.
   Other scenarios still contribute to session boundaries, as the
   [session rules](../../specs/sessions.md#sessions) specify.
-- Score vs Sensitivity adds `Sensitivity: {sensitivity}` as a fourth line,
+- Score vs Sensitivity adds `Sensitivity: {sensitivity}` as a final line,
   using the exact axis category. Other modes omit it. Accuracy remains in
   the list. Typical Score's tooltips are unchanged.
 - A converted run's Sensitivity cell has a native tooltip containing

@@ -55,7 +55,7 @@ its play session, continuing across returning visits, and "overall" counts
 its whole imported history. The list's `#` column uses the session number.
 Changing the chart range resets neither number.
 
-- On screen: `Run 8 this session · 1,247 overall`.
+- On screen: `Run: 1,247 (overall)` and `Run: 8 (this session)`, on separate lines.
 - Contract: [Run History](specs/run_history.md#the-chart).
 
 ### Stats folder
