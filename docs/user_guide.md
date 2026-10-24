@@ -289,7 +289,7 @@ chart.
 
 Hover a run in the list to emphasize its dot or star on the chart. Hover a
 chart dot or star to highlight one matching list row. Under **All scenarios**,
-a collapsed Scenario visit uses its Scenario row instead of the Run row.
+a collapsed Scenario row gets the outline instead of the Run row.
 A collapsed Session uses its Session row in either view.
 The temporary outline clears when you move away. Hover keeps the list's
 scroll position and groups as they are, so a matching row outside the

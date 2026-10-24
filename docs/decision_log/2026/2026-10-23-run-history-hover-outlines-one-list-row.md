@@ -7,8 +7,10 @@ moves the outline to the most specific group row available. This keeps the
 hovered run's location clear without adding outlines around its ancestors.
 
 **Direction.** Ruled (user) 2026-10-23: adopt one outline per hovered run,
-using the most specific row exposed by expansion. The maintainer approved
-this change to the earlier combined highlights before merge.
+using the most specific row exposed by expansion. The Session-only fallback
+could leave the player looking at another scenario without realizing where
+the run belonged. Outlining the exact Scenario row, identified by visit ID,
+locates its containing group while keeping one clear hover target.
 
 **Contract.**
 
@@ -32,6 +34,5 @@ this change to the earlier combined highlights before merge.
   its dot or star; hovering a Scenario or Session row does not emphasize a
   set of chart points. Click actions are unchanged.
 
-This replaces the target policy in the [combined Scenario-highlight decision](2026-10-23-run-history-hover-identifies-the-containing-scenario.md)
-and the Session-only fallback in the [original linked-hover decision](2026-10-23-run-history-links-chart-and-list-runs-on-hover.md).
+This replaces the Session-only fallback in the [original linked-hover decision](2026-10-23-run-history-links-chart-and-list-runs-on-hover.md).
 Current behavior is specified in [Run History](../../specs/run_history.md#linked-hover).
