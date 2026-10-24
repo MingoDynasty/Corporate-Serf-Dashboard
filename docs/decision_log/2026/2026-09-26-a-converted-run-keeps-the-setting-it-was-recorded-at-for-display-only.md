@@ -2,12 +2,10 @@
 
 Status: Accepted
 
-A run recorded on a game's own scale, such as 0.2 Valorant, used to lose that
-setting when it was converted to cm/360. The chart's point hover now shows
-the setting and its DPI after the cm/360 value, in both chart modes. A wrong
-DPI in a file now shows up there instead of hiding behind an odd cm/360
-value. Everything else still works from the converted value, so a wrong DPI
-is shown but not corrected.
+Converted runs retain the original game sensitivity and DPI alongside
+their normalized value. This lets the player inspect a suspicious conversion
+without changing grouping or scoring. The original setting was first shown
+in the chart tooltip and now appears in the run list's Sensitivity tooltip.
 
 **What is kept.** The recorded setting is the one a player remembers
 playing, and its DPI explains a cm/360 group that would otherwise look
