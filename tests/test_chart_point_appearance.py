@@ -29,6 +29,7 @@ from source.plot.plot_service import (  # noqa: E402
     NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
+    RunPointContext,
     apply_light_dark_mode,
     generate_empty_plot,
     generate_score_vs_run_plot,
@@ -40,6 +41,19 @@ from source.plot.plot_service import (  # noqa: E402
 IDS = run_history.CHART_OPTIONS_IDS
 APPEARANCE_INPUT_IDS = {IDS.point_size, IDS.point_color}
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+
+
+def _context(runs):
+    """Give figure-builder tests a single-session context."""
+    return {
+        run: RunPointContext(
+            session_number=index,
+            runs_ago=len(runs) - index,
+            session_total=len(runs),
+            session_name="Oct 10, 12:00 PM",
+        )
+        for index, run in enumerate(runs, 1)
+    }
 
 
 def _walk_components(component):
@@ -91,12 +105,35 @@ def cached_plot(request) -> str:
     runs = _two_runs()
     if request.param == "score_vs_run":
         figure = generate_score_vs_run_plot(
-            runs, 1, "1w4ts", False, [], False, (), date(2025, 1, 2)
+            runs,
+            1,
+            "1w4ts",
+            False,
+            [],
+            False,
+            (),
+            date(2025, 1, 2),
+            run_context=_context(runs),
         )
     elif request.param == "score_vs_time":
-        figure = generate_score_vs_time_plot(runs, "1w4ts", False, [], False, ())
+        figure = generate_score_vs_time_plot(
+            runs,
+            "1w4ts",
+            False,
+            [],
+            False,
+            (),
+            run_context=_context(runs),
+        )
     else:
-        figure = generate_score_vs_sensitivity_plot(runs, "1w4ts", False, [], False)
+        figure = generate_score_vs_sensitivity_plot(
+            runs,
+            "1w4ts",
+            False,
+            [],
+            False,
+            run_context=_context(runs),
+        )
     return figure.to_json()
 
 
@@ -104,7 +141,15 @@ def cached_plot(request) -> str:
 def starred_plot() -> str:
     """A cached Score vs Time payload whose second run set a new PB."""
     runs = _two_runs()
-    figure = generate_score_vs_time_plot(runs, "1w4ts", False, [], False, {runs[1]})
+    figure = generate_score_vs_time_plot(
+        runs,
+        "1w4ts",
+        False,
+        [],
+        False,
+        {runs[1]},
+        run_context=_context(runs),
+    )
     return figure.to_json()
 
 

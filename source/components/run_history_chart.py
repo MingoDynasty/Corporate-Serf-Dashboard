@@ -12,7 +12,7 @@ from datetime import date, datetime, time, timedelta
 
 import plotly.graph_objects as go
 
-from source.kovaaks.data_models import run_id
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import (
     get_all_runs,
     get_rank_data_from_playlist_code,
@@ -22,6 +22,7 @@ from source.kovaaks.data_service import (
 from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.typical_score import build_typical_scores
 from source.plot.plot_service import (
+    RunPointContext,
     generate_empty_plot,
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
@@ -29,6 +30,7 @@ from source.plot.plot_service import (
     typical_score_hold_traces,
     typical_score_traces,
 )
+from source.utilities.utilities import format_short_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -136,12 +138,26 @@ def build_run_history_figure(  # noqa: PLR0913
     Score vs Time each value held flat to the next run. Score vs Sensitivity
     draws neither.
     """
-    # One copy of the store for the scenario's runs and, when the typical
-    # score is drawn, the play sessions: a run that lands mid-build is then in
-    # both or neither, and ``build_typical_scores`` refuses a run its sessions
-    # don't hold.
+    # One snapshot keeps a mid-build import in both runs and sessions or neither:
+    # tooltips need session context, and typical scores require session membership.
     all_runs = get_all_runs()
     runs = in_play_order(run for run in all_runs if run.scenario == selected_scenario)
+    # Other scenarios can bridge a session's breaks. Splitting only the
+    # plotted scenario, or only its visible range, would renumber its runs.
+    sessions = split_into_play_sessions(all_runs)
+    overall_numbers = {run: number for number, run in enumerate(runs, 1)}
+    run_context: dict[RunData, RunPointContext] = {}
+    for session in sessions:
+        scenario_runs = [
+            run for run in session.runs if run.scenario == selected_scenario
+        ]
+        for number, run in enumerate(scenario_runs, 1):
+            run_context[run] = RunPointContext(
+                session_number=number,
+                runs_ago=len(runs) - overall_numbers[run],
+                session_total=len(scenario_runs),
+                session_name=format_short_timestamp(session.start, today),
+            )
     newest = runs[-1]
     newest_id = run_id(newest)
     # Judged over the whole history, and only then is the range applied: a
@@ -165,12 +181,13 @@ def build_run_history_figure(  # noqa: PLR0913
             today,
             newest,
             newest_id,
+            run_context=run_context,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Worked out over the whole history before the range is applied,
             # as the stars are, so the value at the range's first run counts
             # the runs before it that the range leaves out.
-            values = build_typical_scores(runs, split_into_play_sessions(all_runs))
+            values = build_typical_scores(runs, sessions)
             figure.add_traces(
                 typical_score_traces(
                     range(first_run_number, len(runs) + 1),
@@ -218,11 +235,12 @@ def build_run_history_figure(  # noqa: PLR0913
             new_pbs,
             newest,
             newest_id,
+            run_context=run_context,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Over the whole history, as on Score vs Run. The range keeps the
             # newest runs, so the last values are the plotted runs'.
-            values = build_typical_scores(runs, split_into_play_sessions(all_runs))
+            values = build_typical_scores(runs, sessions)
             figure.add_traces(
                 typical_score_hold_traces(
                     values[-len(plotted) :],
@@ -253,6 +271,7 @@ def build_run_history_figure(  # noqa: PLR0913
             show_all_ranks_switch,
             newest,
             newest_id,
+            run_context=run_context,
         ),
         True,
     )

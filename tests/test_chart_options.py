@@ -28,6 +28,7 @@ from source.plot.plot_service import (
     MIDDLE_50_TRACE_NAME,
     MIDDLE_80_TRACE_NAME,
     TYPICAL_SCORE_TRACE_NAME,
+    RunPointContext,
     generate_score_vs_run_plot,
     generate_score_vs_time_plot,
     generated_point_color,
@@ -42,6 +43,19 @@ from source.pages import run_history  # noqa: E402
 
 IDS = run_history.CHART_OPTIONS_IDS
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+
+
+def _context(runs):
+    """Give figure-builder tests a single-session context."""
+    return {
+        run: RunPointContext(
+            session_number=index,
+            runs_ago=len(runs) - index,
+            session_total=len(runs),
+            session_name="Oct 10, 12:00 PM",
+        )
+        for index, run in enumerate(runs, 1)
+    }
 
 
 def _walk_components(component):
@@ -587,7 +601,15 @@ def _typical_score_plot() -> str:
     ]
     today = date(2026, 10, 12)
     figure = generate_score_vs_run_plot(
-        runs, 1, "Scenario", False, [], False, (), today
+        runs,
+        1,
+        "Scenario",
+        False,
+        [],
+        False,
+        (),
+        today,
+        run_context=_context(runs),
     )
     figure.add_traces(
         typical_score_traces(
@@ -683,7 +705,15 @@ def test_score_vs_times_only_value_takes_each_themes_gray(
         )
         for index in range(10)
     ]
-    figure = generate_score_vs_time_plot(runs, "Scenario", False, [], False, ())
+    figure = generate_score_vs_time_plot(
+        runs,
+        "Scenario",
+        False,
+        [],
+        False,
+        (),
+        run_context=_context(runs),
+    )
     figure.add_traces(
         typical_score_hold_traces(
             build_typical_scores(runs, split_into_play_sessions(runs)),

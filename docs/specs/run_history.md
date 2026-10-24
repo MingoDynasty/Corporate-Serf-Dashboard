@@ -1,8 +1,8 @@
 # Run History
 
 Run History charts one scenario's runs and typical score beside a session
-list, with hover linking each chart run to one list row and a separate
-latest-run highlight.
+list, with point tooltips naming each run's session, hover linking each chart
+run to one list row and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -667,18 +667,37 @@ The card's lines, local-record scope and leaderboard presentation follow
   `0.32 Valorant` reads `0.32 Valorant`
   ([2026-09-27][precision]).
   A converted run also keeps the value, scale, and DPI its file recorded,
-  unrounded, for the point hover only
+  unrounded, for its chart tooltip and the run list's Sensitivity tooltip
   ([2026-09-26][recorded]).
-- Point hover is the same in each mode. It shows the run's timestamp with
-  seconds kept, the one surface that keeps them, cross-referencing KovaaK's
-  second-stamped CSV filenames
-  ([2026-07-11][timestamps]).
-  Then come the score, the run's sensitivity-and-scale string, and the
-  accuracy to two decimals. A converted run's sensitivity line adds the
-  setting it was recorded at, as in
-  `Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)`. Any other run's line
-  ends at its sensitivity
-  ([2026-09-26][recorded]).
+- Point hover has four lines, with no blank line after its timestamp.
+  Its first line is the run's full absolute timestamp with seconds, as
+  [the timestamp rule][timestamps] requires. In Score vs Run alone it adds
+  ` · {n} runs ago`: the number of newer imported runs of that scenario in
+  play order, across all sensitivities and versions, independently of range
+  or zoom. One reads `1 run ago` and zero reads `Latest run`.
+  The next lines are `Score: {score}`,
+  `Session: {session_name} · run {session_number} of {session_total}` and
+  `Sensitivity: {sensitivity}`. Labels are bold. The score uses the list's
+  exact formatting, including thousands separators and up to two decimals
+  with trailing zeroes dropped ([2026-10-24][compact-hover]).
+- The session name exactly matches its Session row in the list, including
+  the year when it differs from the app's current year. It names the whole
+  play session, including play on other scenarios before this scenario.
+  The numerator matches the run's `#` in the list; the denominator is the
+  first count on its session's `12 of 47 runs` readout. Both count only
+  this scenario, across versions, sensitivities and returning visits.
+  The total includes runs after the hovered run and outside the chart range.
+  During an ongoing session, the total so far and older points' run ages grow
+  as more runs of that scenario are imported ([2026-10-24][compact-hover]).
+- Sensitivity stays in every mode, including the converted run's original
+  setting and DPI, such as `40.8 cm/360 (0.16 Valorant at 1600 DPI)`.
+  Native and unconverted runs have no recorded-setting suffix
+  ([2026-09-26][recorded]). Every point tooltip states the point's position on
+  both axes; only Score vs Run needs a run-age readout because its Run-axis
+  labels show dates. Accuracy is absent from the point tooltip and remains
+  in the list; inspecting an old run may require scrolling, expanding or
+  loading older sessions. Hover provides no click action
+  ([2026-10-24][compact-hover]).
   A star carries the same tooltip as its run point, including when ordinary
   dots are hidden through the legend ([2026-10-23][linked-hover]).
   Runs at one position share one hover, the one whose point comes last in the
@@ -783,12 +802,15 @@ The card's lines, local-record scope and leaderboard presentation follow
   hands that tab the figure only once Plotly Cloud reports the user signed in
   there. A blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
-  accuracy, sensitivity, and x value, the setting a converted run was
-  recorded at, the New PB stars and the ring, which repeat the position and
+  session name (its start time), run number and total within that session,
+  run-age text, sensitivity with the setting a converted run was recorded
+  at, and x value, the New PB stars and the ring, which repeat the position and
   score of runs already in it, the label and value of each overlay line
   drawn, and on Score vs Run and Score vs Time the typical score's line and
   bands with what the line's hover shows at each point
-  ([TS3][typical-chart]). Neither the button nor the flow is app code: the
+  ([TS3][typical-chart]). Run-age text is included even in Score vs Time and
+  Score vs Sensitivity, whose hover does not show it. Accuracy is not included
+  in the figure's run data. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow. Its figure is the playlist lines, their dates and
@@ -870,6 +892,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   the stats file lists. Sensitivity is the run's normalized
   sensitivity-and-scale string, as on the chart's axis. Columns don't sort
   ([2026-10-12][column]).
+- A converted run's Sensitivity cell has a native tooltip with its normalized
+  value followed by its original game setting and DPI, such as
+  `40.8 cm/360 (0.16 Valorant at 1600 DPI)`. Original values stay unrounded,
+  and whole values drop trailing zeroes. Native and unconverted runs have no
+  extra tooltip. This applies in both list views ([2026-10-24][compact-hover]).
 - Reloads is the stats file's count, such as `0` or `12`. FOV is the FOV the
   run was played at, the number with trailing zeros dropped, then its scale,
   such as `103 Overwatch`, or the number alone where the file names no scale.
@@ -1571,3 +1598,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [linked-hover]: ../decision_log/2026/2026-10-23-run-history-links-chart-and-list-runs-on-hover.md
 
 [one-row-hover]: ../decision_log/2026/2026-10-23-run-history-hover-outlines-one-list-row.md
+
+[compact-hover]: ../decision_log/2026/2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md

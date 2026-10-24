@@ -24,6 +24,7 @@ from source.plot.plot_service import (
     NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
+    RunPointContext,
     apply_point_appearance,
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
@@ -40,11 +41,10 @@ LADDER = [
     Rank(name="Silver", color="#cccccc", threshold=110.0),
 ]
 RUN_POINT_HOVER = (
-    "<b>%{customdata[0]}</b><br><br>"
-    "<b>Score</b>: %{y}<br>"
-    "<b>Sensitivity</b>: %{customdata[2]}%{customdata[3]}<br>"
-    "<b>Accuracy</b>: %{customdata[1]}%"
-    "<extra></extra>"
+    "%{customdata[0]}<br>"
+    "<b>Score</b>: %{customdata[6]}<br>"
+    "<b>Session</b>: %{customdata[4]} · run %{customdata[1]} of %{customdata[3]}<br>"
+    "<b>Sensitivity</b>: %{customdata[5]}"
 )
 
 
@@ -67,20 +67,54 @@ def _run(
     )
 
 
+def _context(runs):
+    """Give figure-builder tests a single-session context."""
+    return {
+        run: RunPointContext(
+            session_number=index,
+            runs_ago=len(runs) - index,
+            session_total=len(runs),
+            session_name="Oct 10, 12:00 PM",
+        )
+        for index, run in enumerate(runs, 1)
+    }
+
+
 def _score_vs_run(runs, *, first_run_number=1, new_pbs=(), ranks=(), today=TODAY):
     return generate_score_vs_run_plot(
-        runs, first_run_number, SCENARIO, True, list(ranks), False, new_pbs, today
+        runs,
+        first_run_number,
+        SCENARIO,
+        True,
+        list(ranks),
+        False,
+        new_pbs,
+        today,
+        run_context=_context(runs),
     )
 
 
 def _score_vs_time(runs, *, new_pbs=(), ranks=()):
     return generate_score_vs_time_plot(
-        runs, SCENARIO, True, list(ranks), False, new_pbs
+        runs,
+        SCENARIO,
+        True,
+        list(ranks),
+        False,
+        new_pbs,
+        run_context=_context(runs),
     )
 
 
 def _score_vs_sensitivity(runs, *, ranks=()):
-    return generate_score_vs_sensitivity_plot(runs, SCENARIO, True, list(ranks), False)
+    return generate_score_vs_sensitivity_plot(
+        runs,
+        SCENARIO,
+        True,
+        list(ranks),
+        False,
+        run_context=_context(runs),
+    )
 
 
 def _three_runs() -> list[RunData]:
@@ -146,36 +180,87 @@ def test_the_legend_sits_above_the_plot(build) -> None:
 
 
 @EVERY_MODE
-def test_the_point_hover_is_the_runs_timestamp_score_sensitivity_and_accuracy(
+def test_the_point_hover_is_compact_and_keeps_the_exact_timestamp(
     build,
 ) -> None:
-    """The same in each mode, and with no line for the day."""
     run = _run(101.5, datetime(2026, 10, 10, 21, 4, 22), accuracy=0.51234)
 
     points = _trace(build([run]), RUN_DATA_POINT_TRACE_NAME)
 
-    assert points.hovertemplate == RUN_POINT_HOVER
+    hover = RUN_POINT_HOVER
+    if build == _score_vs_run:
+        hover = hover.replace("<br>", " · %{customdata[2]}<br>", 1)
+    assert points.hovertemplate == hover + "<extra></extra>"
+    assert "<br><br>" not in points.hovertemplate
     assert "Date" not in points.hovertemplate
     assert list(points.customdata[0]) == [
         "Oct 10, 2026, 9:04:22 PM",
-        51.23,
+        "1",
+        "Latest run",
+        "1",
+        "Oct 10, 12:00 PM",
         "40.8 cm/360",
-        "",
+        "101.5",
     ]
     assert points.hoverlabel.font.size == 16
 
 
 @EVERY_MODE
-def test_a_converted_runs_hover_names_the_setting_it_was_recorded_at(build) -> None:
+def test_a_converted_runs_chart_hover_keeps_the_recorded_setting(build) -> None:
     run = _run(
         100.0,
         NOON,
-        recorded=RecordedSensitivity(value=0.2, scale="Valorant", dpi=1600.0),
+        recorded=RecordedSensitivity(value=0.16, scale="Valorant", dpi=1600.0),
     )
 
     points = _trace(build([run]), RUN_DATA_POINT_TRACE_NAME)
 
-    assert points.customdata[0][3] == " (0.2 Valorant at 1600 DPI)"
+    assert points.customdata[0][5] == "40.8 cm/360 (0.16 Valorant at 1600 DPI)"
+    assert "Accuracy" not in points.hovertemplate
+
+
+def test_run_numbers_use_thousands_separators() -> None:
+    run = _run(100.0, NOON)
+    figure = generate_score_vs_time_plot(
+        [run],
+        SCENARIO,
+        False,
+        [],
+        False,
+        (),
+        run_context={run: RunPointContext(1234, 5678, 2345, "Oct 10, 12:00 PM")},
+    )
+    assert list(_trace(figure, RUN_DATA_POINT_TRACE_NAME).customdata[0][1:4]) == [
+        "1,234",
+        "5,678 runs ago",
+        "2,345",
+    ]
+
+
+@EVERY_MODE
+def test_score_hover_matches_the_lists_thousands_separators(build):
+    points = _trace(build([_run(3324.0, NOON)]), RUN_DATA_POINT_TRACE_NAME)
+    assert points.customdata[0][6] == "3,324"
+
+
+@pytest.mark.parametrize(
+    ("count", "text"),
+    [(0, "Latest run"), (1, "1 run ago"), (57, "57 runs ago")],
+)
+def test_run_age_names_the_latest_run_and_uses_singular_for_one(count, text):
+    run = _run(100.0, NOON)
+    figure = generate_score_vs_run_plot(
+        [run],
+        1,
+        SCENARIO,
+        False,
+        [],
+        False,
+        (),
+        TODAY,
+        run_context={run: RunPointContext(1, count, 1, "Oct 10, 12:00 PM")},
+    )
+    assert _trace(figure, RUN_DATA_POINT_TRACE_NAME).customdata[0][2] == text
 
 
 @EVERY_MODE
@@ -307,7 +392,10 @@ def test_score_vs_run_stars_each_plotted_run_that_was_a_new_pb() -> None:
     assert (list(stars.x), list(stars.y)) == ([6], [120.0])
     assert stars.marker.symbol == "star"
     # A star answers for its own run even with ordinary run points hidden.
-    assert stars.hovertemplate == RUN_POINT_HOVER
+    assert stars.hovertemplate == (
+        RUN_POINT_HOVER.replace("<br>", " · %{customdata[2]}<br>", 1)
+        + "<extra></extra>"
+    )
     assert stars.ids == (_trace(figure, RUN_DATA_POINT_TRACE_NAME).ids[1],)
     assert [trace.name for trace in figure.data] == [
         RUN_DATA_POINT_TRACE_NAME,
@@ -393,8 +481,8 @@ def test_a_new_pb_is_drawn_last_among_runs_that_share_its_second_and_score(
     figure = _score_vs_time([earlier, *pair, later], new_pbs={new_pb})
 
     points = _trace(figure, RUN_DATA_POINT_TRACE_NAME)
-    # Accuracy stands in for which run a point is.
-    assert [row[1] for row in points.customdata] == [11.0, 22.0, 99.0, 33.0]
+    expected = ["1", "3", "2", "4"] if new_pb_first else ["1", "2", "3", "4"]
+    assert [row[1] for row in points.customdata] == expected
     assert list(points.x) == [
         earlier.datetime_object,
         NOON,
@@ -411,7 +499,7 @@ def test_runs_that_share_a_second_keep_their_order_without_a_new_pb() -> None:
 
     points = _trace(_score_vs_time([first, second]), RUN_DATA_POINT_TRACE_NAME)
 
-    assert [row[1] for row in points.customdata] == [11.0, 22.0]
+    assert [row[1] for row in points.customdata] == ["1", "2"]
 
 
 def test_a_new_pb_follows_every_run_that_ties_it_and_nothing_else_moves() -> None:
@@ -430,12 +518,12 @@ def test_a_new_pb_follows_every_run_that_ties_it_and_nothing_else_moves() -> Non
     plain = _score_vs_time(ended_together)
     starred = _score_vs_time(ended_together, new_pbs={new_pb, higher})
 
-    def accuracies(figure: go.Figure) -> list[float]:
+    def ordinals(figure: go.Figure) -> list[str]:
         points = _trace(figure, RUN_DATA_POINT_TRACE_NAME)
         return [row[1] for row in points.customdata]
 
-    assert accuracies(plain) == [11.0, 22.0, 33.0, 44.0, 55.0]
-    assert accuracies(starred) == [11.0, 33.0, 44.0, 22.0, 55.0]
+    assert ordinals(plain) == ["1", "2", "3", "4", "5"]
+    assert ordinals(starred) == ["1", "3", "4", "2", "5"]
     # Only the order within the trace changed: the same scores at the same
     # positions, and one star for the three runs at 100.
     assert sorted(_trace(starred, RUN_DATA_POINT_TRACE_NAME).y) == sorted(
@@ -497,13 +585,38 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
     ringed = runs[1]
 
     by_run = generate_score_vs_run_plot(
-        runs, 5, SCENARIO, True, [], False, (), TODAY, ringed, "ringed.csv"
+        runs,
+        5,
+        SCENARIO,
+        True,
+        [],
+        False,
+        (),
+        TODAY,
+        ringed,
+        "ringed.csv",
+        run_context=_context(runs),
     )
     by_time = generate_score_vs_time_plot(
-        runs, SCENARIO, True, [], False, (), ringed, "ringed.csv"
+        runs,
+        SCENARIO,
+        True,
+        [],
+        False,
+        (),
+        ringed,
+        "ringed.csv",
+        run_context=_context(runs),
     )
     by_sensitivity = generate_score_vs_sensitivity_plot(
-        runs, SCENARIO, True, [], False, ringed, "ringed.csv"
+        runs,
+        SCENARIO,
+        True,
+        [],
+        False,
+        ringed,
+        "ringed.csv",
+        run_context=_context(runs),
     )
 
     assert (list(_ring(by_run).x), list(_ring(by_run).y)) == ([6], [120.0])
@@ -520,7 +633,17 @@ def test_the_ring_has_no_legend_entry_and_no_hover_of_its_own() -> None:
 
     ring = _ring(
         generate_score_vs_run_plot(
-            runs, 1, SCENARIO, True, [], False, (), TODAY, runs[-1], "newest.csv"
+            runs,
+            1,
+            SCENARIO,
+            True,
+            [],
+            False,
+            (),
+            TODAY,
+            runs[-1],
+            "newest.csv",
+            run_context=_context(runs),
         )
     )
 
@@ -537,7 +660,17 @@ def test_the_ring_is_drawn_last_so_it_sits_over_a_star() -> None:
     runs = _three_runs()
 
     figure = generate_score_vs_run_plot(
-        runs, 1, SCENARIO, True, [], False, {runs[-1]}, TODAY, runs[-1], "newest.csv"
+        runs,
+        1,
+        SCENARIO,
+        True,
+        [],
+        False,
+        {runs[-1]},
+        TODAY,
+        runs[-1],
+        "newest.csv",
+        run_context=_context(runs),
     )
 
     assert [trace.name for trace in figure.data] == [
@@ -553,7 +686,17 @@ def test_a_run_that_is_not_plotted_gets_no_ring() -> None:
     outside = _run(999.0, NOON + timedelta(days=30))
 
     figure = generate_score_vs_run_plot(
-        runs, 1, SCENARIO, True, [], False, (), TODAY, outside, "outside.csv"
+        runs,
+        1,
+        SCENARIO,
+        True,
+        [],
+        False,
+        (),
+        TODAY,
+        outside,
+        "outside.csv",
+        run_context=_context(runs),
     )
 
     assert _ring(figure) is None
@@ -568,7 +711,17 @@ def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
     second = _run(100.0, NOON, accuracy=0.9)
 
     figure = generate_score_vs_run_plot(
-        [first, second], 1, SCENARIO, True, [], False, (), TODAY, second, "second.csv"
+        [first, second],
+        1,
+        SCENARIO,
+        True,
+        [],
+        False,
+        (),
+        TODAY,
+        second,
+        "second.csv",
+        run_context=_context([first, second]),
     )
 
     assert list(_ring(figure).x) == [2]
@@ -601,7 +754,17 @@ def test_the_ring_is_shown_in_the_schemes_blue_and_hidden_by_its_opacity(
     """Never by ``visible``, which would take the ring out of the axis ranges."""
     runs = _three_runs()
     figure = generate_score_vs_run_plot(
-        runs, 1, SCENARIO, True, [], False, (), TODAY, runs[-1], "newest.csv"
+        runs,
+        1,
+        SCENARIO,
+        True,
+        [],
+        False,
+        (),
+        TODAY,
+        runs[-1],
+        "newest.csv",
+        run_context=_context(runs),
     )
 
     shown = show_latest_run_ring(figure, "newest.csv", color_scheme)
@@ -629,7 +792,17 @@ def test_showing_the_ring_leaves_a_figure_with_no_ring_as_it_is() -> None:
 def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
     runs = _three_runs()
     figure = generate_score_vs_run_plot(
-        runs, 1, SCENARIO, True, [], False, {runs[-1]}, TODAY, runs[-1], "newest.csv"
+        runs,
+        1,
+        SCENARIO,
+        True,
+        [],
+        False,
+        {runs[-1]},
+        TODAY,
+        runs[-1],
+        "newest.csv",
+        run_context=_context(runs),
     )
 
     apply_point_appearance(figure, point_size, "#ff0000")
@@ -645,7 +818,17 @@ def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
 def test_the_default_point_size_leaves_the_rings_own() -> None:
     runs = _three_runs()
     figure = generate_score_vs_run_plot(
-        runs, 1, SCENARIO, True, [], False, (), TODAY, runs[-1], "newest.csv"
+        runs,
+        1,
+        SCENARIO,
+        True,
+        [],
+        False,
+        (),
+        TODAY,
+        runs[-1],
+        "newest.csv",
+        run_context=_context(runs),
     )
 
     apply_point_appearance(figure, "Default", "")
