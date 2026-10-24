@@ -16,15 +16,16 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The four entries below were established by the two 2026-08-12 audits, which
+The three entries below were established by the two 2026-08-12 audits, which
 hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
 (gitignored, main checkout only — deliberately not linked so a fresh clone's
-docs link check stays green). Four further defects from the same corpus are
+docs link check stays green). Five further defects from the same corpus are
 already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
-(PR #254), the two cache defects — colliding cache keys and the invalid-UTF-8
-read escape (PR #264) — and the unbounded configured port (PR #266).
+(PR #254), the two cache defects (colliding cache keys and the invalid-UTF-8
+read escape, PR #264), the unbounded configured port (PR #266), and the
+duplicate-event double count (PR #421).
 
 ### Run files missed until restart on a single failed parse
 

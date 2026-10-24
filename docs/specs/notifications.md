@@ -1,12 +1,13 @@
 # Notifications
 
-Each run file counts once, even when the app sees it again. The app
-announces new runs on any page and otherwise interrupts only for a player's
-action, a run worth celebrating, or a failure they would act on. A condition
-that stays true is explained where it happens, while replies replace their
-own previous copy on every retry and messages about different things stack.
-Toasts and page notices share one severity color scale and keep their text
-links underlined and readable against their backgrounds.
+The app says once when it has seen a new run, on whatever page is open, and
+otherwise interrupts only for something the player did, a run worth
+celebrating, or a failure they would act on. A condition that stays true is
+explained where it happens, while replies replace their own previous copy
+on every retry and messages about different things stack. Toasts and the
+notices printed into the page share one severity color scale, so a color
+means the same thing wherever it appears. Their text links stay underlined
+and readable against their backgrounds.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
