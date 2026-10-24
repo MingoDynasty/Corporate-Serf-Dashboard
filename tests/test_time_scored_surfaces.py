@@ -115,7 +115,6 @@ def folders(tmp_path, monkeypatch) -> _Folders:
 def _land(monkeypatch, stats_file: Path):
     """Land one stats file through the watchdog and return its queued message."""
     messages = []
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(
         file_watchdog, "message_queue", SimpleNamespace(append=messages.append)
     )
@@ -124,9 +123,7 @@ def _land(monkeypatch, stats_file: Path):
     )
     file_watchdog.run_import_failure_queue.clear()
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path=str(stats_file))
-    )
+    file_watchdog.import_run_file(str(stats_file))
 
     assert file_watchdog.drain_run_import_failures() == []
     (message,) = messages
@@ -361,7 +358,7 @@ def test_a_landed_run_logs_no_verdict_of_its_own(folders, monkeypatch, caplog):
         if record.name == file_watchdog.logger.name
     ]
     # The import still logs what it found, so an empty log would prove nothing.
-    assert any("Detected new file" in line for line in log)
+    assert any("Importing new run file" in line for line in log)
     # Nor does it place the run among the others at its sensitivity any more.
     assert not [
         line

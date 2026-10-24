@@ -49,7 +49,6 @@ def _patch_common(monkeypatch, run_data):
         loads.append(file)
         return True
 
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(
         file_watchdog,
         "extract_data_from_file",
@@ -80,7 +79,7 @@ def _patch_common(monkeypatch, run_data):
 
 
 @pytest.mark.parametrize("path_kind", ["new_scenario", "new_sensitivity", "existing"])
-def test_on_created_schedules_score_aware_refresh_for_all_pb_paths(
+def test_import_run_file_schedules_score_aware_refresh_for_all_pb_paths(
     monkeypatch,
     path_kind,
 ):
@@ -113,9 +112,7 @@ def test_on_created_schedules_score_aware_refresh_for_all_pb_paths(
             lambda _scenario: sensitivities,
         )
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    file_watchdog.import_run_file("run.csv")
 
     assert len(messages) == 1
     assert loads == ["run.csv"]
@@ -130,7 +127,7 @@ def test_on_created_schedules_score_aware_refresh_for_all_pb_paths(
     ]
 
 
-def test_on_created_parses_absolute_source_path_outside_stats_dir(
+def test_import_run_file_parses_absolute_source_path_outside_stats_dir(
     tmp_path,
     monkeypatch,
 ):
@@ -150,16 +147,14 @@ def test_on_created_parses_absolute_source_path_outside_stats_dir(
         lambda _scenario: False,
     )
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path=str(source_path))
-    )
+    file_watchdog.import_run_file(str(source_path))
 
     assert parsed_paths == [str(source_path)]
     assert len(messages) == 1
     assert loads == [str(source_path)]
 
 
-def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
+def test_import_run_file_does_not_schedule_refresh_for_non_pb(monkeypatch):
     run_data = _run_data(score=80.0)
     messages, loads, schedules = _patch_common(monkeypatch, run_data)
     monkeypatch.setattr(
@@ -178,9 +173,7 @@ def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
         lambda _scenario: {SENSITIVITY_KEY: _sorted_runs()},
     )
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    file_watchdog.import_run_file("run.csv")
 
     assert len(messages) == 1
     assert loads == ["run.csv"]
@@ -215,9 +208,7 @@ def test_scheduling_failure_does_not_block_ingestion(monkeypatch, caplog):
     )
 
     with caplog.at_level(logging.ERROR, logger=file_watchdog.logger.name):
-        file_watchdog.NewFileHandler().on_created(
-            SimpleNamespace(is_directory=False, src_path="run.csv")
-        )
+        file_watchdog.import_run_file("run.csv")
 
     assert len(messages) == 1
     assert loads == ["run.csv"]
@@ -230,10 +221,9 @@ def test_scheduling_failure_does_not_block_ingestion(monkeypatch, caplog):
     assert matching_records[0].exc_info is not None
 
 
-def test_on_created_loads_before_enqueuing(monkeypatch):
+def test_import_run_file_loads_before_enqueuing(monkeypatch):
     run_data = _run_data()
     events = []
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(
         file_watchdog,
         "extract_data_from_file",
@@ -257,14 +247,12 @@ def test_on_created_loads_before_enqueuing(monkeypatch):
     # No stored identity, so ingestion must still complete without a refresh.
     settings_service.save_settings({})
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    file_watchdog.import_run_file("run.csv")
 
     assert events == ["load", "enqueue"]
 
 
-def test_on_created_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
+def test_import_run_file_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
     run_data = _run_data()
     messages, loads, schedules = _patch_common(monkeypatch, run_data)
     file_watchdog.run_import_failure_queue.clear()
@@ -280,22 +268,17 @@ def test_on_created_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
 
     monkeypatch.setattr(file_watchdog, "load_csv_file_into_database", fail_load)
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    file_watchdog.import_run_file("run.csv")
 
     assert loads == ["run.csv"]
     assert messages == []
     assert schedules == []
-    # The store's own re-read failed, so the run never landed -- the user hears
-    # about it here rather than only in debug.log.
-    assert file_watchdog.drain_run_import_failures() == [
-        file_watchdog.RUN_IMPORT_FAILURE_MESSAGE
-    ]
+    # The worker reports only after retry exhaustion.
+    assert file_watchdog.drain_run_import_failures() == []
 
 
 @pytest.mark.parametrize("previous_high_score", [0.0, -5.0])
-def test_on_created_ingests_run_when_high_score_has_no_usable_denominator(
+def test_import_run_file_ingests_run_when_high_score_has_no_usable_denominator(
     monkeypatch,
     previous_high_score,
 ):
@@ -325,9 +308,7 @@ def test_on_created_ingests_run_when_high_score_has_no_usable_denominator(
         lambda _scenario: {SENSITIVITY_KEY: _sorted_runs(previous_high_score)},
     )
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    file_watchdog.import_run_file("run.csv")
 
     assert loads == ["run.csv"]
     assert len(messages) == 1
@@ -345,7 +326,7 @@ def test_on_created_ingests_run_when_high_score_has_no_usable_denominator(
 
 
 def _patch_scenario_path(monkeypatch, path_kind, high_score=90.0):
-    """Steer on_created down one of its three message-building branches."""
+    """Steer the importer down one of its message-building branches."""
     monkeypatch.setattr(
         file_watchdog,
         "is_scenario_in_database",
@@ -372,7 +353,7 @@ def _patch_scenario_path(monkeypatch, path_kind, high_score=90.0):
         ("existing", 90.0, False),
     ],
 )
-def test_on_created_publishes_facts_from_every_branch(
+def test_import_run_file_publishes_facts_from_every_branch(
     monkeypatch,
     path_kind,
     expected_previous_best,
@@ -390,11 +371,8 @@ def test_on_created_publishes_facts_from_every_branch(
     messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
     _patch_scenario_path(monkeypatch, path_kind)
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(
-            is_directory=False,
-            src_path="S:/stats/VT Pasu Intermediate S5 - Challenge - 2026.08.29 Stats.csv",
-        )
+    file_watchdog.import_run_file(
+        "S:/stats/VT Pasu Intermediate S5 - Challenge - 2026.08.29 Stats.csv"
     )
 
     (message,) = messages
@@ -435,9 +413,7 @@ def test_a_new_sensitivity_run_that_is_a_personal_best_reports_both_facts(monkey
     messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
     _patch_scenario_path(monkeypatch, "new_sensitivity", high_score=90.0)
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    file_watchdog.import_run_file("run.csv")
 
     (message,) = messages
     assert message.is_new_sensitivity is True
@@ -501,7 +477,6 @@ def _normalized_group(*scores):
 def _import_real_file(monkeypatch, file_path, *, group_scores, high_score):
     """Import one real file and return the message the app would receive."""
     messages = []
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(
         file_watchdog, "message_queue", SimpleNamespace(append=messages.append)
     )
@@ -519,9 +494,7 @@ def _import_real_file(monkeypatch, file_path, *, group_scores, high_score):
         lambda _name: {NORMALIZED_KEY: _normalized_group(*group_scores)},
     )
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path=str(file_path))
-    )
+    file_watchdog.import_run_file(str(file_path))
 
     (message,) = messages
     return message

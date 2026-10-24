@@ -27,7 +27,7 @@ PERFORMANCE_FILE_SUFFIX = " Performance.perf"
 logger = logging.getLogger(__name__)
 
 # Unsynchronized on the same terms as the run stores: after startup the
-# watchdog thread is the only writer of the listing, and a raced read
+# ingestion worker is the only writer of the listing, and a raced read
 # self-heals on the next look. See the 2026-07-09 "Unsynchronized In-Memory
 # Stores" entry in docs/decision_log/.
 _performance_dir: Path | None = None
@@ -98,7 +98,7 @@ def note_performance_file(run: RunData) -> None:
     if name is None or _performance_dir is None or name in _performance_file_names:
         return
     # ``os.path.isfile`` answers False where a ``Path`` method could raise, and
-    # this runs on the watchdog thread before the run is imported.
+    # this runs on the ingestion worker before the run is imported.
     if os.path.isfile(_performance_dir / name):
         _performance_file_names.add(name)
 

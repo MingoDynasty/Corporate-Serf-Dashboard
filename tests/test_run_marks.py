@@ -490,7 +490,6 @@ def folders(tmp_path, monkeypatch) -> _Folders:
 def _land(monkeypatch, stats_file: Path):
     """Land one stats file through the watchdog and return its queued message."""
     messages = []
-    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(
         file_watchdog, "message_queue", SimpleNamespace(append=messages.append)
     )
@@ -499,9 +498,7 @@ def _land(monkeypatch, stats_file: Path):
     )
     file_watchdog.run_import_failure_queue.clear()
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path=str(stats_file))
-    )
+    file_watchdog.import_run_file(str(stats_file))
 
     assert file_watchdog.drain_run_import_failures() == []
     (message,) = messages

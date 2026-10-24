@@ -6,8 +6,8 @@ celebrating, or a failure they would act on. A condition that stays true is
 explained where it happens, while replies replace their own previous copy
 on every retry and messages about different things stack. Toasts and the
 notices printed into the page share one severity color scale, so a color
-means the same thing wherever it appears. Their text links stay underlined
-and readable against their backgrounds.
+means the same thing wherever it appears. The app retries unfinished run files
+before reporting an import failure.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -275,7 +275,17 @@ toasts under, and it applies to every toast the app adds from here on
 
 ## Run notifications
 
-- The watchdog thread imports a new run CSV, loads it into the in-memory
+- The observer queues created or modified CSV paths and the destination of a
+  rename to CSV. One ingestion worker waits for a one-second quiet period per
+  file, then imports all ready files without another delay between them.
+  Successful startup and live imports are deduplicated by file name within
+  the watched stats folder, using platform case normalization. Failed files
+  retry after 0.25, 0.5, 1, 2, and 4 seconds while other ready files proceed.
+  After exhaustion, one failure notice is queued for that path and the worker
+  rechecks it every 30 seconds without repeating the notice. Shutdown lets an
+  active import finish and leaves pending source files for the next startup
+  ([2026-10-23](../decision_log/2026/2026-10-23-schedule-run-imports-on-one-worker.md)).
+- The ingestion worker imports a new run CSV, loads it into the in-memory
   stores, and only then appends a `NewFileMessage` to the process-wide
   `message_queue` deque
   ([2026-07-06](../decision_log/2026/2026-07-06-coalesce-pending-home-run-events.md)).
@@ -527,10 +537,11 @@ toasts under, and it applies to every toast the app adds from here on
 
 ## Background threads and diagnostics
 
-- When the watchdog cannot import a run file — a CSV that will not parse, a
-  handler exception, or a store load that fails after a successful parse — it
+- When the ingestion worker exhausts its retries for a run file — a CSV that
+  will not parse, a handler exception, or a store load that fails after a
+  successful parse — it
   appends "Couldn't process a new run file. See data/logs/debug.log." to
-  `run_import_failure_queue`, and the observer thread survives. On each poll
+  `run_import_failure_queue`, and the ingestion worker survives. On each poll
   tick of Home or Run History, `flush_run_import_failures` drains the queue into
   one red toast, id `run-import-failure`, title "Run not recorded": the
   message above for one failure, or
