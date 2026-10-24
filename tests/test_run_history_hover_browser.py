@@ -687,13 +687,21 @@ def test_expanded_offscreen_run_keeps_its_target_without_highlighting_its_header
     if toggle.get_attribute("aria-expanded") != "true":
         toggle.click()
     playwright.expect(toggle).to_have_attribute("aria-expanded", "true")
+    # The header can already be visible while a pending bodyScroll clears hover.
     page.evaluate(
         """id => {
         const api = window.runHistoryList.api;
+        window.__hoverTestScrollEnded = false;
+        const onScrollEnd = () => {
+            api.removeEventListener('bodyScrollEnd', onScrollEnd);
+            window.__hoverTestScrollEnded = true;
+        };
+        api.addEventListener('bodyScrollEnd', onScrollEnd);
         api.ensureIndexVisible(api.getRowNode(id).rowIndex, 'bottom');
     }""",
         row["vid"],
     )
+    page.wait_for_function("window.__hoverTestScrollEnded")
     page.wait_for_function(
         """({run, visit}) => {
         const grid = document.querySelector('#run-history-list-grid');
