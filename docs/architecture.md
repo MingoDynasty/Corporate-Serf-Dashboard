@@ -1020,10 +1020,10 @@ flowchart LR
   the empty-state copy, and `build_run_history_figure()`. That function
   takes one copy of the run store (`data_service.get_all_runs`), puts the
   scenario's runs from it in play order, splits that copy into play sessions,
-  and assigns the scenario's session and overall run ordinals and session
-  totals. It judges the new PBs over the whole history, applies the range the
-  mode counts in, and hands the runs and ordinals to one of `plot_service`'s
-  three builders.
+  and builds each run's `RunPointContext`: its session number, session total,
+  exact list-session name and number of newer scenario runs. It judges the
+  new PBs over the whole history, applies the range the mode counts in, and
+  hands the runs and context to one of `plot_service`'s three builders.
   On Score vs Run and Score vs Time, while
   any of the typical score's switches is on, it builds the typical score
   after every run of the scenario
@@ -1350,12 +1350,12 @@ flowchart LR
   `generate_score_vs_run_plot`, `generate_score_vs_time_plot`, and
   `generate_score_vs_sensitivity_plot`.
   Each plots every run it is given as one point, titles the figure with the
-  scenario's name alone, and receives the session and overall run ordinals
-  and session totals counted by the chart module over the full store
-  snapshot. Point and star tooltips share a compact score, timestamp and
-  run-number readout; only
-  Score vs Sensitivity adds its axis value. Recorded sensitivity and DPI
-  details live in the run list's Sensitivity tooltip.
+  scenario's name alone, and receives context counted by the chart module
+  over the full store snapshot. Point and star tooltips share four lines:
+  full timestamp, list-formatted score, named session with its scenario's run
+  number and total, and sensitivity with the recorded setting and DPI.
+  Only Score vs Run adds a run-age suffix to its timestamp. The list's
+  Sensitivity-cell tooltip also exposes the recorded setting and DPI.
   Each draws no summary line: the typical score's
   traces come from `typical_score_traces()` and
   `typical_score_hold_traces()`, which the chart module adds to the Score vs

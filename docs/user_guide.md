@@ -300,15 +300,20 @@ The temporary outline clears when you move away. Hover keeps the list's
 scroll position and groups as they are, so a matching row outside the
 visible list stays off-screen.
 
-A chart dot or star's tooltip shows its exact date and time above separate
-labeled lines for its score and two run numbers.
-Both count only the selected scenario: "Session run" matches
-the list's **#** column and gives the total runs of that scenario in the whole
-session, such as "6 of 9". "Overall run" counts its whole imported history.
-Changing the chart range resets neither number nor the total. In an ongoing
-session the total grows as more runs are imported. **Score vs Sensitivity**
-also shows the point's sensitivity. For a converted run's original game
-sensitivity and DPI, hover its **Sensitivity** cell in the list.
+A chart dot or star's tooltip shows its full timestamp, score, named session
+and sensitivity. **Score vs Run** also says how many newer runs of that
+scenario came after it, such as "57 runs ago"; the newest says "Latest run".
+This counts the whole imported history, independently of chart range and zoom.
+The score matches the list's formatting.
+
+The session name matches the list's Session row. Its "run 7 of 12" matches
+the list's **#** column and counts only this scenario within the whole
+session, including returning visits and runs outside the chart range.
+In an ongoing session the total grows as more runs are imported.
+A converted run's sensitivity includes its original game setting and DPI
+in both the chart tooltip and the list's **Sensitivity** cell tooltip.
+Accuracy is in the list; reaching an old run may require scrolling,
+expanding its groups or loading older sessions.
 
 A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh, from the Playlists page

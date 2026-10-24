@@ -26,6 +26,7 @@ from source.kovaaks.typical_score import (
 from source.utilities.utilities import (
     format_absolute_timestamp,
     format_decimal,
+    format_score,
     format_short_date,
 )
 
@@ -129,11 +130,20 @@ _LEGEND_ABOVE_PLOT = {
 }
 
 _RUN_POINT_HOVER = (
-    "%{customdata[0]}<br><br>"
-    "<b>Score</b>: %{y}<br>"
-    "<b>Overall run</b>: %{customdata[2]}<br>"
-    "<b>Session run</b>: %{customdata[1]} of %{customdata[3]}"
+    "<b>Score</b>: %{customdata[6]}<br>"
+    "<b>Session</b>: %{customdata[4]} · run %{customdata[1]} of %{customdata[3]}<br>"
+    "<b>Sensitivity</b>: %{customdata[5]}"
 )
+
+
+class RunPointContext(NamedTuple):
+    """The scenario's session and practice context for one plotted run."""
+
+    session_number: int
+    runs_ago: int
+    session_total: int
+    session_name: str
+
 
 # What the Score vs Run axis assumes when it thins its date labels: the width
 # of the plot area, and the room one character and one label's margin take.
@@ -269,6 +279,24 @@ def _add_rank_overlays(
             line_dash="dash",
             line_color=rank.color,
         )
+
+
+def _recorded_sensitivity_suffix(run: RunData) -> str:
+    """Name a converted run's original setting without rounding it."""
+    recorded = run.recorded_sensitivity
+    if recorded is None:
+        return ""
+    return (
+        f" ({format_decimal(recorded.value)} {recorded.scale}"
+        f" at {format_decimal(recorded.dpi)} DPI)"
+    )
+
+
+def _runs_ago_text(count: int) -> str:
+    """Describe the selected scenario's runs played after this run."""
+    if count == 0:
+        return "Latest run"
+    return "1 run ago" if count == 1 else f"{count:,} runs ago"
 
 
 def _new_high_scores_last(
@@ -889,8 +917,8 @@ def _generate_run_history_plot(  # noqa: PLR0913
     ringed_run: RunData | None = None,
     ringed_run_id: str = "",
     *,
-    run_numbers: Mapping[RunData, tuple[int, int, int]],
-    show_sensitivity: bool = False,
+    run_context: Mapping[RunData, RunPointContext],
+    show_runs_ago: bool = False,
 ) -> go.Figure:
     """Build a Run History figure: one point per run, at the x value given for it.
 
@@ -903,24 +931,28 @@ def _generate_run_history_plot(  # noqa: PLR0913
     ``ringed_run`` gets a ring when it is plotted, tagged ``ringed_run_id``,
     in a trace of its own that comes last so the ring is drawn over a star.
 
-    ``run_numbers`` maps each plotted run to its scenario's session ordinal,
-    overall ordinal and total runs in that session, counted over the whole
-    history before filtering or draw-order changes.
+    ``run_context`` is counted over the whole history before filtering or
+    draw-order changes. Its session name is the run list's label, formatted
+    against the app's current date.
     """
     scores = [run.score for run in runs]
     hover_data: dict[RunData, list[float | str]] = {
         run: [
             format_absolute_timestamp(run.datetime_object, include_seconds=True),
-            f"{run_numbers[run][0]:,}",
-            f"{run_numbers[run][1]:,}",
-            f"{run_numbers[run][2]:,}",
+            f"{run_context[run].session_number:,}",
+            _runs_ago_text(run_context[run].runs_ago),
+            f"{run_context[run].session_total:,}",
+            run_context[run].session_name,
+            f"{run.horizontal_sens} {run.sens_scale}"
+            + _recorded_sensitivity_suffix(run),
+            format_score(run.score),
         ]
         for run in runs
     }
-    hovertemplate = _RUN_POINT_HOVER
-    if show_sensitivity:
-        hovertemplate += "<br><b>Sensitivity</b>: %{x}"
-    hovertemplate += "<extra></extra>"
+    hovertemplate = "%{customdata[0]}"
+    if show_runs_ago:
+        hovertemplate += " · %{customdata[2]}"
+    hovertemplate += "<br>" + _RUN_POINT_HOVER + "<extra></extra>"
     figure = go.Figure(
         go.Scatter(
             x=list(x_values),
@@ -1033,7 +1065,7 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
     ringed_run: RunData | None = None,
     ringed_run_id: str = "",
     *,
-    run_numbers: Mapping[RunData, tuple[int, int, int]],
+    run_context: Mapping[RunData, RunPointContext],
 ) -> go.Figure:
     """Build the Score vs Run figure: the runs given, evenly spaced, in their order.
 
@@ -1063,7 +1095,8 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
         new_high_score_runs,
         ringed_run,
         ringed_run_id,
-        run_numbers=run_numbers,
+        run_context=run_context,
+        show_runs_ago=True,
     )
 
 
@@ -1077,7 +1110,7 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
     ringed_run: RunData | None = None,
     ringed_run_id: str = "",
     *,
-    run_numbers: Mapping[RunData, tuple[int, int, int]],
+    run_context: Mapping[RunData, RunPointContext],
 ) -> go.Figure:
     """Build the Score vs Time figure: each run given, at the time it ended.
 
@@ -1100,7 +1133,7 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
         new_high_score_runs,
         ringed_run,
         ringed_run_id,
-        run_numbers=run_numbers,
+        run_context=run_context,
     )
 
 
@@ -1113,7 +1146,7 @@ def generate_score_vs_sensitivity_plot(  # noqa: PLR0913
     ringed_run: RunData | None = None,
     ringed_run_id: str = "",
     *,
-    run_numbers: Mapping[RunData, tuple[int, int, int]],
+    run_context: Mapping[RunData, RunPointContext],
 ) -> go.Figure:
     """Build the Score vs Sensitivity figure: each run given, at its sensitivity.
 
@@ -1133,8 +1166,7 @@ def generate_score_vs_sensitivity_plot(  # noqa: PLR0913
         new_high_score_runs=(),
         ringed_run=ringed_run,
         ringed_run_id=ringed_run_id,
-        run_numbers=run_numbers,
-        show_sensitivity=True,
+        run_context=run_context,
     )
 
 

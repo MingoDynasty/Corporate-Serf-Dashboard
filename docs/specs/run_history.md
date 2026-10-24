@@ -1,8 +1,8 @@
 # Run History
 
 Run History charts one scenario's runs and typical score beside a session
-list, with session counts in point tooltips, hover linking each chart run to
-one list row and a separate latest-run highlight.
+list, with point tooltips naming each run's session, hover linking each chart
+run to one list row and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -667,26 +667,37 @@ The card's lines, local-record scope and leaderboard presentation follow
   `0.32 Valorant` reads `0.32 Valorant`
   ([2026-09-27][precision]).
   A converted run also keeps the value, scale, and DPI its file recorded,
-  unrounded, for the run list's Sensitivity tooltip
+  unrounded, for its chart tooltip and the run list's Sensitivity tooltip
   ([2026-09-26][recorded]).
-- Point hover starts with the run's absolute timestamp with seconds kept,
-  then a blank line. Three labeled lines follow: `Score: {score}`,
-  `Overall run: {overall_number}` and
-  `Session run: {session_number} of {session_total}`.
-  The labels are bold.
-  Both numbers count only that scenario, across every sensitivity and version,
-  in play order. The session number matches the list's `#` column, including
-  returning visits, and the overall number counts the whole imported history.
-  The session total counts every imported run of that scenario in the whole
-  session, including runs after the hovered run and outside the chart range.
-  During an ongoing session it is the total so far; earlier points' totals grow
-  as more runs are imported. Range filtering and draw order don't reset either
-  ordinal or the total. Counts use thousands separators
+- Point hover has four lines, with no blank line after its timestamp.
+  Its first line is the run's full absolute timestamp with seconds, as
+  [the timestamp rule][timestamps] requires. In Score vs Run alone it adds
+  ` · {n} runs ago`: the number of newer imported runs of that scenario in
+  play order, across all sensitivities and versions, independently of range
+  or zoom. One reads `1 run ago` and zero reads `Latest run`.
+  The next lines are `Score: {score}`,
+  `Session: {session_name} · run {session_number} of {session_total}` and
+  `Sensitivity: {sensitivity}`. Labels are bold. The score uses the list's
+  exact formatting, including thousands separators and up to two decimals
+  with trailing zeroes dropped ([2026-10-24][compact-hover]).
+- The session name exactly matches its Session row in the list, including
+  the year when it differs from the app's current year. It names the whole
+  play session, including play on other scenarios before this scenario.
+  The numerator matches the run's `#` in the list; the denominator is the
+  first count on its session's `12 of 47 runs` readout. Both count only
+  this scenario, across versions, sensitivities and returning visits.
+  The total includes runs after the hovered run and outside the chart range.
+  During an ongoing session, the total so far and older points' run ages grow
+  as more runs of that scenario are imported ([2026-10-24][compact-hover]).
+- Sensitivity stays in every mode, including the converted run's original
+  setting and DPI, such as `40.8 cm/360 (0.16 Valorant at 1600 DPI)`.
+  Native and unconverted runs have no recorded-setting suffix
+  ([2026-09-26][recorded]). Every point tooltip states the point's position on
+  both axes; only Score vs Run needs a run-age readout because its Run-axis
+  labels show dates. Accuracy is absent from the point tooltip and remains
+  in the list; inspecting an old run may require scrolling, expanding or
+  loading older sessions. Hover provides no click action
   ([2026-10-24][compact-hover]).
-  Seconds cross-reference KovaaK's second-stamped CSV filenames
-  ([2026-07-11][timestamps]). Score vs Sensitivity adds a final line,
-  `Sensitivity: {sensitivity}`, using the exact axis category. Other modes
-  omit sensitivity, and every mode omits accuracy from its point tooltip.
   A star carries the same tooltip as its run point, including when ordinary
   dots are hidden through the legend ([2026-10-23][linked-hover]).
   Runs at one position share one hover, the one whose point comes last in the

@@ -29,6 +29,7 @@ from source.plot.plot_service import (  # noqa: E402
     NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
+    RunPointContext,
     apply_light_dark_mode,
     generate_empty_plot,
     generate_score_vs_run_plot,
@@ -99,8 +100,11 @@ def cached_plot(request) -> str:
             False,
             (),
             date(2025, 1, 2),
-            run_numbers={
-                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            run_context={
+                run: RunPointContext(
+                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+                )
+                for index, run in enumerate(runs, 1)
             },
         )
     elif request.param == "score_vs_time":
@@ -111,8 +115,11 @@ def cached_plot(request) -> str:
             [],
             False,
             (),
-            run_numbers={
-                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            run_context={
+                run: RunPointContext(
+                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+                )
+                for index, run in enumerate(runs, 1)
             },
         )
     else:
@@ -122,8 +129,11 @@ def cached_plot(request) -> str:
             False,
             [],
             False,
-            run_numbers={
-                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            run_context={
+                run: RunPointContext(
+                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+                )
+                for index, run in enumerate(runs, 1)
             },
         )
     return figure.to_json()
@@ -140,8 +150,11 @@ def starred_plot() -> str:
         [],
         False,
         {runs[1]},
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
     return figure.to_json()

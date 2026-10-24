@@ -306,13 +306,31 @@ def test_chart_hover_links_the_exact_visible_run_without_requests_or_movement(
     tooltip = page.locator("#run-history-graph .hoverlayer .hovertext")
     playwright.expect(tooltip).to_contain_text(f"Score: {row['score']}")
     total = sum(run["sid"] == row["sid"] for run in run_rows(page))
-    playwright.expect(tooltip).to_contain_text(f"Session run: {row['n']} of {total}")
-    playwright.expect(tooltip).to_contain_text("Overall run:")
+    session_name = page.evaluate(
+        """sid => {
+            const api = window.runHistoryList.api;
+            const session = api.getRowNode(sid)?.data ?? api.getPinnedTopRow(0)?.data;
+            return session?.id === sid ? session.name : null;
+        }""",
+        row["sid"],
+    )
+    assert session_name is not None
+    playwright.expect(tooltip).to_contain_text(
+        f"Session: {session_name} · run {row['n']} of {total}"
+    )
     playwright.expect(tooltip).not_to_contain_text("Accuracy")
-    if mode == "Score vs Sensitivity":
-        playwright.expect(tooltip).to_contain_text("Sensitivity: 40.8 cm/360")
+    playwright.expect(tooltip).to_contain_text(
+        "Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)"
+    )
+    if mode == "Score vs Run":
+        playwright.expect(tooltip).to_contain_text("Latest run")
     else:
-        playwright.expect(tooltip).not_to_contain_text("Sensitivity")
+        playwright.expect(tooltip).not_to_contain_text("Latest run")
+        playwright.expect(tooltip).not_to_contain_text("run ago")
+        playwright.expect(tooltip).not_to_contain_text("runs ago")
+    lines = tooltip.locator("text.nums > tspan.line").all_text_contents()
+    assert len(lines) == 4
+    assert all(line.strip() for line in lines)
     assert linked_rows(page) == [row["id"]]
     assert list_snapshot(page) == before
     page.mouse.move(0, 0)
@@ -336,6 +354,28 @@ def test_original_sensitivity_is_available_on_the_list_cell(hover_page, view):
     playwright.expect(cell).to_have_attribute(
         "title", "40.8 cm/360 (0.2 Valorant at 1600 DPI)"
     )
+
+
+def test_four_line_tooltip_fits_the_narrow_chart_with_options_open(hover_page):
+    page = hover_page
+    page.set_viewport_size({"width": 1600, "height": 1000})
+    page.get_by_role("button", name="Chart options", exact=True).click()
+    wait_for_history(page)
+    row = next(row for row in run_rows(page) if row["displayed"])
+    hover_point(page, row)
+    tooltip = page.locator("#run-history-graph .hoverlayer .hovertext")
+    playwright.expect(tooltip).to_contain_text("(0.2 Valorant at 1600 DPI)")
+    boxes = page.evaluate("""() => {
+        const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+        const tooltip = graph.querySelector('.hoverlayer .hovertext');
+        return {graph: graph.getBoundingClientRect().toJSON(),
+                tooltip: tooltip.getBoundingClientRect().toJSON()};
+    }""")
+    graph, tip = boxes["graph"], boxes["tooltip"]
+    assert tip["left"] >= graph["left"] - 1, boxes
+    assert tip["right"] <= graph["right"] + 1, boxes
+    assert tip["top"] >= graph["top"] - 1, boxes
+    assert tip["bottom"] <= graph["bottom"] + 1, boxes
 
 
 def test_collapsed_run_highlights_its_pinned_session_without_opening_it(hover_page):

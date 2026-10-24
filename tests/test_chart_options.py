@@ -28,6 +28,7 @@ from source.plot.plot_service import (
     MIDDLE_50_TRACE_NAME,
     MIDDLE_80_TRACE_NAME,
     TYPICAL_SCORE_TRACE_NAME,
+    RunPointContext,
     generate_score_vs_run_plot,
     generate_score_vs_time_plot,
     generated_point_color,
@@ -595,8 +596,11 @@ def _typical_score_plot() -> str:
         False,
         (),
         today,
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
     figure.add_traces(
@@ -700,8 +704,11 @@ def test_score_vs_times_only_value_takes_each_themes_gray(
         [],
         False,
         (),
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
     figure.add_traces(

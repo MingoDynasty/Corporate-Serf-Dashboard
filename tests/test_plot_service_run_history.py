@@ -24,6 +24,7 @@ from source.plot.plot_service import (
     NEW_PB_TRACE_NAME,
     POINT_SIZE_PRESET_PX,
     RUN_DATA_POINT_TRACE_NAME,
+    RunPointContext,
     apply_point_appearance,
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
@@ -40,10 +41,10 @@ LADDER = [
     Rank(name="Silver", color="#cccccc", threshold=110.0),
 ]
 RUN_POINT_HOVER = (
-    "%{customdata[0]}<br><br>"
-    "<b>Score</b>: %{y}<br>"
-    "<b>Overall run</b>: %{customdata[2]}<br>"
-    "<b>Session run</b>: %{customdata[1]} of %{customdata[3]}"
+    "%{customdata[0]}<br>"
+    "<b>Score</b>: %{customdata[6]}<br>"
+    "<b>Session</b>: %{customdata[4]} · run %{customdata[1]} of %{customdata[3]}<br>"
+    "<b>Sensitivity</b>: %{customdata[5]}"
 )
 
 
@@ -76,8 +77,11 @@ def _score_vs_run(runs, *, first_run_number=1, new_pbs=(), ranks=(), today=TODAY
         False,
         new_pbs,
         today,
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -90,8 +94,11 @@ def _score_vs_time(runs, *, new_pbs=(), ranks=()):
         list(ranks),
         False,
         new_pbs,
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -103,8 +110,11 @@ def _score_vs_sensitivity(runs, *, ranks=()):
         True,
         list(ranks),
         False,
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -179,33 +189,35 @@ def test_the_point_hover_is_compact_and_keeps_the_exact_timestamp(
 
     points = _trace(build([run]), RUN_DATA_POINT_TRACE_NAME)
 
-    sensitivity_line = (
-        "<br><b>Sensitivity</b>: %{x}" if build == _score_vs_sensitivity else ""
-    )
-    assert (
-        points.hovertemplate == RUN_POINT_HOVER + sensitivity_line + "<extra></extra>"
-    )
+    hover = RUN_POINT_HOVER
+    if build == _score_vs_run:
+        hover = hover.replace("<br>", " · %{customdata[2]}<br>", 1)
+    assert points.hovertemplate == hover + "<extra></extra>"
+    assert "<br><br>" not in points.hovertemplate
     assert "Date" not in points.hovertemplate
     assert list(points.customdata[0]) == [
         "Oct 10, 2026, 9:04:22 PM",
         "1",
+        "Latest run",
         "1",
-        "1",
+        "Oct 10, 12:00 PM",
+        "40.8 cm/360",
+        "101.5",
     ]
     assert points.hoverlabel.font.size == 16
 
 
 @EVERY_MODE
-def test_a_converted_runs_chart_hover_omits_the_recorded_setting(build) -> None:
+def test_a_converted_runs_chart_hover_keeps_the_recorded_setting(build) -> None:
     run = _run(
         100.0,
         NOON,
-        recorded=RecordedSensitivity(value=0.2, scale="Valorant", dpi=1600.0),
+        recorded=RecordedSensitivity(value=0.16, scale="Valorant", dpi=1600.0),
     )
 
     points = _trace(build([run]), RUN_DATA_POINT_TRACE_NAME)
 
-    assert list(points.customdata[0]) == ["Oct 10, 2026, 12:00:00 PM", "1", "1", "1"]
+    assert points.customdata[0][5] == "40.8 cm/360 (0.16 Valorant at 1600 DPI)"
     assert "Accuracy" not in points.hovertemplate
 
 
@@ -218,13 +230,39 @@ def test_run_numbers_use_thousands_separators() -> None:
         [],
         False,
         (),
-        run_numbers={run: (1234, 5678, 2345)},
+        run_context={run: RunPointContext(1234, 5678, 2345, "Oct 10, 12:00 PM")},
     )
-    assert list(_trace(figure, RUN_DATA_POINT_TRACE_NAME).customdata[0][1:]) == [
+    assert list(_trace(figure, RUN_DATA_POINT_TRACE_NAME).customdata[0][1:4]) == [
         "1,234",
-        "5,678",
+        "5,678 runs ago",
         "2,345",
     ]
+
+
+@EVERY_MODE
+def test_score_hover_matches_the_lists_thousands_separators(build):
+    points = _trace(build([_run(3324.0, NOON)]), RUN_DATA_POINT_TRACE_NAME)
+    assert points.customdata[0][6] == "3,324"
+
+
+@pytest.mark.parametrize(
+    ("count", "text"),
+    [(0, "Latest run"), (1, "1 run ago"), (57, "57 runs ago")],
+)
+def test_run_age_names_the_latest_run_and_uses_singular_for_one(count, text):
+    run = _run(100.0, NOON)
+    figure = generate_score_vs_run_plot(
+        [run],
+        1,
+        SCENARIO,
+        False,
+        [],
+        False,
+        (),
+        TODAY,
+        run_context={run: RunPointContext(1, count, 1, "Oct 10, 12:00 PM")},
+    )
+    assert _trace(figure, RUN_DATA_POINT_TRACE_NAME).customdata[0][2] == text
 
 
 @EVERY_MODE
@@ -356,7 +394,10 @@ def test_score_vs_run_stars_each_plotted_run_that_was_a_new_pb() -> None:
     assert (list(stars.x), list(stars.y)) == ([6], [120.0])
     assert stars.marker.symbol == "star"
     # A star answers for its own run even with ordinary run points hidden.
-    assert stars.hovertemplate == RUN_POINT_HOVER + "<extra></extra>"
+    assert stars.hovertemplate == (
+        RUN_POINT_HOVER.replace("<br>", " · %{customdata[2]}<br>", 1)
+        + "<extra></extra>"
+    )
     assert stars.ids == (_trace(figure, RUN_DATA_POINT_TRACE_NAME).ids[1],)
     assert [trace.name for trace in figure.data] == [
         RUN_DATA_POINT_TRACE_NAME,
@@ -556,8 +597,11 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         TODAY,
         ringed,
         "ringed.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
     by_time = generate_score_vs_time_plot(
@@ -569,8 +613,11 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         (),
         ringed,
         "ringed.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
     by_sensitivity = generate_score_vs_sensitivity_plot(
@@ -581,8 +628,11 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
         False,
         ringed,
         "ringed.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -610,8 +660,11 @@ def test_the_ring_has_no_legend_entry_and_no_hover_of_its_own() -> None:
             TODAY,
             runs[-1],
             "newest.csv",
-            run_numbers={
-                run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+            run_context={
+                run: RunPointContext(
+                    index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+                )
+                for index, run in enumerate(runs, 1)
             },
         )
     )
@@ -639,8 +692,11 @@ def test_the_ring_is_drawn_last_so_it_sits_over_a_star() -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -667,8 +723,11 @@ def test_a_run_that_is_not_plotted_gets_no_ring() -> None:
         TODAY,
         outside,
         "outside.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -694,8 +753,9 @@ def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
         TODAY,
         second,
         "second.csv",
-        run_numbers={
-            run: (index, index, 2) for index, run in enumerate([first, second], 1)
+        run_context={
+            run: RunPointContext(index, 2 - index, 2, "Oct 10, 12:00 PM")
+            for index, run in enumerate([first, second], 1)
         },
     )
 
@@ -739,8 +799,11 @@ def test_the_ring_is_shown_in_the_schemes_blue_and_hidden_by_its_opacity(
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -779,8 +842,11 @@ def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 
@@ -807,8 +873,11 @@ def test_the_default_point_size_leaves_the_rings_own() -> None:
         TODAY,
         runs[-1],
         "newest.csv",
-        run_numbers={
-            run: (index, index, len(runs)) for index, run in enumerate(runs, 1)
+        run_context={
+            run: RunPointContext(
+                index, len(runs) - index, len(runs), "Oct 10, 12:00 PM"
+            )
+            for index, run in enumerate(runs, 1)
         },
     )
 

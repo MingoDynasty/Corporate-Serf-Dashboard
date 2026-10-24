@@ -22,6 +22,7 @@ from source.kovaaks.data_service import (
 from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.typical_score import build_typical_scores
 from source.plot.plot_service import (
+    RunPointContext,
     generate_empty_plot,
     generate_score_vs_run_plot,
     generate_score_vs_sensitivity_plot,
@@ -29,6 +30,7 @@ from source.plot.plot_service import (
     typical_score_hold_traces,
     typical_score_traces,
 )
+from source.utilities.utilities import format_short_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -146,13 +148,18 @@ def build_run_history_figure(  # noqa: PLR0913
     # plotted scenario, or only its visible range, would renumber its runs.
     sessions = split_into_play_sessions(all_runs)
     overall_numbers = {run: number for number, run in enumerate(runs, 1)}
-    run_numbers: dict[RunData, tuple[int, int, int]] = {}
+    run_context: dict[RunData, RunPointContext] = {}
     for session in sessions:
         scenario_runs = [
             run for run in session.runs if run.scenario == selected_scenario
         ]
         for number, run in enumerate(scenario_runs, 1):
-            run_numbers[run] = (number, overall_numbers[run], len(scenario_runs))
+            run_context[run] = RunPointContext(
+                number,
+                len(runs) - overall_numbers[run],
+                len(scenario_runs),
+                format_short_timestamp(session.start, today),
+            )
     newest = runs[-1]
     newest_id = run_id(newest)
     # Judged over the whole history, and only then is the range applied: a
@@ -176,7 +183,7 @@ def build_run_history_figure(  # noqa: PLR0913
             today,
             newest,
             newest_id,
-            run_numbers=run_numbers,
+            run_context=run_context,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Worked out over the whole history before the range is applied,
@@ -230,7 +237,7 @@ def build_run_history_figure(  # noqa: PLR0913
             new_pbs,
             newest,
             newest_id,
-            run_numbers=run_numbers,
+            run_context=run_context,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Over the whole history, as on Score vs Run. The range keeps the
@@ -266,7 +273,7 @@ def build_run_history_figure(  # noqa: PLR0913
             show_all_ranks_switch,
             newest,
             newest_id,
-            run_numbers=run_numbers,
+            run_context=run_context,
         ),
         True,
     )
