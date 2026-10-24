@@ -69,6 +69,7 @@
     // The grid the state below belongs to. The page is drawn again on every
     // visit, with a new grid, and which rows are open is not remembered.
     api: null,
+    linkedRow: null,
     // One per view: its open rows, its mark, and whether its rows have
     // arrived yet in this visit. The mark is the newest run whose rows the
     // view has opened. Each view keeps its own because a batch can hold runs
@@ -149,6 +150,9 @@
   }
 
   function setOpen(api, ids, open) {
+    if (window.runHistoryHover) {
+      window.runHistoryHover.clear();
+    }
     var rows = openRows();
     ids.forEach(function (id) {
       if (open) {
@@ -585,7 +589,12 @@
         )
       );
     }
-    return groupRow(props, "run-list-session", toggle, line);
+    return groupRow(
+      props,
+      data.id === state.linkedRow ? "run-list-session run-list-row-linked" : "run-list-session",
+      toggle,
+      line
+    );
   }
 
   dagcomponentfuncs.RunListWideRow = function (props) {
@@ -746,10 +755,14 @@
 
   // ---- Applying a model from the server ----
   state.apply = function (api, model, follow) {
+    if (window.runHistoryHover) {
+      window.runHistoryHover.clear();
+    }
     var context = contextOf(api);
     var labels = context.labels || {};
     if (state.api !== api) {
       state.api = api;
+      state.linkedRow = null;
       state.views = {};
       state.view = undefined;
       state.started = false;
@@ -847,6 +860,39 @@
       }
     }
     updateExpandLabel(context);
+  };
+
+  // A filtered-out run belongs to a closed group. Its session, including
+  // the pinned current session, is the fallback; scrolling alone does not
+  // make a run filtered out and must never change the target to its session.
+  state.highlightRun = function (id) {
+    var api = state.api;
+    if (!api || api.isDestroyed()) {
+      return;
+    }
+    var pinned = api.getPinnedTopRow(0);
+    function nodeById(key) {
+      if (key == null) {
+        return null;
+      }
+      return pinned && pinned.id === key ? pinned : api.getRowNode(key);
+    }
+    var run = id == null ? null : api.getRowNode(contextOf(api).runRowIdPrefix + id);
+    var target = run && (run.displayed ? run : nodeById(run.data.sid));
+    var next = target ? target.id : null;
+    if (state.linkedRow === next) {
+      return;
+    }
+    var previous = nodeById(state.linkedRow);
+    state.linkedRow = next;
+    // Refresh normal rows through their class rule; React updates the full-
+    // width session in place, preserving the focused button and open state.
+    [previous, target].filter(Boolean).forEach(function (node) {
+      if (node.data.kind === RUN) {
+        node.updateData(Object.assign({}, node.data, { linked: node.id === next }));
+      }
+    });
+    notify();
   };
 
   // Expand all opens every loaded session of the view on screen, down to its

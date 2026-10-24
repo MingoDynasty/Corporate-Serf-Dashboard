@@ -1,7 +1,7 @@
 # Run History
 
 Run History charts one scenario's runs and their typical score beside a
-session list, with matching highlights for its latest run.
+session list, with matching highlights for its latest run and hovered runs.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -678,7 +678,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   `Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)`. Any other run's line
   ends at its sensitivity
   ([2026-09-26][recorded]).
-  A star takes no hover of its own, so hovering one shows its run's hover.
+  A star carries the same tooltip as its run point, including when ordinary
+  dots are hidden through the legend ([2026-10-23][linked-hover]).
   Runs at one position share one hover, the one whose point comes last in the
   run trace. In Score vs Time that is runs that ended in the same second with
   the same score, and a new PB is ordered last among them, so the star's
@@ -1042,6 +1043,26 @@ The card's lines, local-record scope and leaderboard presentation follow
   ([2026-10-12][grid], [2026-10-14][all-scenarios]).
 - The grid draws only the rows in view, so a browser's find-in-page reaches
   only those.
+
+### Linked hover
+
+- Hovering a run point or PB star highlights that run's row in either list
+  view. When a session or scenario group is collapsed over it, its containing
+  Session row is highlighted instead, including the pinned current session.
+  An off-screen or unloaded target produces no visible cross-highlight
+  ([2026-10-23][linked-hover]).
+- Hovering a visible run row emphasizes its dot or star in the current chart.
+  A run outside the selected scenario, plotted range, zoom, or visible traces
+  has no visible counterpart. Session rows do not highlight whole sets of runs.
+- Temporary links use a grape outline, separate from the blue latest-run
+  highlight and selected-scenario band. Hover preserves point preferences,
+  stars, the latest-run ring, scroll position, chart axes, expanded groups,
+  keyboard focus, selections, and the number of sessions loaded.
+  A linked PB star retains its gold fill.
+- The emphasis appears immediately and clears on unhover. A list scroll,
+  model or expansion change, chart redraw, or page departure clears it too.
+  Hover runs entirely in the browser. It neither loads older sessions nor
+  introduces a click action.
 
 ## Marks: the check and the star
 
@@ -1525,3 +1546,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [score-strip]: ../decision_log/2026/2026-10-21-run-historys-score-cards-stay-together-after-the-note.md
 
 [latest-highlights]: ../decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md
+
+[linked-hover]: ../decision_log/2026/2026-10-23-run-history-links-chart-and-list-runs-on-hover.md

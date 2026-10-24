@@ -201,7 +201,7 @@ def test_the_two_kinds_of_row_are_kept_in_reading_order():
 
 
 def test_keys_on_a_row_reach_the_lists_own_handler():
-    assert _grid().eventListeners == {"cellKeyDown": ["runListKeyDown(params)"]}
+    assert _grid().eventListeners["cellKeyDown"] == ["runListKeyDown(params)"]
 
 
 def test_no_column_sorts_moves_or_resizes():
@@ -759,6 +759,7 @@ def test_the_selected_scenarios_latest_run_is_highlighted_by_a_row_rule():
     rules = _options()["rowClassRules"]
 
     assert rules == {
+        "run-list-row-linked": "params.data.linked === true",
         "run-list-row-latest": "params.data.latest",
         "run-list-row-selected": "params.data.sel && params.data.kind === 'run'",
     }

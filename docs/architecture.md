@@ -1537,6 +1537,12 @@ flowchart LR
   lists the ten pieces of grid work, each a place an AG Grid upgrade can
   break. It holds no copy: every string comes with the rows or with the
   grid's `context`.
+- `assets/runHistoryHover.js` — links Run History chart markers and loaded
+  run-list rows by run ID on hover. It indexes SVG run and PB-star markers
+  after plotting, applies a temporary CSS class, and asks
+  `runHistoryList.highlightRun` to mark a run row or its containing session
+  when collapsed. Grid mouse events clear or emphasize chart markers. No
+  hover request, scroll, expansion, or focus change is involved.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Run History
   graph to the runs in view when
   the x axis is zoomed. It reads the x axis through plotly.js's own

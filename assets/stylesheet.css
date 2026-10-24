@@ -1029,6 +1029,47 @@ a.run-toast-link {
     box-shadow: inset 3px 0 0 var(--mantine-color-blue-filled);
 }
 
+/* A temporary run link uses grape so the latest-run blue and the selected
+   scenario's band keep their own meanings. No border changes row geometry. */
+.run-history-page {
+    --run-history-link-color: #862e9c;
+}
+
+:root[data-mantine-color-scheme="dark"] .run-history-page {
+    --run-history-link-color: #e599f7;
+}
+
+.run-history-list-grid .ag-row.run-list-row-linked,
+.run-history-list-grid .run-list-session.run-list-row-linked {
+    outline: 2px solid var(--run-history-link-color);
+    outline-offset: -2px;
+}
+
+/* Plotly writes marker strokes inline; the temporary class takes precedence
+   and removing it restores the actual point preference or PB-star outline. */
+.run-history-page .point.run-history-point-linked {
+    stroke: var(--run-history-link-color) !important;
+    stroke-width: 2px !important;
+    filter: drop-shadow(0 0 1px var(--run-history-link-color));
+}
+
+/* In the 2026-10-23 mockup, grape was only 1.45:1 against the blue dot in
+   light mode, so a stroke over the fill merged into a dark blob. Paint underneath
+   to keep the dot's color and make its outer edge visibly larger. */
+:root[data-mantine-color-scheme="light"] .run-history-page .point.run-history-point-linked {
+    stroke-width: 8px !important;
+    paint-order: stroke;
+    filter: drop-shadow(0 0 2px var(--run-history-link-color));
+}
+
+/* Gold identifies a PB, so hover must not paint over it. This selector also
+   keeps the star's grape edge thinner than the light-mode dot's edge. */
+:root[data-mantine-color-scheme] .run-history-page .point.run-history-point-star.run-history-point-linked {
+    stroke-width: 4px !important;
+    paint-order: stroke;
+    filter: drop-shadow(0 0 2px var(--run-history-link-color));
+}
+
 /* The current session, held under the column headings while the list
    scrolls. Beside it the grid keeps a scrollbar of the row's own, so its
    columns stay in line with the body's. It scrolls nothing, so it is drawn
