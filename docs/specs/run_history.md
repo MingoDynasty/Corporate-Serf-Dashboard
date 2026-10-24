@@ -6,8 +6,8 @@ latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
-played. A check marks a run that met its score threshold and a star marks a
-new personal best, each judged when the run was played.
+played. Checks mark runs that met their score threshold and stars mark new
+personal bests on runs and their groups, each judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -1088,6 +1088,19 @@ The card's lines, local-record scope and leaderboard presentation follow
   The chart's threshold line is drawn at the current PB, so an old run can
   carry a check and sit below today's line
   ([2026-10-12][check]).
+- A session row shows one star after its count when any run in its scope
+  set a new PB, whether the row is open or closed. Under This scenario only
+  the selected scenario's runs count, so a session with none has no star.
+  Under All scenarios every run in the session counts, regardless of the
+  selected scenario or Playlist filter. Multiple PBs still produce one star.
+- A session star's hover and accessible name are "A new PB for this scenario
+  was set in this session." under This scenario and "A new PB was set in
+  this session." under All scenarios. Unstarred session rows keep the star's
+  room, so Median, Best and count stay aligned across rows.
+- Session stars aggregate the runs' historical PB marks. A later PB doesn't
+  remove an older session's star, ties don't count and a scenario's first
+  run only sets the baseline. The score threshold percentage doesn't affect
+  stars.
 - The percentage is the Score threshold percentage as it is set now, for
   every run. A change to it marks every run again, at once, because the
   percentage in force when an old run was played was never recorded. It lives

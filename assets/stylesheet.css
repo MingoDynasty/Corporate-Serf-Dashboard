@@ -1133,6 +1133,12 @@ a.run-toast-link {
     color: #fab005;
 }
 
+/* Unstarred session rows keep this room so their figure columns stay aligned. */
+.run-list-session-star {
+    display: inline-block;
+    width: 1em;
+}
+
 /* What the list's script draws in a full-width row: a session row, a
    scenario row, a divider, a date header, the note under a session the
    scenario was not played in, and the button that loads older sessions.
