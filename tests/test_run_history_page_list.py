@@ -644,6 +644,8 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
             ),
             "wholeSession": "Show the whole session",
             "newPb": "New PB",
+            "sessionNewPb": "A new PB was set in this session.",
+            "scenarioSessionNewPb": "A new PB for this scenario was set in this session.",
             # The figures' words, which This scenario draws in columns.
             "median": "Median",
             "best": "Best",
@@ -1285,7 +1287,8 @@ def test_the_marks_cell_says_why_a_run_has_no_check():
 
     assert "title: data.passed ? undefined : data.check_text" in script
     assert 'h("span", { className: "visually-hidden" }, data.check_text)' in script
-    assert '"aria-label": labels.newPb,' in script
+    assert '"aria-label": label,' in _function(script, "star")
+    assert "star(labels.newPb)" in script
 
 
 def _inline_script(registration: dict) -> str:
