@@ -31,6 +31,7 @@ sessions, and click actions remain out of scope.
 - Grape outlines identify temporary links independently of the blue
   latest-run highlight and the selected-scenario band. Point colors, sizes,
   PB-star shapes, and the latest-run ring return unchanged on unhover.
+  A linked PB star retains its gold fill.
 - Run and star traces carry the same filename-based run IDs as the list.
   Point indices, rounded scores, and timestamps are never identity. A star
   carries its run's tooltip too, so hiding ordinary dots still leaves its

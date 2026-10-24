@@ -217,7 +217,7 @@ uv run --group screenshots pytest tests/test_run_history_hover_browser.py
 Remove-Item Env:CSD_HOVER_BROWSER
 ```
 
-All 12 tests must pass. A run that skips the module or its tests does not
+All collected tests must pass. A run that skips the module or its tests does not
 count as a pass. If Edge is unavailable, install Playwright's Chromium and
 run with no browser channel set:
 

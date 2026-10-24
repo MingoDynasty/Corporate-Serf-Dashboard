@@ -46,7 +46,8 @@ def hover_server(tmp_path_factory):
             (0, SCENARIO, 0),
             (2, "Other hover sample", 3),
             (4, SCENARIO, 10),
-            (6, SCENARIO, 5),
+            # Exercise the latest-run ring and PB star on the same run.
+            (6, SCENARIO, 15 if day == 33 else 5),
         ):
             ended = noon - timedelta(days=34 - day) + timedelta(minutes=minute)
             name = f"{scenario} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv"
@@ -179,7 +180,8 @@ def hover_point(page, row, *, star=False):
         const graph = document.querySelector('#run-history-graph .js-plotly-plot');
         for (const group of graph.querySelectorAll('.trace.scatter')) {
             const trace = group.__data__?.[0]?.trace;
-            if (trace?.name !== (star ? 'New PB' : 'Run data point')) continue;
+            if (star ? trace?.marker?.symbol !== 'star'
+                : trace?.name !== 'Run data point') continue;
             const point = [...group.querySelectorAll('.points .point')]
                 .find(point => point.__data__.id === id);
             if (point) {
@@ -298,13 +300,32 @@ def test_list_hover_emphasizes_its_marker_and_clears_when_leaving(
     playwright.expect(page.locator(".run-history-point-linked").first).to_have_css(
         "stroke", outline
     )
+    dot = page.locator(".run-history-point-linked:not(.run-history-point-star)")
+    playwright.expect(dot).to_have_count(1)
+    playwright.expect(dot).to_have_css(
+        "stroke-width", "8px" if scheme == "light" else "2px"
+    )
+    playwright.expect(dot).to_have_css(
+        "paint-order", "stroke" if scheme == "light" else "normal"
+    )
+    glow = "2px" if scheme == "light" else "1px"
+    playwright.expect(dot).to_have_css(
+        "filter", f"drop-shadow({outline} 0px 0px {glow})"
+    )
     assert list_snapshot(page) == before
     page.mouse.move(0, 0)
     playwright.expect(page.locator(".run-history-point-linked")).to_have_count(0)
 
 
-def test_star_hover_still_links_when_ordinary_dots_are_hidden(hover_page):
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_star_hover_still_links_when_ordinary_dots_are_hidden(hover_page, scheme):
     page = hover_page
+    if page.locator("html").get_attribute("data-mantine-color-scheme") != scheme:
+        page.get_by_label("Switch between light and dark mode", exact=True).click()
+    playwright.expect(page.locator("html")).to_have_attribute(
+        "data-mantine-color-scheme", scheme
+    )
+    wait_for_history(page)
     row = next(row for row in run_rows(page) if row["displayed"] and row["new_pb"])
     page.evaluate("""() => {
         const gd = document.querySelector('#run-history-graph .js-plotly-plot');
@@ -315,6 +336,97 @@ def test_star_hover_still_links_when_ordinary_dots_are_hidden(hover_page):
     playwright.expect(page.locator(".ag-row.run-list-row-linked")).to_have_count(1)
     assert linked_rows(page) == [row["id"]]
     playwright.expect(page.locator(".hoverlayer")).to_contain_text(row["score"])
+    star = page.locator(".run-history-point-star.run-history-point-linked")
+    playwright.expect(star).to_have_count(1)
+    playwright.expect(star).to_have_css("fill", "rgb(250, 176, 5)")
+    playwright.expect(star).to_have_css("paint-order", "stroke")
+    playwright.expect(star).to_have_css("stroke-width", "4px")
+    outline = "rgb(134, 46, 156)" if scheme == "light" else "rgb(229, 153, 247)"
+    playwright.expect(star).to_have_css("stroke", outline)
+    page.mouse.move(0, 0)
+    playwright.expect(page.locator(".run-history-point-linked")).to_have_count(0)
+
+
+def test_star_tag_follows_symbol_after_redraw_and_trace_rename(hover_page):
+    page = hover_page
+    page.evaluate("""() => {
+        const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+        const index = graph.data.findIndex(trace => trace.marker?.symbol === 'star');
+        return Plotly.restyle(graph, {'marker.symbol': 'circle'}, [index]);
+    }""")
+    wait_for_chart_quiet(page)
+    playwright.expect(page.locator(".run-history-point-star")).to_have_count(0)
+    page.evaluate("""() => {
+        const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+        const index = graph.data.findIndex(trace => trace.name === 'New PB');
+        return Plotly.restyle(graph, {
+            name: 'Renamed PB', 'marker.symbol': 'star'
+        }, [index]);
+    }""")
+    wait_for_chart_quiet(page)
+    row = next(row for row in run_rows(page) if row["displayed"] and row["new_pb"])
+    hover_point(page, row, star=True)
+    playwright.expect(
+        page.locator(".run-history-point-star.run-history-point-linked")
+    ).to_have_count(1)
+    page.mouse.move(0, 0)
+    playwright.expect(page.locator(".run-history-point-linked")).to_have_count(0)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+@pytest.mark.parametrize("size", ["Small", "Default", "Large"])
+def test_hover_preserves_the_latest_run_ring_on_a_pb(hover_page, scheme, size):
+    page = hover_page
+    if page.locator("html").get_attribute("data-mantine-color-scheme") != scheme:
+        page.get_by_label("Switch between light and dark mode", exact=True).click()
+    wait_for_history(page)
+    page.get_by_role("button", name="Chart options", exact=True).click()
+    page.get_by_role("radiogroup", name="Point size", exact=True).get_by_text(
+        size, exact=True
+    ).click()
+    page.get_by_role("button", name="Chart options", exact=True).click()
+    wait_for_history(page)
+    row = next(row for row in run_rows(page) if row.get("latest"))
+    assert row["new_pb"]
+    before = list_snapshot(page)
+    ring = (
+        page.locator(".trace.scatter")
+        .filter(has=page.locator(".points .point"))
+        .evaluate_all("""groups => {
+        const group = groups.find(group => group.__data__?.[0]?.trace.name === 'Latest run');
+        const point = group.querySelector('.point');
+        const style = getComputedStyle(point);
+        return {
+            d: point.getAttribute('d'), stroke: style.stroke,
+            strokeWidth: style.strokeWidth, opacity: style.opacity
+        };
+    }""")
+    )
+    hover_point(page, row, star=True)
+    star = page.locator(".run-history-point-star.run-history-point-linked")
+    playwright.expect(star).to_have_css("fill", "rgb(250, 176, 5)")
+    playwright.expect(star).to_have_css("paint-order", "stroke")
+    hovered = page.evaluate("""() => {
+        const graph = document.querySelector('#run-history-graph .js-plotly-plot');
+        const star = graph.querySelector('.run-history-point-star.run-history-point-linked');
+        const ringGroup = [...graph.querySelectorAll('.trace.scatter')]
+            .find(group => group.__data__?.[0]?.trace.name === 'Latest run');
+        const ring = ringGroup.querySelector('.point');
+        const style = getComputedStyle(ring);
+        return {
+            d: ring.getAttribute('d'), stroke: style.stroke,
+            strokeWidth: style.strokeWidth, opacity: style.opacity,
+            linked: ring.classList.contains('run-history-point-linked'),
+            starPosition: star.getAttribute('transform'),
+            ringPosition: ring.getAttribute('transform')
+        };
+    }""")
+    assert not hovered["linked"]
+    assert hovered["starPosition"] == hovered["ringPosition"]
+    assert {key: hovered[key] for key in ring} == ring
+    assert list_snapshot(page) == before
+    page.mouse.move(0, 0)
+    playwright.expect(page.locator(".run-history-point-linked")).to_have_count(0)
 
 
 def test_chart_hover_does_not_load_sessions_or_scroll_to_an_offscreen_match(hover_page):

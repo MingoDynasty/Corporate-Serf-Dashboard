@@ -1058,6 +1058,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   highlight and selected-scenario band. Hover preserves point preferences,
   stars, the latest-run ring, scroll position, chart axes, expanded groups,
   keyboard focus, selections, and the number of sessions loaded.
+  A linked PB star retains its gold fill.
 - The emphasis appears immediately and clears on unhover. A list scroll,
   model or expansion change, chart redraw, or page departure clears it too.
   Hover runs entirely in the browser. It neither loads older sessions nor

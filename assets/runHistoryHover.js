@@ -40,9 +40,12 @@
       if (!trace || trace.meta !== "run-history-run" || trace.visible !== true) {
         return;
       }
+      var isStar = Boolean(trace.marker && trace.marker.symbol === "star");
       group.querySelectorAll(".points .point").forEach(function (point) {
         var id = point.__data__ && point.__data__.id;
         if (typeof id === "string") {
+          // Plotly can reuse a path after its symbol changes.
+          point.classList.toggle("run-history-point-star", isStar);
           if (!markers.has(id)) {
             markers.set(id, []);
           }

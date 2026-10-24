@@ -1049,7 +1049,24 @@ a.run-toast-link {
    and removing it restores the actual point preference or PB-star outline. */
 .run-history-page .point.run-history-point-linked {
     stroke: var(--run-history-link-color) !important;
-    stroke-width: 3px !important;
+    stroke-width: 2px !important;
+    filter: drop-shadow(0 0 1px var(--run-history-link-color));
+}
+
+/* In the 2026-10-23 mockup, grape was only 1.45:1 against the blue dot in
+   light mode, so a stroke over the fill merged into a dark blob. Paint underneath
+   to keep the dot's color and make its outer edge visibly larger. */
+:root[data-mantine-color-scheme="light"] .run-history-page .point.run-history-point-linked {
+    stroke-width: 8px !important;
+    paint-order: stroke;
+    filter: drop-shadow(0 0 2px var(--run-history-link-color));
+}
+
+/* Gold identifies a PB, so hover must not paint over it. This selector also
+   keeps the star's grape edge thinner than the light-mode dot's edge. */
+:root[data-mantine-color-scheme] .run-history-page .point.run-history-point-star.run-history-point-linked {
+    stroke-width: 4px !important;
+    paint-order: stroke;
     filter: drop-shadow(0 0 2px var(--run-history-link-color));
 }
 
