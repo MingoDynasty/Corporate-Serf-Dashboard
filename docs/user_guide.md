@@ -287,6 +287,19 @@ A session's run count, such as "7 of 47 runs", opens that session under
 **All scenarios**, and a scenario's name there shows that scenario on the
 chart.
 
+A star on a session row means a run in it set a new PB when it was played.
+Under **This scenario**, only the selected scenario's runs count; under
+**All scenarios**, any scenario's runs count. The star stays visible with
+its session collapsed, and a later PB doesn't remove it.
+
+Hover a run in the list to emphasize its dot or star on the chart. Hover a
+chart dot or star to highlight one matching list row. Under **All scenarios**,
+a collapsed Scenario row gets the outline instead of the Run row.
+A collapsed Session uses its Session row in either view.
+The temporary outline clears when you move away. Hover keeps the list's
+scroll position and groups as they are, so a matching row outside the
+visible list stays off-screen.
+
 A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh, from the Playlists page
 or from that link, starts it in playlist order; to clear a sort, click a sorted

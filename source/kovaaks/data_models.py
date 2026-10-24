@@ -73,6 +73,16 @@ class RunData:
     avg_fps: float | None = None
 
 
+def run_id(run: RunData) -> str:
+    """Return the id a run's row is keyed by: its stats file's name.
+
+    A run event's ``run_id`` is the same value, so a run that just landed can
+    be found in the list. A record that was not read from a stats file has no
+    name, and is keyed by its scenario and its end.
+    """
+    return run.stats_file_name or f"{run.scenario} {run.datetime_object.isoformat()}"
+
+
 @dataclass()
 class ScenarioStats:
     """Dataclass models statistics for a scenario."""

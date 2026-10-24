@@ -312,7 +312,7 @@ def test_point_color_changes_the_run_points_and_never_the_new_pb_stars(starred_p
         assert stars.marker.color == "#fab005"
         assert stars.marker.line.color == "#5f3d00"
         assert stars.marker.line.width == 1
-        assert stars.hoverinfo == "skip"
+        assert stars.hovertemplate == _run_trace(figure).hovertemplate
 
 
 def test_a_figure_with_no_new_pb_trace_passes_through_the_star_sizing(cached_plot):
