@@ -1040,6 +1040,7 @@ a.run-toast-link {
 }
 
 .run-history-list-grid .ag-row.run-list-row-linked,
+.run-history-list-grid .run-list-scenario.run-list-row-linked,
 .run-history-list-grid .run-list-session.run-list-row-linked {
     outline: 2px solid var(--run-history-link-color);
     outline-offset: -2px;

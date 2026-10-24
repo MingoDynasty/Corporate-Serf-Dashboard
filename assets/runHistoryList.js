@@ -485,13 +485,17 @@
       window.dash_clientside.set_props(context.askStoreId, { data: data.name });
       announce(context, data.selected_text);
     }
+    // The band is drawn here and not by the grid's row class rule, which
+    // the grid works out again when a row's data changes but not for a
+    // full-width row (AG Grid 35.3): the rule's band stayed on the
+    // scenario selected before. React redraws this class in place.
+    var className = data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario";
+    if (data.id === state.linkedRow) {
+      className += " run-list-row-linked";
+    }
     return groupRow(
       props,
-      // The band is drawn here and not by the grid's row class rule, which
-      // the grid works out again when a row's data changes but not for a
-      // full-width row (AG Grid 35.3): the rule's band stayed on the
-      // scenario selected before. React redraws this class in place.
-      data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario",
+      className,
       toggle,
       [
         toggleButton(labels.scenario, open, toggle),
@@ -862,9 +866,8 @@
     updateExpandLabel(context);
   };
 
-  // A filtered-out run belongs to a closed group. Its session, including
-  // the pinned current session, is the fallback; scrolling alone does not
-  // make a run filtered out and must never change the target to its session.
+  // Choose one row exposed by expansion. An off-screen Run stays the target;
+  // scrolling alone must never promote its Scenario or Session parent.
   state.highlightRun = function (id) {
     var api = state.api;
     if (!api || api.isDestroyed()) {
@@ -878,7 +881,11 @@
       return pinned && pinned.id === key ? pinned : api.getRowNode(key);
     }
     var run = id == null ? null : api.getRowNode(contextOf(api).runRowIdPrefix + id);
-    var target = run && (run.displayed ? run : nodeById(run.data.sid));
+    var target = run;
+    if (run && !run.displayed) {
+      var scenario = nodeById(run.data.vid);
+      target = scenario && scenario.displayed ? scenario : nodeById(run.data.sid);
+    }
     var next = target ? target.id : null;
     if (state.linkedRow === next) {
       return;
@@ -886,7 +893,7 @@
     var previous = nodeById(state.linkedRow);
     state.linkedRow = next;
     // Refresh normal rows through their class rule; React updates the full-
-    // width session in place, preserving the focused button and open state.
+    // width groups in place, preserving the focused button and open state.
     [previous, target].filter(Boolean).forEach(function (node) {
       if (node.data.kind === RUN) {
         node.updateData(Object.assign({}, node.data, { linked: node.id === next }));

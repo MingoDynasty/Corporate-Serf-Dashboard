@@ -1540,8 +1540,9 @@ flowchart LR
 - `assets/runHistoryHover.js` — links Run History chart markers and loaded
   run-list rows by run ID on hover. It indexes SVG run and PB-star markers
   after plotting, applies a temporary CSS class, and asks
-  `runHistoryList.highlightRun` to mark a run row or its containing session
-  when collapsed. Grid mouse events clear or emphasize chart markers. No
+  `runHistoryList.highlightRun` to mark one row: the Run exposed by expansion,
+  its collapsed Scenario visit under All scenarios, or its collapsed Session.
+  Grid mouse events clear or emphasize chart markers. No
   hover request, scroll, expansion, or focus change is involved.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Run History
   graph to the runs in view when
