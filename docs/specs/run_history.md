@@ -1,7 +1,8 @@
 # Run History
 
 Run History charts one scenario's runs and typical score beside a session
-list, with hover links to Run and Scenario rows and a separate latest-run highlight.
+list, with hover links between chart runs and list rows and a separate
+latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -1059,7 +1060,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   separately ([2026-10-23][scenario-hover]).
 - Hovering a visible run row emphasizes its dot or star in the current chart.
   A run outside the selected scenario, plotted range, zoom, or visible traces
-  has no visible counterpart. Session rows do not highlight whole sets of runs.
+  has no visible counterpart. Session and Scenario rows do not highlight
+  whole sets of runs.
 - Temporary links use a grape outline, separate from the blue latest-run
   highlight and selected-scenario band. Hover preserves point preferences,
   stars, the latest-run ring, scroll position, chart axes, expanded groups,
