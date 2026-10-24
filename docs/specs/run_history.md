@@ -1,8 +1,8 @@
 # Run History
 
 Run History charts one scenario's runs and typical score beside a session
-list, with hover linking each chart run to one list row and a separate
-latest-run highlight.
+list, with compact point tooltips, hover linking each chart run to one list
+row and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives new runs without a reload and can follow the scenario just
@@ -667,18 +667,19 @@ The card's lines, local-record scope and leaderboard presentation follow
   `0.32 Valorant` reads `0.32 Valorant`
   ([2026-09-27][precision]).
   A converted run also keeps the value, scale, and DPI its file recorded,
-  unrounded, for the point hover only
+  unrounded, for the run list's Sensitivity tooltip
   ([2026-09-26][recorded]).
-- Point hover is the same in each mode. It shows the run's timestamp with
-  seconds kept, the one surface that keeps them, cross-referencing KovaaK's
-  second-stamped CSV filenames
-  ([2026-07-11][timestamps]).
-  Then come the score, the run's sensitivity-and-scale string, and the
-  accuracy to two decimals. A converted run's sensitivity line adds the
-  setting it was recorded at, as in
-  `Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)`. Any other run's line
-  ends at its sensitivity
-  ([2026-09-26][recorded]).
+- Point hover shows bold `Score {score}`, the run's absolute timestamp with
+  seconds kept, then `Run {session_number} this session · {overall_number} overall`.
+  Both numbers count only that scenario, across every sensitivity and version,
+  in play order. The session number matches the list's `#` column, including
+  returning visits, and the overall number counts the whole imported history.
+  Range filtering and draw order don't reset either number. Counts use
+  thousands separators ([2026-10-24][compact-hover]).
+  Seconds cross-reference KovaaK's second-stamped CSV filenames
+  ([2026-07-11][timestamps]). Score vs Sensitivity adds a fourth line,
+  `Sensitivity: {sensitivity}`, using the exact axis category. Other modes
+  omit sensitivity, and every mode omits accuracy from its point tooltip.
   A star carries the same tooltip as its run point, including when ordinary
   dots are hidden through the legend ([2026-10-23][linked-hover]).
   Runs at one position share one hover, the one whose point comes last in the
@@ -870,6 +871,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   the stats file lists. Sensitivity is the run's normalized
   sensitivity-and-scale string, as on the chart's axis. Columns don't sort
   ([2026-10-12][column]).
+- A converted run's Sensitivity cell has a native tooltip with its normalized
+  value followed by its original game setting and DPI, such as
+  `40.8 cm/360 (0.16 Valorant at 1600 DPI)`. Original values stay unrounded,
+  and whole values drop trailing zeroes. Native and unconverted runs have no
+  extra tooltip. This applies in both list views ([2026-10-24][compact-hover]).
 - Reloads is the stats file's count, such as `0` or `12`. FOV is the FOV the
   run was played at, the number with trailing zeros dropped, then its scale,
   such as `103 Overwatch`, or the number alone where the file names no scale.
@@ -1558,3 +1564,5 @@ The card's lines, local-record scope and leaderboard presentation follow
 [linked-hover]: ../decision_log/2026/2026-10-23-run-history-links-chart-and-list-runs-on-hover.md
 
 [one-row-hover]: ../decision_log/2026/2026-10-23-run-history-hover-outlines-one-list-row.md
+
+[compact-hover]: ../decision_log/2026/2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md

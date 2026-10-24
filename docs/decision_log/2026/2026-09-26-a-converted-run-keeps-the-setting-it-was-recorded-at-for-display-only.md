@@ -1,11 +1,17 @@
 # 2026-09-26: A Converted Run Keeps The Setting It Was Recorded At, For Display Only
 
-Status: Accepted
+Status: Superseded in part
 
 Converted runs retain the original game sensitivity and DPI alongside
 their normalized value. This lets the player inspect a suspicious conversion
 without changing grouping or scoring. The original setting was first shown
 in the chart tooltip and now appears in the run list's Sensitivity tooltip.
+
+**Superseded in part (2026-10-24).** The
+[compact point-tooltip decision](2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md)
+moves recorded settings from the chart tooltip to the run list's Sensitivity
+cell tooltip. The historical display contract below is replaced; retention,
+conversion, grouping and DPI trust remain unchanged.
 
 **What is kept.** The recorded setting is the one a player remembers
 playing, and its DPI explains a cm/360 group that would otherwise look

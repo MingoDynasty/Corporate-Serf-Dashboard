@@ -587,7 +587,15 @@ def _typical_score_plot() -> str:
     ]
     today = date(2026, 10, 12)
     figure = generate_score_vs_run_plot(
-        runs, 1, "Scenario", False, [], False, (), today
+        runs,
+        1,
+        "Scenario",
+        False,
+        [],
+        False,
+        (),
+        today,
+        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
     )
     figure.add_traces(
         typical_score_traces(
@@ -683,7 +691,15 @@ def test_score_vs_times_only_value_takes_each_themes_gray(
         )
         for index in range(10)
     ]
-    figure = generate_score_vs_time_plot(runs, "Scenario", False, [], False, ())
+    figure = generate_score_vs_time_plot(
+        runs,
+        "Scenario",
+        False,
+        [],
+        False,
+        (),
+        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+    )
     figure.add_traces(
         typical_score_hold_traces(
             build_typical_scores(runs, split_into_play_sessions(runs)),

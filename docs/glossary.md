@@ -47,6 +47,17 @@ How long a run took to play, with paused time left out. Some runs have none,
 because their stats files give no usable start. Which runs those are is in
 [sessions.md](specs/sessions.md#run-start-and-run-length).
 
+### Run number
+
+A run's chronological place among runs of the same scenario, at every
+sensitivity and version. In the chart tooltip, "this session" counts within
+its play session, continuing across returning visits, and "overall" counts
+its whole imported history. The list's `#` column uses the session number.
+Changing the chart range resets neither number.
+
+- On screen: `Run 8 this session · 1,247 overall`.
+- Contract: [Run History](specs/run_history.md#the-chart).
+
 ### Stats folder
 
 The KovaaK's folder of stats files that the app reads runs from.

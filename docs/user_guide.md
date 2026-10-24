@@ -295,6 +295,13 @@ The temporary outline clears when you move away. Hover keeps the list's
 scroll position and groups as they are, so a matching row outside the
 visible list stays off-screen.
 
+A chart dot or star's tooltip shows its score, exact date and time, and two
+run numbers. Both count only the selected scenario: "this session" matches
+the list's **#** column and "overall" counts its whole imported history.
+Neither resets when you change the chart range. **Score vs Sensitivity**
+also shows the point's sensitivity. For a converted run's original game
+sensitivity and DPI, hover its **Sensitivity** cell in the list.
+
 A playlist's scenario table keeps its sort when you come back to it with the
 browser's Back button, but opening the playlist fresh, from the Playlists page
 or from that link, starts it in playlist order; to clear a sort, click a sorted

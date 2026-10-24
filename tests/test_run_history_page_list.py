@@ -312,17 +312,13 @@ def test_the_three_new_columns_are_right_aligned_and_hidden_to_start():
     ]
 
 
-def test_the_fov_cell_gives_its_whole_text_as_the_browsers_own_hover():
-    """A long scale is cut short, and the hover gives it whole.
-
-    The browser's title, as a scenario row's name has, and not a popup the
-    grid draws. No other column has a hover.
-    """
+def test_detail_cells_use_the_browsers_own_hover():
+    """Keep full details available without widening fixed columns."""
     columns = _grid().columnDefs
 
     assert [
         (c["field"], c["tooltipField"]) for c in columns if "tooltipField" in c
-    ] == [("fov", "fov")]
+    ] == [("sens", "sens_detail"), ("fov", "fov")]
     assert _options()["enableBrowserTooltips"] is True
 
 

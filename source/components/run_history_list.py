@@ -67,6 +67,7 @@ from source.kovaaks.play_sessions import (
 )
 from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.utilities.utilities import (
+    format_decimal,
     format_elapsed_duration,
     format_percent,
     format_score,
@@ -345,6 +346,14 @@ def _run_row(
     mark: RunMark,
     highlighted_run: str | None,
 ) -> dict:
+    sensitivity = f"{run.horizontal_sens} {run.sens_scale}"
+    recorded = run.recorded_sensitivity
+    sensitivity_detail = (
+        f"{sensitivity} ({format_decimal(recorded.value)} {recorded.scale}"
+        f" at {format_decimal(recorded.dpi)} DPI)"
+        if recorded is not None
+        else ""
+    )
     return {
         "id": f"{RUN_ROW_ID_PREFIX}{run_id(run)}",
         "kind": RUN_ROW,
@@ -360,7 +369,8 @@ def _run_row(
         "accuracy": format_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "reloads": "" if run.reloads is None else f"{run.reloads:,}",
-        "sens": f"{run.horizontal_sens} {run.sens_scale}",
+        "sens": sensitivity,
+        "sens_detail": sensitivity_detail,
         "fov": _fov_text(run),
         "avg_fps": "" if run.avg_fps is None else f"{run.avg_fps:,.0f}",
     }
@@ -929,6 +939,7 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             "field": "sens",
             "headerName": "Sensitivity",
             "type": "rightAligned",
+            "tooltipField": "sens_detail",
             **_fixed_width(96),
         },
         {

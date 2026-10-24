@@ -305,6 +305,49 @@ def test_score_vs_sensitivity_lists_the_sensitivities_lowest_first(load_runs) ->
     assert len(_points(figure).y) == 4
 
 
+@pytest.mark.parametrize("mode", [SCORE_VS_RUN, SCORE_VS_TIME, SCORE_VS_SENSITIVITY])
+def test_tooltip_numbers_count_full_scenario_history_and_whole_sessions(
+    load_runs, mode
+):
+    boundary = MIDNIGHT_TODAY - timedelta(days=6)
+    first = _run(100.0, boundary - timedelta(days=1))
+    # Two other-scenario runs bridge more than 30 minutes between selected runs.
+    older = _run(101.0, boundary - timedelta(minutes=40), sens=50.0)
+    bridge = [
+        replace(_run(200.0, boundary - timedelta(minutes=20)), scenario="Other"),
+        replace(_run(200.0, boundary), scenario="Other"),
+    ]
+    returned = _run(102.0, boundary + timedelta(minutes=1), sens=30.0)
+    next_session = _run(103.0, boundary + timedelta(hours=2), sens=40.0)
+    load_runs(first, older, *bridge, returned, next_session)
+
+    # The day range hides the first run of the session in the day modes.
+    figure, _ = _figure(mode, day_range="7", run_range="all")
+    points = _points(figure)
+    numbers = {
+        score: list(data[1:]) for score, data in zip(points.y, points.customdata)
+    }
+    assert numbers[102.0] == ["2", "3"]
+    assert numbers[103.0] == ["1", "4"]
+    if mode == SCORE_VS_RUN:
+        assert numbers[101.0] == ["1", "2"]
+    else:
+        assert 101.0 not in numbers
+
+
+def test_tooltip_numbers_survive_a_range_starting_mid_session(load_runs):
+    runs = [
+        _run(100.0 + index, MIDNIGHT_TODAY + timedelta(minutes=index))
+        for index in range(60)
+    ]
+    load_runs(*runs)
+    figure, _ = _figure(SCORE_VS_RUN, run_range="50")
+    points = _points(figure)
+    assert points.x[0] == 11
+    assert list(points.customdata[0][1:]) == ["11", "11"]
+    assert list(points.customdata[-1][1:]) == ["60", "60"]
+
+
 # --- New PB stars ---------------------------------------------------------------
 
 
@@ -1243,7 +1286,10 @@ def test_of_two_runs_in_one_second_the_later_played_ones_value_holds(
     figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="all")
     _faded, full = _line_traces(figure)
 
-    assert [data[1] for data in _points(figure).customdata[10:12]] == [75.0, 25.0]
+    assert [list(data[1:]) for data in _points(figure).customdata[10:12]] == [
+        ["2", "12"],
+        ["1", "11"],
+    ]
     v10, v11, v12, v13 = (value.median for value in _values(runs)[-4:])
     assert v11 not in {v10, v12}
     assert _held(full) == [

@@ -91,12 +91,35 @@ def cached_plot(request) -> str:
     runs = _two_runs()
     if request.param == "score_vs_run":
         figure = generate_score_vs_run_plot(
-            runs, 1, "1w4ts", False, [], False, (), date(2025, 1, 2)
+            runs,
+            1,
+            "1w4ts",
+            False,
+            [],
+            False,
+            (),
+            date(2025, 1, 2),
+            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
         )
     elif request.param == "score_vs_time":
-        figure = generate_score_vs_time_plot(runs, "1w4ts", False, [], False, ())
+        figure = generate_score_vs_time_plot(
+            runs,
+            "1w4ts",
+            False,
+            [],
+            False,
+            (),
+            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        )
     else:
-        figure = generate_score_vs_sensitivity_plot(runs, "1w4ts", False, [], False)
+        figure = generate_score_vs_sensitivity_plot(
+            runs,
+            "1w4ts",
+            False,
+            [],
+            False,
+            run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+        )
     return figure.to_json()
 
 
@@ -104,7 +127,15 @@ def cached_plot(request) -> str:
 def starred_plot() -> str:
     """A cached Score vs Time payload whose second run set a new PB."""
     runs = _two_runs()
-    figure = generate_score_vs_time_plot(runs, "1w4ts", False, [], False, {runs[1]})
+    figure = generate_score_vs_time_plot(
+        runs,
+        "1w4ts",
+        False,
+        [],
+        False,
+        {runs[1]},
+        run_numbers={run: (index, index) for index, run in enumerate(runs, 1)},
+    )
     return figure.to_json()
 
 

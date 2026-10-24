@@ -12,7 +12,7 @@ from datetime import date, datetime, time, timedelta
 
 import plotly.graph_objects as go
 
-from source.kovaaks.data_models import run_id
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import (
     get_all_runs,
     get_rank_data_from_playlist_code,
@@ -142,6 +142,17 @@ def build_run_history_figure(  # noqa: PLR0913
     # don't hold.
     all_runs = get_all_runs()
     runs = in_play_order(run for run in all_runs if run.scenario == selected_scenario)
+    # Other scenarios can bridge a session's breaks. Splitting only the
+    # plotted scenario, or only its visible range, would renumber its runs.
+    sessions = split_into_play_sessions(all_runs)
+    overall_numbers = {run: number for number, run in enumerate(runs, 1)}
+    run_numbers: dict[RunData, tuple[int, int]] = {}
+    for session in sessions:
+        scenario_runs = (
+            run for run in session.runs if run.scenario == selected_scenario
+        )
+        for number, run in enumerate(scenario_runs, 1):
+            run_numbers[run] = (number, overall_numbers[run])
     newest = runs[-1]
     newest_id = run_id(newest)
     # Judged over the whole history, and only then is the range applied: a
@@ -165,12 +176,13 @@ def build_run_history_figure(  # noqa: PLR0913
             today,
             newest,
             newest_id,
+            run_numbers=run_numbers,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Worked out over the whole history before the range is applied,
             # as the stars are, so the value at the range's first run counts
             # the runs before it that the range leaves out.
-            values = build_typical_scores(runs, split_into_play_sessions(all_runs))
+            values = build_typical_scores(runs, sessions)
             figure.add_traces(
                 typical_score_traces(
                     range(first_run_number, len(runs) + 1),
@@ -218,11 +230,12 @@ def build_run_history_figure(  # noqa: PLR0913
             new_pbs,
             newest,
             newest_id,
+            run_numbers=run_numbers,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Over the whole history, as on Score vs Run. The range keeps the
             # newest runs, so the last values are the plotted runs'.
-            values = build_typical_scores(runs, split_into_play_sessions(all_runs))
+            values = build_typical_scores(runs, sessions)
             figure.add_traces(
                 typical_score_hold_traces(
                     values[-len(plotted) :],
@@ -253,6 +266,7 @@ def build_run_history_figure(  # noqa: PLR0913
             show_all_ranks_switch,
             newest,
             newest_id,
+            run_numbers=run_numbers,
         ),
         True,
     )

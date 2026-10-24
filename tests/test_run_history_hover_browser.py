@@ -53,7 +53,8 @@ def hover_server(tmp_path_factory):
             name = f"{scenario} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv"
             (stats / name).write_text(
                 f"Score:,{100 + day * 2 + bonus}\nScenario:,{scenario}\n"
-                "Sens Scale:,cm/360\nHoriz Sens:,40.8\n"
+                "Sens Scale:,Valorant\nSens Increment:,0.199886\n"
+                "Horiz Sens:,0.2\nDPI:,1600\n"
                 "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,"
                 "Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,"
                 "ADS Sens,ADS Zoom Scale\nRifle,100,70,0,0\n",
@@ -242,6 +243,15 @@ def test_chart_hover_links_the_exact_visible_run_without_requests_or_movement(
     )
     hover_point(page, row)
     playwright.expect(page.locator(".ag-row.run-list-row-linked")).to_have_count(1)
+    tooltip = page.locator("#run-history-graph .hoverlayer .hovertext")
+    playwright.expect(tooltip).to_contain_text(f"Score {row['score']}")
+    playwright.expect(tooltip).to_contain_text(f"Run {row['n']} this session")
+    playwright.expect(tooltip).to_contain_text("overall")
+    playwright.expect(tooltip).not_to_contain_text("Accuracy")
+    if mode == "Score vs Sensitivity":
+        playwright.expect(tooltip).to_contain_text("Sensitivity: 40.8 cm/360")
+    else:
+        playwright.expect(tooltip).not_to_contain_text("Sensitivity")
     assert linked_rows(page) == [row["id"]]
     assert list_snapshot(page) == before
     page.mouse.move(0, 0)
@@ -250,6 +260,20 @@ def test_chart_hover_links_the_exact_visible_run_without_requests_or_movement(
     assert all(
         all(prop.endswith(".n_intervals") for prop in request.get("changedPropIds", []))
         for request in requests
+    )
+
+
+@pytest.mark.parametrize("view", ["scenario", "all"])
+def test_original_sensitivity_is_available_on_the_list_cell(hover_page, view):
+    page = hover_page
+    if view == "all":
+        page.get_by_text("All scenarios", exact=True).click()
+        page.wait_for_function("window.runHistoryList.view === 'all'")
+    row = next(row for row in run_rows(page) if row["displayed"])
+    cell = page.locator(f'{GRID} .ag-row[row-id="{row["id"]}"] .ag-cell[col-id="sens"]')
+    playwright.expect(cell).to_have_text("40.8 cm/360")
+    playwright.expect(cell).to_have_attribute(
+        "title", "40.8 cm/360 (0.2 Valorant at 1600 DPI)"
     )
 
 
