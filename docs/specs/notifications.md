@@ -1,13 +1,12 @@
 # Notifications
 
-The app says when it has seen a new run, on whatever page is open, and
-otherwise interrupts only for something the player did, a run worth
-celebrating, or a failure they would act on. A condition that stays true is
-explained where it happens, while replies replace their own previous copy
-on every retry and messages about different things stack. Toasts and the
-notices printed into the page share one severity color scale, so a color
-means the same thing wherever it appears. Their text links stay underlined
-and readable against their backgrounds.
+Each run file counts once, even when the app sees it again. The app
+announces new runs on any page and otherwise interrupts only for a player's
+action, a run worth celebrating, or a failure they would act on. A condition
+that stays true is explained where it happens, while replies replace their
+own previous copy on every retry and messages about different things stack.
+Toasts and page notices share one severity color scale and keep their text
+links underlined and readable against their backgrounds.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them — rationale lives
@@ -291,6 +290,15 @@ toasts under, and it applies to every toast the app adds from here on
   ([run_history.md](run_history.md#the-chart)). The message does not say
   where the run placed among them
   ([2026-10-13](../decision_log/2026/2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md)).
+- A run CSV's filename identifies it for the life of the in-memory stores,
+  with filename casing ignored on Windows. Startup loads and live imports
+  share this identity check. Repeated create events, including deletion and
+  recreation of the same file, add no run and queue no message once that
+  filename has loaded successfully. Different filenames remain separate
+  runs even when their timestamps and scores match. Failed imports reserve
+  no identity, so a later create event can try again. Replacing an already
+  loaded file does not update its stored run until a restart rebuilds the
+  stores from the files on disk.
 - The message also carries `pace_constant`, the constant a time-scored
   scenario's score counts down from, as a fact like the previous best. The
   watchdog works it out before the message is queued, with the landed run

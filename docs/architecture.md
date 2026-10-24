@@ -1141,6 +1141,11 @@ flowchart LR
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
   `load_csv_file_into_database`, `extract_data_from_file`, `get_high_score`,
   `get_sensitivities_vs_runs`, and the playlist loaders/getters.
+  `is_run_file_loaded` checks the run filename against the existing time
+  index before a startup load or live import. Successfully stored filenames
+  are idempotent for that store's lifetime, including after deletion and
+  recreation; failed imports remain retryable. The watchdog skips an
+  already loaded file before its wait, parsing, or message delivery.
   `extract_data_from_file` normalizes a run's sensitivity to cm/360 when the
   file carries `Sens Increment` and `DPI`, so every downstream consumer of
   `RunData.horizontal_sens` / `RunData.sens_scale` reads one scale

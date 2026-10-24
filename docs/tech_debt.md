@@ -51,12 +51,6 @@ finishes scanning but before `observer.start()` is never imported this
 session; the soak reproduced it with a synchronized arrival. Restart
 reconciles.
 
-### Duplicate create events double-count one logical run
-
-`source/my_watchdog/file_watchdog.py` — the handler has no event dedup, so
-duplicate create events and delete/recreate patterns for one logical run file
-import it twice (observed in the 2026-08-12 soak).
-
 ## Code Smells
 
 ### Remove the merged-cell repair when dash-ag-grid bundles AG Grid 36.1.0
