@@ -36,8 +36,8 @@ session start for the comparison." The author had recommended the Typical
 score card's own value; see [Alternatives rejected](#alternatives-rejected).
 The wave kept the basis and the evidence bar, and asked that the basis be
 named on screen and an old value be marked on the card, not only in the
-hover. Leaving the phrase off a new PB is the author's, to keep the named
-phrase on one line.
+hover. Leaving the phrase off a new PB is the author's: there it could never
+report a deficit.
 
 The material consequence: the card gains a second comparison, and during a
 session its percentage, and even its direction, can differ from what the
@@ -89,12 +89,16 @@ alone.**
   Intermediate S5, 0 of 20), and the Typical score card beside the Flower
   states looks current by then, so it can't serve as the warning. A scenario
   with no known typical score before the session gets no phrase.
-- **No phrase on a new PB.** A new PB beats the previous best, and the
-  typical score at session start, a median of earlier runs, can't exceed
-  that, so on a new PB the phrase could only ever say `above`. The PB gain
-  already says how far the run went. With the phrase, a new PB's line runs
-  past the wide card's 474 px: 438 to 469 px by score, more with an old
-  value's clock, and 504 px by pace.
+- **No phrase on a new PB.** A new PB scores above every earlier run, at
+  any sensitivity and version, and the typical score at session start is a
+  median of earlier runs, so on a new PB the phrase could never report a
+  deficit: it would read `above`, or `Matches` where a tiny gain rounds to
+  0.0%. It would add only a magnitude, which the Typical score card beside
+  it approximates, and the PB gain already says how far the run went. The
+  rule rests on that, not on the line's width. The width is a second
+  reason: with the phrase a new PB's line can run past the wide card's
+  474 px, as the pace form does at 504 px, and a long score form does with
+  an old value's clock (438 to 469 px before it).
 - **Time-scored scenarios** are compared by pace when every run behind the
   typical value is of the run's version and a performance file answers for
   that version, with both times positive, as the scenario table's Typical
@@ -215,9 +219,10 @@ every state.**
   older year's session with a two-digit run number, such as
   `Run 12 (Jul 20, 2020, 11:47 PM session) · Time on this scenario unknown`.
   With both on two lines the card measured 164 px on the mockup in review,
-  and the
-  floor keeps 12 px below the last line, so about 176 px there. The
-  implementation measures it.
+  and the floor keeps 12 px below the last line, so about 176 px there. That
+  floor is set in the narrow layout alone, under the page's container query
+  at 900 px or less: the wide layout keeps today's floor, since a higher one
+  would raise the whole row. The implementation measures it.
 
 ## Problem
 
@@ -333,7 +338,10 @@ the PB card's first line keep today's grey.
 - **An old value,** judged at the session's start by the typical score's
   recency rule: the scenario table's 13 px history clock after the phrase,
   hidden from assistive technology, and `Not recent` after the phrase for a
-  screen reader, as the table's old cells have.
+  screen reader, as the table's old cells have. The clock sits inside the
+  phrase's hover target, so hovering or focusing it opens the phrase's
+  hover; the table's clock has no tooltip of its own, and the card doesn't
+  follow it there.
 - **The hover,** by mouse and keyboard, as the card's age has one: `Typical
   score when this run's session began: {typical}`, and on an old value a
   second line.
@@ -346,8 +354,9 @@ the PB card's first line keep today's grey.
   between lines; Scenario Stats gains the 2 px gap the other two have.
 - They still stretch to their line's height; spare room is at the bottom.
 - The Latest Run card's minimum height holds its tallest state with 12 px
-  below its last line: in the wide layout the row's 141.4 px, and in the
-  narrow layout about 176 px, measured at 380 px wide (SC4). The other
+  below its last line: in the wide layout today's floor, inside the row's
+  141.4 px, and in the narrow layout alone, under the page's container query
+  at 900 px or less, about 176 px, measured at 380 px wide (SC4). The other
   cards' floors are unchanged.
 - The narrow layout keeps its order and wrapping; each card's lines start
   from its top there too.
@@ -447,9 +456,13 @@ changes it with the others.
 - **`Not recent at session start` for a screen reader.** The phrase already
   ends `at session start`, so the table's `Not recent` reads the same and
   adds no new words.
-- **Keeping the phrase on a new PB,** after the gain. It can only say
-  `above` there, and it would wrap the line in the wide layout, making the
-  row taller on those runs.
+- **Keeping the phrase on a new PB,** after the gain. It could never report
+  a deficit there, and its longest forms would wrap the line in the wide
+  layout, making the row taller on those runs.
+- **The short, unnamed phrase on a new PB alone,** `Up 4.3% on your
+  previous best of 3,021 · 17.4% above typical`. It fits (the pace form at
+  about 409 px), but it would put an unnamed basis back on the card, which
+  the wave asked to remove.
 - **The typical phrase on a line of its own.** Six lines don't fit the row's
   141 px with the card's padding.
 - **The quiet lines in today's grey.** At 3.32:1 light and 4.04:1 dark it is
