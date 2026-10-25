@@ -61,10 +61,13 @@ with no known value the phrase is left out.**
   above. The phrase's hover names the value it used, so the two can be
   reconciled.
 - **The evidence bar.** The 2026-10-04 principles say a judgment that uses an
-  old value must choose its evidence bar. This row chooses the table's (TB3):
-  a known value counts at any age. Two of the four mocked states compare
-  against a session-start value that wasn't recent when the session began
-  (Flower 50cm, 8 of 16 runs recent; VT ww5t Intermediate S5, 0 of 20). The
+  old value must choose its evidence bar. This row chooses the scenario
+  table's
+  ([2026-10-22](../decision_log/2026/2026-10-22-every-known-typical-score-gets-a-typical-rank-old-or-not.md)):
+  a known value counts at any age. Three of the four mocked states, on two
+  scenarios, compare against a session-start value that wasn't recent when
+  the session began (both Flower 50cm states, 8 of 16 runs recent; VT ww5t
+  Intermediate S5, 0 of 20). The
   phrase's hover then adds that the value may have been out of date. A
   scenario with no known typical score before the session gets no phrase.
 - **Time-scored scenarios** are compared by pace when the run's PB comparison
