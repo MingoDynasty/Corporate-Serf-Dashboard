@@ -73,6 +73,7 @@ SCENARIO_CLASS = "run-history-card-scenario"
 BODY_CLASS = "run-history-card-body"
 SCORE_ROW_CLASS = "run-history-card-score-row"
 SCORE_CLASS = "run-history-card-score"
+BADGE_CLASS = "run-history-card-badge"
 RESULT_CLASS = "run-history-card-result"
 SESSION_CLASS = "run-history-card-session"
 EMPTY_TITLE_CLASS = "run-history-card-empty-title"
@@ -467,11 +468,15 @@ def latest_run_card_content(
         score_row.append(
             dmc.Badge(
                 BADGE_TEXT[shown.badge],
-                color=shown.badge.value,
+                className=BADGE_CLASS,
+                style={
+                    "--run-history-card-badge-color": (
+                        f"var(--mantine-color-{shown.badge.value}-6)"
+                    )
+                },
                 # The app's sentence case, where the badge's own style would
                 # print capitals.
                 tt="none",
-                variant="light",
             )
         )
     return CardContent(

@@ -550,6 +550,15 @@ a.run-toast-link {
     color: var(--mantine-color-text);
 }
 
+/* The light variant's colored text fails contrast on its pale tint in light
+   mode. Mirror the rank badge's page text, tint, and border in both themes;
+   two classes outrank Mantine's badge rule. */
+.run-history-card .run-history-card-badge {
+    background: color-mix(in srgb, var(--run-history-card-badge-color) 20%, transparent);
+    border: 1px solid var(--run-history-card-badge-color);
+    color: var(--mantine-color-text);
+}
+
 /* The next rank's color, before its threshold. */
 .pb-card-rank-dot {
     background: var(--pb-card-rank-color);

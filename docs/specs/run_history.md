@@ -351,7 +351,9 @@ it is saved is in [2026-10-18][note-store].
   the run was judged. Otherwise a judged run shows "Threshold passed" or
   "Below threshold", and a run nothing judges shows no badge
   ([2026-10-12][check]).
-  The badges are yellow, green, and gray in that order.
+  The badges are yellow, green, and gray in that order, drawn as the PB
+  card's rank badge is: the page's text on a 20% tint of the badge's color,
+  with a 1px solid border in that color, so each reads in both themes.
 - The second line compares the run with the PB it was chasing, then gives
   its accuracy to two decimals ([2026-10-18][accuracy]):
   `{pct}% of PB · Accuracy {accuracy}%`,
