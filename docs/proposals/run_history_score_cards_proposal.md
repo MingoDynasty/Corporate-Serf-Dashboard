@@ -25,7 +25,8 @@ The first review wave, on 2026-10-25, endorsed SC2 and SC4 and amended SC1
 and SC3; each row's status line says how.
 Two more changes from the same discussion go elsewhere
 ([Out of scope](#out-of-scope)): the verdict badges' contrast in light mode,
-a defect fix in its own pull request, and the typical score's rank on the
+a defect fix that shipped in its own pull request (#429), and the typical
+score's rank on the
 Typical score card, which gets a proposal of its own.
 
 ### SC1. The latest run is compared with the typical score at session start
@@ -480,7 +481,9 @@ changes it with the others.
 
 - **The verdict badges' contrast** in light mode (`New PB` 1.75:1, `Threshold
   passed` 2.17:1, `Below threshold` 3.01:1, against 4.5:1 needed). A defect
-  with a settled fix, in its own pull request from its own kickoff.
+  with a settled fix, shipped in its own pull request,
+  [#429](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/429):
+  the badges now draw as the PB card's rank badge does.
 - **The typical score's rank on the Typical score card,** as a badge like the
   PB's. It gets a proposal of its own.
 - **The typical comparison anywhere else:** the run list, the run toast, the
@@ -495,9 +498,9 @@ changes it with the others.
 Stated intent, not a contract; a PR that moves a boundary says so in its
 description.
 
-- **Already split out: the badge contrast fix.** Independent of everything
-  here. Where it and PR 1 both touch the card's badge, whichever merges second
-  rebases.
+- **Already shipped: the badge contrast fix,**
+  [#429](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/429).
+  PR 1 starts from it.
 - **PR 1, gated on SC2, SC3 and SC4:** the Latest Run card's first line, its
   session and last lines, the readable grey on the quiet lines, and the
   three cards lined up from the top; the card's new minimum height measured;
