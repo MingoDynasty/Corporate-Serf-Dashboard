@@ -4,10 +4,11 @@ Run History charts one scenario's runs and typical score beside a session
 list, with point tooltips naming each run's session, hover linking each chart
 run to one list row and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
-by adjacent cards for its typical score, personal best and latest run. The
-page receives new runs without a reload and can follow the scenario just
-played. Checks mark runs that met their score threshold and stars mark new
-personal bests on runs and their groups, each judged when the run was played.
+by adjacent cards for its typical score, personal best and latest run, with
+badges readable in both themes. The page receives new runs without a reload
+and can follow the scenario just played. Checks mark runs that met their
+score threshold and stars mark new personal bests on runs and their groups,
+each judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -351,7 +352,9 @@ it is saved is in [2026-10-18][note-store].
   the run was judged. Otherwise a judged run shows "Threshold passed" or
   "Below threshold", and a run nothing judges shows no badge
   ([2026-10-12][check]).
-  The badges are yellow, green, and gray in that order.
+  The badges are yellow, green, and gray in that order, drawn as the PB
+  card's rank badge is: the page's text on a 20% tint of the badge's color,
+  with a 1px solid border in that color, so each reads in both themes.
 - The second line compares the run with the PB it was chasing, then gives
   its accuracy to two decimals ([2026-10-18][accuracy]):
   `{pct}% of PB · Accuracy {accuracy}%`,
