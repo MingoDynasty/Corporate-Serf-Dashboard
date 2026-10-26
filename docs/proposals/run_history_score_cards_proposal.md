@@ -16,13 +16,15 @@ holds.
 
 ## Decisions needed
 
-Four rows, SC1 to SC4. **Nothing is ratified.** Each row carries the
-maintainer's lean from the design discussion of 2026-10-24 and 2026-10-25,
-worked out on three versions of a mockup built from their own stats, with
-today's cards behind a switch. A lean is not a ruling, and reviewers may
-challenge any row, and anything in [Design](#design), which is author-owned.
-The first review wave, on 2026-10-25, endorsed SC2 and SC4 and amended SC1
-and SC3; each row's status line says how.
+Four rulings: SC1 to SC4. The maintainer ratified this proposal on
+2026-10-25 at `c77ad06`: "I ratify the proposal on PR #430 at c77ad06." That
+settles each row as its recommendation, SC1 and SC3 as amended in review.
+Before that, each row was the maintainer's lean from the design discussion
+of 2026-10-24 and 2026-10-25, worked out on three versions of a mockup built
+from their own stats, with today's cards behind a switch. The first review
+wave, on 2026-10-25, endorsed SC2 and SC4 and amended SC1 and SC3; each
+row's status line keeps what was said, for the record. Everything else is
+author-owned, in [Design](#design), and the ratification covers it too.
 Two more changes from the same discussion go elsewhere
 ([Out of scope](#out-of-scope)): the verdict badges' contrast in light mode,
 a defect fix that shipped in its own pull request (#429), and the typical
@@ -31,9 +33,9 @@ Typical score card, which gets a proposal of its own.
 
 ### SC1. The latest run is compared with the typical score at session start
 
-Status: open; amended after the first review wave, awaiting reviewer
-confirmation. The maintainer's lean, 2026-10-24: "Use the typical score at
-session start for the comparison." The author had recommended the Typical
+Status: Ratified (user), 2026-10-25: accept the recommendation below, as
+amended in review. The maintainer's lean before that, 2026-10-24: "Use the
+typical score at session start for the comparison." The author had recommended the Typical
 score card's own value; see [Alternatives rejected](#alternatives-rejected).
 The wave kept the basis and the evidence bar, and asked that the basis be
 named on screen and an old value be marked on the card, not only in the
@@ -116,7 +118,8 @@ alone.**
 
 ### SC2. The card's first line drops the scenario's name
 
-Status: open. The maintainer's lean, 2026-10-25: "Keep changes 2 to 5 as
+Status: Ratified (user), 2026-10-25: accept the recommendation below. The
+maintainer's lean before that, 2026-10-25: "Keep changes 2 to 5 as
 proposed: no scenario name, the rebalanced lines, top-aligned cards, and
 readable badges."
 
@@ -148,9 +151,9 @@ only.**
 
 ### SC3. One comparison line, one session line, then cm/360 and accuracy
 
-Status: open; amended after the first review wave, awaiting reviewer
-confirmation. The maintainer's lean, 2026-10-25, as quoted under SC2. The
-wave asked that the quiet lines stay readable.
+Status: Ratified (user), 2026-10-25: accept the recommendation below, as
+amended in review. The maintainer's lean before that, 2026-10-25, as quoted
+under SC2. The wave asked that the quiet lines stay readable.
 
 The material consequence: the card shows the run's sensitivity, and accuracy
 moves from the comparison line to a quiet last line, in a grey that stays
@@ -188,8 +191,9 @@ grey, at least 4.5:1 in both themes.**
 
 ### SC4. The three score cards line up from the top
 
-Status: open. The maintainer's lean, 2026-10-25, as quoted under SC2. The
-wave endorsed the row and corrected its narrow floor.
+Status: Ratified (user), 2026-10-25: accept the recommendation below. The
+maintainer's lean before that, 2026-10-25, as quoted under SC2. The wave
+endorsed the row and corrected its narrow floor.
 
 The material consequence: a card with fewer lines leaves its spare room at
 its bottom instead of above and below its lines, and in the narrow layout the
