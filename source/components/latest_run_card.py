@@ -2,8 +2,9 @@
 
 ``latest_run`` works out, from a copy of the run store, the selected
 scenario's latest run and what the card says about it: when it was played,
-its score, its verdict, how it measured up against the PB it was chasing, and
-where it sits in its session. The rest of the module draws that in the card.
+its score, its verdict, how it measured up against the PB it was chasing,
+where it sits in its session, and its sensitivity and accuracy. The rest of
+the module draws that in the card.
 
 The card is worked out from the run store each time, never from the message a
 new run arrives in, so it is right on a page that has just been drawn, with
@@ -45,6 +46,7 @@ from source.kovaaks.play_sessions import (
     split_into_play_sessions,
     split_into_scenario_visits,
 )
+from source.kovaaks.playlist_scenarios_service import personal_best_cm360
 from source.kovaaks.time_scored_service import PaceBasis, get_version_pace_basis
 from source.utilities.utilities import (
     format_elapsed_duration,
@@ -64,18 +66,16 @@ NO_SCENARIO_RUNS_MESSAGE = (
 
 CARD_CLASS = "run-history-card"
 HEADING_CLASS = "run-history-card-heading"
-HEADING_TEXT_CLASS = "run-history-card-heading-text"
-HEADING_LABEL_CLASS = "run-history-card-label"
 # The run's age, with the hover affordance the playlist tables' Last played has.
 TIME_CLASS = "cell-tooltip-affordance"
 TIME_TARGET_CLASS = "run-history-card-time-target"
-SCENARIO_CLASS = "run-history-card-scenario"
 BODY_CLASS = "run-history-card-body"
 SCORE_ROW_CLASS = "run-history-card-score-row"
 SCORE_CLASS = "run-history-card-score"
 BADGE_CLASS = "run-history-card-badge"
 RESULT_CLASS = "run-history-card-result"
-SESSION_CLASS = "run-history-card-session"
+# The lines under the comparison, which support the score.
+QUIET_CLASS = "run-history-card-quiet"
 EMPTY_TITLE_CLASS = "run-history-card-empty-title"
 EMPTY_MESSAGE_CLASS = "run-history-card-empty-message"
 
@@ -123,18 +123,19 @@ class LatestRun:
 
     ``run_id`` is the run's id as the run list keys its row and a run event
     names it. ``played_at`` is when the run ended, as the run's file names it,
-    which the browser words as an age. ``result`` is the card's second line,
-    ``session`` its third and ``time_on_scenario`` its fourth.
+    which the browser words as an age. Under the score, ``comparison`` is the
+    run against the PB it was chasing, or ``None`` with nothing to compare it
+    with; ``session`` is its number in its session and the time on its
+    scenario; ``sensitivity_and_accuracy`` is the last line.
     """
 
     run_id: str
-    scenario: str
     played_at: datetime
     score: str
     badge: CardBadge | None
-    result: str
+    comparison: str | None
     session: str
-    time_on_scenario: str
+    sensitivity_and_accuracy: str
 
 
 def _badge(verdict: ThresholdVerdict | Unjudged, is_new_pb: bool) -> CardBadge | None:
@@ -200,9 +201,7 @@ def _which_session(
     return "last session"
 
 
-def _session_lines(
-    session: PlaySession, scenario: str, which_session: str
-) -> tuple[str, str]:
+def _session_line(session: PlaySession, scenario: str, which_session: str) -> str:
     """Word the run's number in its session, then the time spent on its scenario.
 
     The run is its scenario's last in the session, so its number is how many
@@ -223,9 +222,24 @@ def _session_lines(
     number = sum(len(visit.runs) for visit in visits)
     run_line = f"Run {number} {which_session}"
     if any(visit.runs[0].run_start is None for visit in visits):
-        return run_line, "Time on this scenario unknown"
+        return f"{run_line} · Time on this scenario unknown"
     seconds = sum((visit.end - visit.start).total_seconds() for visit in visits)
-    return run_line, f"{format_elapsed_duration(seconds)} on this scenario"
+    return f"{run_line} · {format_elapsed_duration(seconds)} on this scenario"
+
+
+def sensitivity_and_accuracy(run: RunData) -> str:
+    """Word a run's sensitivity and its hit accuracy: the last line of the PB card and this one.
+
+    The sensitivity is the scenario table's PB cm/360, formatted as that
+    column formats it, and left out where the run's is unknown. The accuracy
+    is the hit accuracy, as the table's PB Accuracy and the run list show a
+    run's.
+    """
+    accuracy = f"Accuracy {format_percent(run.accuracy)}"
+    cm360 = personal_best_cm360(run)
+    if cm360 is None:
+        return accuracy
+    return f"{format_score(cm360)} cm/360 · {accuracy}"
 
 
 def latest_run(
@@ -279,20 +293,16 @@ def latest_run(
     )
     is_new_pb = run in new_high_score_runs(scenario_runs)
 
-    accuracy = f"Accuracy {format_percent(run.accuracy)}"
-    comparison = _comparison(run.score, chased, verdict, is_new_pb)
-    session_line, time_line = _session_lines(
-        session, scenario, _which_session(sessions, session, now)
-    )
     return LatestRun(
         run_id=run_id(run),
-        scenario=scenario,
         played_at=run.datetime_object,
         score=format_score(run.score),
         badge=_badge(verdict, is_new_pb),
-        result=accuracy if comparison is None else f"{comparison} · {accuracy}",
-        session=session_line,
-        time_on_scenario=time_line,
+        comparison=_comparison(run.score, chased, verdict, is_new_pb),
+        session=_session_line(
+            session, scenario, _which_session(sessions, session, now)
+        ),
+        sensitivity_and_accuracy=sensitivity_and_accuracy(run),
     )
 
 
@@ -342,9 +352,8 @@ class LatestRunCardIds(NamedTuple):
 
     ``played_at`` is a store holding when the run ended, in epoch seconds, or
     nothing with no run. A script on the page words it into ``label``, the
-    first line's words between ``Latest run`` and the scenario's name, hidden
-    with no run: ``time`` is the run's age in it and ``time_tooltip`` the
-    age's hover. ``heading`` holds the run's scenario's name, and ``body``
+    first line's words after ``Latest run``, hidden with no run: ``time`` is
+    the run's age in it and ``time_tooltip`` the age's hover. ``body`` holds
     the lines under the first, or the card's empty state.
     """
 
@@ -352,7 +361,6 @@ class LatestRunCardIds(NamedTuple):
     label: str
     time: str
     time_tooltip: str
-    heading: str
     body: str
 
 
@@ -360,7 +368,6 @@ class CardContent(NamedTuple):
     """What a page writes to its card, one field per prop it writes."""
 
     played_at: float | None
-    heading: html.Span | None
     body: list[Any]
 
 
@@ -377,48 +384,36 @@ def latest_run_card(ids: LatestRunCardIds) -> dmc.Paper:
         className=CARD_CLASS,
         children=[
             dcc.Store(id=ids.played_at),
+            # Not a flex container, as the PB card's first line is not: that
+            # would drop the space before the age and hand a screen reader the
+            # words run together. The card's name stays with no run, as the PB
+            # card's does, and only the words that hold the age are hidden.
             html.Div(
                 className=HEADING_CLASS,
                 children=[
-                    # One item of the heading, with the age inline in it. The
-                    # heading is a flex container, which drops a space between
-                    # its items, and a screen reader would be handed the words
-                    # on either side of the age run together. The card's name
-                    # stays with no run, as the PB card's does, and only the
-                    # words that hold the age are hidden.
+                    LATEST_RUN_LABEL,
                     html.Span(
                         [
-                            LATEST_RUN_LABEL,
-                            html.Span(
-                                [
-                                    " · ",
-                                    dmc.Tooltip(
-                                        dmc.Text(
-                                            className=TIME_CLASS,
-                                            id=ids.time,
-                                            inherit=True,
-                                            span=True,
-                                            tabIndex=0,
-                                        ),
-                                        # dmc wraps the tooltip's target in a
-                                        # block box, which would break the
-                                        # line round it.
-                                        boxWrapperProps={
-                                            "className": TIME_TARGET_CLASS
-                                        },
-                                        events=TOOLTIP_EVENTS,
-                                        id=ids.time_tooltip,
-                                        label="",
-                                    ),
-                                    " · ",
-                                ],
-                                hidden=True,
-                                id=ids.label,
+                            " · ",
+                            dmc.Tooltip(
+                                dmc.Text(
+                                    className=TIME_CLASS,
+                                    id=ids.time,
+                                    inherit=True,
+                                    span=True,
+                                    tabIndex=0,
+                                ),
+                                # dmc wraps the tooltip's target in a block
+                                # box, which would break the line round it.
+                                boxWrapperProps={"className": TIME_TARGET_CLASS},
+                                events=TOOLTIP_EVENTS,
+                                id=ids.time_tooltip,
+                                label="",
                             ),
                         ],
-                        className=HEADING_LABEL_CLASS,
+                        hidden=True,
+                        id=ids.label,
                     ),
-                    html.Span(id=ids.heading, className=HEADING_TEXT_CLASS),
                 ],
             ),
             html.Div(id=ids.body, className=BODY_CLASS),
@@ -458,9 +453,7 @@ def latest_run_card_content(
     """
     if shown is None:
         return CardContent(
-            played_at=None,
-            heading=None,
-            body=_empty_body(selected_scenario, store_has_runs),
+            played_at=None, body=_empty_body(selected_scenario, store_has_runs)
         )
 
     score_row: list[Any] = [html.Span(shown.score, className=SCORE_CLASS)]
@@ -479,16 +472,9 @@ def latest_run_card_content(
                 tt="none",
             )
         )
-    return CardContent(
-        played_at=shown.played_at.timestamp(),
-        # The title gives the whole name where the card cuts it short.
-        heading=html.Span(
-            shown.scenario, className=SCENARIO_CLASS, title=shown.scenario
-        ),
-        body=[
-            html.Div(score_row, className=SCORE_ROW_CLASS),
-            html.Div(shown.result, className=RESULT_CLASS),
-            html.Div(shown.session, className=SESSION_CLASS),
-            html.Div(shown.time_on_scenario, className=SESSION_CLASS),
-        ],
-    )
+    body: list[Any] = [html.Div(score_row, className=SCORE_ROW_CLASS)]
+    if shown.comparison is not None:
+        body.append(html.Div(shown.comparison, className=RESULT_CLASS))
+    body.append(html.Div(shown.session, className=QUIET_CLASS))
+    body.append(html.Div(shown.sensitivity_and_accuracy, className=QUIET_CLASS))
+    return CardContent(played_at=shown.played_at.timestamp(), body=body)

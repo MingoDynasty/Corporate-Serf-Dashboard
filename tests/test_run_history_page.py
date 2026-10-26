@@ -1606,13 +1606,34 @@ def test_card_frames_keep_the_existing_color():
     assert "border-color: var(--mantine-color-default-border);" in frame
 
 
-def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
-    """135px holds the card's tallest state, so its height never follows a run.
+SCORE_CARDS = (".scenario-stats-card", ".pb-card", ".run-history-card")
 
-    The tallest state is the second line on two lines in a narrow card, over
-    the third and fourth lines, measured at 135px in Edge and Firefox. A
-    minimum and not a height: the card is as tall as the row, which the PB
-    card makes taller in its setup state, with no KovaaK's username.
+
+@pytest.mark.parametrize("selector", SCORE_CARDS)
+def test_the_three_score_cards_start_their_lines_12px_from_the_top_2px_apart(
+    selector,
+):
+    """Their first lines then share one top and their scores another, in every state.
+
+    Centered, where each score sat followed how many lines its card held:
+    11 to 23px apart on the maintainer's stats. Nothing pads the bottom,
+    where a card with fewer lines leaves its spare room, so the row keeps
+    the height the dropdowns' column sets.
+    """
+    card = _css_block(STYLESHEET.read_text(encoding="utf-8"), selector)
+
+    assert "padding: 12px var(--mantine-spacing-sm) 0;" in card
+    assert "gap: 2px;" in card
+    assert "flex-direction: column;" in card
+    assert "justify-content" not in card
+
+
+def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
+    """In the wide layout every line fits on one, and the row holds every state.
+
+    A minimum and not a height: the card is as tall as the row, which the PB
+    card makes taller in its setup state, with no KovaaK's username. A higher
+    minimum here would raise the whole row.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".run-history-card")
@@ -1621,18 +1642,33 @@ def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
     assert re.search(r"(?m)^    height:", card) is None
     assert "min-width: 0;" in card
     assert "overflow: hidden;" in card
-    assert "justify-content: center;" in card
 
 
-def test_the_stats_card_is_270px_and_adds_only_its_border_to_the_height():
-    """Category fits beside the PB card without padding raising the row."""
+def test_in_the_narrow_layout_the_cards_floor_holds_its_tallest_state():
+    """At its 380px minimum width the session line can take two lines.
+
+    The tallest state is a comparison on one line over an older year's
+    session with a two-digit run number and an unknown time, on two, with
+    12px kept under the last line, measured in Edge and Firefox. Set under
+    the page's container query alone, so the wide row keeps its height.
+    """
+    narrow = _container_block(
+        STYLESHEET.read_text(encoding="utf-8"), "run-history-page (max-width: 900px)"
+    )
+    card = re.search(r"(?m)^    \.run-history-card \{(.*?)^    \}", narrow, re.DOTALL)
+
+    assert card is not None
+    assert "flex: 1 1 380px;" in card.group(1)
+    assert "min-height: 158px;" in card.group(1)
+
+
+def test_the_stats_card_is_270px_and_its_lines_fit_the_row():
+    """Category fits beside the PB card without the card raising the row."""
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".scenario-stats-card")
 
     assert "width: 270px;" in card
-    assert "padding: 0 var(--mantine-spacing-sm);" in card
     assert "flex: 0 0 auto;" in card
-    assert "justify-content: center;" in card
     heading = _css_block(css, ".scenario-stats-card > .scenario-stats-heading")
     assert "font-size: 12px;" in heading
     assert "line-height: 18px;" in heading
@@ -1642,8 +1678,8 @@ def test_the_stats_card_is_270px_and_adds_only_its_border_to_the_height():
 def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     """Keep the PB beside the latest run, after Scenario Stats in their wrapper.
 
-    Its frame adds only its border to its height, so the row stays the height
-    the dropdowns' column sets in every state that changes between runs.
+    Nothing pads its bottom, so the row stays the height the dropdowns'
+    column sets in every state that changes between runs.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     card = _css_block(css, ".pb-card")
@@ -1651,8 +1687,6 @@ def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     assert "flex: 0 0 300px;" in card
     assert "width: 300px;" in card
     assert "margin-left" not in card
-    assert "padding: 0 var(--mantine-spacing-sm);" in card
-    assert "justify-content: center;" in card
     assert "max-width: 100%;" in card
     # The age stays in its line: not a flex container, which drops spaces.
     assert "display" not in _css_block(css, ".pb-card-heading")
@@ -1667,8 +1701,8 @@ def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     assert "white-space: pre;" in word_end
 
 
-def test_the_pb_cards_quiet_lines_and_its_badge_use_the_themes_tokens():
-    """The rank colors from the benchmark files are the only fixed colors."""
+def test_the_pb_cards_badge_and_first_line_use_the_themes_tokens():
+    """The rank colors from the benchmark files are the only colors of its own."""
     css = STYLESHEET.read_text(encoding="utf-8")
     badge = _css_block(css, ".pb-card .pb-card-rank-badge")
 
@@ -1681,14 +1715,40 @@ def test_the_pb_cards_quiet_lines_and_its_badge_use_the_themes_tokens():
     assert "background: var(--pb-card-rank-color);" in _css_block(
         css, ".pb-card-rank-dot"
     )
-    for quiet in (".pb-card-heading", ".pb-card-faded"):
-        assert "color: var(--mantine-color-dimmed);" in _css_block(css, quiet)
+    assert "color: var(--mantine-color-dimmed);" in _css_block(css, ".pb-card-heading")
     # With no PB the faded line is empty and out of the card.
     assert "display: none;" in _css_block(css, ".pb-card-faded:empty")
     # Its hidden attribute takes the leaderboard line out with no local PB,
     # which the line's own display would otherwise undo.
     assert "display: flex;" in _css_block(css, ".pb-card-leaderboard")
     assert "display: none;" in _css_block(css, ".pb-card-leaderboard[hidden]")
+
+
+@pytest.mark.parametrize("quiet", [".run-history-card-quiet", ".pb-card-faded"])
+def test_the_quiet_lines_take_the_scenario_tables_readable_grey(quiet):
+    """The cards' dimmed grey is under 4.5:1 at 12px; the table's clears it in both themes.
+
+    The latest-run card's session and last lines, and the PB card's last
+    line, so the two cards' last lines read alike. The first lines keep the
+    dimmed grey.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    dark = re.search(
+        r'(?m)^\[data-mantine-color-scheme="dark"\] \.run-history-card-quiet,\n'
+        r'\[data-mantine-color-scheme="dark"\] \.pb-card-faded \{(.*?)^\}',
+        css,
+        re.DOTALL,
+    )
+
+    rule = _css_block(css, quiet)
+    assert "color: #676d75;" in rule
+    assert "font-size: 12px;" in rule
+    assert dark is not None
+    assert "color: #a6a6a6;" in dark.group(1)
+    # The values the scenario table measured, still there.
+    assert "color: #676d75;" in _css_block(
+        css, ".playlist-scenarios-grid .ag-cell.typical-not-recent"
+    )
 
 
 def test_the_latest_run_badge_uses_page_text_on_a_bordered_tint():
@@ -1703,20 +1763,23 @@ def test_the_latest_run_badge_uses_page_text_on_a_bordered_tint():
     )
 
 
-def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
+def test_the_cards_first_line_keeps_its_spaces_and_the_dimmed_grey():
+    """``Latest run · {age}``, drawn as the PB card's first line is."""
     css = STYLESHEET.read_text(encoding="utf-8")
-    label = _css_block(css, ".run-history-card-label")
-    scenario = _css_block(css, ".run-history-card-scenario")
+    heading = _css_block(css, ".run-history-card-heading")
 
-    assert "display: flex;" in _css_block(css, ".run-history-card-heading")
-    # The label is kept whole, with the space it ends on.
-    assert "flex: 0 0 auto;" in label
-    assert "white-space: pre;" in label
-    # The run's age stays in the label's line, though dmc wraps it in a box.
+    # Not a flex container, which would drop the space before the age.
+    assert "display" not in heading
+    assert "color: var(--mantine-color-dimmed);" in heading
+    # The run's age stays in the line, though dmc wraps it in a box.
     assert "display: inline;" in _css_block(css, ".run-history-card-time-target")
-    assert "min-width: 0;" in scenario
-    assert "text-overflow: ellipsis;" in scenario
-    assert "white-space: nowrap;" in scenario
+    for gone in (
+        ".run-history-card-label",
+        ".run-history-card-scenario",
+        ".run-history-card-heading-text",
+        ".run-history-card-session",
+    ):
+        assert f"\n{gone} {{" not in css
 
 
 # --- The latest-run card ---------------------------------------------------------------
@@ -1735,8 +1798,8 @@ def test_the_card_is_written_by_these_five_inputs_and_on_load():
     card = run_history.LATEST_RUN_CARD_IDS
 
     assert registration["output"] == (
-        f"..{card.played_at}.data...{card.heading}.children"
-        f"...{card.body}.children...{run_history.LATEST_RUN_STORE_ID}.data.."
+        f"..{card.played_at}.data...{card.body}.children"
+        f"...{run_history.LATEST_RUN_STORE_ID}.data.."
     )
     assert _keys(registration["inputs"]) == [
         f"{run_history.RUN_LANDED_STORE_ID}.data",
@@ -1813,13 +1876,12 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     asked = []
     shown = latest_run_card.LatestRun(
         run_id="selected.csv",
-        scenario=SCENARIO,
         played_at=datetime(2026, 10, 12, 22, 49),
         score="812.4",
         badge=None,
-        result="Accuracy 55.00%",
-        session="Run 1 this session",
-        time_on_scenario="4 min on this scenario",
+        comparison=None,
+        session="Run 1 this session · 4 min on this scenario",
+        sensitivity_and_accuracy="50 cm/360 · Accuracy 55.00%",
     )
 
     def from_store(*arguments):
@@ -1836,14 +1898,12 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     # The batch only calls it: nothing of the run is read from the store that
     # names it.
     assert asked == [(SCENARIO, 95, datetime(2026, 10, 12, 22, 50))]
-    played_at, heading, body, latest_run_id = answer
+    played_at, body, latest_run_id = answer
     assert played_at == datetime(2026, 10, 12, 22, 49).timestamp()
-    assert rendered_text(heading) == SCENARIO
     assert [rendered_text(line) for line in body] == [
         "812.4",
-        "Accuracy 55.00%",
-        "Run 1 this session",
-        "4 min on this scenario",
+        "Run 1 this session · 4 min on this scenario",
+        "50 cm/360 · Accuracy 55.00%",
     ]
     # The card and ring identify the same selected-scenario run.
     assert latest_run_id == "selected.csv"
@@ -1891,12 +1951,11 @@ def test_with_no_run_to_report_the_card_says_why(
         lambda *_arguments: latest_run_card.StoreRuns(None, newest_run_id),
     )
 
-    played_at, heading, body, _latest_run_id = run_history.show_latest_run(
+    played_at, body, _latest_run_id = run_history.show_latest_run(
         None, selected, 95, False, "2026-10-12", None
     )
 
     assert played_at is None
-    assert heading is None
     assert [rendered_text(line) for line in body] == said
 
 
@@ -1932,14 +1991,14 @@ class _Store:
 def _card_at(monkeypatch, moment: datetime, selected, held_latest_run=None):
     """Call the card's callback as the page does at ``moment``.
 
-    Returns what a reader sees in the card, the first line's scenario then
-    every line under it, and the ring store's write.
+    Returns what a reader sees in the card, every line under its first, and
+    the ring store's write.
     """
     monkeypatch.setattr(run_history, "datetime", _clock_at(*moment.timetuple()[:6]))
-    _played_at, heading, body, latest_run_id = run_history.show_latest_run(
+    _played_at, body, latest_run_id = run_history.show_latest_run(
         None, selected, 95, True, moment.date().isoformat(), held_latest_run
     )
-    return rendered_text(heading), [rendered_text(line) for line in body], latest_run_id
+    return [rendered_text(line) for line in body], latest_run_id
 
 
 B_SCENARIO = "Scenario B"
@@ -1957,12 +2016,12 @@ def test_a_change_of_scenario_rewrites_the_card_for_the_new_one(monkeypatch):
     on_a = _card_at(monkeypatch, now, SCENARIO)
     on_b = _card_at(monkeypatch, now, B_SCENARIO)
 
-    assert on_a[:2] == (
-        SCENARIO,
-        ["80", "Accuracy 50.00%", "Run 1 this session", "1 min on this scenario"],
-    )
-    assert on_b[0] == B_SCENARIO
-    assert on_b[1][0] == "612.5"
+    assert on_a[0] == [
+        "80",
+        "Run 1 this session · 1 min on this scenario",
+        "40.8 cm/360 · Accuracy 50.00%",
+    ]
+    assert on_b[0][0] == "612.5"
 
 
 def test_with_follow_off_a_run_on_another_scenario_keeps_the_ring_and_card(
@@ -1978,16 +2037,16 @@ def test_with_follow_off_a_run_on_another_scenario_keeps_the_ring_and_card(
         monkeypatch,
         EVENING + timedelta(minutes=6),
         SCENARIO,
-        held_latest_run=before[2],
+        held_latest_run=before[1],
     )
 
-    assert after[:2] == before[:2]
-    assert after[2] is no_update
-    assert before[2] == run_history_list.run_id(store.runs[0])
+    assert after[0] == before[0]
+    assert after[1] is no_update
+    assert before[1] == run_history_list.run_id(store.runs[0])
 
 
 def test_a_run_that_starts_a_new_session_names_the_old_one(monkeypatch):
-    """With Follow off, a run on another scenario can change the third line's words."""
+    """With Follow off, a run on another scenario can change the session line's words."""
     a_run = _record(SCENARIO, EVENING, score=80.0)
     store = _Store(monkeypatch, a_run)
     an_hour_on = EVENING + timedelta(hours=1)
@@ -1996,8 +2055,8 @@ def test_a_run_that_starts_a_new_session_names_the_old_one(monkeypatch):
     store.runs.append(_record(B_SCENARIO, an_hour_on))
     named = _card_at(monkeypatch, an_hour_on + timedelta(minutes=1), SCENARIO)
 
-    assert ended[1][2] == "Run 1 last session"
-    assert named[1][2] == "Run 1 (Oct 12, 8:59 PM session)"
+    assert ended[0][1] == "Run 1 last session · 1 min on this scenario"
+    assert named[0][1] == "Run 1 (Oct 12, 8:59 PM session) · 1 min on this scenario"
 
 
 def test_the_date_moving_into_a_new_year_puts_the_year_in_an_older_sessions_name(
@@ -2013,8 +2072,10 @@ def test_the_date_moving_into_a_new_year_puts_the_year_in_an_older_sessions_name
     before = _card_at(monkeypatch, datetime(2026, 12, 31, 23, 59), SCENARIO)
     after = _card_at(monkeypatch, datetime(2027, 1, 1, 0, 0), SCENARIO)
 
-    assert before[1][2] == "Run 1 (Dec 30, 9:00 PM session)"
-    assert after[1][2] == "Run 1 (Dec 30, 2026, 9:00 PM session)"
+    assert before[0][1] == "Run 1 (Dec 30, 9:00 PM session) · 1 min on this scenario"
+    assert (
+        after[0][1] == "Run 1 (Dec 30, 2026, 9:00 PM session) · 1 min on this scenario"
+    )
     assert f"{run_history.TODAY_STORE_ID}.data" in _keys(_card_registration()["inputs"])
 
 
@@ -2083,10 +2144,9 @@ def test_with_follow_on_a_first_run_into_an_empty_store_shows_in_the_card(
     """Its scenario is selected as it lands, so the card reports it."""
     before, after, now_selected = _first_run_lands(monkeypatch, True, selected)
 
-    assert before[1][0] == "No runs yet"
+    assert before[0][0] == "No runs yet"
     assert now_selected == B_SCENARIO
-    assert after[0] == B_SCENARIO
-    assert after[1][0] == "612.5"
+    assert after[0][0] == "612.5"
 
 
 @pytest.mark.parametrize(
@@ -2115,11 +2175,11 @@ def test_with_follow_off_a_first_run_into_an_empty_store_leaves_the_selection(
 ):
     before, after, now_selected = _first_run_lands(monkeypatch, False, selected)
 
-    assert before[1] == ["No runs yet", before_message]
+    assert before[0] == ["No runs yet", before_message]
     assert now_selected == selected
-    assert after[1] == after_lines
+    assert after[0] == after_lines
     # The ring's store still moves to the run.
-    assert after[2] is not None
+    assert after[1] is not None
 
 
 def test_the_card_starts_empty_and_the_page_load_fills_it():
@@ -2127,7 +2187,6 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
     page = run_history.layout()
     card = run_history.LATEST_RUN_CARD_IDS
 
-    assert _by_id(page, card.heading).children is None
     assert _by_id(page, card.body).children is None
     assert _by_id(page, card.body).children is None
 
@@ -2169,7 +2228,7 @@ def test_the_selected_run_id_is_written_only_when_it_changes(
     )
     held = None if held_index is None else run_history_list.run_id(runs[held_index])
 
-    written = _card_at(monkeypatch, EVENING + timedelta(minutes=6), selected, held)[2]
+    written = _card_at(monkeypatch, EVENING + timedelta(minutes=6), selected, held)[1]
 
     assert written == (no_update if expected == held else expected)
 
@@ -2281,7 +2340,7 @@ def test_the_card_list_and_chart_identify_the_selected_scenarios_latest_run(
     now = EVENING + timedelta(minutes=6)
     expected = runs[1] if selected == SCENARIO else runs[2]
     expected_id = run_history_list.run_id(expected)
-    _heading, body, highlighted = _card_at(monkeypatch, now, selected)
+    body, highlighted = _card_at(monkeypatch, now, selected)
 
     assert highlighted == expected_id
     for view in (run_history_list.VIEW_SCENARIO, run_history_list.VIEW_ALL):
@@ -2333,7 +2392,7 @@ def test_no_selected_run_means_no_highlight_even_with_runs_on_other_scenarios(
     )
 
     assert (
-        _card_at(monkeypatch, EVENING, selected, held_latest_run="old.csv")[2] is None
+        _card_at(monkeypatch, EVENING, selected, held_latest_run="old.csv")[1] is None
     )
     for view in (run_history_list.VIEW_SCENARIO, run_history_list.VIEW_ALL):
         model = run_history_list.run_list_from_store(view, selected, 30, 95, EVENING)
@@ -2352,7 +2411,7 @@ def test_a_chart_range_excluding_the_latest_run_keeps_the_card_and_list_on_it(
     monkeypatch.setattr(
         run_history_list, "get_version_pace_basis", lambda *_arguments: None
     )
-    highlighted = _card_at(monkeypatch, EVENING, SCENARIO)[2]
+    highlighted = _card_at(monkeypatch, EVENING, SCENARIO)[1]
     model = run_history_list.run_list_from_store(
         run_history_list.VIEW_SCENARIO, SCENARIO, 30, 95, EVENING
     )

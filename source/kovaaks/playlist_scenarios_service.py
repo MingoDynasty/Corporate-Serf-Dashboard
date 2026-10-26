@@ -556,7 +556,7 @@ def _get_personal_best_run(scenario_name: str) -> RunData | None:
 
 
 def personal_best_cm360(run_data: RunData | None) -> float | None:
-    """Return a PB run's sensitivity in cm/360, as the PB cm/360 column shows it.
+    """Return a run's sensitivity in cm/360, as the PB cm/360 column shows a PB run's.
 
     A run's sensitivity is cm/360 either natively or by the parser's
     conversion from the file's own increment and DPI. It stays unknown only

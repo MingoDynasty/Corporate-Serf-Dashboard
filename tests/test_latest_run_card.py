@@ -6,6 +6,7 @@ is ``tests/test_run_history_page.py``.
 """
 
 import re
+from dataclasses import replace
 from datetime import datetime, timedelta
 
 import dash
@@ -15,7 +16,7 @@ from dash import dcc, html
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source import app_shell  # noqa: E402
-from source.components import latest_run_card  # noqa: E402
+from source.components import latest_run_card, pb_card  # noqa: E402
 from source.components.latest_run_card import (  # noqa: E402
     CardBadge,
     LatestRun,
@@ -139,9 +140,9 @@ def test_the_card_reports_the_selected_scenarios_latest_run():
     shown_a = _shown(runs, scenario=A)
     shown_b = _shown(runs, scenario=B)
 
-    assert (shown_a.scenario, shown_a.score) == (A, "80")
+    assert shown_a.score == "80"
     assert shown_a.run_id == run_id(runs[0])
-    assert (shown_b.scenario, shown_b.score) == (B, "612.5")
+    assert shown_b.score == "612.5"
     assert shown_b.run_id == run_id(runs[1])
 
 
@@ -289,14 +290,16 @@ def test_the_badge_agrees_with_the_run_lists_mark_for_the_same_run(percentage):
             assert (badge is CardBadge.THRESHOLD_PASSED) == mark.passed
 
 
-# --- The second line -----------------------------------------------------------
+# --- The comparison line -------------------------------------------------------
 
 
-def test_a_run_shows_its_percentage_of_the_pb_it_was_chasing_and_its_accuracy():
+def test_a_run_shows_its_percentage_of_the_pb_it_was_chasing_and_no_accuracy():
+    """The run's accuracy is on the card's last line, as the PB's is on the PB card."""
     runs = _scored(100.0, 120.0, 96.0, accuracy=0.57)
 
     # Against 120, the PB before it, and not against the first run's 100.
-    assert _shown(runs).result == "80.0% of PB · Accuracy 57.00%"
+    assert _shown(runs).comparison == "80.0% of PB"
+    assert _shown(runs).sensitivity_and_accuracy == "40.8 cm/360 · Accuracy 57.00%"
 
 
 def test_the_percentage_shows_whether_or_not_the_run_was_judged():
@@ -307,20 +310,19 @@ def test_the_percentage_shows_whether_or_not_the_run_was_judged():
         _run(A, EVENING + timedelta(minutes=1), score=96.0, sensitivity=30.0),
     ]
 
-    assert _shown(runs).result == "96.0% of PB · Accuracy 50.00%"
-    assert _shown(runs, percentage=None).result == "96.0% of PB · Accuracy 50.00%"
-    assert _shown(first_at_its_sensitivity).result == "96.0% of PB · Accuracy 50.00%"
+    assert _shown(runs).comparison == "96.0% of PB"
+    assert _shown(runs, percentage=None).comparison == "96.0% of PB"
+    assert _shown(first_at_its_sensitivity).comparison == "96.0% of PB"
 
 
 def test_a_time_scored_run_shows_its_percentage_of_the_pbs_pace():
     # A clock that counts down from 100: 50 took 50 seconds and 40 took 60.
     runs = _scored(50.0, 40.0, scenario_hash=VERSION)
 
-    assert _shown(runs, pace=_pace_of(100.0)).result == (
-        "83.3% of PB pace · Accuracy 50.00%"
-    )
-    assert _shown(runs, percentage=None, pace=_pace_of(100.0)).result == (
-        "83.3% of PB pace · Accuracy 50.00%"
+    assert _shown(runs, pace=_pace_of(100.0)).comparison == "83.3% of PB pace"
+    assert (
+        _shown(runs, percentage=None, pace=_pace_of(100.0)).comparison
+        == "83.3% of PB pace"
     )
 
 
@@ -328,27 +330,24 @@ def test_a_time_scored_pb_of_zero_or_less_still_has_a_percentage_of_pace():
     """Pace needs positive times, and not a positive previous best."""
     runs = _scored(-10.0, -20.0, scenario_hash=VERSION)
 
-    assert _shown(runs, pace=_pace_of(100.0)).result == (
-        "91.7% of PB pace · Accuracy 50.00%"
-    )
+    assert _shown(runs, pace=_pace_of(100.0)).comparison == "91.7% of PB pace"
 
 
 def test_a_new_pb_says_how_far_it_beat_the_previous_best():
     runs = _scored(3000.0, 3324.0)
 
-    assert _shown(runs).result == (
-        "Up 10.8% on your previous best of 3,000 · Accuracy 50.00%"
-    )
+    assert _shown(runs).comparison == "Up 10.8% on your previous best of 3,000"
     # Judged or not, it reads the same.
-    assert _shown(runs, percentage=None).result == _shown(runs).result
+    assert _shown(runs, percentage=None).comparison == _shown(runs).comparison
 
 
 def test_a_new_pb_by_pace_says_how_much_faster_it_finished():
     # 40 took 60 seconds and 50 took 50: a fifth faster.
     runs = _scored(40.0, 50.0, scenario_hash=VERSION)
 
-    assert _shown(runs, pace=_pace_of(100.0)).result == (
-        "20.0% faster than your previous best of 40 · Accuracy 50.00%"
+    assert (
+        _shown(runs, pace=_pace_of(100.0)).comparison
+        == "20.0% faster than your previous best of 40"
     )
 
 
@@ -356,7 +355,7 @@ def test_a_new_pb_by_pace_says_how_much_faster_it_finished():
 def test_a_new_pb_over_a_previous_best_of_zero_or_less_names_it(previous, worded):
     runs = _scored(previous, 12.0)
 
-    assert _shown(runs).result == f"Your previous best was {worded} · Accuracy 50.00%"
+    assert _shown(runs).comparison == f"Your previous best was {worded}"
 
 
 @pytest.mark.parametrize(
@@ -370,9 +369,12 @@ def test_a_new_pb_over_a_previous_best_of_zero_or_less_names_it(previous, worded
         _scored(-5.0, -8.0),
     ],
 )
-def test_a_run_with_no_percentage_shows_its_accuracy_alone(runs):
-    assert _shown(runs).result == "Accuracy 50.00%"
-    assert _shown(runs, percentage=None).result == "Accuracy 50.00%"
+def test_a_run_with_no_percentage_has_no_comparison_line(runs):
+    assert _shown(runs).comparison is None
+    assert _shown(runs, percentage=None).comparison is None
+
+
+# --- The last line -------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -380,7 +382,30 @@ def test_a_run_with_no_percentage_shows_its_accuracy_alone(runs):
     [(107 / 130, "82.31%"), (1 / 32, "3.13%"), (1.0, "100.00%"), (0.0, "0.00%")],
 )
 def test_accuracy_is_shown_to_two_decimals_a_half_rounding_up(accuracy, worded):
-    assert _shown(_scored(100.0, accuracy=accuracy)).result == f"Accuracy {worded}"
+    shown = _shown(_scored(100.0, accuracy=accuracy))
+
+    assert shown.sensitivity_and_accuracy == f"40.8 cm/360 · Accuracy {worded}"
+
+
+@pytest.mark.parametrize(
+    ("sensitivity", "worded"), [(50.0, "50"), (34.64, "34.64"), (1234.5, "1,234.5")]
+)
+def test_the_runs_cm360_is_formatted_as_the_pb_cards(sensitivity, worded):
+    """One function words both cards' last lines, so they read alike."""
+    run = _run(A, EVENING, sensitivity=sensitivity)
+
+    assert _shown([run]).sensitivity_and_accuracy == (
+        f"{worded} cm/360 · Accuracy 50.00%"
+    )
+    assert pb_card.personal_best([run], None, None, lambda _version: None).faded == (
+        _shown([run]).sensitivity_and_accuracy
+    )
+
+
+def test_a_run_whose_cm360_is_unknown_shows_its_accuracy_alone():
+    run = replace(_run(A, EVENING), sens_scale="Valorant", horizontal_sens=0.35)
+
+    assert _shown([run]).sensitivity_and_accuracy == "Accuracy 50.00%"
 
 
 def test_a_miss_is_held_one_tenth_under_its_goal():
@@ -388,27 +413,25 @@ def test_a_miss_is_held_one_tenth_under_its_goal():
     runs = _scored(10000.0, 9498.0)
 
     assert _shown(runs).badge is CardBadge.BELOW_THRESHOLD
-    assert _shown(runs).result == "94.9% of PB · Accuracy 50.00%"
+    assert _shown(runs).comparison == "94.9% of PB"
 
 
 def test_a_run_below_the_pb_never_reads_as_all_of_it():
     """Rounding alone would print a run 0.03% short of the PB as 100.0%."""
     runs = _scored(10000.0, 9997.0)
 
-    assert _shown(runs).result == "99.9% of PB · Accuracy 50.00%"
+    assert _shown(runs).comparison == "99.9% of PB"
     # With nothing judging the run, this is the one cap left: there is no
     # goal to hold a miss under.
-    assert _shown(runs, percentage=None).result == "99.9% of PB · Accuracy 50.00%"
-    assert _shown(_scored(10000.0, 9498.0), percentage=None).result == (
-        "95.0% of PB · Accuracy 50.00%"
-    )
+    assert _shown(runs, percentage=None).comparison == "99.9% of PB"
+    assert _shown(_scored(10000.0, 9498.0), percentage=None).comparison == "95.0% of PB"
 
 
 def test_a_run_that_ties_the_pb_reads_as_all_of_it():
-    assert _shown(_scored(100.0, 100.0)).result == "100.0% of PB · Accuracy 50.00%"
+    assert _shown(_scored(100.0, 100.0)).comparison == "100.0% of PB"
 
 
-# --- The second line agrees with the judging rule, and with the celebration ----
+# --- The comparison agrees with the judging rule, and with the celebration ----
 
 
 def _chased(runs: list[RunData], pace):
@@ -472,8 +495,9 @@ def test_the_percentage_is_the_judging_rules_own_at_every_goal(
     assert isinstance(verdict, ThresholdVerdict)
 
     measure = "PB pace" if verdict.by_pace else "PB"
-    assert _shown(runs, percentage=percentage, pace=pace).result == (
-        f"{shown_percentage(verdict):.1f}% of {measure} · Accuracy 50.00%"
+    assert (
+        _shown(runs, percentage=percentage, pace=pace).comparison
+        == f"{shown_percentage(verdict):.1f}% of {measure}"
     )
 
 
@@ -498,15 +522,17 @@ def test_a_new_pbs_gain_is_the_one_its_celebration_toast_printed(
 
     printed = re.search(said, toast["message"])
     assert printed is not None
-    assert _shown(runs, pace=pace).result.startswith(printed.group())
+    comparison = _shown(runs, pace=pace).comparison
+    assert comparison is not None
+    assert comparison.startswith(printed.group())
 
 
-# --- The third and fourth lines ------------------------------------------------
+# --- The session line ----------------------------------------------------------
 
 
-def _lines(shown: LatestRun) -> tuple[str, str]:
-    """Read the card's third line, the run in its session, and its fourth."""
-    return shown.session, shown.time_on_scenario
+def _line(shown: LatestRun) -> str:
+    """Read the card's session line: the run in its session, then its time."""
+    return shown.session
 
 
 def _visits() -> list[RunData]:
@@ -524,12 +550,9 @@ def _visits() -> list[RunData]:
     ]
 
 
-def test_the_run_is_numbered_and_the_scenarios_visits_are_summed_on_two_lines():
+def test_the_run_is_numbered_and_the_scenarios_visits_are_summed_on_one_line():
     """The breaks inside a visit count, and the time on another scenario does not."""
-    assert _lines(_shown(_visits())) == (
-        "Run 4 this session",
-        "12 min on this scenario",
-    )
+    assert _line(_shown(_visits())) == "Run 4 this session · 12 min on this scenario"
 
 
 def test_the_number_counts_this_scenarios_runs_in_the_runs_own_session_only():
@@ -538,9 +561,9 @@ def test_the_number_counts_this_scenarios_runs_in_the_runs_own_session_only():
         _run(A, EVENING - timedelta(hours=3) + timedelta(minutes=2)),
     ]
 
-    assert _lines(_shown([*earlier_session, *_visits()])) == (
-        "Run 4 this session",
-        "12 min on this scenario",
+    assert (
+        _line(_shown([*earlier_session, *_visits()]))
+        == "Run 4 this session · 12 min on this scenario"
     )
 
 
@@ -551,7 +574,7 @@ def test_the_run_is_its_scenarios_last_in_the_session_and_not_the_sessions_last(
     shown = _shown(runs, scenario=A)
 
     assert shown.run_id == run_id(runs[4])
-    assert _lines(shown) == ("Run 4 this session", "12 min on this scenario")
+    assert _line(shown) == "Run 4 this session · 12 min on this scenario"
 
 
 @pytest.mark.parametrize(
@@ -567,7 +590,7 @@ def test_the_run_is_its_scenarios_last_in_the_session_and_not_the_sessions_last(
 def test_the_time_on_a_scenario_rounds_to_the_nearest_minute(seconds, time):
     runs = [_run(A, EVENING, length=timedelta(seconds=seconds))]
 
-    assert _lines(_shown(runs)) == ("Run 1 this session", f"{time} on this scenario")
+    assert _line(_shown(runs)) == f"Run 1 this session · {time} on this scenario"
 
 
 @pytest.mark.parametrize(
@@ -583,23 +606,20 @@ def test_once_the_session_has_ended_the_line_says_last_session(since_the_run, wh
     runs = _visits()
     now = runs[-1].datetime_object + since_the_run
 
-    assert _lines(_shown(runs, now=now)) == (
-        f"Run 4 {which}",
-        "12 min on this scenario",
-    )
+    assert _line(_shown(runs, now=now)) == f"Run 4 {which} · 12 min on this scenario"
 
 
 def test_a_visit_whose_first_run_has_no_usable_start_reads_as_time_unknown():
     """Counted from the run's end, one long run would read as under a minute."""
     one_long_run = [_run(A, EVENING, length=None)]
 
-    assert _lines(_shown(one_long_run)) == (
-        "Run 1 this session",
-        "Time on this scenario unknown",
+    assert (
+        _line(_shown(one_long_run))
+        == "Run 1 this session · Time on this scenario unknown"
     )
-    assert _lines(_shown(one_long_run, now=EVENING + timedelta(hours=2))) == (
-        "Run 1 last session",
-        "Time on this scenario unknown",
+    assert (
+        _line(_shown(one_long_run, now=EVENING + timedelta(hours=2)))
+        == "Run 1 last session · Time on this scenario unknown"
     )
 
 
@@ -612,10 +632,10 @@ def test_the_time_is_unknown_when_any_visits_first_run_has_no_usable_start(
     broken = runs[without_a_start]
     runs[without_a_start] = _run(A, broken.datetime_object, length=None)
 
-    session, time = _lines(_shown(runs))
+    line = _line(_shown(runs))
 
-    assert (session, time) == ("Run 4 this session", "Time on this scenario unknown")
-    assert not re.search(r"\d+ (min|hr)", time)
+    assert line == "Run 4 this session · Time on this scenario unknown"
+    assert not re.search(r"\d+ (min|hr)", line)
 
 
 def test_a_later_run_of_a_visit_with_no_usable_start_leaves_the_time_known():
@@ -624,14 +644,14 @@ def test_a_later_run_of_a_visit_with_no_usable_start_leaves_the_time_known():
     runs[1] = _run(A, runs[1].datetime_object, length=None)
     runs[4] = _run(A, runs[4].datetime_object, length=None)
 
-    assert _lines(_shown(runs)) == ("Run 4 this session", "12 min on this scenario")
+    assert _line(_shown(runs)) == "Run 4 this session · 12 min on this scenario"
 
 
 def test_a_visit_to_another_scenario_with_no_usable_start_leaves_the_time_known():
     runs = _visits()
     runs[2] = _run(B, runs[2].datetime_object, length=None)
 
-    assert _lines(_shown(runs)) == ("Run 4 this session", "12 min on this scenario")
+    assert _line(_shown(runs)) == "Run 4 this session · 12 min on this scenario"
 
 
 # --- An older session's name ---------------------------------------------------
@@ -672,10 +692,7 @@ def test_a_run_in_an_older_session_names_it_as_the_run_list_names_its_row(
     shown = _shown(runs, scenario=A, now=now)
 
     assert shown.run_id == run_id(older[1])
-    assert _lines(shown) == (
-        "Run 2 (Oct 4, 2:00 PM session)",
-        "6 min on this scenario",
-    )
+    assert _line(shown) == "Run 2 (Oct 4, 2:00 PM session) · 6 min on this scenario"
     assert _listed_name(runs, A, older[0], now) == "Oct 4, 2:00 PM"
 
 
@@ -685,9 +702,9 @@ def test_a_session_from_an_earlier_year_is_named_with_its_year():
     runs = [*older, *newest]
     now = datetime(2026, 1, 2, 9, 1)
 
-    session, _time = _lines(_shown(runs, scenario=A, now=now))
-
-    assert session == "Run 1 (Dec 30, 2025, 9:45 PM session)"
+    assert _line(_shown(runs, scenario=A, now=now)) == (
+        "Run 1 (Dec 30, 2025, 9:45 PM session) · 1 min on this scenario"
+    )
     assert _listed_name(runs, A, older[0], now) == "Dec 30, 2025, 9:45 PM"
 
 
@@ -701,8 +718,10 @@ def test_the_year_joins_the_name_once_the_date_moves_into_a_new_year():
     before = _shown(runs, scenario=A, now=datetime(2025, 12, 31, 23, 59))
     after = _shown(runs, scenario=A, now=datetime(2026, 1, 1, 0, 0))
 
-    assert before.session == "Run 1 (Dec 30, 9:45 PM session)"
-    assert after.session == "Run 1 (Dec 30, 2025, 9:45 PM session)"
+    assert before.session == "Run 1 (Dec 30, 9:45 PM session) · 1 min on this scenario"
+    assert after.session == (
+        "Run 1 (Dec 30, 2025, 9:45 PM session) · 1 min on this scenario"
+    )
 
 
 def test_an_older_session_whose_first_run_has_no_usable_start_is_named_by_its_end():
@@ -711,10 +730,9 @@ def test_an_older_session_whose_first_run_has_no_usable_start_is_named_by_its_en
     newest = [_run(B, EVENING)]
     runs = [*older, *newest]
 
-    session, time = _lines(_shown(runs, scenario=A, now=EVENING))
-
-    assert session == "Run 1 (Oct 4, 2:01 PM session)"
-    assert time == "Time on this scenario unknown"
+    assert _line(_shown(runs, scenario=A, now=EVENING)) == (
+        "Run 1 (Oct 4, 2:01 PM session) · Time on this scenario unknown"
+    )
     assert _listed_name(runs, A, older[0], EVENING) == "Oct 4, 2:01 PM"
 
 
@@ -775,7 +793,8 @@ def test_the_newest_run_on_any_scenario_comes_from_the_same_copy_as_the_cards(
     assert newest_run_id == run_id(runs[1])
     assert (shown is None) == (selected is None)
     if shown is not None:
-        assert shown.scenario == selected
+        (selected_run,) = (run for run in runs if run.scenario == selected)
+        assert shown.run_id == run_id(selected_run)
 
 
 @pytest.mark.parametrize("selected", [A, None])
@@ -800,13 +819,12 @@ def _walk(component):
 
 LATEST = LatestRun(
     run_id="a.csv",
-    scenario=A,
     played_at=datetime(2026, 10, 4, 22, 50),
     score="3,324",
     badge=CardBadge.THRESHOLD_PASSED,
-    result="96.4% of PB · Accuracy 55.00%",
-    session="Run 7 (Oct 4, 2:00 PM session)",
-    time_on_scenario="1 hr 6 min on this scenario",
+    comparison="96.4% of PB",
+    session="Run 7 (Oct 4, 2:00 PM session) · 1 hr 6 min on this scenario",
+    sensitivity_and_accuracy="50 cm/360 · Accuracy 55.00%",
 )
 
 
@@ -821,7 +839,6 @@ def test_the_card_starts_with_nothing_in_it_and_holds_no_button():
     }
     assert set(held) == set(IDS)
     assert card.className == "run-history-card"
-    assert held[IDS.heading].children is None
     assert held[IDS.body].children is None
     assert isinstance(held[IDS.played_at], dcc.Store)
     assert getattr(held[IDS.played_at], "data", None) is None
@@ -833,11 +850,10 @@ def test_the_card_starts_with_nothing_in_it_and_holds_no_button():
 def test_the_first_lines_words_and_the_age_are_drawn_once_and_hidden_until_a_run():
     """A script writes the age, so it is never part of the server's answer.
 
-    The card's name, the age and the dots between are one item of the
-    heading, so the spaces either side of the age reach a screen reader: the
-    heading is a flex container, which drops a space between its items. With
-    no run the card's name stays, as the PB card's ``PB`` does, and only the
-    words that hold the age are hidden.
+    The first line is ``Latest run · {age}``, and no scenario's name: the
+    card follows the selection, which the Selected scenario field and the
+    chart's title name. With no run the card's name stays, as the PB card's
+    ``PB`` does, and only the words that hold the age are hidden.
     """
     card = latest_run_card.latest_run_card(IDS)
     held = {
@@ -851,15 +867,12 @@ def test_the_first_lines_words_and_the_age_are_drawn_once_and_hidden_until_a_run
         if getattr(component, "className", None) == latest_run_card.HEADING_CLASS
     )
 
-    item = heading.children[0]
-    assert item.className == latest_run_card.HEADING_LABEL_CLASS
-    assert getattr(item, "hidden", None) is None
-    name, label = item.children
+    name, label = heading.children
     assert name == "Latest run"
     assert label is held[IDS.label]
     assert label.hidden is True
-    lead, tooltip, trail = label.children
-    assert (lead, trail) == (" · ", " · ")
+    lead, tooltip = label.children
+    assert lead == " · "
     assert tooltip.id == IDS.time_tooltip
     assert tooltip.events == {"hover": True, "focus": True, "touch": True}
     # dmc wraps the target in a block box; the stylesheet makes it inline.
@@ -877,28 +890,39 @@ def test_the_first_lines_words_and_the_age_are_drawn_once_and_hidden_until_a_run
     assert getattr(age, "children", None) is None
 
 
-def test_the_runs_scenario_is_plain_text_with_its_whole_name_as_its_title():
+def test_the_card_names_no_scenario_and_holds_when_the_run_ended():
     content = latest_run_card_content(LATEST, A, True)
 
-    assert rendered_text(content.heading) == A
-    # The title gives the whole name where the card cuts it short.
-    assert content.heading.title == A
+    assert content._fields == ("played_at", "body")
     assert content.played_at == LATEST.played_at.timestamp()
+    assert A not in "".join(rendered_text(child) for child in content.body)
 
 
 def test_the_body_is_the_score_with_its_badge_then_three_lines():
-    """The time spent on the scenario takes a line of its own."""
-    score_row, result, session, time = latest_run_card_content(LATEST, A, True).body
+    """The comparison at its own weight, then the session and the run's settings, quiet."""
+    body = latest_run_card_content(LATEST, A, True).body
+    score_row, comparison, session, last = body
 
     assert [rendered_text(child) for child in score_row.children] == [
         "3,324",
         "Threshold passed",
     ]
-    assert rendered_text(result) == "96.4% of PB · Accuracy 55.00%"
-    assert rendered_text(session) == "Run 7 (Oct 4, 2:00 PM session)"
-    assert rendered_text(time) == "1 hr 6 min on this scenario"
-    # Both in the card's quiet session style.
-    assert session.className == time.className == latest_run_card.SESSION_CLASS
+    assert rendered_text(comparison) == "96.4% of PB"
+    assert comparison.className == latest_run_card.RESULT_CLASS
+    assert rendered_text(session) == (
+        "Run 7 (Oct 4, 2:00 PM session) · 1 hr 6 min on this scenario"
+    )
+    assert rendered_text(last) == "50 cm/360 · Accuracy 55.00%"
+    assert session.className == last.className == latest_run_card.QUIET_CLASS
+
+
+def test_with_no_comparison_the_line_is_left_out():
+    """A scenario's first run has no PB to measure against."""
+    shown = LatestRun(**{**LATEST.__dict__, "comparison": None})
+    score_row, session, last = latest_run_card_content(shown, A, True).body
+
+    assert score_row.className == latest_run_card.SCORE_ROW_CLASS
+    assert session.className == last.className == latest_run_card.QUIET_CLASS
 
 
 @pytest.mark.parametrize(
@@ -980,7 +1004,6 @@ def test_with_no_run_to_report_the_card_says_why(selected, store_has_runs, said)
 
     # Nothing to word, so the script hides the age, and "Latest run" stays.
     assert content.played_at is None
-    assert content.heading is None
     assert [rendered_text(line) for line in content.body] == said
     # A title, then the sentence in the quieter style, as the PB card's.
     assert content.body[0].className == latest_run_card.EMPTY_TITLE_CLASS

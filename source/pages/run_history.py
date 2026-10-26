@@ -201,7 +201,6 @@ LATEST_RUN_CARD_IDS = LatestRunCardIds(
     label="run-history-card-lead",
     time="run-history-card-time",
     time_tooltip="run-history-card-time-tooltip",
-    heading="run-history-card-heading",
     body="run-history-card-body",
 )
 SCENARIO_STATS_IDS = ScenarioStatsIds(
@@ -452,7 +451,6 @@ def build_run_list_rows(  # noqa: PLR0913
 
 @callback(
     Output(LATEST_RUN_CARD_IDS.played_at, "data"),
-    Output(LATEST_RUN_CARD_IDS.heading, "children"),
     Output(LATEST_RUN_CARD_IDS.body, "children"),
     Output(LATEST_RUN_STORE_ID, "data"),
     # A run on another scenario can change which session the card's run is

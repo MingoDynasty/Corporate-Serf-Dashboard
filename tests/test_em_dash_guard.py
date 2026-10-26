@@ -87,7 +87,7 @@ def test_the_walk_reads_real_source():
     found = _source_strings_with(MIDDLE_DOT)
 
     assert (module, "latest_run_card", MIDDLE_DOT) in found
-    assert (module, "latest_run", MIDDLE_DOT) in found
+    assert (module, "_session_line", MIDDLE_DOT) in found
 
 
 def test_the_walk_reads_fstring_parts_and_skips_docstrings():
