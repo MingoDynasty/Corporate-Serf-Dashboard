@@ -44,6 +44,7 @@ from source.kovaaks.playlist_scenarios_service import (
     start_playlist_scenario_fill,
     take_typical_snapshot,
 )
+from source.kovaaks.typical_score import NOT_RECENT_TEXT
 from source.pages.page_title import page_title
 
 
@@ -288,7 +289,6 @@ BENCHMARK_COLUMN_DEFS = [
 # table, and Typical Score alone after PB Score on a playlist's, which has no
 # ranks. Both cells draw through ``TypicalCell``, which marks a value that is
 # not recent and gives the cell its hover's words as its description.
-NOT_RECENT_TEXT = "Not recent"
 TYPICAL_SCORE_COLUMN_DEF = {
     "headerName": "Typical Score",
     "field": "typical_score_sort",

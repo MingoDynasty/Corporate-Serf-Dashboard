@@ -494,6 +494,16 @@ a.run-toast-link {
     line-height: 19px;
 }
 
+/* The typical phrase's hover: the value, and on an old value why it may
+   have been out of date, as two paragraphs. */
+.run-history-card-typical-hover p {
+    margin: 0 0 8px;
+}
+
+.run-history-card-typical-hover p:last-child {
+    margin-bottom: 0;
+}
+
 /* The run's session line and its sensitivity and accuracy: quieter than the
    comparison, because they support the score, in the scenario table's
    readable grey for an old typical value. The cards' dimmed grey measures
@@ -1460,12 +1470,13 @@ a.run-toast-link {
         display: contents;
     }
 
-    /* At its 380px minimum the session line can take two lines, so the floor
-       here holds that state, with 12px under the last line. The wide row
+    /* At its 380px minimum the comparison and the session line can each take
+       two lines, so the floor here holds that state: 12px above the first
+       line, as the top row's offset, and 12px under the last. The wide row
        keeps 135px, since a higher floor there would raise the whole row. */
     .run-history-card {
         flex: 1 1 380px;
-        min-height: 158px;
+        min-height: 177px;
     }
 
     .run-history-columns {

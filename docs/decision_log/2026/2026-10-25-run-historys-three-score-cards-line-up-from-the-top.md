@@ -9,6 +9,11 @@ row already has, so the row never grows for it. In a narrow window the latest-ru
 height rises, so its tallest state still fits and the page doesn't jump
 between runs.
 
+**Superseded in part (2026-10-25).** [The card measures the run against the typical score at session start](2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md):
+the typical phrase can take the comparison line to two lines at 380 px, so
+the narrow floor is 177 px, where this entry set 158. The spacer, the
+offset, the ruled exception and the wide floor stand.
+
 **Ruling and delivery.** SC4 of the Run History score cards proposal,
 [#430](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/430),
 ratified by the maintainer on 2026-10-25 at `c77ad06`: "I ratify the proposal

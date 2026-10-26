@@ -4,8 +4,9 @@ The typical score defines what a player's runs on a scenario usually score.
 It uses the median of the last twenty runs, with a minimum before the value
 is known and a separate test of how recent its runs are.
 The definition and its display rounding are pure functions; the Run History
-chart draws the value, Scenario Stats leads with it, and the playlist
-scenario table ranks by it, each marking it where it isn't recent.
+chart draws the value, Scenario Stats leads with it, the playlist
+scenario table ranks by it, and the latest-run card measures a run against
+it as it stood at the session's start, each marking it where it isn't recent.
 Stats files with non-finite scores are skipped during import so malformed
 scores cannot stop a calculation.
 
@@ -141,6 +142,23 @@ scores cannot stop a calculation.
   marks one that isn't recent with a clock
   ([2026-10-22][typical-table]). The columns are specified in
   [playlists.md](playlists.md#the-per-playlist-scenario-table).
+- `typical_score_at_session_start(runs, play_sessions, session)` returns a
+  scenario's value as it stood when `session` began: the one after its last
+  run before the session, built from those runs alone, since a value depends
+  only on the runs before it. `runs` is the scenario's runs in play order,
+  holding at least one of the session's, and `play_sessions` is split from
+  the same snapshot. With no run before the session it returns `None`; the
+  value it returns can still be unknown. Every run of the session meets the
+  same value, and none meets a value it helped make
+  ([SC1][typical-session-start]).
+- Run History's latest-run card is a caller. It takes that value from the
+  same snapshot as the card's run, judges its recency at the session's
+  start, and words the run against it, by pace where every run behind the
+  value is of the run's version. The phrase is specified in
+  [run_history.md](run_history.md#the-latest-run-card).
+- `NOT_RECENT_TEXT`, `Not recent`, is what a screen reader hears in place of
+  the clock that marks an old value, on the scenario table and the
+  latest-run card alike.
 
 [typical-table]: ../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md
 
@@ -155,3 +173,5 @@ scores cannot stop a calculation.
 [typical-recency]: ../decision_log/2026/2026-10-20-a-typical-score-is-recent-with-ten-runs-from-the-last-thirty-days.md
 
 [typical-card-lead]: ../decision_log/2026/2026-10-20-scenario-stats-leads-with-the-typical-score.md
+
+[typical-session-start]: ../decision_log/2026/2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md

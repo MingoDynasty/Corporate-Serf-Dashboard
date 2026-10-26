@@ -371,10 +371,14 @@ it is saved is in [2026-10-18][note-store].
   with a 1px solid border in that color, so each reads in both themes.
 - Under the score are three lines: the comparison, the session line, and
   the run's sensitivity and accuracy ([SC3][card-lines]).
-- The comparison line, at 13px, compares the run with the PB it was
-  chasing and holds nothing else: `{pct}% of PB`, or `{pct}% of PB pace`
+- The comparison line, at 13px, holds only comparisons: on a run that isn't
+  a new PB, the typical phrase, then ` · `, then the run against the PB it
+  was chasing, `3.6% above typical at session start · 85.8% of PB`. A part
+  with nothing to say is left out, and with neither part the line is absent
+  ([SC1][typical-start], [SC3][card-lines]).
+- The PB part reads `{pct}% of PB`, or `{pct}% of PB pace`
   where the comparison is by pace. A new PB says how
-  far it beat the previous best instead:
+  far it beat the previous best instead, with no typical phrase:
   `Up {pct}% on your previous best of {previous}`,
   `{pct}% faster than your previous best of {previous}` by pace, or
   `Your previous best was {previous}` over a previous best of zero or less.
@@ -388,6 +392,39 @@ it is saved is in [2026-10-18][note-store].
   most 99.9%, and a judged miss shows at most one tenth under its goal.
   The card is the one place a run's percentage of the PB is printed
   ([2026-10-13][run-toast]).
+- The typical phrase measures the run against its scenario's typical score
+  as it stood when the run's session began: the value after the scenario's
+  last run before that session, from the same copy of the run store as the
+  card's run ([typical_score.md](typical_score.md#api-and-snapshot-ownership)).
+  Every run of a session meets the same value, and a later run in the
+  session never moves it. With no run before the session, or an unknown
+  value there, there is no phrase. A new PB has none, because it beats every
+  earlier run and the phrase could only read above
+  ([SC1][typical-start]).
+  - By score: `(score − typical) / typical × 100` to one decimal,
+    `{pct}% above typical at session start` or
+    `{pct}% below typical at session start`, and
+    `Matches typical at session start` where it rounds to 0.0. A typical
+    score of zero or less has no phrase.
+  - By pace, when every run behind the value is of the run's own version, a
+    performance file answers for that version, and both times are positive,
+    as the scenario table's Typical Rank decides it: the run toast's
+    `percent_faster`, `{pct}% faster than typical at session start` or
+    `{pct}% slower than typical at session start`, and `Matches …` at 0.0.
+    That is decided apart from the PB part's measure, so one line can mix
+    them, and the words name each ([SC1][typical-start],
+    [2026-10-05][pace]).
+  - A value that wasn't recent when the session began, judged then and not
+    when the card is read, has the scenario table's 13px history clock after
+    the phrase, hidden from a screen reader, which hears `, Not recent`
+    instead ([SC1][typical-start], [2026-10-22][old-mark]).
+  - The phrase is focusable, with the age's dotted underline, and hovering
+    or focusing it, the clock included, shows
+    `Typical score when this run's session began: {typical}`, the value
+    formatted as the scenario table formats a typical score. On an old
+    value a second paragraph follows: `Fewer than 10 of its runs were from
+    the 30 days before the session began, so it may have been out of date.`
+    The hover is at most 360px wide ([SC1][typical-start]).
 - The session line names the run in its session, then ` · `, then the time
   spent on its scenario: `Run 7 this session · 9 min on this scenario`
   ([SC3][card-lines]). In the newest session the run reads
@@ -422,9 +459,10 @@ it is saved is in [2026-10-18][note-store].
   nothing that changes between runs changes its height, and the page doesn't
   jump. In the wide layout every line fits on one, and the floor is 135px.
   In a page area of 900px or less, where the card can be 380px wide, the
-  floor is 158px: the comparison on one line over the session line on two,
-  with 12px under the last line. Its lines start from its top, as the other
-  score cards' do ([SC4][top-aligned]).
+  floor is 177px: the comparison by pace with an old value's clock on two
+  lines, over the session line on two, with the top row's 12px above the
+  first line and 12px under the last. Its lines start from its top, as the
+  other score cards' do ([SC4][top-aligned], [SC1][typical-start]).
 - With no run to report, the card's first line reads `Latest run` alone, and
   the selection decides first, as on the PB card
   ([2026-10-18][follows]):
@@ -1236,7 +1274,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   threshold line (The chart), the New personal best toast
   ([notifications.md](notifications.md#run-notifications)), and the check
   and the latest-run card's badge and percentage
-  ([Marks](#marks-the-check-and-the-star)).
+  ([Marks](#marks-the-check-and-the-star)), and the card's typical phrase
+  ([The latest-run card](#the-latest-run-card)).
   Anything that orders or places scores is unchanged, because a higher score
   is always a faster finish: the chart's points and axis, the PB score line,
   the rank lines, and the Rank column. No completion time is shown anywhere
@@ -1494,7 +1533,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   Scenario Stats, the PB card, and the latest-run card, which joins a line at
   380px and takes the room left on it. The score pair's wrapper has no box
   there ([2026-10-21][score-strip]). The latest-run card's floor there is
-  158px ([SC4][top-aligned]).
+  177px ([SC4][top-aligned], [SC1][typical-start]).
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side
@@ -1611,6 +1650,8 @@ The card's lines, local-record scope and leaderboard presentation follow
 [first-line]: ../decision_log/2026/2026-10-25-the-latest-run-cards-first-line-drops-the-scenarios-name.md
 [card-lines]: ../decision_log/2026/2026-10-25-the-latest-run-card-ends-with-the-runs-cm360-and-accuracy.md
 [top-aligned]: ../decision_log/2026/2026-10-25-run-historys-three-score-cards-line-up-from-the-top.md
+[typical-start]: ../decision_log/2026/2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md
+[old-mark]: ../decision_log/2026/2026-10-22-an-old-typical-value-on-the-table-is-marked-with-a-clock-in-a-readable-grey.md
 [stats-last-played]: ../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md
 [heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md
 [note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md

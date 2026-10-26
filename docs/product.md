@@ -341,6 +341,17 @@ the same form as the finished ones under it.
   selected-scenario run, so finding its point or row while browsing no longer
   depends on whether it was the last run played across all scenarios
   ([2026-10-23](decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md)).
+- **The latest run against the typical run** (Run History page, PRs #431
+  and #434; design in #430). The latest-run card says how far the run was
+  from the scenario's typical score as it stood when the session began, such
+  as `3.6% above typical at session start · 85.8% of PB`, with a clock when
+  that value was old. Its first line drops the scenario's name, its session
+  details share one line, it ends with the run's cm/360 and accuracy as the
+  PB card ends with the PB's, and the three score cards line up from the
+  top. *Problem solved:* measured only against the PB, almost every run read
+  as a miss, so a good run looked like a failure and the card couldn't
+  answer *how did that run go?* at a glance. The typical run is how this app
+  judges skill, and the PB stays the record beside it.
 - **Scenario rank and percentile** (PRs #8–#10). The Run History page
   shows your global leaderboard standing for the selected scenario, led by
   its percentile — `82.33% percentile`, with `Position 11,290 of 63,892` on

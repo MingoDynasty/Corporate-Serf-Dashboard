@@ -174,7 +174,8 @@ need. Score vs Time plots the same runs by when they were played
 ### Latest-run card
 
 The card at the right end of Run History's top row, over the run list, that
-reports the selected scenario's latest run with its verdict
+reports the selected scenario's latest run with its verdict, and measures it
+against the typical score at session start and the PB it was chasing
 ([run_history.md](specs/run_history.md#the-latest-run-card)).
 
 - On screen it has no title. Its first line reads `Latest run · {age}`, or
@@ -457,7 +458,27 @@ than 30 days, up to half of them.
 - On the scenario table: judged once, as the page opens. Not recent, a
   muted grey with a clock after the value in both typical cells, and
   `Not recent` for a screen reader, explained in the cells' hovers.
-- In code: `recent`; the table's row field is `typical_not_recent`.
+- On the latest-run card: a typical score at session start, judged when the
+  session began. Not recent, a clock after its phrase and `Not recent` for a
+  screen reader, explained in the phrase's hover.
+- In code: `recent`; the table's row field is `typical_not_recent`, and the
+  card's is `TypicalPhrase.not_recent`.
+
+### Typical at session start
+
+The typical score as it stood when a session began: the value after the
+scenario's last run before that session. The latest-run card measures a run
+against it, so every run of a session meets the same value, and a run never
+meets a value it helped make. Unknown when the scenario had no known typical
+score before the session. Its recency is judged at the session's start, not
+when the card is read
+([2026-10-25](decision_log/2026/2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md)).
+
+- On screen: the latest-run card's `3.6% above typical at session start`,
+  with the value in its hover, and a clock after it when the value wasn't
+  recent.
+- Not the Typical score card's value, which follows every run.
+- In code: `typical_score_at_session_start`.
 
 ### Middle 50%
 
@@ -509,7 +530,8 @@ time divided by 0.95
 ([2026-10-05](decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)).
 
 - On screen: PB pace on the latest-run card, and faster in the Next Rank
-  column, the New personal best toast, and the card's line for a new PB.
+  column, the New personal best toast, the card's line for a new PB, and the
+  card's `faster than typical at session start`, with slower its opposite.
 
 ### Score threshold
 

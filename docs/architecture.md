@@ -662,7 +662,11 @@ flowchart LR
   selected scenario's latest run: `latest_run_from_store` copies the run
   store once and works out from that copy both the card's run and the
   newest run on any scenario, whose presence helps choose the card's empty
-  state. The callback writes when the card's run ended, in epoch seconds, to
+  state. The card's comparison line measures the run against
+  `typical_score_at_session_start`, taken from the same copy and the
+  sessions split from it, and against the PB it was chasing; its pace basis
+  is the run's own version's, through the same `get_version_pace_basis` the
+  PB comparison uses. The callback writes when the card's run ended, in epoch seconds, to
   the card's `run-history-card-played-at` store. A
   clientside callback (`latest_run_card.AGE_SCRIPT`, which the PB card
   registers for its own age too) words that as the run's age with the shared
@@ -1337,9 +1341,12 @@ flowchart LR
   ([decision log](decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md)).
 - `typical_score.py` — the typical score's pure definition, which the Run
   History chart draws on Score vs Run and Score vs Time, Scenario Stats
-  leads with, and the playlist scenario table ranks by. `typical_score_hover`
+  leads with, the playlist scenario table ranks by, and the latest-run card
+  measures a run against as it stood at the session's start
+  (`typical_score_at_session_start`). `typical_score_hover`
   and `below_minimum_text` word a value's hover for the card and the table
-  alike.
+  alike, and `NOT_RECENT_TEXT` is what a screen reader hears for an old
+  value's clock on the table and the latest-run card.
   `build_typical_scores` takes one
   scenario's runs and the play
   sessions split across every scenario from the same snapshot, returning a

@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Run History's score cards** — the latest-run card measures the run
+  against the typical score as it stood when the session began, such as
+  3.6% above typical at session start, before its percentage of the PB,
+  with a clock when that value was old. It no longer repeats the scenario's
+  name, its session details share one line, and it ends with the run's
+  cm/360 and accuracy as the PB card does. The three score cards line up
+  from the top. (PRs #431 and #434; design in #430) Design rationale
+  distilled into [`decision_log/`](./decision_log/README.md).
 - **Typical score on the scenario table** — a playlist's scenario table
   shows each scenario's typical score beside its PB, and a benchmark's table
   also shows the rank it reaches and how far toward the next, such as
@@ -60,13 +68,6 @@ sequence.
   reads like the other cards', and the run list's heading line left the
   screen, which gives the list more rows. (PR #391; design in #388) Design
   rationale distilled into [`decision_log/`](./decision_log/README.md).
-- **Run History top row cards** — the dropdowns are stacked, Scenario Stats
-  shows the selected benchmark's category, and a PB card puts the local
-  record and next rank's score beside the latest run. The leaderboard line
-  lives with the PB, the latest-run card aligns over the run list, and both
-  cards show relative ages with exact times on hover and focus. (PRs #380,
-  #383 and #384; design in #379) Design rationale
-  distilled into [`decision_log/`](./decision_log/README.md).
 
 ---
 
