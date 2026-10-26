@@ -31,6 +31,7 @@ the recorded game version.
 | Check | Date | Focus |
 | --- | --- | --- |
 | [Detecting a scenario switch from KovaaK's files](kovaaks_scenario_switch_signals.md) | 2026-10-25 | Whether the app can tell which scenario is loaded before its first run lands: the analytics log names it, but the game writes that log in 4 KB batches, so the answer comes seconds to minutes late. Two other candidates stay untested |
+| [The analytics log as a source for restarts](kovaaks_analytics_log_restarts.md) | 2026-10-25 | What the game's analytics log records about restarts and finished runs, how far it can be trusted, and what an app feature would need |
 
 ## More than one survey of an app
 
