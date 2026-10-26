@@ -6,12 +6,15 @@ Game version: KovaaK's 3.9.10. This app's code was not involved.
 
 The question was whether the app can tell which scenario is loaded in
 KovaaK's before its first run finishes, so that the Run History page's Follow
-switch could move at once instead of waiting for a run's stats file. It
-can't, not at once. The only file that names a scenario as it loads is the
-game's analytics log, and the game writes that log in 4 KB batches, so a
-switch reaches the disk anywhere from seconds to minutes late. On
-2026-10-25 the maintainer chose not to build load-based Follow, and Follow
-still moves only when a run lands.
+switch could move at once instead of waiting for a run's stats file. Not
+from anything tested. With the game's usual settings, the only file found to
+name a scenario as it loads is the game's analytics log, and the game writes
+that log in 4 KB batches, so a switch reaches the disk anywhere from seconds
+to minutes late. Two other candidates stay untested: the analytics
+library's event database, checked only after play, and a stats file that a
+non-default export setting writes when a run is left for another scenario.
+On 2026-10-25 the maintainer chose not to build load-based Follow, and
+Follow still moves only when a run lands.
 
 **Run the check again if a KovaaK's update changes its logging**, or if the
 idea of following a scenario as it loads comes back. The quick test is in
@@ -86,20 +89,35 @@ the file's size did. It did so also in a dry run in which a script held the
 file open and appended to it, as the game does. The delay is the game's
 buffer, not file notification.
 
-**No other file names the loaded scenario.** These files were written
-during the live session, and none of them helps:
+**No other file written during the live session names the loaded
+scenario.** These were written, and none of them helps:
 
 - `Saved\SaveGames\PlaylistInProgress.json` is the running playlist's
   definition: its scenarios in order, with play counts.
 - `Saved\SaveGames\PlaylistOrder.json` has a `currentScenarioIndex`, but
   the file was written only when the playlist started. It pointed at the
   third scenario while the first was played.
-- `GameAnalytics\ga.sqlite3` queues events until they are uploaded, and its
-  `ga_events` table was empty afterwards. The analytics log shows each event
-  uploaded within seconds of being added.
 - A map file and the Steam scenario cache files were written as one
   scenario loaded, and not when the next one did. A map file names a map,
   not a scenario.
+
+**Two candidates are untested as live signals.**
+
+- `GameAnalytics\ga.sqlite3` queues each event until it is uploaded. A copy
+  taken after the live session had an empty `ga_events` table, and the
+  analytics log shows each event uploaded within seconds of being added.
+  Whether a queued row can be read while the game runs, and for how long,
+  was not measured: the live probe watched only `ga_log.txt`. The empty
+  table explains why the rows were gone afterwards. It does not rule the
+  database out.
+- With KovaaK's **Statistics Export** setting on **Always** instead of
+  **Challenge Completion**, leaving a run for another scenario writes a
+  stats file named after the incoming scenario, with an empty `Scenario:`
+  line. In a 2026-10-10 experiment on 3.9.10 this happened twice, written
+  3 s and 22 s before the incoming scenario's `challenge:start`. It needs a
+  run left unfinished, and the setting also exports resets and freeplay,
+  so the stats folder gains files that are not completed runs. It was not
+  studied further here.
 
 ## Measurements
 
@@ -108,13 +126,18 @@ scenario other than the one before it.
 
 | Measure | Result |
 | --- | --- |
-| Challenge loads | 67, plus 10 freeplay loads, which never write a stats file |
+| Challenge loads | 67, plus 10 freeplay loads, left out because the comparison uses completed Challenge stats files. Freeplay wrote stats files with Statistics Export on Always, and none under Challenge Completion |
 | Loads with no completed run before the next switch | 20 of 67 |
 | Loads followed by a completed run | 47 |
 | How much earlier the load is logged than that run's stats file | median 74 s, minimum 60 s, 75th percentile 94 s, maximum 496 s |
 | When a load becomes readable, after the 4 KB batching | median 17 s after the load, 25th percentile 6 s, 75th percentile 66 s, maximum 149 s |
 | Loads readable within 5 s, 10 s, 30 s, 60 s | 15, 26, 42, 48 of 67 |
 | Loads readable before that run's stats file | 34 of 47, a median 65 s sooner when they were |
+
+The stats folder no longer holds the files of the 2026-10-10 Statistics
+Export experiment, which were moved out of it. So one load from those
+launches counts as having no completed run, though it had one: a full run
+that scored 0.
 
 The batched figures come from replaying the 4 KB rule over the archived
 files: each line becomes readable when the block holding it fills, and a
@@ -146,16 +169,17 @@ its first run.
 
 These are recommendations, not decisions.
 
-- No file gives the loaded scenario at once. A Follow that moves on load
-  could only be best-effort: often a minute sooner than a run's stats file,
-  sometimes later than it.
+- No file tested gives the loaded scenario at once. A Follow that moves on
+  load from the analytics log could only be best-effort: often a minute
+  sooner than a run's stats file, sometimes later than it.
 - A best-effort version would act only when the log names a new game
   scenario, never on a repeated one. Otherwise a batch that lands while the
   user browses another scenario would move the page back. It would take
   the last scenario a batch names. It would skip a scenario with no runs,
-  which the page has nothing to show for, and fall back to following runs whenever the
-  file is missing. Its tailer would have to notice the file being emptied
-  at launch, even when the new launch has already written past the old end.
+  which the page has nothing to show for, and fall back to following runs
+  whenever the file is missing. Its tailer would have to notice the file
+  being emptied at launch, even when the new launch has already written
+  past the old end.
 - Uses that read the log after the fact are not affected by the batching,
   because a closed launch's log is complete. Two examples are counting
   restarts and taking a session's launch and exit times. The other limits
@@ -175,3 +199,9 @@ while ($true) { "{0:HH:mm:ss} {1}" -f (Get-Date), (Get-Item $f).Length; Start-Sl
 If the size moves only in steps of 4096 bytes, the log is still batched and
 these findings stand. If it grows a line at a time, measure again: load-based
 Follow would then be close to instant.
+
+Then test the two open candidates before settling on the log: whether a
+queued row in `ga.sqlite3` can be read during play, and for how long, and
+whether a load-time file that appears only when a run is left unfinished,
+under a non-default export setting, is worth what that setting adds to the
+stats folder.
