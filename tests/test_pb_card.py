@@ -746,3 +746,18 @@ def test_the_pbs_age_is_reworded_in_the_browser_on_the_30_second_tick():
         f"{run_history.RELATIVE_TIME_INTERVAL_ID}.n_intervals",
     ]
     assert latest_run_card.AGE_SCRIPT in script
+
+
+@pytest.mark.parametrize(
+    ("hint", "class_name"),
+    [
+        ("username_unset", "scenario-rank-hint scenario-rank-hint-username-unset"),
+        ("lookup_failed", "scenario-rank-hint"),
+        ("served_stale", "scenario-rank-hint"),
+    ],
+)
+def test_only_the_username_hint_is_marked_for_the_top_rows_offset(hint, class_name):
+    """The stylesheet drops the score cards' top offset while that hint shows."""
+    _value, shown_hint = pb_card._rank_display("N/A", hint)
+
+    assert shown_hint.className == class_name

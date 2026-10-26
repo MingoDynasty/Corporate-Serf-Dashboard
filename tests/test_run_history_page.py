@@ -1622,10 +1622,30 @@ def test_the_three_score_cards_start_their_lines_12px_from_the_top_2px_apart(
     """
     card = _css_block(STYLESHEET.read_text(encoding="utf-8"), selector)
 
-    assert "padding: 12px var(--mantine-spacing-sm) 0;" in card
+    assert (
+        "padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;"
+        in card
+    )
     assert "gap: 2px;" in card
     assert "flex-direction: column;" in card
     assert "justify-content" not in card
+
+
+def test_the_cards_top_offset_is_12px_and_none_with_the_username_hint():
+    """The one state where the PB card fills the row it makes: no KovaaK's username.
+
+    Its leaderboard hint takes two lines there, so a 12px offset would raise
+    the row by 12px (found by the Codex seat on #431). The three cards drop it
+    together, so they stay lined up and the row keeps its height.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+
+    assert "--run-history-score-card-top: 12px;" in _css_block(
+        css, ".run-history-top-row"
+    )
+    assert "--run-history-score-card-top: 0px;" in _css_block(
+        css, ".run-history-top-row:has(.scenario-rank-hint-username-unset)"
+    )
 
 
 def test_the_card_is_as_tall_as_the_row_and_never_under_135px():

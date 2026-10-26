@@ -35,6 +35,15 @@ details' second line did, lines them up in one PB card state only.
 - They still stretch to their line's height. A card with fewer lines leaves
   its spare room at its bottom, where nothing pads it, so the row stays the
   height the dropdowns' column sets.
+- **With no KovaaK's username the offset is 0 for all three.** The PB card's
+  leaderboard hint then takes two lines, and the card already fills the row
+  it makes (164.4 px with a benchmark, 143.4 px without, from 1920 px up), so
+  12 px at its top would raise the row by 12 px, which the Codex seat found
+  in review of #431. The three cards share one offset,
+  `--run-history-score-card-top` on the top row, which a rule zeroes while
+  the row holds the username hint (`scenario-rank-hint-username-unset`, the
+  hint's own class). They stay lined up, the row keeps its height, and the
+  first lines sit at the cards' top edge, as the PB card's did there before.
 - At 1536 px Scenario Stats and the PB card wrap to their own line, as
   before, and line up with each other there. The latest-run card, on the
   first line, can't line up with them.
@@ -70,9 +79,14 @@ Benchmarks S5, and a scenario with too few runs for a typical score.
 | The row, from 1920 px up | 141.4 px | 141.4 px |
 | The row at 1536 px | 285.4 px | 285.4 px |
 | Scenario Stats' and the PB card's numbers at 1536 px | 10.8 to 14.9 px apart | 0 px |
+| With no username: the row, from 1920 px up | 143.4 px without a benchmark, 164.4 px with one | the same |
+| With no username: the row at 1536 px | 296.8 px and 317.8 px | the same |
+| With no username: the three numbers' tops, apart | 33.0 to 37.1 px | 0 px in every state |
 
-No card's content overflows it in any state. In a page area of 843 px the
-card is 158 px tall in all four states, where it was 135.
+The first five rows' measurements had the maintainer's username and a copy
+of the leaderboard cache; the last three none. No card's content overflows
+it in any state. In a page area of 843 px, with a username, the card is
+158 px tall in all four states, where it was 135.
 
 **What this changes in older entries.** Each keeps its text and gains a dated
 note.

@@ -109,8 +109,10 @@ times that name or order runs remain absolute ([T4][card-order]).
 - Scenario Stats, the PB card and the latest-run card start their lines 12px
   below their top edge, 2px apart, with no padding at their bottom. Their
   first lines share one top and their large numbers another in every state,
-  and a card with fewer lines leaves its spare room at its bottom
-  ([SC4][top-aligned]).
+  and a card with fewer lines leaves its spare room at its bottom. With no
+  KovaaK's username the PB card's leaderboard hint takes two lines and the
+  card fills the row it makes, so all three start their lines at their top
+  edge instead, and the row keeps its height ([SC4][top-aligned]).
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under

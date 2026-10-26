@@ -245,11 +245,21 @@ a.run-toast-link {
    the page, because the page's column also holds the setup card's container,
    which is empty on a configured install and would still be given a gap. */
 .run-history-top-row {
+    --run-history-score-card-top: 12px;
+
     display: grid;
     flex: 0 0 auto;
     gap: var(--mantine-spacing-md);
     grid-template-columns: minmax(0, 1fr) var(--run-history-card-width);
     margin-bottom: var(--mantine-spacing-md);
+}
+
+/* With no KovaaK's username the PB card's leaderboard hint takes two lines
+   and the card already fills the row it makes, so a 12px top offset would
+   raise the row by 12px. All three score cards drop the offset together, so
+   they stay lined up and the row keeps the height it had. */
+.run-history-top-row:has(.scenario-rank-hint-username-unset) {
+    --run-history-score-card-top: 0px;
 }
 
 /* The first column wraps on its own width: the score pair leaves the line
@@ -369,7 +379,7 @@ a.run-toast-link {
     flex-direction: column;
     gap: 2px;
     max-width: 100%;
-    padding: 12px var(--mantine-spacing-sm) 0;
+    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
     width: 270px;
 }
 
@@ -432,7 +442,7 @@ a.run-toast-link {
     min-height: 135px;
     min-width: 0;
     overflow: hidden;
-    padding: 12px var(--mantine-spacing-sm) 0;
+    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
 }
 
 /* "Latest run" and the run's age, as the PB card's first line is drawn. Not
@@ -508,7 +518,7 @@ a.run-toast-link {
     gap: 2px;
     max-width: 100%;
     min-width: 0;
-    padding: 12px var(--mantine-spacing-sm) 0;
+    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
     width: 300px;
 }
 
