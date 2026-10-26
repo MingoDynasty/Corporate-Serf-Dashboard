@@ -805,11 +805,11 @@ def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
     file_watchdog.run_import_failure_queue.clear()
 
     with caplog.at_level(logging.DEBUG, logger=data_service.__name__):
-        loaded_files = data_service.initialize_kovaaks_data(str(tmp_path))
+        scanned_files = data_service.initialize_kovaaks_data(str(tmp_path))
 
-    assert loaded_files == {
-        str(tmp_path / "1w4ts - Challenge - 2025.01.01-10.00.00 Stats.csv"): True,
-        str(tmp_path / "1w4ts - Challenge - 2025.01.01-11.00.00 Stats.csv"): False,
+    assert scanned_files == {
+        str(tmp_path / "1w4ts - Challenge - 2025.01.01-10.00.00 Stats.csv"),
+        str(tmp_path / "1w4ts - Challenge - 2025.01.01-11.00.00 Stats.csv"),
     }
     assert any(
         message.startswith(

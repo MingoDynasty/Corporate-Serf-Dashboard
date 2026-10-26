@@ -522,8 +522,8 @@ def get_rank_data_from_playlist_code(
     return []
 
 
-def initialize_kovaaks_data(stats_dir: str) -> dict[str, bool]:
-    """Load existing run CSVs and return each scanned path's import outcome."""
+def initialize_kovaaks_data(stats_dir: str) -> set[str]:
+    """Load existing run CSVs and return every scanned path, including failures."""
     stopwatch = Stopwatch()
     stopwatch.start()
     csv_files = []
@@ -532,10 +532,9 @@ def initialize_kovaaks_data(stats_dir: str) -> dict[str, bool]:
             if entry.is_file() and entry.name.endswith(".csv"):
                 csv_files.append(entry.path)
 
-    scan_results = {
-        csv_file: load_csv_file_into_database(csv_file) for csv_file in csv_files
-    }
-    loaded_count = sum(scan_results.values())
+    loaded_count = sum(
+        1 for csv_file in csv_files if load_csv_file_into_database(csv_file)
+    )
     stopwatch.stop()
     logger.debug(
         "CSV startup load complete: %d scanned, %d loaded, %d failed in %.2f seconds.",
@@ -544,7 +543,7 @@ def initialize_kovaaks_data(stats_dir: str) -> dict[str, bool]:
         len(csv_files) - loaded_count,
         stopwatch.elapsed(),
     )
-    return scan_results
+    return set(csv_files)
 
 
 def _run_file_datetime(path: Path) -> datetime:

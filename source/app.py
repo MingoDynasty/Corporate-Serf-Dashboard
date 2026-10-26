@@ -361,7 +361,7 @@ def main() -> None:
     configured_stats_dir = resolve_stats_dir()
     stats_dir = get_usable_stats_dir()
 
-    scanned_csv_files: dict[str, bool] = {}
+    scanned_csv_files: set[str] = set()
     if stats_dir is None:
         # Not fatal: only `port` is needed to serve pages. Without a stats
         # directory the app is merely empty, and Home says so.

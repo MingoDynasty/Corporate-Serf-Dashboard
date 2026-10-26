@@ -11,8 +11,8 @@ per app session.
   both the initial scan and monitoring are skipped and the app serves without
   run data ([settings](settings.md)).
 - The initial scan lists the folder's CSV files, imports readable runs, and
-  records each scanned path's import outcome. Those imports do not publish
-  new-run messages.
+  returns every scanned path, including files that failed to load. Those
+  imports do not publish new-run messages.
 - After the observer starts, a second listing queues CSVs absent from the
   initial scan as create events on the same observer. A file arriving
   after this listing is covered by normal filesystem monitoring.
