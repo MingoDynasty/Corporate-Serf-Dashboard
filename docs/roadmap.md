@@ -34,7 +34,7 @@ sequence.
   with a clock when that value was old. It no longer repeats the scenario's
   name, its session details share one line, and it ends with the run's
   cm/360 and accuracy as the PB card does. The three score cards line up
-  from the top. (PRs #431 and #PR2; design in #430) Design rationale
+  from the top. (PRs #431 and #434; design in #430) Design rationale
   distilled into [`decision_log/`](./decision_log/README.md).
 - **Typical score on the scenario table** — a playlist's scenario table
   shows each scenario's typical score beside its PB, and a benchmark's table

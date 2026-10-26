@@ -342,7 +342,7 @@ the same form as the finished ones under it.
   depends on whether it was the last run played across all scenarios
   ([2026-10-23](decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md)).
 - **The latest run against the typical run** (Run History page, PRs #431
-  and #PR2; design in #430). The latest-run card says how far the run was
+  and #434; design in #430). The latest-run card says how far the run was
   from the scenario's typical score as it stood when the session began, such
   as `3.6% above typical at session start · 85.8% of PB`, with a clock when
   that value was old. Its first line drops the scenario's name, its session

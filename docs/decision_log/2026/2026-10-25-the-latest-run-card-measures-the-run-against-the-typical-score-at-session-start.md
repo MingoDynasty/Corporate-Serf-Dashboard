@@ -18,7 +18,7 @@ an old value be marked on the card, not only in the hover. Before it, the
 maintainer's lean of 2026-10-24: "Use the typical score at session start for
 the comparison." The author had recommended the Typical score card's own
 value. Leaving the phrase off a new PB is the author's. Built in
-[#PR2](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PR2),
+[#434](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/434),
 the proposal's second and last delivery PR, after
 [#431](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/431).
 Current behavior is in
@@ -166,4 +166,4 @@ whose evidence bar SC1 chooses, and the
 whose clock and words the card reuses.
 
 The proposal file, `docs/proposals/run_history_score_cards_proposal.md`, is
-deleted in #PR2, and git history keeps it.
+deleted in #434, and git history keeps it.
