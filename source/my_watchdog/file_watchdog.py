@@ -4,10 +4,8 @@ Business logic for monitoring a specified directory for newly created files.
 
 import datetime
 import logging
-import os
 import time
 from collections import deque
-from collections.abc import Iterable
 from pathlib import Path
 
 from watchdog.events import FileSystemEventHandler
@@ -21,6 +19,7 @@ from source.kovaaks.data_service import (
     get_high_score,
     get_personal_best_run,
     get_sensitivities_vs_runs,
+    is_run_file_loaded,
     is_scenario_in_database,
     load_csv_file_into_database,
 )
@@ -132,26 +131,10 @@ class NewFileHandler(FileSystemEventHandler):
     This class handles monitoring a specified directory for newly created files.
     """
 
-    def __init__(self, imported_files: Iterable[str] = ()) -> None:
-        """Remember successful startup imports so overlapping events stay silent."""
-        super().__init__()
-        self._imported_files = {
-            os.path.normcase(os.path.abspath(file)) for file in imported_files
-        }
-
     def on_created(self, event):
-        """Import each run CSV once and notify interested UI callbacks."""
+        """Import a newly created run CSV and notify interested UI callbacks."""
         try:
-            file = _get_created_csv_path(event)
-            if file is None:
-                return
-            # The startup listing and real create events can name the same
-            # immutable run. Only this observer thread updates the identities.
-            identity = os.path.normcase(os.path.abspath(file))
-            if identity in self._imported_files:
-                return
-            if self._import_created_file(file):
-                self._imported_files.add(identity)
+            self._import_created_file(event)
         except Exception:  # noqa: BLE001 -- watchdog does not guard handlers.
             # An escaped exception would kill the observer thread and silently
             # end run tracking for the rest of the session (e.g. an OSError
@@ -163,18 +146,23 @@ class NewFileHandler(FileSystemEventHandler):
             )
             run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
 
-    def _import_created_file(self, file: str) -> bool:
-        """Parse, store, and announce a file; return whether the import succeeded."""
+    def _import_created_file(self, event):
+        """Parse, store, and announce one created file; may raise on surprises."""
+        file = _get_created_csv_path(event)
+        if file is None or is_run_file_loaded(file):
+            return
+
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         run_data = extract_data_from_file(file)
         if not run_data:
-            # A locked or partial CSV returns None, so ``on_created``'s
-            # exception guard never sees the failure. There is no readiness
-            # retry for this event: without a later create event or restart,
-            # the run stays missing and needs a notification here.
+            # extract_data_from_file contains its own read and parse failures --
+            # a CSV still locked by KovaaK's, a mid-write line -- and returns
+            # None, so on_created's guard above never sees them. This handler
+            # only sees the creation event and never retries, so the run stays
+            # missing until a restart: notify here or the user is never told.
             logger.warning('Failed to get run data for CSV file: "%s"', file)
             run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
-            return False
+            return
 
         sensitivity_key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
 
@@ -198,10 +186,9 @@ class NewFileHandler(FileSystemEventHandler):
                 # Nothing judges or celebrates a scenario's first run.
                 pace_constant=None,
             )
-            loaded = _enqueue_after_loading(file, message)
-            if loaded:
+            if _enqueue_after_loading(file, message):
                 _refresh_rank_after_high_score(run_data.scenario, run_data.score)
-            return loaded
+            return
 
         high_score = get_high_score(run_data.scenario)
         is_new_high_score = run_data.score > high_score
@@ -227,10 +214,9 @@ class NewFileHandler(FileSystemEventHandler):
                 sensitivity=sensitivity_key,
                 pace_constant=pace_constant,
             )
-            loaded = _enqueue_after_loading(file, message)
-            if loaded and is_new_high_score:
+            if _enqueue_after_loading(file, message) and is_new_high_score:
                 _refresh_rank_after_high_score(run_data.scenario, run_data.score)
-            return loaded
+            return
 
         # Case 3: existing scenario and existing sensitivity.
         message = NewFileMessage(
@@ -243,7 +229,5 @@ class NewFileHandler(FileSystemEventHandler):
             sensitivity=sensitivity_key,
             pace_constant=pace_constant,
         )
-        loaded = _enqueue_after_loading(file, message)
-        if loaded and is_new_high_score:
+        if _enqueue_after_loading(file, message) and is_new_high_score:
             _refresh_rank_after_high_score(run_data.scenario, run_data.score)
-        return loaded

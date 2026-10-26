@@ -1691,6 +1691,18 @@ def test_the_pb_cards_quiet_lines_and_its_badge_use_the_themes_tokens():
     assert "display: none;" in _css_block(css, ".pb-card-leaderboard[hidden]")
 
 
+def test_the_latest_run_badge_uses_page_text_on_a_bordered_tint():
+    css = STYLESHEET.read_text(encoding="utf-8")
+    badge = _css_block(css, ".run-history-card .run-history-card-badge")
+
+    assert "color: var(--mantine-color-text);" in badge
+    assert "border: 1px solid var(--run-history-card-badge-color);" in badge
+    assert (
+        "background: color-mix(in srgb, var(--run-history-card-badge-color) 20%, transparent);"
+        in badge
+    )
+
+
 def test_the_cards_heading_is_one_line_and_cuts_a_long_scenario_name_short():
     css = STYLESHEET.read_text(encoding="utf-8")
     label = _css_block(css, ".run-history-card-label")

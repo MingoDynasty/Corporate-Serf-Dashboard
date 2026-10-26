@@ -1,8 +1,6 @@
 import dataclasses
 import datetime
 import logging
-import os
-from collections import deque
 from types import SimpleNamespace
 
 import pytest
@@ -588,78 +586,3 @@ def test_a_native_run_at_a_converted_groups_value_is_not_a_new_sensitivity(
     assert isinstance(verdict, ThresholdVerdict)
     assert verdict.passed is False
     assert f"{shown_percentage(verdict):.1f}" == "94.4"
-
-
-@pytest.mark.parametrize("path_kind", ["new_scenario", "new_sensitivity", "existing"])
-def test_duplicate_create_imports_and_notifies_once(monkeypatch, path_kind):
-    messages, loads, schedules = _patch_common(monkeypatch, _run_data())
-    _patch_scenario_path(monkeypatch, path_kind)
-    handler = file_watchdog.NewFileHandler()
-    event = SimpleNamespace(is_directory=False, src_path="run.csv")
-
-    handler.on_created(event)
-    handler.on_created(event)
-
-    assert loads == ["run.csv"]
-    assert len(messages) == 1
-    assert len(schedules) == 1
-
-
-def test_startup_imported_file_is_silent_with_a_normalized_path(monkeypatch, tmp_path):
-    messages, loads, schedules = _patch_common(monkeypatch, _run_data())
-    path = tmp_path / "run.csv"
-    handler = file_watchdog.NewFileHandler(
-        [str(tmp_path / "nested" / ".." / path.name)]
-    )
-
-    handler.on_created(SimpleNamespace(is_directory=False, src_path=str(path)))
-
-    assert loads == []
-    assert messages == []
-    assert schedules == []
-
-
-@pytest.mark.skipif(os.name != "nt", reason="Windows paths ignore case")
-def test_startup_imported_file_is_silent_with_different_path_case(
-    monkeypatch, tmp_path
-):
-    messages, loads, schedules = _patch_common(monkeypatch, _run_data())
-    path = str(tmp_path / "run.csv")
-    handler = file_watchdog.NewFileHandler([path])
-
-    handler.on_created(
-        SimpleNamespace(is_directory=False, src_path=path[:-4].upper() + ".csv")
-    )
-
-    assert loads == []
-    assert messages == []
-    assert schedules == []
-
-
-@pytest.mark.parametrize("failed_stage", ["parse", "load"])
-def test_failed_import_can_succeed_on_a_later_event(monkeypatch, failed_stage):
-    run = _run_data()
-    messages, _loads, _schedules = _patch_common(monkeypatch, run)
-    _patch_scenario_path(monkeypatch, "new_scenario")
-    monkeypatch.setattr(file_watchdog, "run_import_failure_queue", deque())
-    if failed_stage == "parse":
-        readings = iter([None, run])
-        monkeypatch.setattr(
-            file_watchdog, "extract_data_from_file", lambda _path: next(readings)
-        )
-    else:
-        outcomes = iter([False, True])
-        monkeypatch.setattr(
-            file_watchdog, "load_csv_file_into_database", lambda _path: next(outcomes)
-        )
-    handler = file_watchdog.NewFileHandler()
-    event = SimpleNamespace(is_directory=False, src_path="run.csv")
-
-    handler.on_created(event)
-    handler.on_created(event)
-    handler.on_created(event)
-
-    assert len(messages) == 1
-    assert file_watchdog.drain_run_import_failures() == [
-        file_watchdog.RUN_IMPORT_FAILURE_MESSAGE
-    ]

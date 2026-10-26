@@ -17,8 +17,8 @@ the in-memory stores from existing CSVs, lists the `performances` folder beside
 it (`time_scored_service.index_performance_files`, which parses nothing), starts
 a watchdog `Observer` on the stats directory, then lists the directory again
 and queues files the first scan missed on that observer's event queue. The
-handler remembers successfully imported file paths, so a real create event
-and the second listing cannot count a run twice. Reconciliation and live imports
+handler checks the stores' successful filename identities, so a real create
+event and the second listing cannot count a run twice. Reconciliation and live imports
 both run on the watchdog thread, preserving the single writer to the run stores.
 The process serves the Dash app with Waitress (Flask dev server when
 `config.debug`). With no usable stats directory — unset, or set but missing —
@@ -1024,11 +1024,14 @@ flowchart LR
   no component ids: the three modes, the range options in runs and in days,
   the empty-state copy, and `build_run_history_figure()`. That function
   takes one copy of the run store (`data_service.get_all_runs`), puts the
-  scenario's runs from it in play order, judges the new PBs over all of
-  them, applies the range the mode counts in, and hands the runs to one of
-  `plot_service`'s three builders. On Score vs Run and Score vs Time, while
-  any of the typical score's switches is on, it also splits that copy into
-  play sessions, builds the typical score after every run of the scenario
+  scenario's runs from it in play order, splits that copy into play sessions,
+  and builds each run's `RunPointContext`: its session number, session total,
+  exact list-session name and number of newer scenario runs. It judges the
+  new PBs over the whole history, applies the range the mode counts in, and
+  hands the runs and context to one of `plot_service`'s three builders.
+  On Score vs Run and Score vs Time, while
+  any of the typical score's switches is on, it builds the typical score
+  after every run of the scenario
   (`typical_score.build_typical_scores`), and adds the plotted runs' values
   as `plot_service.typical_score_traces()` on Score vs Run or
   `plot_service.typical_score_hold_traces()` on Score vs Time: the
@@ -1146,6 +1149,11 @@ flowchart LR
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
   `load_csv_file_into_database`, `extract_data_from_file`, `get_high_score`,
   `get_sensitivities_vs_runs`, and the playlist loaders/getters.
+  `is_run_file_loaded` checks the run filename against the existing time
+  index before a startup load or live import. Successfully stored filenames
+  are idempotent for that store's lifetime, including after deletion and
+  recreation; failed imports remain retryable. The watchdog skips an
+  already loaded file before its wait, parsing, or message delivery.
   `extract_data_from_file` normalizes a run's sensitivity to cm/360 when the
   file carries `Sens Increment` and `DPI`, so every downstream consumer of
   `RunData.horizontal_sens` / `RunData.sens_scale` reads one scale
@@ -1352,7 +1360,13 @@ flowchart LR
   `generate_score_vs_run_plot`, `generate_score_vs_time_plot`, and
   `generate_score_vs_sensitivity_plot`.
   Each plots every run it is given as one point, titles the figure with the
-  scenario's name alone, and draws no summary line: the typical score's
+  scenario's name alone, and receives context counted by the chart module
+  over the full store snapshot. Point and star tooltips share four lines:
+  full timestamp, list-formatted score, named session with its scenario's run
+  number and total, and sensitivity with the recorded setting and DPI.
+  Only Score vs Run adds a run-age suffix to its timestamp. The list's
+  Sensitivity-cell tooltip also exposes the recorded setting and DPI.
+  Each draws no summary line: the typical score's
   traces come from `typical_score_traces()` and
   `typical_score_hold_traces()`, which the chart module adds to the Score vs
   Run and Score vs Time figures. Score vs Run puts a
@@ -1542,6 +1556,13 @@ flowchart LR
   lists the ten pieces of grid work, each a place an AG Grid upgrade can
   break. It holds no copy: every string comes with the rows or with the
   grid's `context`.
+- `assets/runHistoryHover.js` — links Run History chart markers and loaded
+  run-list rows by run ID on hover. It indexes SVG run and PB-star markers
+  after plotting, applies a temporary CSS class, and asks
+  `runHistoryList.highlightRun` to mark one row: the Run exposed by expansion,
+  its collapsed Scenario visit under All scenarios, or its collapsed Session.
+  Grid mouse events clear or emphasize chart markers. No
+  hover request, scroll, expansion, or focus change is involved.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Run History
   graph to the runs in view when
   the x axis is zoomed. It reads the x axis through plotly.js's own

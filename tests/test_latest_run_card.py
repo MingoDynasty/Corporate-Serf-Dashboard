@@ -914,7 +914,11 @@ def test_each_badge_reads_as_the_copy_has_it(badge, text, color):
 
     _score, drawn = latest_run_card_content(shown, A, True).body[0].children
 
-    assert (drawn.children, drawn.color) == (text, color)
+    assert drawn.children == text
+    assert drawn.className == "run-history-card-badge"
+    assert drawn.style == {
+        "--run-history-card-badge-color": f"var(--mantine-color-{color}-6)"
+    }
     # The badge's own style would print capitals.
     assert drawn.tt == "none"
 

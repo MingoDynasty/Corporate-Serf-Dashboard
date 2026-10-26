@@ -2,7 +2,7 @@
 
 The app loads existing run files at startup and watches the stats folder for
 new ones. A second directory listing after monitoring starts recovers files
-written during startup. Each successfully imported file contributes one run
+written during startup. Each successfully imported filename contributes one run
 per app session.
 
 ## Startup And Monitoring
@@ -26,16 +26,18 @@ per app session.
 
 ## Successful File Identity
 
-- Each handler remembers the normalized absolute path of every successfully
-  imported CSV, seeded with the initial scan's successful paths. Normalization
-  follows the platform's path casing rules.
-- A repeated create event for a successful path is ignored before parsing or
+- The stores identify each successful import by its full stats filename,
+  using the platform's filename casing rules. The handler checks this identity
+  for initial-scan imports as well as earlier live imports, without maintaining
+  a separate registry ([run identity](notifications.md#run-notifications)).
+- A repeated create event for a successful filename is ignored before parsing or
   waiting. Overlap between reconciliation and a real event contributes one
   run, one new-run message, and at most one rank-refresh scheduling call.
 - File contents are not part of this identity. A successful run file is treated
-  as immutable for the session, including deletion and recreation at the same
-  path. Distinct paths remain distinct runs. Restarting rebuilds the stores
-  from the files currently on disk; identities are not persisted.
+  as immutable for the session, including deletion and recreation with the same
+  filename. Distinct filenames remain distinct runs, even when their scores and
+  timestamps match. Restarting rebuilds the stores from the files currently on
+  disk; identities are not persisted.
 
 ## Read Failures
 

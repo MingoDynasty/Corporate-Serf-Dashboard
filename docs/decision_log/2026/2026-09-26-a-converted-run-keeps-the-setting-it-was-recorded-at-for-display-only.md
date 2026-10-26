@@ -9,6 +9,13 @@ DPI in a file now shows up there instead of hiding behind an odd cm/360
 value. Everything else still works from the converted value, so a wrong DPI
 is shown but not corrected.
 
+**Display extended (2026-10-24).** The
+[compact point-tooltip decision](2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md)
+also exposes recorded settings in the run list's Sensitivity cell tooltip.
+The chart still shows them in every mode. The original display rationale,
+retention, conversion, grouping and DPI trust remain in force; the historical
+template and customdata positions below describe their original implementation.
+
 **What is kept.** The recorded setting is the one a player remembers
 playing, and its DPI explains a cm/360 group that would otherwise look
 wrong. `RunData` gains `recorded_sensitivity`, a frozen

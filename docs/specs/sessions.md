@@ -3,9 +3,9 @@
 The app groups a player's runs into sessions: the runs separated by breaks of
 no more than 30 minutes. To measure a break it works out when each run began
 and how long it took, from two lines of the run's stats file. Inside a
-session it also finds each visit, the consecutive runs on one scenario. One
-page shows sessions so far, Run History, where a player can read a run in
-the context of their practice.
+session it also finds each visit, the consecutive runs on one scenario.
+Run History names the session and shows a scenario's run position and total
+within it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in
@@ -20,9 +20,13 @@ Two words are kept apart throughout. A **break** is time between runs. A
 
 ## Where sessions show
 
-- The Run History page is the one page that shows a session, in four
-  places: its run list, its latest-run card, the chart's typical-score hover,
-  and the Scenario Stats lead's hover. Both typical-score hovers count the
+- The Run History page shows sessions in its run list and latest-run card,
+  and in hovers on chart points, typical score and the Scenario Stats lead.
+  The point tooltip uses the same session name as its Session row, numbers
+  a run among its scenario's runs in that session, and gives the scenario's
+  total imported runs in that session
+  ([2026-10-24](../decision_log/2026/2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md)).
+  Both typical-score hovers count the
   sessions behind a value ([TS3][typical-chart], [TS5][typical-card-value]).
 - The run list has two views. Under This scenario it lists a scenario's runs
   under the session each was played in, names a session by when it started,

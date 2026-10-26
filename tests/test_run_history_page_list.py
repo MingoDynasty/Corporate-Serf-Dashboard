@@ -201,7 +201,7 @@ def test_the_two_kinds_of_row_are_kept_in_reading_order():
 
 
 def test_keys_on_a_row_reach_the_lists_own_handler():
-    assert _grid().eventListeners == {"cellKeyDown": ["runListKeyDown(params)"]}
+    assert _grid().eventListeners["cellKeyDown"] == ["runListKeyDown(params)"]
 
 
 def test_no_column_sorts_moves_or_resizes():
@@ -312,17 +312,13 @@ def test_the_three_new_columns_are_right_aligned_and_hidden_to_start():
     ]
 
 
-def test_the_fov_cell_gives_its_whole_text_as_the_browsers_own_hover():
-    """A long scale is cut short, and the hover gives it whole.
-
-    The browser's title, as a scenario row's name has, and not a popup the
-    grid draws. No other column has a hover.
-    """
+def test_detail_cells_use_the_browsers_own_hover():
+    """Keep full details available without widening fixed columns."""
     columns = _grid().columnDefs
 
     assert [
         (c["field"], c["tooltipField"]) for c in columns if "tooltipField" in c
-    ] == [("fov", "fov")]
+    ] == [("sens", "sens_detail"), ("fov", "fov")]
     assert _options()["enableBrowserTooltips"] is True
 
 
@@ -644,6 +640,8 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
             ),
             "wholeSession": "Show the whole session",
             "newPb": "New PB",
+            "sessionNewPb": "A new PB was set in this session.",
+            "scenarioSessionNewPb": "A new PB for this scenario was set in this session.",
             # The figures' words, which This scenario draws in columns.
             "median": "Median",
             "best": "Best",
@@ -759,6 +757,7 @@ def test_the_selected_scenarios_latest_run_is_highlighted_by_a_row_rule():
     rules = _options()["rowClassRules"]
 
     assert rules == {
+        "run-list-row-linked": "params.data.linked === true",
         "run-list-row-latest": "params.data.latest",
         "run-list-row-selected": "params.data.sel && params.data.kind === 'run'",
     }
@@ -795,7 +794,7 @@ def test_a_scenario_rows_band_follows_its_row_and_not_the_rows_it_was_drawn_with
     naming = naming[: naming.index("function sessionRow(")]
 
     assert (
-        'data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario",'
+        'data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario";'
         in naming
     )
     assert "redrawRows" not in script
@@ -1284,7 +1283,8 @@ def test_the_marks_cell_says_why_a_run_has_no_check():
 
     assert "title: data.passed ? undefined : data.check_text" in script
     assert 'h("span", { className: "visually-hidden" }, data.check_text)' in script
-    assert '"aria-label": labels.newPb,' in script
+    assert '"aria-label": label,' in _function(script, "star")
+    assert "star(labels.newPb)" in script
 
 
 def _inline_script(registration: dict) -> str:

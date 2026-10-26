@@ -387,9 +387,7 @@ def main() -> None:
     if stats_dir is not None:
         observer = Observer()
         watch = observer.schedule(
-            NewFileHandler(
-                file for file, loaded in scanned_csv_files.items() if loaded
-            ),
+            NewFileHandler(),
             stats_dir,
             recursive=False,
         )
