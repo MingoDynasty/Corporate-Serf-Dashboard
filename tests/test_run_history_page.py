@@ -2188,7 +2188,6 @@ def test_the_card_starts_empty_and_the_page_load_fills_it():
     card = run_history.LATEST_RUN_CARD_IDS
 
     assert _by_id(page, card.body).children is None
-    assert _by_id(page, card.body).children is None
 
 
 def test_the_page_holds_no_scenario_button_and_no_script_to_hand_focus_on():
