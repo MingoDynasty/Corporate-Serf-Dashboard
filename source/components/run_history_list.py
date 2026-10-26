@@ -1022,8 +1022,9 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
 
     The header is the switch between the two views at the left, with Expand
     all and the Columns menu at the right. The heading line is in it too, in
-    its place before the switch, for a screen reader only: the latest-run
-    card above the list names its scenario on screen.
+    its place before the switch, for a screen reader only: on screen the
+    Selected scenario field and the chart's title name the scenario, and on
+    a line of its own the heading would take a row of the list.
 
     The grid is given no rows. The page's callback writes them to
     ``ids.model``, and the script registered by ``register_run_list`` hands

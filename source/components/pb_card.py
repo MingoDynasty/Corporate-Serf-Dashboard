@@ -54,6 +54,7 @@ from source.components.latest_run_card import (
     SCORE_ROW_CLASS,
     TIME_CLASS,
     TIME_TARGET_CLASS,
+    sensitivity_and_accuracy,
 )
 from source.components.local_icon import local_icon
 from source.components.run_marks import new_pb_gain, what_runs_chased
@@ -69,10 +70,7 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
 )
 from source.kovaaks.play_sessions import in_play_order
-from source.kovaaks.playlist_scenarios_service import (
-    ladder_standing,
-    personal_best_cm360,
-)
+from source.kovaaks.playlist_scenarios_service import ladder_standing
 from source.kovaaks.time_scored_service import (
     PaceBasis,
     eligible_pace_constant,
@@ -84,7 +82,7 @@ from source.utilities.notifications import (
     channel_toast,
     toast,
 )
-from source.utilities.utilities import format_percent, format_score
+from source.utilities.utilities import format_score
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +107,9 @@ FLEX_TARGET_CLASS = "pb-card-flex-target"
 WORD_END_CLASS = "pb-card-word-end"
 POSITION_LABEL_CLASS = "pb-card-position-label"
 POSITION_TOOLTIP_CLASS = "pb-card-position-tooltip"
+# The stylesheet drops the score cards' top offset while a hint shows, so
+# every hint keeps this class.
+RANK_HINT_CLASS = "scenario-rank-hint"
 _ARIA_HIDDEN: dict[str, Any] = {"aria-hidden": "true"}
 
 SCENARIO_RANK_LOADING_DELAY_MS = 250
@@ -187,20 +188,6 @@ class PersonalBest:
     faded: str
 
 
-def _faded_line(run: RunData) -> str:
-    """Word the PB run's sensitivity and its hit accuracy.
-
-    The sensitivity is the scenario table's PB cm/360, formatted as that
-    column formats it. The accuracy is the hit accuracy, as the table's PB
-    Accuracy, the latest-run card and the run list show a run's.
-    """
-    accuracy = f"Accuracy {format_percent(run.accuracy)}"
-    cm360 = personal_best_cm360(run)
-    if cm360 is None:
-        return accuracy
-    return f"{format_score(cm360)} cm/360 · {accuracy}"
-
-
 def personal_best(
     runs: Sequence[RunData],
     ladder: list[Rank] | None,
@@ -260,7 +247,7 @@ def personal_best(
         rank=None if standing is None else standing.reached,
         at_top_rank=standing is not None and standing.at_top,
         next_rank=next_rank,
-        faded=_faded_line(run),
+        faded=sensitivity_and_accuracy(run),
     )
 
 
@@ -461,7 +448,7 @@ def _rank_display(value: str, hint: str | None) -> str | list:
         value,
         dmc.Text(
             _rank_hint_children(hint),
-            className="scenario-rank-hint",
+            className=RANK_HINT_CLASS,
             span=True,
         ),
     ]

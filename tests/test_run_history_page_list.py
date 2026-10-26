@@ -1531,7 +1531,7 @@ def test_the_switch_sits_at_the_left_and_the_buttons_at_the_right():
 
 
 def test_the_heading_line_is_for_a_screen_reader_only_in_both_views():
-    """The latest-run card above the list names its scenario on screen.
+    """The Selected scenario field and the chart's title name its scenario on screen.
 
     The line keeps its words, in its place before the switch, and stays a
     line of text: an HTML heading would change what a screen reader hears.

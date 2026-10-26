@@ -19,6 +19,13 @@ the card reports the selected scenario during a lookup as well, so the two
 large scores always concern the same scenario. The rule, and every other
 application of it, stands.
 
+**Note (2026-10-25).** The latest-run card's first line no longer names its
+scenario ([2026-10-25](2026-10-25-the-latest-run-cards-first-line-drops-the-scenarios-name.md)),
+so the `Latest run · {age} · {scenario}` quoted as an example of a relative
+age now reads `Latest run · {age}`. The rule is unchanged, and the card's
+new lines apply it
+([2026-10-25](2026-10-25-the-latest-run-card-ends-with-the-runs-cm360-and-accuracy.md)).
+
 **Ruling.** T4 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`, as amended after the
 first review wave. This rule also binds later cards in this row, including

@@ -177,9 +177,9 @@ The card at the right end of Run History's top row, over the run list, that
 reports the selected scenario's latest run with its verdict
 ([run_history.md](specs/run_history.md#the-latest-run-card)).
 
-- On screen it has no title. Its first line reads
-  `Latest run · {age} · {scenario}`, or `Latest run` alone with no run to
-  report.
+- On screen it has no title. Its first line reads `Latest run · {age}`, or
+  `Latest run` alone with no run to report. It doesn't name the scenario,
+  which the Selected scenario field names.
 
 ### Scenario Stats
 

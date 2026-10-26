@@ -16,6 +16,17 @@ scenario is superseded by
 [selected-scenario latest-run highlights](2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md).
 The original text is retained as history; the other rules stand.
 
+**Superseded in part (2026-10-25).** [The first line drops the scenario's name](2026-10-25-the-latest-run-cards-first-line-drops-the-scenarios-name.md),
+so the name, its title and its cutting short are history.
+[The card ends with the run's cm/360 and accuracy](2026-10-25-the-latest-run-card-ends-with-the-runs-cm360-and-accuracy.md):
+the time on the scenario shares the session line, after ` · `, and no longer
+takes a line of its own.
+[The three score cards line up from the top](2026-10-25-run-historys-three-score-cards-line-up-from-the-top.md):
+the lines start 12 px below the card's top instead of being centered, and the
+floor is 135 px in the wide layout and 158 px in a page area of 900 px or
+less. Which run, the session's words, the empty states and when the card is
+written stand.
+
 **Ruling and delivery.** R1 of
 [#388](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/388),
 ratified by the maintainer on 2026-10-18 at `0fcac03`, "I ratify the

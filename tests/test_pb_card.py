@@ -307,7 +307,7 @@ def test_the_scores_hover_is_the_latest_run_cards_line_for_the_pb(
 
     assert shown.score_hover == hover
     if hover is not None:
-        assert landed.result.startswith(f"{hover} · Accuracy ")
+        assert landed.comparison == hover
 
 
 def test_the_scores_hover_is_measured_under_the_pbs_own_version():
@@ -746,3 +746,11 @@ def test_the_pbs_age_is_reworded_in_the_browser_on_the_30_second_tick():
         f"{run_history.RELATIVE_TIME_INTERVAL_ID}.n_intervals",
     ]
     assert latest_run_card.AGE_SCRIPT in script
+
+
+@pytest.mark.parametrize("hint", ["username_unset", "lookup_failed", "served_stale"])
+def test_every_hint_carries_the_class_the_top_row_reads(hint):
+    """The stylesheet drops the score cards' top offset while any hint shows."""
+    _value, shown_hint = pb_card._rank_display("N/A", hint)
+
+    assert shown_hint.className == pb_card.RANK_HINT_CLASS == "scenario-rank-hint"

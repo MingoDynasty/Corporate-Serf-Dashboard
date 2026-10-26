@@ -981,7 +981,8 @@ flowchart LR
   (`run_marks.new_pb_gain()` over `what_runs_chased()` in play order), the
   rank it has reached and the next rank's parts from
   `playlist_scenarios_service.ladder_standing()`, the table's own walk, and
-  the PB run's cm/360 and hit accuracy. `personal_best_from_store()` copies
+  the PB run's cm/360 and hit accuracy, worded by the latest-run card's
+  `sensitivity_and_accuracy()`. `personal_best_from_store()` copies
   the store once, finds the ladder in the benchmark the Playlist filter
   holds, and reads the pace basis as the table does. A page fills in a
   `PbCardIds`: an id for each component the card builds, plus the page's
@@ -1103,9 +1104,11 @@ flowchart LR
   selected scenario to the text the card shows for that scenario's latest
   run, its last in the newest session that holds one: when it ended, which
   the page's script words as an age, its score, one badge, its percentage of
-  the PB it was chasing or a new PB's gain, its number in its session, which
-  names an older session as the run list names its row, and the time on its
-  scenario there.
+  the PB it was chasing or a new PB's gain, one line with its number in its
+  session, which names an older session as the run list names its row, and
+  the time on its scenario there, and its cm/360 and hit accuracy.
+  `sensitivity_and_accuracy()` words that last line for this card and the
+  PB card's, so the two read alike.
   It judges the run with `score_threshold.judge_run()` from what
   `run_marks.what_runs_chased()` works out, as the run list does, and prints
   the percentage with `shown_percentage()`. A run nothing

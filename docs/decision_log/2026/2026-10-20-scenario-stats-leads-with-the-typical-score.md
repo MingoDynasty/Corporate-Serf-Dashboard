@@ -6,6 +6,10 @@ Scenario Stats leads with the typical score in the same large-number style as th
 Its first line names that figure and explains older support, while Category and Total runs follow.
 The total count has a distinct name so it is not mistaken for the runs used to calculate the score.
 
+**Superseded in part (2026-10-25).** [The three score cards line up from the top](2026-10-25-run-historys-three-score-cards-line-up-from-the-top.md):
+the card's lines, which the spec gave as centered under this entry, start
+12 px below its top, 2 px apart. The lead, its order and its words stand.
+
 **Ruling.** TS8 of [proposal #382](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/382), ruled with TS7 on 2026-10-20 at [e2d36db](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/commit/e2d36db). It amends TS5's ordinary line and the older card's absence of a lead fact. Delivered in #401 after #398 and #400, alongside #402.
 
 **Contract.** The first line is plain text, not a heading, and reads `Typical score`, then a help icon named `About the typical score`, then [TS6's partial-recent readout](2026-10-20-a-typical-score-is-recent-with-ten-runs-from-the-last-thirty-days.md) whenever any supporting runs are old. The value is a 30px weight-600 lead with a dotted underline for its hover, dimmed in the theme's dimmed color when not recent. Dimmed large text must clear 3:1 against the card background in each theme. Category follows while the Playlist filter holds a grouped benchmark, then `Total runs: {n}`, replacing Number of runs.

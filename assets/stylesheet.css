@@ -245,11 +245,21 @@ a.run-toast-link {
    the page, because the page's column also holds the setup card's container,
    which is empty on a configured install and would still be given a gap. */
 .run-history-top-row {
+    --run-history-score-card-top: 12px;
+
     display: grid;
     flex: 0 0 auto;
     gap: var(--mantine-spacing-md);
     grid-template-columns: minmax(0, 1fr) var(--run-history-card-width);
     margin-bottom: var(--mantine-spacing-md);
+}
+
+/* While the PB card's leaderboard line shows a hint, its line can wrap and
+   the card can fill the row it makes, as it does with no KovaaK's username.
+   All three score cards drop the offset together then, so they stay lined
+   up. */
+.run-history-top-row:has(.pb-card .scenario-rank-hint) {
+    --run-history-score-card-top: 0px;
 }
 
 /* The first column wraps on its own width: the score pair leaves the line
@@ -358,14 +368,27 @@ a.run-toast-link {
     border-color: var(--mantine-color-default-border);
 }
 
-/* The frame adds only its border to the height, so with Category's line the
-   card still fits in the row the dropdown column sets. Its lines are
-   centered in that height, as the latest-run card's are. */
+/* The three score cards start their lines 12px below their top, 2px apart,
+   so their first lines share one top and their scores another whatever each
+   card holds. Centered, where the scores sat would follow each card's line
+   count. The 12px is a spacer that takes only room the row already has, and
+   not padding: a card that needs more room keeps it, so no card's content
+   ever makes the row taller than it was. Its negative margin cancels the gap
+   after it, so it adds nothing to a card's height while it is empty. */
+.scenario-stats-card::before,
+.pb-card::before,
+.run-history-card::before {
+    content: "";
+    flex: 1 1 0;
+    margin-bottom: -2px;
+    max-height: var(--run-history-score-card-top);
+}
+
 .scenario-stats-card {
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
-    justify-content: center;
+    gap: 2px;
     max-width: 100%;
     padding: 0 var(--mantine-spacing-sm);
     width: 270px;
@@ -419,45 +442,26 @@ a.run-toast-link {
 }
 
 /* The latest-run card, over the run list. It is as tall as the row, and
-   never less than 135px, which holds its tallest state: its second line on
-   two lines in a narrow card, over the run's session and its time on the
-   scenario. What it shows changes between runs and its height never follows
-   it, so the chart under it never jumps. The lines are centered in that
-   height. */
+   never less than 135px. What it shows changes between runs and its height
+   never follows it, so the chart under it never jumps: in the wide layout
+   every line fits on one, and the row holds every state. Its lines start
+   from the top, as the other score cards' do. */
 .run-history-card {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    justify-content: center;
     min-height: 135px;
     min-width: 0;
     overflow: hidden;
     padding: 0 var(--mantine-spacing-sm);
 }
 
-/* "Latest run", the run's time, and its scenario, on one line. A long
-   scenario name is the part that is cut short. */
+/* "Latest run" and the run's age, as the PB card's first line is drawn. Not
+   a flex container: that would drop the space before the age. */
 .run-history-card-heading {
     color: var(--mantine-color-dimmed);
-    display: flex;
     font-size: 12px;
     line-height: 18px;
-    min-width: 0;
-}
-
-/* Not a box of its own: the name inside it is laid out as the heading's own
-   item, beside the label, so it is the part that is cut short. */
-.run-history-card-heading-text {
-    display: contents;
-}
-
-/* Kept whole, with the space it ends on: a flex container drops a space
-   between two items, and the label would run into the name. With no run
-   "Latest run" stays, and the words inside it that hold the age are hidden
-   by their own attribute, which a display set on them would undo. */
-.run-history-card-label {
-    flex: 0 0 auto;
-    white-space: pre;
 }
 
 /* The box dmc wraps a tooltip's target in, where the target sits in a line of
@@ -465,14 +469,6 @@ a.run-toast-link {
    break the line round the target. */
 .run-history-card-time-target {
     display: inline;
-}
-
-.run-history-card-scenario {
-    flex: 0 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* Not a box of its own either, so the heading and the lines under it are
@@ -498,8 +494,12 @@ a.run-toast-link {
     line-height: 19px;
 }
 
-.run-history-card-session {
-    color: var(--mantine-color-dimmed);
+/* The run's session line and its sensitivity and accuracy: quieter than the
+   comparison, because they support the score, in the scenario table's
+   readable grey for an old typical value. The cards' dimmed grey measures
+   3.3:1 light and 4.0:1 dark, under the 4.5:1 text this size needs. */
+.run-history-card-quiet {
+    color: #676d75;
     font-size: 12px;
     line-height: 18px;
 }
@@ -516,17 +516,17 @@ a.run-toast-link {
 }
 
 /* The PB card, 300px wide after Scenario Stats in the score pair, beside
-   the latest-run card. Its frame adds only its border to its height, as the
-   Scenario Stats card's does, and its lines are centered in that height.
-   It shares the latest-run card's lines: the score row, the line under it,
-   and the empty state. The explicit width keeps Firefox from sizing the
-   pair from the PB's content instead of its flex basis. */
+   the latest-run card. Its lines start from the top, as the other score
+   cards' do, with no padding at the bottom, so the row stays the height the
+   dropdowns' column sets. It shares the latest-run card's lines: the score
+   row, the line under it, and the empty state. The explicit width keeps
+   Firefox from sizing the pair from the PB's content instead of its flex
+   basis. */
 .pb-card {
     display: flex;
     flex: 0 0 300px;
     flex-direction: column;
     gap: 2px;
-    justify-content: center;
     max-width: 100%;
     min-width: 0;
     padding: 0 var(--mantine-spacing-sm);
@@ -620,15 +620,22 @@ a.run-toast-link {
 }
 
 /* The PB run's sensitivity and accuracy: quieter than the lines above it,
-   because they support the PB. With no PB it is empty and out of the card. */
+   because they support the PB, in the latest-run card's readable grey, so
+   the two cards' last lines read alike. With no PB it is empty and out of
+   the card. */
 .pb-card-faded {
-    color: var(--mantine-color-dimmed);
+    color: #676d75;
     font-size: 12px;
     line-height: 18px;
 }
 
 .pb-card-faded:empty {
     display: none;
+}
+
+[data-mantine-color-scheme="dark"] .run-history-card-quiet,
+[data-mantine-color-scheme="dark"] .pb-card-faded {
+    color: #a6a6a6;
 }
 
 /* The scenario note card sits after the dropdowns, before both scores. It
@@ -1453,8 +1460,12 @@ a.run-toast-link {
         display: contents;
     }
 
+    /* At its 380px minimum the session line can take two lines, so the floor
+       here holds that state, with 12px under the last line. The wide row
+       keeps 135px, since a higher floor there would raise the whole row. */
     .run-history-card {
         flex: 1 1 380px;
+        min-height: 158px;
     }
 
     .run-history-columns {
