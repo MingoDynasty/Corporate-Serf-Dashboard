@@ -16,20 +16,21 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The three entries below were established by the two 2026-08-12 audits, which
+The remaining entries below were established by the two 2026-08-12 audits, which
 hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
 (gitignored, main checkout only — deliberately not linked so a fresh clone's
-docs link check stays green). Five further defects from the same corpus are
+docs link check stays green). Other defects from the same corpus are
 already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
 (PR #254), the two cache defects (colliding cache keys and the invalid-UTF-8
-read escape, PR #264), the unbounded configured port (PR #266), and the
-duplicate-event double count (PR #421).
+read escape, PR #264), the unbounded configured port (PR #266), the
+duplicate-event double count (PR #421), and the startup scan gap (PR #422).
 
 ### Run files missed until restart on a single failed parse
 
-`source/my_watchdog/file_watchdog.py:136-146` — one fixed 1-second sleep, one
+`NewFileHandler._import_created_file` in
+`source/my_watchdog/file_watchdog.py` — one fixed 1-second sleep, one
 parse attempt, no retry. A CSV still locked by KovaaK's or mid-write when the
 attempt fires raises a toast but is never imported until a restart rescans the
 directory. The runtime register sequences a stable run/file identity first
@@ -40,17 +41,11 @@ zero-PB handling.
 
 ### Fixed one-second handler sleep serializes ingestion
 
-`source/my_watchdog/file_watchdog.py:136` — every create event holds the
+`NewFileHandler._import_created_file` in
+`source/my_watchdog/file_watchdog.py` — every create event holds the
 handler thread for a full second, so bursts queue behind it: the 2026-08-12
 soak left 391 of 1,000 files unprocessed after a ten-minute adversarial burst
 plus settle.
-
-### Startup loss window between the initial scan and the watchdog
-
-`source/app.py:369-386` — a run written after `initialize_kovaaks_data`
-finishes scanning but before `observer.start()` is never imported this
-session; the soak reproduced it with a synchronized arrival. Restart
-reconciles.
 
 ## Code Smells
 

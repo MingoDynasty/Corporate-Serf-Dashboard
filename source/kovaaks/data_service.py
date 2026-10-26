@@ -522,12 +522,8 @@ def get_rank_data_from_playlist_code(
     return []
 
 
-def initialize_kovaaks_data(stats_dir: str) -> None:
-    """
-    Initialize the Kovaaks database.
-    :param stats_dir: stats directory to read data from.
-    :return: None.
-    """
+def initialize_kovaaks_data(stats_dir: str) -> set[str]:
+    """Load existing run CSVs and return every scanned path, including failures."""
     stopwatch = Stopwatch()
     stopwatch.start()
     csv_files = []
@@ -547,6 +543,7 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
         len(csv_files) - loaded_count,
         stopwatch.elapsed(),
     )
+    return set(csv_files)
 
 
 def _run_file_datetime(path: Path) -> datetime:

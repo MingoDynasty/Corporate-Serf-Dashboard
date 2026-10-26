@@ -6,6 +6,7 @@ import errno
 import ipaddress
 import json
 import logging
+import os
 import socket
 import sys
 import tomllib
@@ -16,6 +17,7 @@ from typing import NoReturn
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
 from waitress import serve
+from watchdog.events import FileCreatedEvent
 from watchdog.observers import Observer
 from watchdog.observers.api import BaseObserver
 
@@ -359,6 +361,7 @@ def main() -> None:
     configured_stats_dir = resolve_stats_dir()
     stats_dir = get_usable_stats_dir()
 
+    scanned_csv_files: set[str] = set()
     if stats_dir is None:
         # Not fatal: only `port` is needed to serve pages. Without a stats
         # directory the app is merely empty, and Home says so.
@@ -371,7 +374,7 @@ def main() -> None:
         )
     else:
         # Initialize scenario data
-        initialize_kovaaks_data(stats_dir)
+        scanned_csv_files = initialize_kovaaks_data(stats_dir)
         index_performance_files(stats_dir)
 
     log_rank_lookup_availability()
@@ -380,19 +383,33 @@ def main() -> None:
     # assembled after both playlists and local CSV stats have loaded.
     start_percentile_warmup_worker(config)
 
-    # Monitor for new files
     observer: BaseObserver | None = None
     if stats_dir is not None:
         observer = Observer()
-        observer.schedule(
+        watch = observer.schedule(
             NewFileHandler(),
             stats_dir,
             recursive=False,
-        )  # Set recursive=True to monitor subdirectories
+        )
         observer.start()
         logger.info('Monitoring directory: "%s"', stats_dir)
 
     try:
+        if stats_dir is not None and observer is not None:
+            # List again only after monitoring is active, closing the initial
+            # scan's loss window. Queue imports on the observer thread to keep
+            # one store writer; the handler deduplicates overlapping events.
+            with os.scandir(stats_dir) as entries:
+                for entry in entries:
+                    if (
+                        entry.is_file()
+                        and entry.name.endswith(".csv")
+                        and entry.path not in scanned_csv_files
+                    ):
+                        observer.event_queue.put(
+                            (FileCreatedEvent(entry.path, is_synthetic=True), watch)
+                        )
+
         # Run the Dash app. `app.run()` uses Flask's development server even when
         # debug is disabled, so switch to Waitress for non-debug runs.
         if config.debug:
