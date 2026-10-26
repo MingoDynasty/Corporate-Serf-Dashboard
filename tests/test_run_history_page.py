@@ -1613,30 +1613,44 @@ SCORE_CARDS = (".scenario-stats-card", ".pb-card", ".run-history-card")
 def test_the_three_score_cards_start_their_lines_12px_from_the_top_2px_apart(
     selector,
 ):
-    """Their first lines then share one top and their scores another, in every state.
+    """Their first lines then share one top and their scores another.
 
     Centered, where each score sat followed how many lines its card held:
-    11 to 23px apart on the maintainer's stats. Nothing pads the bottom,
-    where a card with fewer lines leaves its spare room, so the row keeps
-    the height the dropdowns' column sets.
+    11 to 23px apart on the maintainer's stats. The 12px is a ``::before``
+    spacer, not padding, and nothing pads the bottom, where a card with
+    fewer lines leaves its spare room.
     """
     card = _css_block(STYLESHEET.read_text(encoding="utf-8"), selector)
 
-    assert (
-        "padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;"
-        in card
-    )
+    assert "padding: 0 var(--mantine-spacing-sm);" in card
     assert "gap: 2px;" in card
     assert "flex-direction: column;" in card
     assert "justify-content" not in card
 
 
-def test_the_cards_top_offset_is_12px_and_none_with_the_username_hint():
-    """The one state where the PB card fills the row it makes: no KovaaK's username.
+def test_the_cards_top_offset_is_a_spacer_that_never_raises_the_row():
+    """12px of room the row already has, so no card's content makes the row taller.
 
-    Its leaderboard hint takes two lines there, so a 12px offset would raise
-    the row by 12px (found by the Codex seat on #431). The three cards drop it
-    together, so they stay lined up and the row keeps its height.
+    Padding added to a card's height: a PB card whose leaderboard line wraps
+    raised the row by up to 12px (SOL-F1 and SOL-F2 on #431). A spacer with
+    no height of its own grows into the room left, up to the offset, and its
+    negative margin cancels the gap after it.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    spacer = _css_block(css, ",\n".join(f"{card}::before" for card in SCORE_CARDS))
+
+    assert 'content: "";' in spacer
+    assert "flex: 1 1 0;" in spacer
+    assert "margin-bottom: -2px;" in spacer
+    assert "max-height: var(--run-history-score-card-top);" in spacer
+
+
+def test_the_offset_is_12px_and_none_while_a_leaderboard_hint_shows():
+    """A hint can wrap the line, so the three cards drop the offset together.
+
+    They stay lined up there. The maintainer ruled on 2026-10-25 that a long
+    position with no hint, which also wraps, may leave the PB card's lines
+    starting up to about 10px higher than the other two.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
 
@@ -1644,7 +1658,7 @@ def test_the_cards_top_offset_is_12px_and_none_with_the_username_hint():
         css, ".run-history-top-row"
     )
     assert "--run-history-score-card-top: 0px;" in _css_block(
-        css, ".run-history-top-row:has(.scenario-rank-hint-username-unset)"
+        css, ".run-history-top-row:has(.pb-card .scenario-rank-hint)"
     )
 
 

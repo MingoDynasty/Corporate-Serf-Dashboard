@@ -254,11 +254,11 @@ a.run-toast-link {
     margin-bottom: var(--mantine-spacing-md);
 }
 
-/* With no KovaaK's username the PB card's leaderboard hint takes two lines
-   and the card already fills the row it makes, so a 12px top offset would
-   raise the row by 12px. All three score cards drop the offset together, so
-   they stay lined up and the row keeps the height it had. */
-.run-history-top-row:has(.scenario-rank-hint-username-unset) {
+/* While the PB card's leaderboard line shows a hint, its line can wrap and
+   the card can fill the row it makes, as it does with no KovaaK's username.
+   All three score cards drop the offset together then, so they stay lined
+   up. */
+.run-history-top-row:has(.pb-card .scenario-rank-hint) {
     --run-history-score-card-top: 0px;
 }
 
@@ -371,15 +371,26 @@ a.run-toast-link {
 /* The three score cards start their lines 12px below their top, 2px apart,
    so their first lines share one top and their scores another whatever each
    card holds. Centered, where the scores sat would follow each card's line
-   count. Spare room is at the bottom: no padding there, so with Category's
-   line the card still fits in the row the dropdown column sets. */
+   count. The 12px is a spacer that takes only room the row already has, and
+   not padding: a card that needs more room keeps it, so no card's content
+   ever makes the row taller than it was. Its negative margin cancels the gap
+   after it, so it adds nothing to a card's height while it is empty. */
+.scenario-stats-card::before,
+.pb-card::before,
+.run-history-card::before {
+    content: "";
+    flex: 1 1 0;
+    margin-bottom: -2px;
+    max-height: var(--run-history-score-card-top);
+}
+
 .scenario-stats-card {
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
     gap: 2px;
     max-width: 100%;
-    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
+    padding: 0 var(--mantine-spacing-sm);
     width: 270px;
 }
 
@@ -442,7 +453,7 @@ a.run-toast-link {
     min-height: 135px;
     min-width: 0;
     overflow: hidden;
-    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
+    padding: 0 var(--mantine-spacing-sm);
 }
 
 /* "Latest run" and the run's age, as the PB card's first line is drawn. Not
@@ -518,7 +529,7 @@ a.run-toast-link {
     gap: 2px;
     max-width: 100%;
     min-width: 0;
-    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
+    padding: 0 var(--mantine-spacing-sm);
     width: 300px;
 }
 

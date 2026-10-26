@@ -4,8 +4,8 @@ Status: Accepted
 
 Typical score, PB and Latest run now start their lines 12 px below their top
 edge, 2 px apart, instead of centering them. Their first lines then share
-one top and their large numbers another, whatever each card holds, and the
-row keeps its height. In a narrow window the latest-run card's minimum
+one top and their large numbers another, and the offset only takes room the
+row already has, so the row never grows for it. In a narrow window the latest-run card's minimum
 height rises, so its tallest state still fits and the page doesn't jump
 between runs.
 
@@ -30,20 +30,37 @@ details' second line did, lines them up in one PB card state only.
 **The rule.**
 
 - `.scenario-stats-card`, `.pb-card` and `.run-history-card` are columns
-  with `padding: 12px var(--mantine-spacing-sm) 0` and `gap: 2px`, and no
-  `justify-content`. Scenario Stats gains the 2 px gap the other two had.
+  with `gap: 2px`, no `justify-content`, and no padding at the top or the
+  bottom. Scenario Stats gains the 2 px gap the other two had.
+- **The 12 px is a spacer, not padding.** Each card's `::before` is
+  `flex: 1 1 0` with `max-height: var(--run-history-score-card-top)` and a
+  `-2px` bottom margin that cancels the gap after it. Empty, it adds nothing
+  to the card's height, so it never raises the row; it grows into the room
+  the stretched card has, up to the offset. Padding did add to the height:
+  whenever the PB card's leaderboard line wrapped, the card filled the row it
+  made and 12 px of padding raised the row by up to 12 px, which the Codex
+  seat found twice in review of #431 (with no username, and with a cached
+  `Unranked (12,345 players) · from cache`).
 - They still stretch to their line's height. A card with fewer lines leaves
-  its spare room at its bottom, where nothing pads it, so the row stays the
-  height the dropdowns' column sets.
-- **With no KovaaK's username the offset is 0 for all three.** The PB card's
-  leaderboard hint then takes two lines, and the card already fills the row
-  it makes (164.4 px with a benchmark, 143.4 px without, from 1920 px up), so
-  12 px at its top would raise the row by 12 px, which the Codex seat found
-  in review of #431. The three cards share one offset,
-  `--run-history-score-card-top` on the top row, which a rule zeroes while
-  the row holds the username hint (`scenario-rank-hint-username-unset`, the
-  hint's own class). They stay lined up, the row keeps its height, and the
-  first lines sit at the cards' top edge, as the PB card's did there before.
+  its spare room at its bottom.
+- **While the leaderboard line shows a hint the offset is 0 for all three.**
+  A hint is what wraps the line in most such states: the username hint
+  always does, and a long position does with `from cache` or
+  `lookup failed`. `--run-history-score-card-top` is set on the top row,
+  12 px, and `.run-history-top-row:has(.pb-card .scenario-rank-hint)` sets it
+  to 0, so the three cards stay lined up at their top edge, as the PB card's
+  lines sat there on `main`.
+- **The ruled exception.** A long position with no hint can wrap the line
+  too: `Position: Unranked (123,456 players)` with a benchmark selected, for
+  one. Then the PB card has less than 12 px of room and its lines start up to
+  about 10 px higher than the other two cards'. The maintainer accepted this
+  on 2026-10-25, when choosing this rule over a script that would measure the
+  three cards and set one shared offset: "SOL-F2: use the CSS-only spacer
+  plus the zero offset while a leaderboard hint shows. I accept that in rare
+  states (a long Position value with a benchmark and no hint) the PB card's
+  lines start up to ~10 px higher. Record it as a ruled exception." CSS alone
+  can't give the three cards the smallest offset that fits, because they sit
+  in different containers.
 - At 1536 px Scenario Stats and the PB card wrap to their own line, as
   before, and line up with each other there. The latest-run card, on the
   first line, can't line up with them.
@@ -82,9 +99,13 @@ Benchmarks S5, and a scenario with too few runs for a typical score.
 | With no username: the row, from 1920 px up | 143.4 px without a benchmark, 164.4 px with one | the same |
 | With no username: the row at 1536 px | 296.8 px and 317.8 px | the same |
 | With no username: the three numbers' tops, apart | 33.0 to 37.1 px | 0 px in every state |
+| Every leaderboard text and hint written into the PB card, 36 cases at 1920 px | | the row as tall as with no offset in all 36; the cards lined up in 35, and in the ruled exception the PB card's lines 9.6 px higher |
 
 The first five rows' measurements had the maintainer's username and a copy
-of the leaderboard cache; the last three none. No card's content overflows
+of the leaderboard cache; the next three none. The last row wrote each of
+six position forms, with no hint, `from cache` or `lookup failed`, into the
+live card, on Flower 50cm and on VT Controlsphere Viscose with its
+benchmark. No card's content overflows
 it in any state. In a page area of 843 px, with a username, the card is
 158 px tall in all four states, where it was 135.
 

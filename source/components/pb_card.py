@@ -107,11 +107,9 @@ FLEX_TARGET_CLASS = "pb-card-flex-target"
 WORD_END_CLASS = "pb-card-word-end"
 POSITION_LABEL_CLASS = "pb-card-position-label"
 POSITION_TOOLTIP_CLASS = "pb-card-position-tooltip"
+# The stylesheet drops the score cards' top offset while a hint shows, so
+# every hint keeps this class.
 RANK_HINT_CLASS = "scenario-rank-hint"
-# The hint with no KovaaK's username takes two lines, the one state where the
-# PB card is taller than the row would otherwise be. The stylesheet takes the
-# score cards' top offset out while it is shown, so the row doesn't grow.
-USERNAME_UNSET_HINT_CLASS = f"{RANK_HINT_CLASS} scenario-rank-hint-username-unset"
 _ARIA_HIDDEN: dict[str, Any] = {"aria-hidden": "true"}
 
 SCENARIO_RANK_LOADING_DELAY_MS = 250
@@ -450,11 +448,7 @@ def _rank_display(value: str, hint: str | None) -> str | list:
         value,
         dmc.Text(
             _rank_hint_children(hint),
-            className=(
-                USERNAME_UNSET_HINT_CLASS
-                if hint == _RANK_HINT_USERNAME_UNSET
-                else RANK_HINT_CLASS
-            ),
+            className=RANK_HINT_CLASS,
             span=True,
         ),
     ]

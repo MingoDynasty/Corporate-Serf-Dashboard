@@ -107,12 +107,18 @@ times that name or order runs remain absolute ([T4][card-order]).
   sits before the score pair, never between its cards. Every card stretches
   to its line's height ([2026-10-21][score-strip]).
 - Scenario Stats, the PB card and the latest-run card start their lines 12px
-  below their top edge, 2px apart, with no padding at their bottom. Their
-  first lines share one top and their large numbers another in every state,
-  and a card with fewer lines leaves its spare room at its bottom. With no
-  KovaaK's username the PB card's leaderboard hint takes two lines and the
-  card fills the row it makes, so all three start their lines at their top
-  edge instead, and the row keeps its height ([SC4][top-aligned]).
+  below their top edge, 2px apart, in room the row already has: the 12px is
+  never added to a card's height, so no card's content makes the row taller
+  than it would be without it. Their first lines share one top and their
+  large numbers another, and a card with fewer lines leaves its spare room at
+  its bottom ([SC4][top-aligned]).
+- While the PB card's leaderboard line shows a hint, such as the one with no
+  KovaaK's username, all three start their lines at their top edge instead,
+  still lined up. A long position with no hint, such as
+  `Position: Unranked (123,456 players)` with a benchmark selected, can also
+  wrap that line. Then the PB card's lines start up to about 10px higher than
+  the other two, by the maintainer's ruling of 2026-10-25
+  ([SC4][top-aligned]).
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under
