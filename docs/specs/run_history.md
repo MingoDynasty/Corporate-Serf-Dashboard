@@ -1,12 +1,14 @@
 # Run History
 
-Run History charts one scenario's runs and their typical score beside a
-session list, with matching highlights for its latest run.
+Run History charts one scenario's runs and typical score beside a session
+list, with point tooltips naming each run's session, hover linking each chart
+run to one list row and a separate latest-run highlight.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
-page receives new runs without a reload and can follow the scenario just
-played. A check marks a run that met its score threshold and a star marks a
-new personal best, each judged when the run was played.
+page receives each new run once without a reload and can follow the
+scenario just played. Checks mark runs that met their score threshold and
+stars mark new personal bests on runs and their groups, each judged when
+the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -350,7 +352,9 @@ it is saved is in [2026-10-18][note-store].
   the run was judged. Otherwise a judged run shows "Threshold passed" or
   "Below threshold", and a run nothing judges shows no badge
   ([2026-10-12][check]).
-  The badges are yellow, green, and gray in that order.
+  The badges are yellow, green, and gray in that order, drawn as the PB
+  card's rank badge is: the page's text on a 20% tint of the badge's color,
+  with a 1px solid border in that color, so each reads in both themes.
 - The second line compares the run with the PB it was chasing, then gives
   its accuracy to two decimals ([2026-10-18][accuracy]):
   `{pct}% of PB · Accuracy {accuracy}%`,
@@ -666,19 +670,39 @@ The card's lines, local-record scope and leaderboard presentation follow
   `0.32 Valorant` reads `0.32 Valorant`
   ([2026-09-27][precision]).
   A converted run also keeps the value, scale, and DPI its file recorded,
-  unrounded, for the point hover only
+  unrounded, for its chart tooltip and the run list's Sensitivity tooltip
   ([2026-09-26][recorded]).
-- Point hover is the same in each mode. It shows the run's timestamp with
-  seconds kept, the one surface that keeps them, cross-referencing KovaaK's
-  second-stamped CSV filenames
-  ([2026-07-11][timestamps]).
-  Then come the score, the run's sensitivity-and-scale string, and the
-  accuracy to two decimals. A converted run's sensitivity line adds the
-  setting it was recorded at, as in
-  `Sensitivity: 40.8 cm/360 (0.2 Valorant at 1600 DPI)`. Any other run's line
-  ends at its sensitivity
-  ([2026-09-26][recorded]).
-  A star takes no hover of its own, so hovering one shows its run's hover.
+- Point hover has four lines, with no blank line after its timestamp.
+  Its first line is the run's full absolute timestamp with seconds, as
+  [the timestamp rule][timestamps] requires. In Score vs Run alone it adds
+  ` · {n} runs ago`: the number of newer imported runs of that scenario in
+  play order, across all sensitivities and versions, independently of range
+  or zoom. One reads `1 run ago` and zero reads `Latest run`.
+  The next lines are `Score: {score}`,
+  `Session: {session_name} · run {session_number} of {session_total}` and
+  `Sensitivity: {sensitivity}`. Labels are bold. The score uses the list's
+  exact formatting, including thousands separators and up to two decimals
+  with trailing zeroes dropped ([2026-10-24][compact-hover]).
+- The session name exactly matches its Session row in the list, including
+  the year when it differs from the app's current year. It names the whole
+  play session, including play on other scenarios before this scenario.
+  The numerator matches the run's `#` in the list; the denominator is the
+  first count on its session's `12 of 47 runs` readout. Both count only
+  this scenario, across versions, sensitivities and returning visits.
+  The total includes runs after the hovered run and outside the chart range.
+  During an ongoing session, the total so far and older points' run ages grow
+  as more runs of that scenario are imported ([2026-10-24][compact-hover]).
+- Sensitivity stays in every mode, including the converted run's original
+  setting and DPI, such as `40.8 cm/360 (0.16 Valorant at 1600 DPI)`.
+  Native and unconverted runs have no recorded-setting suffix
+  ([2026-09-26][recorded]). Every point tooltip states the point's position on
+  both axes; only Score vs Run needs a run-age readout because its Run-axis
+  labels show dates. Accuracy is absent from the point tooltip and remains
+  in the list; inspecting an old run may require scrolling, expanding or
+  loading older sessions. Hover provides no click action
+  ([2026-10-24][compact-hover]).
+  A star carries the same tooltip as its run point, including when ordinary
+  dots are hidden through the legend ([2026-10-23][linked-hover]).
   Runs at one position share one hover, the one whose point comes last in the
   run trace. In Score vs Time that is runs that ended in the same second with
   the same score, and a new PB is ordered last among them, so the star's
@@ -781,12 +805,15 @@ The card's lines, local-record scope and leaderboard presentation follow
   hands that tab the figure only once Plotly Cloud reports the user signed in
   there. A blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
-  accuracy, sensitivity, and x value, the setting a converted run was
-  recorded at, the New PB stars and the ring, which repeat the position and
+  session name (its start time), run number and total within that session,
+  run-age text, sensitivity with the setting a converted run was recorded
+  at, and x value, the New PB stars and the ring, which repeat the position and
   score of runs already in it, the label and value of each overlay line
   drawn, and on Score vs Run and Score vs Time the typical score's line and
   bands with what the line's hover shows at each point
-  ([TS3][typical-chart]). Neither the button nor the flow is app code: the
+  ([TS3][typical-chart]). Run-age text is included even in Score vs Time and
+  Score vs Sensitivity, whose hover does not show it. Accuracy is not included
+  in the figure's run data. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
   same toolbar and flow. Its figure is the playlist lines, their dates and
@@ -868,6 +895,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   the stats file lists. Sensitivity is the run's normalized
   sensitivity-and-scale string, as on the chart's axis. Columns don't sort
   ([2026-10-12][column]).
+- A converted run's Sensitivity cell has a native tooltip with its normalized
+  value followed by its original game setting and DPI, such as
+  `40.8 cm/360 (0.16 Valorant at 1600 DPI)`. Original values stay unrounded,
+  and whole values drop trailing zeroes. Native and unconverted runs have no
+  extra tooltip. This applies in both list views ([2026-10-24][compact-hover]).
 - Reloads is the stats file's count, such as `0` or `12`. FOV is the FOV the
   run was played at, the number with trailing zeros dropped, then its scale,
   such as `103 Overwatch`, or the number alone where the file names no scale.
@@ -1043,6 +1075,33 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The grid draws only the rows in view, so a browser's find-in-page reaches
   only those.
 
+### Linked hover
+
+- Hovering a run point or PB star targets one list row. When its Run row is
+  exposed by expansion, that row is outlined. Under All scenarios, a collapsed
+  visit uses its exact Scenario row instead. A collapsed Session uses its
+  Session row, including the pinned current session. The **This scenario**
+  view falls directly from Run to Session
+  ([2026-10-23][linked-hover], [2026-10-23][one-row-hover]).
+- Expansion state chooses the most specific target. A Run in an expanded
+  visit remains the target when off-screen, even when its Scenario header is on-screen.
+  An off-screen or unloaded target produces no visible cross-highlight.
+  Repeated visits to the same scenario are identified separately by visit ID
+  ([2026-10-23][one-row-hover]).
+- Hovering a visible run row emphasizes its dot or star in the current chart.
+  A run outside the selected scenario, plotted range, zoom, or visible traces
+  has no visible counterpart. Session and Scenario rows do not highlight
+  whole sets of runs.
+- Temporary links use a grape outline, separate from the blue latest-run
+  highlight and selected-scenario band. Hover preserves point preferences,
+  stars, the latest-run ring, scroll position, chart axes, expanded groups,
+  keyboard focus, selections, and the number of sessions loaded.
+  A linked PB star retains its gold fill.
+- The emphasis appears immediately and clears on unhover. A list scroll,
+  model or expansion change, chart redraw, or page departure clears it too.
+  Hover runs entirely in the browser. It neither loads older sessions nor
+  introduces a click action.
+
 ## Marks: the check and the star
 
 - Two facts about a run are drawn beside its score in the run list, and
@@ -1059,6 +1118,19 @@ The card's lines, local-record scope and leaderboard presentation follow
   The chart's threshold line is drawn at the current PB, so an old run can
   carry a check and sit below today's line
   ([2026-10-12][check]).
+- A session row shows one star after its count when any run in its scope
+  set a new PB, whether the row is open or closed. Under This scenario only
+  the selected scenario's runs count, so a session with none has no star.
+  Under All scenarios every run in the session counts, regardless of the
+  selected scenario or Playlist filter. Multiple PBs still produce one star.
+- A session star's hover and accessible name are "A new PB for this scenario
+  was set in this session." under This scenario and "A new PB was set in
+  this session." under All scenarios. Unstarred session rows keep the star's
+  room, so Median, Best and count stay aligned across rows.
+- Session stars aggregate the runs' historical PB marks. A later PB doesn't
+  remove an older session's star, ties don't count and a scenario's first
+  run only sets the baseline. The score threshold percentage doesn't affect
+  stars.
 - The percentage is the Score threshold percentage as it is set now, for
   every run. A change to it marks every run again, at once, because the
   percentage in force when an old run was played was never recorded. It lives
@@ -1323,6 +1395,11 @@ The card's lines, local-record scope and leaderboard presentation follow
 
 ## Run delivery
 
+- A successfully imported run CSV appears once in the stores and run lists.
+  Duplicate create events and deletion/recreation of that filename during
+  the same app session do not add runs or increase scenario counts. The
+  filename identity and retry rules are in
+  [notifications.md](notifications.md#run-notifications).
 - The app shell drains the run-event deque, on its own interval and on every
   page, and publishes one batch per tick. This page's `forward_run_events`
   consumes that batch store as its only `Input` and writes two stores in one
@@ -1525,3 +1602,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 [score-strip]: ../decision_log/2026/2026-10-21-run-historys-score-cards-stay-together-after-the-note.md
 
 [latest-highlights]: ../decision_log/2026/2026-10-23-run-history-highlights-the-selected-scenarios-latest-run.md
+
+[linked-hover]: ../decision_log/2026/2026-10-23-run-history-links-chart-and-list-runs-on-hover.md
+
+[one-row-hover]: ../decision_log/2026/2026-10-23-run-history-hover-outlines-one-list-row.md
+
+[compact-hover]: ../decision_log/2026/2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md

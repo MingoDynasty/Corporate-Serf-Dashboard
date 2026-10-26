@@ -313,3 +313,27 @@ def test_windows_case_alias_events_preserve_the_original_run_name(
     assert file_watchdog.message_queue[0].run_id == path.name
     assert data_service.run_database[0].stats_file_name == path.name
     assert len(data_service.run_database) == 1
+
+
+def test_pending_run_loaded_before_worker_start_is_not_announced_again(
+    tmp_path, monkeypatch, stores
+):
+    monkeypatch.setattr(file_watchdog, "FILE_GRACE_SECONDS", 0.01)
+    path = _write(tmp_path)
+    handler = file_watchdog.NewFileHandler()
+    handler.on_created(FileCreatedEvent(str(path)))
+    assert data_service.load_csv_file_into_database(str(path))
+
+    def unexpected_parse(_path):
+        raise AssertionError("An imported file must be skipped before parsing")
+
+    monkeypatch.setattr(file_watchdog, "extract_data_from_file", unexpected_parse)
+    handler.start()
+    try:
+        _wait_for(lambda: not handler._pending)
+        assert len(data_service.run_database) == 1
+        assert file_watchdog.message_queue == []
+        assert file_watchdog.drain_run_import_failures() == []
+    finally:
+        handler.stop()
+        handler.join(2)

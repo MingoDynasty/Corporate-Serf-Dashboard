@@ -55,7 +55,7 @@ from source.components.score_threshold import (
     Unjudged,
     normalize_score_threshold_percentage,
 )
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import get_all_runs
 from source.kovaaks.play_sessions import (
     PlaySession,
@@ -73,6 +73,7 @@ from source.utilities.utilities import (
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
+    recorded_sensitivity_suffix,
 )
 
 # How many sessions each view loads at first, and how many more each press of
@@ -131,6 +132,8 @@ ONE_SCORE_TEXT = f"{SCORE_LABEL} {{score}}"
 THRESHOLD_PASSED_TEXT = "Threshold passed"
 BELOW_THRESHOLD_TEXT = "Below threshold"
 NEW_PB_TEXT = "New PB"
+SESSION_PB_TEXT = "A new PB was set in this session."
+SCENARIO_SESSION_PB_TEXT = "A new PB for this scenario was set in this session."
 # What a blank cell says on hover, and to a screen reader, for each reason
 # nothing judges a run. Unknown is not a miss, so each says why.
 UNJUDGED_TEXT = {
@@ -217,16 +220,6 @@ def empty_run_list(
         "grid_name": "",
         "empty": text,
     }
-
-
-def run_id(run: RunData) -> str:
-    """Return the id a run's row is keyed by: its stats file's name.
-
-    A run event's ``run_id`` is the same value, so a run that just landed can
-    be found in the list. A record that was not read from a stats file has no
-    name, and is keyed by its scenario and its end.
-    """
-    return run.stats_file_name or f"{run.scenario} {run.datetime_object.isoformat()}"
 
 
 def _count(count: int, noun: str) -> str:
@@ -355,6 +348,9 @@ def _run_row(
     mark: RunMark,
     highlighted_run: str | None,
 ) -> dict:
+    sensitivity = f"{run.horizontal_sens} {run.sens_scale}"
+    suffix = recorded_sensitivity_suffix(run.recorded_sensitivity)
+    sensitivity_detail = f"{sensitivity}{suffix}" if suffix else ""
     return {
         "id": f"{RUN_ROW_ID_PREFIX}{run_id(run)}",
         "kind": RUN_ROW,
@@ -370,7 +366,8 @@ def _run_row(
         "accuracy": format_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "reloads": "" if run.reloads is None else f"{run.reloads:,}",
-        "sens": f"{run.horizontal_sens} {run.sens_scale}",
+        "sens": sensitivity,
+        "sens_detail": sensitivity_detail,
         "fov": _fov_text(run),
         "avg_fps": "" if run.avg_fps is None else f"{run.avg_fps:,.0f}",
     }
@@ -503,7 +500,7 @@ def build_run_list(
     ]
 
     rows: list[dict] = []
-    for index, (place, session, _) in enumerate(listed[:session_limit]):
+    for index, (place, session, played) in enumerate(listed[:session_limit]):
         session_id = f"s:{run_id(session.runs[0])}"
         is_first_row = session is newest_session
         rows.append(
@@ -516,6 +513,7 @@ def build_run_list(
                 "counts": counts[index],
                 "place": place,
                 "figures": figures[index],
+                "new_pb": any(marks[run].is_new_pb for run in played),
             }
         )
         rows.extend(
@@ -666,6 +664,7 @@ def build_session_tree(
                 # session is the subject, and its length one of its facts.
                 "length": format_elapsed_duration(session.length.total_seconds()),
                 "length_help": is_first_row,
+                "new_pb": any(marks[run].is_new_pb for run in session.runs),
                 "counts": (
                     f"{_count(len(session.runs), 'run')} · "
                     f"{_count(len({run.scenario for run in session.runs}), 'scenario')}"
@@ -939,6 +938,7 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             "field": "sens",
             "headerName": "Sensitivity",
             "type": "rightAligned",
+            "tooltipField": "sens_detail",
             **_fixed_width(96),
         },
         {
@@ -1121,6 +1121,7 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                     # data changes, but not for a full-width row, so a rule's
                     # band stayed on the scenario selected before.
                     "rowClassRules": {
+                        "run-list-row-linked": "params.data.linked === true",
                         LATEST_ROW_CLASS: "params.data.latest",
                         SELECTED_ROW_CLASS: (
                             f"params.data.sel && params.data.kind === '{RUN_ROW}'"
@@ -1156,13 +1157,20 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                             "lengthHelp": SESSION_LENGTH_HELP,
                             "wholeSession": WHOLE_SESSION_HELP,
                             "newPb": NEW_PB_TEXT,
+                            "sessionNewPb": SESSION_PB_TEXT,
+                            "scenarioSessionNewPb": SCENARIO_SESSION_PB_TEXT,
                             "median": MEDIAN_LABEL,
                             "best": BEST_LABEL,
                             "score": SCORE_LABEL,
                         },
                     },
                 },
-                eventListeners={"cellKeyDown": ["runListKeyDown(params)"]},
+                eventListeners={
+                    "cellKeyDown": ["runListKeyDown(params)"],
+                    "cellMouseOver": ["runHistoryHoverOver(params)"],
+                    "cellMouseOut": ["runHistoryHoverOut(params)"],
+                    "bodyScroll": ["runHistoryHoverClear(params)"],
+                },
                 getRowId="params.data.id",
                 dangerously_allow_code=True,
                 style={"flex": 1, "minHeight": 0, "width": "100%"},

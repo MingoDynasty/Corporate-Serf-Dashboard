@@ -27,7 +27,7 @@ from source.components.run_history_list import (  # noqa: E402
     run_list_from_store,
 )
 from source.components.run_marks import mark_runs  # noqa: E402
-from source.kovaaks.data_models import RunData  # noqa: E402
+from source.kovaaks.data_models import RecordedSensitivity, RunData  # noqa: E402
 from source.kovaaks.play_sessions import in_play_order  # noqa: E402
 
 A, B, C = "Scenario A", "Scenario B", "Scenario C"
@@ -661,6 +661,7 @@ def test_a_run_row_formats_each_value_for_its_column():
         "shots": "1,234",
         "reloads": "",
         "sens": "40.8 cm/360",
+        "sens_detail": "",
         "fov": "",
         "avg_fps": "",
     }
@@ -685,6 +686,28 @@ def test_a_run_with_no_shot_count_shows_none_and_not_zero():
 def _run_row_with(**fields) -> dict:
     run = replace(_run(A, EVENING), **fields)
     return _of_kind(_build([run]), "run")[0]
+
+
+@pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])
+def test_sensitivity_tooltip_preserves_the_original_setting_in_both_views(view):
+    run = replace(
+        _run(A, EVENING),
+        recorded_sensitivity=RecordedSensitivity(
+            value=0.16, scale="Valorant", dpi=1600.0
+        ),
+    )
+    marks = mark_runs([run], 95.0, lambda _version: None)
+    build = build_run_list if view == VIEW_SCENARIO else build_session_tree
+    model = build([run], A, SESSIONS_PER_LOAD, EVENING, marks)
+    row = _of_kind(model, "run")[0]
+    assert row["sens"] == "40.8 cm/360"
+    assert row["sens_detail"] == "40.8 cm/360 (0.16 Valorant at 1600 DPI)"
+    column = next(
+        column
+        for column in run_history_list.run_list_column_defs()
+        if column.get("field") == "sens"
+    )
+    assert column["tooltipField"] == "sens_detail"
 
 
 @pytest.mark.parametrize(
@@ -1294,6 +1317,68 @@ def test_every_session_row_gives_its_length_and_only_the_first_its_hover():
         False,
         False,
     )
+
+
+@pytest.mark.parametrize(
+    "score,starred", [(90.0, False), (100.0, False), (120.0, True)]
+)
+@pytest.mark.parametrize("percentage", [95.0, None, 150.0])
+def test_a_scenario_sessions_star_only_counts_its_scenarios_new_pbs(
+    score, starred, percentage
+):
+    runs = [
+        _run(A, EVENING - timedelta(days=1), score=100.0),
+        _run(B, EVENING - timedelta(days=1, minutes=-2), score=50.0),
+        _run(A, EVENING, score=score),
+        _run(B, EVENING + timedelta(minutes=2), score=60.0),
+    ]
+
+    sessions = _of_kind(_build(runs, A, percentage=percentage), "session")
+
+    assert [row["new_pb"] for row in sessions] == [starred, False]
+
+
+@pytest.mark.parametrize("selected", [A, B, None])
+def test_an_all_scenarios_session_stars_a_pb_on_any_scenario(selected):
+    runs = [
+        _run(A, EVENING - timedelta(days=1)),
+        _run(B, EVENING - timedelta(days=1, minutes=-2), score=50.0),
+        _run(A, EVENING, score=90.0),
+        _run(B, EVENING + timedelta(minutes=2), score=60.0),
+        _run(B, EVENING + timedelta(minutes=4), score=70.0),
+    ]
+
+    sessions = _of_kind(_tree(runs, selected), "session")
+
+    assert [row["new_pb"] for row in sessions] == [True, False]
+
+
+@pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])
+def test_a_later_pb_keeps_the_star_on_an_older_session(view):
+    runs = [
+        _run(A, EVENING - timedelta(days=2)),
+        _run(A, EVENING - timedelta(days=1), score=120.0),
+        _run(A, EVENING, score=150.0),
+    ]
+    model = _tree(runs) if view == VIEW_ALL else _build(runs)
+
+    assert [row["new_pb"] for row in _of_kind(model, "session")] == [
+        True,
+        True,
+        False,
+    ]
+
+
+def test_a_session_without_the_selected_scenario_has_no_scenario_pb_star():
+    runs = [
+        _run(A, EVENING - timedelta(days=1)),
+        _run(B, EVENING, score=50.0),
+        _run(B, EVENING + timedelta(minutes=2), score=60.0),
+    ]
+
+    assert _of_kind(_build(runs, A), "session")[0]["new_pb"] is False
+    assert _of_kind(_build(runs, C), "session")[0]["new_pb"] is False
+    assert _of_kind(_tree(runs, A), "session")[0]["new_pb"] is True
 
 
 def test_a_scenario_row_carries_its_star_where_a_new_pb_was_set():

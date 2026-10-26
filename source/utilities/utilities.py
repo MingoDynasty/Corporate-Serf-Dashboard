@@ -5,6 +5,10 @@ Utility functions for the Corporate Serf app.
 import math
 from datetime import date, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from source.kovaaks.data_models import RecordedSensitivity
 
 # Abbreviated English month names, hardcoded so the absolute-timestamp format is
 # locale-independent (``%b``/``calendar.month_abbr`` follow the process locale).
@@ -35,6 +39,20 @@ def format_decimal(number) -> Decimal | int:
     if decimal == decimal.to_integral():
         return int(decimal)
     return decimal.normalize()
+
+
+def recorded_sensitivity_suffix(recorded: RecordedSensitivity | None) -> str:
+    """Format an original game setting as a suffix, or return ``""``.
+
+    ``format_decimal`` drops trailing zeroes without rounding: the recorded
+    setting must not inherit cm/360's one-decimal grouping.
+    """
+    if recorded is None:
+        return ""
+    return (
+        f" ({format_decimal(recorded.value)} {recorded.scale}"
+        f" at {format_decimal(recorded.dpi)} DPI)"
+    )
 
 
 def format_approximate_duration(seconds: float) -> str:

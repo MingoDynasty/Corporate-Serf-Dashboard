@@ -69,6 +69,7 @@
     // The grid the state below belongs to. The page is drawn again on every
     // visit, with a new grid, and which rows are open is not remembered.
     api: null,
+    linkedRow: null,
     // One per view: its open rows, its mark, and whether its rows have
     // arrived yet in this visit. The mark is the newest run whose rows the
     // view has opened. Each view keeps its own because a batch can hold runs
@@ -149,6 +150,9 @@
   }
 
   function setOpen(api, ids, open) {
+    if (window.runHistoryHover) {
+      window.runHistoryHover.clear();
+    }
     var rows = openRows();
     ids.forEach(function (id) {
       if (open) {
@@ -309,18 +313,18 @@
             "✓"
           )
         : h("span", { className: "visually-hidden" }, data.check_text),
-      data.new_pb ? star(labels) : null
+      data.new_pb ? star(labels.newPb) : null
     );
   };
 
-  function star(labels) {
+  function star(label) {
     return h(
       "span",
       {
         className: "run-list-star",
         role: "img",
-        "aria-label": labels.newPb,
-        title: labels.newPb,
+        "aria-label": label,
+        title: label,
       },
       "★"
     );
@@ -481,13 +485,17 @@
       window.dash_clientside.set_props(context.askStoreId, { data: data.name });
       announce(context, data.selected_text);
     }
+    // The band is drawn here and not by the grid's row class rule, which
+    // the grid works out again when a row's data changes but not for a
+    // full-width row (AG Grid 35.3): the rule's band stayed on the
+    // scenario selected before. React redraws this class in place.
+    var className = data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario";
+    if (data.id === state.linkedRow) {
+      className += " run-list-row-linked";
+    }
     return groupRow(
       props,
-      // The band is drawn here and not by the grid's row class rule, which
-      // the grid works out again when a row's data changes but not for a
-      // full-width row (AG Grid 35.3): the rule's band stayed on the
-      // scenario selected before. React redraws this class in place.
-      data.sel ? "run-list-scenario run-list-scenario-selected" : "run-list-scenario",
+      className,
       toggle,
       [
         toggleButton(labels.scenario, open, toggle),
@@ -514,7 +522,7 @@
           ["span", { className: "run-list-group-facts" }].concat(figuresInLine(data), [
             data.counts,
             data.new_pb ? " " : null,
-            data.new_pb ? star(labels) : null,
+            data.new_pb ? star(labels.newPb) : null,
           ])
         ),
       ]
@@ -563,7 +571,14 @@
             ? h("span", { title: data.length_help ? labels.lengthHelp : undefined }, data.length)
             : null,
           data.length ? " · " : null,
-        ].concat(figuresAndCount)
+        ].concat(figuresAndCount, [
+          " ",
+          h(
+            "span",
+            { className: "run-list-session-star" },
+            data.new_pb ? star(isTree(context) ? labels.sessionNewPb : labels.scenarioSessionNewPb) : null
+          ),
+        ])
       ),
     ];
     var kids = state.children[data.id] || [];
@@ -585,7 +600,12 @@
         )
       );
     }
-    return groupRow(props, "run-list-session", toggle, line);
+    return groupRow(
+      props,
+      data.id === state.linkedRow ? "run-list-session run-list-row-linked" : "run-list-session",
+      toggle,
+      line
+    );
   }
 
   dagcomponentfuncs.RunListWideRow = function (props) {
@@ -746,10 +766,14 @@
 
   // ---- Applying a model from the server ----
   state.apply = function (api, model, follow) {
+    if (window.runHistoryHover) {
+      window.runHistoryHover.clear();
+    }
     var context = contextOf(api);
     var labels = context.labels || {};
     if (state.api !== api) {
       state.api = api;
+      state.linkedRow = null;
       state.views = {};
       state.view = undefined;
       state.started = false;
@@ -847,6 +871,42 @@
       }
     }
     updateExpandLabel(context);
+  };
+
+  // Choose one row exposed by expansion. An off-screen Run stays the target;
+  // scrolling alone must never promote its Scenario or Session parent.
+  state.highlightRun = function (id) {
+    var api = state.api;
+    if (!api || api.isDestroyed()) {
+      return;
+    }
+    var pinned = api.getPinnedTopRow(0);
+    function nodeById(key) {
+      if (key == null) {
+        return null;
+      }
+      return pinned && pinned.id === key ? pinned : api.getRowNode(key);
+    }
+    var run = id == null ? null : api.getRowNode(contextOf(api).runRowIdPrefix + id);
+    var target = run;
+    if (run && !run.displayed) {
+      var scenario = nodeById(run.data.vid);
+      target = scenario && scenario.displayed ? scenario : nodeById(run.data.sid);
+    }
+    var next = target ? target.id : null;
+    if (state.linkedRow === next) {
+      return;
+    }
+    var previous = nodeById(state.linkedRow);
+    state.linkedRow = next;
+    // Refresh normal rows through their class rule; React updates the full-
+    // width groups in place, preserving the focused button and open state.
+    [previous, target].filter(Boolean).forEach(function (node) {
+      if (node.data.kind === RUN) {
+        node.updateData(Object.assign({}, node.data, { linked: node.id === next }));
+      }
+    });
+    notify();
   };
 
   // Expand all opens every loaded session of the view on screen, down to its

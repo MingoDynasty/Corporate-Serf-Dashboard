@@ -27,6 +27,7 @@ from source.kovaaks.data_service import (
     get_high_score,
     get_personal_best_run,
     get_sensitivities_vs_runs,
+    is_run_file_loaded,
     is_scenario_in_database,
     load_csv_file_into_database,
 )
@@ -133,7 +134,8 @@ def import_run_file(file: str) -> bool:
     """Import and announce one run, returning False when the attempt fails.
 
     Call only from the ingestion worker after startup. Store writes precede
-    notification publication, and failures never announce a landed run.
+    notification publication, and failures never announce a landed run. An
+    already imported file succeeds without parsing or announcing it again.
     """
     logger.debug('Importing new run file: "%s"', Path(file).name)
     try:
@@ -145,6 +147,9 @@ def import_run_file(file: str) -> bool:
 
 def _load_and_announce_run(file: str) -> bool:
     """Load one parsed run and publish its pre-import facts."""
+    if is_run_file_loaded(file):
+        return True
+
     run_data = extract_data_from_file(file)
     if not run_data:
         logger.warning('Failed to get run data for CSV file: "%s"', file)
