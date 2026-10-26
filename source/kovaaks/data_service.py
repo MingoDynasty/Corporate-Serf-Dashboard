@@ -551,7 +551,7 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
 
 def _run_file_datetime(path: Path) -> datetime:
     """Read the run end time from its stats filename."""
-    stamp = path.stem.rsplit(" - ", 1)[-1].split(" ", 1)[0]
+    stamp = path.stem.split(" Stats")[0].split(" - ")[-1]
     return datetime.strptime(stamp, "%Y.%m.%d-%H.%M.%S")
 
 

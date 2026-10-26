@@ -82,7 +82,7 @@ def test_duplicate_create_keeps_one_run_and_no_extra_message(
         monkeypatch.chdir(tmp_path)
         path = Path(FILENAME)
     elif repeat == "case_variant":
-        path = path.with_name(path.stem.swapcase() + path.suffix)
+        path = path.with_name(FILENAME.replace(SCENARIO, SCENARIO.swapcase()))
     _deliver(path)
 
     _assert_one_run()
@@ -110,6 +110,7 @@ def test_loading_an_imported_file_is_successful_without_adding_it_again(
     [
         FILENAME.replace("Challenge", "Free Play"),
         FILENAME.replace("12.00.00", "12.01.00"),
+        FILENAME.replace(" Stats.csv", " Stats - Copy.csv"),
     ],
 )
 def test_distinct_files_with_identical_run_values_are_both_imported(
