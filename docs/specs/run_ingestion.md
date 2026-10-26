@@ -3,7 +3,8 @@
 The app loads existing run files at startup and watches the stats folder for
 new ones. A second directory listing after monitoring starts recovers files
 written during startup. Each successfully imported filename contributes one run
-per app session.
+per app session. A new file that can't be read yet is tried again for a few
+seconds before the run is reported as not recorded.
 
 ## Startup And Monitoring
 
@@ -45,9 +46,15 @@ per app session.
   later create event for that path may try again. Files already attempted by
   the initial scan are not queued by the second listing, so historical read
   failures do not create a backlog of live imports or failure notifications.
-- Live and reconciled imports retain the one-second wait and one parse attempt
-  per event. There is no periodic reconciliation or automatic readiness retry;
-  an unreadable file can still remain absent until a later event or restart
-  ([remaining ingestion debt](../tech_debt.md#run-files-missed-until-restart-on-a-single-failed-parse)).
+- A live or reconciled import parses the file after waits of 1, 2 and 4
+  seconds and stops at the first parse that succeeds, so a CSV still locked or
+  mid-write gets about seven seconds to settle. Only the last failed attempt
+  queues the failure message. The waits run on the observer thread, so files
+  arriving faster than one a second import one at a time
+  ([2026-10-26](../decision_log/2026/2026-10-26-run-imports-retry-a-failed-parse-on-the-observer-thread.md),
+  [accepted debt](../tech_debt.md#fixed-one-second-handler-sleep-serializes-ingestion)).
+- There is no periodic reconciliation. A file that still fails after the last
+  attempt stays absent until a later event or a restart. A store load that
+  fails after a successful parse is not retried.
 - Startup scan failures are counted in the startup log. A failed watchdog
   import queues the existing run-import failure message for the UI.

@@ -536,8 +536,10 @@ toasts under, and it applies to every toast the app adds from here on
 
 ## Background threads and diagnostics
 
-- When the watchdog cannot import a run file — a CSV that will not parse, a
-  handler exception, or a store load that fails after a successful parse — it
+- When the watchdog cannot import a run file — a CSV that still will not parse
+  after its last retry
+  ([2026-10-26](../decision_log/2026/2026-10-26-run-imports-retry-a-failed-parse-on-the-observer-thread.md)),
+  a handler exception, or a store load that fails after a successful parse — it
   appends "Couldn't process a new run file. See data/logs/debug.log." to
   `run_import_failure_queue`, and the observer thread survives. On each poll
   tick of Home or Run History, `flush_run_import_failures` drains the queue into
