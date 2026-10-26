@@ -198,6 +198,9 @@ both by layering:
 - The summary is written and updated in the same PR as its payload, by the
   same author, and reviewed with it. A payload change that leaves the
   summary untouched should make the reviewer ask which layer is wrong.
+  Marking an older entry superseded, in whole or in part, is not such a
+  change: that entry keeps its summary as it was, as
+  [the decision log's README](docs/decision_log/README.md) says.
 - No backfill: an entry that predates this rule gains its summary only
   when a payload change edits it anyway, never in a PR of its own. A
   summary that exists but breaks these rules is a defect, not legacy:
