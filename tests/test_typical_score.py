@@ -9,6 +9,7 @@ from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.typical_score import (
     build_typical_scores,
     format_typical_score,
+    typical_score_at_session_start,
     typical_score_fade_time,
     typical_score_recency,
 )
@@ -226,6 +227,56 @@ def test_a_run_missing_from_the_session_snapshot_is_rejected() -> None:
 
     with pytest.raises(ValueError, match="same run snapshot"):
         build_typical_scores(runs, split_into_play_sessions(runs[:-1]))
+
+
+def test_the_value_at_session_start_is_the_one_after_the_last_run_before_it() -> None:
+    """Every run of the session meets it, and none meets a value it helped make."""
+    runs = (
+        _sitting(5)
+        + _sitting(5, START + timedelta(days=1))
+        + _sitting(4, START + timedelta(days=2))
+        + _sitting(3, START + timedelta(days=3))
+    )
+    sessions = split_into_play_sessions(runs)
+    session = sessions[2]
+    before = _values(runs)[9]
+
+    for end in range(11, len(runs) + 1):
+        value = typical_score_at_session_start(runs[:end], sessions, session)
+
+        assert value == before
+    assert before.known
+    assert before.runs == tuple(runs[:10])
+    assert before.median == 3
+
+
+def test_a_first_session_has_no_value_at_its_start() -> None:
+    runs = _sitting(20) + _sitting(5, START + timedelta(days=1))
+    sessions = split_into_play_sessions(runs)
+
+    assert typical_score_at_session_start(runs, sessions, sessions[0]) is None
+
+
+def test_too_few_runs_before_the_session_leave_its_value_unknown() -> None:
+    """Ten runs in one session make no typical score, whatever follows."""
+    runs = _sitting(10) + _sitting(10, START + timedelta(days=1))
+    sessions = split_into_play_sessions(runs)
+
+    value = typical_score_at_session_start(runs, sessions, sessions[1])
+
+    assert value is not None
+    assert not value.known
+    assert value.run_count == 10
+
+
+def test_the_session_is_split_from_every_scenarios_runs() -> None:
+    """Another scenario's run can join two sittings into the session that counts."""
+    target = _sitting(5) + _sitting(5, START + timedelta(hours=1))
+    bridge = replace(_run(START + timedelta(minutes=35)), scenario="another")
+    sessions = split_into_play_sessions(target + [bridge])
+
+    assert len(sessions) == 1
+    assert typical_score_at_session_start(target, sessions, sessions[0]) is None
 
 
 @pytest.mark.parametrize("recent_count", [0, 1, 9, 10, 14, 20])

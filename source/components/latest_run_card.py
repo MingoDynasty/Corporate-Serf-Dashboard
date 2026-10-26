@@ -2,9 +2,9 @@
 
 ``latest_run`` works out, from a copy of the run store, the selected
 scenario's latest run and what the card says about it: when it was played,
-its score, its verdict, how it measured up against the PB it was chasing,
-where it sits in its session, and its sensitivity and accuracy. The rest of
-the module draws that in the card.
+its score, its verdict, how it measured up against the typical score at its
+session's start and the PB it was chasing, where it sits in its session, and
+its sensitivity and accuracy. The rest of the module draws that in the card.
 
 The card is worked out from the run store each time, never from the message a
 new run arrives in, so it is right on a page that has just been drawn, with
@@ -39,6 +39,7 @@ from source.components.score_threshold import (
 )
 from source.kovaaks.data_models import RunData
 from source.kovaaks.data_service import get_all_runs, new_high_score_runs
+from source.kovaaks.pace import percent_faster
 from source.kovaaks.play_sessions import (
     PlaySession,
     find_play_session_in_progress,
@@ -47,7 +48,18 @@ from source.kovaaks.play_sessions import (
     split_into_scenario_visits,
 )
 from source.kovaaks.playlist_scenarios_service import personal_best_cm360
-from source.kovaaks.time_scored_service import PaceBasis, get_version_pace_basis
+from source.kovaaks.time_scored_service import (
+    PaceBasis,
+    eligible_pace_constant,
+    get_version_pace_basis,
+)
+from source.kovaaks.typical_score import (
+    NOT_RECENT_TEXT,
+    TypicalScore,
+    format_typical_score,
+    typical_score_at_session_start,
+    typical_score_recency,
+)
 from source.utilities.utilities import (
     format_elapsed_duration,
     format_percent,
@@ -56,6 +68,12 @@ from source.utilities.utilities import (
 )
 
 LATEST_RUN_LABEL = "Latest run"
+TYPICAL_BASIS = "typical at session start"
+TYPICAL_HOVER_LEAD = "Typical score when this run's session began: "
+TYPICAL_HOVER_OLD = (
+    "Fewer than 10 of its runs were from the 30 days before the session "
+    "began, so it may have been out of date."
+)
 # With no scenario selected and no runs at all. With Follow off a first run
 # leaves the selection empty, so "will show here" would promise what the card
 # does not do.
@@ -74,6 +92,13 @@ SCORE_ROW_CLASS = "run-history-card-score-row"
 SCORE_CLASS = "run-history-card-score"
 BADGE_CLASS = "run-history-card-badge"
 RESULT_CLASS = "run-history-card-result"
+# The clock after a typical value that isn't recent, as the scenario table
+# draws it, and the words a screen reader hears in its place.
+OLD_MARK_CLASS = "typical-old-mark"
+HIDDEN_CLASS = "visually-hidden"
+TYPICAL_HOVER_CLASS = "run-history-card-typical-hover"
+TYPICAL_HOVER_WIDTH = 360
+_ARIA_HIDDEN: dict[str, Any] = {"aria-hidden": "true"}
 # The lines under the comparison, which support the score.
 QUIET_CLASS = "run-history-card-quiet"
 EMPTY_TITLE_CLASS = "run-history-card-empty-title"
@@ -118,22 +143,39 @@ BADGE_TEXT = {
 
 
 @dataclass(frozen=True)
+class TypicalPhrase:
+    """The run against its scenario's typical score at session start, as the card words it.
+
+    ``text`` is the phrase. ``typical`` is the value it was measured against,
+    formatted as the scenario table formats a typical score, for its hover.
+    ``not_recent`` is whether the value wasn't recent when the session began.
+    """
+
+    text: str
+    typical: str
+    not_recent: bool
+
+
+@dataclass(frozen=True)
 class LatestRun:
     """What the card says about the selected scenario's latest run, as the text it shows.
 
     ``run_id`` is the run's id as the run list keys its row and a run event
     names it. ``played_at`` is when the run ended, as the run's file names it,
-    which the browser words as an age. Under the score, ``comparison`` is the
-    run against the PB it was chasing, or ``None`` with nothing to compare it
-    with; ``session`` is its number in its session and the time on its
-    scenario; ``sensitivity_and_accuracy`` is the last line.
+    which the browser words as an age. Under the score, the comparison line
+    joins ``typical``, the run against the typical score at its session's
+    start, and ``pb_comparison``, the run against the PB it was chasing; each
+    is ``None`` with nothing to say, and with neither the line is left out.
+    ``session`` is its number in its session and the time on its scenario;
+    ``sensitivity_and_accuracy`` is the last line.
     """
 
     run_id: str
     played_at: datetime
     score: str
     badge: CardBadge | None
-    comparison: str | None
+    typical: TypicalPhrase | None
+    pb_comparison: str | None
     session: str
     sensitivity_and_accuracy: str
 
@@ -149,7 +191,7 @@ def _badge(verdict: ThresholdVerdict | Unjudged, is_new_pb: bool) -> CardBadge |
     return None
 
 
-def _comparison(
+def _pb_comparison(
     score: float,
     chased: Chased,
     verdict: ThresholdVerdict | Unjudged,
@@ -181,6 +223,50 @@ def _comparison(
         return None
     measure = "PB pace" if measured.by_pace else "PB"
     return f"{shown_percentage(measured):.1f}% of {measure}"
+
+
+def _measured_from(percent: float, ahead: str, behind: str) -> str:
+    """Word a percentage from the typical score at session start, to one decimal."""
+    shown = f"{abs(percent):.1f}"
+    if shown == "0.0":
+        return f"Matches {TYPICAL_BASIS}"
+    return f"{shown}% {ahead if percent > 0 else behind} {TYPICAL_BASIS}"
+
+
+def _typical_phrase(
+    run: RunData,
+    value: TypicalScore | None,
+    session: PlaySession,
+    basis: PaceBasis | None,
+) -> TypicalPhrase | None:
+    """Word the run against the typical score its session began with, or return None.
+
+    ``value`` is that typical score, ``None`` with no run before the session.
+    ``basis`` is what the run's own version says of its pace. The run is
+    measured by pace when every run behind the value is of that version and
+    both times are positive, as the scenario table's Typical Rank decides it,
+    whatever measured the run against its PB; otherwise by score, which has
+    nothing to say of a typical score of zero or less. Whether the value was
+    recent is judged when the session began, not when the card is read.
+    """
+    if value is None or value.median is None:
+        return None
+    typical = value.median
+    constant = eligible_pace_constant(basis, *value.runs, run)
+    faster = (
+        percent_faster(constant, typical, run.score) if constant is not None else None
+    )
+    if faster is not None:
+        text = _measured_from(faster, "faster than", "slower than")
+    elif typical > 0:
+        text = _measured_from((run.score - typical) / typical * 100, "above", "below")
+    else:
+        return None
+    return TypicalPhrase(
+        text=text,
+        typical=format_typical_score(typical, value.runs),
+        not_recent=not typical_score_recency(value, session.start).recent,
+    )
 
 
 def _which_session(
@@ -265,7 +351,9 @@ def latest_run(
     second included. A run that lands late, older than the store's newest,
     is the card's run once it is newer than the scenario's latest. It is
     judged as the list judges it: against the PB it was chasing, under its
-    own version of the scenario.
+    own version of the scenario. A run that isn't a new PB is also measured
+    against its scenario's typical score as it stood when the run's session
+    began; a new PB beats every earlier run, so that could only read above.
     """
     if not scenario:
         return None
@@ -292,13 +380,24 @@ def latest_run(
         goal_percentage,
     )
     is_new_pb = run in new_high_score_runs(scenario_runs)
+    typical = (
+        None
+        if is_new_pb
+        else _typical_phrase(
+            run,
+            typical_score_at_session_start(scenario_runs, sessions, session),
+            session,
+            version_pace_basis(scenario, run.scenario_hash),
+        )
+    )
 
     return LatestRun(
         run_id=run_id(run),
         played_at=run.datetime_object,
         score=format_score(run.score),
         badge=_badge(verdict, is_new_pb),
-        comparison=_comparison(run.score, chased, verdict, is_new_pb),
+        typical=typical,
+        pb_comparison=_pb_comparison(run.score, chased, verdict, is_new_pb),
         session=_session_line(
             session, scenario, _which_session(sessions, session, now)
         ),
@@ -440,6 +539,34 @@ def _empty_body(selected_scenario: str | None, store_has_runs: bool) -> list[htm
     ]
 
 
+def _typical_target(phrase: TypicalPhrase) -> dmc.Tooltip:
+    """Draw the typical phrase with its hover, and the clock on an old value.
+
+    The clock is the scenario table's, hidden from a screen reader, which
+    hears the table's ``Not recent`` instead. Both sit inside the hover's
+    target, so pointing at or focusing the clock opens the phrase's hover.
+    """
+    target: list[Any] = [phrase.text]
+    label: list[Any] = [html.P(f"{TYPICAL_HOVER_LEAD}{phrase.typical}")]
+    if phrase.not_recent:
+        target += [
+            html.Span(className=OLD_MARK_CLASS, **_ARIA_HIDDEN),
+            html.Span(f", {NOT_RECENT_TEXT}", className=HIDDEN_CLASS),
+        ]
+        label.append(html.P(TYPICAL_HOVER_OLD))
+    return dmc.Tooltip(
+        html.Span(target, className=TIME_CLASS, tabIndex=0),
+        # dmc wraps the target in a block box, which would break the line
+        # round it.
+        boxWrapperProps={"className": TIME_TARGET_CLASS},
+        classNames={"tooltip": TYPICAL_HOVER_CLASS},
+        events=TOOLTIP_EVENTS,
+        label=label,
+        maw=TYPICAL_HOVER_WIDTH,
+        multiline=True,
+    )
+
+
 def latest_run_card_content(
     shown: LatestRun | None,
     selected_scenario: str | None,
@@ -473,8 +600,15 @@ def latest_run_card_content(
             )
         )
     body: list[Any] = [html.Div(score_row, className=SCORE_ROW_CLASS)]
-    if shown.comparison is not None:
-        body.append(html.Div(shown.comparison, className=RESULT_CLASS))
+    comparison: list[Any] = []
+    if shown.typical is not None:
+        comparison.append(_typical_target(shown.typical))
+    if shown.pb_comparison is not None:
+        comparison.append(
+            f" · {shown.pb_comparison}" if comparison else shown.pb_comparison
+        )
+    if comparison:
+        body.append(html.Div(comparison, className=RESULT_CLASS))
     body.append(html.Div(shown.session, className=QUIET_CLASS))
     body.append(html.Div(shown.sensitivity_and_accuracy, className=QUIET_CLASS))
     return CardContent(played_at=shown.played_at.timestamp(), body=body)

@@ -1679,12 +1679,13 @@ def test_the_card_is_as_tall_as_the_row_and_never_under_135px():
 
 
 def test_in_the_narrow_layout_the_cards_floor_holds_its_tallest_state():
-    """At its 380px minimum width the session line can take two lines.
+    """At its 380px minimum width the comparison and the session line can each take two.
 
-    The tallest state is a comparison on one line over an older year's
-    session with a two-digit run number and an unknown time, on two, with
-    12px kept under the last line, measured in Edge and Firefox. Set under
-    the page's container query alone, so the wide row keeps its height.
+    The tallest state is the longest comparison by pace with an old value's
+    clock, on two lines, over an older year's session with a two-digit run
+    number and an unknown time, on two, with the top row's 12px above the
+    first line and 12px under the last, measured in Edge. Set under the
+    page's container query alone, so the wide row keeps its height.
     """
     narrow = _container_block(
         STYLESHEET.read_text(encoding="utf-8"), "run-history-page (max-width: 900px)"
@@ -1693,7 +1694,7 @@ def test_in_the_narrow_layout_the_cards_floor_holds_its_tallest_state():
 
     assert card is not None
     assert "flex: 1 1 380px;" in card.group(1)
-    assert "min-height: 158px;" in card.group(1)
+    assert "min-height: 177px;" in card.group(1)
 
 
 def test_the_stats_card_is_270px_and_its_lines_fit_the_row():
@@ -1913,7 +1914,8 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
         played_at=datetime(2026, 10, 12, 22, 49),
         score="812.4",
         badge=None,
-        comparison=None,
+        typical=None,
+        pb_comparison=None,
         session="Run 1 this session · 4 min on this scenario",
         sensitivity_and_accuracy="50 cm/360 · Accuracy 55.00%",
     )

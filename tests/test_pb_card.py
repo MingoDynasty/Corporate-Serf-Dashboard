@@ -307,7 +307,7 @@ def test_the_scores_hover_is_the_latest_run_cards_line_for_the_pb(
 
     assert shown.score_hover == hover
     if hover is not None:
-        assert landed.comparison == hover
+        assert landed.pb_comparison == hover
 
 
 def test_the_scores_hover_is_measured_under_the_pbs_own_version():

@@ -337,7 +337,7 @@ def test_the_landed_run_reaches_the_card_as_a_percentage_of_pb_pace(
 
     assert shown is not None
     assert shown.badge is latest_run_card.CardBadge.BELOW_THRESHOLD
-    assert shown.comparison == "88.8% of PB pace"
+    assert shown.pb_comparison == "88.8% of PB pace"
 
 
 def test_a_landed_run_logs_no_verdict_of_its_own(folders, monkeypatch, caplog):

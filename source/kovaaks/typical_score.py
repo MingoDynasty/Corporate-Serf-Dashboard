@@ -7,7 +7,7 @@ The words of a value's hover are here too, so every surface that explains a
 value says the same thing.
 """
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
@@ -23,6 +23,8 @@ TYPICAL_SCORE_MIN_RUNS = 10
 TYPICAL_SCORE_MIN_SESSIONS = 2
 TYPICAL_SCORE_RECENT_AGE = timedelta(days=30)
 TOO_FEW_RUNS_TEXT = "Too few runs"
+# What a screen reader hears where a clock marks a value that isn't recent.
+NOT_RECENT_TEXT = "Not recent"
 
 
 @dataclass(frozen=True)
@@ -121,6 +123,29 @@ def build_typical_scores(
             p10, p90 = float(deciles[0]), float(deciles[-1])
         values.append(TypicalScore(window, session_ids, middle, p25, p75, p10, p90))
     return values
+
+
+def typical_score_at_session_start(
+    runs: Sequence[RunData],
+    play_sessions: Sequence[PlaySession],
+    session: PlaySession,
+) -> TypicalScore | None:
+    """Return one scenario's typical score as it stood when ``session`` began.
+
+    It is the value after the scenario's last run before the session, so every
+    run of the session meets the same value and none meets a value it helped
+    make. ``runs`` is the scenario's runs in play order and must hold at least
+    one of ``session``'s runs; ``play_sessions`` is split from the same
+    snapshot of every scenario's runs and holds ``session``. ``None`` when the
+    scenario has no run before the session. The value can still be unknown.
+    """
+    in_session = set(session.runs)
+    first = next(index for index, run in enumerate(runs) if run in in_session)
+    if first == 0:
+        return None
+    # The value after a run depends only on the runs before it, so the runs
+    # after the session's start need not be built.
+    return build_typical_scores(runs[:first], play_sessions)[-1]
 
 
 def typical_score_recency(value: TypicalScore, moment: datetime) -> TypicalScoreRecency:
