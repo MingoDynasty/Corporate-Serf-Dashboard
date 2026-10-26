@@ -16,7 +16,7 @@ on PR #430 at c77ad06.", as amended in review: the first review wave asked
 that the quiet lines stay readable. Before it, the maintainer's lean of
 2026-10-25: "Keep changes 2 to 5 as proposed: no scenario name, the
 rebalanced lines, top-aligned cards, and readable badges." Built in
-[#NNN](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/NNN),
+[#431](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/431),
 the proposal's first delivery PR. Current behavior is in
 [run_history.md](../../specs/run_history.md#the-latest-run-card).
 
