@@ -21,6 +21,15 @@ looks at another app.
 | --- | --- | --- |
 | [The Run History page's run list under NVDA](run_history_list_nvda_walk.md) | 2026-10-13, 2026-10-14 | What NVDA said on the built run list in Firefox, Chrome, and Edge, against the five tasks the page's proposal names and the eight the All scenarios tree adds, and what still does not work |
 
+## Checks of KovaaK's
+
+A check of KovaaK's records what the game itself writes to disk, measured on
+the recorded game version.
+
+| Check | Date | Focus |
+| --- | --- | --- |
+| [Detecting a scenario switch from KovaaK's files](kovaaks_scenario_switch_signals.md) | 2026-10-25 | Whether the app can tell which scenario is loaded before its first run lands: the analytics log names it, but the game writes that log in 4 KB batches, so the answer comes seconds to minutes late. Two other candidates stay untested |
+
 ## More than one survey of an app
 
 Two models may survey the same app independently, and each survey then keeps
