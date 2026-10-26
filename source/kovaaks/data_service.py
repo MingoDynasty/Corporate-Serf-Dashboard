@@ -549,12 +549,39 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
     )
 
 
+def _run_file_datetime(path: Path) -> datetime:
+    """Read the run end time from its stats filename."""
+    stamp = path.stem.split(" Stats")[0].split(" - ")[-1]
+    return datetime.strptime(stamp, "%Y.%m.%d-%H.%M.%S")
+
+
+def is_run_file_loaded(csv_file: str) -> bool:
+    """Return whether this run filename is already represented in the stores."""
+    path = Path(csv_file)
+    try:
+        ended = _run_file_datetime(path)
+    except ValueError:
+        # Malformed names still reach the parser's normal failure reporting.
+        return False
+    name = os.path.normcase(path.name)
+    # A score or timestamp can belong to distinct runs. Use the full filename
+    # for identity, and the existing time index to avoid scanning all history.
+    return any(
+        run.stats_file_name is not None
+        and os.path.normcase(run.stats_file_name) == name
+        for run in run_database.irange_key(ended, ended)
+    )
+
+
 def load_csv_file_into_database(csv_file: str) -> bool:
+    """Load a run unless its filename is already represented in the stores.
+
+    Return ``True`` when the file was added or already loaded, ``False`` on a
+    parse failure. Only successfully stored runs establish an identity, so a later
+    event can retry a failed import.
     """
-    Loads a CSV file into the database.
-    :param csv_file: CSV to load.
-    :return: True when the run was added, otherwise False.
-    """
+    if is_run_file_loaded(csv_file):
+        return True
     run_data = extract_data_from_file(csv_file)
     if not run_data:
         logger.warning('Failed to get run data for CSV file: "%s"', csv_file)
@@ -794,8 +821,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     raw_avg_fps = None
 
     try:
-        splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
-        datetime_object = datetime.strptime(splits[-1], "%Y.%m.%d-%H.%M.%S")
+        datetime_object = _run_file_datetime(Path(full_file_path))
 
         with open(full_file_path, encoding="utf-8") as file:
             lines_list = file.readlines()  # Read all lines into a list

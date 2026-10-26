@@ -19,6 +19,7 @@ from source.kovaaks.data_service import (
     get_high_score,
     get_personal_best_run,
     get_sensitivities_vs_runs,
+    is_run_file_loaded,
     is_scenario_in_database,
     load_csv_file_into_database,
 )
@@ -148,7 +149,7 @@ class NewFileHandler(FileSystemEventHandler):
     def _import_created_file(self, event):
         """Parse, store, and announce one created file; may raise on surprises."""
         file = _get_created_csv_path(event)
-        if file is None:
+        if file is None or is_run_file_loaded(file):
             return
 
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
