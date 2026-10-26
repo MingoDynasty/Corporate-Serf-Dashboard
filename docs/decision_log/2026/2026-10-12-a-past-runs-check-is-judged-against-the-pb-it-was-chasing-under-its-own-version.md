@@ -34,6 +34,12 @@ to the card's last line, beside its cm/360. Where there is no comparison the
 line is absent, where it read the accuracy alone. The marks, the badge, the
 comparison's words and caps, and a past run's pace basis stand.
 
+**Superseded in part (2026-10-25).** [The card measures the run against the typical score at session start](2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md):
+on a run that isn't a new PB, the second line opens with the run's distance
+from the typical score as it stood when its session began, before the PB
+comparison. The marks, the badge, the PB comparison's words and caps, and a
+past run's pace basis stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." Nothing here was a numbered row. It is the

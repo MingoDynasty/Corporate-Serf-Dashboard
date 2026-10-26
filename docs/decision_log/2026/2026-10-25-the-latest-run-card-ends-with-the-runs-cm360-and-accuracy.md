@@ -9,6 +9,12 @@ session and its time on the scenario share one quiet line. Those two lines,
 and the PB card's last line, take the scenario table's readable grey,
 because the cards' dimmed grey is too faint for text this small.
 
+**Superseded in part (2026-10-25).** [The card measures the run against the typical score at session start](2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md):
+the comparison line holds the typical phrase before the PB comparison, as
+this entry left for the second delivery PR, and `LatestRun.comparison` is
+now `pb_comparison` beside `typical`. The session line, the last line and
+the readable grey stand.
+
 **Ruling and delivery.** SC3 of the Run History score cards proposal,
 [#430](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/430),
 ratified by the maintainer on 2026-10-25 at `c77ad06`: "I ratify the proposal

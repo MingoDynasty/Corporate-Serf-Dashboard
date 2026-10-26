@@ -113,6 +113,15 @@ as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
 off, a run on another scenario doesn't reach the card: the run's toast links
 to it, and the run list's **All scenarios** view lists it.
 
+Under the score, the card compares the run with your typical score as it
+stood when the run's session began, such as "3.6% above typical at session
+start", then with the PB it was chasing. Every run of a session is measured
+against that same value, so it can differ from the **Typical score** card,
+which moves with every run. Hover or focus the phrase to see the value. A
+clock after it means that value wasn't recent when the session began. A
+scenario needs a typical score before the session for the phrase to show,
+and a new PB shows how far it beat your previous best instead.
+
 The card's run is also highlighted in the run list and circled on the chart.
 Choosing another scenario through **Selected scenario** or a scenario name in
 the list moves all three to that scenario's latest run. The chart keeps its
