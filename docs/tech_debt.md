@@ -24,8 +24,8 @@ hold the reproductions, soak measurements, and sequenced fix plans:
 docs link check stays green). Other defects from the same corpus are
 already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
 (PR #254), the two cache defects (colliding cache keys and the invalid-UTF-8
-read escape, PR #264), the unbounded configured port (PR #266), and the
-duplicate-event double count (PR #421).
+read escape, PR #264), the unbounded configured port (PR #266), the
+duplicate-event double count (PR #421), and the startup scan gap (PR #422).
 
 ### Run files missed until restart on a single failed parse
 

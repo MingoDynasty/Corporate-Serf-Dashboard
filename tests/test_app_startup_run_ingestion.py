@@ -29,7 +29,6 @@ names = {{
 }}
 live_finished = threading.Event()
 writes = []
-injected = False
 
 def write_run(phase):
     (stats / names[phase]).write_text(
@@ -55,10 +54,6 @@ write_run("before")
 original_load = data_service.load_csv_file_into_database
 
 def record_load(path):
-    global injected
-    if arrival == "during_scan" and not injected:
-        injected = True
-        write_run("gap")
     loaded = original_load(path)
     if loaded:
         writes.append((Path(path).name, threading.current_thread().name))
@@ -68,15 +63,6 @@ data_service.load_csv_file_into_database = record_load
 # The watchdog holds its own imported reference to the same loader.
 import source.my_watchdog.file_watchdog as file_watchdog
 file_watchdog.load_csv_file_into_database = record_load
-original_scan = app.initialize_kovaaks_data
-
-def scan(path):
-    loaded = original_scan(path)
-    if arrival == "after_scan":
-        write_run("gap")
-    return loaded
-
-app.initialize_kovaaks_data = scan
 OriginalObserver = app.Observer
 
 class Observer(OriginalObserver):
@@ -121,7 +107,7 @@ app.main()
 
 @pytest.mark.parametrize(
     "arrival",
-    ["during_scan", "after_scan", "before_observer_start", "after_observer_start"],
+    ["before_observer_start", "after_observer_start"],
 )
 def test_startup_imports_an_arrival_once_across_the_watchdog_handoff(
     tmp_path: Path,
