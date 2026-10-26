@@ -16,7 +16,7 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The remaining entries below were established by the two 2026-08-12 audits, which
+The remaining entry below was established by the two 2026-08-12 audits, which
 hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
@@ -25,27 +25,25 @@ docs link check stays green). Other defects from the same corpus are
 already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
 (PR #254), the two cache defects (colliding cache keys and the invalid-UTF-8
 read escape, PR #264), the unbounded configured port (PR #266), the
-duplicate-event double count (PR #421), and the startup scan gap (PR #422).
-
-### Run files missed until restart on a single failed parse
-
-`NewFileHandler._import_created_file` in
-`source/my_watchdog/file_watchdog.py` — one fixed 1-second sleep, one
-parse attempt, no retry. A CSV still locked by KovaaK's or mid-write when the
-attempt fires raises a toast but is never imported until a restart rescans the
-directory. The runtime register sequences a stable run/file identity first
-(its step 1, explicitly before retries), then readiness detection plus bounded
-retry (step 2), and removes the blocking sleep separately (step 6); the
-engineering register sequences cache hardening first and pairs the retry with
-zero-PB handling.
+duplicate-event double count (PR #421), the startup scan gap (PR #422), and
+the single parse attempt (PR #433).
 
 ### Fixed one-second handler sleep serializes ingestion
 
 `NewFileHandler._import_created_file` in
 `source/my_watchdog/file_watchdog.py` — every create event holds the
-handler thread for a full second, so bursts queue behind it: the 2026-08-12
-soak left 391 of 1,000 files unprocessed after a ten-minute adversarial burst
-plus settle.
+observer thread for at least its first one-second wait, so files that arrive
+faster than one a second queue behind it: the 2026-08-12 soak left 391 of
+1,000 files unprocessed after a ten-minute adversarial burst plus settle.
+Nothing is dropped; the imports are late, and a restart imports the rest.
+
+**Accepted, not scheduled**
+([2026-10-26](decision_log/2026/2026-10-26-run-imports-retry-a-failed-parse-on-the-observer-thread.md)).
+Play never triggers it: the main instance's logs hold 1,267 run arrivals from
+2026-07-27 to 2026-10-25, none closer than 30 seconds apart. Taking the wait
+off the observer thread needs a worker thread. Reopen when a feature or
+workflow writes many run files while the app runs; closed PR #423 is the
+reference design, without its endless 30-second recheck.
 
 ## Code Smells
 

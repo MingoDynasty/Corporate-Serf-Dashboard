@@ -34,6 +34,16 @@ logger = logging.getLogger(__name__)
 
 RUN_IMPORT_FAILURE_MESSAGE = "Couldn't process a new run file. See data/logs/debug.log."
 
+# The wait before each parse of a new run CSV. The first lets the game finish
+# the file and its performance file. The later ones give a CSV still locked or
+# mid-write, by the game or by an antivirus or sync agent, more time before the
+# run is reported as not recorded. Every wait holds the observer thread, so a
+# file that never parses delays the next event by their sum; runs land far
+# enough apart that nobody sees it. Moving the waits to a worker thread was
+# weighed and declined:
+# docs/decision_log/2026/2026-10-26-run-imports-retry-a-failed-parse-on-the-observer-thread.md
+PARSE_WAITS_SECONDS = (1, 2, 4)
+
 # Run files this thread failed to import. The watchdog runs outside any Dash
 # callback context, so it publishes here instead of driving a UI output, and
 # an interval callback on Home and on Run History drains it into one toast --
@@ -152,14 +162,18 @@ class NewFileHandler(FileSystemEventHandler):
         if file is None or is_run_file_loaded(file):
             return
 
-        time.sleep(1)  # Wait a second to avoid permission issues with race condition
-        run_data = extract_data_from_file(file)
+        run_data: RunData | None = None
+        for wait in PARSE_WAITS_SECONDS:
+            time.sleep(wait)
+            run_data = extract_data_from_file(file)
+            if run_data:
+                break
         if not run_data:
             # extract_data_from_file contains its own read and parse failures --
             # a CSV still locked by KovaaK's, a mid-write line -- and returns
-            # None, so on_created's guard above never sees them. This handler
-            # only sees the creation event and never retries, so the run stays
-            # missing until a restart: notify here or the user is never told.
+            # None, so on_created's guard never sees them. With the retries
+            # spent and no later event promised, the run stays missing until a
+            # restart: notify here or the user is never told.
             logger.warning('Failed to get run data for CSV file: "%s"', file)
             run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
             return
