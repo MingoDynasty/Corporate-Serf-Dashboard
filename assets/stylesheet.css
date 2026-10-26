@@ -602,13 +602,14 @@ a.run-toast-link {
     font-weight: 700;
 }
 
-/* The space that ends the PB score, for a screen reader: the score row is a
-   flex container, which drops the space between the score and the badge.
-   Kept, or the browser would drop a space at the end of a line, and sized to
-   nothing, so the score looks as it would without it. Its line height too:
-   with no font, the score's 33px line would hang below the baseline and make
-   the row 12px taller. */
-.pb-card-word-end {
+/* The space that ends the PB card's and the latest-run card's score, for a
+   screen reader: each score row is a flex container, which drops the space
+   between the score and the badge. Kept, or the browser would drop a space
+   at the end of a line, and sized to nothing, so the score looks as it would
+   without it. Its line height too: with no font, the score's 33px line would
+   hang below the baseline and make the row 12px taller. */
+.pb-card-word-end,
+.run-history-card-word-end {
     font-size: 0;
     line-height: 0;
     white-space: pre;
