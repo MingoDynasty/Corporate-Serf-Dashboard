@@ -14,26 +14,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ---
 
-## Bugs
-
-The remaining ingestion entry below was established by the two 2026-08-12
-audits, which hold the reproductions, soak measurements, and sequenced fix plans:
-`ignore/audits/engineering/2026-08-12-project-audit.md` and
-`ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
-(gitignored, main checkout only — deliberately not linked so a fresh clone's
-docs link check stays green). Five further defects from the same corpus are
-already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
-(PR #254), the two cache defects (colliding cache keys and the invalid-UTF-8
-read escape, PR #264), the unbounded configured port (PR #266), and the
-duplicate-event double count (PR #421).
-
-### Startup loss window between the initial scan and the watchdog
-
-`source/app.py:374-402` — a run written after `initialize_kovaaks_data`
-finishes scanning but before `observer.start()` is never imported this
-session; the soak reproduced it with a synchronized arrival. Restart
-reconciles.
-
 ## Code Smells
 
 ### Remove the merged-cell repair when dash-ag-grid bundles AG Grid 36.1.0

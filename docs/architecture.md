@@ -15,8 +15,12 @@ so a first detection serves this boot), pins the stats directory for the process
 (`settings_service.resolve_stats_dir`), calls `initialize_kovaaks_data` to build
 the in-memory stores from existing CSVs, lists the `performances` folder beside
 it (`time_scored_service.index_performance_files`, which parses nothing), starts
-a watchdog `Observer` on the stats directory and one `run-import` writer, and serves the Dash app with
-Waitress (Flask dev server when `config.debug`). With no usable stats directory — unset, or set but missing —
+a watchdog `Observer` on the stats directory and one `run-import` writer, then
+lists the directory again and queues files the first scan missed on the
+observer's event queue. Both recovered files and live events reach the same
+worker, preserving one live writer and one import per successful filename.
+The process serves the Dash app with Waitress (Flask dev server when
+`config.debug`). With no usable stats directory — unset, or set but missing —
 the scan and the observer are both skipped and the app serves empty pages; only
 `port` is needed to serve.
 

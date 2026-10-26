@@ -6,6 +6,7 @@ import errno
 import ipaddress
 import json
 import logging
+import os
 import socket
 import sys
 import tomllib
@@ -16,8 +17,9 @@ from typing import NoReturn
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
 from waitress import serve
+from watchdog.events import FileCreatedEvent
 from watchdog.observers import Observer
-from watchdog.observers.api import BaseObserver
+from watchdog.observers.api import BaseObserver, ObservedWatch
 
 from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import (
@@ -307,6 +309,42 @@ def bind_server_socket(port: int, host: str = DEFAULT_HOST) -> list[socket.socke
     return sockets
 
 
+def _queue_startup_runs(
+    observer: BaseObserver,
+    watch: ObservedWatch,
+    stats_dir: str,
+    scanned_csv_files: set[str],
+) -> None:
+    """Queue paths absent from the initial scan after monitoring is active."""
+    # The second listing closes the scan-to-monitor gap. Recovered
+    # paths share the event queue, so the ingestion worker remains
+    # the sole live writer and coalesces overlapping real events.
+    with os.scandir(stats_dir) as entries:
+        for entry in entries:
+            if (
+                entry.is_file()
+                and entry.name.endswith(".csv")
+                and entry.path not in scanned_csv_files
+            ):
+                observer.event_queue.put(
+                    (FileCreatedEvent(entry.path, is_synthetic=True), watch)
+                )
+
+
+def _stop_run_monitoring(
+    observer: BaseObserver | None,
+    run_handler: NewFileHandler | None,
+) -> None:
+    """Stop observer dispatch before joining the sole run-store writer."""
+    if observer is not None:
+        observer.stop()
+        if observer.ident is not None:
+            observer.join()
+    if run_handler is not None:
+        run_handler.stop()
+        run_handler.join()
+
+
 def main() -> None:
     """
     Main entry point.
@@ -359,6 +397,7 @@ def main() -> None:
     configured_stats_dir = resolve_stats_dir()
     stats_dir = get_usable_stats_dir()
 
+    scanned_csv_files: set[str] = set()
     if stats_dir is None:
         # Not fatal: only `port` is needed to serve pages. Without a stats
         # directory the app is merely empty, and Home says so.
@@ -371,7 +410,7 @@ def main() -> None:
         )
     else:
         # Initialize scenario data
-        initialize_kovaaks_data(stats_dir)
+        scanned_csv_files = initialize_kovaaks_data(stats_dir)
         index_performance_files(stats_dir)
 
     log_rank_lookup_availability()
@@ -380,23 +419,24 @@ def main() -> None:
     # assembled after both playlists and local CSV stats have loaded.
     start_percentile_warmup_worker(config)
 
-    # Monitor for new files
     observer: BaseObserver | None = None
     run_handler: NewFileHandler | None = None
     if stats_dir is not None:
         observer = Observer()
         run_handler = NewFileHandler()
-        observer.schedule(
+        watch = observer.schedule(
             run_handler,
             stats_dir,
             recursive=False,
-        )  # Set recursive=True to monitor subdirectories
+        )
 
     try:
-        if observer is not None and run_handler is not None:
+        if stats_dir is not None and observer is not None and run_handler is not None:
             run_handler.start()
             observer.start()
             logger.info('Monitoring directory: "%s"', stats_dir)
+            _queue_startup_runs(observer, watch, stats_dir, scanned_csv_files)
+
         # Run the Dash app. `app.run()` uses Flask's development server even when
         # debug is disabled, so switch to Waitress for non-debug runs.
         if config.debug:
@@ -432,13 +472,7 @@ def main() -> None:
                 threads=8,
             )
     finally:
-        if observer is not None:
-            observer.stop()
-            if observer.ident is not None:
-                observer.join()
-        if run_handler is not None:
-            run_handler.stop()
-            run_handler.join()
+        _stop_run_monitoring(observer, run_handler)
 
 
 if __name__ == "__main__":

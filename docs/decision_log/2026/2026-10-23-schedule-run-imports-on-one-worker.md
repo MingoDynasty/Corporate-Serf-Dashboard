@@ -2,7 +2,8 @@
 
 Status: Accepted
 
-New run files share their waiting time so a burst reaches the app promptly.
+New runs and files recovered during startup share their waiting time so a
+burst reaches the app promptly.
 One background worker imports ready files and retries unfinished ones without
 holding up other runs. Repeated events for an imported file leave its run count
 unchanged, and a file that remains unreadable raises one notice while recovery
@@ -45,5 +46,6 @@ the latter experiment, so deleting the delay alone was rejected.
 Regression coverage uses a native observer and 1,000 synthetic files, real
 parsing and stores, duplicate events, delayed writes, rename arrivals, exhausted
 retries, recovery without a modify event, and worker shutdown. No thread pool,
-new persisted store, or configurable retry policy is introduced. The separate
-scan-to-observer startup loss window remains tracked in the technical debt list.
+new persisted store, or configurable retry policy is introduced. Post-startup
+reconciliation uses the same worker and successful-file identity check; its
+current contract is recorded in the [run ingestion spec](../../specs/run_ingestion.md).
