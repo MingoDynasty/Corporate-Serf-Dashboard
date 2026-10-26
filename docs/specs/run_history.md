@@ -106,6 +106,11 @@ times that name or order runs remain absolute ([T4][card-order]).
   one score pair at its right end, beside the latest-run card. Spare room
   sits before the score pair, never between its cards. Every card stretches
   to its line's height ([2026-10-21][score-strip]).
+- Scenario Stats, the PB card and the latest-run card start their lines 12px
+  below their top edge, 2px apart, with no padding at their bottom. Their
+  first lines share one top and their large numbers another in every state,
+  and a card with fewer lines leaves its spare room at its bottom
+  ([SC4][top-aligned]).
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
   column's full width, and the "Follow newly played scenario" switch under
@@ -336,16 +341,17 @@ it is saved is in [2026-10-18][note-store].
   ([2026-10-12][check]).
   During play with Follow on, the selected scenario is the one just played,
   so the card reports the run just played.
-- Its first line reads `Latest run · {age} · {scenario}`. The age is how
+- Its first line reads `Latest run · {age}`, as the PB card's reads
+  `PB · set {age}`. It doesn't name the scenario, which the Selected scenario
+  field and the chart's title name ([SC2][first-line]). The age is how
   long ago the run ended, worded as the playlist tables' Last played words
   it, such as `just now` or `5 minutes ago`, and worded again every 30
   seconds, so during play it reads as the length of the break since the last
   run. Hovering or focusing the age shows the exact time, in the shared
   format with no seconds, such as `Oct 9, 2026, 5:24 PM`
   ([2026-07-11][timestamps], [T4][card-order]).
-  The scenario's name is plain text, with the whole name as its tooltip where
-  the card cuts it short. The card has no control of its own apart from the
-  age, which takes keyboard focus ([2026-10-18][follows]).
+  The card has no control of its own apart from the age, which takes
+  keyboard focus ([2026-10-18][follows]).
 - The score is large, formatted as the playlist scenario table formats PB
   Score, with one badge beside it. A new PB shows "New PB", whether or not
   the run was judged. Otherwise a judged run shows "Threshold passed" or
@@ -354,38 +360,48 @@ it is saved is in [2026-10-18][note-store].
   The badges are yellow, green, and gray in that order, drawn as the PB
   card's rank badge is: the page's text on a 20% tint of the badge's color,
   with a 1px solid border in that color, so each reads in both themes.
-- The second line compares the run with the PB it was chasing, then gives
-  its accuracy to two decimals ([2026-10-18][accuracy]):
-  `{pct}% of PB · Accuracy {accuracy}%`,
-  or `{pct}% of PB pace` where the comparison is by pace. A new PB says how
+- Under the score are three lines: the comparison, the session line, and
+  the run's sensitivity and accuracy ([SC3][card-lines]).
+- The comparison line, at 13px, compares the run with the PB it was
+  chasing and holds nothing else: `{pct}% of PB`, or `{pct}% of PB pace`
+  where the comparison is by pace. A new PB says how
   far it beat the previous best instead:
   `Up {pct}% on your previous best of {previous}`,
   `{pct}% faster than your previous best of {previous}` by pace, or
   `Your previous best was {previous}` over a previous best of zero or less.
   The percentage is a fact about the run, so it shows whether or not the run
   was judged, and an empty threshold doesn't hide it. Two kinds of run have
-  none and show `Accuracy {accuracy}%` alone: a scenario's first run, and a
-  run that is not a new PB and is compared by score with a previous best of
-  zero or less
-  ([2026-10-12][check]).
+  none, and the line is absent: a scenario's first run, and a run that is
+  not a new PB and is compared by score with a previous best of zero or less
+  ([2026-10-12][check], [SC3][card-lines]).
   The percentage has one decimal and the two display caps
   ([Marks](#marks-the-check-and-the-star)): a run below the PB shows at
   most 99.9%, and a judged miss shows at most one tenth under its goal.
   The card is the one place a run's percentage of the PB is printed
   ([2026-10-13][run-toast]).
-- The third line names the run in its session. In the newest session it
-  reads `Run {n} this session` while the session is in progress, and
+- The session line names the run in its session, then ` · `, then the time
+  spent on its scenario: `Run 7 this session · 9 min on this scenario`
+  ([SC3][card-lines]). In the newest session the run reads
+  `Run {n} this session` while the session is in progress, and
   `Run {n} last session` once it has ended. A run in an older session names
   the session as the run list names its row, by when it began, with the year
   where it is not this one: `Run 7 (Oct 16, 2:00 PM session)`,
   `Run 8 (Jul 20, 2020, 11:47 PM session)`. The year is judged against the
   app's own date. `{n}` counts the session's runs on the run's scenario
   ([2026-10-18][follows]).
-- The fourth line reads `{duration} on this scenario`, the time spent on the
+  The time reads `{duration} on this scenario`, the time spent on the
   scenario in the run's session, as
   [sessions.md](sessions.md#where-sessions-show) defines it. Where that time
   can't be known it reads `Time on this scenario unknown`
   ([2026-10-12][check], [2026-10-18][follows]).
+- The last line is the run's sensitivity and accuracy, worded as the PB
+  card's last line words the PB run's: `{cm/360} cm/360 · Accuracy
+  {accuracy}%`, or `Accuracy {accuracy}%` where the run's cm/360 is unknown
+  ([SC3][card-lines], [2026-10-18][accuracy]).
+- The session line and the last line are 12px, in the scenario table's
+  readable grey for an old typical value, `#676d75` light and `#a6a6a6`
+  dark, quieter than the comparison line and at least 4.5:1 in both themes.
+  The first line keeps the theme's dimmed grey ([SC3][card-lines]).
 - A measured time, here and in the run list, is rounded to the nearest
   minute, a half rounding up: `9 min`, `1 hr 6 min`
   ([2026-10-13][nearest-minute]).
@@ -393,11 +409,13 @@ it is saved is in [2026-10-18][note-store].
   seconds.
 - The card is 500px wide, a width of its own that equals the run list's
   default width ([2026-10-22][card-width], [2026-10-22][list-minimum]),
-  and as tall as the top row,
-  and never less than 135px, which holds its tallest state: the second line
-  on two lines in a narrow card, over the third and fourth. So nothing that
-  changes between runs changes its height, and the page doesn't jump. Its
-  lines are centered in that height ([2026-10-18][follows]).
+  and as tall as the top row. It is never less than its tallest state, so
+  nothing that changes between runs changes its height, and the page doesn't
+  jump. In the wide layout every line fits on one, and the floor is 135px.
+  In a page area of 900px or less, where the card can be 380px wide, the
+  floor is 158px: the comparison on one line over the session line on two,
+  with 12px under the last line. Its lines start from its top, as the other
+  score cards' do ([SC4][top-aligned]).
 - With no run to report, the card's first line reads `Latest run` alone, and
   the selection decides first, as on the PB card
   ([2026-10-18][follows]):
@@ -435,8 +453,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   ([2026-10-05][stars]).
 - It is 300px wide, after Scenario Stats in the score pair at the first
   column's right end, beside the latest-run card, and as tall as its line
-  ([2026-10-21][score-strip]). Its frame is the other cards' and adds only
-  its border to its height, and its lines are centered in that height.
+  ([2026-10-21][score-strip]). Its frame is the other cards', and its lines
+  start 12px below its top, with no padding at its bottom
+  ([SC4][top-aligned]).
 - Its first line reads `PB · set {age}`: how long ago the PB run ended,
   worded as the playlist tables' Last played words it, such as `5 days ago`,
   and worded again
@@ -483,8 +502,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   has no line, and nothing looks it up. KovaaK's places the best score its
   server holds, which can differ from the local PB, for example after runs
   on another computer, and the card shows both as they are.
-- The last line is the PB run's sensitivity and accuracy, in the quieter
-  style of the card's first line: `{cm/360} cm/360 · Accuracy {accuracy}%`.
+- The last line is the PB run's sensitivity and accuracy, 12px in the
+  latest-run card's readable grey, so the two cards' last lines read alike
+  ([SC3][card-lines]): `{cm/360} cm/360 · Accuracy {accuracy}%`.
   The sensitivity is the scenario table's PB cm/360, trailing zeros dropped
   ([2026-09-27][trailing-zeros]), and the accuracy is the hit accuracy to two
   decimals, as the latest-run card shows a run's ([2026-10-18][accuracy]).
@@ -846,8 +866,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   [2026-10-18][heading-line], [2026-10-22][list-minimum]).
 - The header also holds a heading line, before the switch, for screen
   readers only: it is hidden from view in both views, and it is a line of
-  text, not an HTML heading. The latest-run card above the list names its
-  scenario on screen ([2026-10-18][heading-line]).
+  text, not an HTML heading ([2026-10-18][heading-line]). On screen the
+  Selected scenario field and the chart's title name the scenario
+  ([SC2][first-line]).
   Under This scenario the line reads `{scenario} · {n} runs`, or `1 run`,
   where `{n}` counts every run of the scenario in the run store, the figure
   Scenario Stats shows as Total runs. Under All scenarios it reads
@@ -1388,9 +1409,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   benchmark on the grouping exclusion list hides the entire row with no
   placeholder. A scenario or filter change rewrites it, including a filter
   change alone ([T2][category]).
-- Its frame is 270px wide and adds only a border to its height.
-  The card fits in the row the dropdowns' column sets, its lines centered
-  ([TS8][typical-card-lead]).
+- Its frame is 270px wide. Its lines start 12px below its top, 2px apart,
+  with no padding at its bottom, and it fits in the row the dropdowns'
+  column sets ([SC4][top-aligned]).
 
 ## Run delivery
 
@@ -1458,7 +1479,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   order: the dropdowns' column, the scenario note card, at least 240px wide,
   Scenario Stats, the PB card, and the latest-run card, which joins a line at
   380px and takes the room left on it. The score pair's wrapper has no box
-  there ([2026-10-21][score-strip]).
+  there ([2026-10-21][score-strip]). The latest-run card's floor there is
+  158px ([SC4][top-aligned]).
 - Chart options sits beside the chart only while the chart's own area is
   wider than 48em. At that width or less it stacks above the chart, with its
   groups side by side
@@ -1572,6 +1594,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 [card-order]: ../decision_log/2026/2026-10-14-a-cards-lines-follow-their-role-in-the-players-next-action.md
 [accuracy]: ../decision_log/2026/2026-10-18-a-runs-accuracy-shows-two-decimals.md
 [follows]: ../decision_log/2026/2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md
+[first-line]: ../decision_log/2026/2026-10-25-the-latest-run-cards-first-line-drops-the-scenarios-name.md
+[card-lines]: ../decision_log/2026/2026-10-25-the-latest-run-card-ends-with-the-runs-cm360-and-accuracy.md
+[top-aligned]: ../decision_log/2026/2026-10-25-run-historys-three-score-cards-line-up-from-the-top.md
 [stats-last-played]: ../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md
 [heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md
 [note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md

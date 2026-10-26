@@ -28,6 +28,12 @@ card's one height through every state stands, at 135 px where it was 132,
 because its tallest state gained the fourth line. The marks, the badge, the
 second line, and a past run's pace basis stand.
 
+**Superseded in part (2026-10-25).** [The card ends with the run's cm/360 and accuracy](2026-10-25-the-latest-run-card-ends-with-the-runs-cm360-and-accuracy.md):
+the second line holds the PB comparison alone, and the run's accuracy moves
+to the card's last line, beside its cm/360. Where there is no comparison the
+line is absent, where it read the accuracy alone. The marks, the badge, the
+comparison's words and caps, and a past run's pace basis stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." Nothing here was a numbered row. It is the

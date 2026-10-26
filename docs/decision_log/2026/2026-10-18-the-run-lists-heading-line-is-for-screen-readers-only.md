@@ -8,6 +8,12 @@ Stats counts its runs, so the line was a second label for one fact. It keeps
 its words for screen readers, and the list's view switch and two buttons move
 up to the header's first line, which gives the list about 35 px more rows.
 
+**Superseded in part (2026-10-25).** [The latest-run card's first line drops the scenario's name](2026-10-25-the-latest-run-cards-first-line-drops-the-scenarios-name.md),
+so the card above the list no longer names it. The line stays for screen
+readers only, for a new reason: the Selected scenario field and the chart's
+title, beside the list, name the scenario on screen, and on a line of its own
+it would cost about 35 px of list rows. The rest stands.
+
 **Ruling and delivery.** R3 of
 [#388](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/388),
 ratified by the maintainer on 2026-10-18 at `0fcac03`, "I ratify the
