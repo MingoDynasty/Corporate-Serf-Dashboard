@@ -43,6 +43,9 @@ it at every launch, so the app would have to read it before the next launch.
 - **Two controlled tests** of restart actions, run by the maintainer on
   2026-10-25 (see [The controlled test](#the-controlled-test-2026-10-25) and
   [The second test](#the-second-test-2026-10-25)).
+- **Another player's log:** one launch of about 16 minutes on game 3.9.10,
+  shared with the maintainer on 2026-10-26. It holds the player's Windows
+  user name and device identifiers, so it is not quoted here.
 - The analysis scripts are in this checkout's gitignored
   `ignore/scripts/restart-tracking/`. They only read.
 
@@ -59,7 +62,9 @@ it at every launch, so the app would have to read it before the next launch.
   disk only when a block fills or the game exits.
 - **The SDK rotates it after 5,000 messages** to `ga_log-prev.txt` in the
   same folder, overwriting any earlier one. The longest launch here reached
-  2,394 lines, about half that.
+  2,394 lines in 115 minutes, so a launch at that pace would rotate after
+  about four hours. Even an idle game logs a queue line about every 8
+  seconds. No archived launch has rotated yet.
 - **It holds more than events.** The init lines carry the game's key, a
   device identifier and the hardware name. An app should keep the challenge
   events and nothing else.
@@ -78,7 +83,10 @@ it at every launch, so the app would have to read it before the next launch.
    outside `A-z 0-9 -_., ()!?`.** It logs one warning per dropped event, with
    the event name and no time or value. 94 of the 866 scenarios in the stats
    folder have such a name (`%`, `+`, `'`, `#` and `&`), 716 of 9,229 runs
-   (7.8%), and 31 of the 349 recent ones.
+   (7.8%), and 31 of the 349 recent ones. It also drops an event when any
+   part of its name is over 64 characters, with a different warning:
+   another player's log shows it for a long playlist name. None of the
+   maintainer's 866 scenario names is that long, but other players' may be.
 3. **The SDK writes the event lines only because KovaaK's switches its info
    logging on.** In `GALogger.cpp`, info lines return early unless info
    logging is enabled. Warnings and errors are written either way. A KovaaK's
@@ -150,6 +158,12 @@ it at every launch, so the app would have to read it before the next launch.
 18. **Before a scenario's first run, presses end no attempt.** During the
     first countdown, Restart Challenge is greyed out. The run then begins
     with an ordinary `start` (the second test, steps 1 and 2).
+19. **Another player's install writes the same file.** It is at that
+    player's own `%LOCALAPPDATA%\GameAnalytics\ga_log.txt`, from the same
+    game build and game key, with info logging on, and it logged
+    `challenge:start` and `challenge:replay` in the same format. Their one
+    launch held no finished run and no menu restart, so scores and timer
+    values from another install are still unseen.
 
 ## Inferred, not verified
 
@@ -230,6 +244,7 @@ Recommendations for a design, not decisions.
   end within 2 seconds, score). A session with an unmatched run outside the
   dropped names has an unknown restart count, never zero.
 - **Dropped names:** the warning lines still count presses, with no times.
+  The two drop rules write different warnings, and both need reading.
 - **When capture fails:** the game is launched again before the app has read
   the last launch's file. Typical case: the app is closed first and opened
   after the game next time. While the app runs alongside the game, only the
@@ -296,7 +311,9 @@ the first test.
 
 ## Still open
 
-- **Other installs.** Whether the file exists there, and whether it holds
-  `challenge:` lines, needs another player to look.
+- **Other installs, partly.** One other install writes the file the same
+  way (point 19). Its one launch held no finished run or menu restart, so a
+  score or timer value from another install hasn't been seen. They come
+  from the same game build, so they are expected to match.
 - **Two runs in the old log began within 0.01 seconds of a press** instead
   of one countdown later (point 13). Too rare to matter for a count.
