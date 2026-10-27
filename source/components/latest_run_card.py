@@ -90,6 +90,7 @@ TIME_TARGET_CLASS = "run-history-card-time-target"
 BODY_CLASS = "run-history-card-body"
 SCORE_ROW_CLASS = "run-history-card-score-row"
 SCORE_CLASS = "run-history-card-score"
+WORD_END_CLASS = "run-history-card-word-end"
 BADGE_CLASS = "run-history-card-badge"
 RESULT_CLASS = "run-history-card-result"
 # The clock after a typical value that isn't recent, as the scenario table
@@ -583,7 +584,15 @@ def latest_run_card_content(
             played_at=None, body=_empty_body(selected_scenario, store_has_runs)
         )
 
-    score_row: list[Any] = [html.Span(shown.score, className=SCORE_CLASS)]
+    # The score ends on a space a screen reader reads and the eye does not
+    # see: the score row is a flex container, which drops the space between
+    # the score and the badge, and the two would be handed over as one word.
+    score_row: list[Any] = [
+        html.Span(
+            [shown.score, html.Span(" ", className=WORD_END_CLASS)],
+            className=SCORE_CLASS,
+        )
+    ]
     if shown.badge is not None:
         score_row.append(
             dmc.Badge(

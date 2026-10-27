@@ -1727,10 +1727,17 @@ def test_the_pb_card_is_300px_at_the_first_columns_right_end():
     assert "display" not in _css_block(css, ".pb-card-heading")
     # dmc's boxes round the score and Refresh add no line of their own.
     assert "display: flex;" in _css_block(css, ".pb-card-flex-target")
-    # The score's last space reaches a screen reader and takes no room, its
-    # line height included: the score's 33px would otherwise make the row
-    # 12px taller, measured in Edge and Firefox.
-    word_end = _css_block(css, ".pb-card-word-end")
+
+
+def test_both_cards_scores_end_on_a_space_that_reaches_a_screen_reader_unseen():
+    """One rule for the PB card's and the latest-run card's word-end space.
+
+    It takes no room, its line height included: the score's 33px would
+    otherwise make the row 12px taller, measured in Edge and Firefox.
+    """
+    css = STYLESHEET.read_text(encoding="utf-8")
+    word_end = _css_block(css, ".pb-card-word-end,\n.run-history-card-word-end")
+
     assert "font-size: 0;" in word_end
     assert "line-height: 0;" in word_end
     assert "white-space: pre;" in word_end
@@ -1937,7 +1944,7 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     played_at, body, latest_run_id = answer
     assert played_at == datetime(2026, 10, 12, 22, 49).timestamp()
     assert [rendered_text(line) for line in body] == [
-        "812.4",
+        "812.4 ",
         "Run 1 this session · 4 min on this scenario",
         "50 cm/360 · Accuracy 55.00%",
     ]
@@ -2053,11 +2060,11 @@ def test_a_change_of_scenario_rewrites_the_card_for_the_new_one(monkeypatch):
     on_b = _card_at(monkeypatch, now, B_SCENARIO)
 
     assert on_a[0] == [
-        "80",
+        "80 ",
         "Run 1 this session · 1 min on this scenario",
         "40.8 cm/360 · Accuracy 50.00%",
     ]
-    assert on_b[0][0] == "612.5"
+    assert on_b[0][0] == "612.5 "
 
 
 def test_with_follow_off_a_run_on_another_scenario_keeps_the_ring_and_card(
@@ -2182,7 +2189,7 @@ def test_with_follow_on_a_first_run_into_an_empty_store_shows_in_the_card(
 
     assert before[0][0] == "No runs yet"
     assert now_selected == B_SCENARIO
-    assert after[0][0] == "612.5"
+    assert after[0][0] == "612.5 "
 
 
 @pytest.mark.parametrize(
@@ -2412,7 +2419,7 @@ def test_the_card_list_and_chart_identify_the_selected_scenarios_latest_run(
     assert ring.opacity == 1
     assert ring.meta == expected_id
     assert list(ring.y) == [expected.score]
-    assert body[0] == ("80New PB" if selected == SCENARIO else "612.5")
+    assert body[0] == ("80 New PB" if selected == SCENARIO else "612.5 ")
 
 
 @pytest.mark.parametrize("selected", [None, "Never played"])

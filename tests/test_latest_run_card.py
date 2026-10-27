@@ -1099,10 +1099,20 @@ def test_the_body_is_the_score_with_its_badge_then_three_lines():
     body = latest_run_card_content(LATEST, A, True).body
     score_row, comparison, session, last = body
 
+    # The score ends on a space a screen reader reads: the row is a flex
+    # container, which would hand over "3,324Threshold passed" as one word.
     assert [rendered_text(child) for child in score_row.children] == [
-        "3,324",
+        "3,324 ",
         "Threshold passed",
     ]
+    score = score_row.children[0]
+    assert score.className == latest_run_card.SCORE_CLASS
+    value, word_end = score.children
+    assert value == "3,324"
+    assert (word_end.children, word_end.className) == (
+        " ",
+        "run-history-card-word-end",
+    )
     assert rendered_text(comparison) == "96.4% of PB"
     assert comparison.className == latest_run_card.RESULT_CLASS
     assert rendered_text(session) == (
@@ -1202,7 +1212,8 @@ def test_a_run_with_no_badge_shows_its_score_alone():
 
     score_row = latest_run_card_content(shown, A, True).body[0]
 
-    assert [rendered_text(child) for child in score_row.children] == ["3,324"]
+    # The word-end space stays: the next line is a block, so it reads the same.
+    assert [rendered_text(child) for child in score_row.children] == ["3,324 "]
 
 
 @pytest.mark.parametrize(
