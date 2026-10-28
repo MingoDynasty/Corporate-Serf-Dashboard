@@ -179,10 +179,26 @@ Important behavior:
 - A 2xx payload missing any of the three fields above, or carrying one in an
   unusable shape, is treated the same as an outage — unchecked — never as "no
   match".
-- **No reverse lookup exists** (probed 2026-07-20; do not re-probe):
+- **The direct reverse-lookup routes are unavailable** (probed 2026-07-20;
+  do not re-probe):
   `/user/profile/by-steam-id` returns 404 and `/user/profile?steamId=`
-  returns 401. Going from a SteamID64 to a username is impossible, which is
-  why detection guesses with personas and verifies.
+  returns 401. Current detection guesses with personas and verifies.
+- **A conditional route through benchmark progress works** (verified live
+  2026-10-28; not used by current detection). Given a SteamID64 and a played
+  benchmark, `/benchmarks/player-progress-rank-benchmark` can supply a
+  scenario's `leaderboard_id` and `leaderboard_rank`. Requesting
+  `/leaderboard/scores/global?leaderboardId=<id>&page=<rank-1>&max=1`
+  can then supply `webappUsername`. Accept it only when that row's `steamId`
+  exactly equals the original SteamID64; a position may move between calls.
+  The approved check succeeded with benchmark 458, leaderboard 98330,
+  position 14738. These coordinates record that observation, not a fixture
+  to assume remains current.
+  An unplayed benchmark, unavailable position or identity mismatch does not
+  prove the account absent. Any future fallback needs bounded attempts and
+  the same privacy-sensitive request handling as persona probes. See the
+  [Companion survey](research/kovaaks_companion_learnings.md#a-conditional-steamid-to-username-lookup-works)
+  and its pinned resolver source. The unavailable direct endpoints do not
+  imply that every SteamID-to-username route is impossible.
 
 Logging:
 
