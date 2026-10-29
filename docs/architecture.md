@@ -513,12 +513,14 @@ flowchart LR
   clientside callback registered by `register_run_list()` writes to the
   page root's `style` as `--run-history-list-need`; the stylesheet clamps it
   above `--run-history-list-width`, the list's 480px minimum, while reserving
-  480px for the chart where possible. The default columns and mount fallback
-  still need 500px, and a 500px floor on the maximum preserves the default
-  list in narrow windows. The top row is a grid with the same gap, whose
-  second column is the latest-run card's own `--run-history-card-width`,
-  500px, so the card lines up with the default list independently of the
-  list's minimum.
+  480px for the chart where possible. The default columns need less than
+  the minimum, so the list and the mount fallback sit at it, and a 500px
+  floor on the maximum keeps a list that needs up to 500px whole in narrow
+  windows. `#`, Time and Accuracy carry `flex` to share the room the minimum
+  leaves; every other column has one allowed width. The top row is a grid
+  with the same gap, whose second column is the latest-run card's own
+  `--run-history-card-width`, set to the list's minimum, so the card lines
+  up with the default list and never moves with the list's need.
   The first column (`_top_row`, `_dropdown_column`) is a
   wrapping row of the dropdowns' column, the scenario note card, and a
   `run-history-score-pair` wrapper holding Scenario Stats then the PB card.

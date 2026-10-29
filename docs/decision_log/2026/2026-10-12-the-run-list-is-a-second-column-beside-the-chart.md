@@ -19,6 +19,9 @@ Superseded in part again, 2026-10-23, by
 [the inline session summaries entry](2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md):
 This scenario no longer shows the newest session's length. All scenarios
 continues to show every session's length.
+Superseded in part again, 2026-10-29, by
+[Shots Fired starts hidden](2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md):
+Shots Fired starts hidden, so a run row has six columns by default.
 
 Run History lists the selected scenario's runs in a column of its own, to the
 right of the chart and always shown. The chart is narrower than the old

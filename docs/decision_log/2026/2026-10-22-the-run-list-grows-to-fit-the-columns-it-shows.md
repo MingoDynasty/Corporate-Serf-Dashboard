@@ -5,6 +5,10 @@ Status: Superseded in part, 2026-10-22, by
 the list can shrink to 480px when columns are hidden. The default columns
 still need 500px, and the latest-run card keeps its independent 500px width.
 The remaining contract stands.
+Superseded in part again, 2026-10-29, by
+[the marks column's entry](2026-10-29-the-run-lists-marks-column-is-30px-and-three-columns-share-its-spare-room.md):
+`need` is 19px plus every shown column's width, the marks column is a
+fixed 30px, and `#`, Time and Accuracy share the room the minimum leaves.
 
 The run list grows to fit its visible columns while leaving room for the
 chart. Its original minimum was 500px, preserving the default layout.

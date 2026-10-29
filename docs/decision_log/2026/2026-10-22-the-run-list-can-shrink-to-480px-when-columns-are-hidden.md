@@ -1,11 +1,21 @@
 # 2026-10-22: The Run List Can Shrink To 480px When Columns Are Hidden
 
-Status: Accepted
+Status: Superseded in part, 2026-10-29, by
+[the marks column's entry](2026-10-29-the-run-lists-marks-column-is-30px-and-three-columns-share-its-spare-room.md) and
+[the card's new width](2026-10-29-the-latest-run-card-is-as-wide-as-the-run-lists-minimum.md).
 
 Hiding run-list columns can now return a little more room to the chart.
 The list can shrink to 480px while its controls stay on one line.
 Its default columns still need 500px, and changing the list's width leaves
 the top-row cards in place. Long scenario names can be cut short sooner.
+
+**Superseded in part (2026-10-29).** [The marks column's entry](2026-10-29-the-run-lists-marks-column-is-30px-and-three-columns-share-its-spare-room.md):
+the need is 19px plus every shown column's width, and with Shots Fired
+hidden to start the default columns need 403px, so the default list sits
+at this entry's 480px minimum, which the page also draws before the column
+choices load. [The card's new width](2026-10-29-the-latest-run-card-is-as-wide-as-the-run-lists-minimum.md): the latest-run
+card is 480px, the minimum, so the two line up. The minimum, the width
+rule and the header stand.
 
 **Maintainer direction, 2026-10-22.** After asking whether hidden columns
 should reduce the list further, the maintainer authorized the measured

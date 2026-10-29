@@ -816,13 +816,13 @@ RUN_LIST_GRID_CLASS = "run-history-list-grid"
 LATEST_ROW_CLASS = "run-list-row-latest"
 SELECTED_ROW_CLASS = "run-list-row-selected"
 
-# The columns the Columns menu shows or hides, in table order. Shots Fired
-# and Sensitivity are shown to start, and the other three are off, so the
-# list looks as it did until someone asks for more. The browser remembers
-# each choice under an id built from the column's, and drops it if the
-# column's default ever changes, so neither may change.
+# The columns the Columns menu shows or hides, in table order. Sensitivity is
+# shown to start and the other four are off. The browser remembers each
+# choice under an id built from the column's, and drops it once if the
+# column's default changes, so changing a default resets every player's
+# choice of that column.
 RUN_LIST_MENU_COLUMNS = (
-    MenuColumn("shots", "Shots Fired"),
+    MenuColumn("shots", "Shots Fired", shown_by_default=False),
     MenuColumn("reloads", "Reloads", shown_by_default=False),
     MenuColumn("sens", "Sensitivity"),
     MenuColumn("fov", "FOV", shown_by_default=False),
@@ -876,7 +876,7 @@ class RunListIds(NamedTuple):
 def _fixed_width(width: int) -> dict[str, int]:
     """Hold a column to one width.
 
-    The list's width is worked out from these widths, in
+    The list's width is worked out from every column's width, in
     ``run_list_widths``, so the columns shown fit it with a scrollbar's room
     to spare and the last one is not clipped once enough rows are open to
     scroll. The minimum and the maximum are what hold it: the shared Columns
@@ -886,11 +886,30 @@ def _fixed_width(width: int) -> dict[str, int]:
     return {"width": width, "minWidth": width, "maxWidth": width}
 
 
+# How far a sharing column can narrow before the list scrolls sideways, in a
+# window too narrow for the list's need. Without it the list would scroll
+# sideways as soon as the chart's floor binds.
+SHARING_GIVE = 5
+
+
+def _sharing_width(width: int) -> dict[str, int]:
+    """Let a column take a share of the list's spare room, by its width.
+
+    The list is never narrower than its minimum, which can be wider than its
+    shown columns need, and the room left over goes to these columns in
+    proportion to their widths rather than collecting in one place. Only
+    columns the Columns menu can't hide share it: the menu's fit takes
+    ``flex`` off a column it shows. ``width`` is still what the list needs
+    for the column.
+    """
+    return {"width": width, "minWidth": width - SHARING_GIVE, "flex": width}
+
+
 def run_list_column_defs() -> list[dict[str, Any]]:
     """Build the list's ten columns, each named for the row field it shows.
 
-    Reloads, FOV and Avg FPS are hidden to start, as their menu entries are
-    unchecked.
+    Shots Fired, Reloads, FOV and Avg FPS are hidden to start, as their menu
+    entries are unchecked.
     """
     return [
         {
@@ -900,31 +919,31 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             "headerClass": "run-list-number",
             # Moves with the class's padding-left in the stylesheet: the
             # number's room is what the two leave.
-            **_fixed_width(50),
+            **_sharing_width(50),
         },
-        {"field": "time", "headerName": "Time", **_fixed_width(66)},
+        {"field": "time", "headerName": "Time", **_sharing_width(66)},
         {"field": "score", "headerName": "Score", **_fixed_width(72)},
         {
-            # The check and the star. It has no visible header, and takes the
-            # room the fixed columns leave, so it is the one that gives when
-            # a scrollbar appears.
+            # The check and the star, which fit in 30px with the cell's
+            # padding. It has no visible header. Fixed, or the list's spare
+            # room would pull the marks away from the score.
             "colId": "marks",
             "headerName": MARKS_HEADER,
             "headerClass": "run-list-header-unseen",
             "cellRenderer": "RunListMarks",
-            "flex": 1,
-            "minWidth": 34,
+            **_fixed_width(30),
         },
         {
             "field": "accuracy",
             "headerName": "Accuracy",
             "type": "rightAligned",
-            **_fixed_width(70),
+            **_sharing_width(70),
         },
         {
             "field": "shots",
             "headerName": "Shots Fired",
             "type": "rightAligned",
+            "hide": True,
             **_fixed_width(82),
         },
         {
@@ -960,34 +979,30 @@ def run_list_column_defs() -> list[dict[str, Any]]:
     ]
 
 
-# The room the list takes beyond its fixed columns: its two borders, a
-# classic scrollbar, and the marks column at the width it had when the list
-# was always 500px. So the default columns need exactly 500px, and no
-# browser sees its marks column change.
-RUN_LIST_ROOM = 64
+# The room the list takes beyond its columns: its two borders and a classic
+# scrollbar's width, so the last column is not clipped once enough rows are
+# open to scroll. Where the scrollbar takes no room, the sharing columns
+# have it.
+RUN_LIST_ROOM = 19
 
 
 def run_list_widths() -> tuple[int, dict[str, int]]:
     """Return what the list needs before its menu's columns, and what each adds.
 
-    The list needs ``RUN_LIST_ROOM`` plus the fixed width of every column it
-    shows. The first value counts the columns the menu can't hide, and the
-    second maps each menu column's id to the width it adds when shown. Both
-    are read from ``run_list_column_defs``, so a width changed there moves
-    the list's.
+    The list needs ``RUN_LIST_ROOM`` plus the width of every column it shows.
+    The first value counts the columns the menu can't hide, and the second
+    maps each menu column's id to the width it adds when shown. Both are read
+    from ``run_list_column_defs``, so a width changed there moves the list's.
     """
     menu_ids = {column.column_id for column in RUN_LIST_MENU_COLUMNS}
     need = RUN_LIST_ROOM
     widths: dict[str, int] = {}
     for column in run_list_column_defs():
-        if "maxWidth" not in column:
-            # The marks column, which flexes inside RUN_LIST_ROOM.
-            continue
-        column_id = column.get("colId", column["field"])
+        column_id = column.get("colId") or column["field"]
         if column_id in menu_ids:
-            widths[column_id] = column["maxWidth"]
+            widths[column_id] = column["width"]
         else:
-            need += column["maxWidth"]
+            need += column["width"]
     return need, widths
 
 
@@ -1241,7 +1256,7 @@ _APPLY_FIGURES = """
 # variable that the stylesheet clamps between the list's minimum and the
 # chart's floor. It runs as the page mounts, with the stored choices, and on
 # every change. The widths come from the server's column list and not from
-# the grid: the marks column's width follows the list's, which this sets.
+# the grid: the sharing columns' widths follow the list's, which this sets.
 _LIST_NEED = """
 (checked, ids) => {
     let need = BASE_NEED;

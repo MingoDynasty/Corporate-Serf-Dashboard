@@ -1,12 +1,17 @@
 # 2026-10-22: The Run List's Columns Menu Offers Reloads, FOV And Avg FPS, Off To Start
 
-Status: Accepted
+Status: Superseded in part, 2026-10-29, by
+[Shots Fired starts hidden](2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md).
 
 The run list's Columns menu can add three columns, Reloads, FOV with its
 scale, and Avg FPS, and each is off until a player turns it on. A player who
 never opens the menu sees the list as it was. The list stays a short panel
 for picking out a run, so a later column has to show it helps choose or
 compare runs before one is opened, and that it is worth its width.
+
+**Superseded in part (2026-10-29).** [Shots Fired starts hidden](2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md):
+Shots Fired leaves the default tier for this one and is off to start too.
+The three columns, their defaults and the bar for a later column stand.
 
 **Ruling.** RC1 of
 [#403](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/403),

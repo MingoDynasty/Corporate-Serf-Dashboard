@@ -222,12 +222,14 @@ a.run-toast-link {
    wide, so it narrows the page without touching the viewport, and a media
    query would keep two columns in a page too narrow for them.
 
-   The latest-run card keeps the default list's 500px width independently.
-   Hiding columns can narrow the list to 480px without moving the cards. The
-   page's script writes the shown columns' need as --run-history-list-need. */
+   The latest-run card is as wide as the list's minimum, which is the list's
+   width with the default columns, so the two line up on the default page.
+   Columns that need more widen the list under the PB card and leave the card
+   where it is. The page's script writes the shown columns' need as
+   --run-history-list-need. */
 .run-history-page {
     --run-history-list-width: 480px;
-    --run-history-card-width: 500px;
+    --run-history-card-width: var(--run-history-list-width);
 
     container: run-history-page / inline-size;
     display: flex;
@@ -870,17 +872,17 @@ a.run-toast-link {
 /* The chart beside the run list. The list's column is as wide as its shown
    columns need, never narrower than its minimum, and never so wide that the
    chart drops under 480px; past that the list scrolls sideways. Where the
-   window is narrow, the maximum's 500px floor keeps the default columns
-   from losing room: only hiding columns can narrow the list below 500px.
-   Before the script writes the need, keep the default width to avoid a
-   horizontal shift as the page mounts. */
+   window is narrow, the maximum's 500px floor keeps a list that needs up to
+   500px from losing room. Before the script writes the need, the list takes
+   its minimum, the default columns' width, so the default page doesn't shift
+   as it mounts. */
 .run-history-columns {
     display: grid;
     flex: 1 1 0;
     gap: var(--mantine-spacing-md);
     grid-template-columns: minmax(0, 1fr) clamp(
             var(--run-history-list-width),
-            var(--run-history-list-need, 500px),
+            var(--run-history-list-need, var(--run-history-list-width)),
             max(500px, calc(100% - var(--mantine-spacing-md) - 480px))
         );
     min-height: 0;
@@ -1125,10 +1127,11 @@ a.run-toast-link {
    pointer on it, it covered the end of the last column and of the session
    rows. The grid marks such a scrollbar invisible. The room goes inside both
    scrolling areas, so the pinned row stays in line with the rows under it,
-   and the marks column gives it up. A scrollbar that takes room of its own
-   gets none: it already clears the rows, and the marks column has too little
-   left to give both. The room is the scrollbar's width with the pointer on
-   it, 12px in Firefox 158, so a cell's own padding stays clear beside it. */
+   out of the room the list keeps for a classic scrollbar. A scrollbar that
+   takes room of its own gets none: it already clears the rows, and the list
+   keeps room for one scrollbar, not both. The room is the scrollbar's width
+   with the pointer on it, 12px in Firefox 158, so a cell's own padding stays
+   clear beside it. */
 .run-history-list-grid:has(.ag-body-vertical-scroll.ag-scrollbar-invisible)
     :is(.ag-center-cols-viewport, .ag-floating-top-viewport) {
     padding-right: 12px;
