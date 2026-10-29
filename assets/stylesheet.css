@@ -737,6 +737,15 @@ a.run-toast-link {
     text-decoration: underline;
 }
 
+/* Edit takes clicks 30 x 24px round its 20 x 18px word, which the first
+   line's 12px type leaves small for a mouse. The margins cancel the padding,
+   so nothing moves. Only 2px below: the note's scroll area starts 2px under
+   the line and is drawn over it, so a deeper reach would land on the note. */
+.run-history-note-heading > .run-history-note-link {
+    margin: -4px -5px -2px;
+    padding: 4px 5px 2px;
+}
+
 .run-history-note-link-add {
     align-self: flex-start;
     font-size: var(--mantine-font-size-sm);
