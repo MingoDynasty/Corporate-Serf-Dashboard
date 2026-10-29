@@ -365,8 +365,9 @@ def test_every_column_but_the_sharing_ones_has_one_allowed_width():
 def test_number_time_and_accuracy_share_the_spare_room_by_their_widths():
     """The list's minimum can be wider than its columns need, and they take the rest.
 
-    Each can also give a little before the list scrolls sideways. Only
-    columns the menu can't hide share: the menu's fit takes flex away.
+    None narrows below its width, which fits its widest value, so a list too
+    narrow for its columns scrolls sideways instead. Only columns the menu
+    can't hide share: the menu's fit takes flex away.
     """
     columns = _columns_by_id()
     menu = {entry.column_id for entry in run_history_list.RUN_LIST_MENU_COLUMNS}
@@ -375,7 +376,7 @@ def test_number_time_and_accuracy_share_the_spare_room_by_their_widths():
     for column_id in SHARING:
         column = columns[column_id]
         assert column["flex"] == column["width"], column_id
-        assert column["minWidth"] == column["width"] - run_history_list.SHARING_GIVE
+        assert column["minWidth"] == column["width"], column_id
         assert "maxWidth" not in column, column_id
 
 

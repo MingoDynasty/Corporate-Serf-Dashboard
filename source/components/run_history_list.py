@@ -886,12 +886,6 @@ def _fixed_width(width: int) -> dict[str, int]:
     return {"width": width, "minWidth": width, "maxWidth": width}
 
 
-# How far a sharing column can narrow before the list scrolls sideways, in a
-# window too narrow for the list's need. Without it the list would scroll
-# sideways as soon as the chart's floor binds.
-SHARING_GIVE = 5
-
-
 def _sharing_width(width: int) -> dict[str, int]:
     """Let a column take a share of the list's spare room, by its width.
 
@@ -899,10 +893,14 @@ def _sharing_width(width: int) -> dict[str, int]:
     shown columns need, and the room left over goes to these columns in
     proportion to their widths rather than collecting in one place. Only
     columns the Columns menu can't hide share it: the menu's fit takes
-    ``flex`` off a column it shows. ``width`` is still what the list needs
-    for the column.
+    ``flex`` off a column it shows.
+
+    ``width`` is also the column's minimum, the room its widest value needs,
+    such as a three-digit run number or "11:56 AM". These cells have no
+    tooltip to show a cut value, so a list too narrow for its columns scrolls
+    sideways instead.
     """
-    return {"width": width, "minWidth": width - SHARING_GIVE, "flex": width}
+    return {"width": width, "minWidth": width, "flex": width}
 
 
 def run_list_column_defs() -> list[dict[str, Any]]:

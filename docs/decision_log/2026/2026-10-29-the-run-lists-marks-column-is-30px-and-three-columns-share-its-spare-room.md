@@ -37,12 +37,17 @@ What the list does today is in
   fixed columns have. The check is 10.0px and the star 10.2px wide (9.8px
   in Edge), in the cell's 4px padding each side.
 - **`#`, Time and Accuracy share spare room.** Each has `flex` equal to its
-  width (50, 66 and 70px) and a `minWidth` 5px under it (`SHARING_GIVE`).
+  width (50, 66 and 70px) and a `minWidth` equal to it, so they only grow.
   The room the list's minimum leaves over the shown columns splits by
-  width, and in a window where the chart's floor binds the three give 15px
-  together before the list scrolls sideways. Only columns the menu can't
-  hide share: the menu's `autoSizeColumns` takes `flex` off a column it
-  shows.
+  width. Only columns the menu can't hide share: the menu's
+  `autoSizeColumns` takes `flex` off a column it shows.
+- **No sharing column narrows below its width.** The widths fit a
+  three-digit run number beside the number's 24px indent and a time such as
+  `11:56 AM`, and neither cell has a tooltip to show a cut value. A list the
+  chart's floor caps below its need scrolls sideways instead. The first
+  build let each give 5px; the seat's review of #445 found `113` cut to
+  `1…` and the AM or PM dropped in a 1280px window with every column shown,
+  and the give was removed.
 - **The list needs `RUN_LIST_ROOM`, 19px, plus every shown column's width,**
   the marks column's included. The 19px is the list's two borders and a
   classic scrollbar's 17px. With Shots Fired hidden to start

@@ -911,8 +911,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   the chart gives ([2026-10-22][list-minimum]). The page draws the list at
   its 480px minimum until the stored column choices load. Where the list is
   wider than its columns need, `#`, Time and Accuracy share the spare room
-  in proportion to their widths, and each can give 5px before the list
-  scrolls sideways; every other column, the marks included, keeps one width
+  in proportion to their widths, and none narrows below its own width;
+  every other column, the marks included, keeps one width
   ([2026-10-29][marks-30]). Past the chart's floor the
   list scrolls sideways inside its own box, and its session rows, scenario
   rows and other full-width rows stay whole in view while the run rows
