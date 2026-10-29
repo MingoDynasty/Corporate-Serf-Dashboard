@@ -1,10 +1,48 @@
 # KovaaK's analytics log as a source for restarts
 
-Date: 2026-10-25
+Date: 2026-10-25, with the 3.9.12 section added 2026-10-29
 Author: claude-opus-5-5 · effort: xhigh
+Game version: KovaaK's 3.9.10, and 3.9.12 in the first section.
 
 Research note; nothing here is ratified, and the recommendations are inputs to
 a design that does not exist yet.
+
+## Since KovaaK's 3.9.12
+
+KovaaK's 3.9.12 no longer includes the analytics library, so the game no
+longer writes the log this note describes, and this app has no source for
+restarts on the current game. Everything after this section describes 3.9.10,
+and applies again only if a later build brings the log back. Checked on the
+maintainer's machine on 2026-10-29:
+
+- **The build.** A 33-run session on 2026-10-27 wrote stats files with
+  `Game Version:,3.9.12.2026-10-24-12-26-07-50e64693faaa`. Steam installed
+  the build on 2026-10-26. The last launch the log recorded, on 2026-10-25,
+  was 3.9.10.
+- **The log was never touched.** Through that 90-minute session,
+  `ga_log.txt` and `ga.sqlite3` kept the contents and timestamps of the
+  2026-10-25 launch. The maintainer's archive checked the log just before the
+  launch, during it and at exit, and found the same file each time.
+- **The library is gone from the game.** The game's executable,
+  `FPSAimTrainer-Win64-Shipping.exe`, contains none of `GameAnalytics`,
+  `ga_log`, `Add DESIGN event` or `challenge:`, in ASCII or in UTF-16. It
+  contains the setting names `StatsExportLevel` and
+  `CountDownBeforeChallengeStart` in both, so the search works. The library
+  was removed, not switched off.
+- **Nothing else on disk records restarts.** `ga.sqlite3` held no events,
+  because the library deletes each event once it is sent. The game's
+  `session.sav` names the loaded scenario, map and profile, and counts
+  nothing. The game's Unreal log stopped at 3.9.10
+  ([the scenario-switch check](kovaaks_scenario_switch_signals.md#verified-findings)).
+- **One source is left, measured on 3.9.10 only.** With Statistics Export on
+  Always, a reset with shots fired writes a stats file. That setting is not
+  the default, a reset about a second in wrote none, and this app imports
+  such a file as a run
+  ([sessions spec](../specs/sessions.md#run-start-and-run-length)).
+
+**To check again after a game update,** play one run and see whether
+`%LOCALAPPDATA%\GameAnalytics\ga_log.txt` changed, or search the game's
+executable for `ga_log`.
 
 ## Takeaway
 
