@@ -36,3 +36,14 @@ widest is an older year's session with a three-digit run number and an
 unknown time, `Run 124 (Dec 17, 2025, 12:48 AM session) · Time on this
 scenario unknown`. A new PB has no typical phrase, so its comparison is its
 gain alone. In the wide layout every line still fits on one at 480px.
+
+**Set aside: the comparison on two lines.** The maintainer asked why the
+typical phrase and the PB's percentage share one line, and the PR first put
+each on a line of its own. The extra line raised the card's tallest state
+to six lines: with the top row's 12px offset above and 12px under the last,
+its floor became 161px in the wide layout and 179px in the narrow one,
+measured in Firefox and Edge. The card then set the row's height, about
+20px taller than the 141px the PB card set with a KovaaK's username, so the
+chart lost that height. Shown the cost, the maintainer dropped it on
+2026-10-29: "Drop it". The comparison stays one line, and the floors stay
+135px and 177px.
