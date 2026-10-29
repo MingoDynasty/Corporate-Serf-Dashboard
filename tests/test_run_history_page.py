@@ -1437,16 +1437,16 @@ def test_the_list_takes_a_column_of_at_least_480px_beside_the_chart():
 def test_the_top_row_takes_the_cards_own_width_and_the_gap_of_the_columns():
     """The card's width is its own, so a wider list never wraps the top row.
 
-    It equals the list's default width, so on the default page the card's
-    edges are the list's at every zoom level. The row stretches each column,
-    and every card in it, to its own height.
+    It is the list's minimum, which the default columns leave the list at, so
+    on the default page the card's edges are the list's at every zoom level.
+    The row stretches each column, and every card in it, to its own height.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     page = _css_block(css, ".run-history-page")
     row = _css_block(css, ".run-history-top-row")
     columns = _css_block(css, ".run-history-columns")
 
-    assert "--run-history-card-width: 500px;" in page
+    assert "--run-history-card-width: var(--run-history-list-width);" in page
     assert "--run-history-list-width: 480px;" in page
     assert "grid-template-columns: minmax(0, 1fr) var(--run-history-card-width);" in row
     for rule in (row, columns):

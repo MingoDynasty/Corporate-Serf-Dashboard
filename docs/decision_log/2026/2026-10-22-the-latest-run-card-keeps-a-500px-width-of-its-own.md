@@ -5,6 +5,10 @@ Status: Superseded in part, 2026-10-22, by
 the list can shrink to 480px when columns are hidden. The default columns
 still need 500px, and the latest-run card keeps its independent 500px width.
 The remaining contract stands.
+Superseded in part again, 2026-10-29, by
+[the card's new width](2026-10-29-the-latest-run-card-is-as-wide-as-the-run-lists-minimum.md):
+the card is 480px, the list's minimum, which the default list sits at.
+Its width of its own stands.
 
 The latest-run card keeps its own 500px width so the run list can resize
 without wrapping the top row. The default list still lines up with the

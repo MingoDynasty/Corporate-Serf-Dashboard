@@ -128,9 +128,9 @@ the list moves all three to that scenario's latest run. The chart keeps its
 range, so an older run can be highlighted in the list while outside the
 chart. Choosing a scenario doesn't scroll or open rows in the list.
 
-The run list's **Columns** menu can also add **Reloads**, **FOV** and
-**Avg FPS**, each off to start, and the list widens to fit the columns you
-turn on.
+The run list's **Columns** menu can also add **Shots Fired**, **Reloads**,
+**FOV** and **Avg FPS**, each off to start, and the list widens to fit the
+columns you turn on.
 
 ### Typical score
 

@@ -96,12 +96,12 @@ nor weight; ages read relative with exact times on hover and focus, while
 times that name or order runs remain absolute ([T4][card-order]).
 
 - The row takes two columns with the gap of the chart and the run list under
-  it. The second column holds the latest-run card alone, at its own 500px
-  ([2026-10-22][card-width]). With the default columns the list is also
-  500px, so the card sits over it with matching edges at every zoom level.
-  Hiding columns can narrow the list to 480px, and adding columns can widen
-  it under the PB card; neither changes the top row
-  ([2026-10-22][list-minimum]). The first holds,
+  it. The second column holds the latest-run card alone, at a width of its
+  own ([2026-10-22][card-width]): 480px, the list's minimum
+  ([2026-10-29][card-480]). With the default columns the list is also
+  480px, so the card sits over it with matching edges at every zoom level.
+  Adding columns can widen the list under the PB card, which doesn't change
+  the top row ([2026-10-22][list-minimum]). The first holds,
   in DOM order, the dropdowns' column, the scenario note card
   ([below](#the-scenario-note-card)), then Scenario Stats and the PB card in
   one score pair at its right end, beside the latest-run card. Spare room
@@ -464,16 +464,17 @@ it is saved is in [2026-10-18][note-store].
   ([2026-10-13][nearest-minute]).
   A time that rounds to zero reads `<1 min`, so that form means under 30
   seconds.
-- The card is 500px wide, a width of its own that equals the run list's
-  default width ([2026-10-22][card-width], [2026-10-22][list-minimum]),
-  and as tall as the top row. It is never less than its tallest state, so
-  nothing that changes between runs changes its height, and the page doesn't
-  jump. In the wide layout every line fits on one, and the floor is 135px.
-  In a page area of 900px or less, where the card can be 380px wide, the
-  floor is 177px: the comparison by pace with an old value's clock on two
-  lines, over the session line on two, with the top row's 12px above the
-  first line and 12px under the last. Its lines start from its top, as the
-  other score cards' do ([SC4][top-aligned], [SC1][typical-start]).
+- The card is 480px wide, a width of its own that equals the run list's
+  minimum, which is the list's width with the default columns
+  ([2026-10-22][card-width], [2026-10-29][card-480]), and as tall as the
+  top row. It is never less than its tallest state, so nothing that changes
+  between runs changes its height, and the page doesn't jump. In the wide
+  layout every line fits on one, and the floor is 135px. In a page area of
+  900px or less, where the card can be 380px wide, the floor is 177px: the
+  comparison by pace with an old value's clock on two lines, over the
+  session line on two, with the top row's 12px above the first line and
+  12px under the last. Its lines start from its top, as the other score
+  cards' do ([SC4][top-aligned], [SC1][typical-start]).
 - With no run to report, the card's first line reads `Latest run` alone, and
   the selection decides first, as on the PB card
   ([2026-10-18][follows]):
@@ -900,15 +901,19 @@ The card's lines, local-record scope and leaderboard presentation follow
 ## The run list
 
 - The list is a second column to the right of the chart, always shown
-  ([2026-10-12][column]). It is as wide as its shown columns need, 64px plus
-  each shown column's fixed width, never narrower than 480px. Hiding
-  Sensitivity or Shots Fired lets it reach that minimum. Its default columns
-  still need exactly 500px; with Reloads or Avg FPS on it needs 564px, with
-  FOV 616px, and with all three 744px. Growth is capped so the chart keeps
-  480px where possible. In a narrow window, the default columns retain
-  their 500px and the chart gives, while a list with fewer columns can still
-  shrink to 480px ([2026-10-22][list-minimum]). The page draws the list at
-  500px until the stored column choices load. Past the chart's floor the
+  ([2026-10-12][column]). It is as wide as its shown columns need, 19px for
+  its borders and a classic scrollbar plus each shown column's width, never
+  narrower than 480px. Its default columns need 407px, so it sits at that
+  minimum; with Shots Fired on they need 489px, with Reloads or Avg FPS
+  471px, with FOV 523px, and with every column 733px
+  ([2026-10-29][marks-30]). Growth is capped so the chart keeps 480px where
+  possible. In a narrow window, a list that needs up to 500px keeps it and
+  the chart gives ([2026-10-22][list-minimum]). The page draws the list at
+  its 480px minimum until the stored column choices load. Where the list is
+  wider than its columns need, `#`, Time and Accuracy share the spare room
+  in proportion to their widths, and none narrows below its own width;
+  every other column, the marks included, keeps one width
+  ([2026-10-29][marks-30]). Past the chart's floor the
   list scrolls sideways inside its own box, and its session rows, scenario
   rows and other full-width rows stay whole in view while the run rows
   scroll under them ([2026-10-22][list-width]). It has two views, This
@@ -961,14 +966,15 @@ The card's lines, local-record scope and leaderboard presentation follow
   the last one listed. The switch moves with the jump, so a reload afterwards
   opens on All scenarios. A tree that does not hold the session shows from its
   top, with focus on its first row ([2026-10-14][count-link]).
-- A run row has seven columns by default and up to ten: `#`, the run's
+- A run row has six columns by default and up to ten: `#`, the run's
   number among this scenario's runs in its session, counted in the order they
   were played, "Time", a time of day with no seconds, "Score", the marks,
   "Accuracy" to two decimals with trailing zeros kept, such as `82.31%` or
   `100.00%` ([2026-10-18][accuracy]), "Shots Fired", "Reloads",
-  "Sensitivity", "FOV", and "Avg FPS". Reloads, FOV and Avg FPS are hidden
-  until turned on in the Columns menu ([2026-10-22][new-columns]). The marks
-  column has no visible header, and its accessible name is "Marks". Shots
+  "Sensitivity", "FOV", and "Avg FPS". Shots Fired, Reloads, FOV and Avg FPS
+  are hidden until turned on in the Columns menu ([2026-10-22][new-columns],
+  [2026-10-29][shots-hidden]). The marks column is 30px, has no visible
+  header, and its accessible name is "Marks" ([2026-10-29][marks-30]). Shots
   Fired is shown on every scenario and counts the shots of the first weapon
   the stats file lists. Sensitivity is the run's normalized
   sensitivity-and-scale string, as on the chart's axis. Columns don't sort
@@ -1079,9 +1085,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   own state alone. Both buttons read what a press would do, following every
   way a row can open or close.
 - The "Columns" menu shows or hides, in table order, Shots Fired, Reloads,
-  Sensitivity, FOV and Avg FPS ([2026-10-05][columns-menu]). Shots Fired and
-  Sensitivity are shown to start, and the other three are off
-  ([2026-10-22][new-columns]). After them it has a "Median and best"
+  Sensitivity, FOV and Avg FPS ([2026-10-05][columns-menu]). Sensitivity is
+  shown to start, and the other four are off ([2026-10-22][new-columns],
+  [2026-10-29][shots-hidden]). After them it has a "Median and best"
   checkbox, off to start. The browser remembers each
   ([2026-10-14][median-best]).
 - With "Median and best" on, a scenario row under All scenarios and a session
@@ -1646,6 +1652,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 [list-width]: ../decision_log/2026/2026-10-22-the-run-list-grows-to-fit-the-columns-it-shows.md
 [list-minimum]: ../decision_log/2026/2026-10-22-the-run-list-can-shrink-to-480px-when-columns-are-hidden.md
 [card-width]: ../decision_log/2026/2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md
+[marks-30]: ../decision_log/2026/2026-10-29-the-run-lists-marks-column-is-30px-and-three-columns-share-its-spare-room.md
+[shots-hidden]: ../decision_log/2026/2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md
+[card-480]: ../decision_log/2026/2026-10-29-the-latest-run-card-is-as-wide-as-the-run-lists-minimum.md
 [figures-line]: ../decision_log/2026/2026-10-18-median-and-best-sit-in-the-rows-own-line-ahead-of-its-count.md
 [figure-columns]: ../decision_log/2026/2026-10-18-the-run-list-draws-a-chevron-and-this-scenario-lines-its-figures-up-in-columns.md
 [inline-summaries]: ../decision_log/2026/2026-10-23-this-scenario-session-rows-keep-their-score-summaries-inline.md

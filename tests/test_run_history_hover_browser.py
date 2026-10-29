@@ -356,6 +356,48 @@ def test_original_sensitivity_is_available_on_the_list_cell(hover_page, view):
     )
 
 
+def test_a_capped_list_keeps_long_run_numbers_and_times_whole(hover_page):
+    """A list the chart's floor caps scrolls sideways before # and Time narrow.
+
+    Every optional column needs more than a 1280px window leaves the list.
+    The columns that share the list's spare room never go under their own
+    widths, which fit a third digit beside the number's indent and an hour of
+    two digits with AM or PM, and neither cell has a tooltip to recover a cut.
+    """
+    page = hover_page
+    page.set_viewport_size({"width": 1280, "height": 1080})
+    page.get_by_role("button", name="Columns", exact=True).click()
+    for name in ("Shots Fired", "Reloads", "FOV", "Avg FPS"):
+        page.get_by_role("checkbox", name=name, exact=True).check()
+    page.keyboard.press("Escape")
+    page.wait_for_function(
+        "() => window.runHistoryList.api.getAllDisplayedColumns().length === 10"
+    )
+    row = next(row for row in run_rows(page) if row["displayed"])
+    page.evaluate(
+        """id => {
+        const api = window.runHistoryList.api;
+        const data = api.getRowNode(id).data;
+        api.applyTransaction({update: [{...data, n: 113, time: '11:56 AM'}]});
+    }""",
+        row["id"],
+    )
+    page.wait_for_function(
+        """grid => {
+        const list = document.querySelector(grid);
+        const need = getComputedStyle(list).getPropertyValue('--run-history-list-need');
+        return parseFloat(need) > list.getBoundingClientRect().width;
+    }""",
+        arg=GRID,
+    )
+    for column, text in (("n", "113"), ("time", "11:56 AM")):
+        cell = page.locator(
+            f'{GRID} .ag-row[row-id="{row["id"]}"] .ag-cell[col-id="{column}"]'
+        )
+        playwright.expect(cell).to_have_text(text)
+        assert cell.evaluate("cell => cell.scrollWidth <= cell.clientWidth"), column
+
+
 def test_four_line_tooltip_fits_the_narrow_chart_with_options_open(hover_page):
     page = hover_page
     page.set_viewport_size({"width": 1600, "height": 1000})

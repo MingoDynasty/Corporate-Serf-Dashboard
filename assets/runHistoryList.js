@@ -29,9 +29,10 @@
 //   6. Tab into a full-width row's buttons needs a listener that runs before
 //      the grid's own, which skips from a full-width row to the next cell.
 //   7. Sorting is off on every column, set with the grid.
-//   8. The column widths are fixed and leave room for the scrollbar, set
-//      with the grid. The list's width is worked out from them on the
-//      server, so it grows with the columns shown.
+//   8. The column widths leave room for the scrollbar, set with the grid.
+//      The list's width is worked out from them on the server, so it grows
+//      with the columns shown, and #, Time and Accuracy share whatever room
+//      the list's minimum leaves over.
 //   9. After new rows are applied, focus goes back to the same row id, and to
 //      the same button in it. The grid holds focus by position, so a run that
 //      lands would otherwise leave a keyboard user on a different run, and a

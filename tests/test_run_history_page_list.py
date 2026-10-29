@@ -54,10 +54,13 @@ STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
 LIST_SCRIPT = REPO_ROOT / "assets" / "runHistoryList.js"
 IDS = run_history.RUN_LIST_IDS
 SCENARIO = "Scenario A"
-# The default columns need 500px even though hiding columns can narrow the
-# list. Its border takes 2px, and a classic scrollbar is 17px in the widest
-# browser the app is used in.
-LIST_COLUMN_PX = 500
+# The list's minimum, which the default columns leave it at: they need 407px.
+# A list that needs up to 500px keeps it in a narrow window. Its border takes
+# 2px, and a classic scrollbar is 17px in the widest browser the app is used
+# in.
+LIST_MINIMUM_PX = 480
+DEFAULT_NEED_PX = 407
+NARROW_WINDOW_KEEPS_PX = 500
 BORDER_PX = 2
 SCROLLBAR_PX = 17
 # A scrollbar drawn over the rows, as Firefox draws it on Windows 11 by
@@ -290,10 +293,11 @@ def test_each_fixed_column_has_the_width_its_header_and_values_need():
         "n": 50,
         "time": 66,
         "score": 72,
+        "marks": 30,
         "accuracy": 70,
         "shots": 82,
         "reloads": 64,
-        "sens": 96,
+        "sens": 100,
         "fov": 116,
         "avg_fps": 64,
     }
@@ -306,6 +310,7 @@ def test_the_three_new_columns_are_right_aligned_and_hidden_to_start():
         assert columns[field]["hide"] is True
         assert columns[field]["type"] == "rightAligned"
     assert [c["field"] for c in _grid().columnDefs if c.get("hide")] == [
+        "shots",
         "reloads",
         "fov",
         "avg_fps",
@@ -333,47 +338,68 @@ def test_the_marks_column_has_a_name_and_shows_no_header():
     )
 
 
-def test_every_column_but_the_marks_has_one_allowed_width():
+SHARING = ("n", "time", "accuracy")
+
+
+def _columns_by_id() -> dict[str, dict]:
+    return {c.get("colId") or c["field"]: c for c in _grid().columnDefs}
+
+
+def test_every_column_but_the_sharing_ones_has_one_allowed_width():
     """The Columns menu fits a column it shows to its content.
 
     A column whose minimum and maximum are its width comes out of that fit
-    unchanged, so the widths that leave room for the scrollbar stay put.
+    unchanged, so the widths that leave room for the scrollbar stay put. The
+    marks column is one of them, so spare room never pulls the marks away
+    from the score.
     """
-    fixed = [c for c in _grid().columnDefs if c.get("colId") != "marks"]
+    fixed = {k: c for k, c in _columns_by_id().items() if k not in SHARING}
 
-    assert len(fixed) == 9
-    for column in fixed:
-        assert column["width"] == column["minWidth"] == column["maxWidth"]
-    (marks,) = [c for c in _grid().columnDefs if c.get("colId") == "marks"]
-    assert marks["flex"] == 1
-    assert "width" not in marks
+    assert len(fixed) == 7
+    for column_id, column in fixed.items():
+        assert column["width"] == column["minWidth"] == column["maxWidth"], column_id
+        assert "flex" not in column, column_id
+    assert fixed["marks"]["width"] == 30
+
+
+def test_number_time_and_accuracy_share_the_spare_room_by_their_widths():
+    """The list's minimum can be wider than its columns need, and they take the rest.
+
+    None narrows below its width, which fits its widest value, so a list too
+    narrow for its columns scrolls sideways instead. Only columns the menu
+    can't hide share: the menu's fit takes flex away.
+    """
+    columns = _columns_by_id()
+    menu = {entry.column_id for entry in run_history_list.RUN_LIST_MENU_COLUMNS}
+
+    assert not menu & set(SHARING)
+    for column_id in SHARING:
+        column = columns[column_id]
+        assert column["flex"] == column["width"], column_id
+        assert column["minWidth"] == column["width"], column_id
+        assert "maxWidth" not in column, column_id
 
 
 def test_the_columns_leave_room_for_the_scrollbar():
-    """The list needs its shown columns' widths and room for the rest.
+    """The list needs its shown columns' widths, its borders and a classic scrollbar.
 
-    That room holds the borders, a classic scrollbar, and the marks column
-    at its minimum, whatever columns are shown.
+    The default columns need less than the list's minimum, so the list sits
+    there, as wide as the latest-run card.
     """
-    (marks,) = [c for c in _grid().columnDefs if c.get("colId") == "marks"]
-
-    assert (
-        run_history_list.RUN_LIST_ROOM - BORDER_PX - SCROLLBAR_PX >= marks["minWidth"]
-    )
+    assert run_history_list.RUN_LIST_ROOM == BORDER_PX + SCROLLBAR_PX
     default_shown = sum(
-        column["width"]
-        for column in _grid().columnDefs
-        if "width" in column and not column.get("hide")
+        column["width"] for column in _grid().columnDefs if not column.get("hide")
     )
-    assert default_shown + run_history_list.RUN_LIST_ROOM == LIST_COLUMN_PX
+    assert default_shown + run_history_list.RUN_LIST_ROOM == DEFAULT_NEED_PX
+    assert DEFAULT_NEED_PX < LIST_MINIMUM_PX
 
 
 def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
     """A scrollbar that takes no room of its own covered the last column.
 
     The grid marks such a scrollbar invisible. Keyed on that mark, the body
-    and the pinned row both keep its width free, so the two stay in line, and
-    the marks column gives the room up without going under its minimum.
+    and the pinned row both keep its width free, so the two stay in line, out
+    of the room the list keeps for a classic scrollbar.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     room = _css_block(
@@ -383,9 +409,7 @@ def test_a_scrollbar_drawn_over_the_rows_gets_room_beside_them():
     )
 
     assert f"padding-right: {OVERLAY_SCROLLBAR_PX}px;" in room
-    (marks,) = [c for c in _grid().columnDefs if c.get("colId") == "marks"]
-    marks_room = run_history_list.RUN_LIST_ROOM - BORDER_PX - OVERLAY_SCROLLBAR_PX
-    assert marks_room >= marks["minWidth"]
+    assert OVERLAY_SCROLLBAR_PX <= SCROLLBAR_PX
 
 
 # --- The list's width ----------------------------------------------------------
@@ -401,13 +425,14 @@ def test_the_list_needs_its_room_and_the_widths_of_the_columns_it_shows():
     assert need == run_history_list.RUN_LIST_ROOM + sum(
         width for column_id, width in fixed.items() if column_id not in menu
     )
-    # The proposal's figures: the default columns, each new one alone, and all.
-    default = need + widths["shots"] + widths["sens"]
-    assert default == LIST_COLUMN_PX
+    # The default columns, each other menu column alone, and every column.
+    default = need + widths["sens"]
+    assert default == DEFAULT_NEED_PX
     assert [
-        default + widths[column_id] for column_id in ("reloads", "fov", "avg_fps")
-    ] == [564, 616, 564]
-    assert default + widths["reloads"] + widths["fov"] + widths["avg_fps"] == 744
+        default + widths[column_id]
+        for column_id in ("shots", "reloads", "fov", "avg_fps")
+    ] == [489, 471, 523, 471]
+    assert need + sum(widths.values()) == 733
 
 
 def test_the_menus_checkboxes_write_the_lists_need_to_the_pages_style():
@@ -426,15 +451,15 @@ def test_the_menus_checkboxes_write_the_lists_need_to_the_pages_style():
 
 
 def test_the_list_grows_to_its_need_between_its_minimum_and_the_charts_floor():
-    """Keep the default columns whole in a narrow window, even at a lower minimum."""
+    """Keep a list that needs up to 500px whole in a narrow window."""
     css = STYLESHEET.read_text(encoding="utf-8")
     columns = _css_block(css, ".run-history-columns")
 
     assert (
         "grid-template-columns: minmax(0, 1fr) clamp(\n"
         "            var(--run-history-list-width),\n"
-        f"            var(--run-history-list-need, {LIST_COLUMN_PX}px),\n"
-        f"            max({LIST_COLUMN_PX}px, "
+        "            var(--run-history-list-need, var(--run-history-list-width)),\n"
+        f"            max({NARROW_WINDOW_KEEPS_PX}px, "
         "calc(100% - var(--mantine-spacing-md) - 480px))\n"
         "        );"
     ) in columns
@@ -513,7 +538,7 @@ def test_the_columns_menu_offers_five_columns_in_table_order_and_then_median_and
     checkboxes = _menu_checkboxes()
 
     assert [(box.label, box.checked, box.persistence) for box in checkboxes] == [
-        ("Shots Fired", True, True),
+        ("Shots Fired", False, True),
         ("Reloads", False, True),
         ("Sensitivity", True, True),
         ("FOV", False, True),
@@ -580,7 +605,7 @@ def test_the_menus_layout_default_never_varies(query):
     page = run_history.layout(**query)
 
     assert [box.checked for box in _menu_checkboxes(page)] == [
-        True,
+        False,
         False,
         True,
         False,
