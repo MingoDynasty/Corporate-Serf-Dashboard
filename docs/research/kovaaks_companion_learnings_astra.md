@@ -12,9 +12,10 @@ to a scenario, a scenario to a recorded run, and the run's chart to the same
 moment in its video. CSD can learn most immediately from that continuity,
 its session summaries, and a verified alternative for discovering a
 KovaaK's username. Its coaching system offers useful ways to limit advice,
-but its causal language and several data assumptions should not be adopted
-without stronger evidence. Recording is a substantial additional product,
-not a prerequisite for improving our run analysis.
+but CSD's ratified direction is facts and verdicts; prescriptive coaching
+would require a separate product decision and stronger evidence. Recording
+is a substantial additional product, not a prerequisite for improving our
+run analysis.
 
 ## Evidence and scope
 
@@ -33,8 +34,9 @@ not a prerequisite for improving our run analysis.
   using PowerShell's C# compiler. The only parser substitution expanded its
   generated regular-expression declaration into the equivalent ordinary
   `Regex` factory, because `Add-Type` does not run source generators.
-  Results and inputs are recorded below. Scratch is in
-  `ignore/scripts/companion-research/`; no competitor code is added to CSD.
+  Results and inputs are recorded below. The probe bundle, including its
+  pinned source inputs, is retained in the main checkout's
+  `ignore/scripts/companion-research/`; no competitor code is committed to CSD.
 - With maintainer permission, verified the benchmark-to-username route
   against KovaaK's public API using the public example account already in
   our API notes. Retained only the match result and request coordinates,
@@ -60,7 +62,9 @@ scenario analytics, automatic game recording, optional webcams, and a
 replay player with a reconstructed mouse trail. Its source separates the
 Core calculations and storage from the WPF shell. The catalog contains
 132 benchmark groups and 268 difficulty entries; the README calls these
-132 benchmark playlists. [README][readme], [catalog][catalog],
+132 benchmark playlists. The entries live in embedded `playlists.json`;
+`BenchmarkCatalog.cs` loads them. [README][readme], [catalog data][catalog-data],
+[catalog loader][catalog],
 [project files][projects].
 
 The useful comparison is what each app helps the player do:
@@ -189,7 +193,11 @@ Specific limits matter before adopting these tests:
 
 A useful first CSD observation would describe a result and offer an
 inspection action. Prescriptive coaching needs its own evaluation against
-held-out sessions and plausible alternative explanations.
+held-out sessions and plausible alternative explanations. CSD's
+[D3, ruled 2026-10-04](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md),
+*State verdicts, not advice*, limits the app to facts and verdicts. Moving
+past that rule requires a separate product decision as well as supporting
+evidence; an observation with an inspection action stays within it.
 
 ### Give sensitivity comparisons their sample and time context
 
@@ -257,6 +265,12 @@ a SteamID64. A ranked scenario supplies `leaderboard_id` and
 `leaderboard_rank`. Fetching that position with `max=1` exposes a
 `webappUsername`; the resolver accepts it only when the row's `steamId`
 exactly matches the requested identity. [Resolver source][api].
+
+The resolver defaults to at most six benchmarks and checks at most three
+ranked scenarios per benchmark: up to 24 endpoint lookups before any HTTP
+retries. Its caller supplies that six-benchmark limit and prioritizes
+difficulties by how many of their scenarios have local runs.
+[Resolver source][api], [caller][identity-caller].
 
 The approved check succeeded with benchmark 458: leaderboard 98330,
 position 14738, one returned row, exact Steam ID match and a nonempty
@@ -345,7 +359,9 @@ overlays, not authoritative per-shot telemetry. [Shot classifier][shots],
 as distinct states. Start with per-bot kills, hits/shots and TTK that CSV
 rows directly support. A motion-analysis proposal would need corpus
 validation, settings and clock checks, scenario applicability and neutral
-names for its proxies before it could support coaching.
+names for its proxies. Any move from those observations to coaching also
+requires the separate D3 decision described
+[above](#put-a-small-amount-of-interpretation-near-its-evidence).
 
 ### Recording requires its own performance and retention design
 
@@ -386,12 +402,15 @@ The following probes executed the inspected parser. Every filename was
 `Probe - Challenge - 2026.10.28-12.00.00 Stats.csv`; the text contained
 `Scenario:,Probe`, the listed fields and `Score:,100` unless specified.
 Duration is parsed `End - Start`, the same expression used by `RunRecord`.
+These inputs have no kill rows, so they exercise the filename-based end
+time. In general, the parser uses the later of filename time plus one
+second and the last kill time.
 These are synthetic boundary checks, not estimates of how frequently real
 players encounter them. [CSV parser][parser], [run record][run-record].
 
 | Input | Observed result | Implication |
 | --- | --- | --- |
-| `Challenge Start:,11:59:00.000` | 61 seconds | Parser uses filename end plus one second, an upper bound rather than the exact finish |
+| `Challenge Start:,11:59:00.000` | 61 seconds | With no kill rows, end is filename time plus one second, an upper bound rather than the exact finish |
 | Start `11:58:30.000`, `Pause Duration:,30` | 91 seconds | Pause duration is not subtracted; this is unsuitable as active playtime |
 | No challenge start | 1 second | Unknown duration becomes an invented positive duration |
 | Start `12:00:00.500` | 86,400.5 seconds | A start within the filename's truncated second is interpreted as the previous day |
@@ -497,7 +516,7 @@ These are research priorities, not a roadmap change.
 | Next design | Session summary and route into its runs | Moderate product design using existing sessions and session-start Typical Score; prove that players can judge the session without mixing incomparable scores |
 | Next design | Within-run CSV and `.perf` viewer | Moderate to large; start with per-bot evidence and linked selection, validate scoring models and coverage, leave video optional |
 | Supporting improvement | Better context for sensitivity comparisons | Counts, dates and comparison populations; distinguish exploratory association from a recommended setting |
-| Separate research | Bounded observations or coaching | Validate proxies, sample dependence, false discoveries and wording before prescribing behavior; test on unseen sessions |
+| Separate research | Bounded observations | Validate proxies, sample dependence, false discoveries and wording on unseen sessions; any proposal to move past verdicts also needs a separate decision under D3 |
 | Defer pending demand | Automatic video/raw-input capture and browser userscript | Large operational and product surface; measure benefit against resource cost, storage, permission and maintenance burden |
 
 The earlier surveys exposed sources of data and ways to chart recent form.
@@ -512,6 +531,7 @@ why our existing contracts matter.
 [csd-snapshot]: https://github.com/MingoDynasty/Corporate-Serf-Dashboard/tree/911ca00986c109de614861e9db2613c326d52d6c
 [readme]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/README.md
 [catalog]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.Core/Benchmarks/BenchmarkCatalog.cs
+[catalog-data]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.Core/Benchmarks/playlists.json
 [projects]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.App/KovaaksCompanion.App.csproj
 [home-ui]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.App/StatsView.Home.cs
 [app-host]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.App/AppHost.cs
@@ -532,6 +552,7 @@ why our existing contracts matter.
 [home-image]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/assets/screenshots/app-home.png
 [profile-export]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.App/StatsView.ProfileWebp.cs
 [api]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.Core/Benchmarks/BenchmarkProgress.cs
+[identity-caller]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.App/StatsView.Data.cs
 [history]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.Core/Library/ScenarioHistory.cs
 [run-record]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.Core/Library/RunRecord.cs
 [stats-store]: https://github.com/dededed1024/kovaakscompanion/blob/9c634585a325aab3c1a22fb4c453d87208bb90b7/src/KovaaksCompanion.Core/Benchmarks/StatsStore.cs

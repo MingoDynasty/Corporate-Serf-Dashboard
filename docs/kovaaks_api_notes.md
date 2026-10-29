@@ -225,9 +225,9 @@ Important behavior:
   `/leaderboard/scores/global?leaderboardId=<id>&page=<rank-1>&max=1`
   can then supply `webappUsername`. Accept it only when that row's `steamId`
   exactly equals the original SteamID64; a position may move between calls.
-  The approved Astra check succeeded with benchmark 458, leaderboard 98330,
-  position 14738. These coordinates record that observation, not a fixture
-  to assume remains current.
+  A second live check, in the Astra survey, succeeded with benchmark 458,
+  leaderboard 98330, position 14738. These coordinates record that
+  observation, not a fixture to assume remains current.
   Independently, the Opus survey verified six lookups for three public
   players, at positions 2 to 3,226; all returned the player's own entry.
   The route needs a ranked score on a scenario of a benchmark that is
@@ -237,9 +237,7 @@ Important behavior:
   the same privacy-sensitive request handling as persona probes. See the
   [Astra Companion survey](research/kovaaks_companion_learnings_astra.md#a-conditional-steamid-to-username-lookup-works)
   and [Opus Companion survey](research/kovaaks_companion_learnings_opus.md#1-a-steamid64-leads-to-a-kovaaks-username-after-all)
-  for the independent observations and pinned resolver source. The
-  unavailable direct endpoints do not imply that every SteamID-to-username
-  route is impossible.
+  for the independent observations and pinned resolver source.
 
 Logging:
 
