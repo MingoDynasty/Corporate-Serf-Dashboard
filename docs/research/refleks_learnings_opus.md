@@ -18,7 +18,7 @@ player's Steam account. What is left to learn is narrower. Two analytics
 ideas fit open questions here: a read of how the whole session compares with
 usual play, and a calendar of time spent. The rest is groundwork: a recipe
 for putting a run's kills and its `.perf` events on one clock, tests against
-real stats files, three gaps in our API notes, and a reduced-motion rule.
+real stats files, two gaps in our API notes, and a reduced-motion rule.
 RefleK's also shows by example the honesty failures our principles rule out,
 chief among them presenting missing evidence as an all-clear.
 
@@ -90,7 +90,7 @@ server.
 | Read the `.perf` performance files | Shipped for time-scored detection ([PR #343](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/343)). Our reader takes the header and the score ticks only |
 | Parse the kill rows for within-run analysis | Not taken. The roadmap's per-bot breakdown would need them; see finding 3 |
 | Read UTF-16 and BOM-prefixed stats files | No evidence it is needed: every local file is plain UTF-8, and RefleK's tests the case only with made-up bytes |
-| Document the last-scores endpoint and the progress endpoint's score scaling | Not done; see finding 6 |
+| Document the last-scores endpoint and the progress endpoint's score scaling | Last-scores is documented, from a live probe in the [KovaaK's Companion survey](kovaaks_companion_learnings_opus.md). The score scaling is not; see finding 6 |
 | Find the SteamID in `loginusers.vdf` | Shipped ([PR #191](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/191)), stronger than RefleK's: each account is checked against its KovaaK's profile |
 | Group runs into sessions | Shipped with a 30-minute break ([PR #359](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/359)). RefleK's still uses 20 minutes, measured differently (finding 8) |
 | Load recent runs first at startup | Not taken. RefleK's version hides older history (see What not to take) |
@@ -290,7 +290,7 @@ to `stylesheet.css`, and set Mantine's `respectReducedMotion` if Dash
 Mantine Components passes it through, which was not checked. An in-app
 override is not needed in a browser app.
 
-### 6. Three gaps in our API notes
+### 6. Two gaps in our API notes
 
 **Observed:** RefleK's calls two KovaaK's endpoints
 (`internal/constants/urls.go:5-8`).
@@ -312,19 +312,24 @@ override is not needed in a browser app.
   Its energy figures would be off by a factor of 100 if that were wrong, so
   the scaling is probably right (inferred).
 
-**Our baseline:** [kovaaks_api_notes.md](../kovaaks_api_notes.md) records
-neither fact. It already says that Steam personas and KovaaK's usernames are
-distinct namespaces. Its progress section also says "Existing app behavior
-uses this endpoint for benchmark progress", and its endpoint table calls it
-the "Existing benchmark progress flow". That is out of date: only
-`scripts/benchmark_importer/` and `scripts/Leaderboard Sensitivities/` call
-it, with a placeholder Steam ID whose scores are all 0. The app computes
-benchmark ranks itself from the bundled thresholds.
+**Our baseline:** [kovaaks_api_notes.md](../kovaaks_api_notes.md) now
+documents last-scores, from a live probe in the
+[KovaaK's Companion survey](kovaaks_companion_learnings_opus.md) on
+2026-10-28; its attribute list covers every attribute RefleK's reads. It
+already says that Steam personas and KovaaK's usernames are distinct
+namespaces. It does not record the progress `score`'s scaling. Its progress
+section also says "Existing app behavior uses this endpoint for benchmark
+progress", and its endpoint table calls it the "Existing benchmark progress
+flow". That is out of date: only `scripts/benchmark_importer/` and
+`scripts/Leaderboard Sensitivities/` call it, with a placeholder Steam ID
+whose scores are all 0. The app computes benchmark ranks itself from the
+bundled thresholds.
 
-**Recommendation:** Add both facts to the API notes, marked as RefleK's
-reading and not probed, and correct the out-of-date wording. Probe with a
-real Steam ID before any code reads the progress `score`. If the app ever
-calls last-scores, send the verified KovaaK's username, never a persona.
+**Recommendation:** Add the progress scaling to the API notes, marked as
+RefleK's reading and not probed, and correct the out-of-date wording. Probe
+with a real Steam ID before any code reads the progress `score`. If the app
+ever calls last-scores, send the verified KovaaK's username, never a
+persona.
 
 ### 7. Honesty failures to avoid by name
 
