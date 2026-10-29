@@ -17,7 +17,8 @@ cases more carefully: sessions, reading the `.perf` file, and finding the
 player's Steam account. What is left to learn is narrower. Two analytics
 ideas fit open questions here: a read of how the whole session compares with
 usual play, and a calendar of time spent. The rest is groundwork: a recipe
-for putting a run's kills and its `.perf` events on one clock, tests against
+for putting an unpaused run's kills and its `.perf` events on one clock,
+tests against
 real stats files, two gaps in our API notes, and a reduced-motion rule.
 RefleK's also shows by example the honesty failures our principles rule out,
 chief among them presenting missing evidence as an all-clear.
@@ -172,15 +173,21 @@ Whether this app shows one is a product judgment, not a detail.
 
 ### 3. One clock for a run's kills and its `.perf` events
 
-**Observed:** RefleK's Analysis tab plots accuracy over time from the
-`.perf` shot and hit events, and each kill's time to kill from the kill
-rows, on one axis: seconds since the stats file's `Challenge Start:`
+**Observed:** RefleK's Analysis tab has an events chart that plots accuracy
+over time from the `.perf` shot and hit events, and the running kill count
+from the kill rows, on one axis: seconds since the stats file's
+`Challenge Start:`
 (`frontend/src/features/history/lib/analysisChart.ts:90-131, 165-250`;
-`mouseAnalysis.ts:309-345`).
+`mouseAnalysis.ts:309-345`). Its time-to-kill chart is not on that axis. It
+measures from the first kill, so in a run whose kills land 5 and 7 seconds
+after the start they plot at 0 and 2 seconds
+(`scenarioAnalysis.ts:181-221`, `analysisChart.ts:269-275`).
 
 - `.perf` timestamps are already relative to the run's start.
 - A kill row's clock time minus the `Challenge Start:` clock gives its
-  offset, adding a day when the run crosses midnight.
+  offset, adding a day when the run crosses midnight. That offset is wall
+  time and includes any pause; the `.perf` clock appears not to, and
+  RefleK's makes no correction for it.
 - The `.perf` header's `challenge_start_utc` places the run in absolute
   time.
 - With no `Challenge Start:` line the `.perf` stream is dropped, not
@@ -205,6 +212,16 @@ kill and on scenarios with no kills.
   signals. It ends on the profile's bot lives, with
   `end_challenge_after_kills` unset, so a capped scenario need not set that
   field.
+
+**Verified locally, the two clocks with and without a pause.** Across
+1,038 paired local runs with no pause, 85,879 kills, each kill row's offset
+fell between 1.0 second before and 0.43 seconds after its `.perf` kill
+event, which fits events stamped in ticks of about a second. The one paired
+paused run with kills, a 2-second pause before its first kill, put each
+kill row 1.6 to 2.2 seconds after its `.perf` event. The `.perf` file
+records when the pause began, at 14.1 seconds in that run, and the stats
+file only its total length. Shifting later kill rows by that length might
+map one clock onto the other, but one run cannot verify it.
 
 **Verified locally, the kill table across 9,261 stats files.** Every file
 starts with the header row `Kill #,Timestamp,Bot,...`. Its shape has
@@ -243,6 +260,8 @@ decision keeps everything about one run for a later Run Viewer.
   and each row's own time to kill.
 - Use the `.perf` events for the course of a run second by second. They
   are the only within-run source for the third of runs that have no kills.
+- Put the two on one clock only for runs with no pause. For a paused run,
+  either leave the streams apart or verify a pause mapping first.
 - Decode `.perf` counts as signed, and don't assume they only rise.
 
 ### 4. Test the parser against real stats files
@@ -410,7 +429,10 @@ labelled as one. An arrow or a verdict waits for the runs that support it.
   (`frontend/src/features/history/components/PerformanceVsSensWidget.tsx:360-454`).
   Like our Score vs Sensitivity mode, it mixes sensitivity with improvement
   over time. Plotting each run against the typical score at its session's
-  start would remove the trend; that idea is ours, not RefleK's.
+  start might reduce the drift between sessions; that idea is ours, not
+  RefleK's. It cannot remove learning, warm-up or fatigue within a session,
+  because that baseline stays fixed for the whole session. Whether it helps
+  needs testing on real histories.
 
 ## What not to take
 
