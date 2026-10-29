@@ -27,11 +27,12 @@ chief among them presenting missing evidence as an all-clear.
 - Inspected RefleK's at [`e1ef943`][rk], the head of `main` on 2026-10-28.
   It was committed on 2026-10-15, after release 0.10.0 of 2026-09-12. Paths
   cited as `path:line` are at that revision.
-- The July survey's commit, `1f31c96`, is no longer in the repository,
-  because `main` keeps one squashed commit per release. The July text places
-  it between 0.8.3 (2026-05-08) and 0.9.0 (2026-08-01). **New** below means
-  absent from the July note, not proven absent from July's snapshot. Several
-  surfaces this note describes for the first time already existed at 0.8.3.
+- The July survey's commit, `1f31c96`, is on no branch, because `main`
+  keeps one squashed commit per release, but GitHub still serves it by its
+  full ID. It was committed on 2026-07-03, between 0.8.3 (2026-05-08) and
+  0.9.0 (2026-08-01). **New** below means absent from the July note; this
+  survey did not check each one against that commit. Several surfaces this
+  note describes for the first time already existed at 0.8.3.
 - The GitHub release notes are empty, so the release timeline comes from the
   project's [changelog page](https://refleksapp.com/changelog/), fetched
   2026-10-28.
