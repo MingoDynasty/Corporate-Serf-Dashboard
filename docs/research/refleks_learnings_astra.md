@@ -4,7 +4,8 @@ Date: 2026-10-28
 Author: gpt-6-astra · effort: xhigh
 
 Research note; recommendations remain unratified. This Astra survey is retained
-separately from the [other RefleK's survey](refleks_learnings.md).
+separately from the [July survey](refleks_learnings.md) and the
+[Opus survey](refleks_learnings_opus.md).
 
 ## Takeaway
 
@@ -12,8 +13,9 @@ RefleK's makes a completed run explorable: a player can move from a session
 to a run, compare it with another, and inspect events, settings, movement,
 and video. CSD would benefit most from that connected inspection workflow
 and from making better use of the files it already reads. Its training
-prescriptions, inferred target motion, and convenient timing fallbacks need
-more evidence before they could become trustworthy CSD features.
+prescriptions fall outside CSD's ratified verdicts-only boundary; changing
+that requires a separate decision and the evidence described below. Inferred
+target motion and convenient timing fallbacks also need stronger evidence.
 
 ## Evidence and scope
 
@@ -56,21 +58,26 @@ an independently reproduced defect.
 The desktop repository declares GPL-3.0. This update copies no implementation
 into CSD; it records behavior, data contracts, and design lessons.
 
-## Corrections to the July survey
+## Changes and corrections since the July survey
 
-| Earlier statement | Verified replacement |
-| --- | --- |
-| CSD has no session concept. | CSD has sessions, scenario visits, session rows, and session-based comparisons. Its break limit is 30 minutes. See [Sessions](../specs/sessions.md). |
-| CSD does not read `.perf` files. | It reads selected header and score-event fields for time-scored detection and pace comparisons. It does not yet expose a general within-run event viewer. See [the parser](../../source/kovaaks/performance_file.py) and [Run History](../specs/run_history.md#time-scored-scenarios). |
-| Steam-account discovery is a new opportunity. | CSD already detects accounts and verifies the returned KovaaK's identity against SteamID64. See [Settings](../specs/settings.md#detection). |
-| A yaw lookup table is needed for cm/360. | CSD already converts from the recorded `Sens Increment` and DPI, retaining original values. A second engine-name table would duplicate a solved problem. See [Run History](../specs/run_history.md). |
-| RefleK's uses polling instead of filesystem events. | It prefers `fsnotify` Create/Write events; five-second polling is the fallback when watcher creation or attachment fails. [Watcher][watcher]. |
-| Its catch-up window is 90 days / 1,500 runs. | Defaults are now 180 days with a minimum of the newest 2,500 runs, where available. This is a floor, not a 2,500-run cap. [Defaults][defaults], [filtering][watcher]. |
-| Mouse input is recorded at 125 Hz into a two-minute buffer. | The Windows tracker is event-driven Raw Input; its constructor ignores the sample-rate argument. The default buffer is five minutes. The metadata's 125 Hz value is not proof of a measured capture rate. [Tracker][mouse-tracker], [defaults][defaults]. |
-| Sensitivity advice needs four kills / 0.42 confidence and changes sensitivity by 3–30%. | Current code requires at least five classified kills with confidence ≥0.5, average ≥0.55, and additional dominance checks. Its dose is clamped to 18–45% **of cm/360**. [Advice][mouse-analysis]. |
-| The performance schema is reverse-engineered. | KovaaK's publishes `performance.proto`. It is the primary reference; RefleK's is an implementation example. [Schema][proto]. |
-| UTF-16 support proves the game emits UTF-16 files. | It proves RefleK's handles those encodings. This investigation did not establish how often the game itself produces them. [Reader][stats-parser]. |
-| Cloud sync is simply optional. | The setting can be disabled, but fresh defaults enable run upload and disable anonymous mode. Screen capture defaults off; mouse tracking defaults on. [Defaults][settings-defaults]. |
+Most rows record later changes, not mistakes in the dated July account.
+The [July source][july-desktop] already ignored the mouse sample-rate argument
+and enabled non-anonymous upload by default; those two claims were wrong then.
+The schema and encoding rows correct inferences about external evidence.
+
+| Earlier statement | Relationship to July | Verified replacement |
+| --- | --- | --- |
+| CSD has no session concept. | Changed since July | CSD has sessions, scenario visits, session rows, and session-based comparisons. Its break limit is 30 minutes. See [Sessions](../specs/sessions.md). |
+| CSD does not read `.perf` files. | Changed since July | It reads selected header and score-event fields for time-scored detection and pace comparisons. It does not yet expose a general within-run event viewer. See [the parser](../../source/kovaaks/performance_file.py) and [Run History](../specs/run_history.md#time-scored-scenarios). |
+| Steam-account discovery is a new opportunity. | Changed since July | CSD already detects accounts and verifies the returned KovaaK's identity against SteamID64. See [Settings](../specs/settings.md#detection). |
+| A yaw lookup table is needed for cm/360. | Changed since July | CSD already converts from the recorded `Sens Increment` and DPI, retaining original values. A second engine-name table would duplicate a solved problem. See [Run History](../specs/run_history.md). |
+| RefleK's uses polling instead of filesystem events. | Changed since July | It prefers `fsnotify` Create/Write events; five-second polling is the fallback when watcher creation or attachment fails. [Watcher][watcher]. |
+| Its catch-up window is 90 days / 1,500 runs. | Changed since July | Defaults are now 180 days with a minimum of the newest 2,500 runs, where available. This is a floor, not a 2,500-run cap. [Defaults][defaults], [filtering][watcher]. |
+| Mouse input is recorded at 125 Hz into a two-minute buffer. | Rate claim was wrong then; buffer changed since | The Windows tracker is event-driven Raw Input; its constructor ignores the sample-rate argument. The default buffer is now five minutes. The metadata's 125 Hz value is not proof of a measured capture rate. [Tracker][mouse-tracker], [defaults][defaults]. |
+| Sensitivity advice needs four kills / 0.42 confidence and changes sensitivity by 3–30%. | Changed since July | Current code requires at least five classified kills with confidence ≥0.5, average ≥0.55, and additional dominance checks. The intended dose is a change **of cm/360**, with outer bounds of 18–45%; its present base-and-factor formula never reaches those bounds. [Advice][mouse-analysis]. |
+| The performance schema is reverse-engineered. | Inference corrected | KovaaK's publishes `performance.proto`. It is the primary reference; RefleK's is an implementation example. [Schema][proto]. |
+| UTF-16 support proves the game emits UTF-16 files. | Inference corrected | It proves RefleK's handles those encodings. This investigation did not establish how often the game itself produces them. [Reader][stats-parser]. |
+| Cloud sync is simply optional. | Wrong then | The setting can be disabled, but fresh defaults enable run upload and disable anonymous mode. Screen capture defaults off; mouse tracking defaults on. The first-launch modal preselects Public as Recommended and offers no sync-off choice. [Defaults][settings-defaults], [onboarding][onboarding]. |
 
 CSD's ingestion position also changed. It now deduplicates successful
 filenames, reconciles the startup scan/watch gap, and retries live parsing
@@ -92,7 +99,7 @@ These are research priorities, not approved implementation tasks.
 | Medium | Test CSV encoding resilience with real examples. | Recover otherwise unreadable imports without losing healthy files. | Establish a representative fixture and explicit BOM/encoding rules. |
 | Medium | Add optional session reflection and richer sensitivity comparisons. | Keep training context and compare similar attempts. | Identify demand beyond existing scenario notes, session lists, and Score vs Sensitivity. |
 | Conditional | Use bounded detail caches and progressive loading if profiling warrants them. | Keep detailed inspection responsive on large histories. | Measure CSD first; preserve full-history PB and Typical Score semantics. |
-| Defer | Native mouse capture, video capture, cloud archives, and automated coaching. | Potentially richer review and recommendations. | Separate scope, consent, storage, validation, and maintenance decisions. |
+| Defer | Native mouse capture, video capture, cloud archives, and automated coaching. | Potentially richer review and recommendations. | Separate scope, consent, storage, validation, and maintenance decisions; coaching also requires a decision to move past D3 and its evidence bar. |
 
 The first three form a useful sequence: trustworthy run details, then
 comparison, then carefully chosen derived explanations. Copying an entire
@@ -135,8 +142,9 @@ alone does not establish comparability.
 
 **Observed.** RefleK's recognizes kill rows structurally, reads them with a
 CSV parser, and retains kill index, time of day, bot, weapon, recorded TTK,
-shots, hits, accuracy, damage, efficiency, cheated, and overshots. It also
-retains many summary fields as typed values. [Stats parser][stats-parser].
+shots, hits, accuracy, damage done and possible, efficiency, cheated, and
+overshots. It also retains many summary fields as typed values.
+[Stats parser][stats-parser].
 
 CSD's [current parser](../../source/kovaaks/data_service.py) reads the
 summary and weapon sections needed for its run model. It does not retain
@@ -181,9 +189,12 @@ trajectory. Header bot names cannot turn global damage samples into
 per-bot telemetry. [Published schema][proto], [RefleK's decoder][perf-parser].
 
 RefleK's combines CSV kill markers with cumulative shots/hits from `.perf`.
-Its accuracy chart prefers performance samples when usable; otherwise it
-uses kill rows. It requires a valid challenge-start clock to combine those
-sources. [Chart construction][analysis-chart].
+Its accuracy chart starts with kill-row cumulative accuracy at kill times,
+then adds usable performance samples. A performance sample replaces a kill
+point's accuracy only when their timestamps match at millisecond precision;
+otherwise the line mixes both populations. Without usable performance
+samples it uses kill rows alone. Combining the sources requires a valid
+challenge-start clock. [Chart construction][analysis-chart].
 
 **Recommendation.** Use the official schema and CSD's existing
 [three-state parser](../../source/kovaaks/performance_file.py) as the starting
@@ -235,14 +246,16 @@ target; it is not evidence of fatigue by itself.
 ### Reproduced calculation edge cases
 
 Four research probes imported RefleK's actual exported functions. These
-results describe the inspected implementation, not desired CSD behavior.
+results describe the inspected functions, not desired CSD behavior. The
+session-average helper in rows 3–4 has no production caller at this revision;
+its arithmetic is not evidence of a displayed session average.
 
 | Input | Observed result | Consequence for CSD |
 | --- | --- | --- |
 | Three kills at seconds 1, 2, and 3; recorded TTK 0.25 s each | Inter-kill series `[0, 1, 1]`; reported average “TTK” `0.6667 s`; average gap `1 s` | Give distinct measures distinct names; do not include a synthetic first zero in the interval population. |
 | First performance sample at second 1: two shots, one hit | Chart also contains 50% accuracy at second 0 | Distinguish drawn extensions from actual observations. |
-| Session scores 100 and 10,000 on different scenarios | Session average 5,050 | An average across unrelated score scales is not a training-quality measure. |
-| Session scores 0 and 100 | Session average 100; `formatScore(0)` and `formatScore(-1)` return `--` | Keep legitimate zero/negative scores distinct from missing data. |
+| Session scores 100 and 10,000 on different scenarios | Unused exported helper `readSessionAverageScore` returns 5,050 | An average across unrelated score scales is not a training-quality measure; this is not RefleK's displayed comparison. |
+| Session scores 0 and 100 | The same unused helper returns 100; History's `formatScore(0)` and `formatScore(-1)` return `--` | Keep legitimate zero/negative scores distinct from missing data. |
 | One-run session with identical start/end timestamps and a 60 s run duration | Session span 0 ms; summed run duration 60,000 ms | Define time from the underlying run boundaries, not just the first and last completion times. |
 
 Sources: [analysis][scenario-analysis], [chart][analysis-chart],
@@ -250,15 +263,27 @@ Sources: [analysis][scenario-analysis], [chart][analysis-chart],
 The final row used the same completion-time session shape that
 `groupSessions` produces.
 
+The live Overview comparison uses `readPerformance`: it compares each
+eligible run with its scenario's earlier median and clamps the relative
+change to ±35%. It excludes non-positive scores from both the historical
+baseline and current-session comparison. History's run list uses the probed
+`formatScore`; the Overview has a separate formatter that displays zero.
+The live zero-versus-missing problem therefore remains, without attributing
+a raw cross-scenario average to a screen.
+[Overview calculations][overview], [History run list][history-run-list],
+[Overview formatter][overview-score].
+
 ### Sessions and time are already better specified in CSD
 
 RefleK's groups consecutive **completion timestamps** by a configurable gap
-(default 20 minutes from backend settings). A session's start is its earliest
-completion timestamp. Separately, ingest derives a run window from
+(default 20 minutes from backend settings; the frontend store initially uses
+30 until settings load). A session's start is its earliest completion
+timestamp. Separately, ingest derives a run window from
 `Challenge Start`, falling back to the first kill and then to end minus
 60 seconds. It stores the window length as duration without subtracting
 `Pause Duration`. “Active playtime” sums those durations.
-[Grouping][store], [ingestion][ingest], [history calculations][history-models].
+[Grouping][store], [backend default][defaults], [ingestion][ingest],
+[history calculations][history-models].
 
 CSD's [session contract](../specs/sessions.md) instead distinguishes trusted
 run duration, session span, and scenario visits. Trusted run duration excludes
@@ -281,7 +306,12 @@ sensitivity does not show that sensitivity caused the improvement:
 practice, target changes, and selective use can explain the association.
 Retain the original recorded settings alongside normalized values.
 
-## 4. Recommendations: borrow explanations, validate prescriptions
+## 4. Training recommendations and CSD's advice boundary
+
+**CSD baseline.** The ratified rule is verdicts, not advice: the app reports
+facts and supported judgments, and does not tell the player what to play or
+when to stop. Moving past that boundary requires a decision of its own.
+[D3 and its evidence bar][verdicts-rule] govern the recommendations below.
 
 ### Scenario and benchmark suggestions
 
@@ -297,16 +327,22 @@ jitter. It rescales candidates against each other and returns a small set.
 Those scores are relative ranking rules, not calibrated probabilities.
 [Benchmark heuristic][benchmark-recs].
 
-**Recommendation.** If CSD later adds training suggestions, start with an
-auditable reason such as repeated practice, an under-practiced category,
-or an explicit benchmark gap. Show the supporting runs and let the player
-ignore or change the goal. Category diversity is worth considering.
+**Recommendation.** Borrow auditable explanations of the recorded facts and
+show their supporting runs. Under D3, a built-in reason to practice an
+under-practiced category, repeat a scenario, or close a benchmark gap is
+advice the app vouches for. Before shipping it, D3 requires a check declared
+before its data arrives, measuring the claimed benefit on results after the
+session; a learning claim needs retained performance. Shipping a method to
+everyone also needs evidence across players and tasks. A rule the player
+writes, off until they write it and worded as theirs, is instead an ordinary
+product decision; its underlying verdicts ship first and the player can
+override it and turn it off. Neither route is authorized by this survey.
 
 Do not relabel CSD's PB-to-next-rank proximity as likelihood of ranking up.
 Likewise, a boost from daily jitter changes the ordering without new
 performance evidence; it belongs to variety, not a claimed prediction.
-The acceptable objective and the evidence needed for a suggestion remain
-product decisions.
+Choosing to move past verdicts remains a product decision; D3 already sets
+the evidence bar for built-in advice.
 
 ### Session performance and “when to stop”
 
@@ -319,18 +355,21 @@ when evidence is sparse. [Overview calculations][overview].
 The normalization is a better starting point than averaging unrelated raw
 scores. However, later run positions are represented only by sessions that
 lasted that long, and a player may change scenarios or stop because of how
-they feel. These are observational-selection problems. The code's confidence
-label does not establish that its suggested stopping point improves training.
+they feel. These are observational-selection problems. The heuristic computes
+a confidence value, but the Overview snapshot does not expose it as a label.
+That value does not establish that its suggested stopping point improves
+training.
 
 CSD already has a defined [Typical Score](../specs/typical_score.md) and a
 session-start baseline. Build future comparisons on those definitions rather
-than introducing another unnamed “normal.” Record observations before
-prescribing breaks or claiming fatigue.
+than introducing another unnamed “normal.” Report supported observations as
+verdicts; do not infer fatigue from a score decline or prescribe breaks.
+When to stop stays the player's call under D3.
 
 ## 5. Mouse traces and target inference are different evidence
 
-**Observed.** Windows Raw Input accumulates relative mouse deltas and button
-changes into an unbounded virtual coordinate space. It uses a hidden input
+**Observed.** Windows Raw Input accumulates relative mouse deltas and left-button
+transitions into an unbounded virtual coordinate space. It uses a hidden input
 window and `RIDEV_INPUTSINK`, with capture lifecycle tied to the game process.
 These coordinates are raw input units, not screen pixels or known crosshair
 coordinates. [Windows tracker][mouse-tracker], [runtime lifecycle][runtime].
@@ -350,9 +389,14 @@ change; because sensitivity is inverse to cm/360, the same numeric
 percentage does not describe the in-game sensitivity change.
 [Advice and thresholds][mouse-analysis], [displayed explanation][history-copy].
 
+The dose starts at 20%, 29%, or 38%, scaled by a factor clamped to 0.95–1.15.
+This leaves the outer 18–45% clamp inactive under the current formula;
+those outer bounds are not attainable dose endpoints.
+
 **Recommendation.** Borrow the distinction between measured, inferred, and
 unavailable evidence. Do not borrow the diagnosis or dose without validation
-against labeled runs and actual target information. Unknown classifications
+against labeled runs and actual target information, plus D3's separate
+decision and evidence requirements for training advice. Unknown classifications
 and suppressed advice are essential states, not UI defects to fill in.
 
 Native capture is substantial new scope for CSD: device/process lifecycle,
@@ -372,9 +416,10 @@ trim can preserve two seconds after the run's end.
 [Capture][capture], [defaults][defaults], [trim lifecycle][ingest].
 
 Replay availability has explicit processing and terminal states, and the
-frontend listens for state changes. It supports comparison playback and
-export. Cleanup can enforce age and storage limits; defaults enable cleanup
-with a 5 GiB cap and no age limit. The size-limit pass keeps the newest
+frontend listens for state changes. Comparison presents two independent
+replay players with their own controls, rather than synchronized playback;
+export is also supported. Cleanup can enforce age and storage limits;
+defaults enable cleanup with a 5 GiB cap and no age limit. The size-limit pass keeps the newest
 replay even if that file alone exceeds the cap.
 [Replay UI][replay-ui], [cleanup][cleanup], [settings][settings-defaults].
 
@@ -401,10 +446,12 @@ while building summaries. Video remains a separate replay file.
 [Codec][codec], [store][run-store].
 
 The run index bounds its parsed-summary cache at 4,096 entries. Inspector
-resources have a separate eight-entry LRU cache, and history lists use
+stats and performance events have separate eight-entry LRU caches; the mouse
+trace cache holds two entries. History lists use
 virtualization. This separates opening a history from decoding every run's
 trace. A custom archive format is not necessary to borrow that separation.
-[Index][run-index], [resource loader][run-resource], [virtual list][virtual-list].
+[Index][run-index], [resource loader][run-resource], [trace cache][run-trace],
+[virtual list][virtual-list].
 
 **Recommendation.** Keep CSD's raw files authoritative and consider bounded,
 on-demand event parsing for a viewer. Key results by the selected run and
@@ -441,11 +488,13 @@ seen afterward; store-level existence checks provide another duplicate
 barrier. It writes to a unique temporary file before rename.
 [Watcher][watcher], [atomic publication][run-store].
 
-A limit worth preserving in our interpretation: the matching performance
-file is retried while missing, but an existing malformed performance file
-returns a parse error to the whole ingest. This is visible in source; it
-was not reproduced through the native watcher. A retry mechanism alone
-does not prove a complete readiness policy. [Sidecar handling][ingest].
+A limit worth preserving in our interpretation: a missing matching performance
+file gets at most 30 checks, 10 ms apart, about 0.3 seconds. If still missing,
+the run is stored without performance data and no later sidecar backfill is
+scheduled. An existing malformed performance file instead returns a parse
+error to the whole ingest. These are source observations, not native watcher
+reproductions. A retry mechanism alone does not prove a complete readiness
+policy. [Sidecar handling][ingest], [retry constants][defaults].
 
 CSD already has filename deduplication, startup reconciliation, and bounded
 retry. Its chosen threading model should stay governed by the existing
@@ -470,19 +519,28 @@ the disclosures required by its [user guide](../user_guide.md#what-it-talks-to).
 ### “Local desktop app” does not mean data stays local
 
 Fresh settings enable mouse tracking and run sync, and disable anonymous
-mode. Newly ingested live runs reach the upload handler; startup catch-up
-uses a path without that callback. The upload sends the `.refleks` record,
+mode. First-launch onboarding preselects Public, marks it Recommended, and
+says run sync is enabled and can be changed later in Privacy settings; it
+offers no sync-off choice in that modal. Newly ingested live runs reach the
+upload handler; startup catch-up uses a path without that callback. The
+upload sends the `.refleks` record,
 not the separate replay video. The anonymous transformation clears
 `SteamID` and `PersonaName` only. Stats, timestamps, trace, and other
 environment metadata remain.
-[Settings][settings-defaults], [live callback][runtime],
+[Settings][settings-defaults], [onboarding][onboarding],
+[onboarding wording][onboarding-copy], [live callback][runtime],
 [upload and scrubbing][cloud], [catch-up][watcher].
 
-Environment collection includes OS/architecture, CPU information, application
-version, and mouse metadata. This investigation did not assess whether the
-remaining combination can identify someone. “Anonymous” describes the code's
-named-field removal, not a demonstrated privacy guarantee.
-[Environment collector][environment].
+Environment collection retains OS/architecture, Windows version/build,
+CPU name and core count, GPU name, total RAM, application version, and the
+primary display's width, height, and refresh rate. Mouse metadata includes
+VID, PID, interface number, and `MouseName`, which is the raw device interface
+path obtained through `RIDI_DEVICENAME`. All survive the anonymous transform.
+Whether that path contains a per-machine identifier, or the remaining
+combination identifies someone, was not tested. “Anonymous” describes the
+code's named-field removal, not a demonstrated privacy guarantee.
+[Environment collector][environment], [Windows fields][environment-windows],
+[raw device path][mouse-tracker].
 
 **Recommendation.** Any future CSD sharing should be explicitly chosen,
 show what is sent, and distinguish local export from remote upload. A
@@ -507,11 +565,12 @@ similarly named query parameter.
 
 ### Accessibility and polish have transferable mechanisms
 
-The source has six language catalogs, locale-aware formatting, resizable
-presentation controls, and shared expandable widgets. Current main adds an
+The source has six language catalogs, locale-aware formatting, an interface
+scale setting, and shared expandable widgets. Current main adds an
 explicit system/reduced/full motion preference. These mechanisms can make a
 dense analytics interface easier to use.
-[Localization][i18n], [motion preference][motion], [widgets][widget].
+[Localization][i18n], [interface scaling][theme], [motion preference][motion],
+[widgets][widget].
 
 They do not establish screen-reader or keyboard accessibility of the whole
 product. Test actual workflows, particularly virtualized rows, nested
@@ -525,18 +584,21 @@ Language expansion needs translation review, not only typed keys.
 The desktop still calls
 `/webapp-backend/user/scenario/last-scores/by-name` with `username` and
 `scenarioName`. Its code expects a recent-score list and describes it as ten
-scores. That is a source observation, not an independently checked current
-server limit. The benchmark-progress parser still divides scenario scores
-by 100, retains `rank_maxes` thresholds without that division, and filters
+scores. Since the initial CSD baseline check, the main merge brought in
+[API notes](../kovaaks_api_notes.md#userscenariolast-scoresby-name) recording a
+live probe on 2026-10-28: an array of at most ten runs, with per-run attributes.
+That observation is already independently checked in our notes; this survey
+did not repeat the live probe. The benchmark-progress parser still divides
+scenario scores by 100, retains `rank_maxes` thresholds without that division, and filters
 “No Rank” from the rank display.
 [URLs][urls], [scenario service][scenario-service],
 [progress parser][progress-parser].
 
-CSD's [API notes](../kovaaks_api_notes.md) already cover the progress endpoint
-and later benchmark-importer observations. Treat RefleK's behavior as a lead
-to verify against a controlled response before promoting it into our API
-contract. This update does not silently convert another client's assumptions
-into verified endpoint facts.
+CSD's [API notes](../kovaaks_api_notes.md) also cover the progress endpoint
+and later benchmark-importer observations, but do not record that scaling
+between scores and thresholds. Treat that parser behavior as a lead to verify against a
+controlled response before promoting it into our API contract. This update
+does not convert another client's scaling assumptions into verified facts.
 
 Benchmark semantics deserve particular care. The inspected
 [Voltaic energy code][energy] calculates group energy from scenario
@@ -553,15 +615,20 @@ There is now a separate public API and research project:
   its retention/privacy promises were not audited here.
 - The [research repository][research-tree] names mouse-deviation GRU and
   recommendation-autoencoder workspaces. At the inspected revision the
-  tree contains workspace documentation, a design file, and requirements,
-  but no training scripts or model weights. The desktop recommendation and
-  mouse-analysis paths inspected here are heuristics. The website's
+  tree contains workspace documentation, a design file, requirements, and a
+  root [setup script][research-setup], but no training scripts or model
+  weights. The setup script points to the public Hugging Face dataset
+  `ARm8/refleks-raw-public`, offering a raw `.refleks` archive and a PostgreSQL
+  dump, and can restore the latter locally. This supplies a concrete corpus
+  lead for a separately scoped test-data investigation. The desktop
+  recommendation and mouse-analysis paths inspected here are heuristics. The website's
   dataset-size and machine-learning descriptions are not evidence of
   validated or deployed coaching models.
 
-No population dataset was downloaded. If one is used later, verify its
-provenance, attribution requirements, scenario coverage, sampling biases,
-and suitability for the question before treating it as ground truth.
+No population dataset was downloaded and the setup script was not executed.
+The corpus's provenance, consent, relationship to default-on uploads,
+attribution requirements, scenario coverage, sampling biases, and suitability
+were not assessed. Verify these before treating it as ground truth.
 
 ## 10. Upstream reports: leads, not reproduced conclusions
 
@@ -615,6 +682,7 @@ The strongest opportunity is better explanations from existing evidence.
 The main restraint is preserving what each measurement actually means.
 
 [desktop]: https://github.com/ARm8-2/refleks/tree/e1ef9437169eee484b03a723887f7ece86a7c4f8
+[july-desktop]: https://github.com/ARm8-2/refleks/tree/1f31c96c4c993572ba5fefa260ba5a1761329b51
 [release]: https://github.com/ARm8-2/refleks/releases/tag/0.10.0
 [proto]: https://wiki.kovaaks.com/performance.proto
 [watcher]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/watcher/watcher.go
@@ -632,6 +700,9 @@ The main restraint is preserving what each measurement actually means.
 [analysis-chart]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/lib/analysisChart.ts
 [scenario-analysis]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/lib/scenarioAnalysis.ts
 [history-models]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/lib/historyModels.ts
+[history-run-list]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/components/HistoryRunList.tsx
+[overview-score]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/overview/components/sessionWidgets/shared.tsx
+[verdicts-rule]: ../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md
 [store]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/shared/hooks/useStore.tsx
 [ingest]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/runs/ingest.go
 [sensitivity]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/components/PerformanceVsSensWidget.tsx
@@ -647,22 +718,28 @@ The main restraint is preserving what each measurement actually means.
 [run-store]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/runs/store.go
 [run-index]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/runs/index.go
 [run-resource]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/hooks/useRunResource.ts
+[run-trace]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/hooks/useRunTrace.ts
 [virtual-list]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/history/components/VirtualList.tsx
 [catalog]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/benchmarks/catalog.go
 [progress-fetcher]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/benchmarks/progress_fetcher.go
 [benchmark-service]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/benchmarks/service.go
 [cloud]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/runs/cloud_sync.go
 [environment]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/runs/environment/collector.go
+[environment-windows]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/runs/environment/platform_windows.go
+[onboarding]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/features/welcome/components/WelcomeModal.tsx
+[onboarding-copy]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/shared/lib/i18n/messages/en/welcome.ts
 [steam]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/steam/steam.go
 [scenario-service]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/scenarios/service.go
 [i18n]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/shared/lib/i18n/core.ts
 [motion]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/shared/lib/motion.ts
+[theme]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/frontend/src/shared/lib/theme.ts
 [urls]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/constants/urls.go
 [progress-parser]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/benchmarks/progress_parser.go
 [energy]: https://github.com/ARm8-2/refleks/blob/e1ef9437169eee484b03a723887f7ece86a7c4f8/internal/benchmarks/rankcalc/vt_energy.go
 [rank-pr]: https://github.com/ARm8-2/refleks/pull/50
 [api-readme]: https://github.com/ARm8-2/refleks-api/blob/f7a24b74bd04f97abe84a9c7d23358b9e5687c45/README.md
 [research-tree]: https://github.com/ARm8-2/refleks-research/tree/a30e4cd4f91c2553e9a6e0fefcd0e783508a4433
+[research-setup]: https://github.com/ARm8-2/refleks-research/blob/a30e4cd4f91c2553e9a6e0fefcd0e783508a4433/setup.ps1
 [rank-issue]: https://github.com/ARm8-2/refleks/issues/14
 [catalog-issue]: https://github.com/ARm8-2/refleks/issues/45
 [launch-issue]: https://github.com/ARm8-2/refleks/issues/18

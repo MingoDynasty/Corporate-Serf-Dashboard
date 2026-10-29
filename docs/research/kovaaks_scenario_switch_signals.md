@@ -20,6 +20,13 @@ Follow still moves only when a run lands.
 idea of following a scenario as it loads comes back. The quick test is in
 [If the idea comes back](#if-the-idea-comes-back).
 
+**Since 3.9.12 the game no longer writes the analytics log** (checked
+2026-10-29). KovaaK's removed the analytics library, so the log and its event
+database are gone, and with them this check's one signal and one of its two
+untested candidates. The Statistics Export candidate is the one left. The
+evidence is in
+[the restarts check](kovaaks_analytics_log_restarts.md#since-kovaaks-3912).
+
 ## Verified findings
 
 Measured on the maintainer's machine: one live session on 2026-10-25, and
