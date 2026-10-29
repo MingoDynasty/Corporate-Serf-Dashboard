@@ -27,8 +27,8 @@ What the list does today is in
 - A run row has six columns by default: `#`, Time, Score, the marks,
   Accuracy and Sensitivity. The menu still lists Shots Fired first, in table
   order.
-- The default columns need 403px, under the 480px minimum. With Shots Fired
-  on they need 485px.
+- The default columns need 407px, under the 480px minimum. With Shots Fired
+  on they need 489px.
 
 **The one-time reset.** Dash stores a persisted checkbox's value with the
 layout default it was saved against, and drops it once that default changes.

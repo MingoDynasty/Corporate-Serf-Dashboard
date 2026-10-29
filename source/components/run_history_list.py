@@ -958,7 +958,10 @@ def run_list_column_defs() -> list[dict[str, Any]]:
             "headerName": "Sensitivity",
             "type": "rightAligned",
             "tooltipField": "sens_detail",
-            **_fixed_width(96),
+            # The widest value in the maintainer's 9,261 runs, "2.38
+            # Overwatch", is 91.8px in Firefox and Edge, and the cell's
+            # padding is 3px each side (2026-10-29).
+            **_fixed_width(100),
         },
         {
             "field": "fov",

@@ -22,7 +22,7 @@ Current behavior is in
   both. The card's width stays its own: the list's need never moves it, so
   a wider list never wraps the top row, which is why it got a width of its
   own ([2026-10-22](2026-10-22-the-latest-run-card-keeps-a-500px-width-of-its-own.md)).
-- With the default columns the list needs 403px and takes its 480px minimum
+- With the default columns the list needs 407px and takes its 480px minimum
   ([Shots Fired starts hidden](2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md)),
   so the card's edges are the list's at every zoom level. Adding columns
   widens the list under the PB card, as before.

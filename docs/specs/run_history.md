@@ -903,9 +903,9 @@ The card's lines, local-record scope and leaderboard presentation follow
 - The list is a second column to the right of the chart, always shown
   ([2026-10-12][column]). It is as wide as its shown columns need, 19px for
   its borders and a classic scrollbar plus each shown column's width, never
-  narrower than 480px. Its default columns need 403px, so it sits at that
-  minimum; with Shots Fired on they need 485px, with Reloads or Avg FPS
-  467px, with FOV 519px, and with every column 729px
+  narrower than 480px. Its default columns need 407px, so it sits at that
+  minimum; with Shots Fired on they need 489px, with Reloads or Avg FPS
+  471px, with FOV 523px, and with every column 733px
   ([2026-10-29][marks-30]). Growth is capped so the chart keeps 480px where
   possible. In a narrow window, a list that needs up to 500px keeps it and
   the chart gives ([2026-10-22][list-minimum]). The page draws the list at

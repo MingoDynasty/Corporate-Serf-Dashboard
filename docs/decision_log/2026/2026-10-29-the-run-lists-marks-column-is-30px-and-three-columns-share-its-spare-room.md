@@ -45,9 +45,9 @@ alternative." Asked which version of that to build, the maintainer answered
   the marks column's included. The 19px is the list's two borders and a
   classic scrollbar's 17px. With Shots Fired hidden to start
   ([its entry](2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md)),
-  the default columns need 403px, so the default list sits at its 480px
+  the default columns need 407px, so the default list sits at its 480px
   minimum. Shots Fired adds 82px, Reloads and Avg FPS 64px each, FOV 116px,
-  and every column together needs 729px.
+  and every column together needs 733px.
 - **A scrollbar drawn over the rows** takes its 12px from the 17px the list
   keeps for a classic one. The sharing columns have the other 5px, and all
   17px where no scrollbar shows.
@@ -61,7 +61,7 @@ maintainer's stats, VT DotTS Intermediate S5. Before: the marks column was
 50px with the default columns, 126px with Sensitivity hidden, 208px with
 every optional column hidden, and 112px with Shots Fired hidden. After, with
 the default columns, the list is 480px, the marks column 30px, and `#`, Time
-and Accuracy 72, 95 and 101px. Every session row fits at 480px with Median
+and Accuracy 71, 94 and 99px. Every session row fits at 480px with Median
 and best on, across all 329 of the maintainer's sessions open in All
 scenarios.
 

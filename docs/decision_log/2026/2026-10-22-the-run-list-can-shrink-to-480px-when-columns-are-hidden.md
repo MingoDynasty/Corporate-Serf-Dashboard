@@ -11,7 +11,7 @@ the top-row cards in place. Long scenario names can be cut short sooner.
 
 **Superseded in part (2026-10-29).** [The marks column's entry](2026-10-29-the-run-lists-marks-column-is-30px-and-three-columns-share-its-spare-room.md):
 the need is 19px plus every shown column's width, and with Shots Fired
-hidden to start the default columns need 403px, so the default list sits
+hidden to start the default columns need 407px, so the default list sits
 at this entry's 480px minimum, which the page also draws before the column
 choices load. [The card's new width](2026-10-29-the-latest-run-card-is-as-wide-as-the-run-lists-minimum.md): the latest-run
 card is 480px, the minimum, so the two line up. The minimum, the width

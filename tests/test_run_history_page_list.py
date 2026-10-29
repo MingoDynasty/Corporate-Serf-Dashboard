@@ -54,12 +54,12 @@ STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
 LIST_SCRIPT = REPO_ROOT / "assets" / "runHistoryList.js"
 IDS = run_history.RUN_LIST_IDS
 SCENARIO = "Scenario A"
-# The list's minimum, which the default columns leave it at: they need 403px.
+# The list's minimum, which the default columns leave it at: they need 407px.
 # A list that needs up to 500px keeps it in a narrow window. Its border takes
 # 2px, and a classic scrollbar is 17px in the widest browser the app is used
 # in.
 LIST_MINIMUM_PX = 480
-DEFAULT_NEED_PX = 403
+DEFAULT_NEED_PX = 407
 NARROW_WINDOW_KEEPS_PX = 500
 BORDER_PX = 2
 SCROLLBAR_PX = 17
@@ -297,7 +297,7 @@ def test_each_fixed_column_has_the_width_its_header_and_values_need():
         "accuracy": 70,
         "shots": 82,
         "reloads": 64,
-        "sens": 96,
+        "sens": 100,
         "fov": 116,
         "avg_fps": 64,
     }
@@ -430,8 +430,8 @@ def test_the_list_needs_its_room_and_the_widths_of_the_columns_it_shows():
     assert [
         default + widths[column_id]
         for column_id in ("shots", "reloads", "fov", "avg_fps")
-    ] == [485, 467, 519, 467]
-    assert need + sum(widths.values()) == 729
+    ] == [489, 471, 523, 471]
+    assert need + sum(widths.values()) == 733
 
 
 def test_the_menus_checkboxes_write_the_lists_need_to_the_pages_style():
