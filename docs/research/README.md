@@ -8,9 +8,10 @@ here does not approve a feature or establish current app behavior.
 
 | App | Survey date | Focus |
 | --- | --- | --- |
+| [RefleK's (Astra)](refleks_learnings_astra.md) | 2026-10-28 | Run inspection and comparison, event-data limits, metric probes, recommendations, capture and privacy, and current CSD priorities |
 | [Aimcurve (Astra)](aimcurve_learnings_astra.md) | 2026-10-01 | Recent form, within-run analysis, settings comparisons, and connected chart/table interactions |
 | [Aimcurve (Opus)](aimcurve_learnings_opus.md) | 2026-10-03 | Time-scored detection from `.perf` files, checked against local recordings; reset-file handling; scenario-history design |
-| [RefleK's](refleks_learnings.md) | 2026-10-28 | Run inspection and comparison, event-data limits, metric probes, recommendations, capture and privacy, and current CSD priorities |
+| [RefleK's](refleks_learnings.md) | 2026-07-03 | Additional run data, API observations, sessions, and analytics ideas |
 
 ## Checks of this app
 
