@@ -227,6 +227,9 @@ it is saved is in [2026-10-18][note-store].
   it at 14px, its line breaks kept, broken anywhere a word is too long. The
   text is selectable; only **Edit** opens the editor. **Edit**'s accessible
   name is `Edit scenario note` ([2026-10-18][note-card]).
+- **Edit** takes clicks 5px either side of the word, 4px above it and 2px
+  below, so its area is 30 × 24px where the word is 20 × 18px. Nothing moves
+  for it, and the keyboard's focus ring frames that area.
 - A note taller than the room under the first line scrolls inside the card,
   with a scrollbar this app draws at the card's right edge whenever there is
   more than fits, whatever the system's scrollbar setting. Its bottom line

@@ -401,6 +401,21 @@ def test_the_note_starts_its_lines_at_the_score_cards_offset():
     assert "justify-content" not in read
 
 
+def test_edit_takes_clicks_round_the_word_without_moving_it():
+    """Edit's click area is 30 x 24px round its 20 x 18px word, and nothing moves.
+
+    The margins cancel the padding. It reaches 2px below the word, not 3: the
+    note's scroll area starts 2px under the first line and is drawn over it.
+    """
+    edit = _css_block(
+        STYLESHEET.read_text(encoding="utf-8"),
+        ".run-history-note-heading > .run-history-note-link",
+    )
+
+    assert "margin: -4px -5px -2px;" in edit
+    assert "padding: 4px 5px 2px;" in edit
+
+
 def test_the_note_scrolls_in_the_room_under_its_first_line_and_fades_while_more_is_below():
     """The scroll area shrinks to the room left, so a long note never sizes the card.
 
