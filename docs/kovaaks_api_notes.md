@@ -214,22 +214,30 @@ Important behavior:
 - A 2xx payload missing any of the three fields above, or carrying one in an
   unusable shape, is treated the same as an outage — unchecked — never as "no
   match".
-- **No profile endpoint takes a Steam ID** (probed 2026-07-20; do not
-  re-probe): `/user/profile/by-steam-id` returns 404 and
-  `/user/profile?steamId=` returns 401, which is why detection guesses with
-  personas and verifies.
-- **A SteamID64 can still reach a username, indirectly** (verified
-  2026-10-28; until then this note called it impossible). The app does not
-  use the path. `/benchmarks/player-progress-rank-benchmark` with a real
-  `steamId` gives each scenario's `leaderboard_id` and the player's
-  `leaderboard_rank`. The global leaderboard page at `page=<rank - 1>` with
-  `max=1` is then the player's own entry, whose `steamId` confirms it and
-  whose `webappUsername` names them. Six lookups for three public players,
-  at positions 2 to 3,226, all returned the player's own entry. It needs a
-  ranked score on a scenario of a benchmark that is tried, costs at least
-  two requests per attempt, and misses when the rank moves between them.
-  Found in the
-  [KovaaK's Companion survey](research/kovaaks_companion_learnings_opus.md#1-a-steamid64-leads-to-a-kovaaks-username-after-all).
+- **The direct reverse-lookup routes are unavailable** (probed 2026-07-20;
+  do not re-probe):
+  `/user/profile/by-steam-id` returns 404 and `/user/profile?steamId=`
+  returns 401. Current detection guesses with personas and verifies.
+- **A conditional route through benchmark progress works** (verified live
+  2026-10-28; not used by current detection). Given a SteamID64 and a played
+  benchmark, `/benchmarks/player-progress-rank-benchmark` can supply a
+  scenario's `leaderboard_id` and `leaderboard_rank`. Requesting
+  `/leaderboard/scores/global?leaderboardId=<id>&page=<rank-1>&max=1`
+  can then supply `webappUsername`. Accept it only when that row's `steamId`
+  exactly equals the original SteamID64; a position may move between calls.
+  A second live check, in the Astra survey, succeeded with benchmark 458,
+  leaderboard 98330, position 14738. These coordinates record that
+  observation, not a fixture to assume remains current.
+  Independently, the Opus survey verified six lookups for three public
+  players, at positions 2 to 3,226; all returned the player's own entry.
+  The route needs a ranked score on a scenario of a benchmark that is
+  tried and costs at least two requests per attempt.
+  An unplayed benchmark, unavailable position or identity mismatch does not
+  prove the account absent. Any future fallback needs bounded attempts and
+  the same privacy-sensitive request handling as persona probes. See the
+  [Astra Companion survey](research/kovaaks_companion_learnings_astra.md#a-conditional-steamid-to-username-lookup-works)
+  and [Opus Companion survey](research/kovaaks_companion_learnings_opus.md#1-a-steamid64-leads-to-a-kovaaks-username-after-all)
+  for the independent observations and pinned resolver source.
 
 Logging:
 

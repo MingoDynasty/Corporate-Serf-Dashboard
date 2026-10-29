@@ -10,6 +10,7 @@ here does not approve a feature or establish current app behavior.
 | --- | --- | --- |
 | 2026-10-28 | [RefleK's (Astra)](refleks_learnings_astra.md) | Run inspection and comparison, event-data limits, metric probes, recommendations, capture and privacy, and current CSD priorities |
 | 2026-10-28 | [RefleK's (Opus)](refleks_learnings_opus.md) | A whole-session read and a time-spent calendar for open questions; one clock for kills and `.perf` events, with the kill table's shapes across game versions; API-note gaps; and what not to take: default run upload and training advice |
+| 2026-10-28 | [KovaaK's Companion (Astra)](kovaaks_companion_learnings_astra.md) | Session summaries, connected replay analysis, coaching limits, parser probes, and a verified benchmark-based identity lookup |
 | 2026-10-28 | [KovaaK's Companion (Opus)](kovaaks_companion_learnings_opus.md) | A SteamID64-to-username lookup checked live, each benchmark's overall-rank rule in data we already bundle, an advice engine and its author's review of why advice misleads, server scores, and sessions as game launches |
 | 2026-10-03 | [Aimcurve (Opus)](aimcurve_learnings_opus.md) | Time-scored detection from `.perf` files, checked against local recordings; reset-file handling; scenario-history design |
 | 2026-10-01 | [Aimcurve (Astra)](aimcurve_learnings_astra.md) | Recent form, within-run analysis, settings comparisons, and connected chart/table interactions |
