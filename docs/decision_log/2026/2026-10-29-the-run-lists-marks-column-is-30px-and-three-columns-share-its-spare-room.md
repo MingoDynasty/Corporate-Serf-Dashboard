@@ -26,7 +26,9 @@ basically just option B, but only shrinking the Latest Run so that it lines
 up with the Run History panel's minimum width." Then: "Which also implies
 that the Run History panel stays as-is, since we could not find a better
 alternative." Asked which version of that to build, the maintainer answered
-"Copy A". What the list does today is in
+"Copy A". Built in
+[#445](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/445).
+What the list does today is in
 [run_history.md](../../specs/run_history.md#the-run-list).
 
 **The rule.**

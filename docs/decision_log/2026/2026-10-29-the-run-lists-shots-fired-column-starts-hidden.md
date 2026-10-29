@@ -15,6 +15,8 @@ column." The layout built on it was then chosen as "Copy A"
 It moves Shots Fired from the tier the maintainer called probably useful by
 default to the tier of columns possibly useful to some players
 ([the three new columns](2026-10-22-the-run-lists-columns-menu-offers-reloads-fov-and-avg-fps-off-to-start.md)).
+Built in
+[#445](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/445).
 What the list does today is in
 [run_history.md](../../specs/run_history.md#the-run-list).
 

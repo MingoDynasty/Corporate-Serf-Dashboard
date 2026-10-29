@@ -12,6 +12,8 @@ so far is basically just option B, but only shrinking the Latest Run so that
 it lines up with the Run History panel's minimum width." The layout built on
 it was then chosen as "Copy A"
 ([the marks column's entry](2026-10-29-the-run-lists-marks-column-is-30px-and-three-columns-share-its-spare-room.md)).
+Built in
+[#445](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/445).
 Current behavior is in
 [run_history.md](../../specs/run_history.md#the-top-row).
 
