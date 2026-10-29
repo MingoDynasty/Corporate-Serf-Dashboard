@@ -112,13 +112,16 @@ times that name or order runs remain absolute ([T4][card-order]).
   never added to a card's height, so no card's content makes the row taller
   than it would be without it. Their first lines share one top and their
   large numbers another, and a card with fewer lines leaves its spare room at
-  its bottom ([SC4][top-aligned]).
+  its bottom ([SC4][top-aligned]). The scenario note card starts its lines at
+  the same offset, so its first line shares theirs whatever the note holds
+  ([2026-10-28][note-aligned]).
 - While the PB card's leaderboard line shows a hint, such as the one with no
   KovaaK's username, all three start their lines at their top edge instead,
-  still lined up. A long position with no hint, such as
+  still lined up, and so does the note card ([SC4][top-aligned],
+  [2026-10-28][note-aligned]). A long position with no hint, such as
   `Position: Unranked (123,456 players)` with a benchmark selected, can also
   wrap that line. Then the PB card's lines start up to about 10px higher than
-  the other two, by the maintainer's ruling of 2026-10-25
+  the other cards', by the maintainer's ruling of 2026-10-25
   ([SC4][top-aligned]).
 - The dropdowns' column holds the "Playlist filter" select over the "Selected
   scenario" searchable select (placeholder "Select a scenario"), each the
@@ -213,12 +216,20 @@ it is saved is in [2026-10-18][note-store].
   pair can make a selected row taller. At a page area of 900px or less the
   score-pair wrapper has no box, so its floor has no effect
   ([2026-10-21][score-strip]).
+- While reading, its lines start 12px below its top edge, the score cards'
+  offset, and at its top edge while they start theirs there. Its first line,
+  or the **Add a scenario note** link, then shares the score cards' first
+  lines' top whatever the note holds, and a short note leaves its spare room
+  at the card's bottom. The editor keeps its own spacing
+  ([2026-10-28][note-aligned]).
 - With a note: a frame, the first line `Scenario note · edited {age}` in the
-  other cards' quiet style with **Edit** at its right end, and the note at
-  14px, its line breaks kept, broken anywhere a word is too long, centered in
-  the card when short. The text is selectable; only **Edit** opens the
-  editor. **Edit**'s accessible name is `Edit scenario note`
-  ([2026-10-18][note-card]).
+  other cards' quiet style with **Edit** at its right end, and the note under
+  it at 14px, its line breaks kept, broken anywhere a word is too long. The
+  text is selectable; only **Edit** opens the editor. **Edit**'s accessible
+  name is `Edit scenario note` ([2026-10-18][note-card]).
+- **Edit** takes clicks 5px either side of the word, 4px above it and 2px
+  below, so its area is 30 × 24px where the word is 20 × 18px. Nothing moves
+  for it, and the keyboard's focus ring frames that area.
 - A note taller than the room under the first line scrolls inside the card,
   with a scrollbar this app draws at the card's right edge whenever there is
   more than fits, whatever the system's scrollbar setting. Its bottom line
@@ -1657,6 +1668,7 @@ The card's lines, local-record scope and leaderboard presentation follow
 [note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md
 [note-card]: ../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md
 [long-note]: ../decision_log/2026/2026-10-19-a-long-scenario-note-scrolls-in-its-card.md
+[note-aligned]: ../decision_log/2026/2026-10-28-the-scenario-note-lines-up-with-the-score-cards.md
 [note-unsaved]: ../decision_log/2026/2026-10-18-unsaved-note-text-is-never-lost-to-a-change-of-scenario-or-page.md
 
 [typical-definition]: ../decision_log/2026/2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md

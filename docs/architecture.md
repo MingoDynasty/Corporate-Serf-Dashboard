@@ -1446,10 +1446,12 @@ flowchart LR
   `config/loginusers.vdf` (roots come from `stats_dir_detection._steam_roots`),
   merges accounts by SteamID64 keeping the newest `Timestamp`, and probes each
   distinct persona once through `api_service.get_user_profile_by_username`. A
-  profile counts only when its `steamId` equals that account's ID64 — there is
-  no reverse lookup from a Steam ID, so detection guesses with personas and
-  verifies, and a persona that coincides with someone else's KovaaK's name is
-  discarded rather than believed. Failures are recorded, not raised: probe
+  profile counts only when its `steamId` equals that account's ID64 — no
+  profile endpoint takes a Steam ID, so detection guesses with personas and
+  verifies (an indirect path through the player's leaderboard entries exists
+  and is unused; see `kovaaks_api_notes.md`), and a persona that coincides
+  with someone else's KovaaK's name is discarded rather than believed.
+  Failures are recorded, not raised: probe
   failures and unusable payloads raise `unchecked_count`, and an account list
   that existed but could not be read or understood clears
   `discovery_complete`, both so the UI cannot present a partial answer as a
