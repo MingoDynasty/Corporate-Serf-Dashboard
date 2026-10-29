@@ -19,7 +19,9 @@ aligning it." Two advisory consults, `claude-fable-5-1` and `gpt-6.1-sol` at
 xhigh, each reached the same recommendation independently: a fixed offset,
 the Add link on the first line, and the editor unchanged. Sol also suggested
 15 px note text. Asked "Rule it as recommended and open the draft PR?", the
-maintainer ruled on 2026-10-28: "Rule it, keep 14px." Current behavior is in
+maintainer ruled on 2026-10-28: "Rule it, keep 14px." Built in
+[#442](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/442).
+Current behavior is in
 [run_history.md](../../specs/run_history.md#the-scenario-note-card).
 
 **Why.** The card centered its lines because every card in the row did when
