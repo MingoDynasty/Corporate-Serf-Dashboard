@@ -365,7 +365,7 @@ def test_the_card_takes_the_room_from_240_to_800px_and_reading_never_sizes_it():
 
     So the chart under the row never moves between a note, none, a broken
     file and no scenario. The floor gives a card alone on a wrapped line
-    five lines.
+    about five lines.
     """
     css = STYLESHEET.read_text(encoding="utf-8")
     box = _css_block(css, ".run-history-note-card")
@@ -381,6 +381,39 @@ def test_the_card_takes_the_room_from_240_to_800px_and_reading_never_sizes_it():
     assert "border: 1px solid transparent;" in box
     assert "position: absolute;" in read
     assert "inset: 0;" in read
+
+
+def test_the_note_starts_its_lines_at_the_score_cards_offset():
+    """Its first line shares the score cards' first lines' top whatever it holds.
+
+    Centered, the first line sat 51px down over a one-line note and 1px down
+    over a long one, beside score cards at 13px. Padding, not their spacer:
+    the reading view is out of the flow, so padding never sizes the card,
+    and a spacer would give the offset up to a long note. Sharing their
+    variable drops it to 0 with them while a leaderboard hint shows.
+    """
+    read = _css_block(STYLESHEET.read_text(encoding="utf-8"), ".run-history-note-read")
+
+    assert (
+        "padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;"
+        in read
+    )
+    assert "justify-content" not in read
+
+
+def test_edit_takes_clicks_round_the_word_without_moving_it():
+    """Edit's click area is 30 x 24px round its 20 x 18px word, and nothing moves.
+
+    The margins cancel the padding. It reaches 2px below the word, not 3: the
+    note's scroll area starts 2px under the first line and is drawn over it.
+    """
+    edit = _css_block(
+        STYLESHEET.read_text(encoding="utf-8"),
+        ".run-history-note-heading > .run-history-note-link",
+    )
+
+    assert "margin: -4px -5px -2px;" in edit
+    assert "padding: 4px 5px 2px;" in edit
 
 
 def test_the_note_scrolls_in_the_room_under_its_first_line_and_fades_while_more_is_below():

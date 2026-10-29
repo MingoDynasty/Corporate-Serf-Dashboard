@@ -25,6 +25,14 @@ which varies with the selection and can grow when the pair itself stacks.
 At a page area of 900px or less the pair has no box and its floor has no
 effect. The existing long-note supersession and the rest of this entry stand.
 
+**Superseded in part (2026-10-28).** [The scenario note lines up with the score cards](2026-10-28-the-scenario-note-lines-up-with-the-score-cards.md):
+while reading, the card's lines start at the score cards' 12 px offset
+instead of centering, so a short note sits under its first line at the top
+of the card, and **Add a scenario note** sits on the first line. A long note
+shows 12 px less before it scrolls, and a card alone on a wrapped line about
+five lines where it showed five and a half. The box rule, the 14 px note text
+and the rest of this entry stand.
+
 **Ruling and delivery.** SN2, SN4, SN5, SN7 and SN8's line of the scenario
 notes proposal
 ([#390](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/390)),

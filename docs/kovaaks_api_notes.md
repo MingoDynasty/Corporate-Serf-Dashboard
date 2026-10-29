@@ -47,6 +47,7 @@ Client identification:
 | --- | --- | --- | --- |
 | `/leaderboard/scores/global` | Current rank lookup and leaderboard total lookup | Yes | Use with `leaderboardId`. Add `usernameSearch` only for user rank lookup. |
 | `/user/scenario/total-play` | Metadata hydration/upsert for `scenarioName -> leaderboardId` | No | Can lag behind current score/rank. Returns `null` for unknown usernames. |
+| `/user/scenario/last-scores/by-name` | Not used | No | A user's last 10 runs of one scenario, with each run's attributes. |
 | `/user/profile/by-username` | Identity detection: verify a local Steam persona against a KovaaK's profile | No | Unauthenticated. HTTP `409` is the confirmed "no such player" answer. Request parameters are never logged. |
 | `/scenario/popular` | Exact-name fallback for leaderboard ID resolution | No | Search can return many variants; require exact `scenarioName` match. |
 | `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires a benchmark ID, sent as `benchmarkId`, so it does not cover all playlists. |
@@ -138,6 +139,40 @@ Failure handling:
 - `null` response means the configured KovaaK's username is unknown and should become an explicit unknown/error state, not `UNRANKED`.
 - Cache failures should not block active fallback lookup. If metadata is missing, resolve the selected scenario lazily through KovaaK's APIs.
 
+## `/user/scenario/last-scores/by-name`
+
+Not used by the app. The [RefleK's survey](research/refleks_learnings.md)
+first noted it, and the
+[KovaaK's Companion survey](research/kovaaks_companion_learnings_opus.md#4-server-scores-fill-in-runs-the-stats-folder-never-saw)
+probed its shape live on 2026-10-28, using the top ten players of one
+leaderboard.
+
+Example:
+
+```text
+GET /user/scenario/last-scores/by-name?username=MingoDynasty&scenarioName=VT%20Pasu%20Intermediate%20S5
+```
+
+Observed:
+
+- A JSON array of the user's most recent runs of one scenario, at most 10.
+  One of the ten players got an empty list although they were ranked on
+  that scenario's leaderboard.
+- Each entry has `score` and an `attributes` object with the same keys a
+  `/leaderboard/scores/global` entry's `attributes` carries: `epoch` (Unix
+  milliseconds, as a string), `score`, `kills`, `avgTtk`, `cm360`, `fov`,
+  `fovScale`, `horizSens`, `vertSens`, `sensScale`, `resolution`,
+  `pauseCount`, `pauseDuration`, `challengeStart`, `hash`,
+  `scenarioVersion`, `clientBuildVersion`, `avgFps`, `accuracyDamage`,
+  `modelOverrides`, and `sensRandomizer`.
+- `accuracyDamage` ran from 80,473 to 96,026 over 82 runs of a tracking
+  scenario, which fits the hit-accuracy reading recorded for leaderboard
+  entries, but no run was matched one to one.
+- The server keeps only the latest runs, so a history built from this
+  endpoint has to be stored as it arrives. KovaaK's Companion does that, and
+  treats a server run whose `epoch` is within 10 seconds of a local run's
+  end as that run.
+
 ## `/user/profile/by-username`
 
 Example:
@@ -179,10 +214,22 @@ Important behavior:
 - A 2xx payload missing any of the three fields above, or carrying one in an
   unusable shape, is treated the same as an outage — unchecked — never as "no
   match".
-- **No reverse lookup exists** (probed 2026-07-20; do not re-probe):
-  `/user/profile/by-steam-id` returns 404 and `/user/profile?steamId=`
-  returns 401. Going from a SteamID64 to a username is impossible, which is
-  why detection guesses with personas and verifies.
+- **No profile endpoint takes a Steam ID** (probed 2026-07-20; do not
+  re-probe): `/user/profile/by-steam-id` returns 404 and
+  `/user/profile?steamId=` returns 401, which is why detection guesses with
+  personas and verifies.
+- **A SteamID64 can still reach a username, indirectly** (verified
+  2026-10-28; until then this note called it impossible). The app does not
+  use the path. `/benchmarks/player-progress-rank-benchmark` with a real
+  `steamId` gives each scenario's `leaderboard_id` and the player's
+  `leaderboard_rank`. The global leaderboard page at `page=<rank - 1>` with
+  `max=1` is then the player's own entry, whose `steamId` confirms it and
+  whose `webappUsername` names them. Six lookups for three public players,
+  at positions 2 to 3,226, all returned the player's own entry. It needs a
+  ranked score on a scenario of a benchmark that is tried, costs at least
+  two requests per attempt, and misses when the rank moves between them.
+  Found in the
+  [KovaaK's Companion survey](research/kovaaks_companion_learnings_opus.md#1-a-steamid64-leads-to-a-kovaaks-username-after-all).
 
 Logging:
 
@@ -282,6 +329,10 @@ see the 2026-07-20 decision log entry):
   them into the permanent name->ID mapping cache at startup — so unplayed
   bundled-playlist scenarios resolve their leaderboard ID without the slow,
   timeout-prone exact-name search endpoint.
+- With a real `steamId`, a scenario also carries the player's
+  `leaderboard_rank` where they have one, which is what makes the indirect
+  username lookup under `/user/profile/by-username` possible (verified
+  2026-10-28).
 
 Benchmark rank-data quirks (surfaced by `scripts/benchmark_importer`, which
 merges Evxl rank names/colors with this endpoint's per-scenario `rank_maxes`

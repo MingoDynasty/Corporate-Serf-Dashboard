@@ -6,12 +6,14 @@ here does not approve a feature or establish current app behavior.
 
 ## Surveys
 
-| App | Survey date | Focus |
+| Survey date | App | Focus |
 | --- | --- | --- |
-| [RefleK's (Astra)](refleks_learnings_astra.md) | 2026-10-28 | Run inspection and comparison, event-data limits, metric probes, recommendations, capture and privacy, and current CSD priorities |
-| [Aimcurve (Astra)](aimcurve_learnings_astra.md) | 2026-10-01 | Recent form, within-run analysis, settings comparisons, and connected chart/table interactions |
-| [Aimcurve (Opus)](aimcurve_learnings_opus.md) | 2026-10-03 | Time-scored detection from `.perf` files, checked against local recordings; reset-file handling; scenario-history design |
-| [RefleK's](refleks_learnings.md) | 2026-07-03 | Additional run data, API observations, sessions, and analytics ideas |
+| 2026-10-28 | [RefleK's (Astra)](refleks_learnings_astra.md) | Run inspection and comparison, event-data limits, metric probes, recommendations, capture and privacy, and current CSD priorities |
+| 2026-10-28 | [RefleK's (Opus)](refleks_learnings_opus.md) | A whole-session read and a time-spent calendar for open questions; one clock for kills and `.perf` events, with the kill table's shapes across game versions; API-note gaps; and what not to take: default run upload and training advice |
+| 2026-10-28 | [KovaaK's Companion (Opus)](kovaaks_companion_learnings_opus.md) | A SteamID64-to-username lookup checked live, each benchmark's overall-rank rule in data we already bundle, an advice engine and its author's review of why advice misleads, server scores, and sessions as game launches |
+| 2026-10-03 | [Aimcurve (Opus)](aimcurve_learnings_opus.md) | Time-scored detection from `.perf` files, checked against local recordings; reset-file handling; scenario-history design |
+| 2026-10-01 | [Aimcurve (Astra)](aimcurve_learnings_astra.md) | Recent form, within-run analysis, settings comparisons, and connected chart/table interactions |
+| 2026-07-03 | [RefleK's](refleks_learnings.md) | Additional run data, API observations, sessions, and analytics ideas |
 
 ## Checks of this app
 
