@@ -164,9 +164,10 @@ PICKER_CLASS = "app-settings-identity-picker"
 PICKER_HIDDEN_CLASS = f"{PICKER_CLASS} app-settings-identity-picker-hidden"
 
 # The only conclusive miss: every account on this machine was checked, and none
-# of them owns a KovaaK's profile. There is no reverse lookup from a Steam ID,
-# so manual entry really is the only path left — which is why this message is
-# reserved for the one result that has ruled everything else out.
+# of them owns a KovaaK's profile. No profile endpoint takes a Steam ID, and the
+# app doesn't use the indirect path through leaderboard entries, so manual entry
+# really is the only path left — which is why this message is reserved for the
+# one result that has ruled everything else out.
 NO_MATCH_STATUS = (
     "No Steam account on this machine has a KovaaK's profile. Type your "
     "username in yourself. KovaaK's can't look one up from a Steam ID."

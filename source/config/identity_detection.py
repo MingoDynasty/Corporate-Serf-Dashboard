@@ -2,12 +2,15 @@
 
 Steam records every account that has signed in on this machine in
 ``<root>/config/loginusers.vdf``: a SteamID64 and the persona name that went
-with it. KovaaK's webapp usernames live server-side only and there is no
-reverse lookup from a Steam ID, so detection has to work the other way round --
-guess with each persona, then verify. A persona that resolves to a profile
-whose ``steamId`` equals that account's ID64 is a tested fact; a persona that
-merely happens to name someone else's KovaaK's account is a coincidence, and
-the equality check is what tells the two apart.
+with it. KovaaK's webapp usernames live server-side only and no profile
+endpoint takes a Steam ID, so detection works the other way round -- guess
+with each persona, then verify. (A Steam ID can reach a username indirectly,
+through the player's own benchmark leaderboard entries;
+``docs/kovaaks_api_notes.md`` records the path, which detection does not use.)
+A persona that resolves to a profile whose ``steamId`` equals that account's
+ID64 is a tested fact; a persona that merely happens to name someone else's
+KovaaK's account is a coincidence, and the equality check is what tells the two
+apart.
 
 Every Steam root the registry knows about is read, not just the first: the
 32-bit and 64-bit views can point at different installs, and neither is
