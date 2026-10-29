@@ -256,8 +256,8 @@ a.run-toast-link {
 
 /* While the PB card's leaderboard line shows a hint, its line can wrap and
    the card can fill the row it makes, as it does with no KovaaK's username.
-   All three score cards drop the offset together then, so they stay lined
-   up. */
+   The three score cards and the note card drop the offset together then, so
+   they stay lined up. */
 .run-history-top-row:has(.pb-card .scenario-rank-hint) {
     --run-history-score-card-top: 0px;
 }
@@ -655,9 +655,9 @@ a.run-toast-link {
 
    While reading, what it shows is out of the flow, so the note's length
    never sets its box: it stretches to its line. A card alone on a wrapped
-   line still gets five lines. While editing, the editor is in the flow and
-   holds the row's height where it fits, and the card grows only where the
-   lines under the buttons need more room than the row leaves. */
+   line still gets about five lines. While editing, the editor is in the flow
+   and holds the row's height where it fits, and the card grows only where
+   the lines under the buttons need more room than the row leaves. */
 .run-history-note-card {
     border: 1px solid transparent;
     border-radius: var(--mantine-radius-sm);
@@ -679,13 +679,17 @@ a.run-toast-link {
     border-color: var(--mantine-color-default-border);
 }
 
+/* The lines start at the score cards' offset, so the first line, or the Add
+   link, shares their first lines' top whatever the note holds. Centered, it
+   sat lower the shorter the note. Padding and not their spacer: this view is
+   out of the flow, so padding never makes the row taller, and a spacer would
+   give up the offset to a long note. */
 .run-history-note-read {
     display: flex;
     flex-direction: column;
     gap: 2px;
     inset: 0;
-    justify-content: safe center;
-    padding: 0 var(--mantine-spacing-sm);
+    padding: var(--run-history-score-card-top) var(--mantine-spacing-sm) 0;
     position: absolute;
 }
 
@@ -738,9 +742,9 @@ a.run-toast-link {
     font-size: var(--mantine-font-size-sm);
 }
 
-/* The note's scroll area: as tall as the note, centered in the card when it
-   is short, and no taller than the room under the first line. It reaches
-   into the card's right padding, so the scrollbar sits by the frame. */
+/* The note's scroll area: as tall as the note, and no taller than the room
+   under the first line. It reaches into the card's right padding, so the
+   scrollbar sits by the frame. */
 .run-history-note-scroll {
     flex: 0 1 auto;
     margin-right: calc(4px - var(--mantine-spacing-sm));

@@ -12,6 +12,7 @@ here does not approve a feature or establish current app behavior.
 | [Aimcurve (Opus)](aimcurve_learnings_opus.md) | 2026-10-03 | Time-scored detection from `.perf` files, checked against local recordings; reset-file handling; scenario-history design |
 | [RefleK's](refleks_learnings.md) | 2026-07-03 | Additional run data, API observations, sessions, and analytics ideas |
 | [RefleK's (Opus)](refleks_learnings_opus.md) | 2026-10-28 | A whole-session read and a time-spent calendar for open questions; one clock for kills and `.perf` events, with the kill table's shapes across game versions; API-note gaps; and what not to take: default run upload and training advice |
+| [KovaaK's Companion (Opus)](kovaaks_companion_learnings_opus.md) | 2026-10-28 | A SteamID64-to-username lookup checked live, each benchmark's overall-rank rule in data we already bundle, an advice engine and its author's review of why advice misleads, server scores, and sessions as game launches |
 
 ## Checks of this app
 
