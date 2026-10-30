@@ -182,6 +182,14 @@ def test_extract_data_from_file_rejects_non_finite_scores(score) -> None:
     assert run is None
 
 
+@pytest.mark.parametrize("scenario", ["", "   "])
+def test_extract_data_from_file_rejects_a_blank_scenario_name(scenario) -> None:
+    """KovaaK's has written ``Scenario:,`` with no name (seen 2026-10-09, -30)."""
+    run = _extract_written_file("blank-scenario", scenario=scenario)
+
+    assert run is None
+
+
 @pytest.mark.parametrize("score", ["0", "-1", "123.456789", "1e20"])
 def test_extract_data_from_file_preserves_finite_scores(score) -> None:
     run = _extract_written_file("finite-score", score=score)

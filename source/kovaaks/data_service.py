@@ -797,9 +797,9 @@ def _run_start_and_length(
 def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
     """Extract a run from a scenario CSV, or None when it cannot be read.
 
-    Reject missing required data and scores that are not finite. Unusable
-    optional data, such as the start, run length, sensitivity conversion or
-    hash, costs that metadata only, never the run.
+    Reject missing required data, a blank scenario name, and scores that are
+    not finite. Unusable optional data, such as the start, run length,
+    sensitivity conversion or hash, costs that metadata only, never the run.
     """
     accuracy = None
     shots_fired = None
@@ -892,11 +892,14 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         )
         return None
 
+    # ``not scenario``: KovaaK's has written ``Scenario:,`` with no name. Kept,
+    # it became a scenario named "" whose rank refresh asked KovaaK's to
+    # search for an empty name, a request it refuses with HTTP 400.
     if (
         datetime_object is None
         or accuracy is None
         or horizontal_sens is None
-        or scenario is None
+        or not scenario
         or score is None
         or sens_scale is None
     ):
