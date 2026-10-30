@@ -33,8 +33,10 @@ row, and anything in [Design](#design), which is author-owned.
 Status: open. The maintainer's choice of source, 2026-10-30, between the
 player's own runs and the leaderboard's: "Yes, own runs". Their direction,
 2026-10-30, on what a target assumes: "I think we should simplify this and
-assume that Mouse 1 is held for the duration of the run." The 5-run
-minimum, the agreement test and the time-scored exclusion are the author's.
+assume that Mouse 1 is held for the duration of the run." Their choice, the
+same day, between keeping the agreement test and a rule with none: "Keep the
+5-run test". The 5-run minimum, the agreement test and the time-scored
+exclusion are the author's.
 
 The material consequence: a target is an estimate for a run with the fire
 button held throughout, not a guarantee, and a scenario shows
