@@ -1493,6 +1493,18 @@ def _notify_exhaustion(
         )
 
 
+def _is_rejected_request(exc: requests.RequestException) -> bool:
+    """Return whether KovaaK's refused the request itself, so a retry can't help.
+
+    A 4xx status answers the request as it was sent, and the next scheduled
+    attempt sends the same one. 429 is the exception: it asks for a later try.
+    """
+    if not isinstance(exc, requests.HTTPError) or exc.response is None:
+        return False
+    status_code = exc.response.status_code
+    return 400 <= status_code < 500 and status_code != 429
+
+
 def _run_attempt(  # noqa: PLR0913
     scenario_name: str,
     username: str,
@@ -1515,6 +1527,13 @@ def _run_attempt(  # noqa: PLR0913
             logger.warning('Rank refresh stopped for "%s": %s', scenario_name, exc)
             return
         except requests.RequestException as exc:
+            if _is_rejected_request(exc):
+                logger.warning(
+                    'Rank refresh stopped for "%s": %s',
+                    scenario_name,
+                    request_exception_summary(exc),
+                )
+                return
             # INFO for the same reason as _get_with_retry's retry records: a
             # scheduled attempt that may still recover is self-healed churn.
             # Exhausting the schedule warns in _notify_exhaustion.
@@ -1529,7 +1548,14 @@ def _run_attempt(  # noqa: PLR0913
                 return
             try:
                 rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
-            except requests.RequestException:
+            except requests.RequestException as exc:
+                if _is_rejected_request(exc):
+                    logger.warning(
+                        'Rank refresh stopped for "%s": %s',
+                        scenario_name,
+                        request_exception_summary(exc),
+                    )
+                    return
                 rank_info = None
 
         if (

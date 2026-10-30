@@ -270,6 +270,10 @@ Important behavior:
 - Search can return many variants for a scenario name.
 - Require exact `scenarioName` match before saving a leaderboard ID.
 - First page with `max=100` is expected to be enough for now; revisit only if real data disproves this.
+- An empty `scenarioNameSearch` returns HTTP 400 (observed 2026-10-09 and
+  2026-10-30, from a run file whose `Scenario:` line had no name). The run
+  parser now rejects such a file, and the rank refresh stops on any 4xx
+  status other than 429 instead of retrying it.
 
 ## `/playlist/playlists`
 
