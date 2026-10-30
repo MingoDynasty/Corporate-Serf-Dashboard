@@ -166,8 +166,9 @@ the seventh row, at the complete Clicking category boundary, with no sliver
 of the next category. All 21 scenarios remain in the sample dataset; the PNG
 is a compact excerpt rather than the entire benchmark.
 
-The script ignores the first load's known Dash Pages race, then attaches error
-listeners before reloading so failures during the clean reload are captured.
+The script loads the page once, then attaches error listeners before reloading,
+so it captures failures during the reload. It leaves the first load out
+because Dash once lost a first-request race there, which dash 4.5.0 fixed.
 After closing Chart options, it waits for the control to report closed and for
 Plotly's canvas to fill its container. It waits for the chart, note, grid and
 leaderboard callbacks, then waits for two matching frames with animations disabled before
