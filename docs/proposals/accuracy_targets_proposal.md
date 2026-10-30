@@ -5,15 +5,15 @@ Date: 2026-10-30
 
 ## TL;DR
 
-On a tracking scenario a run's score is its hit accuracy times a fixed
-amount, so every rank threshold on the chart is also an accuracy the run
-needs, but the chart shows only the score. This proposal adds an Accuracy
-targets switch to Chart options, off to start, that writes each rank's
-accuracy target in the chart's right margin beside its line, such as 39.2%
-beside Saffron (2350). The app works out the targets from the player's own
-runs and shows them only where those runs prove that the score follows
-accuracy, which holds for tracking and for switching scenarios played with
-the fire button held, and the chart says why when a scenario gets none.
+On a tracking scenario a run's score is about its hit accuracy times a fixed
+amount, so each rank threshold on the chart stands for an accuracy too, but
+the chart shows only the score. This proposal adds an Accuracy targets
+switch to Chart options, off to start, that writes each rank's accuracy
+target in the chart's right margin beside its line, such as 39.2% beside
+Saffron (2350). A target is an estimate from the player's own runs of the
+accuracy at which a run with their usual number of shots reaches the rank.
+It shows only where those runs agree that the score follows accuracy, as
+they do on tracking, and the chart says why when a scenario gets none.
 
 ## Decisions needed
 
@@ -28,35 +28,57 @@ this proposal, with a 3-run minimum that the measurements here raised to 5.
 A direction or a choice is not a ruling, and reviewers may challenge any
 row, and anything in [Design](#design), which is author-owned.
 
-### AT1. Targets come from the player's own runs, where at least 5 agree
+### AT1. Targets are estimated from the player's own runs, where at least 5 agree
 
 Status: open. The maintainer's choice of source, 2026-10-30, between the
-player's own runs and the leaderboard's: "Yes, own runs". The 5-run minimum
-and the agreement test are the author's.
+player's own runs and the leaderboard's: "Yes, own runs". The 5-run minimum,
+the agreement test and the time-scored exclusion are the author's.
 
-The material consequence: a scenario shows targets only after 5 runs since
-its last update, and never on a scenario whose runs disagree. On the
-maintainer's stats, 90 of the 659 ranked scenarios they have played get
-targets, 438 have fewer than 5 runs since their last update, and the other
-131 have runs that disagree.
+The material consequence: a target is an estimate for a run with the
+player's usual number of shots, not a guarantee, and a scenario shows
+targets only after 5 runs since its last update, never on one whose runs
+disagree, and never on a time-scored one. On the maintainer's stats, 90 of
+the 659 ranked scenarios they have played get targets, 434 have fewer than
+5 runs since their last update, 125 have runs that disagree, and 10 are
+time-scored.
 
 **Recommendation: a scenario's targets come from its runs since its last
 update. A run's score over its hit accuracy is the score it would have made
-at 100%. When at least 5 runs have a hit accuracy above zero, and at least
-90% of them land within 2% of their median, that median is the scenario's
-score at 100%, and a rank's target is its threshold over it. Otherwise the
-scenario has none.**
+at 100% with the same shots. When at least 5 runs have a hit accuracy above
+zero, and at least 90% of them land within 2% of their median, that median
+is the scenario's score at 100%, and a rank's target is its threshold over
+it: an estimate of the accuracy at which a run with the usual number of
+shots reaches the rank. A version the app recognizes as time-scored has no
+targets, whatever its runs. Otherwise the scenario has none.**
 
 - **Why the player's runs, and not a list of scenario types.** Whether a
   score follows accuracy depends on how the fire button is used, not on the
   scenario's genre. On a multi-bot switching scenario played with the button
-  held through the gaps between bots, shots keep counting, so the targets
-  stay exact and 100% just becomes out of reach: the runs agree within 0.5%
-  on VT EddieTS Intermediate S5 and 1.5% on VT Ground Intermediate S5. A
-  player who lets go in the gaps fires fewer shots on some runs than on
-  others, so their runs disagree and they get none, which is right for them.
-  A list of tracking scenarios would miss the first case and wrongly include
-  the second, and nothing would keep it current.
+  held through the gaps between bots, shots keep counting, so the runs
+  agree, and 100% just becomes out of reach: they agree within 0.5% on VT
+  EddieTS Intermediate S5 and 1.5% on VT Ground Intermediate S5. A player
+  who lets go in the gaps fires fewer shots on some runs than on others, so
+  their runs disagree and they get none, which is right for them. A list of
+  tracking scenarios would miss the first case and wrongly include the
+  second, and nothing would keep it current.
+- **What a target promises.** Runs that agree show that the player's score
+  at 100% held within about 2%, not that the scenario scores by hits alone,
+  so a target is an estimate. A run that fires fewer shots than usual needs
+  more accuracy than its target, and one that fires more needs less. On the
+  maintainer's 90 scenarios with targets, a run cleared a rank's target and
+  missed the rank 20 times, on 16 scenarios, such as a VT Snake Track
+  Intermediate S5 run at 41.75% that scored 2,485 against Gold's 2,500 and
+  41.7%. A run reached a rank while under its target 69 times, on 25. A
+  higher minimum or a tighter test narrows the gap but can't close it,
+  because no file says how a scenario scores.
+- **Why never a time-scored scenario.** Its score is the time left on a
+  countdown, so a player whose accuracy is steady can have runs that agree
+  while the score doesn't follow accuracy at all. The app already
+  recognizes a time-scored version from its performance files. Of the 10
+  it recognizes on the maintainer's stats, Air CELESTIAL No UFO Medium
+  passes the test on 2 of its 33 five-run windows, and Air Pure Medium on 1
+  of 18, so a short history of either would show targets. A version the app
+  can't tell about is judged by the test alone.
 - **Why not the rank data or Damage Possible.** A ladder holds scores only.
   Turning one into an accuracy needs the score at 100%, which no file but a
   run's stats file holds. Damage Possible is one run's shots times its
@@ -68,16 +90,16 @@ scenario has none.**
   player has never played. It would need KovaaK's to answer before a chart
   could show targets, rely on a field the app has only observed, and
   measure how others fire. The maintainer chose the player's own runs.
-- **Why 5 runs.** Over the maintainer's 127 scenario versions whose runs
+- **Why 5 runs.** Over the maintainer's 148 scenario versions whose runs
   disagree, judged on 8 or more runs, 15 passed the test on their first 3
   runs and 5 on their first 5: a passing short streak shows targets that
-  later vanish, on a scenario where they mean nothing. On the 119 versions
+  later vanish, on a scenario where they mean nothing. On the 123 versions
   whose runs agree, a 5-run window failed 2.0% of the time, so the wait is
   rarely longer than 5 runs. With 3 runs, 129 scenarios would get targets
   today rather than 90.
 - **Why since the last update.** An update can change a scenario's length,
   and so its shots. The stats file's `Hash:` names the version, as it does
-  for a run's check today.
+  for the app's time-scored check.
 
 ### AT2. Targets show a tenth of a percent, rounded up
 
@@ -93,28 +115,35 @@ two.
 always with one decimal: Saffron's 39.16% reads 39.2%, and an exact 40%
 reads 40.0%.**
 
-- **Why up.** A run at or above the figure reaches the rank, as long as it
-  fired as many shots as the median run. The first mockup's whole percent,
-  also rounded up, read 42% for Jade on VT EddieTS Intermediate S5, where the
-  PB reached Jade at 41.09%. A tenth reads 41.1%.
+- **Why up.** A run with the usual number of shots that reaches the figure
+  reaches the rank, where a figure rounded down could leave it a little
+  short. The first mockup's whole percent, also rounded up, read 42% for
+  Jade on VT EddieTS Intermediate S5, where the PB reached Jade at 41.09%. A
+  tenth reads 41.1%. On the maintainer's runs, rounding up errs on the safe
+  side more often than not: a run reached a rank under its target 69 times,
+  and cleared a target and missed 20 times (AT1).
 - **Why not two decimals,** as a run's accuracy has. The runs behind a
   target spread by up to 2%, which is 0.8 point at 40%, and 0.2 point at
   41% on VT EddieTS Intermediate S5, whose runs spread 0.45%. A second
   decimal would claim more than the runs agree on.
+- **Why no approximation mark,** such as `≈39.2%`. The help text says the
+  figures are estimates, and the player turns on the switch that shows them.
+  A mark on each of up to nine lines adds back some of the clutter the
+  maintainer asked to keep down.
 
 ### AT3. The figures sit in the chart's right margin
 
 Status: open. The maintainer's choice, 2026-10-30, between the two
 placements of the second mockup: "Right margin".
 
-The material consequence: while figures show, the plot loses 64 px of
-width, which is 4% of it at 2,560 px and 10% at 1,536 px, and a figure is
-read across from its line's label rather than inside it.
+The material consequence: a figure is read across from its line's label
+rather than inside it. The plot keeps its width, since the figures sit in
+the right margin Plotly already leaves, so a chart with figures lines up
+with one without.
 
 **Recommendation: each drawn rank line gets its figure just outside the
 plot's right edge, level with the line, in the chart's normal text color.
-The line's label is unchanged. The margin widens only while at least one
-figure is drawn.**
+The line's label and the chart's margins are unchanged.**
 
 - **Why the margin.** It adds no text inside the plot. The first mockup, and
   the second's other placement, put the figure in each label,
@@ -147,26 +176,31 @@ off the chart is exactly as it is today.**
 - **Why Chart options.** The switch is flipped a few times while looking at
   the chart, and the rank lines' own switches are there. The Settings page
   is a page away from the chart.
-- **Why off, even with the margin.** The maintainer's direction. AT3 is what
-  would let a later release consider turning it on, and AT4's consequence is
-  the price of doing so.
+- **Why off, even though the margin keeps the plot clear.** The
+  maintainer's direction. AT3 is what would let a later release consider
+  turning it on, and AT4's consequence is the price of doing so.
 
 ### AT5. With the switch on, a chart with no figures says why
 
 Status: open. No lean recorded.
 
-The material consequence: while the switch is on and the scenario has no
-targets, a quiet line of text sits under the chart, and the plot is 32 px
+The material consequence: while the switch is on and the chart draws no
+figure, a quiet line of text sits under the chart, and the plot is 32 px
 shorter.
 
 **Recommendation: one quiet line under the x axis's title, right-aligned,
-naming the reason: fewer than 5 runs, fewer than 5 since the scenario was
-last updated, or a score that depends on more than accuracy. Nothing shows
-when no rank line is drawn.**
+naming the reason: a time-scored scenario, fewer than 5 runs, fewer than 5
+since the scenario was last updated, runs whose scores don't follow their
+accuracy closely enough, or ranks on the chart that would all need more
+than 100%. Nothing shows when no rank line is drawn.**
 
 - **Why say anything.** With no note, the switch looks broken on most click
-  scenarios. The reason also tells the player whether playing more will
+  scenarios. The reason also tells the player whether playing more could
   bring targets.
+- **What the notes claim.** What the app measured, not what the scenario
+  is. The count notes state a minimum, since a fifth run can still
+  disagree. The disagreement note is about the player's scores, since a
+  player who fires differently can get targets on the same scenario.
 - **Why under the axis title.** Beside it, the longest note ran into the
   title on a 1,536 px window. Score vs Time's dates take two lines and push
   its title lower, so the note drops 82 px below the plot and the bottom
@@ -207,8 +241,8 @@ accuracy.
   in the run list's Accuracy column, and on the last lines of the
   [latest-run card](../specs/run_history.md#the-latest-run-card) and the
   [PB card](../specs/run_history.md#the-pb-card).
-- So a player sees their accuracy and a rank's score, never the accuracy the
-  rank needs.
+- So a player sees their accuracy and a rank's score, never the accuracy
+  the rank stands for.
 
 ### The idea
 
@@ -224,11 +258,14 @@ scenarios. AT1 answers that concern from the runs.
 
 Measured on the maintainer's stats folder (9,280 stats files on 2026-10-29)
 at `22894be`, with a read-only survey of the files and, for coverage and the
-mockups, the app's own data code and bundled ladders. A scenario's spread is
-the standard deviation of its runs' scores at 100% over their mean; AT1's
-test, within 2% of the median, is a separate measure.
+mockups, the app's own data code and bundled ladders. The coverage, the
+targets against the runs, the time-scored windows and the minimum were
+measured again on 2026-10-30 (9,284 files) with the app's own data code and
+its time-scored recognition. A scenario's spread is the standard deviation
+of its runs' scores at 100% over their mean; AT1's test, within 2% of the
+median, is a separate measure.
 
-- **On tracking scenarios, score follows accuracy exactly.** Of the 82
+- **On tracking scenarios, score follows accuracy closely.** Of the 82
   scenarios with 8 or more runs and no kills (2,598 runs), score per hit is
   constant within 1% on all 82, and shots within 1% on 78. A run's score
   over its hit accuracy agrees within 1% across runs on 78, within 3% on 3,
@@ -247,22 +284,33 @@ test, within 2% of the median, is a separate measure.
   Controlsphere Viscose, 6,001 both ways). Score equals Damage Done on only
   1,606 of the 2,598; VT EddieTS Intermediate S5 and VT ww5t Intermediate S5
   score 10 points per point of damage.
-- **The minimum,** measured on 246 scenario versions with 8 or more runs,
-  each judged on all its runs and then on every window of consecutive runs:
+- **The minimum,** measured on 271 scenario versions with 8 or more runs
+  that have a score and a hit accuracy above zero, 123 whose runs agree and
+  148 whose runs don't, each judged on all its runs and then on every
+  window of consecutive runs:
 
   | Runs in the window | Disagreeing versions passing on their first runs | Windows failing on agreeing versions |
   |---|---|---|
-  | 2 | 63 of 127 | 0.2% |
-  | 3 | 15 of 127 | 1.4% |
-  | 4 | 10 of 127 | 1.5% |
-  | 5 | 5 of 127 | 2.0% |
+  | 2 | 68 of 148 | 0.2% |
+  | 3 | 15 of 148 | 1.4% |
+  | 4 | 9 of 148 | 1.6% |
+  | 5 | 5 of 148 | 2.0% |
 
+  The read-only survey's parser counted 246 such versions and found the
+  same 15 and 5.
 - **Coverage under AT1,** with the bundled ladders: of 659 ranked scenarios
-  with runs, 90 get targets; 430 have fewer than 5 runs, and 8 more have
-  fewer than 5 since their last update; 131 have 5 or more whose scores
-  depend on more than accuracy. VT Penta Bounce Intermediate S5 is the
-  loosest that passes: its runs spread 2.6%, yet at least 90% of them land
-  within 2% of their median.
+  with runs, 90 get targets; 426 have fewer than 5 runs, and 8 more have
+  fewer than 5 since their last update; 125 have 5 or more that don't
+  agree; and the app recognizes 10 as time-scored. VT Penta Bounce
+  Intermediate S5 is the loosest that passes: its runs spread 2.6%, yet at
+  least 90% of them land within 2% of their median.
+- **Targets against the runs.** Over the 3,437 runs behind the 90 scenarios
+  with targets, a run cleared a rank's target and missed the rank 20 times,
+  on 16 scenarios, and reached a rank under its target 69 times, on 25.
+- **Time-scored versions.** The app recognizes 10, all in bundled ladders,
+  and none has 5 or more runs that pass the test in full. Air CELESTIAL No
+  UFO Medium (37 runs) passes on 2 of its 33 five-run windows, and Air Pure
+  Medium (22 runs) on 1 of 18.
 - **The most-played scenarios with targets,** each rank's target under AT1
   and AT2:
 
@@ -279,13 +327,14 @@ test, within 2% of the median, is a separate measure.
   3,653 at 60.87%, below Lavender (3,700, 61.7%). On VT EddieTS Intermediate
   S5 the PB of 1,020 at 41.09% reached Jade (1,020, 41.1%).
 - **The live copy** (the app with its rank-line code patched, on the
-  maintainer's stats, headless Edge, light and dark, at 2,560 and 1,536 px):
-  the switch starts off and the chart matches today's; turned on, all three
-  chart modes draw the figures; a zoom that leaves a line out of view drops
-  its figure; each of the three notes shows on a real scenario (VT ww5t
-  Intermediate S5, Aimerz+ VAS Easy S1, Air Voltaic Easy) and clears the
-  axis title on Score vs Run, and the longest on Score vs Time too; turning
-  the switch off restores today's chart.
+  maintainer's stats, headless Edge, light and dark, at 2,560 and 1,536 px;
+  it had an earlier wording of three of the notes, and set a 64 px right
+  margin): the switch starts off and the chart matches today's; turned on,
+  all three chart modes draw the figures; a zoom that leaves a line out of
+  view drops its figure; each of the three notes shows on a real scenario
+  (VT ww5t Intermediate S5, Aimerz+ VAS Easy S1, Air Voltaic Easy) and
+  clears the axis title on Score vs Run, and the longest on Score vs Time
+  too; turning the switch off restores today's chart.
 
 ### Not checked
 
@@ -295,9 +344,6 @@ test, within 2% of the median, is a separate measure.
   Edge at 2,560 and 1,536 px.
 - **Screen readers.** The figures and the note are chart text, as the rank
   labels are, and weren't probed.
-- **Time-scored scenarios.** Their score is the time left, not their hits,
-  so their runs are expected to disagree and get the third note; none was
-  checked.
 
 ## Design
 
@@ -306,26 +352,34 @@ test, within 2% of the median, is a separate measure.
 | State | Chart |
 |---|---|
 | Switch off (the default) | Today's chart, unchanged |
-| On, the scenario has targets | Each drawn rank line gets its figure in the right margin, such as `39.2%` beside `Saffron (2350)` |
-| On, no targets | The rank lines as today, and one quiet note under the axis title saying why |
+| On, the scenario has targets | Each drawn rank line whose target is at most 100% gets its figure in the right margin, such as `39.2%` beside `Saffron (2350)` |
+| On, no targets, or every drawn rank's target above 100% | The rank lines as today, and one quiet note under the axis title saying why |
 | On, no rank line drawn | Today's chart, unchanged |
 
 ### The score at 100%
 
+- **Time-scored first:** when `get_pace_basis` gives the scenario a pace
+  basis, it has no score at 100%, whatever its runs. That is the app's
+  existing recognition, and it answers for the version the newest run
+  names, which is the version the runs below come from. Its `None` covers a
+  scenario that isn't time-scored and one the app can't tell about alike,
+  and either goes on to the test.
 - **The runs:** the scenario's runs whose `scenario_hash` matches its newest
   run's, with a hit accuracy above zero and a score above zero. Files with
   no `Hash:` line count as one version.
 - **Each run's figure:** its score over its hit accuracy.
 - **The test:** at least 5 such runs, and at least 90% of their figures
-  within 2% of their median. Passing, the median is the score at 100%.
-- **The reason when it fails:** fewer than 5 runs and no runs of an older
-  version, fewer than 5 runs with runs of an older version, or 5 or more
-  that don't agree.
-- **A time-scored scenario** scores the time left, not its hits, so its runs
-  are expected to disagree and get the third note (not checked).
+  within 2% of their median, counted in whole runs
+  (`10 × agreeing ≥ 9 × runs`): 5 to 9 runs must all agree, 10 to 19 may
+  have one outside, 20 to 29 two, and so on. Passing, the median is the
+  score at 100%.
+- **The reason when there is none,** the first that applies: time-scored;
+  fewer than 5 runs and no runs of an older version; fewer than 5 runs with
+  runs of an older version; 5 or more that don't agree.
 - **Worked out on every chart build,** from the same snapshot of the store
-  the chart's runs come from. Nothing is stored. A run that lands redraws
-  the chart, so the figures and the note follow it.
+  the chart's runs come from, and the pace basis the page's cards and run
+  list already ask for. Nothing is stored. A run that lands redraws the
+  chart, so the figures and the note follow it.
 - **The numbers 5, 2% and 90% are author-owned,** set on the measurements in
   [Verified facts](#verified-facts). The tightest held-fire switching
   scenario passes (VT Ground Intermediate S5, 1.5%), and the click scenarios
@@ -336,30 +390,37 @@ test, within 2% of the median, is a separate measure.
 - `threshold / score at 100% × 100`, rounded up to the next tenth, guarded
   against float noise the way `format_percent` is, and written with one
   decimal and a percent sign.
-- A rank whose target would be above 100% gets no figure: the player's shots
-  can't reach it.
+- A target is an estimate for a run with the median run's shots, not a
+  guarantee (AT1).
+- A rank whose target would be above 100% gets no figure: at the player's
+  usual number of shots no run reaches it, though a run that fires more
+  shots might.
 - Each rank is worked out on its own, so a ladder out of order upstream
   doesn't matter.
 
 ### The figures
 
-- One per drawn rank line, whichever lines the app draws today: the ranks
-  around the plotted scores, or the whole ladder with Show all ranks on. The
-  lines and their labels don't change.
+- One per drawn rank line whose target is at most 100%, whichever lines the
+  app draws today: the ranks around the plotted scores, or the whole ladder
+  with Show all ranks on. The lines and their labels don't change.
 - Placed at the plot's right edge, 6 px out, level with the line, in the
   chart's text color for the theme.
-- The right margin is 64 px while at least one figure is drawn, and Plotly's
-  default otherwise.
+- The chart's margins don't change. The chart sets none of its own and its
+  legend sits above the plot, so the right margin is Plotly's default
+  80 px, which holds the widest figure, `100.0%`. The plot's width never
+  changes with the switch or the scenario.
 - All three chart modes, since they share the rank lines.
 
 ### The note
 
 - Under the x axis's title, right-aligned with the plot, 12 px and slightly
   faded, in the chart's text color.
-- Only while the switch is on, at least one rank line is drawn, and the
-  scenario has no score at 100%. The bottom margin is 112 px then.
-- A scenario that has a score at 100% but no rank under 100% shows neither
-  figures nor a note.
+- Only while the switch is on and at least one rank line is drawn, and
+  either the scenario has no score at 100% or every drawn rank's target is
+  above 100%. The bottom margin is 112 px then.
+- One note at a time: the time-scored note, a count note or the
+  disagreement note by the reason there is no score at 100%, and the
+  above-100% note only when there is one.
 
 ### The switch
 
@@ -384,31 +445,41 @@ function that draws the rank lines.
 Every string this proposal adds. Nothing existing changes.
 
 - The switch: `Accuracy targets`.
-- Its help text: `Shows the accuracy each rank needs beside its line, on
-  scenarios where your score depends only on your accuracy, such as
-  tracking. Needs **Rank thresholds** turned on.` The bold name is built
-  with `control_name()`, as Show all ranks' is.
-- A figure: `{target}%` with one decimal, such as `39.2%` or `40.0%`.
-- The notes:
-  - `Accuracy targets show after 5 runs of this scenario.`
-  - `Accuracy targets show after 5 runs of this scenario since it was last
-    updated.`
-  - `This scenario has no accuracy targets, because its score depends on
-    more than accuracy.`
+- Its help text: `Shows beside each rank line an estimate of the accuracy
+  that reaches it, worked out from your runs on scenarios where your score
+  follows your accuracy, such as tracking. The estimate assumes you fire as
+  many shots as usual. Needs **Rank thresholds** turned on.` The bold name
+  is built with `control_name()`, as Show all ranks' is.
+- A figure: `{target}%` with one decimal, such as `39.2%` or `40.0%`, and
+  no approximation mark (AT2).
+- The notes, in the order the reasons are checked:
+  - `This scenario has no accuracy targets, because it's scored by
+    completion time.`
+  - `Accuracy targets need at least 5 runs of this scenario.`
+  - `Accuracy targets need at least 5 runs of this scenario since it was
+    last updated.`
+  - `This scenario has no accuracy targets, because your scores here don't
+    follow your accuracy closely enough.`
+  - `Every rank on the chart would need more than 100% accuracy at your
+    usual number of shots.`
 
 The notes name no version: the app shows no scenario version anywhere, so
 "since it was last updated" says what changed in the player's words.
+"Scored by completion time" is the phrase Chart options' help text already
+uses for a time-scored scenario.
 
 ### Terms
 
 For [docs/glossary.md](../glossary.md), under Benchmark ranks, after Rank
 overlay:
 
-**Accuracy target.** The hit accuracy a run needs to reach a rank's
-threshold, on a scenario where the player's score depends only on their
-accuracy: the threshold over the score their runs would make at 100%,
-rounded up to a tenth of a percent. Known once at least 5 of the scenario's
-runs since its last update agree on that score, and unknown otherwise.
+**Accuracy target.** An estimate of the hit accuracy at which a run reaches
+a rank's threshold, when it fires as many shots as the player's usual run:
+the threshold over the score the player's runs would make at 100%, rounded
+up to a tenth of a percent. Shown once at least 5 of the scenario's runs
+since its last update agree on that score, and never on a scenario the app
+recognizes as time-scored. A run that fires fewer shots than usual can
+clear it and still miss the rank.
 - On screen: the figure beside a rank line in the chart's right margin,
   while the Accuracy targets switch is on.
 - In code: `accuracy_target`; the score at 100% is `full_accuracy_score`.
@@ -426,6 +497,8 @@ None is superseded.
   gains a switch, its eleventh control.
 - **Applied:** hit accuracy as the game shows it
   ([2026-10-18](../decision_log/2026/2026-10-18-pb-accuracy-shows-hit-accuracy-as-the-game-does.md)),
+  the per-version recognition of time-scored scenarios
+  ([2026-10-05](../decision_log/2026/2026-10-05-time-scored-scenarios-are-measured-by-pace.md)),
   the fixed ids and defaults of remembered controls
   ([2026-10-12](../decision_log/2026/2026-10-12-run-history-keeps-its-own-control-ids-so-every-browser-saw-the-defaults-once.md)),
   and the copy rules
@@ -446,7 +519,10 @@ None is superseded.
   removed.
 - **A list of scenario types,** **the leaderboard's runs** and **a 3-run
   minimum:** under AT1.
-- **Whole percent, nearest rounding, two decimals:** under AT2.
+- **A higher minimum or a tighter test, to make the targets exact:** neither
+  shows how a scenario scores (AT1).
+- **Whole percent, nearest rounding, two decimals, an approximation mark:**
+  under AT2.
 - **In the label, in the rank's color:** under AT3.
 - **A second y axis** with ticks at the thresholds: the same place as the
   margin figures, but it needs its range kept matched to the score axis's
@@ -466,8 +542,8 @@ None is superseded.
   Intermediate S5. It happens today, with or without the figures.
 - **Targets anywhere else:** the run list, the cards, the PB card's next
   rank, the playlist's scenario table.
-- **Click and switching scenarios played without held fire,** which by
-  AT1 get no targets.
+- **Click and switching scenarios played without held fire, and
+  time-scored scenarios,** which by AT1 get no targets.
 
 ## Delivery plan
 
@@ -485,18 +561,22 @@ description.
 
 ## Testing
 
-- **Unit, the score at 100%:** agreeing runs give their median; one run in
-  ten outside 2% still passes, two don't; 4 runs give the first reason, 4
-  since an update with older runs the second, 5 that disagree the third;
-  zero accuracy and zero score are skipped; files with no hash count as one
-  version.
+- **Unit, the score at 100%:** agreeing runs give their median; the
+  whole-run count, where 9 runs pass only if all 9 agree and 10 pass with
+  one outside, not two; 4 runs give the count reason, 4 since an update
+  with older runs the since-update reason, 5 that disagree the
+  disagreement reason; a time-scored version whose 5 runs pass the ratio
+  test still gets none, with the time-scored reason ahead of the others; a
+  pace basis of `None` goes on to the test; zero accuracy and zero score
+  are skipped; files with no hash count as one version.
 - **Unit, the target:** rounding up to the next tenth, an exact tenth kept
   (`40.0`), float noise at a tenth's edge, a target above 100% left out.
 - **Unit, the figure:** switch off adds nothing and leaves the margins
-  alone; on, one figure per drawn rank line and none for undrawn ones, the
-  right margin set; Show all ranks gives every rank one; no score at 100%
-  gives the note with its reason and the bottom margin; no rank line drawn
-  gives neither; each chart mode.
+  alone; on, one figure per drawn rank line whose target is at most 100%
+  and none for the others, the right margin untouched; Show all ranks gives
+  every such rank one; no score at 100% gives the note with its reason and
+  the bottom margin; a score at 100% with every drawn rank above 100% gives
+  the above-100% note; no rank line drawn gives neither; each chart mode.
 - **The callback and panel:** the switch is an Input of the chart rebuild,
   starts off, and persists; Chart options lists it after Show all ranks.
 - **Browser** (headless Edge, then the maintainer's Firefox), both themes, at
