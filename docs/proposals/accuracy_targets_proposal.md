@@ -105,7 +105,8 @@ targets, whatever its runs. Otherwise the scenario has none.**
 
 Status: open. The maintainer's direction, 2026-10-29: "Keep rounding up, but
 also we should have at least 1 decimal of precision. There can be a huge
-difference in saying "50.1%" vs "51%"."
+difference in saying "50.1%" vs "51%"." Their choice, 2026-10-30, between a
+bare figure and one marked `≈`: "Bare, 39.2%".
 
 The material consequence: a run up to 0.1 point under a target can still
 reach its rank, and a target shows one decimal where a run's accuracy shows
