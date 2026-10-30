@@ -66,13 +66,14 @@ targets, whatever its runs. Otherwise the scenario has none.**
   tracking scenarios would miss the first case and wrongly include the
   second, and nothing would keep it current.
 - **What a target assumes.** That the fire button is held for the whole
-  run, as on tracking. Holding it is what keeps a run's shots steady, and
-  the agreement test is how the app checks that the player's runs were
-  played that way, so the assumption changes how a target is described, not
-  how it is worked out. One run can't show that, which is why a single
-  run's ratio isn't used: on a click scenario it would draw a figure that
-  means nothing. A player who clicks at a pace steady enough to pass would
-  get figures for that pace.
+  run, as on tracking. The assumption changes how a target is described,
+  not how it is worked out. Holding the button is what keeps a run's shots
+  steady, and the agreement test checks for steady shots, the nearest the
+  stats file comes to showing held fire. It doesn't prove it: a player who
+  clicks at a pace steady enough to pass gets figures for that pace. One
+  run can't show steady shots at all, which is why a single run's ratio
+  isn't used: on a click scenario it would draw a figure that means
+  nothing.
 - **What a target promises.** Runs that agree show that the player's score
   at 100% held within about 2%, not that the scenario scores by hits alone,
   so a target is an estimate. Shots vary a little even with the button
@@ -205,8 +206,8 @@ shorter.
 **Recommendation: one quiet line under the x axis's title, right-aligned,
 naming the reason: a time-scored scenario, fewer than 5 runs, fewer than 5
 since the scenario was last updated, runs whose scores don't follow their
-accuracy closely enough, or ranks on the chart that would all need more
-than 100%. Nothing shows when no rank line is drawn.**
+accuracy closely enough, or every rank on the chart estimated above 100%.
+Nothing shows when no rank line is drawn.**
 
 - **Why say anything.** With no note, the switch looks broken on most click
   scenarios. The reason also tells the player whether playing more could
@@ -406,9 +407,11 @@ median, is a separate measure.
   decimal and a percent sign.
 - A target is an estimate for a run with the median run's shots, not a
   guarantee (AT1).
-- A rank whose target would be above 100% gets no figure: holding the fire
-  button for the whole run fires the most shots a run can, so even then
-  the rank would need more hits than shots.
+- A rank whose target would be above 100% gets no figure. That says the
+  rank is out of reach at the median run's shots, not that no run can
+  reach it: shots vary a little even with the button held, so a run that
+  fires more than the median can reach a rank estimated a little above
+  100%, and may already have.
 - Each rank is worked out on its own, so a ladder out of order upstream
   doesn't matter.
 
@@ -474,8 +477,7 @@ Every string this proposal adds. Nothing existing changes.
     last updated.`
   - `This scenario has no accuracy targets, because your scores here don't
     follow your accuracy closely enough.`
-  - `Every rank on the chart would need more than 100% accuracy, even with
-    the fire button held for the whole run.`
+  - `Every rank on the chart has an estimated accuracy target above 100%.`
 
 The notes name no version: the app shows no scenario version anywhere, so
 "since it was last updated" says what changed in the player's words.
@@ -488,13 +490,14 @@ than Mouse 1, since the game lets a player rebind it.
 For [docs/glossary.md](../glossary.md), under Benchmark ranks, after Rank
 overlay:
 
-**Accuracy target.** An estimate of the hit accuracy a rank's threshold
-needs when the fire button is held for the whole run: the threshold over the
-score the player's runs would make at 100%, rounded up to a tenth of a
-percent. Shown once at least 5 of the scenario's runs since its last update
-agree on that score, and never on a scenario the app recognizes as
-time-scored. Shots vary a little even with the button held, so a run can
-clear it and still miss the rank.
+**Accuracy target.** An estimate of the hit accuracy a run needs to reach a
+rank's threshold when the fire button is held for the whole run: the
+threshold over the score the player's runs would make at 100%, rounded up
+to a tenth of a percent. Shown once at least 5 of the scenario's runs since
+its last update agree on that score, and never on a scenario the app
+recognizes as time-scored. Shots vary a little even with the button held,
+so a run can clear it and still miss the rank, or reach a rank estimated
+above 100%.
 - On screen: the figure beside a rank line in the chart's right margin,
   while the Accuracy targets switch is on.
 - In code: `accuracy_target`; the score at 100% is `full_accuracy_score`.
@@ -557,8 +560,10 @@ None is superseded.
   Intermediate S5. It happens today, with or without the figures.
 - **Targets anywhere else:** the run list, the cards, the PB card's next
   rank, the playlist's scenario table.
-- **Click and switching scenarios played without held fire, and
-  time-scored scenarios,** which by AT1 get no targets.
+- **Held-fire targets for scenarios played without held fire.** A click or
+  switching scenario whose runs don't agree gets no targets, and one whose
+  runs agree at a steady clicking pace gets figures for that pace (AT1).
+- **Time-scored scenarios,** which by AT1 get no targets.
 
 ## Delivery plan
 
@@ -592,6 +597,10 @@ description.
   every such rank one; no score at 100% gives the note with its reason and
   the bottom margin; a score at 100% with every drawn rank above 100% gives
   the above-100% note; no rank line drawn gives neither; each chart mode.
+  An acceptance example for the above-100% note: five runs at 100% scoring
+  990, 995, 1,000, 1,005 and 1,010 pass the test with a median of 1,000,
+  and a one-rank ladder at 1,005 gets no figure and the note, which claims
+  only an estimate, though two of the runs reached the rank.
 - **The callback and panel:** the switch is an Input of the chart rebuild,
   starts off, and persists; Chart options lists it after Show all ranks.
 - **Browser** (headless Edge, then the maintainer's Firefox), both themes, at
