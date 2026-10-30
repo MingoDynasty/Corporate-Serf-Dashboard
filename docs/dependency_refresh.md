@@ -94,9 +94,9 @@ its own steps, in [Moving Python](#moving-python).
    steps, as its own commit.
 
 6. Audit the lock. `uv audit` checks every locked package against the OSV
-   vulnerability database. It reads the default groups only, so the
-   screenshots group takes a second run. Both must report no known
-   vulnerabilities; a finding exits 1. The upgrade usually takes the fix
+   vulnerability database, the dev and screenshots groups included: unlike
+   `uv sync`, it audits every dependency group by default. It must report no
+   known vulnerabilities; a finding exits 1. The upgrade usually takes the fix
    already. A finding with no fixed release goes in the PR body, with whether
    the app reaches the vulnerable code. `uv audit` is experimental in uv 0.13,
    and the preview flag only silences its warning. Dependabot's alerts are no
@@ -105,7 +105,6 @@ its own steps, in [Moving Python](#moving-python).
 
    ```powershell
    uv audit --locked --preview-features audit-command
-   uv audit --locked --only-group screenshots --preview-features audit-command
    ```
 
 7. Verify by what moved, then open the PR.
