@@ -196,6 +196,9 @@ benchmark tier) — see the
   stops the chain outright, but is still reported by the foreground lookup the
   same run event triggers, not by the chain
   ([2026-08-03](../decision_log/2026/2026-08-03-background-rank-diagnostics-are-console-only.md)).
+- A lookup KovaaK's rejects with an HTTP 4xx status other than 429 also stops
+  the chain, with a warning in the log. Connection errors, timeouts, HTTP 429
+  and 5xx statuses are retried at the chain's next step.
 
 ## Failure handling
 

@@ -442,6 +442,72 @@ def test_transient_fetch_error_retries(monkeypatch):
     assert fetch_results == []
 
 
+def _http_error(status_code: int) -> Exception:
+    response = api_service.requests.Response()
+    response.status_code = status_code
+    return api_service.requests.HTTPError(f"{status_code} Error", response=response)
+
+
+def _fail_one_step_with(monkeypatch, failing_step: str, status_code: int) -> None:
+    """Make one network step of an attempt raise an HTTP error."""
+
+    def fail(*_args):
+        raise _http_error(status_code)
+
+    monkeypatch.setattr(
+        api_service, "resolve_leaderboard_id", lambda *_args: LEADERBOARD_ID
+    )
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", lambda *_args: _unranked())
+    monkeypatch.setattr(api_service, failing_step, fail)
+
+
+@pytest.mark.parametrize(
+    "failing_step", ["resolve_leaderboard_id", "fetch_scenario_rank"]
+)
+@pytest.mark.parametrize("status_code", [400, 404])
+def test_a_rejected_request_stops_the_chain_with_a_warning(
+    monkeypatch, caplog, failing_step, status_code
+):
+    """A refused request gets the same answer on every retry.
+
+    Seen live: a search for an empty scenario name, answered 400 five times.
+    """
+    _fail_one_step_with(monkeypatch, failing_step, status_code)
+    monkeypatch.setattr(
+        api_service,
+        "_schedule_attempt",
+        lambda *_args, **_kwargs: pytest.fail("must not retry"),
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)
+
+    assert (
+        f'Rank refresh stopped for "{SCENARIO_NAME}": {status_code} Error'
+        in caplog.text
+    )
+
+
+@pytest.mark.parametrize(
+    "failing_step", ["resolve_leaderboard_id", "fetch_scenario_rank"]
+)
+@pytest.mark.parametrize("status_code", [429, 500, 503])
+def test_a_rate_limit_or_server_error_still_retries(
+    monkeypatch, failing_step, status_code
+):
+    _fail_one_step_with(monkeypatch, failing_step, status_code)
+    scheduled_indexes: list[int] = []
+    monkeypatch.setattr(
+        api_service,
+        "_schedule_attempt",
+        lambda *args: scheduled_indexes.append(args[-1]),
+    )
+
+    api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)
+
+    assert scheduled_indexes == [1]
+
+
 def test_unresolved_leaderboard_is_warning_only(monkeypatch, caplog):
     monkeypatch.setattr(
         api_service,
