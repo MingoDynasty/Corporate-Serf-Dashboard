@@ -373,7 +373,9 @@ Checked against `main` at `22894be` and the maintainer's stats folder on
   in one session." (`below_minimum_text`).
 - The app tells whether a version of a scenario is time-scored from its
   performance files. `get_version_pace_basis` answers for one version, and
-  `get_pace_basis` for the version of the scenario's newest run. The
+  `get_pace_basis` for the version of the scenario's newest run. Both
+  answer `None` alike for a version that isn't time-scored and for one they
+  can't tell about, such as a version with no performance file. The
   constant `C` gives a completion time `C − s`. `eligible_pace_constant`
   gives it only when every run compared is of the version it was read from,
   which is how the latest-run card measures a run against its typical.
@@ -493,13 +495,15 @@ today.
   latest typical run used.
 - **By Bot's kind.** *One kill per bot* when every bot the kill table names
   has exactly one kill row. It is *time-scored* when the run's own version
-  has a pace basis, and *phases* otherwise. *Many kills per bot* when any
-  bot has two kill rows or more, even if another bot has only one. A run of
-  one kill per bot on a version the app can't tell is time-scored reads as
-  phases and shows accuracy alone. That covers every version played only
-  before KovaaK's 3.9.0, which brought the performance files. Without the
-  basis, a bot's split can't be told from a phase's fixed length, so no time
-  is shown rather than a time that may mean nothing.
+  has a pace basis, and *accuracy only* otherwise. *Many kills per bot* when
+  any bot has two kill rows or more, even if another bot has only one. No
+  basis covers two cases `get_version_pace_basis` answers alike: a version
+  known not to be time-scored, such as PGT's, and one the app can't tell
+  about, such as any version played only before KovaaK's 3.9.0, which
+  brought the performance files. In neither does the app know what a bot's
+  time measures, a phase's fixed length or a split, so no time is shown
+  rather than one that may mean nothing. The subtitle says when a one-kill
+  bot's time is shown, not which case the run is.
 - **Per bot.** For each bot named in the run's kill table: its kills; its
   accuracy, its kill rows' hits over their shots; its time, the sum of its
   kills' gaps since the kill before, the first kill's from Challenge Start;
@@ -568,7 +572,7 @@ column headers take Title Case, and everything else sentence case.
 | By Bot heading | `By Bot` |
 | By Bot subtitle, many kills | `Each kill's time runs from the kill before it, so it includes finding the bot.` |
 | By Bot subtitle, time-scored | `Each bot is one kill, in a set order, so these are the run's splits. A kill's time runs from the kill before it.` |
-| By Bot subtitle, phases | `Each bot is one timed phase of the run, so accuracy is what tells them apart.` |
+| By Bot subtitle, accuracy only | `Each bot is one kill, so its time is shown only when the app knows this run was scored by completion time.` |
 | By Bot subtitle, added in play order | `Listed in the order the run plays them.` |
 | By Bot subtitle, added with typical runs | `Typical is each bot's median over your typical runs. Difference is this run minus typical, in percentage points (pts) for accuracy.` |
 | By Bot line, no start time | `Times aren't shown because this run's file has no start time.` |
@@ -661,6 +665,10 @@ is unknown.
   player to the list's Columns menu.
 - **One By Bot table shape for every scenario.** It would show Kills of 1
   and a time per kill that never changes on PGT and Air.
+- **A phases subtitle where a version is known not to be time-scored.** The
+  time-scored service tells that case apart only internally, and a scenario
+  that isn't time-scored still needn't play each bot as a fixed-length
+  phase (RV4).
 - **A lead line naming the bot this run lost the most on,** with its row
   tinted (v7 to v12). No ranking of the bots says where the score went
   (RV4).
@@ -773,7 +781,8 @@ it needs no new reader.
   Intermediate S5, SmoothBot Perfected, VT PGT Intermediate S5, Air
   CELESTIAL No UFO Medium, VoxTS Click Medium and RawControlSphere.
 - **PR 3.** The three kinds on built files, also a many-kills run where one
-  bot has one kill and a one-kill run on a version with no pace basis. The
+  bot has one kill and a one-kill run on a version with no pace basis,
+  which shows accuracy alone under the accuracy-only subtitle. The
   default orders, each header's three sort states by click and by key, and
   the three unknown-times lines.
 - **Every PR.** The standard gates in AGENTS.md, and an instance of the
