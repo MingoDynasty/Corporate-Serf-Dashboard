@@ -182,7 +182,7 @@ when each bot is one kill of any other run. The figure and accuracy each
 show This Run, Typical and Difference. A bot's times show only when every
 gap behind them is known. Rows start in play order where each bot is one
 kill, and in name order otherwise. Each header sorts ascending, then
-descending, then back.**
+descending, then back, on a click or on Enter while it has focus.**
 
 - **Reach.** 175 of the 866 scenarios the maintainer ever played name two
   bots or more (20%). Of the 54 played in the last 90 days with 10 runs or
@@ -774,7 +774,7 @@ it needs no new reader.
   CELESTIAL No UFO Medium, VoxTS Click Medium and RawControlSphere.
 - **PR 3.** The three kinds on built files, also a many-kills run where one
   bot has one kill and a one-kill run on a version with no pace basis. The
-  default orders, each header's three sort states, and the three
-  unknown-times lines.
+  default orders, each header's three sort states by click and by key, and
+  the three unknown-times lines.
 - **Every PR.** The standard gates in AGENTS.md, and an instance of the
   build for the maintainer, as AGENTS.md describes.
