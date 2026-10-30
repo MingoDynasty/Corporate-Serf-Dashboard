@@ -93,7 +93,21 @@ its own steps, in [Moving Python](#moving-python).
    upstream project's latest release. To update one, follow that README's
    steps, as its own commit.
 
-6. Verify by what moved, then open the PR.
+6. Audit the lock. `uv audit` checks every locked package against the OSV
+   vulnerability database, the dev and screenshots groups included: unlike
+   `uv sync`, it audits every dependency group by default. It must report no
+   known vulnerabilities; a finding exits 1. The upgrade usually takes the fix
+   already. A finding with no fixed release goes in the PR body, with whether
+   the app reaches the vulnerable code. `uv audit` is experimental in uv 0.13,
+   and the preview flag only silences its warning. Dependabot's alerts are no
+   substitute while they are stale (see
+   [A security alert between refreshes](#a-security-alert-between-refreshes)).
+
+   ```powershell
+   uv audit --locked --preview-features audit-command
+   ```
+
+7. Verify by what moved, then open the PR.
 
 ## Toolchain pass
 
@@ -323,7 +337,8 @@ the PR body. Lift the cap in a later refresh, once the breakage is gone.
 
 - Title it `chore(deps): ...`, with one commit per step.
 - In the body, list what moved (the dry-run output), what was held back and
-  why, which toolchain pins moved, and what the live check covered.
+  why, which toolchain pins moved, what `uv audit` reported, and what the live
+  check covered.
 - Say whether merging cuts a release. A change to `uv.lock`, `pyproject.toml`,
   or anything under `assets/` does. A change to `.github/` or
   `.pre-commit-config.yaml` alone does not.
@@ -343,6 +358,19 @@ uv sync
 ```
 
 Verify the fix by what moved, the same as a refresh.
+
+Dependabot reads the lock only on a Python version it supports, and since the
+move to Python 3.15 on 2026-10-12 it has not
+([dependabot/dependabot-core#16524](https://github.com/dependabot/dependabot-core/issues/16524)).
+The `update-uv-graph` job of every Dependency Graph run on `main` since then
+has failed with `tool_version_not_supported`. Until one passes, the alerts
+describe the last lock Dependabot read, on 2026-10-12: they can name a version
+`main` no longer locks, and they miss any vulnerability in a version it locks
+now. Check an alert's version against `uv.lock` before acting on it, and run
+the audit in [package pass](#package-pass) step 6 to see what the current lock
+holds. Nothing checks the lock between refreshes in the meantime. The
+[tech-debt entry](tech_debt.md#dependabot-cant-read-the-lock-on-python-315)
+says what to do once Dependabot supports the project's Python again.
 
 ## Moving Python
 
@@ -456,6 +484,13 @@ release that lists it, and a wheel for every package that ships to users.
    release job. Then launch an installed copy once: it must print
    `Updated to <tag>.` A release that fails to start leaves the copy on its
    previous version ([Updating](specs/release_and_install.md#updating)).
+   Dependabot did not run either: after the merge, check that the Dependency
+   Graph run on `main` passes. Dependabot reads the lock only on a Python
+   version it supports, and while that run fails its alerts stop following
+   the lock, as
+   [A security alert between refreshes](#a-security-alert-between-refreshes)
+   describes. If it fails, say so in a tech-debt entry and lean on `uv audit`
+   until it catches up.
 
 Title the PR `chore: move Python to <version>`. In the body, say which
 packages build from source, what the new version changes for this app and

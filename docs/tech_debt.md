@@ -116,6 +116,21 @@ which makes the false pass look convincing.
 Revisit when the tooling spec is next opened; changing it was out of scope for
 the release-job PR that surfaced it.
 
+### Dependabot can't read the lock on Python 3.15
+
+Dependabot's uv support stops at Python 3.14, so every Dependency Graph run on
+`main` since the Python 3.15 move (2026-10-12, PR #368) has failed with
+`tool_version_not_supported`, and its alerts still describe that day's lock.
+As of 2026-10-30, every open alert names a version from it (certifi
+2026.7.22, filelock 4.1.1, setuptools 84.0.0 and virtualenv 21.14.7), and
+`main` locks a fixed release of each. Tracked upstream as
+[dependabot/dependabot-core#16524](https://github.com/dependabot/dependabot-core/issues/16524).
+Until it ships, the `uv audit` step in each refresh is the only check of the
+current lock. Once a Dependency Graph run on `main` passes, drop the paragraph
+about this from
+[the playbook's security section](dependency_refresh.md#a-security-alert-between-refreshes),
+and confirm the stale alerts closed.
+
 ### Single-command local quality gate
 
 CI enforces four of the five standard checks (ruff format, ruff lint, mypy,
