@@ -266,7 +266,8 @@ stats file doesn't have reads `Not recorded` and is never marked.**
   Recorded.
 - **Why in the card.** The mark and the typical value sit where the eye
   already is. v8 to v11 also put a notice under the tiles; this row drops
-  it. At 2560 by 1320 the cards are on screen without scrolling in every
+  it. On the v12 mockup, before the cuts, which can only shorten the page:
+  at 2560 by 1320 the cards are on screen without scrolling in every
   mocked state. At 1920 by 960 their second row is cut off on the three
   multi-bot scenarios, and on Air all of Settings is below the fold.
 - **`Not recorded`.** The 570 runs from 2019-07-14 to 2021-07-20 have no
