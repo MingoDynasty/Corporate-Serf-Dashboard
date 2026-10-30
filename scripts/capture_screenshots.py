@@ -392,7 +392,9 @@ def capture(origin: str, destination: Path) -> None:
         page = context.new_page()
         page.clock.set_fixed_time(NOW.replace(tzinfo=UTC))
         page.set_default_timeout(30000)
-        # Dash's first-load Pages race clears on reload (AGENTS.md).
+        # Errors are collected from the reload only. The first load once lost
+        # Dash's first-request pages race, fixed in dash 4.5.0 (decision log,
+        # 2026-10-29).
         page.goto(
             origin
             + "/run-history?"

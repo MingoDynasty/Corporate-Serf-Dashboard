@@ -116,7 +116,8 @@ def hover_page(hover_browser, hover_server):
     page = context.new_page()
     page.on("pageerror", lambda error: print("BROWSER ERROR:", error))
     page.goto(hover_server + "/run-history?scenario=Hover%20sample")
-    # The known first-load Dash pages race heals on reload.
+    # The reload dates from Dash's first-request pages race, fixed in dash
+    # 4.5.0 (decision log, 2026-10-29).
     page.reload()
     wait_for_history(page)
     yield page

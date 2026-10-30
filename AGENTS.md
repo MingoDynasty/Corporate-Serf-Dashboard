@@ -94,13 +94,6 @@ Codex <codex@local>
   Start it after the last push, and restart it after every later one: it has
   no reloader, and `/health` reports the commit it started on. Stop it when
   the maintainer says they are done, or when the pull request merges.
-- On the **first** page load after a server start, the browser console shows a
-  `handleClientside` "Cannot read properties of undefined (reading 'apply')"
-  error and a flood of "ID not found in layout" entries. This is a known
-  upstream Dash race, not app code — it self-heals on reload. Reload before
-  judging console cleanliness, and don't attribute it to whatever you just
-  changed. Details in `docs/decision_log/` (the 2026-07-18 pages-race
-  entry).
 - Both playlist grids log an AG Grid "invalid gridOptions property
   'columnSizeOptions'" warning on every mount. This is benign dash-ag-grid
   wrapper noise, still present on 35.3.0, not app code — don't drop the prop

@@ -1,6 +1,8 @@
 # 2026-07-18: Accept Dash's First-Request Pages Race Instead of Warming the App
 
-Status: Accepted
+Status: Superseded by the
+[2026-10-29 entry](2026-10-29-dash-4-5-0-fixes-the-first-request-pages-race.md):
+dash 4.5.0 fixed the race upstream, and the app requires that version
 
 Decision: The browser-console noise on the first page load after a server
 start — a `TypeError: Cannot read properties of undefined (reading 'apply')`

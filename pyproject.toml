@@ -12,7 +12,7 @@ license = "AGPL-3.0-or-later"
 # that could not import at all. Refresh them opportunistically during an
 # upgrade rather than treating it as a per-bump chore.
 dependencies = [
-    "dash>=4.4.1",
+    "dash>=4.5.0",
     "dash-ag-grid>=35.3.0",
     "dash-extensions>=2.0.6",
     "dash-mantine-components>=2.8.1",
@@ -22,7 +22,7 @@ dependencies = [
     # Lift this cap when 3.1 stubs ship and both can be validated together.
     "pandas>=3.0.6,<3.1",
     "plotly>=7.1.0",
-    "pydantic>=2.14.1",
+    "pydantic>=2.14.2",
     "requests>=2.34.2",
     "scipy>=1.18.1",
     "sortedcontainers>=2.4.0",
@@ -34,11 +34,11 @@ dependencies = [
 #test = "scripts.test:main"
 
 [build-system]
-requires = ["uv_build>=0.13.5,<0.14.0"]
+requires = ["uv_build>=0.13.6,<0.14.0"]
 build-backend = "uv_build"
 
 [tool.uv]
-required-version = "==0.13.5"
+required-version = "==0.13.6"
 
 [tool.uv.build-backend]
 module-root = ""
@@ -107,19 +107,19 @@ patch = ["subprocess"]
 
 [dependency-groups]
 dev = [
-    "datamodel-code-generator>=0.86.0",
+    "datamodel-code-generator>=0.87.0",
     "markdown-it-py>=4.2.0",
-    "mypy>=2.4.0",
+    "mypy>=2.4.1",
     # Compatible-release pin rather than a floor: stubs describe a specific
     # pandas major/minor, so bump this in step with pandas itself.
     "pandas-stubs~=3.0.5",
     "pre-commit>=4.7.0",
-    "pytest>=9.1.1",
+    "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
-    "ruff>=0.17.2",
+    "ruff>=0.17.3",
     "scipy-stubs>=1.18.1.1",
 ]
 screenshots = [
     "freezegun>=1.5.5",
-    "playwright>=1.64.0",
+    "playwright>=1.64.1",
 ]
