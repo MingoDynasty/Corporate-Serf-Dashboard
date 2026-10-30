@@ -10,8 +10,8 @@ amount, so each rank threshold on the chart stands for an accuracy too, but
 the chart shows only the score. This proposal adds an Accuracy targets
 switch to Chart options, off to start, that writes each rank's accuracy
 target in the chart's right margin beside its line, such as 39.2% beside
-Saffron (2350). A target is an estimate from the player's own runs of the
-accuracy at which a run with their usual number of shots reaches the rank.
+Saffron (2350). A target is an estimate, from the player's own runs, of the
+accuracy a rank needs when the fire button is held for the whole run.
 It shows only where those runs agree that the score follows accuracy, as
 they do on tracking, and the chart says why when a scenario gets none.
 
@@ -31,11 +31,13 @@ row, and anything in [Design](#design), which is author-owned.
 ### AT1. Targets are estimated from the player's own runs, where at least 5 agree
 
 Status: open. The maintainer's choice of source, 2026-10-30, between the
-player's own runs and the leaderboard's: "Yes, own runs". The 5-run minimum,
-the agreement test and the time-scored exclusion are the author's.
+player's own runs and the leaderboard's: "Yes, own runs". Their direction,
+2026-10-30, on what a target assumes: "I think we should simplify this and
+assume that Mouse 1 is held for the duration of the run." The 5-run
+minimum, the agreement test and the time-scored exclusion are the author's.
 
-The material consequence: a target is an estimate for a run with the
-player's usual number of shots, not a guarantee, and a scenario shows
+The material consequence: a target is an estimate for a run with the fire
+button held throughout, not a guarantee, and a scenario shows
 targets only after 5 runs since its last update, never on one whose runs
 disagree, and never on a time-scored one. On the maintainer's stats, 90 of
 the 659 ranked scenarios they have played get targets, 434 have fewer than
@@ -47,8 +49,8 @@ update. A run's score over its hit accuracy is the score it would have made
 at 100% with the same shots. When at least 5 runs have a hit accuracy above
 zero, and at least 90% of them land within 2% of their median, that median
 is the scenario's score at 100%, and a rank's target is its threshold over
-it: an estimate of the accuracy at which a run with the usual number of
-shots reaches the rank. A version the app recognizes as time-scored has no
+it: an estimate of the accuracy the rank needs when the fire button is held
+for the whole run. A version the app recognizes as time-scored has no
 targets, whatever its runs. Otherwise the scenario has none.**
 
 - **Why the player's runs, and not a list of scenario types.** Whether a
@@ -61,10 +63,19 @@ targets, whatever its runs. Otherwise the scenario has none.**
   their runs disagree and they get none, which is right for them. A list of
   tracking scenarios would miss the first case and wrongly include the
   second, and nothing would keep it current.
+- **What a target assumes.** That the fire button is held for the whole
+  run, as on tracking. Holding it is what keeps a run's shots steady, and
+  the agreement test is how the app checks that the player's runs were
+  played that way, so the assumption changes how a target is described, not
+  how it is worked out. One run can't show that, which is why a single
+  run's ratio isn't used: on a click scenario it would draw a figure that
+  means nothing. A player who clicks at a pace steady enough to pass would
+  get figures for that pace.
 - **What a target promises.** Runs that agree show that the player's score
   at 100% held within about 2%, not that the scenario scores by hits alone,
-  so a target is an estimate. A run that fires fewer shots than usual needs
-  more accuracy than its target, and one that fires more needs less. On the
+  so a target is an estimate. Shots vary a little even with the button
+  held: a run that fires fewer than the median run needs more accuracy than
+  its target, and one that fires more needs less. On the
   maintainer's 90 scenarios with targets, a run cleared a rank's target and
   missed the rank 20 times, on 16 scenarios, such as a VT Snake Track
   Intermediate S5 run at 41.75% that scored 2,485 against Gold's 2,500 and
@@ -116,7 +127,7 @@ two.
 always with one decimal: Saffron's 39.16% reads 39.2%, and an exact 40%
 reads 40.0%.**
 
-- **Why up.** A run with the usual number of shots that reaches the figure
+- **Why up.** A run with the median run's shots that reaches the figure
   reaches the rank, where a figure rounded down could leave it a little
   short. The first mockup's whole percent, also rounded up, read 42% for
   Jade on VT EddieTS Intermediate S5, where the PB reached Jade at 41.09%. A
@@ -393,9 +404,9 @@ median, is a separate measure.
   decimal and a percent sign.
 - A target is an estimate for a run with the median run's shots, not a
   guarantee (AT1).
-- A rank whose target would be above 100% gets no figure: at the player's
-  usual number of shots no run reaches it, though a run that fires more
-  shots might.
+- A rank whose target would be above 100% gets no figure: holding the fire
+  button for the whole run fires the most shots a run can, so even then
+  the rank would need more hits than shots.
 - Each rank is worked out on its own, so a ladder out of order upstream
   doesn't matter.
 
@@ -447,10 +458,10 @@ Every string this proposal adds. Nothing existing changes.
 
 - The switch: `Accuracy targets`.
 - Its help text: `Shows beside each rank line an estimate of the accuracy
-  that reaches it, worked out from your runs on scenarios where your score
-  follows your accuracy, such as tracking. The estimate assumes you fire as
-  many shots as usual. Needs **Rank thresholds** turned on.` The bold name
-  is built with `control_name()`, as Show all ranks' is.
+  that rank needs when you hold the fire button for the whole run. It's
+  worked out from your runs, on scenarios where your score follows your
+  accuracy, such as tracking. Needs **Rank thresholds** turned on.` The
+  bold name is built with `control_name()`, as Show all ranks' is.
 - A figure: `{target}%` with one decimal, such as `39.2%` or `40.0%`, and
   no approximation mark (AT2).
 - The notes, in the order the reasons are checked:
@@ -461,25 +472,26 @@ Every string this proposal adds. Nothing existing changes.
     last updated.`
   - `This scenario has no accuracy targets, because your scores here don't
     follow your accuracy closely enough.`
-  - `Every rank on the chart would need more than 100% accuracy at your
-    usual number of shots.`
+  - `Every rank on the chart would need more than 100% accuracy, even with
+    the fire button held for the whole run.`
 
 The notes name no version: the app shows no scenario version anywhere, so
 "since it was last updated" says what changed in the player's words.
 "Scored by completion time" is the phrase Chart options' help text already
-uses for a time-scored scenario.
+uses for a time-scored scenario. The copy says "the fire button" rather
+than Mouse 1, since the game lets a player rebind it.
 
 ### Terms
 
 For [docs/glossary.md](../glossary.md), under Benchmark ranks, after Rank
 overlay:
 
-**Accuracy target.** An estimate of the hit accuracy at which a run reaches
-a rank's threshold, when it fires as many shots as the player's usual run:
-the threshold over the score the player's runs would make at 100%, rounded
-up to a tenth of a percent. Shown once at least 5 of the scenario's runs
-since its last update agree on that score, and never on a scenario the app
-recognizes as time-scored. A run that fires fewer shots than usual can
+**Accuracy target.** An estimate of the hit accuracy a rank's threshold
+needs when the fire button is held for the whole run: the threshold over the
+score the player's runs would make at 100%, rounded up to a tenth of a
+percent. Shown once at least 5 of the scenario's runs since its last update
+agree on that score, and never on a scenario the app recognizes as
+time-scored. Shots vary a little even with the button held, so a run can
 clear it and still miss the rank.
 - On screen: the figure beside a rank line in the chart's right margin,
   while the Accuracy targets switch is on.
