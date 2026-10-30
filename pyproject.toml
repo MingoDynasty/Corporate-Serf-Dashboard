@@ -18,9 +18,7 @@ dependencies = [
     "dash-mantine-components>=2.8.1",
     "flask>=3.1.3",
     "numpy>=2.5.4",
-    # Keep pandas on the major/minor described by the available pandas-stubs.
-    # Lift this cap when 3.1 stubs ship and both can be validated together.
-    "pandas>=3.0.6,<3.1",
+    "pandas>=3.1.0",
     "plotly>=7.1.0",
     "pydantic>=2.14.2",
     "requests>=2.34.2",
@@ -112,7 +110,7 @@ dev = [
     "mypy>=2.4.1",
     # Compatible-release pin rather than a floor: stubs describe a specific
     # pandas major/minor, so bump this in step with pandas itself.
-    "pandas-stubs~=3.0.5",
+    "pandas-stubs~=3.1.0",
     "pre-commit>=4.7.0",
     "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
