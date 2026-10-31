@@ -17,21 +17,24 @@ they do on tracking, and the chart says why when a scenario gets none.
 
 ## Decisions needed
 
-Six rows, AT1 to AT6. **Nothing is ratified.** AT2 to AT4 carry the
+Six rulings, AT1 to AT6. The maintainer ratified this proposal on
+2026-10-30: "I ratify". That settles each row as its recommendation, AT1,
+AT3 and AT5 as amended in review. Before that, AT2 to AT4 carried the
 maintainer's direction from the design discussion of 2026-10-29 and
 2026-10-30, worked out on two versions of a live copy of the app run on
 their own stats. A third version, built while this proposal was written,
-adds AT5's note and AT1's 5-run minimum. AT1's source of the targets is the
-maintainer's choice of 2026-10-30. The rest of AT1, and AT5 and AT6, are the
-author's recommendations, which the maintainer saw listed before asking for
-this proposal, with a 3-run minimum that the measurements here raised to 5.
-A direction or a choice is not a ruling, and reviewers may challenge any
-row, and anything in [Design](#design), which is author-owned.
+added AT5's note and AT1's 5-run minimum. AT1's source of the targets was
+the maintainer's choice of 2026-10-30. The rest of AT1, and AT5 and AT6,
+were the author's recommendations, which the maintainer saw listed before
+asking for this proposal, with a 3-run minimum that the measurements here
+raised to 5. Each row keeps what was said, for the record. Everything else
+is author-owned, in [Design](#design), and the ratification covers it too.
 
 ### AT1. Targets are estimated from the player's own runs, where at least 5 agree
 
-Status: open. The maintainer's choice of source, 2026-10-30, between the
-player's own runs and the leaderboard's: "Yes, own runs". Their direction,
+Status: Ratified (user), 2026-10-30: accept the recommendation below, as
+amended in review. Before that, the maintainer's choice of source,
+2026-10-30, between the player's own runs and the leaderboard's: "Yes, own runs". Their direction,
 2026-10-30, on what a target assumes: "I think we should simplify this and
 assume that Mouse 1 is held for the duration of the run." Their choice, the
 same day, between keeping the agreement test and a rule with none: "Keep the
@@ -117,7 +120,8 @@ targets, whatever its runs. Otherwise the scenario has none.**
 
 ### AT2. Targets show a tenth of a percent, rounded up
 
-Status: open. The maintainer's direction, 2026-10-29: "Keep rounding up, but
+Status: Ratified (user), 2026-10-30: accept the recommendation below.
+Before that, the maintainer's direction, 2026-10-29: "Keep rounding up, but
 also we should have at least 1 decimal of precision. There can be a huge
 difference in saying "50.1%" vs "51%"." Their choice, 2026-10-30, between a
 bare figure and one marked `≈`: "Bare, 39.2%".
@@ -148,8 +152,9 @@ reads 40.0%.**
 
 ### AT3. The figures sit in the chart's right margin
 
-Status: open. The maintainer's choice, 2026-10-30, between the two
-placements of the second mockup: "Right margin".
+Status: Ratified (user), 2026-10-30: accept the recommendation below, as
+amended in review. Before that, the maintainer's choice, 2026-10-30,
+between the two placements of the second mockup: "Right margin".
 
 The material consequence: a figure is read across from its line's label
 rather than inside it. The plot keeps its width, since the figures sit in
@@ -171,7 +176,8 @@ The line's label and the chart's margins are unchanged.**
 
 ### AT4. An Accuracy targets switch in Chart options, off to start
 
-Status: open. The maintainer's direction, 2026-10-29: "Accuracy Thresholds
+Status: Ratified (user), 2026-10-30: accept the recommendation below.
+Before that, the maintainer's direction, 2026-10-29: "Accuracy Thresholds
 should not show by default; it should be toggle-able via a setting. In most
 cases it's something I would toggle a few times just to gauge the numbers,
 but probably not something I would leave on all the time, mostly because of
@@ -197,7 +203,8 @@ off the chart is exactly as it is today.**
 
 ### AT5. With the switch on, a chart with no figures says why
 
-Status: open. No lean recorded.
+Status: Ratified (user), 2026-10-30: accept the recommendation below, as
+amended in review. No lean was recorded before that.
 
 The material consequence: while the switch is on and the chart draws no
 figure, a quiet line of text sits under the chart, and the plot is 32 px
@@ -226,7 +233,8 @@ Nothing shows when no rank line is drawn.**
 
 ### AT6. Rank lines only
 
-Status: open. No lean recorded.
+Status: Ratified (user), 2026-10-30: accept the recommendation below. No
+lean was recorded before that.
 
 The material consequence: the PB line and the score threshold line show no
 accuracy.
@@ -570,8 +578,10 @@ None is superseded.
 Stated intent, not a contract; a PR that moves a boundary says so in its
 description.
 
-- **One PR, gated on AT1 to AT6:** the module and its tests, the switch, the
-  figures and the note on all three chart modes, and the shipping checklist:
+- **One PR, unblocked:** the proposal was ratified on 2026-10-30, and the PR
+  starts once this proposal merges. It holds the module and its tests, the
+  switch, the figures and the note on all three chart modes, and the
+  shipping checklist:
   the Run History spec's chart and Chart options sections, a decision-log
   entry per durable decision, the glossary entry from Terms, the roadmap,
   product.md, and deleting this proposal.
