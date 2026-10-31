@@ -2,8 +2,9 @@
 // one run in the chart's place until it is closed. The server decides what
 // opens and closes it and draws it. This script asks it for a run, closes the
 // run on Esc, and once a change is drawn moves focus and marks the run's row
-// in the list (assets/runHistoryList.js). The viewer's root names the store a
-// request goes to and the control focus returns to, in its data- attributes.
+// in the list (assets/runHistoryList.js). It also gives By Bot's grid its name
+// order. The viewer's root names the store a request goes to and the control
+// focus returns to, in its data- attributes.
 (function () {
   function viewer() {
     return document.querySelector(".run-viewer[data-request-store]");
@@ -143,4 +144,11 @@
   }
 
   window.runViewer = { request: request, shown: shown };
+
+  // By Bot's grid sorts its Bot column in the server's name order, which puts
+  // "Bot 2" before "Bot 10", so a sort by name and the default order agree.
+  var functions = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
+  functions.runViewerBotNameComparator = function (valueA, valueB, nodeA, nodeB) {
+    return nodeA.data.bot_order - nodeB.data.bot_order;
+  };
 })();

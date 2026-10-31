@@ -6,6 +6,7 @@ its file. What the reader works out is ``tests/test_run_viewer.py``; what
 the browser does with the viewer is ``tests/test_run_viewer_browser.py``.
 """
 
+import re
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -13,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import dash
+import dash_ag_grid as dag
 import dash_mantine_components as dmc
 import pytest
 from dash import dcc, html, no_update
@@ -43,7 +45,9 @@ from tests.test_run_viewer import (  # noqa: E402
     KILL_HEADER,
     SCENARIO,
     VIEWED_END,
+    _clock,
     _scenario,
+    _typical_ends,
     _view,
     _write_run,
 )
@@ -416,6 +420,374 @@ def test_no_time_tile_on_a_version_not_known_to_be_time_scored(stats_dir) -> Non
 )
 def test_a_completion_time_reads_minutes_and_seconds_to_a_tenth(seconds, text) -> None:
     assert completion_time_text(Decimal(seconds)) == text
+
+
+# --- By Bot --------------------------------------------------------------------
+
+# Fly Bot 10 is killed first and Fly Bot 2 once, so play order, name order and
+# a bot of one kill among bots of many all show. From the 21:59:00 start, Fly
+# Bot takes 1.0 and 0.5 seconds, Fly Bot 2 takes 2.0, and Fly Bot 10 takes 1.0
+# and 1.5.
+FLY_KILLS = [
+    ("21:59:01.000", "Fly Bot 10", 10, 5),
+    ("21:59:02.000", "Fly Bot", 10, 8),
+    ("21:59:04.000", "Fly Bot 2", 10, 6),
+    ("21:59:05.500", "Fly Bot 10", 10, 5),
+    ("21:59:06.000", "Fly Bot", 10, 9),
+]
+
+# Each bot is one kill, played out of name order.
+ONE_KILL_EACH = [
+    ("21:59:19.000", "Float 3 Bot", 1900, 684),
+    ("21:59:39.500", "Bounce 1 Bot", 1975, 1013),
+    ("21:59:59.750", "Bounce 2 Bot", 1972, 1158),
+]
+
+MANY_KILLS_SUBTITLE = (
+    "Each kill's time runs from the kill before it, so it includes finding the bot."
+)
+TYPICAL_SUBTITLE = (
+    "Typical is each bot's median over your typical runs. Difference is this run "
+    "minus typical, in percentage points (pts) for accuracy."
+)
+
+
+def _fly_typical(index: int) -> dict:
+    """A typical run: Fly Bot at 80% and Fly Bot 10 at 40%, a kill a second, never Fly Bot 2."""
+    start = _typical_ends()[index] - timedelta(seconds=60)
+    return {
+        "kills": [
+            (_clock(start + timedelta(seconds=second)), bot, 10, hits)
+            for second, bot, hits in (
+                (1, "Fly Bot 10", 4),
+                (2, "Fly Bot", 8),
+                (3, "Fly Bot 10", 4),
+                (4, "Fly Bot", 8),
+            )
+        ]
+    }
+
+
+def _one_kill_typical(index: int) -> dict:
+    """A typical run: each of the three bots at 50%, in the same order."""
+    start = _typical_ends()[index] - timedelta(seconds=60)
+    return {
+        "kills": [
+            (_clock(start + timedelta(seconds=second)), bot, 100, 50)
+            for second, bot in (
+                (19, "Float 3 Bot"),
+                (39, "Bounce 1 Bot"),
+                (59, "Bounce 2 Bot"),
+            )
+        ]
+    }
+
+
+def _by_bot(content: ViewerContent) -> dict[str, Any] | None:
+    sections = _by_class(content.body, "run-viewer-by-bot")
+    if not sections:
+        return None
+    (section,) = sections
+    (grid,) = [c for c in _walk(section) if isinstance(c, dag.AgGrid)]
+    notes = _by_class(section, "run-viewer-by-bot-note")
+    return {
+        "heading": rendered_text(_one(section, "run-viewer-heading")),
+        "subtitle": rendered_text(_one(section, "run-viewer-subtitle")),
+        "note": rendered_text(notes[0]) if notes else None,
+        "grid": grid,
+    }
+
+
+def _headers(columns: list[dict]) -> list:
+    """Each column's header, a group's as its name and its columns' headers."""
+    return [
+        (column["headerName"], [child["headerName"] for child in column["children"]])
+        if "children" in column
+        else column["headerName"]
+        for column in columns
+    ]
+
+
+def _leaves(columns: list[dict]) -> dict[str, dict]:
+    return {
+        leaf["colId"]: leaf
+        for column in columns
+        for leaf in column.get("children", [column])
+    }
+
+
+def _cells(grid: dag.AgGrid, *keys: str) -> list[list]:
+    """Each row's bot, then each named cell as it reads, in the rows' order."""
+    return [
+        [row["bot"], *(row.get(f"{key}_text", row.get(key)) for key in keys)]
+        for row in grid.rowData
+    ]
+
+
+def _difference_class(column: dict, value: float | None) -> str | None:
+    """Apply a Difference column's class rules to one value, as the grid does."""
+    if value is None:
+        return None
+    for name, rule in column["cellClassRules"].items():
+        if rule == "params.value === 0":
+            matched = value == 0
+        else:
+            parts = re.fullmatch(r"params\.value \* (-?1) ([<>]) 0", rule)
+            assert parts is not None, rule
+            product = value * int(parts[1])
+            matched = product > 0 if parts[2] == ">" else product < 0
+        if matched:
+            return name
+    return None
+
+
+def test_many_kills_show_time_per_kill_and_accuracy_in_name_order(stats_dir) -> None:
+    runs, viewed = _scenario(stats_dir, _fly_typical, kills=FLY_KILLS)
+
+    by_bot = _by_bot(_viewer(stats_dir, runs, viewed))
+
+    assert by_bot is not None
+    assert by_bot["heading"] == "By Bot"
+    assert by_bot["subtitle"] == f"{MANY_KILLS_SUBTITLE} {TYPICAL_SUBTITLE}"
+    assert by_bot["note"] is None
+    grid = by_bot["grid"]
+    assert _headers(grid.columnDefs) == [
+        "Bot",
+        "Kills",
+        ("Time per Kill", ["This Run", "Typical", "Difference"]),
+        ("Accuracy", ["This Run", "Typical", "Difference"]),
+    ]
+    # Name order reads numbers as numbers. Fly Bot 2's one kill is still a
+    # time per kill, and no typical run names it.
+    assert _cells(
+        grid,
+        "kills",
+        "time_per_kill",
+        "time_per_kill_typical",
+        "time_per_kill_difference",
+    ) == [
+        ["Fly Bot", 2, "0.75 s", "1.00 s", "−0.25 s"],
+        ["Fly Bot 2", 1, "2.00 s", None, None],
+        ["Fly Bot 10", 2, "1.25 s", "1.00 s", "+0.25 s"],
+    ]
+    assert _cells(grid, "accuracy", "accuracy_typical", "accuracy_difference") == [
+        ["Fly Bot", "85.00%", "80.00%", "+5.00 pts"],
+        ["Fly Bot 2", "60.00%", None, None],
+        ["Fly Bot 10", "50.00%", "40.00%", "+10.00 pts"],
+    ]
+
+
+def test_each_cell_sorts_by_the_number_it_shows_and_a_typical_says_its_count(
+    stats_dir,
+) -> None:
+    runs, viewed = _scenario(stats_dir, _fly_typical, kills=FLY_KILLS)
+
+    grid = _by_bot(_viewer(stats_dir, runs, viewed))["grid"]
+
+    fly, fly_2, fly_10 = grid.rowData
+    assert (fly["time_per_kill"], fly["time_per_kill_typical"]) == (0.75, 1.0)
+    assert fly["time_per_kill_difference"] == -0.25
+    assert (fly["accuracy"], fly["accuracy_difference"]) == (85.0, 5.0)
+    # An empty cell is a null, which the grid's comparator puts last.
+    assert fly_2["time_per_kill_typical"] is None
+    assert grid.defaultColDef["comparator"] == {"function": "nullsLastComparator"}
+    assert grid.defaultColDef["sortable"] is True
+    # The Bot column sorts by the server's name order.
+    assert [row["bot_order"] for row in grid.rowData] == [0, 1, 2]
+    assert _leaves(grid.columnDefs)["bot"]["comparator"] == {
+        "function": "runViewerBotNameComparator"
+    }
+    assert fly["time_per_kill_typical_hover"] == "Median of your 10 typical runs"
+    assert fly_2["time_per_kill_typical_hover"] is None
+    assert _leaves(grid.columnDefs)["time_per_kill_typical"]["tooltipField"] == (
+        "time_per_kill_typical_hover"
+    )
+
+
+def test_a_bots_difference_is_colored_by_which_way_is_better(stats_dir) -> None:
+    runs, viewed = _scenario(stats_dir, _fly_typical, kills=FLY_KILLS)
+
+    grid = _by_bot(_viewer(stats_dir, runs, viewed))["grid"]
+
+    leaves = _leaves(grid.columnDefs)
+    fly, fly_2, fly_10 = grid.rowData
+    time = leaves["time_per_kill_difference"]
+    accuracy = leaves["accuracy_difference"]
+    # A faster time is better, and so is a higher accuracy.
+    assert _difference_class(time, fly["time_per_kill_difference"]) == (
+        "run-viewer-better"
+    )
+    assert _difference_class(time, fly_10["time_per_kill_difference"]) == (
+        "run-viewer-worse"
+    )
+    assert _difference_class(accuracy, fly["accuracy_difference"]) == (
+        "run-viewer-better"
+    )
+    assert _difference_class(accuracy, -1.5) == "run-viewer-worse"
+    assert _difference_class(time, 0.0) == "run-viewer-even"
+    assert _difference_class(time, fly_2["time_per_kill_difference"]) is None
+
+
+def test_a_typical_run_with_unknown_times_counts_toward_accuracy_only(
+    stats_dir,
+) -> None:
+    def typical(index: int) -> dict:
+        paused = {"Pause Duration": "1.0", "Pause Count": "1"} if index < 3 else {}
+        return {**_fly_typical(index), "fields": paused}
+
+    runs, viewed = _scenario(stats_dir, typical, kills=FLY_KILLS)
+
+    fly = _by_bot(_viewer(stats_dir, runs, viewed))["grid"].rowData[0]
+
+    assert fly["time_per_kill_typical_hover"] == "Median of 7 of your 10 typical runs"
+    assert fly["accuracy_typical_hover"] == "Median of your 10 typical runs"
+
+
+def test_time_scored_bots_show_their_splits_in_play_order(stats_dir) -> None:
+    viewed = _write_run(stats_dir, VIEWED_END, score=10.0, kills=ONE_KILL_EACH)
+
+    by_bot = _by_bot(
+        _viewer(stats_dir, [viewed], viewed, {HASH: PaceBasis(70.0, HASH)})
+    )
+
+    assert by_bot is not None
+    assert by_bot["subtitle"] == (
+        "Each bot is one kill, in a set order, so these are the run's splits. A "
+        "kill's time runs from the kill before it. Listed in the order the run "
+        "plays them."
+    )
+    grid = by_bot["grid"]
+    # The scenario's first session has no typical runs, so each figure is one
+    # column, with no Typical or Difference.
+    assert _headers(grid.columnDefs) == ["Bot", "Time", "Accuracy"]
+    assert _cells(grid, "time", "accuracy") == [
+        ["Float 3 Bot", "19.00 s", "36.00%"],
+        ["Bounce 1 Bot", "20.50 s", "51.29%"],
+        ["Bounce 2 Bot", "20.25 s", "58.72%"],
+    ]
+    assert "time_typical" not in grid.rowData[0]
+    # Sorted by Bot, the rows would read in name order.
+    assert [row["bot_order"] for row in grid.rowData] == [2, 0, 1]
+
+
+def test_one_kill_per_bot_with_no_pace_basis_shows_accuracy_alone(stats_dir) -> None:
+    runs, viewed = _scenario(stats_dir, _one_kill_typical, kills=ONE_KILL_EACH)
+
+    by_bot = _by_bot(_viewer(stats_dir, runs, viewed))
+
+    assert by_bot is not None
+    assert by_bot["subtitle"] == (
+        "Each bot is one kill, so its time is shown only when the app knows this "
+        "run was scored by completion time. Listed in the order the run plays "
+        f"them. {TYPICAL_SUBTITLE}"
+    )
+    grid = by_bot["grid"]
+    assert _headers(grid.columnDefs) == [
+        "Bot",
+        ("Accuracy", ["This Run", "Typical", "Difference"]),
+    ]
+    assert _cells(grid, "accuracy", "accuracy_typical", "accuracy_difference") == [
+        ["Float 3 Bot", "36.00%", "50.00%", "−14.00 pts"],
+        ["Bounce 1 Bot", "51.29%", "50.00%", "+1.29 pts"],
+        ["Bounce 2 Bot", "58.72%", "50.00%", "+8.72 pts"],
+    ]
+
+
+@pytest.mark.parametrize(
+    ("fields", "line"),
+    [
+        (
+            {"Challenge Start": None},
+            "Times aren't shown because this run's file has no start time.",
+        ),
+        (
+            # Two seconds after the first kill.
+            {"Challenge Start": "21:59:03.000"},
+            "Times aren't shown because this run's file has times out of order.",
+        ),
+        (
+            {"Pause Duration": "2.5", "Pause Count": "1"},
+            "Times aren't shown because this run was paused, and its file doesn't "
+            "say when.",
+        ),
+    ],
+)
+def test_a_run_whose_times_are_unknown_says_why_and_shows_no_time(
+    stats_dir, fields, line
+) -> None:
+    runs, viewed = _scenario(stats_dir, _fly_typical, kills=FLY_KILLS, fields=fields)
+
+    by_bot = _by_bot(_viewer(stats_dir, runs, viewed))
+
+    assert by_bot is not None
+    assert by_bot["note"] == line
+    # No time cell, the typical's included, while the kills and accuracy stay.
+    assert _cells(
+        by_bot["grid"],
+        "kills",
+        "time_per_kill",
+        "time_per_kill_typical",
+        "time_per_kill_difference",
+        "accuracy_difference",
+    ) == [
+        ["Fly Bot", 2, None, None, None, "+5.00 pts"],
+        ["Fly Bot 2", 1, None, None, None, None],
+        ["Fly Bot 10", 2, None, None, None, "+10.00 pts"],
+    ]
+
+
+def test_accuracy_alone_says_nothing_of_unknown_times(stats_dir) -> None:
+    viewed = _write_run(
+        stats_dir, VIEWED_END, kills=ONE_KILL_EACH, fields={"Challenge Start": None}
+    )
+
+    by_bot = _by_bot(_viewer(stats_dir, [viewed], viewed))
+
+    assert by_bot is not None
+    assert by_bot["note"] is None
+
+
+@pytest.mark.parametrize(
+    "kills",
+    [
+        [],
+        [("21:59:20.000", "Solo Bot", 10, 5), ("21:59:40.000", "Solo Bot", 10, 5)],
+    ],
+    ids=["no kills", "one bot"],
+)
+def test_one_bot_or_none_shows_no_table_and_keeps_its_place(stats_dir, kills) -> None:
+    runs, viewed = _scenario(stats_dir, kills=kills)
+    other = _write_run(stats_dir, VIEWED_END + timedelta(minutes=2), kills=FLY_KILLS)
+    runs.append(other)
+
+    without = _viewer(stats_dir, runs, viewed)
+    with_table = _viewer(stats_dir, runs, other)
+
+    assert _by_bot(without) is None
+    assert _by_bot(with_table) is not None
+    # A hidden placeholder holds By Bot's place, so Everything Recorded keeps
+    # its own between the two runs.
+    place = [
+        index
+        for index, child in enumerate(with_table.body)
+        if "run-viewer-by-bot" in (getattr(child, "className", None) or "")
+    ]
+    assert len(place) == 1
+    assert without.body[place[0]].hidden is True
+    assert len(without.body) == len(with_table.body)
+    assert isinstance(without.body[-1], html.Details)
+    assert isinstance(with_table.body[-1], html.Details)
+
+
+def test_each_run_draws_a_grid_of_its_own(stats_dir) -> None:
+    runs, viewed = _scenario(stats_dir, kills=FLY_KILLS)
+    other = _write_run(stats_dir, VIEWED_END + timedelta(minutes=2), kills=FLY_KILLS)
+    runs.append(other)
+
+    ids = {_by_bot(_viewer(stats_dir, runs, run))["grid"].id for run in (viewed, other)}
+
+    assert len(ids) == 2
+    assert all(grid_id.startswith("run-viewer-by-bot-") for grid_id in ids)
 
 
 # --- Settings ------------------------------------------------------------------
