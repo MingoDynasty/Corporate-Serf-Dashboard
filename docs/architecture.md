@@ -312,6 +312,7 @@ flowchart LR
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlaySessions["kovaaks/<br/>play_sessions.py"]
         TypicalScore["kovaaks/<br/>typical_score.py"]
+        RunViewer["kovaaks/<br/>run_viewer.py"]
         ScenarioNotes["kovaaks/<br/>scenario_notes_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
@@ -436,6 +437,10 @@ flowchart LR
     DataService --> ApiService
     TimeScored --> DataService
     TimeScored --> PerfFile
+    RunViewer --> DataService
+    RunViewer --> TimeScored
+    RunViewer --> PlaySessions
+    RunViewer --> TypicalScore
 
     FileWatchdog --> DataService
     FileWatchdog --> ApiService
@@ -1270,7 +1275,8 @@ flowchart LR
   one named version of a scenario, which is how a past run is judged under
   its own version and not under the one the scenario's newest run names.
   `eligible_pace_constant` returns the constant only when every run in a
-  comparison carries that hash.
+  comparison carries that hash. `has_performance_file` says whether the
+  listing holds a run's file, opening none.
 - `pace.py` — the pure pace formulas (`pace_percent`, `percent_faster`,
   `pace_threshold_score`, `pace_goal_met`). Each returns `None` when a time
   in the comparison is zero or less, and the caller then keeps its score
@@ -1360,6 +1366,22 @@ flowchart LR
   decimal places by score. Nothing reads the store, reads the clock, or
   persists a value. Rules in
   [specs/typical_score.md](specs/typical_score.md).
+- `run_viewer.py` — reads one run whole and works out what the run viewer
+  shows of it, measured against its typical runs: the runs behind its
+  typical score at session start. `read_run_file` returns a stats file's
+  `Key:,value` fields in file order, its weapon rows and its kill table as
+  written, or `None` when the file can't be read. `view_run` takes a copy of
+  the run store, a run id, the stats folder and the pace lookups, and
+  returns a `RunView`: the run's session and number in it, and its figures,
+  `None` when its file can't be read. The figures are its file, its typical
+  score and typical runs, its tiles (each a run value and a median with the
+  count of runs it took), its eleven settings cards (the shown text and its
+  most common value) and By Bot (the table's kind, why times are unknown,
+  and each bot's kills, accuracy and times against its typical).
+  `view_run_from_store` reads the store and the stats folder setting. The
+  run's file and up to 20 typical runs' files are read on every call, and
+  nothing is kept. No UI yet: the view that draws it is still to come
+  ([proposal](proposals/run_viewer_proposal.md)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus

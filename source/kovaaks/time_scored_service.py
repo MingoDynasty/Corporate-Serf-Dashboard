@@ -103,6 +103,15 @@ def note_performance_file(run: RunData) -> None:
         _performance_file_names.add(name)
 
 
+def has_performance_file(run: RunData) -> bool:
+    """Return whether the listing holds the performance file the game wrote for a run.
+
+    The listing is the one the time-scored check keeps, so no file is opened.
+    """
+    name = _performance_file_name(run)
+    return name is not None and name in _performance_file_names
+
+
 def _describe(reading: PerformanceReading) -> str:
     distance = reading.largest_distance
     return (

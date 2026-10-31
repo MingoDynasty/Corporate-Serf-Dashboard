@@ -13,6 +13,7 @@ from source.kovaaks.time_scored_service import (
     eligible_pace_constant,
     get_pace_basis,
     get_version_pace_basis,
+    has_performance_file,
     index_performance_files,
     note_performance_file,
 )
@@ -287,6 +288,28 @@ def test_a_folder_the_game_creates_after_startup_is_still_found(tmp_path, store)
     note_performance_file(run)
 
     assert get_pace_basis(SCENARIO) == PaceBasis(1000.0, DEFAULT_HASH)
+
+
+def test_whether_a_run_has_a_performance_file_comes_from_the_listing(folders):
+    stats_dir, performance_dir = folders
+    with_file, without_file = _run(NEWEST), _run(OLDER)
+    _performance_file(performance_dir, with_file).write_bytes(COUNTDOWN)
+    index_performance_files(str(stats_dir))
+    # Written after the listing, so only a lookup that opens files would see it.
+    _performance_file(performance_dir, without_file).write_bytes(COUNTDOWN)
+
+    assert has_performance_file(with_file)
+    assert not has_performance_file(without_file)
+    assert not has_performance_file(
+        RunData(
+            datetime_object=datetime(2026, 5, 1),
+            score=1.0,
+            sens_scale="cm/360",
+            horizontal_sens=40.0,
+            scenario=SCENARIO,
+            accuracy=0.5,
+        )
+    )
 
 
 def test_a_landed_run_with_no_performance_file_adds_nothing(folders, store):
