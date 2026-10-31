@@ -519,7 +519,16 @@ def layout(**kwargs):  # noqa: ARG001
         children=[
             dmc.AppShell(
                 children=[
-                    dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
+                    dmc.NotificationContainer(
+                        id=NOTIFICATION_CONTAINER_ID,
+                        # Mantine 9 turned these on: a sideways drag or scroll
+                        # dismisses a toast, and hovering one pauses them all.
+                        # Off, as on Mantine 8, so a toast meant to stay until
+                        # closed can't vanish on a stray trackpad scroll.
+                        allowDragDismiss=False,
+                        allowScrollDismiss=False,
+                        pauseResetOnHover="notification",
+                    ),
                     dcc.Location(id=NAVBAR_LOCATION_ID, refresh=False),
                     # Beside the container on purpose: a toast outlives the
                     # page that emitted it, so the registry that knows which
