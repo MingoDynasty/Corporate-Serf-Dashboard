@@ -168,6 +168,10 @@ console lines quoted here are plain console output, not app notifications.
   -File "<root>\launch.ps1"` with the root as working directory; it never
   points into a version directory
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
+- A shortcut that cannot be written does not fail the install, which is
+  complete by then. A missing Desktop folder, or a failed save, prints
+  "WARNING: could not create the desktop shortcut (<reason>)." and the
+  install goes on to its closing lines and exits 0.
 - Closing lines: "Installed Corporate Serf Dashboard <tag>.", then under a
   pin "This install is PINNED to <tag> and will not auto-update." and
   "Re-run the installer without -Tag to return to automatic updates.", then
@@ -176,6 +180,9 @@ console lines quoted here are plain console output, not app notifications.
   exactly that; nothing outside the root is modified except the shortcut
   and the `%TEMP%` copy of the installer
   ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
+  With no shortcut written, the last two lines are instead 'Launch it with:
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File
+  "<root>\launch.ps1"' and "To uninstall: delete the folder <root>".
 - All scripts target Windows PowerShell 5.1 and are committed BOM-free;
   the bootstrap must carry a `# csd-bootstrap-version: N` marker
   ([2026-07-19](../decision_log/2026/2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths.md)).

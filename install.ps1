@@ -215,6 +215,28 @@ function Write-FirstRunConfig([int]$Port) {
     Write-FileAtomic -Path (Join-Path $InstallRoot 'config.toml') -Content (($lines -join "`n") + "`n")
 }
 
+function New-DesktopShortcut([string]$DesktopDir) {
+    # Returns whether the shortcut was written. By now the install is
+    # complete and launch.ps1 works, so a shortcut that cannot be written is a
+    # warning, never a failed install. The Desktop folder can be missing (a
+    # OneDrive-redirected Desktop before its first sync, a deleted folder);
+    # GetFolderPath then returns '' rather than a path, and Save() into a
+    # missing folder throws.
+    try {
+        if (-not $DesktopDir) { throw 'the Desktop folder does not exist' }
+        $shell = New-Object -ComObject WScript.Shell
+        $shortcut = $shell.CreateShortcut((Join-Path $DesktopDir 'Corporate Serf Dashboard.lnk'))
+        $shortcut.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+        $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
+        $shortcut.WorkingDirectory = $InstallRoot
+        $shortcut.Save()
+        return $true
+    } catch {
+        Write-Host "WARNING: could not create the desktop shortcut ($($_.Exception.Message))." -ForegroundColor Yellow
+        return $false
+    }
+}
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -315,14 +337,7 @@ if (-not (Test-Path -LiteralPath $bootstrapTemplate)) {
 }
 Write-FileAtomic -Path (Join-Path $InstallRoot 'launch.ps1') -Content ([System.IO.File]::ReadAllText($bootstrapTemplate))
 
-# Desktop shortcut.
-$shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Corporate Serf Dashboard.lnk'
-$shell = New-Object -ComObject WScript.Shell
-$shortcut = $shell.CreateShortcut($shortcutPath)
-$shortcut.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
-$shortcut.WorkingDirectory = $InstallRoot
-$shortcut.Save()
+$shortcutWritten = New-DesktopShortcut ([Environment]::GetFolderPath('Desktop'))
 
 Remove-Item -LiteralPath (Join-Path $InstallRoot 'tmp') -Recurse -Force -ErrorAction SilentlyContinue
 
@@ -332,5 +347,12 @@ if ($pinned) {
     Write-Host "This install is PINNED to $targetTag and will not auto-update." -ForegroundColor Yellow
     Write-Host 'Re-run the installer without -Tag to return to automatic updates.'
 }
-Write-Host 'Launch it from the "Corporate Serf Dashboard" desktop shortcut.'
-Write-Host "To uninstall: delete the shortcut and the folder $InstallRoot"
+if ($shortcutWritten) {
+    Write-Host 'Launch it from the "Corporate Serf Dashboard" desktop shortcut.'
+    Write-Host "To uninstall: delete the shortcut and the folder $InstallRoot"
+} else {
+    # The shortcut's own command, not the bare path: double-clicking a .ps1
+    # does not run it, and the default execution policy refuses to.
+    Write-Host "Launch it with: powershell.exe -NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
+    Write-Host "To uninstall: delete the folder $InstallRoot"
+}

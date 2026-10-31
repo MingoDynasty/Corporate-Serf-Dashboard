@@ -228,9 +228,26 @@ def _run_under_windows_powershell(
     The driver receives the install root and the path of ``launcher.ps1`` as
     its two arguments. ``environment`` replaces the one 5.1 would inherit.
     """
+    result = _windows_powershell(
+        tmp_path,
+        driver,
+        [str(root), str(REPO_ROOT / "scripts" / "launcher.ps1")],
+        environment,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout
+
+
+def _windows_powershell(
+    tmp_path: Path,
+    driver: str,
+    arguments: list[str],
+    environment: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
+    """Run a driver script under Windows PowerShell 5.1 with ``arguments``."""
     driver_path = tmp_path / "driver.ps1"
     driver_path.write_text(driver, encoding="utf-8")
-    result = subprocess.run(
+    return subprocess.run(
         [
             str(WINDOWS_POWERSHELL),
             "-NoProfile",
@@ -238,8 +255,7 @@ def _run_under_windows_powershell(
             "Bypass",
             "-File",
             str(driver_path),
-            str(root),
-            str(REPO_ROOT / "scripts" / "launcher.ps1"),
+            *arguments,
         ],
         capture_output=True,
         text=True,
@@ -247,8 +263,6 @@ def _run_under_windows_powershell(
         timeout=120,
         env=environment,
     )
-    assert result.returncode == 0, result.stderr
-    return result.stdout
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
@@ -431,3 +445,89 @@ def test_a_failed_start_leaves_the_launcher_setting_alone(
 
     assert started == "start failed"
     assert launcher_setting == _launcher_setting(inherited)
+
+
+INSTALL_SCRIPT = REPO_ROOT / "install.ps1"
+
+# Dot-sources the real New-DesktopShortcut out of install.ps1 and calls it with
+# the Desktop folder the test names. With no folder named it passes '', which
+# is what GetFolderPath returns for a Desktop folder that does not exist. A
+# written shortcut is read back field by field.
+_SHORTCUT_DRIVER = """
+$ErrorActionPreference = 'Stop'
+$InstallRoot = $args[0]
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($args[1], [ref]$null, [ref]$null)
+$function = $ast.FindAll({
+    param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $n.Name -eq 'New-DesktopShortcut' }, $true)[0]
+Invoke-Expression $function.Extent.Text
+$desktop = if ($args.Count -gt 2) { $args[2] } else { '' }
+$written = New-DesktopShortcut $desktop
+"written: $written"
+if ($written) {
+    $link = (New-Object -ComObject WScript.Shell).CreateShortcut(
+        (Join-Path $desktop 'Corporate Serf Dashboard.lnk'))
+    $link.TargetPath
+    $link.Arguments
+    $link.WorkingDirectory
+}
+"""
+
+
+def _new_desktop_shortcut(tmp_path: Path, *desktop: Path) -> list[str]:
+    """Run the real ``New-DesktopShortcut`` and return its output lines."""
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+    root = tmp_path / "install-root"
+    root.mkdir()
+    result = _windows_powershell(
+        tmp_path,
+        _SHORTCUT_DRIVER,
+        [str(root), str(INSTALL_SCRIPT), *(str(folder) for folder in desktop)],
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.splitlines()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_desktop_shortcut_runs_the_root_launcher(tmp_path: Path) -> None:
+    """The shortcut runs ``launch.ps1`` at the root, never a version directory."""
+    desktop = tmp_path / "Desktop"
+    desktop.mkdir()
+
+    written, target, arguments, working_directory = _new_desktop_shortcut(
+        tmp_path, desktop
+    )
+
+    root = tmp_path / "install-root"
+    assert written == "written: True"
+    assert target.lower() == str(WINDOWS_POWERSHELL).lower()
+    assert arguments == (
+        f'-NoProfile -ExecutionPolicy Bypass -File "{root / "launch.ps1"}"'
+    )
+    assert working_directory == str(root)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize("named", [False, True], ids=["path empty", "folder missing"])
+def test_a_missing_desktop_folder_is_a_warning(tmp_path: Path, named: bool) -> None:
+    """A shortcut that cannot be written must not fail a finished install.
+
+    By the time the shortcut is written, ``launch.ps1`` and ``install.json``
+    exist and the install works. The Desktop folder can still be missing, for
+    example a OneDrive-redirected Desktop before its first sync. Then
+    ``GetFolderPath`` returns an empty string, and ``Save()`` into a folder
+    that is gone throws. Either one used to end the installer with a raw COM
+    error and none of its closing lines.
+    """
+    desktop = tmp_path / "no-such-desktop"
+
+    lines = _new_desktop_shortcut(tmp_path, *([desktop] if named else []))
+
+    *warning, written = lines
+    assert written == "written: False"
+    assert len(warning) == 1
+    assert warning[0].startswith("WARNING: could not create the desktop shortcut (")
+    if not named:
+        assert warning[0].endswith("(the Desktop folder does not exist).")
+    assert not desktop.exists()
