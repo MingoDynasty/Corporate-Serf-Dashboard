@@ -36,7 +36,7 @@ sequence.
   bots or more, each bot against its own typical, sortable by any column.
   Then come its eleven settings, a changed one marked with its typical
   value, and everything its stats file recorded, closed. (PRs #453, #455
-  and #PR3NUM; design in #450) Design rationale distilled into
+  and #456; design in #450) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
 - **Accuracy targets on the chart** — an Accuracy targets switch in Chart
   options, off to start, writes beside each rank line the hit accuracy that

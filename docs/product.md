@@ -107,7 +107,7 @@ the same form as the finished ones under it.
   couldn't see which runs were played at which FOV, and a PB set at an
   unusual one looked like any other run. The list stays a short panel for
   picking out a run: these are for the player who asks.
-- **One run, opened whole** (Run History page, PRs #453, #455 and #PR3NUM;
+- **One run, opened whole** (Run History page, PRs #453, #455 and #456;
   design in #450). A click on any run, in the run list or on the chart,
   opens it where the chart was: its score tiles against the runs behind its
   typical score when its session began, a By Bot table for a run that names

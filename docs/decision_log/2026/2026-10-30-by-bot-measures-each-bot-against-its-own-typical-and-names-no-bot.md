@@ -18,7 +18,7 @@ play order where it is fixed, rows that highlight on hover, the section above
 Settings, This Run, Typical and Difference columns, every column sortable,
 and no By Bot for a single bot. On 2026-10-30: no lead line naming the bot
 this run lost the most on. Shipped in
-[#PR3NUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PR3NUM),
+[#456](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/456),
 on the figures from
 [#453](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/453).
 What the page does today is in
@@ -128,4 +128,4 @@ ships here, for every scenario that names two bots or more.
 
 **Provenance.** Proposal by `claude-opus-5-5` (#450), read by `gpt-6-astra`
 (flagship, first wave) and reviewed by `gpt-6.1-sol` (the seat) and
-`claude-fable-5-1`. Built by `claude-opus-5-5` in #453 and #PR3NUM.
+`claude-fable-5-1`. Built by `claude-opus-5-5` in #453 and #456.

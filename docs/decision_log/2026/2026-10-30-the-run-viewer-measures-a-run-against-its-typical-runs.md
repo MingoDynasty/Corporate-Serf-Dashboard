@@ -16,7 +16,7 @@ ratify."), as recommended. Their lean before that, 2026-10-30, after a
 write-up of what a menu would take: "Yes, keep it shelved." Shipped in
 [#455](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/455)
 for the tiles and Settings and in
-[#PR3NUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PR3NUM)
+[#456](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/456)
 for By Bot, on the figures from
 [#453](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/453).
 What the page does today is in
@@ -69,4 +69,4 @@ Revisit when a question comes up that the typical runs can't answer.
 
 **Provenance.** Proposal by `claude-opus-5-5` (#450), read by `gpt-6-astra`
 (flagship, first wave) and reviewed by `gpt-6.1-sol` (the seat) and
-`claude-fable-5-1`. Built by `claude-opus-5-5` in #453, #455 and #PR3NUM.
+`claude-fable-5-1`. Built by `claude-opus-5-5` in #453, #455 and #456.

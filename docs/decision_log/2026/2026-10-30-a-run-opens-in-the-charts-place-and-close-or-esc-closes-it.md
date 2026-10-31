@@ -91,5 +91,5 @@ every statement both make, and each entry gains a note.
 **Provenance.** Proposal by `claude-opus-5-5` (#450), read by `gpt-6-astra`
 (flagship, first wave) and reviewed by `gpt-6.1-sol` (the seat) and
 `claude-fable-5-1`. Built by `claude-opus-5-5` in #453, #455 and
-[#PR3NUM](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/PR3NUM),
+[#456](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/456),
 which shipped the proposal.
