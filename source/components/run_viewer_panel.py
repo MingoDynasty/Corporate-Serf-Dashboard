@@ -2,7 +2,7 @@
 
 ``run_viewer_content`` draws what the viewer shows of a run from what
 ``source.kovaaks.run_viewer`` works out: the header, the score line, the line
-that names the run's typical runs, the tiles, Settings and Everything
+that names the run's typical runs, the tiles, By Bot, Settings and Everything
 Recorded. ``show_run`` decides what a press does, and ``register_run_viewer``
 wires both to a page.
 
@@ -16,11 +16,14 @@ the chart comes back as it was left: its mode, zoom, ranges and hidden
 traces. The open run is held in a store that no reload keeps.
 """
 
+import hashlib
 import logging
+import re
 from datetime import date, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, NamedTuple
 
+import dash_ag_grid as dag
 import dash_mantine_components as dmc
 from dash import (
     Input,
@@ -41,10 +44,12 @@ from source.components.latest_run_card import (
     score_line,
 )
 from source.components.score_threshold import normalize_score_threshold_percentage
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import get_all_runs
 from source.kovaaks.play_sessions import in_play_order
 from source.kovaaks.run_viewer import (
+    BotRow,
+    ByBotKind,
     RunFigures,
     RunFile,
     RunTable,
@@ -52,6 +57,8 @@ from source.kovaaks.run_viewer import (
     Setting,
     SettingCard,
     Tile,
+    TimesUnknown,
+    Typical,
     view_run_from_store,
 )
 from source.kovaaks.time_scored_service import get_version_pace_basis
@@ -121,6 +128,44 @@ NOT_RECORDED_HOVER = (
     "record it."
 )
 MARKED_HOVER = "{value}\nTypical {typical} · on {count} of your {total} typical runs"
+BY_BOT_HEADING = "By Bot"
+BY_BOT_KIND_TEXT = {
+    ByBotKind.MANY_KILLS: (
+        "Each kill's time runs from the kill before it, so it includes finding the bot."
+    ),
+    ByBotKind.TIME_SCORED: (
+        "Each bot is one kill, in a set order, so these are the run's splits. A "
+        "kill's time runs from the kill before it."
+    ),
+    ByBotKind.ACCURACY_ONLY: (
+        "Each bot is one kill, so its time is shown only when the app knows this "
+        "run was scored by completion time."
+    ),
+}
+BY_BOT_PLAY_ORDER_TEXT = "Listed in the order the run plays them."
+BY_BOT_TYPICAL_TEXT = (
+    "Typical is each bot's median over your typical runs. Difference is this run "
+    "minus typical, in percentage points (pts) for accuracy."
+)
+TIMES_UNKNOWN_TEXT = {
+    TimesUnknown.NO_START: (
+        "Times aren't shown because this run's file has no start time."
+    ),
+    TimesUnknown.TIMES_DISAGREE: (
+        "Times aren't shown because this run's file has times out of order."
+    ),
+    TimesUnknown.PAUSED: (
+        "Times aren't shown because this run was paused, and its file doesn't say when."
+    ),
+}
+BOT_HEADER = "Bot"
+KILLS_HEADER = "Kills"
+TIME_PER_KILL_HEADER = "Time per Kill"
+TIME_HEADER = "Time"
+ACCURACY_HEADER = "Accuracy"
+THIS_RUN_HEADER = "This Run"
+TYPICAL_HEADER = "Typical"
+DIFFERENCE_HEADER = "Difference"
 RECORDED_HEADING = "Everything Recorded"
 RECORDED_SUBTITLE = "The run file as KovaaK's wrote it, grouped by kind."
 OTHER_GROUP = "Other"
@@ -210,6 +255,10 @@ COLUMN_OPEN_CLASS = f"{COLUMN_CLASS} run-viewer-open"
 VIEWER_CLASS = "run-viewer"
 _BETTER_CLASS = "run-viewer-better"
 _WORSE_CLASS = "run-viewer-worse"
+# A difference of zero in By Bot, dimmed as the tiles' typical lines are.
+_EVEN_CLASS = "run-viewer-even"
+BY_BOT_CLASS = "run-viewer-by-bot"
+BY_BOT_GRID_CLASS = "run-viewer-bot-grid"
 _MARKED_CLASS = "run-viewer-card run-viewer-card-marked"
 _UNRECORDED_CLASS = "run-viewer-card run-viewer-card-unrecorded"
 _CARD_CLASS = "run-viewer-card"
@@ -428,6 +477,275 @@ def _tiles(figures: RunFigures) -> html.Div:
         # A time of zero or less isn't a time: the tile shows none.
         drawn.append(_tile(_time_tile(tiles.time), total, unrecorded=""))
     return html.Div(drawn, className="run-viewer-tiles")
+
+
+class _BotFigure(NamedTuple):
+    """One of By Bot's figures.
+
+    ``key`` names the figure on a ``BotRow`` and on ``BotFigures``, and its
+    This Run column in the grid. ``better`` is 1 where a higher value is
+    better and -1 where a lower one is.
+    """
+
+    header: str
+    key: str
+    better: int
+
+
+_TIME_PER_KILL = _BotFigure(TIME_PER_KILL_HEADER, "time_per_kill", -1)
+_TIME = _BotFigure(TIME_HEADER, "time", -1)
+_ACCURACY = _BotFigure(ACCURACY_HEADER, "accuracy", 1)
+
+# What each kind shows of a bot after its name, in column order.
+_BY_BOT_FIGURES = {
+    ByBotKind.MANY_KILLS: (_TIME_PER_KILL, _ACCURACY),
+    ByBotKind.TIME_SCORED: (_TIME, _ACCURACY),
+    ByBotKind.ACCURACY_ONLY: (_ACCURACY,),
+}
+
+
+def _natural_key(name: str) -> tuple[list[str | int], str]:
+    """Order names by their numbers' values: ``Bot 2`` before ``Bot 10``.
+
+    Splitting on digit runs alternates text and number, so two keys never
+    compare a number with text at the same place.
+    """
+    parts = re.split(r"(\d+)", name)
+    key = [
+        int(part) if index % 2 else part.casefold() for index, part in enumerate(parts)
+    ]
+    return key, name
+
+
+def _bot_shown(figure: _BotFigure, value: float | None) -> tuple[Decimal, str] | None:
+    """Return a bot's figure as it reads, with the number it reads as, or None."""
+    if value is None:
+        return None
+    if figure is _ACCURACY:
+        text = format_percent(value)
+        return _plain(text), text
+    seconds = _rounded(value, "0.01")
+    return seconds, f"{seconds:.2f} s"
+
+
+def _bot_cells(
+    figure: _BotFigure,
+    value: float | None,
+    typical: Typical | None,
+    total: int | None,
+) -> dict[str, Any]:
+    """Return one figure's cells of a bot's row: the number each sorts by, and its text.
+
+    ``total`` is the number of typical runs, None when there are none and the
+    figure is one column. The difference is worked out from the two values as
+    shown, so the three always add up on screen.
+    """
+    key = figure.key
+    cells: dict[str, Any] = {key: None, f"{key}_text": None}
+    run = _bot_shown(figure, value)
+    if run is not None:
+        cells[key], cells[f"{key}_text"] = float(run[0]), run[1]
+    if total is None:
+        return cells
+    for column in ("_typical", "_difference"):
+        cells |= dict.fromkeys((key + column, f"{key}{column}_text"))
+    cells[f"{key}_typical_hover"] = None
+    if typical is None:
+        return cells
+    typical_shown = _bot_shown(figure, typical.value)
+    assert typical_shown is not None
+    cells[f"{key}_typical"] = float(typical_shown[0])
+    cells[f"{key}_typical_text"] = typical_shown[1]
+    cells[f"{key}_typical_hover"] = _median_hover(typical.count, total)
+    if run is not None:
+        difference = run[0] - typical_shown[0]
+        unit = " pts" if figure is _ACCURACY else " s"
+        cells[f"{key}_difference"] = float(difference)
+        cells[f"{key}_difference_text"] = _signed(
+            difference, f"{abs(difference):.2f}{unit}"
+        )
+    return cells
+
+
+def _bot_column(figure: _BotFigure, key: str, header: str) -> dict[str, Any]:
+    """Return a figure's column: its value shown as the server wrote it, right aligned."""
+    column: dict[str, Any] = {
+        "colId": key,
+        "field": key,
+        "headerName": header,
+        "type": "rightAligned",
+        "valueFormatter": {"function": f"params.data.{key}_text"},
+    }
+    if key == f"{figure.key}_typical":
+        column["tooltipField"] = f"{key}_hover"
+    if key == f"{figure.key}_difference":
+        # A difference below zero is better for a time, and above zero for
+        # accuracy. An empty cell takes no class.
+        column["cellClassRules"] = {
+            _BETTER_CLASS: f"params.value * {figure.better} > 0",
+            _WORSE_CLASS: f"params.value * {figure.better} < 0",
+            _EVEN_CLASS: "params.value === 0",
+        }
+    return column
+
+
+def _bot_columns(
+    kind: ByBotKind, shown: tuple[_BotFigure, ...], with_typical: bool
+) -> list[dict[str, Any]]:
+    """Return By Bot's columns: the bot, its kills, then each figure.
+
+    With typical runs each figure groups This Run, Typical and Difference under
+    its name, and without any it is one column.
+    """
+    columns: list[dict[str, Any]] = [
+        {
+            "colId": "bot",
+            "field": "bot",
+            "headerName": BOT_HEADER,
+            # Name order, as the server ranked the names.
+            "comparator": {"function": "runViewerBotNameComparator"},
+        }
+    ]
+    if kind is ByBotKind.MANY_KILLS:
+        columns.append(
+            {
+                "colId": "kills",
+                "field": "kills",
+                "headerName": KILLS_HEADER,
+                "type": "rightAligned",
+            }
+        )
+    for figure in shown:
+        if not with_typical:
+            columns.append(_bot_column(figure, figure.key, figure.header))
+            continue
+        columns.append(
+            {
+                # Not the figure's own key: that names its This Run column.
+                "groupId": f"{figure.key}_group",
+                "headerName": figure.header,
+                "headerClass": "run-viewer-bot-group",
+                "children": [
+                    _bot_column(figure, figure.key, THIS_RUN_HEADER),
+                    _bot_column(figure, f"{figure.key}_typical", TYPICAL_HEADER),
+                    _bot_column(figure, f"{figure.key}_difference", DIFFERENCE_HEADER),
+                ],
+            }
+        )
+    return columns
+
+
+def _bot_rows(
+    rows: tuple[BotRow, ...],
+    kind: ByBotKind,
+    shown: tuple[_BotFigure, ...],
+    *,
+    times_known: bool,
+    total: int | None,
+) -> list[dict[str, Any]]:
+    """Return By Bot's rows in their default order.
+
+    That is play order where each bot is one kill, and name order otherwise.
+    A run whose times are unknown has no time cells, its typical's included.
+    """
+    names = sorted((row.name for row in rows), key=_natural_key)
+    order = {name: index for index, name in enumerate(names)}
+    data = []
+    for row in rows:
+        cells: dict[str, Any] = {
+            "bot": row.name,
+            "bot_order": order[row.name],
+            "kills": row.run.kills,
+        }
+        for figure in shown:
+            known = times_known or figure is _ACCURACY
+            cells |= _bot_cells(
+                figure,
+                getattr(row.run, figure.key) if known else None,
+                getattr(row, figure.key) if known else None,
+                total,
+            )
+        data.append(cells)
+    if kind is ByBotKind.MANY_KILLS:
+        data.sort(key=lambda cells: cells["bot_order"])
+    return data
+
+
+def _by_bot_grid_id(run: RunData) -> str:
+    """Name the run in the grid's id, so each run draws a grid of its own.
+
+    Dash keeps a child with an id by that id, so a grid reused for another
+    run would keep the sort the reader left on the last one. A run's rows
+    start in their default order instead.
+    """
+    digest = hashlib.sha256(run_id(run).encode()).hexdigest()
+    return f"run-viewer-by-bot-{digest[:16]}"
+
+
+def _by_bot(run: RunData, figures: RunFigures) -> html.Section | html.Div:
+    """Draw By Bot when the run's kill table names two bots or more.
+
+    Otherwise the slot holds a hidden placeholder: see ``run_viewer_content``.
+    """
+    by_bot = figures.by_bot
+    if by_bot.kind is None or len(by_bot.rows) < 2:
+        return html.Div(hidden=True)
+    shown = _BY_BOT_FIGURES[by_bot.kind]
+    with_typical = bool(figures.typical_runs)
+    subtitle = [BY_BOT_KIND_TEXT[by_bot.kind]]
+    if by_bot.kind is not ByBotKind.MANY_KILLS:
+        subtitle.append(BY_BOT_PLAY_ORDER_TEXT)
+    if with_typical:
+        subtitle.append(BY_BOT_TYPICAL_TEXT)
+    children: list[Any] = [
+        html.H3(BY_BOT_HEADING, className="run-viewer-heading"),
+        html.P(" ".join(subtitle), className="run-viewer-subtitle"),
+    ]
+    # Accuracy alone shows no time, so why a time is unknown is no answer.
+    if by_bot.times_unknown is not None and by_bot.kind is not ByBotKind.ACCURACY_ONLY:
+        children.append(
+            html.P(
+                TIMES_UNKNOWN_TEXT[by_bot.times_unknown],
+                className="run-viewer-by-bot-note",
+            )
+        )
+    grid = dag.AgGrid(
+        id=_by_bot_grid_id(run),
+        className=f"ag-theme-quartz {BY_BOT_GRID_CLASS}",
+        columnDefs=_bot_columns(by_bot.kind, shown, with_typical),
+        rowData=_bot_rows(
+            by_bot.rows,
+            by_bot.kind,
+            shown,
+            times_known=by_bot.times_unknown is None,
+            total=len(figures.typical_runs) if with_typical else None,
+        ),
+        defaultColDef={
+            "sortable": True,
+            "resizable": False,
+            "suppressMovable": True,
+            # An empty cell goes last in both directions.
+            "comparator": {"function": "nullsLastComparator"},
+        },
+        dashGridOptions={
+            "animateRows": False,
+            "autoSizeStrategy": {"type": "fitCellContents"},
+            # Print layout draws every row and column in the page's flow,
+            # so the grid takes the width of its columns, as a table
+            # does. The other layouts fill their container.
+            "domLayout": "print",
+            # A typical's hover is the browser's own title, as a tile's is.
+            "enableBrowserTooltips": True,
+            "groupHeaderHeight": 26,
+            "headerHeight": 28,
+            "rowHeight": 28,
+        },
+        # In place of dash-ag-grid's own full width and 400px height, which
+        # it keeps unless a style names others.
+        style={"height": "auto", "width": "fit-content"},
+    )
+    children.append(html.Div(grid, className="run-viewer-table-scroll"))
+    return html.Section(children, className=f"run-viewer-section {BY_BOT_CLASS}")
 
 
 def _card(card: SettingCard, total: int) -> html.Div:
@@ -681,11 +999,11 @@ def run_viewer_content(
             _score_line(line),
             html.P(_reference_text(figures, today), className="run-viewer-reference"),
             _tiles(figures),
-            # By Bot goes here, between the tiles and Settings. Everything
-            # Recorded stays open through a switch to another run only while
-            # it keeps its place among these children, where React keeps
-            # the open element: a section shown on some runs and not others
-            # has to leave something in its place.
+            # Everything Recorded stays open through a switch to another run
+            # only while it keeps its place among these children, where React
+            # keeps the open element, so By Bot leaves a placeholder on a run
+            # without a table.
+            _by_bot(run, figures),
             _settings(figures),
             _everything_recorded(run, figures),
         ],

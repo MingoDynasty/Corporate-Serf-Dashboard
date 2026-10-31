@@ -8,7 +8,9 @@ Bot. Its typical runs are the runs behind its typical score at session start.
 
 The run's stats file and its typical runs' files are read each time a run is
 viewed. Nothing is kept, and the stats folder is only ever read. The rules
-are the run viewer proposal's, in ``docs/proposals/run_viewer_proposal.md``.
+are the run viewer's decision-log entries of 2026-10-30, in
+``docs/decision_log/2026/``, and its statements in
+``docs/specs/run_history.md``.
 """
 
 import logging

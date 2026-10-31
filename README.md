@@ -22,6 +22,8 @@ are sample data. Open an image for full-resolution detail.
   faded and the current summary in Scenario Stats.
 - **Run history**: a scenario's runs listed by session, with a check on each run that met your
   score threshold and a star on each new personal best, or each session whole across every scenario.
+- **Run viewer**: click any run, in the list or on the chart, to measure it against your typical
+  runs, bot by bot where it has several, with its settings and everything its stats file recorded.
 - **Scenario notes**: your own note on each scenario, such as a reminder about technique, shown
   on Run History whenever the scenario is selected.
 - **Run notifications**: a toast on every page when a new run is detected, with a link to its

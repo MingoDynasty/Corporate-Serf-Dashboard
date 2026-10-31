@@ -132,6 +132,46 @@ The run list's **Columns** menu can also add **Shots Fired**, **Reloads**,
 **FOV** and **Avg FPS**, each off to start, and the list widens to fit the
 columns you turn on.
 
+### Opening a run
+
+Click a run in the run list, or a run's point or gold star on the chart, to
+open it where the chart was. Enter or Space on a focused run row opens it
+too. The list stays beside it, so a click on another run switches to that
+one. **Close**, or Esc, brings the chart back as you left it, with its zoom
+and hidden traces, and puts focus back on the row you opened. Esc is left
+alone while you type in a field or a menu or dialog is open. Choosing another
+scenario closes the run, the browser's Back leaves the page, and a reload
+shows the chart.
+
+The run is measured against its typical runs: up to 20 runs before its
+session, the ones behind your typical score when that session began, named
+in the line under the score. Each tile shows the run's figure over its
+typical and the difference, green when better and red when worse; hover the
+typical to see how many runs it rests on. A run from before the scenario had
+a typical score shows its own figures alone, and the line says why.
+
+**By Bot** appears when the run's kills name two bots or more. Where bots
+come back many times, as on Popcorn, it shows each bot's kills, time per kill
+and accuracy. Where each bot is killed once and the score is a completion
+time, as on Air, it shows each bot's time, the run's split. Anywhere else
+each bot is killed once and it shows accuracy alone, because the app can't
+tell whether a bot's time would be a split or a phase's fixed length. A
+kill's time runs from the kill before it, so it
+includes finding the bot. Click a column's header, or press Enter on it, to
+sort ascending, a second time descending, and a third time back to the
+starting order; empty cells stay last. A run that was paused, or whose file
+has no start time or has times out of order, shows no times, and a line under
+the table's description says which.
+
+**Settings** shows eleven settings on every run, and one that differs from
+what your typical runs mostly used is tinted, with that value under it.
+**Everything Recorded**, closed at the bottom, holds every field the game
+wrote, grouped by kind, with the weapon rows and the kill table. It stays
+open while you click from run to run.
+
+The run's file is read each time it opens. A run whose stats file was moved
+or deleted since the app started says its file couldn't be read.
+
 ### Accuracy targets
 
 In **Chart options**, the **Accuracy targets** switch, off to start, writes

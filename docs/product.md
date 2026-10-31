@@ -107,6 +107,18 @@ the same form as the finished ones under it.
   couldn't see which runs were played at which FOV, and a PB set at an
   unusual one looked like any other run. The list stays a short panel for
   picking out a run: these are for the player who asks.
+- **One run, opened whole** (Run History page, PRs #453, #455 and #456;
+  design in #450). A click on any run, in the run list or on the chart,
+  opens it where the chart was: its score tiles against the runs behind its
+  typical score when its session began, a By Bot table for a run that names
+  two bots or more, its eleven settings with a changed one marked, and
+  everything its stats file recorded. Close or Esc brings the chart back as
+  it was left. *Problem solved:* a run was a row of a few figures and a
+  point on the chart, so its settings, how it went against each bot, and
+  most of what the game recorded were out of reach, and an old run's
+  accuracy meant digging through the list. On a scenario with several bots,
+  nothing showed which ones a run lost time or accuracy on against the
+  player's usual play.
 - **The latest run, on a card** (Run History page, PR #372; design in #356).
   A card at the top of the page reports the selected scenario's latest run:
   its score, whether it passed your threshold or set a new personal best, its

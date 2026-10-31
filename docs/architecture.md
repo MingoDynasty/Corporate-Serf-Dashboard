@@ -1186,9 +1186,15 @@ flowchart LR
 - `components/run_viewer_panel.py` — the Run History page's run viewer: one
   run in the chart's place until it is closed. `run_viewer_content()` draws
   what `kovaaks/run_viewer.py` works out of a run: the header, the score
-  line, the line that names its typical runs, the tiles, the eleven
+  line, the line that names its typical runs, the tiles, By Bot, the eleven
   Settings cards and Everything Recorded, closed. Each tile's difference is
-  worked from the two values as shown, so they add up on screen.
+  worked from the two values as shown, so they add up on screen, and so is
+  each By Bot cell's. By Bot is a `dag.AgGrid` given its columns and rows
+  as data, in print layout so it is as wide as its columns, with an id
+  that names the run, so each run draws a grid of its own and starts
+  unsorted. Its rows carry each cell's number to sort by and its text to
+  show, and a run without a table leaves a hidden placeholder in its
+  place, so Everything Recorded keeps its own among the body's children.
   `recorded_groups()` sorts a stats file's fields into Everything Recorded's
   groups and says which fold to one line, and the weapon rows and the kill
   table go to `dmc.Table` as data, never as one Dash component per cell.
@@ -1449,8 +1455,9 @@ flowchart LR
   and each bot's kills, accuracy and times against its typical).
   `view_run_from_store` reads the store and the stats folder setting. The
   run's file and up to 20 typical runs' files are read on every call, and
-  nothing is kept. `components/run_viewer_panel.py` draws it; By Bot is still
-  to be drawn ([proposal](proposals/run_viewer_proposal.md)).
+  nothing is kept. `components/run_viewer_panel.py` draws it. The rules are
+  the run viewer's decision-log entries, such as
+  [By Bot's](decision_log/2026/2026-10-30-by-bot-measures-each-bot-against-its-own-typical-and-names-no-bot.md).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -1687,6 +1694,8 @@ flowchart LR
   open when it looks. `shown` runs once the server's change is drawn: it
   marks the run's row, starts a run from its top, and puts focus on Close,
   back on the row that opened the run, or on the chart's mode control.
+  It also registers `runViewerBotNameComparator`, which sorts By Bot's
+  Bot column in the server's name order.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Run History
   graph to the runs in view when
   the x axis is zoomed. It reads the x axis through plotly.js's own
