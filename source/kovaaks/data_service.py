@@ -878,7 +878,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 raw_fov = _optional_field_value(line)
             elif line.startswith("FOVScale:"):
                 raw_fov_scale = _optional_field_value(line)
-            elif line.startswith("Avg FPS:"):
+            elif line.startswith(("Avg FPS:", "Avg FPS,")):
+                # KovaaK's 2.0.3 to 2.0.5 wrote this key with no colon.
                 raw_avg_fps = _optional_field_value(line)
     except OSError, ValueError, IndexError:
         # OSError: the CSV can be locked by a still-running KovaaK's or vanish
