@@ -1,5 +1,6 @@
-// Link only run markers and already-loaded list rows. No Plotly restyle is
-// needed: changing marker size through Plotly can change an autoranged axis.
+// Link only run markers and already-loaded list rows, and open a clicked run
+// in the run viewer. No Plotly restyle is needed: changing marker size through
+// Plotly can change an autoranged axis.
 (function () {
   var attached = new WeakSet();
   var graph = null;
@@ -55,6 +56,14 @@
     });
   }
 
+  // The run of the first run point or PB star among an event's points.
+  function runId(event) {
+    var point = (event.points || []).find(function (item) {
+      return item.data.meta === "run-history-run";
+    });
+    return point && point.data.ids && point.data.ids[point.pointNumber];
+  }
+
   var functions = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
   functions.runHistoryHoverOver = function (params) {
     var target = params.event && params.event.target;
@@ -108,11 +117,9 @@
       if (!gd.matches(":hover")) {
         return;
       }
-      var point = (event.points || []).find(function (item) {
-        return item.data.meta === "run-history-run";
-      });
-      var id = point && point.data.ids && point.data.ids[point.pointNumber];
+      var id = runId(event);
       clear();
+      gd.classList.toggle("run-history-graph-pointer", typeof id === "string");
       if (typeof id === "string") {
         source = "chart";
         emphasize(id);
@@ -120,8 +127,18 @@
       }
     });
     gd.on("plotly_unhover", function () {
+      gd.classList.remove("run-history-graph-pointer");
       if (graph === gd && source === "chart") {
         clear();
+      }
+    });
+    // A click opens the run the tooltip names: plotly's click event carries
+    // the points its hover chose. Not dcc.Graph's clickData, which Dash
+    // drops when the same point is clicked again after a close.
+    gd.on("plotly_click", function (event) {
+      var id = runId(event);
+      if (typeof id === "string" && window.runViewer) {
+        window.runViewer.request(id, "chart");
       }
     });
     gd.on("plotly_afterplot", function () {

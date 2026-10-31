@@ -1113,6 +1113,290 @@ a.run-toast-link {
     filter: drop-shadow(0 0 2px var(--run-history-link-color));
 }
 
+/* A run point or a PB star under the pointer opens its run on a click.
+   Plotly's drag layer is what the pointer is over, and its own cursor is the
+   zoom's crosshair everywhere else. */
+.run-history-graph-pointer .nsewdrag {
+    cursor: pointer !important;
+}
+
+/* The run open in the run viewer. An outline and not a border, so it moves
+   no column, in the app's blue: the latest run's tint and the grape of a
+   linked hover keep their own meanings, and a row can carry all three. */
+.run-history-list-grid .ag-row.run-list-row-open {
+    outline: 2px solid var(--mantine-color-blue-filled);
+    outline-offset: -2px;
+}
+
+/* ---- The run viewer, in the chart's place ----
+   Hidden, not removed: everything else in the chart's column stays mounted
+   while a run is open, so the chart comes back with its mode, zoom, ranges
+   and hidden traces as they were. The graph's box is empty meanwhile, and
+   assets/homeGraphResize.js redraws it at its own width once it is shown. */
+.run-viewer {
+    display: none;
+}
+
+.run-history-chart-column.run-viewer-open > :not(.run-viewer) {
+    display: none;
+}
+
+.run-history-chart-column.run-viewer-open > .run-viewer {
+    background: var(--mantine-color-body);
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    overflow: auto;
+    padding: 14px 18px 24px;
+}
+
+.run-viewer {
+    --run-viewer-better: var(--mantine-color-green-9);
+    --run-viewer-worse: var(--mantine-color-red-9);
+}
+
+:root[data-mantine-color-scheme="dark"] .run-viewer {
+    --run-viewer-better: var(--mantine-color-green-4);
+    --run-viewer-worse: var(--mantine-color-red-4);
+}
+
+.run-viewer-header {
+    align-items: flex-start;
+    display: flex;
+    gap: var(--mantine-spacing-md);
+    justify-content: space-between;
+}
+
+.run-viewer-kicker {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+}
+
+.run-viewer-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 2px 0 0;
+}
+
+.run-viewer-close {
+    flex: none;
+}
+
+.run-viewer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Inline boxes with spaces between them: see ``_score_line``. */
+.run-viewer-score-line {
+    line-height: 36px;
+}
+
+.run-viewer-score {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+/* The badge as the latest-run card draws it, set in the line's text. */
+.run-viewer .run-history-card-badge {
+    background: color-mix(in srgb, var(--run-history-card-badge-color) 20%, transparent);
+    border: 1px solid var(--run-history-card-badge-color);
+    color: var(--mantine-color-text);
+    margin: 0 4px;
+    vertical-align: 4px;
+}
+
+.run-viewer-comparison {
+    font-size: 14px;
+}
+
+.run-viewer-reference {
+    color: var(--mantine-color-dimmed);
+    font-size: 13px;
+    margin: -12px 0 0;
+}
+
+.run-viewer-tiles {
+    border-bottom: 1px solid var(--mantine-color-default-border);
+    border-top: 1px solid var(--mantine-color-default-border);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.run-viewer-tile {
+    border-right: 1px solid var(--mantine-color-default-border);
+    margin-right: 28px;
+    min-width: 150px;
+    padding: 10px 28px 10px 0;
+}
+
+.run-viewer-tile:last-child {
+    border-right: 0;
+}
+
+.run-viewer-tile-label,
+.run-viewer-card-label {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+}
+
+.run-viewer-tile-value {
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Every tile keeps its typical line's room, so a tile without one is the
+   height of the rest. */
+.run-viewer-tile-typical {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    min-height: 1.55em;
+}
+
+.run-viewer-better {
+    color: var(--run-viewer-better);
+    font-weight: 600;
+}
+
+.run-viewer-worse {
+    color: var(--run-viewer-worse);
+    font-weight: 600;
+}
+
+.run-viewer-heading {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 2px;
+}
+
+.run-viewer-subtitle {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    margin: 0 0 8px;
+    max-width: 760px;
+}
+
+/* Settings: cards of one size, six to a row at most, so the aim setup fills
+   the first row and the settings changed once fill the second. Every card
+   keeps its typical line's room, so a marked card never grows. */
+.run-viewer-cards {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(auto-fill, 168px);
+    max-width: calc(6 * 168px + 5 * 8px);
+}
+
+.run-viewer-card {
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    min-width: 0;
+    padding: 5px 10px;
+}
+
+.run-viewer-card-value {
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.run-viewer-card-typical {
+    font-size: 12px;
+    min-height: 1.45em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* A setting that differs from its typical value. The tint is matched by the
+   typical line under the value, so the change isn't carried by color alone. */
+.run-viewer-card-marked {
+    background: var(--mantine-color-yellow-light);
+    border-color: var(--mantine-color-yellow-outline);
+}
+
+.run-viewer-card-unrecorded .run-viewer-card-value,
+.run-viewer-unrecorded {
+    color: var(--mantine-color-dimmed);
+    font-weight: 400;
+}
+
+.run-viewer-summary {
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.run-viewer-recorded > .run-viewer-subtitle {
+    margin-top: 6px;
+}
+
+.run-viewer-groups {
+    align-items: start;
+    display: grid;
+    gap: 20px 28px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    margin-top: 10px;
+}
+
+.run-viewer-group-wide {
+    grid-column: 1 / -1;
+}
+
+.run-viewer-group-heading {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.run-viewer-quiet {
+    color: var(--mantine-color-dimmed);
+    font-size: 12px;
+    margin: 0;
+}
+
+/* The kill table can be wider than the viewer: it scrolls sideways in its
+   own box, and the viewer doesn't. */
+.run-viewer-table-scroll {
+    overflow-x: auto;
+}
+
+.run-viewer-table {
+    font-size: 13px;
+    width: auto;
+}
+
+.run-viewer-table th,
+.run-viewer-table td {
+    padding: 3px 12px 3px 6px;
+    white-space: nowrap;
+}
+
+/* A field's value can be a long file name or hash: it wraps rather than
+   widen its group. */
+.run-viewer-field-table {
+    width: 100%;
+}
+
+.run-viewer-field-table td + td {
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.run-viewer-unreadable {
+    margin: 0;
+}
+
 /* The current session, held under the column headings while the list
    scrolls. Beside it the grid keeps a scrollbar of the row's own, so its
    columns stay in line with the body's. It scrolls nothing, so it is drawn
@@ -1503,6 +1787,12 @@ a.run-toast-link {
 
     .run-history-chart-column {
         flex: 1 0 auto;
+    }
+
+    /* The page scrolls here, so the viewer is as tall as what it shows. */
+    .run-history-chart-column.run-viewer-open > .run-viewer {
+        flex: 0 0 auto;
+        overflow: visible;
     }
 
     .run-history-list-column {

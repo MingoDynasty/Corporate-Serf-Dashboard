@@ -809,7 +809,20 @@ def test_hover_preserves_the_focused_run_cell(hover_page):
     )
     # The grid can deliver the click's mouse-over/out after the chart hover.
     # Those older events must neither replace nor clear the new linked run.
+    # A click opens the run in the run viewer, in the chart's place, and Esc
+    # closes it and puts focus back on the row.
     cell.click()
+    page.wait_for_function(
+        "() => document.querySelector('.run-viewer-open .run-viewer-title')"
+    )
+    page.keyboard.press("Escape")
+    page.wait_for_function(
+        """(id) => !document.querySelector('.run-viewer-open')
+            && document.activeElement?.closest('.ag-row')?.getAttribute('row-id')
+                === id""",
+        arg=rows[0]["id"],
+    )
+    wait_for_chart_quiet(page)
     before = list_snapshot(page)
     hover_point(page, rows[1])
     playwright.expect(page.locator(".ag-row.run-list-row-linked")).to_have_count(1)

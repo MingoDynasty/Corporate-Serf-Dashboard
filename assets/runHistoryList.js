@@ -45,6 +45,9 @@
 //      grid's hidden to clip (the stylesheet's .ag-full-width-row rule).
 //      Pinned columns are no way out: with embedded full-width rows the grid
 //      draws each such row twice, once in each part.
+//  12. A click on a Run row, or Enter or Space on it, opens its run in the
+//      run viewer. The open run's row is marked by a field on its data and a
+//      row class rule, set again on every model applied.
 (function () {
   var dagfuncs = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
   var dagcomponentfuncs = (window.dashAgGridComponentFunctions =
@@ -98,6 +101,9 @@
     columns: null,
     // A session asked for from its count, opened when the tree arrives.
     jump: null,
+    // The run open in the run viewer, whose row is marked. Not the grid's: a
+    // run stays open while the list is rebuilt or switches view.
+    openRun: null,
     expandLabel: undefined,
     // One per mounted full-width row, so each redraws when a row opens or
     // closes.
@@ -218,6 +224,21 @@
   dagfuncs.runListRowClass = function (params) {
     return "run-list-row-" + params.data.kind;
   };
+  // A Run row opens its run in the run viewer (assets/runViewer.js), which
+  // takes the chart's place.
+  function openRun(context, data) {
+    if (window.runViewer) {
+      window.runViewer.request(data.id.slice(context.runRowIdPrefix.length), "list");
+    }
+  }
+
+  dagfuncs.runListCellClicked = function (params) {
+    var data = params.node && params.node.data;
+    if (data && data.kind === RUN) {
+      openRun(contextOf(params.api), data);
+    }
+  };
+
   // A key pressed on the row itself. A key pressed on a button inside the row
   // is the button's own.
   dagfuncs.runListKeyDown = function (params) {
@@ -228,6 +249,13 @@
     }
     var key = event.key;
     var context = contextOf(params.api);
+    if (data.kind === RUN) {
+      if (key === "Enter" || key === " ") {
+        event.preventDefault();
+        openRun(context, data);
+      }
+      return;
+    }
     if (data.kind === MORE) {
       if (key === "Enter" || key === " ") {
         event.preventDefault();
@@ -780,6 +808,7 @@
       state.started = false;
       state.newestRun = undefined;
       state.jump = null;
+      state.openRun = null;
       state.expandLabel = labels.expandAll;
       // A full-width row spans the columns shown, and the grid does not
       // draw it again when the Columns menu hides one.
@@ -836,8 +865,11 @@
     state.columns = model.columns;
     state.sessionIds = [];
     state.children = {};
+    var openRow = state.openRun == null ? null : context.runRowIdPrefix + state.openRun;
     rows.forEach(function (row) {
-      if (row.kind === SESSION) {
+      if (row.kind === RUN) {
+        row.open = row.id === openRow;
+      } else if (row.kind === SESSION) {
         state.sessionIds.push(row.id);
       } else if (row.kind === SCENARIO) {
         (state.children[row.sid] = state.children[row.sid] || []).push(row.id);
@@ -908,6 +940,41 @@
       }
     });
     notify();
+  };
+
+  // Mark the open run's row, and take the mark off the row that had it. The
+  // rows' data carries the mark, so a refreshed row keeps it.
+  state.markOpen = function (id) {
+    var previous = state.openRun;
+    state.openRun = id == null ? null : id;
+    var api = state.api;
+    if (!api || api.isDestroyed() || previous === state.openRun) {
+      return;
+    }
+    var prefix = contextOf(api).runRowIdPrefix;
+    [previous, state.openRun].forEach(function (runId) {
+      var node = runId == null ? null : api.getRowNode(prefix + runId);
+      if (node && node.data) {
+        node.updateData(Object.assign({}, node.data, { open: runId === state.openRun }));
+      }
+    });
+  };
+
+  // Put keyboard focus on a run's row, scrolled into view. Returns false when
+  // the row isn't in the view on screen, or its group is closed.
+  state.focusRun = function (id) {
+    var api = state.api;
+    if (!api || api.isDestroyed() || id == null) {
+      return false;
+    }
+    var node = api.getRowNode(contextOf(api).runRowIdPrefix + id);
+    var columns = api.getAllDisplayedColumns();
+    if (!node || !node.displayed || node.rowIndex == null || !columns.length) {
+      return false;
+    }
+    api.ensureNodeVisible(node);
+    api.setFocusedCell(node.rowIndex, columns[0]);
+    return true;
   };
 
   // Expand all opens every loaded session of the view on screen, down to its
