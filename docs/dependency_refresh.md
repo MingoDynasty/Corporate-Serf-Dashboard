@@ -201,6 +201,14 @@ API. The standard CI gates never open a browser, so they see none of it. The
 [on-demand screenshot workflow](screenshots/README.md#refresh-in-github-actions)
 captures three pages for documentation; it does not replace these checks.
 
+Dash serves React 18 unless an app asks for another version, and
+dash-mantine-components 3 needs React 19, so `source/app.py` asks for it
+([2026-10-31 entry](decision_log/2026/2026-10-31-the-app-serves-react-19-for-dash-mantine-components-3.md)).
+When dash or dash-mantine-components moves, read which React version each
+release needs or offers. A dash release that drops the version the app asks
+for fails the import of `source.app`, and one that makes React 19 its default
+lets the call go.
+
 When one of them moves, run the app (`uv run python source/app.py`) and look at
 every page: the chart toolbars, the grids, the menus, and the browser console
 after one reload. [AGENTS.md](../AGENTS.md#workflow) names the console messages
@@ -220,9 +228,12 @@ compare the two. Run this in the browser console on a page with a chart drawn:
 JSON.stringify(document.querySelector(".js-plotly-plot")._context)
 ```
 
-For plotly or dash-ag-grid bumps, run the linked-hover and run viewer
-browser regressions. They exercise Plotly's SVG marker bindings and click
-events and AG Grid's mouse and key events, which the standard gates skip.
+For plotly, dash-ag-grid or dash-mantine-components bumps, run the
+linked-hover and run viewer browser regressions. They exercise Plotly's SVG
+marker bindings and click events, AG Grid's mouse and key events, and the run
+viewer's Esc rule around Mantine's Select, Menu and Modal, which the standard
+gates skip. dash-mantine-components 3 gave a Select's input the combobox role,
+and only the run viewer regression saw it.
 The screenshots dependency group installs Playwright; this command uses an
 installed Microsoft Edge browser:
 
@@ -277,8 +288,8 @@ A dash-mantine-components bump needs two looks at the playlist filter on
 Run History, which no test can take. The filter lists a hidden
 playlist while it holds one, and that rests on how the Select treats a value
 against its options: it names a value its options have, and drops a value its
-new options lack. Both were read in 2.8.0's bundle and seen in a browser, and
-neither is documented
+new options lack. Both were read in 2.8.0's bundle, seen in a browser, and
+seen again on 3.0.0, and neither is documented
 ([2026-10-12 entry](decision_log/2026/2026-10-12-the-playlist-filter-lists-the-hidden-playlist-it-holds.md)).
 
 - **A held hidden playlist is named.** On Playlists, turn on Show hidden,
@@ -293,7 +304,15 @@ neither is documented
   localStorage.setItem("_dash_persistence.run-history-playlist-filter.value.true", '["KovaaKsNoSuchCode",null]')
   ```
 
-If either look fails, stop and ask the maintainer.
+A dash-mantine-components bump also re-reads the run toast's model. The test
+for the run toast's lifetime runs against a Python model of four behaviors of
+dmc's notification store, read out of its bundle and listed in the docstring of
+`tests/test_run_verdict_lifetime.py`. A green run there says nothing about a
+new bundle: find the four in the new `dash_mantine_components.js`, and record
+the version read in that docstring.
+
+If either look fails, or the bundle no longer does what the model says, stop
+and ask the maintainer.
 
 A refresh changes versions, not behavior. If an upgrade adds or removes
 something a user can press, changes what a control does, or adds a new way for
