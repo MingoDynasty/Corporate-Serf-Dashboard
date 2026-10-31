@@ -5,9 +5,9 @@ one run toast is on screen once a response has been applied, a later run's
 toast replaces it, and the replacement gets a full lifetime rather than the
 remainder of the old timer.
 
-``FakeNotificationContainer`` is a Python model of the DMC 2.8.0 notification
-store, transcribed from the shipped bundle so the assertions can advance a
-clock. Four behaviors are modelled, and all four were read out of
+``FakeNotificationContainer`` is a Python model of the DMC notification store,
+transcribed from the 2.8.0 bundle and re-read in 3.0.0's, so the assertions can
+advance a clock. Four behaviors are modelled, and all four were read out of
 ``dash_mantine_components.js``:
 
 - ``show`` is a no-op for an id already on screen
@@ -21,10 +21,11 @@ clock. Four behaviors are modelled, and all four were read out of
 - ``hideNotifications`` drops the ids it names, and the container declares that
   effect *after* the ``sendNotifications`` one, so one response shows the fresh
   instance before retiring the instance it replaces.
-- the auto-close timer is a React effect keyed on the *resolved duration
-  alone* (``useEffect(() => (arm(), clear), [resolvedAutoClose])``); a fresh id
-  is a fresh entry, so it arms its own timer whatever the outgoing one had
-  left.
+- the auto-close timer is a React effect keyed on the *resolved duration*
+  (``useEffect(() => (arm(), clear), [resolvedAutoClose])`` in 2.8.0; 3.0.0
+  also keys it on a swipe in progress and a swipe dismissal, which a toast
+  nobody touches never changes); a fresh id is a fresh entry, so it arms its
+  own timer whatever the outgoing one had left.
 
 If a DMC upgrade changes any of those, this model goes stale -- re-read the
 bundle before trusting a green run here.
