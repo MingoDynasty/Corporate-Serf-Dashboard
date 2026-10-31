@@ -132,6 +132,10 @@ benchmark tier) — see the
   subject to the cache conventions in [AGENTS.md](../../AGENTS.md). They
   carry no schema stamp; the durable-store contract that exempts them lives in
   [settings.md](settings.md#durable-store-schema-contract).
+- A cache that can't be written never stops the app starting. When startup
+  can't create the cache folders, or can't write the bundled leaderboard IDs
+  into the mapping cache (a read-only file, or a directory at its path), it
+  logs one warning naming the path and serves without what it couldn't write.
 - `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
   both default to `168`
   ([2026-04-29](../decision_log/2026/2026-04-29-cache-leaderboard-totals-for-one-week.md)).
