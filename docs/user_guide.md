@@ -154,8 +154,9 @@ a typical score shows its own figures alone, and the line says why.
 come back many times, as on Popcorn, it shows each bot's kills, time per kill
 and accuracy. Where each bot is killed once and the score is a completion
 time, as on Air, it shows each bot's time, the run's split. Anywhere else
-each bot is killed once and it shows accuracy alone, because the time would
-be a phase's fixed length. A kill's time runs from the kill before it, so it
+each bot is killed once and it shows accuracy alone, because the app can't
+tell whether a bot's time would be a split or a phase's fixed length. A
+kill's time runs from the kill before it, so it
 includes finding the bot. Click a column's header, or press Enter on it, to
 sort ascending, a second time descending, and a third time back to the
 starting order; empty cells stay last. A run that was paused, or whose file

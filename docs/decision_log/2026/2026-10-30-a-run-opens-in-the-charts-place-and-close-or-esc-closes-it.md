@@ -44,8 +44,11 @@ What the page does today is in
 parts, its header and Chart options, and keeps them mounted. No callback that
 opens or closes a run writes the figure. Closing shows the chart with its
 mode, zoom, ranges and hidden traces as they were, and a chart drawn again
-while hidden, as when a run lands, comes back at its column's width. The open
-run's Run row carries an outline in either view. Opening a run measured 75 to
+while hidden, as when a run lands, comes back at its column's width. The run
+shows, from the top: its header, the score line, the line naming its typical
+runs, the tiles, By Bot when the run names two bots or more, Settings, and
+Everything Recorded, closed. The open run's Run row carries an outline in
+either view. Opening a run measured 75 to
 111 ms from click to drawn on the maintainer's stats folder, so it is a plain
 server callback with no loading state.
 

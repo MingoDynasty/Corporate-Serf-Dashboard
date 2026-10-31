@@ -78,7 +78,9 @@ living only in Everything Recorded.
   change shape between runs; a notice under the tiles for a changed setting
   (v8 to v11), which this row moved into the card.
 - The scenario's version and the performance file's time scale as cards:
-  the player can't change either. Both are in Everything Recorded.
+  the player can't change either. The version is in Everything Recorded,
+  as the stats file's `Hash:` line; the time scale is the performance
+  file's, which the viewer doesn't read.
 
 **Provenance.** Proposal by `claude-opus-5-5` (#450), read by `gpt-6-astra`
 (flagship, first wave) and reviewed by `gpt-6.1-sol` (the seat) and
