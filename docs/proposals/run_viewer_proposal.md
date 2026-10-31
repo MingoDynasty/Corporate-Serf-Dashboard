@@ -16,21 +16,24 @@ the Esc key brings the chart back as it was left.
 
 ## Decisions needed
 
-Six rows, RV1 to RV6. **Nothing is ratified.** Each row carries the
-maintainer's lean from the design discussion of 2026-10-25 to 2026-10-30,
-worked out on twelve versions of a mockup built from their own stats, at
-2560 and 1920 wide, in light and dark (local only, under the main
-checkout's `ignore/mockups/run-viewer/`). A lean is not a ruling.
-Reviewers may challenge any row, and anything in [Design](#design), which
-is author-owned.
+Six rulings: RV1 to RV6. The maintainer ratified this proposal on
+2026-10-30 at `f80c109`: "Sounds good. I ratify." That settles each row as
+its recommendation, RV3, RV4 and RV5 as amended in review. Before that, each
+row was the maintainer's lean from the design discussion of 2026-10-25 to
+2026-10-30, worked out on twelve versions of a mockup built from their own
+stats, at 2560 and 1920 wide, in light and dark (local only, under the main
+checkout's `ignore/mockups/run-viewer/`). Each row keeps what was said, for
+the record. Everything else is author-owned, in [Design](#design), and the
+ratification covers it too.
 The ideas the discussion set aside are in [Out of scope](#out-of-scope), each
 with what would bring it back.
 
 ### RV1. A run opens in the chart's place, and Close or Esc closes it
 
-Status: open. The maintainer's lean, 2026-10-29, on the author's proposal to
-keep the open run out of the address: "agree, but I also vote to make a
-keyboard shortcut to make navigation a bit more seamless."
+Status: Ratified (user), 2026-10-30: accept the recommendation below. The
+maintainer's lean before that, 2026-10-29, on the author's proposal to keep
+the open run out of the address: "agree, but I also vote to make a keyboard
+shortcut to make navigation a bit more seamless."
 
 The material consequence: the browser's Back doesn't close a run. It leaves
 the page, as it does after any change on Run History today, and no link
@@ -69,8 +72,9 @@ history entry.**
 
 ### RV2. The run is measured against its typical runs, with no Compare with menu
 
-Status: open. The maintainer's lean, 2026-10-30, after a write-up of what a
-menu would take: "Yes, keep it shelved."
+Status: Ratified (user), 2026-10-30: accept the recommendation below. The
+maintainer's lean before that, 2026-10-30, after a write-up of what a menu
+would take: "Yes, keep it shelved."
 
 The material consequence: the page can't answer "what did my PB run do
 differently?" except by opening the PB run, whose figures read against its
@@ -117,8 +121,9 @@ from Sep 27, 2025 to Oct 6, 2025.`**
 
 ### RV3. The tiles: Score, Accuracy, Shots fired and Reloads always, then Time on a time-scored scenario
 
-Status: open. The maintainer's lean, 2026-10-29: "I now vote for always
-showing them, regardless of the type of run. Otherwise the user has to
+Status: Ratified (user), 2026-10-30: accept the recommendation below, as
+amended in review. The maintainer's lean before that, 2026-10-29: "I now
+vote for always showing them, regardless of the type of run. Otherwise the user has to
 adjust columns in the right side panel, when the intent of the Run Viewer
 UI is to show everything applicable to the run." Fire held, a tile for how
 much of the run the fire button was down, was their idea (2026-10-29). On
@@ -164,8 +169,9 @@ shots.**
 
 ### RV4. By Bot: each bot against its own typical, with no verdict on which to practice
 
-Status: open. The maintainer's leans, 2026-10-29: play order where it is
-fixed, rows that highlight on hover, the section above Settings, This Run,
+Status: Ratified (user), 2026-10-30: accept the recommendation below, as
+amended in review. The maintainer's leans before that, 2026-10-29: play
+order where it is fixed, rows that highlight on hover, the section above Settings, This Run,
 Typical and Difference columns, every column sortable, and no By Bot for a
 single bot. On 2026-10-30: no lead line naming the bot this run lost the
 most on.
@@ -228,7 +234,8 @@ descending, then back, on a click or on Enter while it has focus.**
 
 ### RV5. Settings: eleven cards on every run, a changed one marked with its typical value
 
-Status: open. The maintainer's leans:
+Status: Ratified (user), 2026-10-30: accept the recommendation below, as
+amended in review. The maintainer's leans before that:
 - 2026-10-29: cards of one size, with the count on hover.
 - 2026-10-29, on show-or-hide rules: "keep things simple and just show all
   the cards. We can always consider trimming things later."
@@ -291,9 +298,10 @@ stats file doesn't have reads `Not recorded` and is never marked.**
 
 ### RV6. Everything Recorded: the whole stats file, closed, grouped by kind
 
-Status: open. The maintainer's leans, 2026-10-29: everything in the stats
-file, organized and low priority, collapsed or at the bottom. On
-2026-10-30: "Yes, keep folding."
+Status: Ratified (user), 2026-10-30: accept the recommendation below. The
+maintainer's leans before that, 2026-10-29: everything in the stats file,
+organized and low priority, collapsed or at the bottom. On 2026-10-30: "Yes,
+keep folding."
 
 The material consequence: the page shows fields that answer no question
 today, such as Midairs and MBS Points, under the game's own names, behind a
@@ -734,7 +742,8 @@ cards beyond the click that opens a run.
 ## Delivery plan
 
 Stated intent, not a contract. A PR that moves a boundary says so in its
-description.
+description. The proposal was ratified on 2026-10-30, so PR 1 can start once
+this proposal merges.
 
 1. **Read a run whole.** A reader for a stats file's three parts, returning
    its fields in file order, its weapon rows and its kill table, with the
