@@ -11,7 +11,7 @@ new run arrives in, so it is right on a page that has just been drawn, with
 no new run.
 """
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -155,6 +155,22 @@ class TypicalPhrase:
     text: str
     typical: str
     not_recent: bool
+
+
+@dataclass(frozen=True)
+class ScoreLine:
+    """A run's score, its badge, and how it measured up, as the card words them.
+
+    The comparison joins ``typical``, the run against the typical score at
+    its session's start, and ``pb_comparison``, the run against the PB it
+    was chasing; each is ``None`` with nothing to say. The latest-run card
+    and the run viewer both show it.
+    """
+
+    score: str
+    badge: CardBadge | None
+    typical: TypicalPhrase | None
+    pb_comparison: str | None
 
 
 @dataclass(frozen=True)
@@ -329,6 +345,52 @@ def sensitivity_and_accuracy(run: RunData) -> str:
     return f"{format_score(cm360)} cm/360 · {accuracy}"
 
 
+def score_line(  # noqa: PLR0913
+    run: RunData,
+    scenario_runs: Sequence[RunData],
+    typical_score: TypicalScore | None,
+    session: PlaySession,
+    goal_percentage: float | None,
+    version_pace_basis: Callable[[str, str | None], PaceBasis | None],
+) -> ScoreLine:
+    """Work out any run's score line: its badge and how it measured up.
+
+    ``scenario_runs`` is the run's scenario's whole history in play order.
+    ``typical_score`` is the scenario's typical score when ``session``, the
+    run's, began. The run is judged as the list judges it: against the PB it
+    was chasing, under its own version of the scenario, never against today's
+    PB. A run that isn't a new PB is also measured against the typical score;
+    a new PB beats every earlier run, so that could only read above.
+    """
+    chased = what_runs_chased(
+        scenario_runs, lambda version: version_pace_basis(run.scenario, version)
+    )[run]
+    verdict = judge_run(
+        run.score,
+        chased.previous_best,
+        chased.is_new_sensitivity,
+        chased.pace_constant,
+        goal_percentage,
+    )
+    is_new_pb = run in new_high_score_runs(scenario_runs)
+    typical = (
+        None
+        if is_new_pb
+        else _typical_phrase(
+            run,
+            typical_score,
+            session,
+            version_pace_basis(run.scenario, run.scenario_hash),
+        )
+    )
+    return ScoreLine(
+        score=format_score(run.score),
+        badge=_badge(verdict, is_new_pb),
+        typical=typical,
+        pb_comparison=_pb_comparison(run.score, chased, verdict, is_new_pb),
+    )
+
+
 def latest_run(
     all_runs: Iterable[RunData],
     scenario: str | None,
@@ -350,11 +412,8 @@ def latest_run(
     holds one. The sessions are split from every run, as the run list splits
     them, so the two agree on which run is newest, two that ended in the same
     second included. A run that lands late, older than the store's newest,
-    is the card's run once it is newer than the scenario's latest. It is
-    judged as the list judges it: against the PB it was chasing, under its
-    own version of the scenario. A run that isn't a new PB is also measured
-    against its scenario's typical score as it stood when the run's session
-    began; a new PB beats every earlier run, so that could only read above.
+    is the card's run once it is newer than the scenario's latest. Its score
+    line is ``score_line``'s.
     """
     if not scenario:
         return None
@@ -370,35 +429,22 @@ def latest_run(
     scenario_runs = in_play_order(
         scenario_run for scenario_run in runs if scenario_run.scenario == scenario
     )
-    chased = what_runs_chased(
-        scenario_runs, lambda version: version_pace_basis(scenario, version)
-    )[run]
-    verdict = judge_run(
-        run.score,
-        chased.previous_best,
-        chased.is_new_sensitivity,
-        chased.pace_constant,
+    line = score_line(
+        run,
+        scenario_runs,
+        typical_score_at_session_start(scenario_runs, sessions, session),
+        session,
         goal_percentage,
-    )
-    is_new_pb = run in new_high_score_runs(scenario_runs)
-    typical = (
-        None
-        if is_new_pb
-        else _typical_phrase(
-            run,
-            typical_score_at_session_start(scenario_runs, sessions, session),
-            session,
-            version_pace_basis(scenario, run.scenario_hash),
-        )
+        version_pace_basis,
     )
 
     return LatestRun(
         run_id=run_id(run),
         played_at=run.datetime_object,
-        score=format_score(run.score),
-        badge=_badge(verdict, is_new_pb),
-        typical=typical,
-        pb_comparison=_pb_comparison(run.score, chased, verdict, is_new_pb),
+        score=line.score,
+        badge=line.badge,
+        typical=line.typical,
+        pb_comparison=line.pb_comparison,
         session=_session_line(
             session, scenario, _which_session(sessions, session, now)
         ),
@@ -568,6 +614,32 @@ def _typical_target(phrase: TypicalPhrase) -> dmc.Tooltip:
     )
 
 
+def score_badge(badge: CardBadge) -> dmc.Badge:
+    """Draw the badge beside a run's score."""
+    return dmc.Badge(
+        BADGE_TEXT[badge],
+        className=BADGE_CLASS,
+        style={
+            "--run-history-card-badge-color": f"var(--mantine-color-{badge.value}-6)"
+        },
+        # The app's sentence case, where the badge's own style would print
+        # capitals.
+        tt="none",
+    )
+
+
+def comparison_children(
+    typical: TypicalPhrase | None, pb_comparison: str | None
+) -> list[Any]:
+    """Draw the run against its typical score and its PB, or nothing with neither."""
+    comparison: list[Any] = []
+    if typical is not None:
+        comparison.append(_typical_target(typical))
+    if pb_comparison is not None:
+        comparison.append(f" · {pb_comparison}" if comparison else pb_comparison)
+    return comparison
+
+
 def latest_run_card_content(
     shown: LatestRun | None,
     selected_scenario: str | None,
@@ -594,28 +666,9 @@ def latest_run_card_content(
         )
     ]
     if shown.badge is not None:
-        score_row.append(
-            dmc.Badge(
-                BADGE_TEXT[shown.badge],
-                className=BADGE_CLASS,
-                style={
-                    "--run-history-card-badge-color": (
-                        f"var(--mantine-color-{shown.badge.value}-6)"
-                    )
-                },
-                # The app's sentence case, where the badge's own style would
-                # print capitals.
-                tt="none",
-            )
-        )
+        score_row.append(score_badge(shown.badge))
     body: list[Any] = [html.Div(score_row, className=SCORE_ROW_CLASS)]
-    comparison: list[Any] = []
-    if shown.typical is not None:
-        comparison.append(_typical_target(shown.typical))
-    if shown.pb_comparison is not None:
-        comparison.append(
-            f" · {shown.pb_comparison}" if comparison else shown.pb_comparison
-        )
+    comparison = comparison_children(shown.typical, shown.pb_comparison)
     if comparison:
         body.append(html.Div(comparison, className=RESULT_CLASS))
     body.append(html.Div(shown.session, className=QUIET_CLASS))
