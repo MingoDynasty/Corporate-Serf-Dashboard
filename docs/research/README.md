@@ -24,6 +24,7 @@ looks at another app.
 | Check | Date | Focus |
 | --- | --- | --- |
 | [The Run History page's run list under NVDA](run_history_list_nvda_walk.md) | 2026-10-13, 2026-10-14 | What NVDA said on the built run list in Firefox, Chrome, and Edge, against the five tasks the page's proposal names and the eight the All scenarios tree adds, and what still does not work |
+| [Where the app departs from Mantine's defaults](mantine_default_departures.md) | 2026-10-31 | Each place the app's look differs from Mantine 9's defaults, with Mantine's value and the recorded reason, and the Mantine 9 changes kept as shipped, listed for the maintainer to revisit |
 
 ## Checks of KovaaK's
 
