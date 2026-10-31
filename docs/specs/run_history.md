@@ -808,6 +808,38 @@ The card's lines, local-record scope and leaderboard presentation follow
   threshold line. The rank lines redraw at once when the Playlist filter
   changes
   ([2026-10-12][every-run]).
+- With "Accuracy targets" on, each drawn rank line gets its
+  [accuracy target](../glossary.md#accuracy-target) just outside the plot's
+  right edge, level with the line, in the theme's text color, such as
+  `39.2%` beside `Saffron (2350)`, on all three modes. The lines, their
+  labels and the chart's margins are unchanged: the figures sit in Plotly's
+  default 80 px right margin, so the plot keeps its width. Only rank lines
+  get one, not the PB or threshold line ([2026-10-30][at-margin]). A zoom
+  drops the figure of a line it leaves out of view.
+- A target is the rank's threshold over the scenario's score at 100%: the
+  median of its runs' scores over their hit accuracy, over the runs of its
+  newest run's version with an accuracy and a score above zero, when there
+  are at least 5 such runs and at least 90% of them, counted in whole runs,
+  land within 2% of that median. A version the app recognizes as
+  [time-scored](#time-scored-scenarios) has none, whatever its runs. It is
+  worked out on every build over the scenario's whole history, never the
+  plotted range, and is an estimate for a run with the median run's shots
+  and the fire button held throughout ([2026-10-30][at-rule]). It reads one
+  decimal, rounded up to the next tenth (an exact 40% reads `40.0%`), a
+  target above 100% gets no figure, and a threshold at or below zero reads
+  `0.0%` ([2026-10-30][at-tenth]).
+- With "Accuracy targets" on, a chart that draws rank lines but no figure
+  shows one quiet note under the x axis's title, right-aligned, at 12 px and
+  slightly faded, and its bottom margin grows from Plotly's 80 px to 112 px.
+  The note names the first reason that applies: "This scenario has no
+  accuracy targets, because it's scored by completion time.", "Accuracy
+  targets need at least 5 runs of this scenario.", "Accuracy targets need at
+  least 5 runs of this scenario since it was last updated.", "This scenario
+  has no accuracy targets, because your scores here don't follow your
+  accuracy closely enough.", or, when there is a score at 100% and every
+  drawn rank is above 100%, "Every rank on the chart has an estimated
+  accuracy target above 100%." With no rank line drawn there is neither
+  figure nor note ([2026-10-30][at-note]).
 - Zooming the x axis refits the score axis to what is in view: every
   visible trace's points inside the x window, padded by 5% of their span. The
   stars and the ring repeat run points, so they never change the fit. The
@@ -1367,8 +1399,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   When the chart's own area, the page less the navbar and the run list,
   drops to 48em, the same panel stacks above the chart
   ([2026-10-12][column]).
-- Three groups in order, holding ten controls: **Overlays** ("Rank
-  thresholds" on, "Show all ranks" off, "PB score" on), **Run Data
+- Three groups in order, holding eleven controls: **Overlays** ("Rank
+  thresholds" on, "Show all ranks" off, "Accuracy targets" off, "PB score"
+  on), **Run Data
   Points** ("Point size" Default, "Point color" empty), and **Score
   Threshold** ("Score threshold overlay" on, "Score threshold percentage"
   95, minimum 1, placeholder "Percentage")
@@ -1382,6 +1415,14 @@ The card's lines, local-record scope and leaderboard presentation follow
   A help text that names another control renders the name bold: "Needs
   **Rank thresholds** turned on."
   ([2026-09-14][copy]).
+- "Accuracy targets" is an input of the chart rebuild, as "Show all ranks"
+  is, with the id `run-history-accuracy-targets-switch`. Like every
+  remembered control's, its id and its default, off, never change. Off, or
+  with "Rank thresholds" off, it changes nothing. Its help text: "Shows
+  beside each rank line an estimate of the accuracy that rank needs when you
+  hold the fire button for the whole run. It's calculated from your runs, on
+  scenarios where your score follows your accuracy, such as tracking. Needs
+  **Rank thresholds** turned on." ([2026-10-30][at-switch]).
 - Each of the typical score's switches shows or hides its metric on Score vs
   Run and Score vs Time, faded stretches included, and a band's switch also
   its line in the line's hover. A band can show without the line. They are
@@ -1613,6 +1654,11 @@ The card's lines, local-record scope and leaderboard presentation follow
 [column]: ../decision_log/2026/2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md
 [grid]: ../decision_log/2026/2026-10-12-the-run-list-is-built-on-ag-grid-community-and-nvda-is-run-on-the-built-list.md
 [every-run]: ../decision_log/2026/2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md
+[at-rule]: ../decision_log/2026/2026-10-30-accuracy-targets-are-estimated-from-the-players-own-runs-where-at-least-5-agree.md
+[at-tenth]: ../decision_log/2026/2026-10-30-an-accuracy-target-shows-a-tenth-of-a-percent-rounded-up.md
+[at-margin]: ../decision_log/2026/2026-10-30-accuracy-targets-sit-beside-the-rank-lines-in-the-charts-right-margin.md
+[at-switch]: ../decision_log/2026/2026-10-30-an-accuracy-targets-switch-in-chart-options-starts-off.md
+[at-note]: ../decision_log/2026/2026-10-30-with-accuracy-targets-on-a-chart-with-none-says-why.md
 [stars-run]: ../decision_log/2026/2026-10-12-score-vs-run-stars-each-new-pb.md
 [clear-filter]: ../decision_log/2026/2026-10-12-follow-and-a-scenario-link-clear-a-playlist-filter-that-does-not-list-the-scenario.md
 [check]: ../decision_log/2026/2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md

@@ -16,7 +16,8 @@ are sample data. Open an image for full-resolution detail.
 ## Features
 
 - **Scenario plots**: every run of a scenario as Score vs Run, Score vs Time, or Score vs
-  Sensitivity, with PB, score-threshold, and benchmark-rank overlays.
+  Sensitivity, with PB, score-threshold, and benchmark-rank overlays, and an optional estimate of
+  the hit accuracy each rank needs.
 - **Typical score**: your scenario's usual score and its spread on the chart, with older support
   faded and the current summary in Scenario Stats.
 - **Run history**: a scenario's runs listed by session, with a check on each run that met your

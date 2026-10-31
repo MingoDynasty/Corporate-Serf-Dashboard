@@ -28,6 +28,13 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Accuracy targets on the chart** — an Accuracy targets switch in Chart
+  options, off to start, writes beside each rank line the hit accuracy that
+  rank needs, such as 39.2% beside Saffron (2350). Each target is estimated
+  from the player's own runs for a run with the fire button held, and shows
+  once at least 5 runs since the scenario's last update agree; a chart with
+  none says why. (PR #452; design in #449) Design rationale distilled into
+  [`decision_log/`](./decision_log/README.md).
 - **Run History's score cards** — the latest-run card measures the run
   against the typical score as it stood when the session began, such as
   3.6% above typical at session start, before its percentage of the PB,
@@ -60,14 +67,6 @@ sequence.
   first. Each note is a small file of its own under `data/scenario_notes/`.
   (PRs #394 and #396; design in #390) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
-- **The latest-run card follows the selection** — on Run History the
-  latest-run card now reports the selected scenario's latest run, so it and
-  the PB card beside it always describe one scenario, and a run from an older
-  session names that session. Its button that selected the last run's
-  scenario is gone. Last played left Scenario Stats, whose first line now
-  reads like the other cards', and the run list's heading line left the
-  screen, which gives the list more rows. (PR #391; design in #388) Design
-  rationale distilled into [`decision_log/`](./decision_log/README.md).
 
 ---
 

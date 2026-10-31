@@ -12,6 +12,7 @@ from datetime import date, datetime, time, timedelta
 
 import plotly.graph_objects as go
 
+from source.kovaaks.accuracy_target import full_accuracy_score
 from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import (
     get_all_runs,
@@ -20,6 +21,7 @@ from source.kovaaks.data_service import (
     new_high_score_runs,
 )
 from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
+from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.kovaaks.typical_score import build_typical_scores
 from source.plot.plot_service import (
     RunPointContext,
@@ -120,6 +122,7 @@ def build_run_history_figure(  # noqa: PLR0913
     typical_score_switch: bool,
     middle_50_switch: bool,
     middle_80_switch: bool,
+    accuracy_targets_switch: bool,
 ) -> tuple[go.Figure, bool]:
     """Build the chart for one scenario that has runs, in the mode asked for.
 
@@ -137,6 +140,10 @@ def build_run_history_figure(  # noqa: PLR0913
     bands, each while its switch is on: at each run on Score vs Run, and on
     Score vs Time each value held flat to the next run. Score vs Sensitivity
     draws neither.
+
+    With the Accuracy targets switch and Rank thresholds on, every mode's
+    rank lines get their accuracy targets, or a note saying why there are
+    none.
     """
     # One snapshot keeps a mid-build import in both runs and sessions or neither:
     # tooltips need session context, and typical scores require session membership.
@@ -165,6 +172,19 @@ def build_run_history_figure(  # noqa: PLR0913
     # later runs beat it. Judged in play order, so the star sits on the same
     # run of a same-second pair as the order the runs are plotted in.
     new_pbs = new_high_score_runs(runs)
+    accuracy_targets = None
+    if accuracy_targets_switch and rank_overlay_switch:
+        # Over the whole history, never the range, so the figures stay put as
+        # the range changes. The version asked about is this snapshot's
+        # newest: ``get_pace_basis`` reads the store again, and a run that
+        # lands mid-build could make it answer for a version not in ``runs``.
+        accuracy_targets = full_accuracy_score(
+            runs,
+            time_scored=(
+                get_version_pace_basis(selected_scenario, newest.scenario_hash)
+                is not None
+            ),
+        )
 
     if mode == SCORE_VS_RUN:
         run_count = _range_count(run_range, RUN_RANGE_OPTIONS, RUN_RANGE_DEFAULT)
@@ -182,6 +202,7 @@ def build_run_history_figure(  # noqa: PLR0913
             newest,
             newest_id,
             run_context=run_context,
+            accuracy_targets=accuracy_targets,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Worked out over the whole history before the range is applied,
@@ -236,6 +257,7 @@ def build_run_history_figure(  # noqa: PLR0913
             newest,
             newest_id,
             run_context=run_context,
+            accuracy_targets=accuracy_targets,
         )
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Over the whole history, as on Score vs Run. The range keeps the
@@ -272,6 +294,7 @@ def build_run_history_figure(  # noqa: PLR0913
             newest,
             newest_id,
             run_context=run_context,
+            accuracy_targets=accuracy_targets,
         ),
         True,
     )

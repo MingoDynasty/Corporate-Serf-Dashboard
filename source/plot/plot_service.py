@@ -15,6 +15,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 import plotly.io as pio
 
+from source.kovaaks.accuracy_target import NoFullAccuracyScore, accuracy_target
 from source.kovaaks.data_models import Rank, RunData, run_id
 from source.kovaaks.typical_score import (
     TypicalScore,
@@ -130,6 +131,37 @@ _LEGEND_ABOVE_PLOT = {
     "yanchor": "bottom",
 }
 
+# Each drawn rank line's accuracy target sits just outside the plot's right
+# edge, in Plotly's default 80 px right margin, which holds the widest,
+# "100.0%". The chart sets no right margin of its own, so the plot keeps its
+# width with or without the figures.
+_ACCURACY_TARGET_SHIFT_PX = 6
+# The note under the x axis's title when no figure shows. Plotly's default
+# bottom margin is 80 px with the title inside it, and Score vs Time's date
+# ticks take two lines, which puts its title lowest. Beside the title, the
+# longest note ran into it in a 1,536 px window.
+_ACCURACY_TARGETS_NOTE_DROP_PX = 82
+_ACCURACY_TARGETS_NOTE_BOTTOM_MARGIN_PX = 112
+ACCURACY_TARGETS_NOTES = {
+    NoFullAccuracyScore.TIME_SCORED: (
+        "This scenario has no accuracy targets, because it's scored by completion time."
+    ),
+    NoFullAccuracyScore.TOO_FEW_RUNS: (
+        "Accuracy targets need at least 5 runs of this scenario."
+    ),
+    NoFullAccuracyScore.TOO_FEW_RUNS_SINCE_UPDATE: (
+        "Accuracy targets need at least 5 runs of this scenario since it was "
+        "last updated."
+    ),
+    NoFullAccuracyScore.RUNS_DISAGREE: (
+        "This scenario has no accuracy targets, because your scores here don't "
+        "follow your accuracy closely enough."
+    ),
+}
+ACCURACY_TARGETS_ABOVE_100_NOTE = (
+    "Every rank on the chart has an estimated accuracy target above 100%."
+)
+
 _RUN_POINT_HOVER = (
     "<b>Score</b>: %{customdata[6]}<br>"
     "<b>Session</b>: %{customdata[4]} · run %{customdata[1]} of %{customdata[3]}<br>"
@@ -233,17 +265,22 @@ def add_score_threshold_overlay(figure: go.Figure, score_threshold: float) -> go
     return figure
 
 
-def _add_rank_overlays(
+def _add_rank_overlays(  # noqa: PLR0913
     figure: go.Figure,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
     scores: list[float],
     show_all_ranks: bool = False,
+    accuracy_targets: float | NoFullAccuracyScore | None = None,
 ) -> None:
     """Overlay rank threshold lines spanning the plotted score range.
 
     With ``show_all_ranks`` the bracketing selection is skipped and the whole
     ladder is drawn, so the y-axis stretches to cover every threshold.
+
+    ``accuracy_targets`` is ``None`` while the Accuracy targets switch is
+    off. Otherwise it is the scenario's score at 100%, which gives each drawn
+    line its figure, or the reason there is none, which the note gives.
     """
     if not (rank_overlay_switch and rank_data):
         return
@@ -270,9 +307,8 @@ def _add_rank_overlays(
         return low <= threshold <= high or threshold in (nearest_below, nearest_above)
 
     # Draw in original ladder order; do not sort or mutate rank_data (shared).
-    for rank in rank_data:
-        if not _is_selected(rank.threshold):
-            continue
+    drawn = [rank for rank in rank_data if _is_selected(rank.threshold)]
+    for rank in drawn:
         figure.add_hline(
             name=rank.name,
             annotation_text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
@@ -280,6 +316,63 @@ def _add_rank_overlays(
             line_dash="dash",
             line_color=rank.color,
         )
+    if accuracy_targets is not None and drawn:
+        _add_accuracy_targets(figure, drawn, accuracy_targets)
+
+
+def _add_accuracy_targets(
+    figure: go.Figure,
+    drawn: list[Rank],
+    accuracy_targets: float | NoFullAccuracyScore,
+) -> None:
+    """Write each drawn rank's accuracy target beside its line, or say why none shows.
+
+    A rank whose target is above 100% gets no figure. When no drawn rank
+    gets one, the note says why: the reason there is no score at 100%, or
+    that every target is above 100%.
+    """
+    if isinstance(accuracy_targets, NoFullAccuracyScore):
+        _add_accuracy_targets_note(figure, ACCURACY_TARGETS_NOTES[accuracy_targets])
+        return
+    placed = False
+    for rank in drawn:
+        target = accuracy_target(rank.threshold, accuracy_targets)
+        if target is None:
+            continue
+        figure.add_annotation(
+            text=f"{target:.1f}%",
+            x=1,
+            xref="paper",
+            xanchor="left",
+            xshift=_ACCURACY_TARGET_SHIFT_PX,
+            y=rank.threshold,
+            yref="y",
+            showarrow=False,
+            # No color of its own, so it takes the theme's text color: the
+            # pale rank colors (Lavender, Celadon, Diamond) can't be read as
+            # text on the light chart. The line beside it carries the color.
+        )
+        placed = True
+    if not placed:
+        _add_accuracy_targets_note(figure, ACCURACY_TARGETS_ABOVE_100_NOTE)
+
+
+def _add_accuracy_targets_note(figure: go.Figure, note: str) -> None:
+    """Write a quiet note under the x axis's title, and make room for it."""
+    figure.add_annotation(
+        text=note,
+        x=1,
+        xref="paper",
+        xanchor="right",
+        y=0,
+        yref="paper",
+        yanchor="top",
+        yshift=-_ACCURACY_TARGETS_NOTE_DROP_PX,
+        showarrow=False,
+        font={"size": 12},
+        opacity=0.8,
+    )
+    figure.update_layout(margin={"b": _ACCURACY_TARGETS_NOTE_BOTTOM_MARGIN_PX})
 
 
 def _runs_ago_text(count: int) -> str:
@@ -909,6 +1002,7 @@ def _generate_run_history_plot(  # noqa: PLR0913
     *,
     run_context: Mapping[RunData, RunPointContext],
     show_runs_ago: bool = False,
+    accuracy_targets: float | NoFullAccuracyScore | None = None,
 ) -> go.Figure:
     """Build a Run History figure: one point per run, at the x value given for it.
 
@@ -924,6 +1018,11 @@ def _generate_run_history_plot(  # noqa: PLR0913
     ``run_context`` is counted over the whole history before filtering or
     draw-order changes. Its session name is the run list's label, formatted
     against the app's current date.
+
+    ``accuracy_targets`` is ``None`` while the Accuracy targets switch is
+    off, or what the rank lines' figures come from: the scenario's score at
+    100% over its whole history, never the plotted runs, or the reason it
+    has none.
     """
     scores = [run.score for run in runs]
     hover_data: dict[RunData, list[float | str]] = {
@@ -995,7 +1094,14 @@ def _generate_run_history_plot(  # noqa: PLR0913
         font={"size": 14},
         legend=_LEGEND_ABOVE_PLOT,
     )
-    _add_rank_overlays(figure, rank_overlay_switch, rank_data, scores, show_all_ranks)
+    _add_rank_overlays(
+        figure,
+        rank_overlay_switch,
+        rank_data,
+        scores,
+        show_all_ranks,
+        accuracy_targets,
+    )
     return figure
 
 
@@ -1056,6 +1162,7 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
     ringed_run_id: str = "",
     *,
     run_context: Mapping[RunData, RunPointContext],
+    accuracy_targets: float | NoFullAccuracyScore | None = None,
 ) -> go.Figure:
     """Build the Score vs Run figure: the runs given, evenly spaced, in their order.
 
@@ -1066,6 +1173,7 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
     and its labels are dates, which is why the ticks are written out here:
     plotly places a point by its value and would label the axis with the run
     numbers. ``today`` only decides which labels carry a year.
+    ``accuracy_targets`` is as ``_generate_run_history_plot`` takes it.
     """
     axis_run_numbers = list(range(first_run_number, first_run_number + len(runs)))
     tick_values, tick_labels = _run_axis_date_ticks(runs, axis_run_numbers, today)
@@ -1087,6 +1195,7 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
         ringed_run_id,
         run_context=run_context,
         show_runs_ago=True,
+        accuracy_targets=accuracy_targets,
     )
 
 
@@ -1101,6 +1210,7 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
     ringed_run_id: str = "",
     *,
     run_context: Mapping[RunData, RunPointContext],
+    accuracy_targets: float | NoFullAccuracyScore | None = None,
 ) -> go.Figure:
     """Build the Score vs Time figure: each run given, at the time it ended.
 
@@ -1108,6 +1218,7 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
     A run's time is in whole seconds, so two runs that ended in the same
     second with the same score share a point. Among such runs a new PB is
     drawn last, so the hover under its star is its own.
+    ``accuracy_targets`` is as ``_generate_run_history_plot`` takes it.
     """
     drawn: list[RunData] = []
     for _ended, ended_together in groupby(runs, key=attrgetter("datetime_object")):
@@ -1124,6 +1235,7 @@ def generate_score_vs_time_plot(  # noqa: PLR0913
         ringed_run,
         ringed_run_id,
         run_context=run_context,
+        accuracy_targets=accuracy_targets,
     )
 
 
@@ -1137,6 +1249,7 @@ def generate_score_vs_sensitivity_plot(  # noqa: PLR0913
     ringed_run_id: str = "",
     *,
     run_context: Mapping[RunData, RunPointContext],
+    accuracy_targets: float | NoFullAccuracyScore | None = None,
 ) -> go.Figure:
     """Build the Score vs Sensitivity figure: each run given, at its sensitivity.
 
@@ -1144,6 +1257,7 @@ def generate_score_vs_sensitivity_plot(  # noqa: PLR0913
     order their first runs are given in, so the caller hands the runs over
     grouped by sensitivity, lowest first. No run is starred: along this axis
     the stars would have no order to be read in.
+    ``accuracy_targets`` is as ``_generate_run_history_plot`` takes it.
     """
     return _generate_run_history_plot(
         runs,
@@ -1157,6 +1271,7 @@ def generate_score_vs_sensitivity_plot(  # noqa: PLR0913
         ringed_run=ringed_run,
         ringed_run_id=ringed_run_id,
         run_context=run_context,
+        accuracy_targets=accuracy_targets,
     )
 
 

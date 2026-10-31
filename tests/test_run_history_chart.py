@@ -12,6 +12,7 @@ import statistics
 from dataclasses import replace
 from datetime import date, datetime, timedelta
 from itertools import pairwise
+from types import SimpleNamespace
 
 import pytest
 from sortedcontainers import SortedList
@@ -27,6 +28,7 @@ from source.components.run_history_chart import (
 from source.kovaaks import data_service
 from source.kovaaks.data_models import Rank, RunData
 from source.kovaaks.play_sessions import split_into_play_sessions
+from source.kovaaks.time_scored_service import PaceBasis
 from source.kovaaks.typical_score import (
     TypicalScore,
     build_typical_scores,
@@ -101,6 +103,9 @@ def _figure(  # noqa: PLR0913
     typical_score: bool = True,
     middle_50: bool = True,
     middle_80: bool = True,
+    rank_overlay: bool = True,
+    show_all_ranks: bool = False,
+    accuracy_targets: bool = False,
 ):
     """Build a figure with the switches as a first visit draws them, unless told."""
     return build_run_history_figure(
@@ -108,13 +113,14 @@ def _figure(  # noqa: PLR0913
         SCENARIO,
         run_range,
         day_range,
-        True,
-        False,
+        rank_overlay,
+        show_all_ranks,
         playlist,
         today,
         typical_score_switch=typical_score,
         middle_50_switch=middle_50,
         middle_80_switch=middle_80,
+        accuracy_targets_switch=accuracy_targets,
     )
 
 
@@ -529,18 +535,11 @@ def test_both_rank_switches_reach_the_figure(load_runs, monkeypatch, mode) -> No
     )
 
     def drawn_ranks(rank_overlay: bool, show_all_ranks: bool) -> list[str]:
-        figure, _supports_overlays = build_run_history_figure(
+        figure, _supports_overlays = _figure(
             mode,
-            SCENARIO,
-            "100",
-            "90",
-            rank_overlay,
-            show_all_ranks,
-            "KovaaKsTestCode",
-            TODAY,
-            typical_score_switch=True,
-            middle_50_switch=True,
-            middle_80_switch=True,
+            playlist="KovaaKsTestCode",
+            rank_overlay=rank_overlay,
+            show_all_ranks=show_all_ranks,
         )
         return [
             annotation.text.split(" (")[0] for annotation in figure.layout.annotations
@@ -549,6 +548,211 @@ def test_both_rank_switches_reach_the_figure(load_runs, monkeypatch, mode) -> No
     assert drawn_ranks(True, False) == ["Bronze", "Silver", "Gold"]
     assert drawn_ranks(True, True) == ["Bronze", "Silver", "Gold", "Platinum"]
     assert drawn_ranks(False, True) == []
+
+
+# --- Accuracy targets -----------------------------------------------------------
+
+# Scores around 500 at 50% accuracy draw Bronze below and Silver above.
+TARGETS_LADDER = [
+    Rank(name="Bronze", color="#aaaaaa", threshold=400),
+    Rank(name="Silver", color="#bbbbbb", threshold=600),
+]
+ALL_MODES = pytest.mark.parametrize(
+    "mode", [SCORE_VS_RUN, SCORE_VS_TIME, SCORE_VS_SENSITIVITY]
+)
+
+
+def _runs_scoring_at_100_percent(
+    *full_scores: float,
+    accuracy: float = 0.5,
+    scenario_hash: str | None = "v2",
+    start: datetime = MIDNIGHT_TODAY,
+) -> list[RunData]:
+    """Build one run a minute from ``start``, each its score at 100% times ``accuracy``."""
+    return [
+        replace(
+            _run(full_score * accuracy, start + timedelta(minutes=index)),
+            accuracy=accuracy,
+            scenario_hash=scenario_hash,
+        )
+        for index, full_score in enumerate(full_scores)
+    ]
+
+
+@pytest.fixture
+def ladder_and_pace_basis(monkeypatch):
+    """Give the scenario a ladder, and record each version the pace basis is asked for.
+
+    Returns the list of versions asked about. The pace basis is ``None``, a
+    scenario that isn't time-scored, unless a test sets it.
+    """
+    monkeypatch.setattr(
+        run_history_chart,
+        "get_rank_data_from_playlist_code",
+        lambda *_args: TARGETS_LADDER,
+    )
+    asked: list[tuple[str, str | None]] = []
+    basis: dict[str, PaceBasis | None] = {"answer": None}
+
+    def pace_basis(scenario_name, scenario_hash):
+        asked.append((scenario_name, scenario_hash))
+        return basis["answer"]
+
+    monkeypatch.setattr(run_history_chart, "get_version_pace_basis", pace_basis)
+    return SimpleNamespace(asked=asked, basis=basis)
+
+
+def _target_texts(figure) -> list[tuple[float, str]]:
+    return [
+        (annotation.y, annotation.text)
+        for annotation in figure.layout.annotations
+        if annotation.xref == "paper" and annotation.xanchor == "left"
+    ]
+
+
+def _note_texts(figure) -> list[str]:
+    return [
+        annotation.text
+        for annotation in figure.layout.annotations
+        if annotation.yref == "paper"
+    ]
+
+
+@ALL_MODES
+def test_each_mode_gives_its_rank_lines_their_accuracy_targets(
+    load_runs, ladder_and_pace_basis, mode
+) -> None:
+    """The version asked about is the newest run's, not the older runs'."""
+    load_runs(
+        *_runs_scoring_at_100_percent(
+            *[800] * 5, scenario_hash="v1", start=MIDNIGHT_TODAY - timedelta(days=2)
+        ),
+        *_runs_scoring_at_100_percent(990, 1000, 1010, 1000, 1000),
+    )
+
+    figure, _supports_overlays = _figure(
+        mode, playlist="KovaaKsTestCode", accuracy_targets=True
+    )
+
+    assert _target_texts(figure) == [(400, "40.0%"), (600, "60.0%")]
+    assert _note_texts(figure) == []
+    assert ladder_and_pace_basis.asked == [(SCENARIO, "v2")]
+
+
+@ALL_MODES
+def test_with_the_switch_off_the_chart_is_as_it_was_and_asks_for_no_pace_basis(
+    load_runs, ladder_and_pace_basis, mode
+) -> None:
+    load_runs(*_runs_scoring_at_100_percent(*[1000] * 5))
+
+    figure, _supports_overlays = _figure(mode, playlist="KovaaKsTestCode")
+
+    assert [annotation.text for annotation in figure.layout.annotations] == [
+        "Bronze (400) ",
+        "Silver (600) ",
+    ]
+    assert figure.layout.margin.to_plotly_json() == {}
+    assert ladder_and_pace_basis.asked == []
+
+
+@ALL_MODES
+def test_with_rank_thresholds_off_the_switch_changes_nothing(
+    load_runs, ladder_and_pace_basis, mode
+) -> None:
+    load_runs(*_runs_scoring_at_100_percent(*[1000] * 4))
+
+    figure, _supports_overlays = _figure(
+        mode, playlist="KovaaKsTestCode", rank_overlay=False, accuracy_targets=True
+    )
+
+    assert not figure.layout.annotations
+    assert figure.layout.margin.to_plotly_json() == {}
+    assert ladder_and_pace_basis.asked == []
+
+
+@ALL_MODES
+def test_a_time_scored_version_gets_the_note_though_its_runs_agree(
+    load_runs, ladder_and_pace_basis, mode
+) -> None:
+    load_runs(*_runs_scoring_at_100_percent(*[1000] * 5))
+    ladder_and_pace_basis.basis["answer"] = PaceBasis(constant=60.0, scenario_hash="v2")
+
+    figure, _supports_overlays = _figure(
+        mode, playlist="KovaaKsTestCode", accuracy_targets=True
+    )
+
+    assert _target_texts(figure) == []
+    assert _note_texts(figure) == [
+        "This scenario has no accuracy targets, because it's scored by completion time."
+    ]
+    assert figure.layout.margin.b == 112
+
+
+def test_a_scenario_with_too_few_runs_since_its_update_says_so(
+    load_runs, ladder_and_pace_basis
+) -> None:
+    load_runs(
+        *_runs_scoring_at_100_percent(
+            *[1000] * 20, scenario_hash="v1", start=MIDNIGHT_TODAY - timedelta(days=2)
+        ),
+        *_runs_scoring_at_100_percent(*[1000] * 4),
+    )
+
+    figure, _supports_overlays = _figure(
+        SCORE_VS_RUN, playlist="KovaaKsTestCode", accuracy_targets=True
+    )
+
+    assert _note_texts(figure) == [
+        "Accuracy targets need at least 5 runs of this scenario since it was "
+        "last updated."
+    ]
+
+
+@pytest.mark.parametrize("run_range", ["50", "all"])
+def test_a_narrow_range_leaves_the_targets_as_the_whole_history_gives_them(
+    load_runs, ladder_and_pace_basis, run_range
+) -> None:
+    """The whole history's median is 1,000, and the last 50 runs' alone is 1,010.
+
+    Over the last 50 runs alone, Bronze would read 39.7% and Silver 59.5%.
+    """
+    load_runs(*_runs_scoring_at_100_percent(*[990] * 30, *[1010] * 30))
+
+    figure, _supports_overlays = _figure(
+        SCORE_VS_RUN,
+        run_range=run_range,
+        playlist="KovaaKsTestCode",
+        accuracy_targets=True,
+    )
+
+    assert len(_points(figure).y) == (50 if run_range == "50" else 60)
+    assert _target_texts(figure) == [(400, "40.0%"), (600, "60.0%")]
+
+
+def test_the_median_run_reaching_no_rank_gives_the_above_100_note(
+    load_runs, monkeypatch, ladder_and_pace_basis
+) -> None:
+    """Five runs at 100% scoring 990 to 1,010 agree on 1,000, so 1,005 reads 100.5%.
+
+    The rank gets no figure though two of the runs reached it, and the note
+    claims only an estimate.
+    """
+    load_runs(*_runs_scoring_at_100_percent(990, 995, 1000, 1005, 1010, accuracy=1.0))
+    monkeypatch.setattr(
+        run_history_chart,
+        "get_rank_data_from_playlist_code",
+        lambda *_args: [Rank(name="Jade", color="#00aa77", threshold=1005)],
+    )
+
+    figure, _supports_overlays = _figure(
+        SCORE_VS_RUN, playlist="KovaaKsTestCode", accuracy_targets=True
+    )
+
+    assert _target_texts(figure) == []
+    assert _note_texts(figure) == [
+        "Every rank on the chart has an estimated accuracy target above 100%."
+    ]
+    assert figure.layout.margin.b == 112
 
 
 def test_an_unexpected_mode_names_the_three_it_could_have_been(

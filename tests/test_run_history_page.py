@@ -240,6 +240,7 @@ def test_the_ids_are_the_ones_browsers_store_values_under():
     assert (
         options.rank_overlay,
         options.show_all_ranks,
+        options.accuracy_targets,
         options.high_score_overlay,
         options.point_size,
         options.point_color,
@@ -248,6 +249,7 @@ def test_the_ids_are_the_ones_browsers_store_values_under():
     ) == (
         "run-history-rank-overlay-switch",
         "run-history-show-all-ranks-switch",
+        "run-history-accuracy-targets-switch",
         "run-history-high-score-overlay-switch",
         "run-history-point-size",
         "run-history-point-color",
@@ -599,6 +601,7 @@ def test_each_help_text_has_one_wording():
         "automatically-change-scenario",
         "rank-overlay",
         "show-all-ranks",
+        "accuracy-targets",
         "high-score-overlay",
         "typical-score-overlay",
         "middle-50-overlay",
@@ -1126,6 +1129,7 @@ def test_the_chart_rebuilds_on_the_mode_both_ranges_the_date_and_the_playlist_fi
         f"{run_history.TODAY_STORE_ID}.data",
         f"{options.rank_overlay}.checked",
         f"{options.show_all_ranks}.checked",
+        f"{options.accuracy_targets}.checked",
         f"{options.high_score_overlay}.checked",
         f"{options.typical_score_overlay}.checked",
         f"{options.middle_50_overlay}.checked",
@@ -1160,6 +1164,7 @@ def _graph(
     mode="score_vs_run",
     run_range="100",
     day_range="90",
+    accuracy_targets=False,
     high_score_overlay=False,
     typical_score_overlays=(True, True, True),
     threshold_overlay=False,
@@ -1186,6 +1191,7 @@ def _graph(
         "2026-10-12",
         True,
         False,
+        accuracy_targets,
         high_score_overlay,
         *typical_score_overlays,
         threshold_overlay,
@@ -1204,7 +1210,7 @@ def _annotations(plot_json: str) -> list[str]:
 def test_with_no_scenario_selected_the_chart_says_so():
     plot = run_history.generate_graph(
         None, None, None, "score_vs_run", "100", "90", "2026-10-12", True, False,
-        True, True, True, True, True, 95,
+        False, True, True, True, True, True, 95,
     )  # fmt: skip
 
     assert _annotations(plot) == [
@@ -1218,7 +1224,7 @@ def test_a_scenario_with_no_local_runs_says_so(monkeypatch):
 
     plot = run_history.generate_graph(
         None, "Never Played", None, "score_vs_run", "100", "90", "2026-10-12",
-        True, False, True, True, True, True, True, 95,
+        True, False, False, True, True, True, True, True, 95,
     )  # fmt: skip
 
     assert _annotations(plot) == [
@@ -1242,6 +1248,7 @@ def test_the_chart_asks_for_the_figure_with_every_control_and_todays_date(monkey
         run_range="50",
         day_range="30",
         typical_score_overlays=(True, False, True),
+        accuracy_targets=True,
     )
 
     assert built == [
@@ -1260,6 +1267,7 @@ def test_the_chart_asks_for_the_figure_with_every_control_and_todays_date(monkey
                 "typical_score_switch": True,
                 "middle_50_switch": False,
                 "middle_80_switch": True,
+                "accuracy_targets_switch": True,
             },
         )
     ]
@@ -2406,6 +2414,7 @@ def test_the_card_list_and_chart_identify_the_selected_scenarios_latest_run(
         typical_score_switch=False,
         middle_50_switch=False,
         middle_80_switch=False,
+        accuracy_targets_switch=False,
     )
     figure = chart_options.apply_graph_appearance_ringing_latest_run(
         "light",
@@ -2469,6 +2478,7 @@ def test_a_chart_range_excluding_the_latest_run_keeps_the_card_and_list_on_it(
         typical_score_switch=False,
         middle_50_switch=False,
         middle_80_switch=False,
+        accuracy_targets_switch=False,
     )
     figure = chart_options.apply_graph_appearance_ringing_latest_run(
         "light",

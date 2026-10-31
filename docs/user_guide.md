@@ -132,6 +132,28 @@ The run list's **Columns** menu can also add **Shots Fired**, **Reloads**,
 **FOV** and **Avg FPS**, each off to start, and the list widens to fit the
 columns you turn on.
 
+### Accuracy targets
+
+In **Chart options**, the **Accuracy targets** switch, off to start, writes
+beside each rank line, in the chart's right margin, an estimate of the hit
+accuracy that rank needs, such as 39.2% beside Saffron (2350). It needs
+**Rank thresholds** on and a benchmark in the **Playlist filter**, and works
+on every chart mode.
+
+A target assumes you hold the fire button for the whole run, as on tracking.
+The app works it out from your own runs since the scenario was last updated:
+each run's score over its accuracy is what it would have scored at 100%,
+and once at least 5 runs agree on that within 2%, their median divides each
+rank's threshold. Figures are rounded up to a tenth. A run that fires fewer
+shots than usual needs a little more accuracy than its target, so a run can
+clear a target and still miss the rank.
+
+When the chart draws rank lines but no target, a note under the chart says
+why: the scenario is scored by completion time, it needs at least 5 runs (or
+5 since it was last updated), your scores don't follow your accuracy closely
+enough, as on most click scenarios, or every rank shown is estimated above
+100%.
+
 ### Typical score
 
 Scenario Stats leads with your typical score: the median of this scenario's

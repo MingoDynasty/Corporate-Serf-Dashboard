@@ -312,6 +312,7 @@ flowchart LR
         ScenarioGroups["kovaaks/<br/>scenario_groups.py"]
         PlaySessions["kovaaks/<br/>play_sessions.py"]
         TypicalScore["kovaaks/<br/>typical_score.py"]
+        AccuracyTarget["kovaaks/<br/>accuracy_target.py"]
         RunViewer["kovaaks/<br/>run_viewer.py"]
         ScenarioNotes["kovaaks/<br/>scenario_notes_service.py"]
         PlotService["plot/<br/>plot_service.py"]
@@ -377,7 +378,10 @@ flowchart LR
     RunHistoryChart --> RunHistoryList
     RunHistoryChart --> PlaySessions
     RunHistoryChart --> TypicalScore
+    RunHistoryChart --> AccuracyTarget
+    RunHistoryChart --> TimeScored
     PlotService --> TypicalScore
+    PlotService --> AccuracyTarget
     RunHistoryList --> RunMarks
     RunHistoryList --> ColumnsMenu
     RunHistoryList --> DataService
@@ -1051,6 +1055,13 @@ flowchart LR
   mid-build is in both or neither. A range of N days starts at the midnight
   N minus 1 days before the app's own date
   (`first_moment_of_day_range()`).
+  While the Accuracy targets switch and Rank thresholds are on, it works
+  out the scenario's score at 100% once per build, over the whole history
+  from the same copy (`accuracy_target.full_accuracy_score`), asking
+  `time_scored_service.get_version_pace_basis` about that copy's newest
+  version, and passes the score or the reason there is none to the
+  builder. `plot_service._add_rank_overlays` writes each drawn rank line's
+  figure, or the note, from it.
 - `components/run_marks.py` — the check and the star a past run carries, with
   no component ids. A run that lands is judged from three facts the watchdog
   works out then, and a past run has no message to carry them.
@@ -1366,6 +1377,14 @@ flowchart LR
   decimal places by score. Nothing reads the store, reads the clock, or
   persists a value. Rules in
   [specs/typical_score.md](specs/typical_score.md).
+- `accuracy_target.py` — the accuracy targets' pure rule, which the Run
+  History chart draws beside its rank lines. `full_accuracy_score` takes a
+  scenario's whole history in play order and whether its newest version is
+  time-scored, and returns the median score at 100% hit accuracy of that
+  version's runs once at least 5 agree, or a `NoFullAccuracyScore` reason.
+  `accuracy_target` turns a threshold into a percent rounded up to a tenth,
+  or `None` above 100%. Nothing reads the store or persists a value. Rules in
+  [specs/run_history.md](specs/run_history.md#the-chart).
 - `run_viewer.py` — reads one run whole and works out what the run viewer
   shows of it, measured against its typical runs: the runs behind its
   typical score at session start. `read_run_file` returns a stats file's
@@ -1428,6 +1447,11 @@ flowchart LR
   `typical_score_fade_time` says it fades, and a value that holds for no
   time, between two runs that ended in the same second, left out. When only
   one value is left to draw, its line is a marker stroke and its bands bars.
+  `_add_rank_overlays` selects the rank lines once and draws them; given a
+  score at 100% it writes each drawn line's accuracy target in Plotly's
+  default right margin (`accuracy_target.accuracy_target`), and given a
+  reason, or no figure at or under 100%, one note under the x axis's title
+  with a 112 px bottom margin.
 
 ### Infrastructure
 - `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, list its

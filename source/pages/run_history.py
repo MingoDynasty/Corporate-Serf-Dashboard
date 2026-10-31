@@ -165,6 +165,7 @@ CHART_OPTIONS_IDS = ChartOptionsIds(
     toggle="run-history-chart-options-toggle",
     rank_overlay="run-history-rank-overlay-switch",
     show_all_ranks="run-history-show-all-ranks-switch",
+    accuracy_targets="run-history-accuracy-targets-switch",
     high_score_overlay="run-history-high-score-overlay-switch",
     typical_score_overlay="run-history-typical-score-overlay-switch",
     middle_50_overlay="run-history-middle-50-overlay-switch",
@@ -531,6 +532,7 @@ clientside_callback(
     Input(TODAY_STORE_ID, "data"),
     Input(CHART_OPTIONS_IDS.rank_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.show_all_ranks, "checked"),
+    Input(CHART_OPTIONS_IDS.accuracy_targets, "checked"),
     Input(CHART_OPTIONS_IDS.high_score_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.typical_score_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.middle_50_overlay, "checked"),
@@ -548,6 +550,7 @@ def generate_graph(  # noqa: PLR0913
     _held_date,
     rank_overlay_switch,
     show_all_ranks_switch,
+    accuracy_targets_switch,
     high_score_overlay_switch,
     typical_score_overlay_switch,
     middle_50_overlay_switch,
@@ -578,6 +581,7 @@ def generate_graph(  # noqa: PLR0913
         typical_score_switch=typical_score_overlay_switch,
         middle_50_switch=middle_50_overlay_switch,
         middle_80_switch=middle_80_overlay_switch,
+        accuracy_targets_switch=accuracy_targets_switch,
     )
 
     if supports_overlays:
