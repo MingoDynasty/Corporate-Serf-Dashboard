@@ -681,7 +681,11 @@ def run_viewer_content(
             _score_line(line),
             html.P(_reference_text(figures, today), className="run-viewer-reference"),
             _tiles(figures),
-            # By Bot goes here, between the tiles and Settings.
+            # By Bot goes here, between the tiles and Settings. Everything
+            # Recorded stays open through a switch to another run only while
+            # it keeps its place among these children, where React keeps
+            # the open element: a section shown on some runs and not others
+            # has to leave something in its place.
             _settings(figures),
             _everything_recorded(run, figures),
         ],

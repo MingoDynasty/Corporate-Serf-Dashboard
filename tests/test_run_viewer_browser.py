@@ -477,6 +477,29 @@ def test_another_row_switches_the_run_and_keeps_focus_on_that_row(viewer_page):
     assert is_open(page)
 
 
+def test_everything_recorded_stays_open_through_a_switch_and_starts_closed(
+    viewer_page,
+):
+    page = viewer_page
+    first, second = run_rows(page)[:2]
+    recorded = "() => document.querySelector('.run-viewer-recorded').open"
+    row_cell(page, first["id"]).click()
+    wait_open(page, f"Run {first['n']} ")
+    page.locator(".run-viewer-summary").click()
+
+    row_cell(page, second["id"]).click()
+
+    wait_open(page, f"Run {second['n']} ")
+    assert page.evaluate(recorded)
+
+    page.keyboard.press("Escape")
+    wait_closed(page)
+    row_cell(page, first["id"]).click()
+
+    wait_open(page, f"Run {first['n']} ")
+    assert not page.evaluate(recorded)
+
+
 def test_a_point_click_opens_its_run_and_close_returns_to_the_chart_mode(
     viewer_page,
 ):

@@ -1347,7 +1347,9 @@ it.
 
 - A closed section at the bottom, `Everything Recorded`, under it `The run
   file as KovaaK's wrote it, grouped by kind.`, holding the stats file's
-  fields under their own names, as written.
+  fields under their own names, as written. It is closed each time a run
+  opens, and stays open or closed as it was while another run is switched to
+  from the list.
 - The fields are grouped as Result, Other Counters, Run and Settings, each
   in a fixed order, then Other for any field none of those names, in file
   order, so a game update never hides one. A group with no field in the
