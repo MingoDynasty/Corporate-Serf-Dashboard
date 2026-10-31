@@ -376,6 +376,13 @@ UNUSABLE_FPS = [
     "Avg FPS:,-1",
     "Avg FPS:,inf",
     "Avg FPS:,nan",
+    # KovaaK's 2.0.3 to 2.0.5 wrote the key with no colon.
+    "Avg FPS",
+    "Avg FPS,",
+    "Avg FPS,abc",
+    "Avg FPS,-1",
+    "Avg FPS,inf",
+    "Avg FPS,nan",
 ]
 
 
@@ -435,6 +442,14 @@ def test_an_avg_fps_of_zero_is_a_real_reading(tmp_path) -> None:
 
     assert run is not None
     assert run.avg_fps == 0
+
+
+def test_an_avg_fps_line_with_no_colon_is_read(tmp_path) -> None:
+    """KovaaK's 2.0.3 to 2.0.5 wrote ``Avg FPS,`` with no colon."""
+    run = _extract_real_order_file(tmp_path, avg_fps="Avg FPS,298.433838")
+
+    assert run is not None
+    assert run.avg_fps == 298.433838
 
 
 @pytest.mark.parametrize(

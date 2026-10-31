@@ -101,7 +101,8 @@ is, so a missing line, a line with no value yet, or a value out of range
 costs that field only, never the run, and none joins the run's required set.
 `reloads` is a whole number of zero or more, `fov` a finite number above
 zero, `fov_scale` the name as written (empty is none), and `avg_fps` a finite
-number of zero or more.
+number of zero or more. KovaaK's 2.0.3 to 2.0.5 wrote the `Avg FPS:` line
+as `Avg FPS,`, with no colon, and both forms are read.
 
 **Stored choices.** The menu remembers each checkbox under an id built from
 the column's, `reloads`, `fov` and `avg_fps`, and Dash drops a stored choice
