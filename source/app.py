@@ -14,6 +14,7 @@ from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
 from typing import NoReturn
 
+import dash
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
 from waitress import serve
@@ -145,6 +146,11 @@ def app_name() -> str:
 
 
 APP_NAME = app_name()
+# dash-mantine-components 3 draws nothing under React 18, which Dash 4.5 still
+# serves by default; Dash ships React 19 but marks it experimental. Dash reads
+# this when it builds the page's script list, so it must be set before the
+# first page is served. Every way the app starts goes through this module.
+dash._dash_renderer._set_react_version("19.2.4")
 app = DashProxy(
     title=APP_NAME,
     update_title=None,

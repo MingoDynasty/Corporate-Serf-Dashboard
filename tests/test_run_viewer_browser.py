@@ -654,7 +654,9 @@ def test_esc_leaves_the_run_open_in_a_text_field_and_under_a_menu(viewer_page):
     wait_open(page)
     wait_focus(page, {"close": True})
 
-    field = page.get_by_role("textbox", name="Selected scenario")
+    # A searchable Select's input: a text field to the viewer's Esc rule, which
+    # goes by tag, but a combobox to assistive tech since Mantine 9.
+    field = page.get_by_role("combobox", name="Selected scenario")
     field.click()
     page.keyboard.press("Escape")
     page.keyboard.press("Escape")

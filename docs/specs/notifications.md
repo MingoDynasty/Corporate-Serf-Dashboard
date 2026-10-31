@@ -91,6 +91,11 @@ their full behavior.
   ([2026-08-03](../decision_log/2026/2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy.md)).
   The helper always sets `autoClose`, so the container's own 4000 ms default
   never applies.
+- The container keeps Mantine 8's toast interactions: a sideways drag or a
+  sideways scroll over a toast does not dismiss it, and hovering a toast
+  pauses only that toast's timer (`allowDragDismiss=False`,
+  `allowScrollDismiss=False`, `pauseResetOnHover="notification"`; Mantine 9
+  turns all three on).
 - `channel_toast(notification, registry, clears=())` is how every
   replace-in-place toast goes out. The payload's `id` carries the channel's
   logical key; the helper stamps a fresh instance id over it (the key plus a

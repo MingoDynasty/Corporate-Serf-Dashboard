@@ -510,11 +510,25 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         id="mantine-provider",
         defaultColorScheme="light",
-        theme={"components": {"Anchor": {"defaultProps": {"underline": "always"}}}},
+        theme={
+            # Mantine 9's default is "md" (8 px). 4 px is a deliberate choice,
+            # not a leftover from the move off Mantine 8.
+            "defaultRadius": "sm",
+            "components": {"Anchor": {"defaultProps": {"underline": "always"}}},
+        },
         children=[
             dmc.AppShell(
                 children=[
-                    dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
+                    dmc.NotificationContainer(
+                        id=NOTIFICATION_CONTAINER_ID,
+                        # Mantine 9 turned these on: a sideways drag or scroll
+                        # dismisses a toast, and hovering one pauses them all.
+                        # Off, as on Mantine 8, so a toast meant to stay until
+                        # closed can't vanish on a stray trackpad scroll.
+                        allowDragDismiss=False,
+                        allowScrollDismiss=False,
+                        pauseResetOnHover="notification",
+                    ),
                     dcc.Location(id=NAVBAR_LOCATION_ID, refresh=False),
                     # Beside the container on purpose: a toast outlives the
                     # page that emitted it, so the registry that knows which
