@@ -9,8 +9,7 @@ closed.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives each new run once without a reload and can follow the
-scenario just played, and checks and stars mark threshold passes and new
-personal bests, each judged when the run was played.
+scenario just played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
