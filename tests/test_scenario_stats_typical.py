@@ -193,6 +193,7 @@ def test_value_matches_the_chart_last_point_and_rounding(store, monkeypatch, cou
         typical_score_switch=True,
         middle_50_switch=True,
         middle_80_switch=True,
+        accuracy_targets_switch=False,
     )
     line = next(trace for trace in figure.data if trace.name == "Typical score")
     value = build_typical_scores(runs, split_into_play_sessions(runs))[-1]

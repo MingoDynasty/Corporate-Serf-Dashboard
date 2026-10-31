@@ -65,6 +65,7 @@ def _threshold_line_annotation(monkeypatch, *, basis, pb_hash) -> str:
         False,
         False,
         False,
+        False,
         True,
         95,
     )
