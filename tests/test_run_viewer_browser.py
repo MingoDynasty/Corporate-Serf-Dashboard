@@ -537,8 +537,10 @@ def test_esc_leaves_the_run_open_in_a_text_field_and_under_a_menu(viewer_page):
     assert is_open(page)
 
     page.get_by_role("button", name="Columns", exact=True).click()
+    # Mantine's popover closes on Escape only from inside its dropdown, and
+    # the button reads expanded before the focus trap has moved focus there.
     page.wait_for_function(
-        "() => document.querySelector('[aria-haspopup][aria-expanded=\"true\"]')"
+        "() => document.activeElement?.closest('.mantine-Popover-dropdown')"
     )
     page.keyboard.press("Escape")
     page.wait_for_function(
