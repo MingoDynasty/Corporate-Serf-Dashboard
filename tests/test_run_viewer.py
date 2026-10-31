@@ -35,7 +35,7 @@ KILL_HEADER = (
     "Kill #,Timestamp,Bot,Weapon,TTK,Shots,Hits,Accuracy,Damage Done,"
     "Damage Possible,Efficiency,Cheated,OverShots"
 )
-# KovaaK's 1.0.8, 2019: no OverShots column, and a colon before the milliseconds.
+# Up to KovaaK's 2.0.5: no OverShots column.
 OLD_KILL_HEADER = (
     "Kill #,Timestamp,Bot,Weapon,TTK,Shots,Hits,Accuracy,Damage Done,"
     "Damage Possible,Efficiency,Cheated"
@@ -819,11 +819,11 @@ def test_any_bot_with_two_kills_makes_many_kills_per_bot(stats_dir) -> None:
     ]
     viewed = _write_run(stats_dir, VIEWED_END, kills=kills)
 
-    rows = _rows(_view(stats_dir, [viewed], viewed, {HASH: PaceBasis(70.0, HASH)}))
+    # On a time-scored version too: one bot with two kills settles the kind.
+    view = _view(stats_dir, [viewed], viewed, {HASH: PaceBasis(70.0, HASH)})
+    rows = _rows(view)
 
-    assert _view(stats_dir, [viewed], viewed).figures.by_bot.kind is (
-        ByBotKind.MANY_KILLS
-    )
+    assert view.figures.by_bot.kind is ByBotKind.MANY_KILLS
     popcorn = rows["Popcorn 1 Bot"].run
     assert popcorn.kills == 3
     assert popcorn.accuracy == 6 / 10
