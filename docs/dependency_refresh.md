@@ -220,14 +220,15 @@ compare the two. Run this in the browser console on a page with a chart drawn:
 JSON.stringify(document.querySelector(".js-plotly-plot")._context)
 ```
 
-For plotly or dash-ag-grid bumps, run the linked-hover browser regressions.
-They exercise Plotly's SVG marker bindings and AG Grid's mouse events, which
-the standard gates skip. The screenshots dependency group installs
-Playwright; this command uses an installed Microsoft Edge browser:
+For plotly or dash-ag-grid bumps, run the linked-hover and run viewer
+browser regressions. They exercise Plotly's SVG marker bindings and click
+events and AG Grid's mouse and key events, which the standard gates skip.
+The screenshots dependency group installs Playwright; this command uses an
+installed Microsoft Edge browser:
 
 ```powershell
 $env:CSD_HOVER_BROWSER = 'msedge'
-uv run --group screenshots pytest tests/test_run_history_hover_browser.py
+uv run --group screenshots pytest tests/test_run_history_hover_browser.py tests/test_run_viewer_browser.py
 Remove-Item Env:CSD_HOVER_BROWSER
 ```
 
@@ -237,7 +238,7 @@ run with no browser channel set:
 
 ```powershell
 uv run --group screenshots playwright install chromium
-uv run --group screenshots pytest tests/test_run_history_hover_browser.py
+uv run --group screenshots pytest tests/test_run_history_hover_browser.py tests/test_run_viewer_browser.py
 ```
 
 A plotly bump also needs one look that no test can take. On Score vs Time,

@@ -294,6 +294,7 @@ flowchart LR
         RunHistoryList["components/<br/>run_history_list.py"]
         RunMarks["components/<br/>run_marks.py"]
         LatestRunCard["components/<br/>latest_run_card.py"]
+        RunViewerPanel["components/<br/>run_viewer_panel.py"]
         ScenarioNoteCard["components/<br/>scenario_note_card.py"]
     end
 
@@ -397,6 +398,17 @@ flowchart LR
     LatestRunCard --> DataService
     LatestRunCard --> PlaySessions
     LatestRunCard --> TimeScored
+    RunHistory --> RunViewerPanel
+    RunViewerPanel --> RunViewer
+    RunViewerPanel --> LatestRunCard
+    RunViewerPanel --> ScoreThreshold
+    RunViewerPanel --> DataService
+    RunViewerPanel --> TimeScored
+    RunViewerPanel --> TypicalScore
+    RunViewer --> DataService
+    RunViewer --> PlaySessions
+    RunViewer --> TimeScored
+    RunViewer --> TypicalScore
     ScenarioNoteCard --> ScenarioSelection
     ScenarioNoteCard --> LatestRunCard
     ScenarioNoteCard --> ChartOptions
@@ -691,6 +703,25 @@ flowchart LR
   matches the card's. On a scenario change it waits for both that store and
   the new cached figure. A run on another scenario with Follow off rebuilds
   no chart and leaves the store unchanged, preserving the ring and zoom.
+  The run viewer is `components/run_viewer_panel.py`'s, and the page puts it
+  last in the chart's column (`run-history-chart-column`) and wires it with
+  `register_run_viewer()`. Opening a run goes: a click on a Run row (the
+  grid's `cellClicked`), Enter or Space on one (`runListKeyDown`), or a
+  `plotly_click` on a run point or star (`assets/runHistoryHover.js`) calls
+  `window.runViewer.request`, which writes the run id and what asked for it
+  to the `run-history-run-viewer-request` store with `set_props`. The one
+  server callback, `show_run`, takes that store, Close's clicks and the
+  scenario dropdown, and writes the open run to `run-history-run-viewer-open`,
+  the chart column's class, the viewer's header and body, and
+  `run-history-run-viewer-shown`. It reads the run once from the store and
+  its file and typical runs' files through `view_run_from_store`, and builds
+  its score line with the latest-run card's `score_line`. A clientside
+  callback on the shown store hands it to `assets/runViewer.js`, which moves
+  focus and marks the run's row once the change is drawn. The column's class
+  hides the chart's own parts and keeps them mounted, so no callback that
+  opens or closes a run writes the figure. Esc is a capture-phase listener in
+  `assets/runViewer.js` that presses Close. No store the viewer uses
+  persists, so a reload shows the chart.
   With no runs to read it draws `stats_dir_hint` and the setup card's two
   caution states, and never the account offer, so it registers no Skip
   callback. It registers the two flushes of `components/queued_notices.py`
@@ -1149,7 +1180,24 @@ flowchart LR
   clientside script that words a card's age, which the page registers for
   this card and `pb_card.py` for its own. The card's store and the first
   line's words with the age in them are built once, with the card, and never
-  by that callback.
+  by that callback. `score_line()` is the card's score, badge and comparison
+  for any run, which the run viewer shows too, and `score_badge()` and
+  `comparison_children()` draw them for both.
+- `components/run_viewer_panel.py` — the Run History page's run viewer: one
+  run in the chart's place until it is closed. `run_viewer_content()` draws
+  what `kovaaks/run_viewer.py` works out of a run: the header, the score
+  line, the line that names its typical runs, the tiles, the eleven
+  Settings cards and Everything Recorded, closed. Each tile's difference is
+  worked from the two values as shown, so they add up on screen.
+  `recorded_groups()` sorts a stats file's fields into Everything Recorded's
+  groups and says which fold to one line, and the weapon rows and the kill
+  table go to `dmc.Table` as data, never as one Dash component per cell.
+  `run_viewer_from_store()` is the one read: the run, its file and its typical
+  runs' files, and its score line from the same copy of the store.
+  `show_run()` is the pure decision of what a press does: open, switch,
+  close, or nothing, and where focus goes once it is drawn. A page fills in
+  a `RunViewerIds`, puts `run_viewer()` last in the chart's column, and
+  calls `register_run_viewer()` once.
 - `components/scenario_note_card.py` — the Run History page's scenario note
   card, its editor, and the dialog that asks before unsaved text is left
   behind. A page fills in a `NoteCardIds`, puts `scenario_note_card()` and
@@ -1399,8 +1447,8 @@ flowchart LR
   and each bot's kills, accuracy and times against its typical).
   `view_run_from_store` reads the store and the stats folder setting. The
   run's file and up to 20 typical runs' files are read on every call, and
-  nothing is kept. No UI yet: the view that draws it is still to come
-  ([proposal](proposals/run_viewer_proposal.md)).
+  nothing is kept. `components/run_viewer_panel.py` draws it; By Bot is still
+  to be drawn ([proposal](proposals/run_viewer_proposal.md)).
 - `data_models.py` — internal models (`RunData`, `RecordedSensitivity`,
   `ScenarioStats`, `PlaylistData`, `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -1593,7 +1641,8 @@ flowchart LR
   `ResizeObserver` once per element, and each box change calls
   `window.Plotly.Plots.resize` on the plot div. The `window.Plotly` guard is
   load-bearing: dcc injects plotly.js lazily, so until the first graph renders
-  there is nothing to resize.
+  there is nothing to resize. A box of zero is skipped, so the graph the run
+  viewer hides is drawn again at its own width when it is shown.
 - `assets/runHistoryList.js` — draws the Run History page's run list in its
   AG Grid, which is given rows as data and no `rowData` prop. It registers
   the grid's option functions and its two renderers in the same two
@@ -1613,16 +1662,29 @@ flowchart LR
   all or Show all runs, are said through the panel's live region, and each
   part of a session row ends with a space that only a screen reader is given
   ([what NVDA said](research/run_history_list_nvda_walk.md)). Its comment
-  lists the ten pieces of grid work, each a place an AG Grid upgrade can
+  lists the pieces of grid work, each a place an AG Grid upgrade can
   break. It holds no copy: every string comes with the rows or with the
-  grid's `context`.
+  grid's `context`. A click on a Run row, or Enter or Space on one, asks
+  `window.runViewer` for its run, and `markOpen` puts the open run's mark on
+  its row's data, set again on every model applied.
 - `assets/runHistoryHover.js` — links Run History chart markers and loaded
   run-list rows by run ID on hover. It indexes SVG run and PB-star markers
   after plotting, applies a temporary CSS class, and asks
   `runHistoryList.highlightRun` to mark one row: the Run exposed by expansion,
   its collapsed Scenario visit under All scenarios, or its collapsed Session.
   Grid mouse events clear or emphasize chart markers. No
-  hover request, scroll, expansion, or focus change is involved.
+  hover request, scroll, expansion, or focus change is involved. A
+  `plotly_click` on a run point or star asks `window.runViewer` for the run
+  its points name, the one the tooltip names, and the hover puts a hand
+  pointer on the plot while it is over one.
+- `assets/runViewer.js` — the run viewer's browser half. `request` writes a
+  run to open to the viewer's request store, whose id it reads from the
+  viewer's `data-request-store`. A capture-phase Esc listener presses Close
+  unless a text field has focus or a dialog, menu or dropdown is drawn, and
+  runs ahead of Mantine's own handlers, so an overlay Esc closes is still
+  open when it looks. `shown` runs once the server's change is drawn: it
+  marks the run's row, starts a run from its top, and puts focus on Close,
+  back on the row that opened the run, or on the chart's mode control.
 - `assets/homeGraphZoomFit.js` — refits the score axis of the Run History
   graph to the runs in view when
   the x axis is zoomed. It reads the x axis through plotly.js's own
@@ -1689,6 +1751,7 @@ flowchart LR
 | What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
 | The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `my_queue/message_queue.py`; `components/run_delivery.py` for the summary a page makes of a batch; `pages/run_history.py` for that page's three callbacks |
 | The Run History page: its layout, its ids, or what its chart plots | `pages/run_history.py` for the layout, the ids, and the page's callbacks; `components/run_history_chart.py` for the modes, the ranges, and which runs are plotted; `plot/plot_service.py` for the three figure builders; `assets/stylesheet.css` for the columns and the two stacking rules; the rules are in `docs/specs/run_history.md` |
+| The Run History page's run viewer: what opens or closes a run, focus and Esc, or what a run shows | `components/run_viewer_panel.py` for what it draws (`run_viewer_content`) and what a press does (`show_run`); `kovaaks/run_viewer.py` for the figures; `assets/runViewer.js` for Esc, focus and the request; `assets/runHistoryList.js` and `assets/runHistoryHover.js` for a Run row and a point; the rules are in `docs/specs/run_history.md` |
 | The Home page: what it shows, or its stats line | `pages/home.py` for the layout, `stats_line`, and the Skip callback; the rules are in `docs/specs/home.md` |
 | The Run History page's run list: its rows, its two views, when it is rebuilt, or how a grid is made to read as a tree | `components/run_history_list.py` for the rows (`build_run_list`, `build_session_tree`), the grid, its options, and the jump (`jump_to_session`); `assets/runHistoryList.js` for what the browser does with them; `pages/run_history.py` for `build_run_list_rows` and `track_session_in_progress`; `components/run_marks.py` for the check and the star; `components/scenario_selection.py` (`reach_the_scenario_asked_for`) for a scenario's name pressed in the tree |
 | The Run History page's latest-run card, the ring on the latest point, or the highlighted row | `components/latest_run_card.py` for what the card shows (`latest_run`) and how it is drawn; `pages/run_history.py` for `show_latest_run` and the `run-history-latest-run` store; `components/chart_options.py` (`apply_graph_appearance_ringing_latest_run`) and `plot/plot_service.py` (`show_latest_run_ring`) for the ring; `components/run_history_list.py` (`rowClassRules`) for the row |

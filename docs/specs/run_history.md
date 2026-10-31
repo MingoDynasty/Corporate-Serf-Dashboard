@@ -3,12 +3,14 @@
 Run History charts one scenario's runs and typical score beside a session
 list, with point tooltips naming each run's session, hover linking each chart
 run to one list row and a separate latest-run highlight.
+A click on any run, on the chart or in the list, opens it in the chart's
+place, measured against the runs behind its typical score, until it is
+closed.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives each new run once without a reload and can follow the
-scenario just played. Checks mark runs that met their score threshold and
-stars mark new personal bests on runs and their groups, each judged when
-the run was played.
+scenario just played, and checks and stars mark threshold passes and new
+personal bests, each judged when the run was played.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entries that set them. Rationale
@@ -776,9 +778,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   ([2026-09-26][recorded]). Every point tooltip states the point's position on
   both axes; only Score vs Run needs a run-age readout because its Run-axis
   labels show dates. Accuracy is absent from the point tooltip and remains
-  in the list; inspecting an old run may require scrolling, expanding or
-  loading older sessions. Hover provides no click action
-  ([2026-10-24][compact-hover]).
+  in the list ([2026-10-24][compact-hover]). A click on the point opens the
+  run in [the run viewer](#the-run-viewer), which shows it.
   A star carries the same tooltip as its run point, including when ordinary
   dots are hidden through the legend ([2026-10-23][linked-hover]).
   Runs at one position share one hover, the one whose point comes last in the
@@ -1188,6 +1189,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   well, is recorded in
   [run_history_list_nvda_walk.md](../research/run_history_list_nvda_walk.md)
   ([2026-10-12][grid], [2026-10-14][all-scenarios]).
+- A click on a Run row, or Enter or Space on a focused one, opens its run in
+  [the run viewer](#the-run-viewer). A key pressed on a button inside a group
+  row stays that button's own.
 - The grid draws only the rows in view, so a browser's find-in-page reaches
   only those.
 
@@ -1215,8 +1219,149 @@ The card's lines, local-record scope and leaderboard presentation follow
   A linked PB star retains its gold fill.
 - The emphasis appears immediately and clears on unhover. A list scroll,
   model or expansion change, chart redraw, or page departure clears it too.
-  Hover runs entirely in the browser. It neither loads older sessions nor
-  introduces a click action.
+  Hover runs entirely in the browser and never loads older sessions. A click
+  is no part of it: a click on a run point, a PB star or a Run row opens the
+  run in [the run viewer](#the-run-viewer), and opening or closing a run
+  clears the emphasis.
+
+## The run viewer
+
+The run viewer shows one run in the chart's place, with the run list beside
+it.
+
+### Opening and closing
+
+- A click on a Run row, in either view of the run list, or on a run point
+  or a PB star of the chart, in any mode, opens that run. Enter or Space on a
+  focused Run row opens it too. A position several runs share opens the run
+  its tooltip names. Over a run point or a star the pointer is a hand. A
+  Session or Scenario row keeps its own click and keys.
+- The run takes the place of everything in the chart's column: the chart,
+  its header, and Chart options. The chart is hidden, not rebuilt, so
+  closing the run shows it as it was left: its mode, zoom, ranges, hidden
+  traces and Chart options. A chart drawn again while hidden, as when a run
+  lands, comes back at its column's width.
+- A click on another Run row switches to that run, which starts from its
+  top. Points can't be clicked while a run is open, since the chart is
+  hidden.
+- The open run's row carries a blue outline, in either view, and keeps it
+  when the list is rebuilt. The outline is a look alone.
+- **Close** sits at the header's right with an `Esc` key hint, and its
+  accessible name is `Close`. Esc closes the run too, except while a text
+  field has focus or a dialog, menu or dropdown is open, such as the note
+  dialog, a Select's list or the Columns menu: Esc then does only what that
+  control does with it.
+- Focus goes to **Close** when a run opens, and stays on the row pressed
+  when a run is switched from the list. When the run closes, by Close or
+  Esc, focus goes back to the Run row that opened it, scrolled into view, or
+  to the chart's mode control when a point or a star did. A row no longer in
+  the view on screen, or under a closed group, sends focus to the mode
+  control too.
+- A change of the selected scenario closes the run, made by the player or by
+  Follow, and leaves focus where it is. The scenario written again with the
+  value it already holds, as when a run lands with Follow on, changes
+  nothing.
+- A Run row of another scenario, under All scenarios, opens without
+  changing the selection. The header names its scenario, and Close returns
+  the selected scenario's chart.
+- A run that lands while one is open joins the list and the hidden chart,
+  and the open run stays.
+- The open run isn't written to the address and adds no history entry, so
+  the browser's Back leaves the page, and a reload shows the chart.
+
+### What it shows
+
+- From the top: the header, the score line, a line naming the run's typical
+  runs, the tiles, Settings, then Everything Recorded, closed.
+- The header's first line reads `{scenario} · ended {date}`, in the absolute
+  format with seconds, such as `Aug 6, 2026, 10:56:36 PM`. Its title reads
+  `Run {n} · {session} session`: the run's number among its scenario's runs
+  in its session, as the list numbers it, and the session named as the list
+  names its row, such as `Run 2 · Aug 6, 10:23 PM session`.
+- A run whose stats file can't be read shows the header and `This run's file
+  couldn't be read. See data/logs/debug.log.`, and nothing under it.
+- The score line is the score, the latest-run card's badge, and the card's
+  comparison, worked out the same way for any run: judged against the PB the
+  run was chasing, under its own version, with the page's Score threshold
+  percentage, and measured against the typical score when its session began
+  ([The latest-run card](#the-latest-run-card)).
+- A run's typical runs are the runs behind its scenario's typical score when
+  the run's session began, up to 20, while that value is known. The line
+  under the score names them: `Typical comes from your {N} runs before this
+  session, played on {date}.`, or `played from {date} to {date}.` when they
+  ended on more than one date, each date with its year only in another year
+  than this one. With none it says why: `This is the scenario's first
+  session, so there's no typical run to compare with yet.`, or `There's no
+  typical run for this run's session yet: it had {N} runs before it, and a
+  typical score needs 10 runs across 2 or more sessions, or 20 in one
+  session.`, with `1 run` for one. Every Typical and Difference figure is
+  then left out, and no setting is marked.
+
+### The tiles
+
+- Score, Accuracy, Shots fired and Reloads, in that order, then Time on a
+  run whose own version the app recognizes as
+  [time-scored](#time-scored-scenarios).
+- Each tile shows the run's value over `Typical {value} · {difference}`.
+  The typical is the median of the figure over the typical runs that have
+  it, and the hover reads `Median of {n} of your {N} typical runs`, or
+  `Median of your {N} typical runs` when every one has it. The difference
+  is the run's value less the typical, worked from the two values as shown,
+  so the three add up on screen, with `+` or `−` before it and none on zero.
+- Score is formatted as everywhere else, and its typical to its typical
+  runs' precision, as Scenario Stats shows the typical score. Accuracy is
+  KovaaK's hits over shots to two decimals, and its difference reads in
+  percentage points, such as `+1.82 pts`. Shots fired and Reloads read as
+  counts, and a typical between two runs keeps its half, such as `5,776.5`.
+- Time is the clock's constant less the score, read as `m:ss.s`, such as
+  `1:54.3`, with its difference in seconds, such as `−2.4 s`. It has a
+  typical only when every typical run is of the run's own version, and a
+  time of zero or less is none.
+- A higher Score or Accuracy is green and a lower one red, fewer Reloads
+  and a faster Time are green and the reverse red, and Shots fired is
+  uncolored. A difference that reads zero is uncolored.
+- A figure the run's file lacks, such as Reloads in the oldest files, reads
+  `Not recorded`.
+
+### Settings
+
+- Eleven cards on every run, six to a row: Sensitivity, Vertical
+  sensitivity, DPI, FOV, Crosshair and Crosshair scale, then Hide gun,
+  Resolution, Resolution scale, Frame cap and Input lag. Sensitivity is the
+  run list's Sensitivity text with a converted run's recorded setting, FOV
+  is the list's FOV text, Crosshair drops its `.png`, Vertical sensitivity
+  reads `Same as horizontal` when the two are equal, Hide gun reads `Yes`
+  or `No`, Resolution scale is a percentage, and the rest are as the file
+  writes them.
+- A card whose value differs from its most common value over the typical
+  runs is tinted yellow and shows `Typical {value}` under its own, so the
+  change isn't carried by color alone. A tie goes to the value the latest
+  typical run used. Its hover is the value, then `Typical {value} · on {n}
+  of your {N} typical runs`, where an unmarked card's hover is its value,
+  so a value cut short can be read whole.
+- A setting the file doesn't have reads `Not recorded`, with the hover `The
+  run file doesn't have this setting. Older versions of KovaaK's didn't
+  record it.`, and is never marked.
+
+### Everything Recorded
+
+- A closed section at the bottom, `Everything Recorded`, under it `The run
+  file as KovaaK's wrote it, grouped by kind.`, holding the stats file's
+  fields under their own names, as written.
+- The fields are grouped as Result, Other Counters, Run and Settings, each
+  in a fixed order, then Other for any field none of those names, in file
+  order, so a game update never hides one. A group with no field in the
+  file is left out.
+- A group folds to one line, `All zero: {field names}`, only when every
+  field it names is in the file and reads zero. A field the file doesn't
+  have, or has with no value, isn't zero, so its group stays open.
+- Files names the run file and reads `Found` or `None` for the run's
+  performance file. Weapons shows the weapon rows, and Kills the kill table
+  with every column the file has, in file order, or `This run's file
+  records no kills.` Both tables scroll sideways in their own box where they
+  are wider than the viewer.
+- The tables are handed to the page as data and drawn by Mantine, never as
+  one Dash component per cell: a kill table can run to hundreds of rows.
 
 ## Marks: the check and the star
 
@@ -1328,7 +1473,8 @@ The card's lines, local-record scope and leaderboard presentation follow
   Anything that orders or places scores is unchanged, because a higher score
   is always a faster finish: the chart's points and axis, the PB score line,
   the rank lines, and the Rank column. No completion time is shown anywhere
-  ([2026-10-05][pace]).
+  ([2026-10-05][pace]) but the run viewer's Time tile
+  ([The run viewer](#the-tiles)).
   The typical score's line and bands are among them: a median and its
   percentiles order scores, so they divide no times
   ([TS1][typical-definition]).
@@ -1635,6 +1781,12 @@ The card's lines, local-record scope and leaderboard presentation follow
   each time something asks, from the runs, the percentage, and what the
   performance files say now
   ([2026-10-12][check]).
+- The run open in [the run viewer](#the-run-viewer) is held by the open page
+  alone: it is not in the address, and a reload or a visit to another page
+  and back shows the chart. Nothing about a run is stored either: its
+  figures are worked out each time it opens, from its stats file and its
+  typical runs' files, and the stats folder and the performances folder are
+  only ever read.
 
 ## Setup surfaces
 
