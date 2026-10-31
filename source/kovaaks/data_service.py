@@ -737,7 +737,7 @@ def _parse_optional_count(raw_value: str | None) -> int | None:
     return value if value >= 0 else None
 
 
-def _parse_pause_duration(raw_value: str | None) -> timedelta | None:
+def parse_pause_duration(raw_value: str | None) -> timedelta | None:
     """Read ``Pause Duration:`` as the time a run spent paused, or None.
 
     ``raw_value`` is None when the file has no such line, which is no pause:
@@ -776,7 +776,7 @@ def _run_start_and_length(
     of these may raise: a bad value costs the start and the length only --
     never the run, and never the startup scan that hit it.
     """
-    paused = _parse_pause_duration(raw_pause_duration)
+    paused = parse_pause_duration(raw_pause_duration)
     if not raw_challenge_start or paused is None:
         return None, None
     try:

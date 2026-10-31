@@ -73,7 +73,9 @@ from source.utilities.utilities import (
     format_short_date,
     format_short_timestamp,
     format_time_of_day,
+    fov_text,
     recorded_sensitivity_suffix,
+    sensitivity_text,
 )
 
 # How many sessions each view loads at first, and how many more each press of
@@ -315,17 +317,6 @@ def _figure_columns(
 RUN_ROW_ID_PREFIX = "r:"
 
 
-def _fov_text(run: RunData) -> str:
-    """Write a run's FOV as the player typed it, then its scale if the file names one.
-
-    A whole number drops its ``.0``, as the game's own setting reads.
-    """
-    if run.fov is None:
-        return ""
-    number = str(int(run.fov)) if run.fov.is_integer() else str(run.fov)
-    return f"{number} {run.fov_scale}" if run.fov_scale else number
-
-
 def _latest_scenario_run_id(
     sessions: Sequence[PlaySession], scenario: str | None
 ) -> str | None:
@@ -348,7 +339,7 @@ def _run_row(
     mark: RunMark,
     highlighted_run: str | None,
 ) -> dict:
-    sensitivity = f"{run.horizontal_sens} {run.sens_scale}"
+    sensitivity = sensitivity_text(run)
     suffix = recorded_sensitivity_suffix(run.recorded_sensitivity)
     sensitivity_detail = f"{sensitivity}{suffix}" if suffix else ""
     return {
@@ -368,7 +359,7 @@ def _run_row(
         "reloads": "" if run.reloads is None else f"{run.reloads:,}",
         "sens": sensitivity,
         "sens_detail": sensitivity_detail,
-        "fov": _fov_text(run),
+        "fov": fov_text(run),
         "avg_fps": "" if run.avg_fps is None else f"{run.avg_fps:,.0f}",
     }
 
