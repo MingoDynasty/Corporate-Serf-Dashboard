@@ -12,6 +12,7 @@ from statistics import median
 
 import pytest
 
+from source.kovaaks import run_viewer
 from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import extract_data_from_file
 from source.kovaaks.run_viewer import (
@@ -456,6 +457,27 @@ def test_a_byte_order_mark_does_not_hide_the_kill_table(stats_dir) -> None:
 
     assert file is not None
     assert len(file.kills.rows) == 1
+
+
+def test_the_store_view_reads_the_store_and_the_stats_folder(
+    stats_dir, monkeypatch
+) -> None:
+    runs, viewed = _scenario(stats_dir)
+    monkeypatch.setattr(run_viewer, "get_all_runs", lambda: runs)
+    monkeypatch.setattr(run_viewer, "get_usable_stats_dir", lambda: str(stats_dir))
+
+    view = run_viewer.view_run_from_store(run_id(viewed))
+
+    assert view is not None
+    assert view.figures is not None
+    assert view.figures.typical_runs == tuple(runs[:-1])
+    assert view.figures.performance_file_found is False
+
+
+def test_with_no_stats_folder_the_store_view_has_nothing(monkeypatch) -> None:
+    monkeypatch.setattr(run_viewer, "get_usable_stats_dir", lambda: None)
+
+    assert run_viewer.view_run_from_store("any run") is None
 
 
 def test_an_unknown_run_has_no_view(stats_dir) -> None:
