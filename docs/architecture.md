@@ -1192,8 +1192,10 @@ flowchart LR
   `recorded_groups()` sorts a stats file's fields into Everything Recorded's
   groups and says which fold to one line, and the weapon rows and the kill
   table go to `dmc.Table` as data, never as one Dash component per cell.
-  `run_viewer_from_store()` is the one read: the run, its file and its typical
-  runs' files, and its score line from the same copy of the store.
+  `run_viewer_from_store()` is what the page calls: `view_run_from_store()`
+  reads the run, its file and its typical runs' files, and the score line
+  takes the scenario's history from a second copy of the store. The two
+  copies agree on the run, since the store only ever adds runs.
   `show_run()` is the pure decision of what a press does: open, switch,
   close, or nothing, and where focus goes once it is drawn. A page fills in
   a `RunViewerIds`, puts `run_viewer()` last in the chart's column, and
