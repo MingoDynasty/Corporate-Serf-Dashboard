@@ -1285,6 +1285,96 @@ a.run-toast-link {
     max-width: 760px;
 }
 
+/* By Bot: a grid drawn as a plain table, as wide as its columns. Each
+   figure's columns start with a rule, its name centered over them, and the
+   row under the pointer is marked. */
+.run-viewer-bot-grid.ag-theme-quartz {
+    --ag-background-color: var(--mantine-color-body);
+    --ag-border-color: var(--mantine-color-default-border);
+    --ag-borders: none;
+    --ag-cell-horizontal-padding: 12px;
+    --ag-font-family: var(--mantine-font-family);
+    --ag-font-size: 13px;
+    --ag-foreground-color: var(--mantine-color-text);
+    --ag-header-background-color: var(--mantine-color-body);
+    --ag-header-foreground-color: var(--mantine-color-text);
+    --ag-odd-row-background-color: var(--mantine-color-body);
+    --ag-row-border-width: 0;
+    --ag-row-hover-color: var(--mantine-color-gray-1);
+    --ag-wrapper-border-radius: 0;
+}
+
+:root[data-mantine-color-scheme="dark"] .run-viewer-bot-grid.ag-theme-quartz {
+    --ag-row-hover-color: var(--mantine-color-dark-5);
+}
+
+.run-viewer-bot-grid .ag-root-wrapper {
+    border: 0;
+}
+
+/* The grid keeps room for its no-rows message under a short table, and By
+   Bot always has two rows or more. */
+.run-viewer-bot-grid .ag-center-cols-viewport {
+    min-height: 0;
+}
+
+.run-viewer-bot-grid .ag-row {
+    border-bottom: 0;
+}
+
+.run-viewer-bot-grid .ag-cell {
+    font-variant-numeric: tabular-nums;
+}
+
+.run-viewer-bot-grid .ag-header-cell-text,
+.run-viewer-bot-grid .ag-header-group-text {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.run-viewer-bot-grid .run-viewer-bot-group .ag-header-group-cell-label {
+    justify-content: center;
+}
+
+/* The arrow's room, kept while a column isn't sorted. The grid sizes each
+   column to its contents before any sort, and a sorted header's name would
+   otherwise be cut short. */
+.run-viewer-bot-grid .ag-sort-indicator-container {
+    min-width: 20px;
+}
+
+/* One rule under the whole header, none between its two rows. */
+.run-viewer-bot-grid .ag-header-row:not(:first-child) .ag-header-cell {
+    border-top: 0;
+}
+
+/* Bot and Kills span both header rows, and their names sit in the lower
+   one, beside the figures' This Run, Typical and Difference. 28px is the
+   grid's ``headerHeight``. */
+.run-viewer-bot-grid .ag-header-span-height .ag-header-cell-comp-wrapper {
+    align-self: flex-end;
+    height: 28px;
+}
+
+.run-viewer-bot-grid .run-viewer-bot-group,
+.run-viewer-bot-grid :is(.ag-header-cell, .ag-cell):is(
+    [col-id="time_per_kill"],
+    [col-id="time"],
+    [col-id="accuracy"]
+) {
+    border-left: 1px solid var(--ag-border-color);
+}
+
+.run-viewer-even {
+    color: var(--mantine-color-dimmed);
+}
+
+/* A line under By Bot's subtitle saying why the run's times aren't shown. */
+.run-viewer-by-bot-note {
+    font-size: 13px;
+    margin: 0 0 8px;
+}
+
 /* Settings: cards of one size, six to a row at most, so the aim setup fills
    the first row and the settings changed once fill the second. Every card
    keeps its typical line's room, so a marked card never grows. */

@@ -24,21 +24,48 @@ ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = "Viewer sample"
 OTHER = "Other viewer sample"
 LANDING = "Landing sample"
+BOTS = "Bots sample"
 GRID = "#run-history-list-grid"
 COLUMN = "#run-history-chart-column"
 GRAPH = "#run-history-graph .js-plotly-plot"
+BY_BOT = ".run-viewer-by-bot .run-viewer-bot-grid"
+
+# (seconds from the start, bot, shots, hits). Each bot is one kill, played out
+# of name order.
+TWO_BOTS = ((20, "Bot B", 50, 30), (40, "Bot A", 50, 25))
+ONE_BOT = ((20, "Bot A", 50, 30), (40, "Bot A", 50, 25))
+# Many kills: every Bots sample run before the newest takes a second a kill,
+# and never kills Fly Bot 2. The newest run takes 1.00 s a kill on Fly Bot,
+# 2.00 on Fly Bot 10 and 3.00 on Fly Bot 2.
+FLY_TYPICAL = (
+    (1, "Fly Bot 10", 10, 4),
+    (2, "Fly Bot", 10, 8),
+    (3, "Fly Bot 10", 10, 4),
+    (4, "Fly Bot", 10, 8),
+)
+FLY_NEWEST = (
+    (2, "Fly Bot 10", 10, 5),
+    (3, "Fly Bot", 10, 8),
+    (6, "Fly Bot 2", 10, 6),
+    (8, "Fly Bot 10", 10, 5),
+    (9, "Fly Bot", 10, 9),
+)
 
 
-def _stats_text(scenario: str, ended: datetime, score: int) -> str:
+def _stats_text(
+    scenario: str, ended: datetime, score: int, kills: tuple = TWO_BOTS
+) -> str:
     start = ended - timedelta(seconds=60)
     return "\n".join(
         [
             "Kill #,Timestamp,Bot,Weapon,TTK,Shots,Hits,Accuracy,Damage Done,"
             "Damage Possible,Efficiency,Cheated,OverShots",
-            f"1,{start + timedelta(seconds=20):%H:%M:%S}.000,Bot A,Rifle,0.5s,50,30,"
-            "0.6,30,50,0.6,0,0",
-            f"2,{start + timedelta(seconds=40):%H:%M:%S}.000,Bot B,Rifle,0.5s,50,25,"
-            "0.5,25,50,0.5,0,0",
+            *(
+                f"{number},{start + timedelta(seconds=second):%H:%M:%S}.000,{bot},"
+                f"Rifle,0.5s,{shots},{hits},{hits / shots},{hits},{shots},"
+                f"{hits / shots},0,0"
+                for number, (second, bot, shots, hits) in enumerate(kills, start=1)
+            ),
             "",
             "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,"
             "Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,"
@@ -75,9 +102,13 @@ def _stats_text(scenario: str, ended: datetime, score: int) -> str:
     )
 
 
-def _write(stats: Path, scenario: str, ended: datetime, score: int) -> str:
+def _write(
+    stats: Path, scenario: str, ended: datetime, score: int, kills: tuple = TWO_BOTS
+) -> str:
     name = f"{scenario} - Challenge - {ended:%Y.%m.%d-%H.%M.%S} Stats.csv"
-    (stats / name).write_text(_stats_text(scenario, ended, score), encoding="utf-8")
+    (stats / name).write_text(
+        _stats_text(scenario, ended, score, kills), encoding="utf-8"
+    )
     return name
 
 
@@ -102,16 +133,30 @@ def viewer_server(tmp_path_factory):
     noon = datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
     for day in range(20):
         session = noon - timedelta(days=20 - day)
-        for minute, scenario, bonus in (
-            (0, SCENARIO, 0),
-            (2, SCENARIO, 10),
-            (4, SCENARIO, 5),
-            (6, OTHER, 3),
-            (8, LANDING, 0),
+        for minute, scenario, bonus, kills in (
+            (0, SCENARIO, 0, TWO_BOTS),
+            # The middle run names one bot, so it has no By Bot table.
+            (2, SCENARIO, 10, ONE_BOT),
+            (4, SCENARIO, 5, TWO_BOTS),
+            (6, OTHER, 3, TWO_BOTS),
+            (8, LANDING, 0, TWO_BOTS),
         ):
             _write(
-                stats, scenario, session + timedelta(minutes=minute), 100 + day + bonus
+                stats,
+                scenario,
+                session + timedelta(minutes=minute),
+                100 + day + bonus,
+                kills,
             )
+        # A morning session of its own, so the newest session stays the one
+        # the tests above open.
+        _write(
+            stats,
+            BOTS,
+            session - timedelta(hours=4),
+            100 + day,
+            FLY_NEWEST if day == 19 else FLY_TYPICAL,
+        )
     origin = f"http://127.0.0.1:{port}"
     with (state / "server.log").open("w", encoding="utf-8") as log:
         process = subprocess.Popen(
@@ -177,6 +222,29 @@ def _open_page(browser, origin, scenario=SCENARIO):
 @pytest.fixture
 def viewer_page(viewer_browser, viewer_server):
     context, page = _open_page(viewer_browser, viewer_server[0])
+    yield page
+    context.close()
+
+
+@pytest.fixture
+def bots_page(viewer_browser, viewer_server):
+    """Run History on the many-kills scenario, its newest run open."""
+    context, page = _open_page(viewer_browser, viewer_server[0], BOTS)
+    # Its sessions aren't the newest, so the list starts with them closed.
+    page.get_by_role("button", name="Expand all", exact=True).click()
+    page.wait_for_function(
+        """() => {
+        let shown = false;
+        window.runHistoryList.api.forEachNodeAfterFilterAndSort(node => {
+            shown ||= node.data.kind === 'run' && node.displayed;
+        });
+        return shown;
+    }"""
+    )
+    row = run_rows(page)[0]
+    row_cell(page, row["id"]).click()
+    wait_open(page, f"Run {row['n']} ")
+    page.wait_for_selector(f"{BY_BOT} .ag-row")
     yield page
     context.close()
 
@@ -349,6 +417,54 @@ def click_point(page, run_id):
     page.mouse.click(position["x"], position["y"])
 
 
+def has_by_bot(page) -> bool:
+    return page.evaluate(f"() => document.querySelector('{BY_BOT}') !== null")
+
+
+def by_bot_rows(page) -> list[str]:
+    """The bots in By Bot's rows, top to bottom."""
+    return page.evaluate(f"""() => [...document.querySelectorAll(
+        '{BY_BOT} .ag-center-cols-container .ag-row'
+    )].sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
+        .map(row => row.querySelector('[col-id="bot"]').textContent)""")
+
+
+def wait_by_bot_rows(page, bots):
+    page.wait_for_function(
+        f"""(bots) => JSON.stringify([...document.querySelectorAll(
+            '{BY_BOT} .ag-center-cols-container .ag-row'
+        )].sort((a, b) => a.getBoundingClientRect().top
+            - b.getBoundingClientRect().top)
+            .map(row => row.querySelector('[col-id="bot"]').textContent))
+            === JSON.stringify(bots)""",
+        arg=bots,
+    )
+
+
+def wait_by_bot_sorts(page, sorts: dict[str, str]):
+    """Wait until the By Bot headers whose ``aria-sort`` names a direction are these."""
+    page.wait_for_function(
+        f"""(sorts) => JSON.stringify(Object.fromEntries([...document.querySelectorAll(
+            '{BY_BOT} .ag-header-cell[aria-sort]'
+        )].map(header => [header.getAttribute('col-id'),
+            header.getAttribute('aria-sort')])
+            .filter(([, sort]) => sort !== 'none'))) === JSON.stringify(sorts)""",
+        arg=sorts,
+    )
+
+
+def by_bot_header(page, column):
+    return page.locator(
+        f'{BY_BOT} .ag-header-cell[col-id="{column}"] .ag-header-cell-label'
+    )
+
+
+def by_bot_cell(page, row_index, column):
+    return page.locator(
+        f'{BY_BOT} .ag-row[row-index="{row_index}"] .ag-cell[col-id="{column}"]'
+    )
+
+
 def chart_requests(page) -> list[str]:
     """Record every request that writes the chart, from now on."""
     seen: list[str] = []
@@ -481,15 +597,24 @@ def test_everything_recorded_stays_open_through_a_switch_and_starts_closed(
     viewer_page,
 ):
     page = viewer_page
-    first, second = run_rows(page)[:2]
+    first, second, third = run_rows(page)[:3]
     recorded = "() => document.querySelector('.run-viewer-recorded').open"
     row_cell(page, first["id"]).click()
     wait_open(page, f"Run {first['n']} ")
+    assert has_by_bot(page)
     page.locator(".run-viewer-summary").click()
 
+    # The middle run names one bot, so it has no By Bot table.
     row_cell(page, second["id"]).click()
 
     wait_open(page, f"Run {second['n']} ")
+    assert not has_by_bot(page)
+    assert page.evaluate(recorded)
+
+    row_cell(page, third["id"]).click()
+
+    wait_open(page, f"Run {third['n']} ")
+    assert has_by_bot(page)
     assert page.evaluate(recorded)
 
     page.keyboard.press("Escape")
@@ -615,9 +740,132 @@ def test_a_run_of_another_scenario_opens_without_changing_the_selection(
     )
 
 
+# --- By Bot --------------------------------------------------------------------
+
+NAME_ORDER = ["Fly Bot", "Fly Bot 2", "Fly Bot 10"]
+
+
+@pytest.mark.parametrize(
+    ("column", "ascending", "descending"),
+    [
+        ("bot", NAME_ORDER, NAME_ORDER[::-1]),
+        (
+            "time_per_kill",
+            ["Fly Bot", "Fly Bot 10", "Fly Bot 2"],
+            ["Fly Bot 2", "Fly Bot 10", "Fly Bot"],
+        ),
+        # No typical run names Fly Bot 2: its empty cell goes last both ways.
+        (
+            "time_per_kill_difference",
+            ["Fly Bot", "Fly Bot 10", "Fly Bot 2"],
+            ["Fly Bot 10", "Fly Bot", "Fly Bot 2"],
+        ),
+    ],
+)
+def test_a_by_bot_header_click_sorts_up_then_down_then_back(
+    bots_page, column, ascending, descending
+):
+    page = bots_page
+    # Many kills a bot start in name order, numbers read as numbers.
+    assert by_bot_rows(page) == NAME_ORDER
+    wait_by_bot_sorts(page, {})
+    header = by_bot_header(page, column)
+
+    header.click()
+    wait_by_bot_rows(page, ascending)
+    wait_by_bot_sorts(page, {column: "ascending"})
+
+    header.click()
+    wait_by_bot_rows(page, descending)
+    wait_by_bot_sorts(page, {column: "descending"})
+
+    header.click()
+    wait_by_bot_rows(page, NAME_ORDER)
+    wait_by_bot_sorts(page, {})
+
+
+def test_enter_on_a_focused_by_bot_header_sorts_up_then_down_then_back(bots_page):
+    page = bots_page
+    page.evaluate(
+        """(selector) => {
+        const grid = document.querySelector(selector);
+        window.dash_ag_grid.getApi(grid.id).setFocusedHeader('time_per_kill');
+    }""",
+        BY_BOT,
+    )
+    page.wait_for_function(
+        "() => document.activeElement?.closest('.ag-header-cell')"
+        "?.getAttribute('col-id') === 'time_per_kill'"
+    )
+
+    page.keyboard.press("Enter")
+    wait_by_bot_rows(page, ["Fly Bot", "Fly Bot 10", "Fly Bot 2"])
+    wait_by_bot_sorts(page, {"time_per_kill": "ascending"})
+
+    page.keyboard.press("Enter")
+    wait_by_bot_rows(page, ["Fly Bot 2", "Fly Bot 10", "Fly Bot"])
+    wait_by_bot_sorts(page, {"time_per_kill": "descending"})
+
+    page.keyboard.press("Enter")
+    wait_by_bot_rows(page, NAME_ORDER)
+    wait_by_bot_sorts(page, {})
+    assert is_open(page)
+
+
+def test_by_bot_marks_the_hovered_row_and_colors_each_difference(bots_page):
+    page = bots_page
+    # Rows are indexed in their default order: Fly Bot, Fly Bot 2, Fly Bot 10.
+    by_bot_cell(page, 2, "bot").hover()
+
+    playwright.expect(
+        page.locator(f'{BY_BOT} .ag-row[row-index="2"]').first
+    ).to_have_class(re.compile(r"\bag-row-hover\b"))
+    slower = by_bot_cell(page, 2, "time_per_kill_difference")
+    playwright.expect(slower).to_have_text("+1.00 s")
+    playwright.expect(slower).to_have_class(re.compile(r"\brun-viewer-worse\b"))
+    even = by_bot_cell(page, 0, "time_per_kill_difference")
+    playwright.expect(even).to_have_text("0.00 s")
+    playwright.expect(even).to_have_class(re.compile(r"\brun-viewer-even\b"))
+    playwright.expect(by_bot_cell(page, 1, "time_per_kill_difference")).to_have_text("")
+    # The typical's hover is the browser's own title.
+    title = by_bot_cell(page, 0, "time_per_kill_typical").evaluate(
+        "cell => cell.closest('[title]')?.title"
+        " ?? cell.querySelector('[title]')?.title ?? null"
+    )
+    assert title == "Median of your 19 typical runs"
+
+
+def test_one_kill_each_starts_in_play_order_and_a_switch_starts_over(viewer_page):
+    page = viewer_page
+    first, _second, third = run_rows(page)[:3]
+    row_cell(page, first["id"]).click()
+    wait_open(page, f"Run {first['n']} ")
+    page.wait_for_selector(f"{BY_BOT} .ag-row")
+    # Bot B is killed first.
+    assert by_bot_rows(page) == ["Bot B", "Bot A"]
+    header = by_bot_header(page, "bot")
+    header.click()
+    wait_by_bot_rows(page, ["Bot A", "Bot B"])
+    header.click()
+    header.click()
+    wait_by_bot_rows(page, ["Bot B", "Bot A"])
+    wait_by_bot_sorts(page, {})
+    header.click()
+    wait_by_bot_rows(page, ["Bot A", "Bot B"])
+
+    row_cell(page, third["id"]).click()
+
+    # Each run's table starts in its own default order.
+    wait_open(page, f"Run {third['n']} ")
+    wait_by_bot_rows(page, ["Bot B", "Bot A"])
+    wait_by_bot_sorts(page, {})
+
+
 def test_a_run_that_lands_while_one_is_open_joins_the_list_and_the_run_stays(
     viewer_browser, viewer_server
 ):
+    # Last in the module: the run it lands starts a newer session, which the
+    # tests above don't expect.
     origin, stats = viewer_server
     context, page = _open_page(viewer_browser, origin, LANDING)
     try:
