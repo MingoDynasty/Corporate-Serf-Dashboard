@@ -69,9 +69,11 @@ def full_accuracy_score(
             return NoFullAccuracyScore.TOO_FEW_RUNS_SINCE_UPDATE
         return NoFullAccuracyScore.TOO_FEW_RUNS
     median = statistics.median(figures)
-    # A difference against a share of the median, not a ratio against 1: a
-    # run exactly 2% off would land a hair over in float and fail.
-    agreeing = sum(abs(figure - median) <= AGREEMENT * median for figure in figures)
+    # Both sides are rounded to strip float noise, which would fail a run
+    # exactly 2% off: 616 points at 616 hits of 2,040 shots is
+    # 2040.0000000000002 at 100%, a hair over 2% from a median of 2,000.
+    limit = round(AGREEMENT * median, 6)
+    agreeing = sum(round(abs(figure - median), 6) <= limit for figure in figures)
     if 10 * agreeing < AGREEING_IN_TEN * len(figures):
         return NoFullAccuracyScore.RUNS_DISAGREE
     return median

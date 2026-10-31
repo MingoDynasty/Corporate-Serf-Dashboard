@@ -66,6 +66,20 @@ def test_a_run_exactly_2_percent_from_the_median_agrees() -> None:
     ) == pytest.approx(1000)
 
 
+def test_a_run_exactly_2_percent_off_agrees_through_hit_and_shot_noise() -> None:
+    """One point per hit: 616 hits of 2,040 shots is 2040.0000000000002 at 100%."""
+    runs = _runs(2000, 2000, 2000, 2000, 2040)
+    runs[-1] = replace(runs[-1], score=616, accuracy=616 / 2040)
+    assert full_accuracy_score(runs, time_scored=False) == 2000
+
+
+def test_a_run_a_hair_more_than_2_percent_off_disagrees() -> None:
+    assert (
+        full_accuracy_score(_runs(2000, 2000, 2000, 2000, 2040.001), time_scored=False)
+        is NoFullAccuracyScore.RUNS_DISAGREE
+    )
+
+
 def test_nine_runs_pass_only_when_all_nine_agree() -> None:
     assert full_accuracy_score(_runs(*[1000] * 9), time_scored=False) == 1000
     assert (
