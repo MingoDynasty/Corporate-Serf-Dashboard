@@ -464,7 +464,7 @@ Every string this proposal adds. Nothing existing changes.
 - The switch: `Accuracy targets`.
 - Its help text: `Shows beside each rank line an estimate of the accuracy
   that rank needs when you hold the fire button for the whole run. It's
-  worked out from your runs, on scenarios where your score follows your
+  calculated from your runs, on scenarios where your score follows your
   accuracy, such as tracking. Needs **Rank thresholds** turned on.` The
   bold name is built with `control_name()`, as Show all ranks' is.
 - A figure: `{target}%` with one decimal, such as `39.2%` or `40.0%`, and
