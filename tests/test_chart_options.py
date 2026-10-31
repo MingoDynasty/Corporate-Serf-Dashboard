@@ -100,6 +100,7 @@ def _label_text(component) -> str:
 CHART_OPTIONS_INPUT_DEFAULTS = {
     IDS.rank_overlay: ("checked", True),
     IDS.show_all_ranks: ("checked", False),
+    IDS.accuracy_targets: ("checked", False),
     IDS.high_score_overlay: ("checked", True),
     IDS.typical_score_overlay: ("checked", True),
     IDS.middle_50_overlay: ("checked", True),
@@ -120,6 +121,7 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         run_history.FOLLOW_SWITCH_ID: "automatically-change-scenario",
         IDS.rank_overlay: "rank-overlay",
         IDS.show_all_ranks: "show-all-ranks",
+        IDS.accuracy_targets: "accuracy-targets",
         IDS.high_score_overlay: "high-score-overlay",
         IDS.typical_score_overlay: "typical-score-overlay",
         IDS.middle_50_overlay: "middle-50-overlay",
@@ -159,6 +161,12 @@ def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypat
         IDS.show_all_ranks: (
             "Draws every rank in the playlist's ladder instead of only the ones "
             "around your plotted scores. Needs **Rank thresholds** turned on."
+        ),
+        IDS.accuracy_targets: (
+            "Shows beside each rank line an estimate of the accuracy that rank "
+            "needs when you hold the fire button for the whole run. It's "
+            "calculated from your runs, on scenarios where your score follows "
+            "your accuracy, such as tracking. Needs **Rank thresholds** turned on."
         ),
         IDS.score_threshold_percentage: (
             "Sets the score goal as a percentage of your personal best. On a "
@@ -217,6 +225,7 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
     assert labels == {
         IDS.rank_overlay: "Rank thresholds",
         IDS.show_all_ranks: "Show all ranks",
+        IDS.accuracy_targets: "Accuracy targets",
         IDS.high_score_overlay: "PB score",
         IDS.typical_score_overlay: "Typical score",
         IDS.middle_50_overlay: "Middle 50%",
@@ -240,13 +249,14 @@ def test_the_typical_scores_switches_follow_pb_score_under_their_chosen_ids(
     assert [control.id for control in overlays.children[1:]] == [
         IDS.rank_overlay,
         IDS.show_all_ranks,
+        "run-history-accuracy-targets-switch",
         IDS.high_score_overlay,
         "run-history-typical-score-overlay-switch",
         "run-history-middle-50-overlay-switch",
         "run-history-middle-80-overlay-switch",
     ]
     # Each help icon is named for its switch, as every icon in the panel is.
-    for control in overlays.children[4:]:
+    for control in overlays.children[3:]:
         (icon,) = [
             component
             for component in _walk_components(control.label)
@@ -257,7 +267,7 @@ def test_the_typical_scores_switches_follow_pb_score_under_their_chosen_ids(
         )
 
 
-def test_the_panel_holds_three_groups_ten_controls_and_no_notification_control(
+def test_the_panel_holds_three_groups_eleven_controls_and_no_notification_control(
     monkeypatch,
 ):
     """The run toast is app-wide, so its switch is on the Settings page.
@@ -284,6 +294,7 @@ def test_the_panel_holds_three_groups_ten_controls_and_no_notification_control(
     assert controls == {
         IDS.rank_overlay,
         IDS.show_all_ranks,
+        IDS.accuracy_targets,
         IDS.high_score_overlay,
         IDS.typical_score_overlay,
         IDS.middle_50_overlay,

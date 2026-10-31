@@ -49,6 +49,14 @@ SETTINGS_HELP_TEXT: dict[str, str | list] = {
         control_name("Rank thresholds"),
         " turned on.",
     ],
+    "accuracy-targets": [
+        "Shows beside each rank line an estimate of the accuracy that rank "
+        "needs when you hold the fire button for the whole run. It's "
+        "calculated from your runs, on scenarios where your score follows your "
+        "accuracy, such as tracking. Needs ",
+        control_name("Rank thresholds"),
+        " turned on.",
+    ],
     "high-score-overlay": (
         "Shows your current personal best score as a reference line on the graph."
     ),
@@ -140,6 +148,7 @@ class ChartOptionsIds(NamedTuple):
     toggle: str
     rank_overlay: str
     show_all_ranks: str
+    accuracy_targets: str
     high_score_overlay: str
     typical_score_overlay: str
     middle_50_overlay: str
@@ -328,6 +337,19 @@ def chart_options_panel(ids: ChartOptionsIds) -> dmc.Paper:
                         label=settings_help_label(
                             "Show all ranks",
                             SETTINGS_HELP_TEXT["show-all-ranks"],
+                        ),
+                        checked=False,
+                        persistence=True,
+                    ),
+                    # Off to start, and its default never changes: a later
+                    # release that turned it on would turn it on in every
+                    # browser, including those that had turned it off.
+                    dmc.Switch(
+                        id=ids.accuracy_targets,
+                        labelPosition="right",
+                        label=settings_help_label(
+                            "Accuracy targets",
+                            SETTINGS_HELP_TEXT["accuracy-targets"],
                         ),
                         checked=False,
                         persistence=True,
