@@ -510,7 +510,12 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         id="mantine-provider",
         defaultColorScheme="light",
-        theme={"components": {"Anchor": {"defaultProps": {"underline": "always"}}}},
+        theme={
+            # Mantine 9's default is "md" (8 px). 4 px is a deliberate choice,
+            # not a leftover from the move off Mantine 8.
+            "defaultRadius": "sm",
+            "components": {"Anchor": {"defaultProps": {"underline": "always"}}},
+        },
         children=[
             dmc.AppShell(
                 children=[
