@@ -82,3 +82,20 @@ def test_app_serves_the_health_endpoint() -> None:
     )
 
     assert "'/health'" in rules
+
+
+def test_app_serves_react_19(tmp_path: Path) -> None:
+    # dash-mantine-components 3 leaves the page blank under React 18, Dash's
+    # default, and no other gate opens a browser to notice.
+    # Serving "/" builds Home's layout, which reads the config.
+    (tmp_path / "config.toml").write_text("port = 8050\n", encoding="utf-8")
+    page = _run_in_app(
+        "from source.app import app;"
+        " print(app.server.test_client().get('/').get_data(as_text=True))",
+        tmp_path,
+    )
+
+    # Dash fingerprints a file name after its first dot, so "react@19.2.4"
+    # is served as "react@19.v<fingerprint>.2.4.min.js".
+    assert "/deps/react@19." in page
+    assert "/deps/react@18." not in page
