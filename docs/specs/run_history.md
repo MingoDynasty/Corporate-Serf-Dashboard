@@ -1330,9 +1330,10 @@ it.
   Resolution, Resolution scale, Frame cap and Input lag. Sensitivity is the
   run list's Sensitivity text with a converted run's recorded setting, FOV
   is the list's FOV text, Crosshair drops its `.png`, Vertical sensitivity
-  reads `Same as horizontal` when the two are equal, Hide gun reads `Yes`
-  or `No`, Resolution scale is a percentage, and the rest are as the file
-  writes them.
+  reads `Same as horizontal` when the two are equal, else its value and
+  scale, Hide gun reads `Yes` or `No`, Resolution scale is a percentage, and
+  Frame cap drops a trailing `.0`. DPI, Crosshair scale, Resolution and
+  Input lag are as the file writes them.
 - A card whose value differs from its most common value over the typical
   runs is tinted yellow and shows `Typical {value}` under its own, so the
   change isn't carried by color alone. A tie goes to the value the latest
