@@ -51,6 +51,10 @@ $ApiBase = 'https://api.github.com'
 $DownloadBase = 'https://github.com'
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $DefaultPort = 8050
+# True while tmp\ holds the only working copy of a version: a reinstall's
+# parked previous copy, from the park until the replacement has synced or the
+# copy is back in place. The cleanup on exit keeps tmp\ while it is set.
+$TempHoldsParkedCopy = $false
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -160,11 +164,14 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
     # install if the sync fails (network outage, resolver error). Park the
     # existing copy under tmp instead; a rename is same-volume and reversible,
     # and the venv stays valid because restore returns it to its original
-    # path. On success the tmp cleanup at the end of the install removes it.
+    # path. Once the replacement has synced, the tmp cleanup on exit removes
+    # it.
     $backupDir = $null
     if (Test-Path -LiteralPath $targetDir) {
         $backupDir = Join-Path $tempDir "previous-$releaseTag"
         if (Test-Path -LiteralPath $backupDir) { Remove-Item -LiteralPath $backupDir -Recurse -Force }
+        # Set before the move, so that a stop between the two keeps the copy.
+        $script:TempHoldsParkedCopy = $true
         Move-Item -LiteralPath $targetDir -Destination $backupDir
     }
     try {
@@ -182,6 +189,7 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
         Write-Host "Installing dependencies for $releaseTag ..."
         & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
         if ($LASTEXITCODE -ne 0) { throw "uv sync failed for $releaseTag (exit $LASTEXITCODE)" }
+        $script:TempHoldsParkedCopy = $false
     } catch {
         $message = $_.Exception.Message
         # The restore itself can fail (a lingering handle on the partial
@@ -191,6 +199,7 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
             if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
             if ($backupDir -and (Test-Path -LiteralPath $backupDir)) {
                 Move-Item -LiteralPath $backupDir -Destination $targetDir
+                $script:TempHoldsParkedCopy = $false
                 Stop-Fatal "install of $releaseTag failed ($message); the previously installed copy was restored."
             }
         } catch {
@@ -286,60 +295,69 @@ $InstallRoot = (Resolve-Path -LiteralPath $InstallRoot).Path
 $env:UV_PYTHON_INSTALL_DIR = Join-Path $InstallRoot 'python'
 $env:UV_CACHE_DIR = Join-Path $InstallRoot 'uv-cache'
 
-$uvExe = Install-UvVersion ([string]$release.uv_version)
-$versionDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
-
-# First-run config. An existing config.toml (and data/) is never touched.
-$configPath = Join-Path $InstallRoot 'config.toml'
-if (Test-Path -LiteralPath $configPath) {
-    Write-Host 'Keeping the existing config.toml.'
-} else {
-    Write-FirstRunConfig -Port $DefaultPort
-    Write-Host "Wrote $configPath (dashboard port $DefaultPort)."
-}
-
-# Round-trip the config through the installed app's own loader BEFORE the
-# manifest or shortcut exist: a config the app cannot parse must fail the
-# install loudly, never surface later as a broken first launch. Using
-# load_config (tomllib underneath, plus the app's schema validation) rather
-# than bare tomllib catches missing/mistyped required fields too -- the
-# config is kept on reinstall, so a schema miss here would never self-heal.
-$python = Join-Path $versionDir '.venv\Scripts\python.exe'
-$env:CSD_STATE_DIR = $InstallRoot
+# Every exit from here on removes tmp\: a success, Stop-Fatal (exit runs
+# finally blocks), an uncaught error, and Ctrl+C. Nothing else would: a
+# later install clears it only by succeeding, and a reinstall stopped after
+# its sync would keep a second full venv parked there. The one exception is
+# a parked copy that is still the only working one.
 try {
-    & $python -c 'from source.config.config_service import load_config; load_config()'
+    $uvExe = Install-UvVersion ([string]$release.uv_version)
+    $versionDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
+
+    # First-run config. An existing config.toml (and data/) is never touched.
+    $configPath = Join-Path $InstallRoot 'config.toml'
+    if (Test-Path -LiteralPath $configPath) {
+        Write-Host 'Keeping the existing config.toml.'
+    } else {
+        Write-FirstRunConfig -Port $DefaultPort
+        Write-Host "Wrote $configPath (dashboard port $DefaultPort)."
+    }
+
+    # Round-trip the config through the installed app's own loader BEFORE the
+    # manifest or shortcut exist: a config the app cannot parse must fail the
+    # install loudly, never surface later as a broken first launch. Using
+    # load_config (tomllib underneath, plus the app's schema validation) rather
+    # than bare tomllib catches missing/mistyped required fields too -- the
+    # config is kept on reinstall, so a schema miss here would never self-heal.
+    $python = Join-Path $versionDir '.venv\Scripts\python.exe'
+    $env:CSD_STATE_DIR = $InstallRoot
+    try {
+        & $python -c 'from source.config.config_service import load_config; load_config()'
+    } finally {
+        Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
+    }
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Fatal "the installed app cannot load $configPath (details above) -- fix or delete it and run the installer again."
+    }
+
+    # Manifest (install.json, schema v1): the authoritative install identity.
+    $manifest = [ordered]@{
+        schema_version = 1
+        tag            = [string]$release.tag
+        sha            = [string]$release.sha
+        commit_date    = [string]$release.commit_date
+        update_policy  = 'latest'
+    }
+    if ($pinned) {
+        $manifest.update_policy = 'pinned'
+        $manifest.pinned_tag = [string]$release.tag
+    }
+    Write-FileAtomic -Path (Join-Path $InstallRoot 'install.json') -Content (($manifest | ConvertTo-Json) + "`n")
+
+    # Stable bootstrap at the root; the shortcut must never point into a
+    # versioned directory, because those get pruned.
+    $bootstrapTemplate = Join-Path $versionDir 'scripts\launch_bootstrap.ps1'
+    if (-not (Test-Path -LiteralPath $bootstrapTemplate)) {
+        Stop-Fatal "release $targetTag ships no scripts\launch_bootstrap.ps1; cannot write launch.ps1."
+    }
+    Write-FileAtomic -Path (Join-Path $InstallRoot 'launch.ps1') -Content ([System.IO.File]::ReadAllText($bootstrapTemplate))
+
+    $shortcutWritten = New-DesktopShortcut ([Environment]::GetFolderPath('Desktop'))
 } finally {
-    Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
+    if (-not $TempHoldsParkedCopy) {
+        Remove-Item -LiteralPath (Join-Path $InstallRoot 'tmp') -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
-if ($LASTEXITCODE -ne 0) {
-    Stop-Fatal "the installed app cannot load $configPath (details above) -- fix or delete it and run the installer again."
-}
-
-# Manifest (install.json, schema v1): the authoritative install identity.
-$manifest = [ordered]@{
-    schema_version = 1
-    tag            = [string]$release.tag
-    sha            = [string]$release.sha
-    commit_date    = [string]$release.commit_date
-    update_policy  = 'latest'
-}
-if ($pinned) {
-    $manifest.update_policy = 'pinned'
-    $manifest.pinned_tag = [string]$release.tag
-}
-Write-FileAtomic -Path (Join-Path $InstallRoot 'install.json') -Content (($manifest | ConvertTo-Json) + "`n")
-
-# Stable bootstrap at the root; the shortcut must never point into a
-# versioned directory, because those get pruned.
-$bootstrapTemplate = Join-Path $versionDir 'scripts\launch_bootstrap.ps1'
-if (-not (Test-Path -LiteralPath $bootstrapTemplate)) {
-    Stop-Fatal "release $targetTag ships no scripts\launch_bootstrap.ps1; cannot write launch.ps1."
-}
-Write-FileAtomic -Path (Join-Path $InstallRoot 'launch.ps1') -Content ([System.IO.File]::ReadAllText($bootstrapTemplate))
-
-$shortcutWritten = New-DesktopShortcut ([Environment]::GetFolderPath('Desktop'))
-
-Remove-Item -LiteralPath (Join-Path $InstallRoot 'tmp') -Recurse -Force -ErrorAction SilentlyContinue
 
 Write-Host ''
 Write-Host "Installed Corporate Serf Dashboard $targetTag." -ForegroundColor Green

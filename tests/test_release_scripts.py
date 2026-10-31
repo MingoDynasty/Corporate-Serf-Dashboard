@@ -9,8 +9,10 @@ other gate failing.
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -531,3 +533,248 @@ def test_a_missing_desktop_folder_is_a_warning(tmp_path: Path, named: bool) -> N
     if not named:
         assert warning[0].endswith("(the Desktop folder does not exist).")
     assert not desktop.exists()
+
+
+# Runs the real install.ps1 end to end, with no network and no shortcut. A
+# function in the caller's scope shadows a cmdlet of the same name for the
+# script it runs, so these stand in for the two download cmdlets and for the
+# shortcut's COM object. The uv and python the install runs are stub programs.
+# A shadow also reaches the modules the script loads, and the Archive module
+# calls New-Object as it loads, so that shadow passes every other call on.
+_INSTALL_DRIVER = """
+$TestFixtures = $args[2]
+function Invoke-WebRequest {
+    param([string]$Uri, [string]$OutFile, [switch]$UseBasicParsing, [int]$TimeoutSec)
+    $source = Join-Path $TestFixtures ($Uri -split '/')[-1]
+    if (-not (Test-Path -LiteralPath $source)) { throw "unexpected download: $Uri" }
+    if ($OutFile) { Copy-Item -LiteralPath $source -Destination $OutFile; return }
+    [pscustomobject]@{ Content = [System.IO.File]::ReadAllBytes($source) }
+}
+function Invoke-RestMethod { throw 'unexpected request' }
+# The Desktop is the real one of whoever runs the tests.
+function New-Object {
+    if ($args -contains 'WScript.Shell') { throw 'the test writes no desktop shortcut' }
+    Microsoft.PowerShell.Utility\\New-Object @args
+}
+<refuse restore>
+try {
+    & $args[1] -LatestTag $args[3] -InstallRoot $args[0]
+    exit $LASTEXITCODE
+} catch {
+    Write-Host "TEST: uncaught error: $($_.Exception.Message)"
+    exit 99
+}
+"""
+
+# Fails the move that returns a parked copy to its place, as a lingering
+# handle on the replacement's partial tree can.
+_REFUSE_RESTORE = r"""
+function Move-Item {
+    param([string]$LiteralPath, [string]$Destination)
+    if ($LiteralPath -like '*\tmp\previous-*') { throw 'the test refuses the restore' }
+    Microsoft.PowerShell.Management\Move-Item -LiteralPath $LiteralPath -Destination $Destination
+}
+"""
+
+_TAG = "v2026.01.01"
+_SHA = "0123456789abcdef" * 2 + "01234567"
+_UV_VERSION = "0.0.0"
+
+
+@pytest.fixture(scope="module")
+def stub_programs(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+    """Build two console programs that ignore their arguments and exit 0 or 1.
+
+    The installer runs ``uv.exe`` and the venv's ``python.exe`` as native
+    commands and reads only their exit codes, so a stub must be a real
+    program; a script would not run under those names.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+    folder = tmp_path_factory.mktemp("stubs")
+    programs = {f"exit{code}": folder / f"exit{code}.exe" for code in (0, 1)}
+    build = "; ".join(
+        f"Add-Type -OutputType ConsoleApplication -OutputAssembly '{path}'"
+        f" -TypeDefinition 'public static class {name}"
+        f" {{ public static int Main() {{ return {name[-1]}; }} }}'"
+        for name, path in programs.items()
+    )
+    subprocess.run(
+        [str(WINDOWS_POWERSHELL), "-NoProfile", "-Command", build],
+        check=True,
+        capture_output=True,
+        timeout=120,
+    )
+    return programs
+
+
+def _release_fixtures(
+    tmp_path: Path, stubs: dict[str, Path], python: str | None, stamp: str
+) -> Path:
+    """Write the ``release.json`` and zip that the fake downloads serve.
+
+    ``python`` names the stub the zip ships as its venv's ``python.exe``, which
+    is what answers the config check; ``None`` ships no interpreter at all.
+    """
+    fixtures = tmp_path / "fixtures"
+    fixtures.mkdir()
+    release = {
+        "schema_version": 1,
+        "tag": _TAG,
+        "sha": _SHA,
+        "commit_date": "2026-01-01",
+        "uv_version": _UV_VERSION,
+        "source_asset": "csd.zip",
+    }
+    (fixtures / "release.json").write_text(json.dumps(release), encoding="utf-8")
+    top = f"Corporate-Serf-Dashboard-{_TAG}/"
+    with zipfile.ZipFile(fixtures / "csd.zip", "w") as archive:
+        archive.writestr(top + "version.txt", f"sha: {stamp}\n")
+        archive.writestr(top + "scripts/launch_bootstrap.ps1", "# stand-in\n")
+        if python is not None:
+            archive.write(stubs[python], top + ".venv/Scripts/python.exe")
+    return fixtures
+
+
+def _install_root(tmp_path: Path, stubs: dict[str, Path], uv: str) -> Path:
+    """Lay out a root that already holds uv, so nothing downloads it."""
+    root = tmp_path / "install-root"
+    (root / "uv" / _UV_VERSION).mkdir(parents=True)
+    shutil.copyfile(stubs[uv], root / "uv" / _UV_VERSION / "uv.exe")
+    return root
+
+
+def _reinstall_root(tmp_path: Path, stubs: dict[str, Path], uv: str) -> Path:
+    """Lay out a root with the tag already installed and a config it rejects."""
+    root = _install_root(tmp_path, stubs, uv)
+    (root / "versions" / _TAG).mkdir(parents=True)
+    (root / "versions" / _TAG / "previous.txt").write_text("", encoding="utf-8")
+    (root / "config.toml").write_text('port = "not a port"\n', encoding="utf-8")
+    return root
+
+
+def _run_install(
+    tmp_path: Path, root: Path, fixtures: Path, *, refuse_restore: bool = False
+) -> subprocess.CompletedProcess[str]:
+    """Run the real ``install.ps1 -LatestTag`` against the fake release."""
+    driver = _INSTALL_DRIVER.replace(
+        "<refuse restore>", _REFUSE_RESTORE if refuse_restore else ""
+    )
+    return _windows_powershell(
+        tmp_path, driver, [str(root), str(INSTALL_SCRIPT), str(fixtures), _TAG]
+    )
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(
+    ("uv", "python", "stamp", "expected", "installed"),
+    [
+        pytest.param(
+            "exit0",
+            "exit1",
+            _SHA,
+            "ERROR: the installed app cannot load",
+            "version.txt",
+            id="config check fails after the sync",
+        ),
+        pytest.param(
+            "exit0",
+            None,
+            _SHA,
+            "TEST: uncaught error:",
+            "version.txt",
+            id="uncaught error after the sync",
+        ),
+        pytest.param(
+            "exit1",
+            "exit0",
+            _SHA,
+            "the previously installed copy was restored.",
+            "previous.txt",
+            id="sync fails",
+        ),
+        pytest.param(
+            "exit0",
+            "exit0",
+            "f" * 40,
+            "does not carry the release SHA",
+            "previous.txt",
+            id="stamp check fails",
+        ),
+    ],
+)
+def test_a_failed_reinstall_leaves_no_tmp(
+    tmp_path: Path,
+    stub_programs: dict[str, Path],
+    uv: str,
+    python: str | None,
+    stamp: str,
+    expected: str,
+    installed: str,
+) -> None:
+    r"""Every exit removes ``tmp\``, not only a successful one.
+
+    Nothing else ever does: a later install clears it only by succeeding. The
+    costly case is a reinstall onto the installed tag that stops after its
+    sync, at the config check: the previous copy parked under ``tmp\`` is a
+    second full venv. The other exits strand the download and the
+    extraction. ``installed`` names the file that shows which copy ends up
+    under ``versions\<tag>``.
+    """
+    root = _reinstall_root(tmp_path, stub_programs, uv)
+    fixtures = _release_fixtures(tmp_path, stub_programs, python, stamp)
+
+    result = _run_install(tmp_path, root, fixtures)
+
+    assert result.returncode != 0
+    assert expected in result.stdout, result.stdout
+    assert not (root / "tmp").exists(), result.stdout
+    assert (root / "versions" / _TAG / installed).is_file()
+    assert not (root / "install.json").exists()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_a_failed_restore_keeps_the_parked_copy(
+    tmp_path: Path, stub_programs: dict[str, Path]
+) -> None:
+    r"""The one exit that keeps ``tmp\``: it holds the only working copy.
+
+    When the sync fails and the parked copy cannot be moved back, the error
+    names where it is so it can be moved back by hand.
+    """
+    root = _reinstall_root(tmp_path, stub_programs, "exit1")
+    fixtures = _release_fixtures(tmp_path, stub_programs, "exit0", _SHA)
+
+    result = _run_install(tmp_path, root, fixtures, refuse_restore=True)
+
+    parked = root / "tmp" / f"previous-{_TAG}"
+    assert result.returncode == 1
+    assert f"It is intact at {parked}" in result.stdout, result.stdout
+    assert (parked / "previous.txt").is_file()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_an_install_without_a_shortcut_still_finishes(
+    tmp_path: Path, stub_programs: dict[str, Path]
+) -> None:
+    """A shortcut that can't be written leaves a working install and says so."""
+    root = _install_root(tmp_path, stub_programs, "exit0")
+    fixtures = _release_fixtures(tmp_path, stub_programs, "exit0", _SHA)
+
+    result = _run_install(tmp_path, root, fixtures)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    lines = result.stdout.splitlines()
+    assert any(
+        line.startswith("WARNING: could not create the desktop shortcut (")
+        for line in lines
+    ), result.stdout
+    assert lines[-3:] == [
+        f"Installed Corporate Serf Dashboard {_TAG}.",
+        "Launch it with: powershell.exe -NoProfile -ExecutionPolicy Bypass"
+        f' -File "{root / "launch.ps1"}"',
+        f"To uninstall: delete the folder {root}",
+    ]
+    assert (root / "install.json").is_file()
+    assert (root / "launch.ps1").is_file()
+    assert not (root / "tmp").exists()

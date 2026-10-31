@@ -144,6 +144,11 @@ console lines quoted here are plain console output, not app notifications.
   first and restores it if the replacement fails before its sync completes
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md),
   [2026-07-19](../decision_log/2026/2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md)).
+- Once the install root exists, every exit removes `tmp\`: a success, an
+  `ERROR:` stop, or an uncaught error. The one exception is a parked copy
+  that is still the only working one, which is kept while the
+  replacement's sync runs and after a restore that failed. That restore
+  failure's message names the parked copy's path under `tmp\`.
 - Installs ask no questions. With no `config.toml` at the root, the installer
   writes one carrying only `port = 8050` under a comment header; an existing
   `config.toml` and `data/` are never touched ("Keeping the existing
