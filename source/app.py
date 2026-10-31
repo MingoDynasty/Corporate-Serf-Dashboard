@@ -309,6 +309,32 @@ def bind_server_socket(port: int, host: str = DEFAULT_HOST) -> list[socket.socke
     return sockets
 
 
+def prepare_api_cache() -> None:
+    """Build the API cache tree and fold the bundled leaderboard IDs into it.
+
+    A cache this boot can't build or write costs the cache, never the start:
+    uncaught, a read-only mapping file or a directory at its path stops every
+    start until someone deletes ``data/cache`` by hand. The two steps fail
+    separately, so a tree that can't be built in full still gets its seed
+    when the mapping's own folder can be written.
+    """
+    try:
+        make_cache()
+    except OSError as error:
+        logger.warning(
+            "Could not create the API cache folders; serving anyway: %s", error
+        )
+
+    try:
+        seed_leaderboard_ids_from_bundled_corpus()
+    except OSError as error:
+        logger.warning(
+            "Could not write the bundled leaderboard IDs to the mapping cache; "
+            "serving without them: %s",
+            error,
+        )
+
+
 def main() -> None:
     """
     Main entry point.
@@ -345,12 +371,9 @@ def main() -> None:
 
     load_playlists()
 
-    # Create the API cache tree before the first operation that consumes it.
-    make_cache()
-
-    # Fold the bundled corpus's embedded leaderboard IDs into the permanent
-    # name->ID mapping cache before any rank lookup needs them.
-    seed_leaderboard_ids_from_bundled_corpus()
+    # Create the API cache tree before the first operation that consumes it,
+    # and seed it before any rank lookup needs the bundled leaderboard IDs.
+    prepare_api_cache()
 
     # Detect the stats directory when nothing ever configured one -- before the
     # pin below, so a first detection serves this boot instead of the next one.
