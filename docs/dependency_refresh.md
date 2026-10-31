@@ -229,17 +229,18 @@ JSON.stringify(document.querySelector(".js-plotly-plot")._context)
 ```
 
 For plotly, dash-ag-grid or dash-mantine-components bumps, run the
-linked-hover and run viewer browser regressions. They exercise Plotly's SVG
-marker bindings and click events, AG Grid's mouse and key events, and the run
-viewer's Esc rule around Mantine's Select, Menu and Modal, which the standard
-gates skip. dash-mantine-components 3 gave a Select's input the combobox role,
-and only the run viewer regression saw it.
+linked-hover, run viewer and toast interaction browser regressions. They
+exercise Plotly's SVG marker bindings and click events, AG Grid's mouse and key
+events, the run viewer's Esc rule around Mantine's Select, Menu and Modal, and
+the toast container's three interaction settings, which the standard gates
+skip. dash-mantine-components 3 gave a Select's input the combobox role, and
+only the run viewer regression saw it.
 The screenshots dependency group installs Playwright; this command uses an
 installed Microsoft Edge browser:
 
 ```powershell
 $env:CSD_HOVER_BROWSER = 'msedge'
-uv run --group screenshots pytest tests/test_run_history_hover_browser.py tests/test_run_viewer_browser.py
+uv run --group screenshots pytest tests/test_run_history_hover_browser.py tests/test_run_viewer_browser.py tests/test_toast_interactions_browser.py
 Remove-Item Env:CSD_HOVER_BROWSER
 ```
 
@@ -249,7 +250,7 @@ run with no browser channel set:
 
 ```powershell
 uv run --group screenshots playwright install chromium
-uv run --group screenshots pytest tests/test_run_history_hover_browser.py tests/test_run_viewer_browser.py
+uv run --group screenshots pytest tests/test_run_history_hover_browser.py tests/test_run_viewer_browser.py tests/test_toast_interactions_browser.py
 ```
 
 A plotly bump also needs one look that no test can take. On Score vs Time,
