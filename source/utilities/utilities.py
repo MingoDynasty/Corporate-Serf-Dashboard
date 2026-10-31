@@ -8,7 +8,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from source.kovaaks.data_models import RecordedSensitivity
+    from source.kovaaks.data_models import RecordedSensitivity, RunData
 
 # Abbreviated English month names, hardcoded so the absolute-timestamp format is
 # locale-independent (``%b``/``calendar.month_abbr`` follow the process locale).
@@ -53,6 +53,26 @@ def recorded_sensitivity_suffix(recorded: RecordedSensitivity | None) -> str:
         f" ({format_decimal(recorded.value)} {recorded.scale}"
         f" at {format_decimal(recorded.dpi)} DPI)"
     )
+
+
+def sensitivity_text(run: RunData) -> str:
+    """Write a run's sensitivity as the run list's Sensitivity column shows it.
+
+    Such as ``45.0 cm/360``: the normalized value, so a converted run reads
+    in cm/360 and ``recorded_sensitivity_suffix`` says what it was played at.
+    """
+    return f"{run.horizontal_sens} {run.sens_scale}"
+
+
+def fov_text(run: RunData) -> str:
+    """Write a run's FOV as the player typed it, then its scale if the file names one.
+
+    A whole number drops its ``.0``, as the game's own setting reads.
+    """
+    if run.fov is None:
+        return ""
+    number = str(int(run.fov)) if run.fov.is_integer() else str(run.fov)
+    return f"{number} {run.fov_scale}" if run.fov_scale else number
 
 
 def format_approximate_duration(seconds: float) -> str:
