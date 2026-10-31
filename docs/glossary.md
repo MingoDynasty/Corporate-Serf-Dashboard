@@ -415,6 +415,23 @@ The chart's lines for a scenario's rank thresholds
 
 - On screen: the Rank thresholds switch.
 
+### Accuracy target
+
+An estimate of the hit accuracy a run needs to reach a rank's threshold when
+the fire button is held for the whole run: the threshold over the score the
+player's runs would make at 100%, rounded up to a tenth of a percent. Shown
+once at least 5 of the scenario's runs since its last update agree on that
+score, and never on a scenario the app recognizes as time-scored. Shots vary
+a little even with the button held, so a run can clear it and still miss the
+rank, or reach a rank estimated above 100%
+([run_history.md](specs/run_history.md#the-chart)).
+
+- On screen: the figure beside a rank line in the chart's right margin,
+  while the Accuracy targets switch is on.
+- In code: `accuracy_target`; the score at 100% is `full_accuracy_score`.
+- Not the accuracy guideline on the [roadmap](roadmap.md), which is the
+  accuracy top leaderboard players reach.
+
 ## Scores and notifications
 
 ### PB

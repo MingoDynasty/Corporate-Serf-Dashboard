@@ -224,6 +224,21 @@ the same form as the finished ones under it.
   default it draws only the bands around your scores, so the runs fill the
   chart; a **Show all ranks** chart option draws the whole ladder instead, for
   when you want to see how far the climb goes rather than what is next.
+- **Accuracy targets** (Run History page, PR #452; design in #449). An
+  **Accuracy targets** chart option, off to start, writes beside each rank
+  line an estimate of the hit accuracy that rank needs, such as 39.2% beside
+  Saffron (2350). On a tracking scenario a run's score is about its accuracy
+  times a fixed amount, so the app works that amount out from your own runs
+  since the scenario's last update, once at least 5 of them agree on it, and
+  assumes the fire button is held for the whole run. A scenario whose runs
+  disagree, as click scenarios' usually do, or one scored by completion time,
+  gets none, and a quiet note under the chart says why. *Problem solved:* on
+  tracking you aim for an accuracy, not a score, but the chart showed only
+  each rank's score, so "how accurate do I need to be for Saffron?" meant
+  working out a score at 100% that nothing on screen shows. The figures are
+  estimates, rounded up to a tenth, because shots vary a little from run to
+  run, and they sit outside the plot so the chart keeps its shape. Off, the
+  chart is exactly as it was.
 - **New PB stars on the chart** (Run History page, PR #346; design in #337;
   Score vs Run in PR #370). On Score vs Run and Score vs Time, a gold star
   marks each plotted run that
