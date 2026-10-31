@@ -1,12 +1,17 @@
 # 2026-10-24: Chart Point Tooltips Show Score, Time And Run Numbers
 
-Status: Accepted
+Status: Superseded in part by the [run opening decision](2026-10-30-a-run-opens-in-the-charts-place-and-close-or-esc-closes-it.md)
 
 Run-point tooltips identify a run and name the session where it can be found.
 Score vs Run also describes how much practice followed that run.
 Scores and session labels match the run list, and sensitivity keeps its
 recorded game setting. Accuracy is available in the list and can require
 more navigation for older runs.
+
+**Superseded in part (2026-10-30).** [A Run Opens In The Chart's Place](2026-10-30-a-run-opens-in-the-charts-place-and-close-or-esc-closes-it.md)
+is the click feature this entry waited for: a click on a run point or a PB
+star opens the run, with its accuracy, in the chart's place. The accepted
+navigation gap is closed, and the tooltip's contract stands.
 
 **Direction.** The maintainer approved this contract on 2026-10-24 following
 the Fable consult and Opus's requirements handoff. Full run detail belongs

@@ -245,12 +245,12 @@ row. They count every run under the row and compare nothing
 ### Run viewer
 
 The view of one run that takes the place of Run History's chart until it is
-closed: the run's score against its typical runs, its settings, and
-everything its stats file recorded
+closed: the run's score against its typical runs, By Bot, its settings,
+and everything its stats file recorded
 ([run_history.md](specs/run_history.md#the-run-viewer)).
 
-- On screen: no name of its own. Its sections are Settings and Everything
-  Recorded, and its button is Close.
+- On screen: no name of its own. Its sections are By Bot, Settings and
+  Everything Recorded, and its button is Close.
 - In code: `run_viewer`, and `run_viewer_panel` for what draws it.
 
 ## Playlists
@@ -516,8 +516,8 @@ median over the ones that have the figure, and a setting's is its most
 common value among them. A run has none while its typical at session start
 is unknown ([run_history.md](specs/run_history.md#what-it-shows)).
 
-- On screen: `Typical` on the run viewer's tiles and cards, and `your
-  typical runs` in its copy.
+- On screen: `Typical` on the run viewer's tiles, cards and By Bot
+  columns, and `your typical runs` in its copy.
 - Not the runs behind the Typical score card's value, which moves on with
   every run: a run's typical runs stay the ones before its session.
 - In code: `typical_runs`.

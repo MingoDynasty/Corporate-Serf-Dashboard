@@ -28,6 +28,16 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Run viewer** — a click on any run in Run History, in the run list or
+  on the chart, opens it where the chart was, with the list beside it,
+  and Close or Esc brings the chart back as it was left. The run shows its
+  score tiles against its typical runs, such as Accuracy 65.93% over
+  Typical 63.09% · +2.84 pts, and a By Bot table for a run that names two
+  bots or more, each bot against its own typical, sortable by any column.
+  Then come its eleven settings, a changed one marked with its typical
+  value, and everything its stats file recorded, closed. (PRs #453, #455
+  and #PR3NUM; design in #450) Design rationale distilled into
+  [`decision_log/`](./decision_log/README.md).
 - **Accuracy targets on the chart** — an Accuracy targets switch in Chart
   options, off to start, writes beside each rank line the hit accuracy that
   rank needs, such as 39.2% beside Saffron (2350). Each target is estimated
@@ -58,15 +68,6 @@ sequence.
   The three chart metrics have independent remembered switches, all on at
   first. (PRs #398, #400, #402 and #401; design in #382) Design rationale
   distilled into [`decision_log/`](./decision_log/README.md).
-- **Scenario notes** — Run History's top row now holds the player's own
-  note on the selected scenario, such as a reminder about technique, read
-  with no click between runs and edited in place with Save and Cancel. A
-  scenario with no note shows a link to add one. Nothing throws unsaved text
-  away: Follow waits while a note has unsaved changes and the card names the
-  run that waits, and every change of scenario or page the player makes asks
-  first. Each note is a small file of its own under `data/scenario_notes/`.
-  (PRs #394 and #396; design in #390) Design rationale distilled into
-  [`decision_log/`](./decision_log/README.md).
 
 ---
 
@@ -128,8 +129,6 @@ next.
 - **Accuracy guideline** — the accuracy the top leaderboard players land at on
   a scenario, as a reference for what good play looks like rather than a
   target.
-- **Per-bot breakdown on time-scored kill scenarios** — which bots cost the
-  most time, from each bot's time to kill, which the stats files record.
 
 ---
 

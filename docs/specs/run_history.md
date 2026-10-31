@@ -1221,7 +1221,7 @@ The card's lines, local-record scope and leaderboard presentation follow
   Hover runs entirely in the browser and never loads older sessions. A click
   is no part of it: a click on a run point, a PB star or a Run row opens the
   run in [the run viewer](#the-run-viewer), and opening or closing a run
-  clears the emphasis.
+  clears the emphasis ([RV1][rv-open]).
 
 ## The run viewer
 
@@ -1234,44 +1234,46 @@ it.
   or a PB star of the chart, in any mode, opens that run. Enter or Space on a
   focused Run row opens it too. A position several runs share opens the run
   its tooltip names. Over a run point or a star the pointer is a hand. A
-  Session or Scenario row keeps its own click and keys.
+  Session or Scenario row keeps its own click and keys ([RV1][rv-open]).
 - The run takes the place of everything in the chart's column: the chart,
   its header, and Chart options. The chart is hidden, not rebuilt, so
   closing the run shows it as it was left: its mode, zoom, ranges, hidden
   traces and Chart options. A chart drawn again while hidden, as when a run
-  lands, comes back at its column's width.
+  lands, comes back at its column's width ([RV1][rv-open]).
 - A click on another Run row switches to that run, which starts from its
   top. Points can't be clicked while a run is open, since the chart is
-  hidden.
+  hidden ([RV1][rv-open]).
 - The open run's row carries a blue outline, in either view, and keeps it
   when the list is rebuilt. The outline is a look alone.
 - **Close** sits at the header's right with an `Esc` key hint, and its
   accessible name is `Close`. Esc closes the run too, except while a text
   field has focus or a dialog, menu or dropdown is open, such as the note
   dialog, a Select's list or the Columns menu: Esc then does only what that
-  control does with it.
+  control does with it ([RV1][rv-open]).
 - Focus goes to **Close** when a run opens, and stays on the row pressed
   when a run is switched from the list. When the run closes, by Close or
   Esc, focus goes back to the Run row that opened it, scrolled into view, or
   to the chart's mode control when a point or a star did. A row no longer in
   the view on screen, or under a closed group, sends focus to the mode
-  control too.
+  control too ([RV1][rv-open]).
 - A change of the selected scenario closes the run, made by the player or by
   Follow, and leaves focus where it is. The scenario written again with the
   value it already holds, as when a run lands with Follow on, changes
-  nothing.
+  nothing ([RV1][rv-open]).
 - A Run row of another scenario, under All scenarios, opens without
   changing the selection. The header names its scenario, and Close returns
-  the selected scenario's chart.
+  the selected scenario's chart ([RV1][rv-open]).
 - A run that lands while one is open joins the list and the hidden chart,
-  and the open run stays.
+  and the open run stays ([RV1][rv-open]).
 - The open run isn't written to the address and adds no history entry, so
-  the browser's Back leaves the page, and a reload shows the chart.
+  the browser's Back leaves the page, and a reload shows the chart
+  ([RV1][rv-open]).
 
 ### What it shows
 
 - From the top: the header, the score line, a line naming the run's typical
-  runs, the tiles, Settings, then Everything Recorded, closed.
+  runs, the tiles, By Bot when the run names two bots or more, Settings,
+  then Everything Recorded, closed ([RV1][rv-open]).
 - The header's first line reads `{scenario} · ended {date}`, in the absolute
   format with seconds, such as `Aug 6, 2026, 10:56:36 PM`. Its title reads
   `Run {n} · {session} session`: the run's number among its scenario's runs
@@ -1294,33 +1296,95 @@ it.
   typical run for this run's session yet: it had {N} runs before it, and a
   typical score needs 10 runs across 2 or more sessions, or 20 in one
   session.`, with `1 run` for one. Every Typical and Difference figure is
-  then left out, and no setting is marked.
+  then left out, and no setting is marked ([RV2][rv-typical]).
+- Every figure the viewer compares, on a tile, a card or By Bot, is compared
+  with the run's typical runs, and there is no other choice of runs to
+  compare with ([RV2][rv-typical]).
 
 ### The tiles
 
 - Score, Accuracy, Shots fired and Reloads, in that order, then Time on a
   run whose own version the app recognizes as
-  [time-scored](#time-scored-scenarios).
+  [time-scored](#time-scored-scenarios) ([RV3][rv-tiles]).
 - Each tile shows the run's value over `Typical {value} · {difference}`.
   The typical is the median of the figure over the typical runs that have
   it, and the hover reads `Median of {n} of your {N} typical runs`, or
   `Median of your {N} typical runs` when every one has it. The difference
   is the run's value less the typical, worked from the two values as shown,
-  so the three add up on screen, with `+` or `−` before it and none on zero.
+  so the three add up on screen, with `+` or `−` before it and none on zero
+  ([RV2][rv-typical], [RV3][rv-tiles]).
 - Score is formatted as everywhere else, and its typical to its typical
   runs' precision, as Scenario Stats shows the typical score. Accuracy is
   KovaaK's hits over shots to two decimals, and its difference reads in
   percentage points, such as `+1.82 pts`. Shots fired and Reloads read as
-  counts, and a typical between two runs keeps its half, such as `5,776.5`.
+  counts, and a typical between two runs keeps its half, such as `5,776.5`
+  ([RV3][rv-tiles]).
 - Time is the clock's constant less the score, read as `m:ss.s`, such as
   `1:54.3`, with its difference in seconds, such as `−2.4 s`. It has a
   typical only when every typical run is of the run's own version, and a
-  time of zero or less is none.
+  time of zero or less is none ([RV3][rv-tiles]).
 - A higher Score or Accuracy is green and a lower one red, fewer Reloads
   and a faster Time are green and the reverse red, and Shots fired is
-  uncolored. A difference that reads zero is uncolored.
+  uncolored. A difference that reads zero is uncolored ([RV3][rv-tiles]).
 - A figure the run's file lacks, such as Reloads in the oldest files, reads
-  `Not recorded`.
+  `Not recorded` ([RV3][rv-tiles]).
+
+### By Bot
+
+- A run whose kill table names two bots or more shows `By Bot`, one row per
+  bot. A run that names one bot, or whose kill table is empty, shows none
+  ([RV4][rv-by-bot]).
+- What it shows follows the run's kind. When any bot has two kills or more,
+  even if another has one: Kills, Time per Kill and Accuracy. When each bot
+  is one kill and the run's own version is
+  [time-scored](#time-scored-scenarios): Time, the bot's split, and
+  Accuracy. When each bot is one kill on any other run: Accuracy alone
+  ([RV4][rv-by-bot]).
+- A bot's accuracy is its kill rows' hits over their shots. Its time is the
+  sum of its kills' gaps since the kill before, the first kill's from the
+  run's start, and its time per kill is that over its kills. A kill time is
+  a time of day: a gap more than 12 hours below zero crossed midnight, and
+  any other gap below zero means the times disagree ([RV4][rv-by-bot]).
+- With typical runs, each figure shows This Run, Typical and Difference
+  under its name. A bot's typical is the median of the figure over the
+  typical runs that name the bot and have the figure, its hover worded as a
+  tile's, and a bot no typical run names has empty Typical and Difference
+  cells. With no typical runs, each figure is one column
+  ([RV2][rv-typical], [RV4][rv-by-bot]).
+- Times read in seconds to two decimals, such as `1.11 s`, accuracy as a
+  run's accuracy, such as `59.26%`. A difference is worked from the two
+  values as shown and signed as a tile's, in ` s` or ` pts`. A faster time
+  or a higher accuracy is green, the reverse red, and a difference that
+  reads zero is dimmed ([RV4][rv-by-bot]).
+- The subtitle is the kind's line, then `Listed in the order the run plays
+  them.` where each bot is one kill, then `Typical is each bot's median over
+  your typical runs. Difference is this run minus typical, in percentage
+  points (pts) for accuracy.` when there are typical runs. The kinds' lines
+  are `Each kill's time runs from the kill before it, so it includes finding
+  the bot.`, `Each bot is one kill, in a set order, so these are the run's
+  splits. A kill's time runs from the kill before it.`, and `Each bot is one
+  kill, so its time is shown only when the app knows this run was scored by
+  completion time.` ([RV4][rv-by-bot]).
+- A run's times are unknown when its file has no usable `Challenge Start:`,
+  when its times disagree, or when it was paused. It keeps its kills and
+  accuracy, every time cell is empty, its typical's included, and a line
+  under the subtitle says why: `Times aren't shown because this run's file
+  has no start time.`, `Times aren't shown because this run's file has times
+  out of order.`, or `Times aren't shown because this run was paused, and
+  its file doesn't say when.` A run that shows accuracy alone has no such
+  line. A typical run with unknown times counts toward each bot's typical
+  accuracy and not toward its times ([RV4][rv-by-bot]).
+- Rows start in play order where each bot is one kill, and in name order
+  otherwise, numbers read as numbers, so `Fly Bot 2` comes before `Fly Bot
+  10` ([RV4][rv-by-bot]).
+- Each column header sorts ascending, then descending, then back to the
+  starting order, on a click or on Enter while it has focus, and the sorted
+  header carries `aria-sort`. An empty cell goes last both ways, rows that
+  tie keep their starting order, and Bot sorts in name order. Each run, the
+  one switched to included, starts in its own order. The row under the
+  pointer is marked ([RV4][rv-by-bot]).
+- The table is as wide as its columns, each sized to its contents, and
+  scrolls sideways in its own box where it is wider than the viewer.
 
 ### Settings
 
@@ -1332,16 +1396,18 @@ it.
   reads `Same as horizontal` when the two are equal, else its value and
   scale, Hide gun reads `Yes` or `No`, Resolution scale is a percentage, and
   Frame cap drops a trailing `.0`. DPI, Crosshair scale, Resolution and
-  Input lag are as the file writes them.
+  Input lag are as the file writes them ([RV5][rv-settings]).
 - A card whose value differs from its most common value over the typical
   runs is tinted yellow and shows `Typical {value}` under its own, so the
   change isn't carried by color alone. A tie goes to the value the latest
   typical run used. Its hover is the value, then `Typical {value} · on {n}
   of your {N} typical runs`, where an unmarked card's hover is its value,
-  so a value cut short can be read whole.
+  so a value cut short can be read whole ([RV5][rv-settings]).
 - A setting the file doesn't have reads `Not recorded`, with the hover `The
   run file doesn't have this setting. Older versions of KovaaK's didn't
-  record it.`, and is never marked.
+  record it.`, and is never marked ([RV5][rv-settings]).
+- There is no card for the crosshair's color, which the game writes wrong.
+  The value is in Everything Recorded as written ([RV5][rv-settings]).
 
 ### Everything Recorded
 
@@ -1349,21 +1415,24 @@ it.
   file as KovaaK's wrote it, grouped by kind.`, holding the stats file's
   fields under their own names, as written. It is closed each time a run
   opens, and stays open or closed as it was while another run is switched to
-  from the list.
+  from the list, whether or not either run has a By Bot table
+  ([RV6][rv-recorded]).
 - The fields are grouped as Result, Other Counters, Run and Settings, each
   in a fixed order, then Other for any field none of those names, in file
   order, so a game update never hides one. A group with no field in the
-  file is left out.
+  file is left out ([RV6][rv-recorded]).
 - A group folds to one line, `All zero: {field names}`, only when every
   field it names is in the file and reads zero. A field the file doesn't
-  have, or has with no value, isn't zero, so its group stays open.
+  have, or has with no value, isn't zero, so its group stays open
+  ([RV6][rv-recorded]).
 - Files names the run file and reads `Found` or `None` for the run's
   performance file. Weapons shows the weapon rows, and Kills the kill table
   with every column the file has, in file order, or `This run's file
   records no kills.` Both tables scroll sideways in their own box where they
-  are wider than the viewer.
+  are wider than the viewer ([RV6][rv-recorded]).
 - The tables are handed to the page as data and drawn by Mantine, never as
-  one Dash component per cell: a kill table can run to hundreds of rows.
+  one Dash component per cell: a kill table can run to hundreds of rows
+  ([RV6][rv-recorded]).
 
 ## Marks: the check and the star
 
@@ -1475,8 +1544,9 @@ it.
   Anything that orders or places scores is unchanged, because a higher score
   is always a faster finish: the chart's points and axis, the PB score line,
   the rank lines, and the Rank column. No completion time is shown anywhere
-  ([2026-10-05][pace]) but the run viewer's Time tile
-  ([The run viewer](#the-tiles)).
+  but the run viewer's Time tile and By Bot's splits, which the pace entry's
+  note of 2026-10-30 names ([2026-10-05][pace], [RV3][rv-tiles],
+  [RV4][rv-by-bot]; [The tiles](#the-tiles), [By Bot](#by-bot)).
   The typical score's line and bands are among them: a median and its
   percentiles order scores, so they divide no times
   ([TS1][typical-definition]).
@@ -1903,3 +1973,15 @@ it.
 [one-row-hover]: ../decision_log/2026/2026-10-23-run-history-hover-outlines-one-list-row.md
 
 [compact-hover]: ../decision_log/2026/2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md
+
+[rv-open]: ../decision_log/2026/2026-10-30-a-run-opens-in-the-charts-place-and-close-or-esc-closes-it.md
+
+[rv-typical]: ../decision_log/2026/2026-10-30-the-run-viewer-measures-a-run-against-its-typical-runs.md
+
+[rv-tiles]: ../decision_log/2026/2026-10-30-the-run-viewers-tiles-are-score-accuracy-shots-fired-reloads-and-time.md
+
+[rv-by-bot]: ../decision_log/2026/2026-10-30-by-bot-measures-each-bot-against-its-own-typical-and-names-no-bot.md
+
+[rv-settings]: ../decision_log/2026/2026-10-30-the-run-viewer-shows-eleven-settings-and-marks-a-changed-one.md
+
+[rv-recorded]: ../decision_log/2026/2026-10-30-everything-recorded-shows-the-whole-stats-file-closed-and-grouped.md

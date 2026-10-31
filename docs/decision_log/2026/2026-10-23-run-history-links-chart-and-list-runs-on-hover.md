@@ -1,6 +1,7 @@
 # 2026-10-23: Run History Links Chart And List Runs On Hover
 
 Status: Superseded in part by the [one-row hover decision](2026-10-23-run-history-hover-outlines-one-list-row.md)
+and the [run opening decision](2026-10-30-a-run-opens-in-the-charts-place-and-close-or-esc-closes-it.md)
 
 Hovering a run links its chart marker and visible list row. When the run is
 inside collapsed content, its Session row is highlighted instead. This helps
@@ -11,6 +12,11 @@ both views.
 replaces the Session-only fallback. A hidden run now outlines the most
 specific row exposed by expansion: its Scenario row under All scenarios,
 otherwise its Session row. The remaining interaction rules stay in force.
+
+**Superseded in part (2026-10-30).** [A Run Opens In The Chart's Place](2026-10-30-a-run-opens-in-the-charts-place-and-close-or-esc-closes-it.md):
+a click on a run point, a PB star or a Run row opens that run in the run
+viewer, so click actions are no longer out of scope. Opening or closing a
+run clears the emphasis. Every hover statement here stands.
 
 **Direction.** The maintainer chose bidirectional hover, then limited the
 first implementation to visible run rows and a Session-row fallback for

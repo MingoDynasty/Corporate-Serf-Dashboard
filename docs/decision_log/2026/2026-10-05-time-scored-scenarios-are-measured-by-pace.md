@@ -1,6 +1,8 @@
 # 2026-10-05: Time-Scored Scenarios Are Measured By Pace
 
-Status: Accepted
+Status: Superseded in part, as its dated notes say, most recently by the
+[run viewer's tiles](2026-10-30-the-run-viewers-tiles-are-score-accuracy-shots-fired-reloads-and-time.md) and
+[By Bot](2026-10-30-by-bot-measures-each-bot-against-its-own-typical-and-names-no-bot.md) decisions
 
 Some scenarios score the time left on a countdown when the task is done, and
 on those the app now measures by pace: how fast a run finishes compared with
@@ -284,6 +286,16 @@ detection, and the other surfaces stand. See
 [A Run Toast Is Plain And Shows On Every Page](2026-10-13-a-run-toast-is-plain-and-shows-on-every-page.md)
 and
 [Top N Placement And The Score Threshold Verdict Switch Are Retired](2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md).
+
+**Superseded in part (2026-10-30).** The run viewer shows a completion
+time and a per-bot breakdown. Its Time tile reads `C − s` for a run whose
+own version is time-scored
+([the tiles decision](2026-10-30-the-run-viewers-tiles-are-score-accuracy-shots-fired-reloads-and-time.md)),
+and a time-scored run's By Bot shows each bot's split
+([By Bot's decision](2026-10-30-by-bot-measures-each-bot-against-its-own-typical-and-names-no-bot.md)).
+So no completion time is shown anywhere else, and Run History and a
+per-bot breakdown are no longer out of scope. The pace rule, its
+detection and its surfaces stand.
 
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.
