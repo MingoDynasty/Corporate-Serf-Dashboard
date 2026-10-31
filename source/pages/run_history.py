@@ -74,6 +74,12 @@ from source.components.run_history_list import (
     run_list_panel,
     run_list_stores,
 )
+from source.components.run_viewer_panel import (
+    COLUMN_CLASS,
+    RunViewerIds,
+    register_run_viewer,
+    run_viewer,
+)
 from source.components.scenario_note_card import (
     NoteCardIds,
     note_selection_ids,
@@ -142,6 +148,8 @@ SESSION_IN_PROGRESS_STORE_ID = "run-history-session-in-progress"
 # so a change of scenario cannot apply a new run's id to the old figure.
 LATEST_RUN_STORE_ID = "run-history-latest-run"
 FOLLOW_SWITCH_ID = "run-history-follow-switch"
+# The chart's column, which the run viewer takes over while a run is open.
+CHART_COLUMN_ID = "run-history-chart-column"
 CHART_MODE_ID = "run-history-chart-mode"
 RUN_RANGE_ID = "run-history-run-range"
 DAY_RANGE_ID = "run-history-day-range"
@@ -196,6 +204,17 @@ RUN_LIST_IDS = RunListIds(
     apply_sink="run-history-list-apply-sink",
     expand_all_sink="run-history-list-expand-all-sink",
     figures_sink="run-history-list-figures-sink",
+)
+RUN_VIEWER_IDS = RunViewerIds(
+    column=CHART_COLUMN_ID,
+    viewer="run-history-run-viewer",
+    heading="run-history-run-viewer-heading",
+    close="run-history-run-viewer-close",
+    body="run-history-run-viewer-body",
+    request="run-history-run-viewer-request",
+    open="run-history-run-viewer-open",
+    shown="run-history-run-viewer-shown",
+    shown_sink="run-history-run-viewer-shown-sink",
 )
 LATEST_RUN_CARD_IDS = LatestRunCardIds(
     played_at="run-history-card-played-at",
@@ -633,6 +652,11 @@ register_scenario_selection_clearing_filter(
     note=note_selection_ids(NOTE_CARD_IDS),
 )
 register_scenario_note_card(NOTE_CARD_IDS)
+register_run_viewer(
+    RUN_VIEWER_IDS,
+    scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
+    score_threshold_percentage=CHART_OPTIONS_IDS.score_threshold_percentage,
+)
 
 
 def _range_select(
@@ -777,9 +801,14 @@ def _top_row(playlist_code: str | None) -> dmc.Box:
 
 
 def _chart_column() -> dmc.Box:
-    """Build the chart's column: its header, then the graph beside its panel."""
+    """Build the chart's column: its header, then the graph beside its panel.
+
+    The run viewer is the column's last child. While a run is open, the
+    column's class hides everything else in it, and keeps it mounted.
+    """
     return dmc.Box(
-        className="run-history-chart-column",
+        id=CHART_COLUMN_ID,
+        className=COLUMN_CLASS,
         children=[
             dmc.Box(
                 className="run-history-chart-header",
@@ -837,6 +866,7 @@ def _chart_column() -> dmc.Box:
                     ],
                 ),
             ),
+            run_viewer(RUN_VIEWER_IDS, return_focus=CHART_MODE_ID),
         ],
     )
 

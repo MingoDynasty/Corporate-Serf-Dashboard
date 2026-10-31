@@ -806,6 +806,7 @@ RUN_LIST_UNSELECTED_CLASS = f"{RUN_LIST_CLASS} run-history-list-unselected"
 RUN_LIST_GRID_CLASS = "run-history-list-grid"
 LATEST_ROW_CLASS = "run-list-row-latest"
 SELECTED_ROW_CLASS = "run-list-row-selected"
+OPEN_ROW_CLASS = "run-list-row-open"
 
 # The columns the Columns menu shows or hides, in table order. Sensitivity is
 # shown to start and the other four are off. The browser remembers each
@@ -1130,6 +1131,9 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                     # band stayed on the scenario selected before.
                     "rowClassRules": {
                         "run-list-row-linked": "params.data.linked === true",
+                        # The run open in the run viewer, marked by the
+                        # list's script.
+                        OPEN_ROW_CLASS: "params.data.open === true",
                         LATEST_ROW_CLASS: "params.data.latest",
                         SELECTED_ROW_CLASS: (
                             f"params.data.sel && params.data.kind === '{RUN_ROW}'"
@@ -1174,6 +1178,7 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                     },
                 },
                 eventListeners={
+                    "cellClicked": ["runListCellClicked(params)"],
                     "cellKeyDown": ["runListKeyDown(params)"],
                     "cellMouseOver": ["runHistoryHoverOver(params)"],
                     "cellMouseOut": ["runHistoryHoverOut(params)"],

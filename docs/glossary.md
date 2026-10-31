@@ -242,6 +242,17 @@ row. They count every run under the row and compare nothing
   score.
 - In code: `figures`, and the Columns menu's choice `median_best`.
 
+### Run viewer
+
+The view of one run that takes the place of Run History's chart until it is
+closed: the run's score against its typical runs, its settings, and
+everything its stats file recorded
+([run_history.md](specs/run_history.md#the-run-viewer)).
+
+- On screen: no name of its own. Its sections are Settings and Everything
+  Recorded, and its button is Close.
+- In code: `run_viewer`, and `run_viewer_panel` for what draws it.
+
 ## Playlists
 
 ### Playlist
@@ -496,6 +507,20 @@ when the card is read
   recent.
 - Not the Typical score card's value, which follows every run.
 - In code: `typical_score_at_session_start`.
+
+### Typical runs
+
+A run's typical runs are the runs behind its typical at session start: up to
+20 runs of the scenario before the run's session. A figure's typical is its
+median over the ones that have the figure, and a setting's is its most
+common value among them. A run has none while its typical at session start
+is unknown ([run_history.md](specs/run_history.md#what-it-shows)).
+
+- On screen: `Typical` on the run viewer's tiles and cards, and `your
+  typical runs` in its copy.
+- Not the runs behind the Typical score card's value, which moves on with
+  every run: a run's typical runs stay the ones before its session.
+- In code: `typical_runs`.
 
 ### Middle 50%
 

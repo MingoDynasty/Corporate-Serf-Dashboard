@@ -777,12 +777,14 @@ def test_the_selected_scenarios_latest_run_is_highlighted_by_a_row_rule():
     selected scenario's run rows in the tree moves with the selection, so it
     is a rule too. A scenario row is a full-width row, which the grid does
     not work the rules out for again when its data changes, so the rule
-    leaves it to the script.
+    leaves it to the script. The run open in the run viewer is a run row,
+    marked by the script through its data, so a rule takes its mark off too.
     """
     rules = _options()["rowClassRules"]
 
     assert rules == {
         "run-list-row-linked": "params.data.linked === true",
+        "run-list-row-open": "params.data.open === true",
         "run-list-row-latest": "params.data.latest",
         "run-list-row-selected": "params.data.sel && params.data.kind === 'run'",
     }
