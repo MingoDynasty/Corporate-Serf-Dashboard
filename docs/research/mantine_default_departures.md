@@ -2,11 +2,12 @@
 
 Date: 2026-10-31
 Author: claude-opus-5-5 · effort: xhigh
-Source revision: `87fe0c64` on pull request #457's branch, with
-dash-mantine-components 3.0.0, which bundles Mantine 9.7.4
+Source revision: `87fe0c64` on pull request #457's branch, plus the toast
+settings that pull request added after it, with dash-mantine-components 3.0.0,
+which bundles Mantine 9.7.4
 
-This is a list of the places where the app's look departs from Mantine 9's
-defaults, kept so the maintainer can revisit each one. It records the code on
+This is a list of the places where the app's look and behavior depart from
+Mantine 9's defaults, kept so the maintainer can revisit each one. It records the code on
 the date above, and nothing keeps it current: check the code before acting on
 an entry. Mantine's values were read from the CSS that dash-mantine-components
 3.0.0 bundles, and the sizes and weights were measured in headless Edge on
@@ -14,7 +15,7 @@ Settings with the app's two stylesheets removed.
 
 ## App-wide departures
 
-Each of these changes Mantine's look everywhere it applies.
+Each of these changes Mantine's look or behavior everywhere it applies.
 
 | # | What the app does | Mantine 9's default | Where | Why |
 | --- | --- | --- | --- | --- |
@@ -27,6 +28,7 @@ Each of these changes Mantine's look everywhere it applies.
 | 7 | Switch labels are 16 px (`.mantine-Switch-label`) | 14 px | `assets/stylesheet.css` | To make a switch's label "stand out slightly more" (`ca23aeb5`, 2025-11-14) |
 | 8 | Navbar labels are 16 px (`.mantine-NavLink-label`) | 14 px | `assets/stylesheet.css` | "For better legibility" (`3fd3df27`, 2025-11-15) |
 | 9 | Tooltips in dark mode are dark: dark 5 with gray 0 text, a 1 px dark 4 border and a shadow. AG Grid's tooltips are styled to match | Light in dark mode: gray 2 with black text, no border (gray 9 with white text in light mode, which the app keeps) | `assets/tooltips.css` | None recorded. Added in `f96a7c17` (2026-07-01, "Polish playlist last-played tooltips") |
+| 10 | A toast can't be dragged or scrolled away sideways, and hovering a toast pauses only its own timer (`allowDragDismiss=False`, `allowScrollDismiss=False`, `pauseResetOnHover="notification"`) | A sideways drag or scroll dismisses a toast, and hovering any toast pauses them all | `NotificationContainer` in `source/app_shell.py` | Mantine 8's behavior, kept so a toast meant to stay until closed can't vanish on a stray trackpad scroll. Raised in review of #457; asked on 2026-10-31, the maintainer had no preference, and the pull request kept Mantine 8's behavior |
 
 ## Mantine 9 changes kept as shipped
 
@@ -42,9 +44,6 @@ default.
   it a migration aid.
 - **The "medium" font weight is 600, up from 500.** It changed no text on the
   pages compared, because the app's field labels are bold anyway (entry 4).
-- **Hovering one toast pauses every visible toast,** where Mantine 8 paused
-  only the hovered one. `pauseResetOnHover="notification"` on the
-  `NotificationContainer` would bring back the old behavior.
 
 ## Adjustments in one place
 

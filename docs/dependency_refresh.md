@@ -317,8 +317,11 @@ and ask the maintainer.
 A refresh changes versions, not behavior. If an upgrade adds or removes
 something a user can press, changes what a control does, or adds a new way for
 the app to reach an outside service, stop and ask the maintainer before
-shipping it or hiding it. A difference in appearance alone is named in the PR
-body. plotly 7 added a control and an outside service at once: it put a Share
+shipping it or hiding it. A prop that a release adds with its default on can
+do this unseen: dash-mantine-components 3 added sideways drag and scroll
+dismissal to every toast. Check the default of each prop a release note says
+was added, on every component the app uses. A difference in appearance alone
+is named in the PR body. plotly 7 added a control and an outside service at once: it put a Share
 chart button on the charts by default
 ([2026-09-12 entry](decision_log/2026/2026-09-12-charts-keep-plotlyjs-4s-share-chart-button.md)).
 What the maintainer accepts goes into
