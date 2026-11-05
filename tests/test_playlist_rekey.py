@@ -810,7 +810,7 @@ def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_p
 
     result = data_service.delete_user_playlist("UserCode")
 
-    assert result is None
+    assert result == (None, None)
     assert not user_file.exists()
     assert "UserCode" not in data_service.playlist_database
     assert data_service.get_user_root_playlist_codes() == set()
@@ -823,7 +823,7 @@ def test_delete_user_playlist_success_is_logged_at_info(monkeypatch, tmp_path, c
     data_service.load_playlists()
 
     with caplog.at_level(logging.INFO, logger=data_service.logger.name):
-        assert data_service.delete_user_playlist("UserCode") is None
+        assert data_service.delete_user_playlist("UserCode") == (None, None)
 
     assert "Deleted user playlist UserCode (1 file(s))." in caplog.messages
 
@@ -842,7 +842,7 @@ def test_delete_user_playlist_removes_all_same_code_duplicates(monkeypatch, tmp_
 
     result = data_service.delete_user_playlist("DupCode")
 
-    assert result is None
+    assert result == (None, None)
     assert not (user_root / "a.json").exists()
     assert not (user_root / "b.json").exists()
     assert "DupCode" not in data_service.playlist_database
@@ -883,7 +883,8 @@ def test_delete_user_playlist_keeps_served_winner_when_a_duplicate_is_locked(
 
     assert result == (
         "Couldn't delete the playlist file. See data/logs/debug.log. "
-        f"File: {user_root.resolve() / 'b.json'}"
+        f"File: {user_root.resolve() / 'b.json'}",
+        None,
     )
     # The served (winning) file survives — the store is not serving a deleted
     # file — and the store still holds the winner's data.
@@ -906,7 +907,8 @@ def test_delete_user_playlist_refuses_bundled_code(monkeypatch, tmp_path):
     result = data_service.delete_user_playlist("BundledCode")
 
     assert result == (
-        "The playlist code BundledCode isn't one you imported, so it can't be deleted."
+        "The playlist code BundledCode isn't one you imported, so it can't be deleted.",
+        None,
     )
     assert bundled_file.exists()
     assert "BundledCode" in data_service.playlist_database
@@ -919,7 +921,8 @@ def test_delete_user_playlist_refuses_unknown_code(monkeypatch, tmp_path):
     result = data_service.delete_user_playlist("NopeCode")
 
     assert result == (
-        "The playlist code NopeCode isn't one you imported, so it can't be deleted."
+        "The playlist code NopeCode isn't one you imported, so it can't be deleted.",
+        None,
     )
 
 
@@ -932,7 +935,7 @@ def test_delete_user_playlist_tolerates_already_missing_file(monkeypatch, tmp_pa
 
     result = data_service.delete_user_playlist("UserCode")
 
-    assert result is None
+    assert result == (None, None)
     assert "UserCode" not in data_service.playlist_database
     assert "UserCode" not in data_service._user_root_playlist_files
 
@@ -955,7 +958,8 @@ def test_delete_user_playlist_reports_oserror_without_touching_store(
 
     assert result == (
         "Couldn't delete the playlist file. See data/logs/debug.log. "
-        f"File: {user_root.resolve() / 'user.json'}"
+        f"File: {user_root.resolve() / 'user.json'}",
+        None,
     )
     assert "UserCode" in data_service.playlist_database
     assert "UserCode" in data_service._user_root_playlist_files
@@ -975,11 +979,247 @@ def test_delete_superseded_user_playlist_files_removes_all_dead_copies(
 
     result = data_service.delete_superseded_user_playlist_files()
 
-    assert result is None
+    assert result == (None, None)
     assert not superseded.exists()
     assert data_service.get_superseded_user_playlist_files() == []
     # The bundled winner never had a store entry touched.
     assert "BundledCode" in data_service.playlist_database
+
+
+def _import_onto(
+    monkeypatch: pytest.MonkeyPatch, destination: Path, name: str, code: str
+) -> None:
+    """Import a playlist whose file lands on ``destination``.
+
+    Two playlists share a path when their names and codes sanitize alike, or
+    differ only in case on a case-insensitive disk such as NTFS. Pinning the
+    path stands in for either.
+    """
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: _search_response(name, code)
+    )
+    monkeypatch.setattr(
+        data_service, "get_playlist_file_path", lambda _name, _code: destination
+    )
+    assert data_service.load_playlist_from_code(code) == (None, code)
+
+
+def _code_in_file(path: Path) -> str:
+    return json.loads(path.read_text(encoding="utf-8"))["code"]
+
+
+def test_delete_user_playlist_keeps_a_file_an_import_wrote_over_its_path(
+    monkeypatch,
+    tmp_path,
+):
+    """A hand delete, then an import that lands on the same path, in one session.
+
+    The delete unlinked the path recorded at startup without asking what the
+    file held, so deleting the old playlist removed the new playlist's file,
+    and the new playlist vanished on the next restart (found in PR #464).
+    """
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_user_playlist(
+        user_root / "Squad Alpha [OldCode].json", _playlist("Squad Alpha", "OldCode")
+    )
+    data_service.load_playlists()
+    shared = data_service._user_root_playlist_files["OldCode"][0]
+    shared.unlink()  # deleted by hand while the app runs
+    _import_onto(monkeypatch, shared, "Squad: Alpha", "NewCode")
+
+    result = data_service.delete_user_playlist("OldCode")
+
+    assert shared.exists(), "the delete removed the new playlist's file"
+    assert _code_in_file(shared) == "NewCode"
+    assert result == (
+        None,
+        "Its file no longer holds this playlist, so that file wasn't deleted. "
+        f"File: {shared}",
+    )
+    assert "OldCode" not in data_service.playlist_database
+    assert "OldCode" not in data_service._user_root_playlist_files
+    assert data_service.get_user_root_playlist_codes() == {"NewCode"}
+    # Simulated restart: the new playlist is still there.
+    data_service.load_playlists()
+    assert set(data_service.playlist_database) == {"NewCode"}
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["not json", json.dumps({"schema_version": 99})],
+    ids=["unusable", "newer-build"],
+)
+def test_delete_user_playlist_keeps_a_file_that_no_longer_holds_a_usable_playlist(
+    monkeypatch,
+    tmp_path,
+    content,
+):
+    """Only a file that still holds the playlist's code is that playlist's file."""
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    user_file = user_root / "user.json"
+    _write_user_playlist(user_file, _playlist("User", "UserCode"))
+    data_service.load_playlists()
+    _write_raw_playlist(user_file, content)  # replaced while the app runs
+
+    result = data_service.delete_user_playlist("UserCode")
+
+    assert user_file.exists(), "the delete removed a file that held something else"
+    assert user_file.read_text(encoding="utf-8") == content
+    assert result == (
+        None,
+        "Its file no longer holds this playlist, so that file wasn't deleted. "
+        f"File: {user_file.resolve()}",
+    )
+    assert "UserCode" not in data_service.playlist_database
+
+
+def test_delete_user_playlist_fails_on_a_file_it_cannot_read(monkeypatch, tmp_path):
+    """A file it can't read may still hold the playlist, so it stays recorded.
+
+    Forgetting it as if it held something else would bring the deleted
+    playlist back on the next restart.
+    """
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    user_file = user_root / "user.json"
+    _write_user_playlist(user_file, _playlist("User", "UserCode"))
+    data_service.load_playlists()
+    real_read_text = data_service.Path.read_text
+
+    def locked_read_text(self, *args, **kwargs):
+        if self.name == "user.json":
+            raise PermissionError("user.json is locked")
+        return real_read_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(data_service.Path, "read_text", locked_read_text)
+
+    result = data_service.delete_user_playlist("UserCode")
+
+    assert user_file.exists(), "the delete removed a file it couldn't check"
+    assert result == (
+        "Couldn't delete the playlist file. See data/logs/debug.log. "
+        f"File: {user_file.resolve()}",
+        None,
+    )
+    assert "UserCode" in data_service.playlist_database
+    assert data_service._user_root_playlist_files["UserCode"] == [user_file.resolve()]
+
+
+def test_delete_user_playlist_reports_a_kept_file_on_the_retry_that_lands(
+    monkeypatch,
+    tmp_path,
+):
+    """A failed delete keeps the other file recorded, so the retry says it kept it."""
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    winner = user_root / "a.json"
+    copy = user_root / "b.json"
+    _write_user_playlist(winner, _playlist("Winner", "DupCode"))
+    _write_user_playlist(copy, _playlist("Copy", "DupCode"))
+    data_service.load_playlists()
+    _write_user_playlist(copy, _playlist("Other", "OtherCode"))
+    real_unlink = data_service.Path.unlink
+
+    def locked_winner_unlink(self, *args, **kwargs):
+        if self.name == "a.json":
+            raise PermissionError("a.json is locked")
+        real_unlink(self, *args, **kwargs)
+
+    monkeypatch.setattr(data_service.Path, "unlink", locked_winner_unlink)
+
+    first = data_service.delete_user_playlist("DupCode")
+
+    assert copy.exists(), "the delete removed a file that held another playlist"
+    assert first == (
+        "Couldn't delete the playlist file. See data/logs/debug.log. "
+        f"File: {winner.resolve()}",
+        None,
+    )
+    monkeypatch.setattr(data_service.Path, "unlink", real_unlink)
+
+    second = data_service.delete_user_playlist("DupCode")
+
+    assert second == (
+        None,
+        "Its file no longer holds this playlist, so that file wasn't deleted. "
+        f"File: {copy.resolve()}",
+    )
+    assert not winner.exists()
+    assert _code_in_file(copy) == "OtherCode"
+    assert "DupCode" not in data_service.playlist_database
+
+
+def test_delete_superseded_user_playlist_files_keeps_a_file_an_import_wrote_over(
+    monkeypatch,
+    tmp_path,
+):
+    """The leftover-file cleanup had the same flaw as the playlist delete."""
+    bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    _write_user_playlist(
+        user_root / "Old Copy [BundledCode].json", _playlist("Old Copy", "BundledCode")
+    )
+    data_service.load_playlists()
+    [(shared, _code)] = data_service.get_superseded_user_playlist_files()
+    shared.unlink()  # deleted by hand while the app runs
+    _import_onto(monkeypatch, shared, "Old: Copy", "NewCode")
+
+    result = data_service.delete_superseded_user_playlist_files()
+
+    assert shared.exists(), "the cleanup removed the new playlist's file"
+    assert _code_in_file(shared) == "NewCode"
+    assert result == (
+        None,
+        "A file no longer holds the playlist it held when this app started, so it "
+        f"wasn't deleted. File: {shared}",
+    )
+    assert data_service.get_superseded_user_playlist_files() == []
+    # Simulated restart: the new playlist is still there.
+    data_service.load_playlists()
+    assert "NewCode" in data_service.playlist_database
+
+
+def test_delete_superseded_user_playlist_files_reports_a_kept_file_on_the_retry(
+    monkeypatch,
+    tmp_path,
+):
+    """A failed cleanup keeps the other file recorded, so the retry says it kept it."""
+    bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    locked = user_root / "a.json"
+    replaced = user_root / "b.json"
+    _write_user_playlist(locked, _playlist("Old A", "BundledCode"))
+    _write_user_playlist(replaced, _playlist("Old B", "BundledCode"))
+    data_service.load_playlists()
+    _write_user_playlist(replaced, _playlist("Other", "OtherCode"))
+    real_unlink = data_service.Path.unlink
+
+    def locked_unlink(self, *args, **kwargs):
+        if self.name == "a.json":
+            raise PermissionError("a.json is locked")
+        real_unlink(self, *args, **kwargs)
+
+    monkeypatch.setattr(data_service.Path, "unlink", locked_unlink)
+
+    first = data_service.delete_superseded_user_playlist_files()
+
+    assert replaced.exists(), "the cleanup removed a file that held another playlist"
+    assert first == (
+        "Couldn't delete the playlist file. See data/logs/debug.log. "
+        f"File: {locked.resolve()}",
+        None,
+    )
+    assert len(data_service.get_superseded_user_playlist_files()) == 2
+    monkeypatch.setattr(data_service.Path, "unlink", real_unlink)
+
+    second = data_service.delete_superseded_user_playlist_files()
+
+    assert second == (
+        None,
+        "A file no longer holds the playlist it held when this app started, so it "
+        f"wasn't deleted. File: {replaced.resolve()}",
+    )
+    assert not locked.exists()
+    assert _code_in_file(replaced) == "OtherCode"
+    assert data_service.get_superseded_user_playlist_files() == []
 
 
 def _committed_bundled_playlist_paths() -> list[Path]:

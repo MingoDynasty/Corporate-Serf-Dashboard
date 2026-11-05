@@ -597,7 +597,7 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
     monkeypatch.setattr(
         playlists,
         "delete_user_playlist",
-        lambda code: deleted.append(code) or None,
+        lambda code: deleted.append(code) or (None, None),
     )
     monkeypatch.setattr(playlists, "hide_playlist", hidden.append)
     # After the delete the code is gone from the playlist database, so the
@@ -636,7 +636,7 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
 
 
 def test_confirm_delete_playlist_failure_leaves_rows_and_visibility(monkeypatch):
-    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: "boom")
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: ("boom", None))
     monkeypatch.setattr(
         playlists,
         "hide_playlist",
@@ -657,6 +657,29 @@ def test_confirm_delete_playlist_failure_leaves_rows_and_visibility(monkeypatch)
     assert opened is False
 
 
+def test_confirm_delete_playlist_says_when_it_kept_a_file(monkeypatch):
+    """The playlist is deleted, so the toast stays green and adds the kept file."""
+    monkeypatch.setattr(
+        playlists, "delete_user_playlist", lambda _code: (None, "Kept a file.")
+    )
+    monkeypatch.setattr(playlists, "hide_playlist", lambda _code: None)
+    monkeypatch.setattr(
+        playlists, "get_playlist_display_label", lambda _code: "User Label"
+    )
+
+    notifications, _hidden, _patch, rows_refresh, opened = (
+        playlists.confirm_delete_playlist(1, "UserCode", 4, {})
+    )
+
+    assert notifications[0]["color"] == "green"
+    assert notifications[0]["title"] == "Playlist deleted"
+    assert notifications[0]["message"] == (
+        'Deleted "User Label" (UserCode). Kept a file.'
+    )
+    assert rows_refresh == 5
+    assert opened is False
+
+
 def test_confirm_delete_playlist_reports_the_delete_despite_a_failed_write(monkeypatch):
     """The file is already unlinked, so the delete's own outcome is the report.
 
@@ -670,7 +693,7 @@ def test_confirm_delete_playlist_reports_the_delete_despite_a_failed_write(monke
     monkeypatch.setattr(
         playlists,
         "delete_user_playlist",
-        lambda code: deleted.append(code) or None,
+        lambda code: deleted.append(code) or (None, None),
     )
     monkeypatch.setattr(
         playlists, "get_playlist_display_label", lambda _code: "User Label"
@@ -772,7 +795,7 @@ def test_manage_superseded_modal_cancel_closes(monkeypatch):
 
 def test_confirm_delete_superseded_success_refreshes(monkeypatch):
     monkeypatch.setattr(
-        playlists, "delete_superseded_user_playlist_files", lambda: None
+        playlists, "delete_superseded_user_playlist_files", lambda: (None, None)
     )
 
     notifications, hidden, patch, rows_refresh, opened = (
@@ -794,7 +817,7 @@ def test_confirm_delete_superseded_failure_still_refreshes(monkeypatch):
     # A partial failure still prunes the files it removed, so the alert must
     # re-render with the reduced count even on error.
     monkeypatch.setattr(
-        playlists, "delete_superseded_user_playlist_files", lambda: "nope"
+        playlists, "delete_superseded_user_playlist_files", lambda: ("nope", None)
     )
 
     notifications, _hidden, patch, rows_refresh, opened = (
@@ -806,6 +829,26 @@ def test_confirm_delete_superseded_failure_still_refreshes(monkeypatch):
     assert _registry_writes(patch) == {
         playlists.CLEANUP_FAILED_CHANNEL: notifications[0]["id"]
     }
+    assert rows_refresh == 3
+    assert opened is False
+
+
+def test_confirm_delete_superseded_says_when_it_kept_a_file(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "delete_superseded_user_playlist_files",
+        lambda: (None, "Kept a file."),
+    )
+
+    notifications, _hidden, _patch, rows_refresh, opened = (
+        playlists.confirm_delete_superseded(1, 2, {})
+    )
+
+    assert notifications[0]["color"] == "green"
+    assert notifications[0]["title"] == "Leftover files deleted"
+    assert notifications[0]["message"] == (
+        "Deleted leftover playlist files. Kept a file."
+    )
     assert rows_refresh == 3
     assert opened is False
 
@@ -1254,7 +1297,7 @@ def test_re_importing_one_playlist_replaces_its_own_toast(monkeypatch):
     monkeypatch.setattr(playlists, "get_playlist_display_label", lambda code: code)
     monkeypatch.setattr(playlists, "show_playlist", lambda _code: None)
     monkeypatch.setattr(playlists, "hide_playlist", lambda _code: None)
-    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: None)
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: (None, None))
     monkeypatch.setattr(
         playlists, "enqueue_playlist_percentile_warmup", lambda _code: None
     )
@@ -2960,7 +3003,7 @@ def test_an_import_still_lands_when_the_visibility_write_is_refused(monkeypatch)
 
 
 def test_a_delete_still_reports_when_the_visibility_write_is_refused(monkeypatch):
-    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: None)
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: (None, None))
     monkeypatch.setattr(playlists, "get_playlist_display_label", lambda _code: "User")
 
     def refuse(_code):

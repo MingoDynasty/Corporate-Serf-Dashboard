@@ -43,6 +43,7 @@ from source.utilities.store_schema import (
     StoreState,
     UnsupportedSchemaError,
     back_up_unusable_store,
+    decode_store_document,
     read_store_document,
     stamped_payload,
 )
@@ -1403,7 +1404,39 @@ def load_playlist_from_code(  # noqa: PLR0911
     return None, playlist_data.code
 
 
-def delete_user_playlist(playlist_code: str) -> str | None:
+def _now_holds_something_else(file_path: Path, playlist_code: str) -> bool:
+    """Say whether a recorded user playlist file now holds something else.
+
+    The delete paths act on paths recorded at startup or by an import, and the
+    file at one can change while the app runs: deleted by hand, then written
+    again by an import or a sync. Only a file that still holds
+    ``playlist_code`` is that playlist's to delete. A file this build can't
+    read as a playlist (unusable, or from a newer build) never counts as
+    holding it.
+
+    ``False`` for a missing file, so the caller's unlink reports it as already
+    gone. Raises ``OSError`` when the file exists but can't be read: it may
+    still hold the playlist, and treating it as something else would forget
+    it and bring the playlist back on the next restart.
+    """
+    try:
+        text = file_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return False
+    except UnicodeDecodeError:
+        return True
+    document = decode_store_document(
+        text,
+        path=file_path,
+        kind="playlist file",
+        validate=validate_playlist_v1,
+    )
+    return not (
+        document.state is StoreState.SUPPORTED and document.value.code == playlist_code
+    )
+
+
+def delete_user_playlist(playlist_code: str) -> tuple[str | None, str | None]:
     """Delete a user playlist's file(s) and store entry.
 
     Only user-root playlists are deletable — bundled benchmarks cannot be
@@ -1421,7 +1454,16 @@ def delete_user_playlist(playlist_code: str) -> str | None:
     rather than deleting the served file while a copy survives — which would
     serve a deleted file now and silently swap in the survivor on restart. On
     full success the store entry and user-root tracking are dropped under
-    ``_PLAYLIST_IO_LOCK``. Returns an error message, or ``None`` on success.
+    ``_PLAYLIST_IO_LOCK``.
+
+    A tracked file that no longer holds the code is kept, never unlinked (see
+    ``_now_holds_something_else``). It can't bring this playlist back, so the
+    delete completes without it, as it does for a file already gone.
+
+    Returns ``(error_message, kept_file_message)``. The second is the sentence
+    the success toast adds when a file was kept. A failed delete returns no
+    such sentence and leaves the kept file tracked, so the retry that lands
+    reports it.
     """
     with _PLAYLIST_IO_LOCK:
         file_paths = _user_root_playlist_files.get(playlist_code)
@@ -1430,15 +1472,25 @@ def delete_user_playlist(playlist_code: str) -> str | None:
                 "Playlist code cannot be deleted: %s is not a user playlist.",
                 playlist_code,
             )
-            return (
+            message = (
                 f"The playlist code {playlist_code} isn't one you imported, so it "
                 "can't be deleted."
             )
+            return message, None
         error_message: str | None = None
         deleted: set[Path] = set()
+        kept: list[Path] = []
         # reversed(): non-winning duplicates first, the served winner last.
         for file_path in reversed(file_paths):
             try:
+                if _now_holds_something_else(file_path, playlist_code):
+                    logger.warning(
+                        'Playlist file no longer holds %s, so the delete kept it: "%s"',
+                        playlist_code,
+                        file_path,
+                    )
+                    kept.append(file_path)
+                    continue
                 file_path.unlink()
             except FileNotFoundError:
                 # Already gone on disk (manual delete or a prior partial run).
@@ -1463,7 +1515,7 @@ def delete_user_playlist(playlist_code: str) -> str | None:
             _user_root_playlist_files[playlist_code] = [
                 path for path in file_paths if path not in deleted
             ]
-            return error_message
+            return error_message, None
         playlist_database.pop(playlist_code, None)
         _user_root_playlist_codes.discard(playlist_code)
         _user_root_playlist_files.pop(playlist_code, None)
@@ -1471,26 +1523,51 @@ def delete_user_playlist(playlist_code: str) -> str | None:
     logger.info(
         "Deleted user playlist %s (%d file(s)).",
         playlist_code,
-        len(file_paths),
+        len(file_paths) - len(kept),
     )
-    return None
+    if not kept:
+        return None, None
+    # The last one checked: the served file, when it is among them.
+    kept_file_message = (
+        "Its file no longer holds this playlist, so that file wasn't deleted. "
+        f"File: {kept[-1]}"
+    )
+    return None, kept_file_message
 
 
-def delete_superseded_user_playlist_files() -> str | None:
+def delete_superseded_user_playlist_files() -> tuple[str | None, str | None]:
     """Delete every recorded superseded user-root playlist file.
 
     These files were skipped at load because a bundled benchmark already
     served their code, so they hold no store entry — deletion only touches the
     filesystem and the recorded list. Already-missing files are tolerated and
     dropped; a file that fails to unlink for another reason is kept in the list
-    and its error reported. Returns an error message when any file failed, or
-    ``None`` when all recorded files are gone.
+    and its error reported.
+
+    A file that no longer holds its recorded code is kept, never unlinked (see
+    ``_now_holds_something_else``), and dropped from the list once the run
+    has no failure: it is no longer a leftover.
+
+    Returns ``(error_message, kept_file_message)``, as ``delete_user_playlist``
+    does. A failed run keeps any such file recorded, so the retry that lands
+    reports it.
     """
     with _PLAYLIST_IO_LOCK:
         remaining: list[tuple[Path, str]] = []
+        kept: list[Path] = []
         error_message: str | None = None
         for file_path, code in _superseded_user_playlist_files:
             try:
+                if _now_holds_something_else(file_path, code):
+                    logger.warning(
+                        "Superseded playlist file no longer holds %s, so the "
+                        'cleanup kept it: "%s"',
+                        code,
+                        file_path,
+                    )
+                    kept.append(file_path)
+                    remaining.append((file_path, code))
+                    continue
                 file_path.unlink()
             except FileNotFoundError:
                 logger.warning(
@@ -1506,8 +1583,17 @@ def delete_superseded_user_playlist_files() -> str | None:
                     f"File: {file_path}"
                 )
                 remaining.append((file_path, code))
-        _superseded_user_playlist_files[:] = remaining
-    return error_message
+        if error_message:
+            _superseded_user_playlist_files[:] = remaining
+            return error_message, None
+        _superseded_user_playlist_files.clear()
+    if not kept:
+        return None, None
+    kept_file_message = (
+        "A file no longer holds the playlist it held when this app started, so it "
+        f"wasn't deleted. File: {kept[-1]}"
+    )
+    return None, kept_file_message
 
 
 def _guard_playlist_destination(file_path: Path) -> None:

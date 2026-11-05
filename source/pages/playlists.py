@@ -801,7 +801,9 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels)
     write is logged and otherwise ignored: the delete is what the toast reports
     (see the 2026-08-02 committed-side-effect entry in ``docs/decision_log/``).
     Success clears the failure channel, so a retry that lands does not leave the
-    red toast standing beside the green one.
+    red toast standing beside the green one. When the service kept a file that
+    now holds something else, the green toast adds the service's sentence: the
+    playlist is still deleted, so the outcome stays a success.
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     still fire once on initial page load despite ``prevent_initial_call``, so a
@@ -813,7 +815,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels)
     # Look up the label before the delete: afterwards the code is gone from
     # the playlist database and the lookup falls back to the raw code.
     label = get_playlist_display_label(target_code)
-    error_message = delete_user_playlist(target_code)
+    error_message, kept_file_message = delete_user_playlist(target_code)
     if error_message:
         notification = toast(
             DELETE_FAILED_CHANNEL,
@@ -835,10 +837,13 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels)
         logger.exception(
             "Failed to drop deleted playlist %s from the shown set", target_code
         )
+    deleted_message = f'Deleted "{label}" ({target_code}).'
+    if kept_file_message:
+        deleted_message = f"{deleted_message} {kept_file_message}"
     notification = toast(
         delete_successful_channel(target_code),
         "Playlist deleted",
-        f'Deleted "{label}" ({target_code}).',
+        deleted_message,
         color="green",
     )
     return (
@@ -941,7 +946,8 @@ def confirm_delete_superseded(n_clicks, rows_refresh, toast_channels):
     ``delete_superseded_user_playlist_files`` prunes every file it removes even
     on partial failure, so the refresh store bumps in both branches to keep the
     alert's count honest. Success clears the failure channel for the same reason
-    the delete path does.
+    the delete path does, and adds the service's sentence about a kept file the
+    same way.
 
     Guard on ``n_clicks``: like ``confirm_delete_playlist``, this
     ``allow_duplicate`` handler can fire once on initial page load under
@@ -949,7 +955,7 @@ def confirm_delete_superseded(n_clicks, rows_refresh, toast_channels):
     """
     if not n_clicks:
         return no_update, no_update, no_update, no_update, no_update
-    error_message = delete_superseded_user_playlist_files()
+    error_message, kept_file_message = delete_superseded_user_playlist_files()
     next_refresh = (rows_refresh or 0) + 1
     if error_message:
         notification = toast(
@@ -959,10 +965,13 @@ def confirm_delete_superseded(n_clicks, rows_refresh, toast_channels):
             color="red",
         )
         return *channel_toast(notification, toast_channels), next_refresh, False
+    deleted_message = "Deleted leftover playlist files."
+    if kept_file_message:
+        deleted_message = f"{deleted_message} {kept_file_message}"
     notification = toast(
         CLEANUP_SUCCESSFUL_CHANNEL,
         "Leftover files deleted",
-        "Deleted leftover playlist files.",
+        deleted_message,
         color="green",
     )
     return (

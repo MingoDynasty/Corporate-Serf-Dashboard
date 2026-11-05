@@ -1270,7 +1270,9 @@ flowchart LR
   (so deletion targets the real file, not a reconstructed name) and the user files it skips because
   a bundled code already won; `delete_user_playlist` and
   `delete_superseded_user_playlist_files` are the write paths that unlink those
-  files under the playlist I/O lock, keeping startup itself read-only.
+  files under the playlist I/O lock, keeping startup itself read-only. Each
+  re-reads a recorded file first and unlinks it only while it still holds the
+  recorded code.
   `load_playlists` also reads each winning bundled file's KovaaK's benchmark
   ID from its `generated_from` stamp into a table keyed by playlist code,
   which `get_bundled_benchmark_id` serves. It is a side table and not a
