@@ -71,6 +71,14 @@ function Get-HttpStatusCode($ErrorRecord) {
     try { return [int]$ErrorRecord.Exception.Response.StatusCode } catch { return 0 }
 }
 
+function Get-DownloadFailureReason($ErrorRecord) {
+    # The record's own text is no reason: for an HTTP error it is the response
+    # body, and for a zip that will not open it is a .NET constructor call.
+    $status = Get-HttpStatusCode $ErrorRecord
+    if ($status) { return "HTTP $status" }
+    return $ErrorRecord.Exception.GetBaseException().Message.TrimEnd('.')
+}
+
 function Write-FileAtomic([string]$Path, [string]$Content) {
     $temp = "$Path.new"
     [System.IO.File]::WriteAllText($temp, $Content, $Utf8NoBom)
@@ -252,20 +260,28 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
 
     Write-Host "Downloading $tag ..."
     $zipPath = Join-Path $tempDir "$tag.zip"
-    try {
-        Invoke-WebRequest -UseBasicParsing -TimeoutSec 600 `
-            -Uri "$DownloadBase/$Repo/releases/download/$tag/$($Release.source_asset)" -OutFile $zipPath
-    } catch {
-        if ((Get-HttpStatusCode $_) -ne 404) { throw }
-        # Named asset missing: fall back to the tag's source archive. Same
-        # member set, different top-level directory name -- discovered below.
-        Invoke-WebRequest -UseBasicParsing -TimeoutSec 600 `
-            -Uri "$DownloadBase/$Repo/archive/refs/tags/$tag.zip" -OutFile $zipPath
-    }
-
     $extractDir = Join-Path $tempDir "extract-$tag"
     if (Test-Path -LiteralPath $extractDir) { Remove-Item -LiteralPath $extractDir -Recurse -Force }
-    Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir
+    try {
+        try {
+            Invoke-WebRequest -UseBasicParsing -TimeoutSec 600 `
+                -Uri "$DownloadBase/$Repo/releases/download/$tag/$($Release.source_asset)" -OutFile $zipPath
+        } catch {
+            if ((Get-HttpStatusCode $_) -ne 404) { throw }
+            # Named asset missing: fall back to the tag's source archive. Same
+            # member set, different top-level directory name -- discovered below.
+            Invoke-WebRequest -UseBasicParsing -TimeoutSec 600 `
+                -Uri "$DownloadBase/$Repo/archive/refs/tags/$tag.zip" -OutFile $zipPath
+        }
+        Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir
+    } catch {
+        # Invoke-WebRequest -OutFile keeps what a dropped transfer delivered
+        # and reports no error, so a cut-off zip fails only here, at
+        # extraction. Whichever step failed, the zip on disk is unusable.
+        Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
+        throw "download incomplete or failed ($(Get-DownloadFailureReason $_))"
+    }
+
     $top = @(Get-ChildItem -LiteralPath $extractDir)
     if ($top.Count -ne 1 -or -not $top[0].PSIsContainer) {
         throw "expected exactly one top-level directory in the $tag zip, found $($top.Count) entries"

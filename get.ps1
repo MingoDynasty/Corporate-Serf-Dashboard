@@ -34,7 +34,12 @@ try {
         $csdStatus = 0
         try { $csdStatus = [int]$_.Exception.Response.StatusCode } catch { }
         if ($csdStatus -eq 404) { Write-Host $csdNotReady; return }
-        throw
+        # The error record's own text is the response body, which names
+        # neither the status nor what failed.
+        $csdReason = "HTTP $csdStatus"
+        if (-not $csdStatus) { $csdReason = $_.Exception.GetBaseException().Message.TrimEnd('.') }
+        Write-Host "Corporate Serf Dashboard: download incomplete or failed ($csdReason)."
+        return
     }
     $csdTag = [string]$csdRelease.tag_name
 
@@ -46,7 +51,10 @@ try {
         $csdStatus = 0
         try { $csdStatus = [int]$_.Exception.Response.StatusCode } catch { }
         if ($csdStatus -eq 404) { Write-Host $csdNotReady; return }
-        throw
+        $csdReason = "HTTP $csdStatus"
+        if (-not $csdStatus) { $csdReason = $_.Exception.GetBaseException().Message.TrimEnd('.') }
+        Write-Host "Corporate Serf Dashboard: download incomplete or failed ($csdReason)."
+        return
     }
 
     # Run from a file rather than iex so the installer's param block works and

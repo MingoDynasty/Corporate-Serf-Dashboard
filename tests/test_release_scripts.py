@@ -6,6 +6,7 @@ renaming or dropping any of these files breaks installs at runtime with no
 other gate failing.
 """
 
+import io
 import json
 import os
 import re
@@ -766,7 +767,7 @@ def test_a_failed_restore_keeps_the_parked_copy(
             "exit0",
             "exit0",
             False,
-            "TEST: uncaught error: unexpected download:",
+            "ERROR: download incomplete or failed (unexpected download:",
             True,
             id="retry download fails",
         ),
@@ -1038,7 +1039,7 @@ def _run_shim(tmp_path: Path, server: _FakeGitHub) -> list[str]:
     if not WINDOWS_POWERSHELL.is_file():
         pytest.skip(f"{WINDOWS_POWERSHELL} not found")
     temp = tmp_path / "temp"
-    temp.mkdir()
+    temp.mkdir(exist_ok=True)
     environment = os.environ.copy()
     environment.update(
         {
@@ -1079,8 +1080,7 @@ _LATEST_REPLY = _Reply(200, json.dumps({"tag_name": _TAG}).encode())
         ),
         pytest.param(
             {_LATEST: _Reply(500)},
-            "TEST: uncaught error: The remote server returned an error: (500)"
-            " Internal Server Error.",
+            "Corporate Serf Dashboard: download incomplete or failed (HTTP 500).",
             id="fetch fails",
         ),
     ],
@@ -1105,3 +1105,239 @@ def test_the_shim_gives_the_console_its_preference_back(
 
     assert expected in lines, lines
     assert lines[-1] == "TEST: preference Continue", lines
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_an_error_the_shim_does_not_catch_gives_the_preference_back(
+    tmp_path: Path, fake_github: _FakeGitHub
+) -> None:
+    r"""The preference comes back on the way out of an uncaught error too.
+
+    A folder where the installer's temp file goes makes writing it throw.
+    """
+    fake_github.replies.update(
+        {_LATEST: _LATEST_REPLY, _RAW_INSTALLER: _Reply(200, _STAND_IN_INSTALLER)}
+    )
+    (tmp_path / "temp" / f"csd-install-{_TAG}.ps1").mkdir(parents=True)
+
+    lines = _run_shim(tmp_path, fake_github)
+
+    assert lines[0].startswith("TEST: uncaught error: "), lines
+    assert lines[-1] == "TEST: preference Continue", lines
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(
+    "replies",
+    [
+        pytest.param({_LATEST: _Reply(500)}, id="releases/latest"),
+        pytest.param(
+            {_LATEST: _LATEST_REPLY, _RAW_INSTALLER: _Reply(500)}, id="install.ps1"
+        ),
+    ],
+)
+def test_a_failed_shim_fetch_is_one_line(
+    tmp_path: Path, fake_github: _FakeGitHub, replies: dict[str, _Reply]
+) -> None:
+    """A fetch that fails other than with a 404 says so in one line, with the status.
+
+    The shim used to rethrow, and the console printed the error record, whose
+    text is the response body: ``{}``, or GitHub's JSON error, with no status
+    and no word of what failed.
+    """
+    fake_github.replies.update(replies)
+
+    lines = _run_shim(tmp_path, fake_github)
+
+    assert lines == [
+        "Corporate Serf Dashboard: download incomplete or failed (HTTP 500).",
+        "TEST: preference Continue",
+    ]
+    assert not list((tmp_path / "temp").iterdir())
+
+
+_ASSET = f"/{_REPO}/releases/download/{_TAG}/csd.zip"
+_ARCHIVE = f"/{_REPO}/archive/refs/tags/{_TAG}.zip"
+
+
+def _release_zip() -> bytes:
+    """Build a release zip whose stamp carries the release SHA."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        top = f"Corporate-Serf-Dashboard-{_TAG}/"
+        archive.writestr(top + "version.txt", f"sha: {_SHA}\n")
+        for number in range(20):
+            archive.writestr(top + f"source/module{number}.py", "x = 1\n" * 200)
+    return buffer.getvalue()
+
+
+_RELEASE_ZIP = _release_zip()
+
+# Stages the release through the real Install-ReleaseVersion of the script
+# named by the second argument, downloading from the fake server named by the
+# third. The fourth stands in for uv and fails, so a download that worked
+# shows up as a failed sync.
+_STAGING_DRIVER = f"""
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+$InstallRoot = $args[0]
+$Repo = '{_REPO}'
+$DownloadBase = $args[2]
+{_DEFINE_FUNCTIONS}
+$release = [pscustomobject]@{{
+    tag = '{_TAG}'; sha = '{_SHA}'; source_asset = 'csd.zip' }}
+try {{
+    Install-ReleaseVersion $release ([byte[]]@()) $args[3] | Out-Null
+    'TEST: staged'
+}} catch {{
+    "TEST: failed: $($_.Exception.Message)"
+}}
+"""
+
+# How each script reports a failed stage: the installer stops with an ERROR
+# line, and the launcher throws for its update path to print.
+_STAGING_SCRIPTS = [
+    pytest.param(REPO_ROOT / "install.ps1", "ERROR: {}.", id="installer"),
+    pytest.param(
+        REPO_ROOT / "scripts" / "launcher.ps1", "TEST: failed: {}", id="launcher"
+    ),
+]
+
+
+def _stage(
+    tmp_path: Path, server: _FakeGitHub, script: Path, uv: Path
+) -> tuple[Path, str]:
+    """Stage the release with ``script`` and return the root and the output."""
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+    root = tmp_path / "install-root"
+    root.mkdir()
+    result = _windows_powershell(
+        tmp_path,
+        _STAGING_DRIVER,
+        [str(root), str(script), server.url, str(uv)],
+    )
+    return root, result.stdout
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(("script", "line"), _STAGING_SCRIPTS)
+@pytest.mark.parametrize(
+    ("replies", "reason"),
+    [
+        pytest.param({_ASSET: _Reply(500)}, "HTTP 500", id="asset fails"),
+        pytest.param({}, "HTTP 404", id="asset and archive missing"),
+        pytest.param(
+            {_ASSET: _Reply(200, _RELEASE_ZIP, dropped=True)},
+            "End of Central Directory record could not be found",
+            id="transfer dropped",
+        ),
+        pytest.param(
+            {_ASSET: _Reply(200, _RELEASE_ZIP[: len(_RELEASE_ZIP) // 2])},
+            "End of Central Directory record could not be found",
+            id="zip cut short",
+        ),
+    ],
+)
+def test_a_failed_download_is_one_line(
+    tmp_path: Path,
+    fake_github: _FakeGitHub,
+    stub_programs: dict[str, Path],
+    script: Path,
+    line: str,
+    replies: dict[str, _Reply],
+    reason: str,
+) -> None:
+    r"""A download or extraction that fails says so in one line, and keeps no zip.
+
+    These failures used to reach the user as the error record, whose text is
+    the response body for an HTTP error, or as a .NET constructor call for a
+    zip that would not open. A dropped transfer is the second kind:
+    ``Invoke-WebRequest -OutFile`` keeps the partial file without an error, so
+    it fails only at extraction, and the partial zip stayed under ``tmp\``.
+    """
+    fake_github.replies.update(replies)
+
+    root, output = _stage(tmp_path, fake_github, script, stub_programs["exit1"])
+
+    assert output.splitlines() == [
+        f"Downloading {_TAG} ...",
+        line.format(f"download incomplete or failed ({reason})"),
+    ]
+    assert not (root / "tmp" / f"{_TAG}.zip").exists()
+    assert not (root / "versions" / _TAG).exists()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(
+    "script",
+    [
+        pytest.param(REPO_ROOT / "install.ps1", id="installer"),
+        pytest.param(REPO_ROOT / "scripts" / "launcher.ps1", id="launcher"),
+    ],
+)
+@pytest.mark.parametrize(
+    "replies",
+    [
+        pytest.param({_ASSET: _Reply(200, _RELEASE_ZIP)}, id="asset"),
+        pytest.param({_ARCHIVE: _Reply(200, _RELEASE_ZIP)}, id="archive fallback"),
+    ],
+)
+def test_a_good_download_goes_on_to_the_sync(
+    tmp_path: Path,
+    fake_github: _FakeGitHub,
+    stub_programs: dict[str, Path],
+    script: Path,
+    replies: dict[str, _Reply],
+) -> None:
+    """A download that works is extracted, checked, and handed to the sync."""
+    fake_github.replies.update(replies)
+
+    _, output = _stage(tmp_path, fake_github, script, stub_programs["exit1"])
+
+    assert f"uv sync failed for {_TAG} (exit 1)" in output, output
+    assert "download incomplete" not in output, output
+
+
+# Runs the whole installer with no tag, so it looks up releases/latest itself,
+# at the fake server named by the third argument.
+_LOOKUP_DRIVER = r"""
+$server = $args[2]
+function Invoke-RestMethod {
+    param([string]$Uri, [switch]$UseBasicParsing, [int]$TimeoutSec)
+    $api = 'https://api.github.com'
+    if (-not $Uri.StartsWith("$api/")) { throw "unexpected request: $Uri" }
+    Microsoft.PowerShell.Utility\Invoke-RestMethod -UseBasicParsing `
+        -TimeoutSec $TimeoutSec -Uri ($server + $Uri.Substring($api.Length))
+}
+& $args[1] -InstallRoot $args[0]
+exit $LASTEXITCODE
+"""
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_a_failed_release_lookup_is_one_line(
+    tmp_path: Path, fake_github: _FakeGitHub
+) -> None:
+    """The installer's own ``releases/latest`` lookup fails in one line too.
+
+    Run without a tag, the installer resolves the latest release itself. A
+    404 there already had its line; anything else was rethrown, and the
+    console printed the response body as the error.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+    fake_github.replies[_LATEST] = _Reply(500)
+    root = tmp_path / "install-root"
+
+    result = _windows_powershell(
+        tmp_path,
+        _LOOKUP_DRIVER,
+        [str(root), str(REPO_ROOT / "install.ps1"), fake_github.url],
+    )
+
+    assert result.returncode == 1
+    assert result.stdout.splitlines() == [
+        "ERROR: download incomplete or failed (HTTP 500)."
+    ]
+    assert not root.exists()
