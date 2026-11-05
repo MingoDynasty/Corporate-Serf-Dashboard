@@ -154,7 +154,10 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
             Invoke-WebRequest -UseBasicParsing -TimeoutSec 600 `
                 -Uri "$DownloadBase/$Repo/archive/refs/tags/$releaseTag.zip" -OutFile $zipPath
         }
-        Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir
+        # Out-Null: Archive 1.2.6 writes an assembly to the output before it
+        # throws on a bad zip, and Stop-Fatal's exit would print it after the
+        # ERROR line.
+        Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir | Out-Null
     } catch {
         # Invoke-WebRequest -OutFile keeps what a dropped transfer delivered
         # and reports no error, so a cut-off zip fails only here, at

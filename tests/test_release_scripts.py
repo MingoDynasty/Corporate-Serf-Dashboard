@@ -562,7 +562,7 @@ function New-Object {
     if ($args -contains 'WScript.Shell') { throw 'the test writes no desktop shortcut' }
     Microsoft.PowerShell.Utility\\New-Object @args
 }
-<refuse restore>
+<shadows>
 try {
     & $args[1] -LatestTag $args[3] -InstallRoot $args[0]
     exit $LASTEXITCODE
@@ -660,12 +660,13 @@ def _reinstall_root(tmp_path: Path, stubs: dict[str, Path], uv: str) -> Path:
 
 
 def _run_install(
-    tmp_path: Path, root: Path, fixtures: Path, *, refuse_restore: bool = False
+    tmp_path: Path, root: Path, fixtures: Path, *, shadows: str = ""
 ) -> subprocess.CompletedProcess[str]:
-    """Run the real ``install.ps1 -LatestTag`` against the fake release."""
-    driver = _INSTALL_DRIVER.replace(
-        "<refuse restore>", _REFUSE_RESTORE if refuse_restore else ""
-    )
+    """Run the real ``install.ps1 -LatestTag`` against the fake release.
+
+    ``shadows`` adds functions that stand in for more cmdlets.
+    """
+    driver = _INSTALL_DRIVER.replace("<shadows>", shadows)
     return _windows_powershell(
         tmp_path, driver, [str(root), str(INSTALL_SCRIPT), str(fixtures), _TAG]
     )
@@ -751,7 +752,7 @@ def test_a_failed_restore_keeps_the_parked_copy(
     root = _reinstall_root(tmp_path, stub_programs, "exit1")
     fixtures = _release_fixtures(tmp_path, stub_programs, "exit0", _SHA)
 
-    result = _run_install(tmp_path, root, fixtures, refuse_restore=True)
+    result = _run_install(tmp_path, root, fixtures, shadows=_REFUSE_RESTORE)
 
     parked = root / "tmp" / f"previous-{_TAG}"
     assert result.returncode == 1
@@ -819,7 +820,7 @@ def test_a_retry_keeps_the_copy_an_earlier_run_parked(
     parked = root / "tmp" / f"previous-{_TAG}"
     target = root / "versions" / _TAG
 
-    first = _run_install(tmp_path, root, fixtures, refuse_restore=True)
+    first = _run_install(tmp_path, root, fixtures, shadows=_REFUSE_RESTORE)
 
     assert f"It is intact at {parked}" in first.stdout, first.stdout
     assert not target.exists()
@@ -1266,6 +1267,48 @@ def test_a_failed_download_is_one_line(
     ]
     assert not (root / "tmp" / f"{_TAG}.zip").exists()
     assert not (root / "versions" / _TAG).exists()
+
+
+# Behaves like Archive 1.2.6, the module PowerShell 7 ships, which Windows
+# PowerShell 5.1 loads when PowerShell 7's module folder comes first in
+# PSModulePath: on a zip that will not open, it writes the WindowsBase
+# assembly to its output before it throws.
+_NOISY_EXTRACTION = r"""
+function Expand-Archive {
+    param([string]$LiteralPath, [string]$DestinationPath)
+    [System.Reflection.Assembly]::Load('WindowsBase,Version=4.0.0.0,Culture=neutral,PublicKeyToken=31bf3856ad364e35')
+    Microsoft.PowerShell.Archive\Expand-Archive -LiteralPath $LiteralPath -DestinationPath $DestinationPath
+}
+"""
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+def test_a_zip_that_will_not_open_ends_the_install_in_one_line(
+    tmp_path: Path, stub_programs: dict[str, Path]
+) -> None:
+    """Nothing the extraction writes follows the installer's ERROR line.
+
+    ``Stop-Fatal`` exits from inside ``Install-ReleaseVersion``, whose output
+    the installer collects for an assignment. The exit prints what was
+    collected so far after the ERROR line: with Archive 1.2.6, a table of the
+    WindowsBase assembly.
+    """
+    root = _install_root(tmp_path, stub_programs, "exit0")
+    fixtures = _release_fixtures(tmp_path, stub_programs, "exit0", _SHA)
+    archive = fixtures / "csd.zip"
+    archive.write_bytes(archive.read_bytes()[: archive.stat().st_size // 2])
+
+    result = _run_install(tmp_path, root, fixtures, shadows=_NOISY_EXTRACTION)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert result.stdout.splitlines() == [
+        f"Installing Corporate Serf Dashboard {_TAG} to {root}",
+        f"Downloading {_TAG} ...",
+        "ERROR: download incomplete or failed"
+        " (End of Central Directory record could not be found).",
+    ]
+    assert not (root / "tmp").exists()
+    assert not (root / "install.json").exists()
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
