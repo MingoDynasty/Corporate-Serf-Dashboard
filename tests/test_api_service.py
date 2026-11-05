@@ -2011,6 +2011,89 @@ def test_get_scenario_rank_info_keeps_rank_when_total_fetch_fails(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_scenario_rank_info_serves_the_fetched_rank_when_its_save_fails(
+    monkeypatch,
+    tmp_path,
+    caplog,
+):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    # A file where the user's rank folder belongs: the save's mkdir raises
+    # FileExistsError.
+    blocker = tmp_path / "leaderboard" / "user_rank" / safe_file_key("MingoDynasty")
+    blocker.write_text("not a folder", encoding="utf-8")
+    fetched_at = datetime(2026, 11, 5, 15, 0, tzinfo=UTC)
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11266,
+            score=812.5,
+            leaderboard_id=98330,
+            fetched_at=fetched_at,
+        )
+
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", fake_fetch_scenario_rank)
+    monkeypatch.setattr(api_service, "get_leaderboard_total", lambda *_args: 18342)
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        rank_info = api_service.get_scenario_rank_info(
+            "VT Pasu Intermediate S5",
+            "MingoDynasty",
+        )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 11266
+    assert rank_info.score == 812.5
+    assert rank_info.fetched_at == fetched_at
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    assert rank_info.total_players == 18342
+    assert rank_info.error_message is None
+    assert rank_info.served_stale is None
+    assert blocker.is_file()
+    warnings = [record.getMessage() for record in caplog.records]
+    assert len(warnings) == 1
+    assert f'"{api_service._rank_cache_file(98330, "MingoDynasty")}"' in warnings[0]
+
+
+def test_get_scenario_rank_info_serves_a_cached_rank_whose_backfill_fails(
+    monkeypatch,
+    tmp_path,
+    caplog,
+):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    # A fresh entry written before ranks stored their scenario name, so the
+    # lookup re-saves it with the name.
+    cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
+    api_service._write_json(
+        cache_file,
+        {"status": "RANKED", "rank": 500, "leaderboard_id": 98330, "score": 900.0},
+    )
+
+    def fail_save(*_args, **_kwargs):
+        raise PermissionError(13, "Access is denied", str(cache_file))
+
+    monkeypatch.setattr(api_service, "save_scenario_rank", fail_save)
+    monkeypatch.setattr(api_service, "get_leaderboard_total", lambda *_args: 18342)
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        rank_info = api_service.get_scenario_rank_info(
+            "VT Pasu Intermediate S5",
+            "MingoDynasty",
+        )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 500
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    assert rank_info.total_players == 18342
+    warnings = [record.getMessage() for record in caplog.records]
+    assert len(warnings) == 1
+    assert f'"{cache_file}"' in warnings[0]
+
+
 def test_get_scenario_rank_info_logs_total_request_failure_without_traceback(
     monkeypatch,
     caplog,
@@ -2579,6 +2662,66 @@ def test_resolve_leaderboard_id_falls_back_to_search_after_total_play_failure(
     assert leaderboard_id == 98330
     assert searched_scenarios == ["VT Pasu Intermediate S5"]
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_resolve_leaderboard_id_falls_back_to_search_when_hydration_cannot_write(
+    monkeypatch,
+    tmp_path,
+    caplog,
+):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.make_cache()
+    # A file where the user's total-play page folder belongs: the first page
+    # write's mkdir raises FileExistsError.
+    blocker = tmp_path / "user_scenario_total_play" / safe_file_key("MingoDynasty")
+    blocker.write_text("not a folder", encoding="utf-8")
+
+    def fake_get(url, **_kwargs):
+        assert url == api_service.Endpoints.USER_SCENARIO_TOTAL_PLAY
+        return FakeResponse(
+            {
+                "page": 0,
+                "max": 100,
+                "total": 1,
+                "data": [
+                    {
+                        "leaderboardId": "1",
+                        "scenarioName": "Other Scenario",
+                        "counts": {"plays": 10},
+                        "rank": 12,
+                        "score": 100,
+                    }
+                ],
+            }
+        )
+
+    searched_scenarios = []
+
+    def fake_search_scenario_exact(scenario_name):
+        searched_scenarios.append(scenario_name)
+        return 98330
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(
+        api_service,
+        "search_scenario_exact",
+        fake_search_scenario_exact,
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        leaderboard_id = api_service.resolve_leaderboard_id(
+            "VT Pasu Intermediate S5",
+            "MingoDynasty",
+        )
+
+    assert leaderboard_id == 98330
+    assert searched_scenarios == ["VT Pasu Intermediate S5"]
+    assert blocker.is_file()
+    warnings = [record.getMessage() for record in caplog.records]
+    assert len(warnings) == 1
+    assert 'leaderboard metadata for "MingoDynasty"' in warnings[0]
+    # The OSError's text names the blocking path, quoted as its repr.
+    assert repr(str(blocker)) in warnings[0]
 
 
 def test_resolve_leaderboard_id_skips_hydration_when_disabled(monkeypatch):
