@@ -1943,8 +1943,11 @@ a.run-toast-link {
 /* A title-less panel's icon sits beside a sentence that may wrap, so its group
    aligns to the top rather than the center, which pins the ``1em`` icon to the
    top of a taller line box, visibly above the first line's middle. Half the
-   leading drops it onto that middle; the icon inherits the sentence's line
-   height, so ``1lh`` is the sentence's line box. */
+   leading drops it onto that middle. The icon inherits the page's font size
+   and line height, while the sentence, a Mantine ``Text``, sets its own from
+   its ``size``. Both resolve to Mantine's ``md`` values, so the icon's ``1lh``
+   equals the sentence's line box; a sentence given another ``size`` needs the
+   icon's font size and line height set to match. */
 .stats-dir-hint .alert-panel-icon,
 .app-settings-restart-notice .alert-panel-icon {
     margin-top: calc((1lh - 1em) / 2);
