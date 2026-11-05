@@ -272,9 +272,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   The newer-build refusal reads 'The playlist "{name}" ({code}) would
   replace a playlist file written by a newer version of this app. Update the
   app to import it.', the collision 'The file for this playlist already holds
-  "{name}" ({code}). Delete that playlist first, then import again.', and a
-  failed write 'Couldn't save the playlist file for "{name}" ({code}). See
-  data/logs/debug.log.' ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
+  "{name}" ({code}). Delete that file by hand, then restart the app and
+  import again. File: {path}', and a failed write 'Couldn't save the
+  playlist file for "{name}" ({code}). See data/logs/debug.log.' ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
   Success adds the code to the show-list, enqueues warmup, closes and clears
   the modal, rebuilds rows, and toasts green "Playlist imported" / 'Imported
   "{label}" ({code}).'. A failed or refused show-list write changes only the

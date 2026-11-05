@@ -1381,7 +1381,7 @@ def load_playlist_from_code(  # noqa: PLR0911
         )
         return message, None
     except PlaylistFileCollisionError as exc:
-        # Logged where it is raised, with the file name the message leaves out.
+        # Logged where it is raised.
         return str(exc), None
     playlist_database[playlist_data.code] = playlist_data
     _user_root_playlist_codes.add(playlist_data.code)
@@ -1531,15 +1531,20 @@ def _guard_playlist_destination(file_path: Path) -> None:
     if document.state is StoreState.SUPPORTED:
         incumbent = document.value
         logger.warning(
-            'Cannot save this playlist: "%s" already holds "%s" (%s). Delete that '
-            "playlist first, then import again.",
+            'Cannot save this playlist: "%s" already holds "%s" (%s).',
             file_path.name,
             incumbent.name,
             incumbent.code,
         )
+        # Not "delete that playlist": an incumbent that arrived after startup
+        # has no overview row, and one whose code a bundled benchmark serves
+        # has no Delete button. The restart drops the running app's record of
+        # this path: without it, deleting the incumbent in the app after the
+        # new import lands here would unlink the new file.
         msg = (
             f'The file for this playlist already holds "{incumbent.name}" '
-            f"({incumbent.code}). Delete that playlist first, then import again."
+            f"({incumbent.code}). Delete that file by hand, then restart the app "
+            f"and import again. File: {file_path}"
         )
         raise PlaylistFileCollisionError(msg)
     back_up_unusable_store(file_path)
