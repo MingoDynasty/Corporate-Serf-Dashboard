@@ -141,14 +141,16 @@ console lines quoted here are plain console output, not app notifications.
   `versions\<tag>\`, `release.json` is written beside it byte-for-byte, and
   `uv sync --locked --no-dev --managed-python` runs there. A reinstall onto
   a tag whose directory already exists parks that directory under `tmp\`
-  first and restores it if the replacement fails before its sync completes
+  first, replacing any copy of that tag already parked there, and restores
+  it if the replacement fails before its sync completes
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md),
   [2026-07-19](../decision_log/2026/2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md)).
 - Once the install root exists, every exit removes `tmp\`: a success, an
-  `ERROR:` stop, or an uncaught error. The one exception is a parked copy
-  that is still the only working one, which is kept while the
-  replacement's sync runs and after a restore that failed. That restore
-  failure's message names the parked copy's path under `tmp\`.
+  `ERROR:` stop, or an uncaught error. The one exception is an exit short
+  of success while `tmp\` holds a parked copy that may be the only working
+  one of its version: any parked copy, this run's or one an earlier run
+  left, except a copy of the version this run has synced. A restore that
+  fails names the parked copy's path under `tmp\` in its message.
 - Installs ask no questions. With no `config.toml` at the root, the installer
   writes one carrying only `port = 8050` under a comment header; an existing
   `config.toml` and `data/` are never touched ("Keeping the existing

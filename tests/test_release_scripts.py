@@ -737,7 +737,7 @@ def test_a_failed_reinstall_leaves_no_tmp(
 def test_a_failed_restore_keeps_the_parked_copy(
     tmp_path: Path, stub_programs: dict[str, Path]
 ) -> None:
-    r"""The one exit that keeps ``tmp\``: it holds the only working copy.
+    r"""An exit that keeps ``tmp\``: it holds the only working copy.
 
     When the sync fails and the parked copy cannot be moved back, the error
     names where it is so it can be moved back by hand.
@@ -751,6 +751,87 @@ def test_a_failed_restore_keeps_the_parked_copy(
     assert result.returncode == 1
     assert f"It is intact at {parked}" in result.stdout, result.stdout
     assert (parked / "previous.txt").is_file()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(
+    ("uv", "python", "download", "expected", "kept"),
+    [
+        pytest.param(
+            "exit0",
+            "exit0",
+            False,
+            "TEST: uncaught error: unexpected download:",
+            True,
+            id="retry download fails",
+        ),
+        pytest.param(
+            "exit1",
+            "exit0",
+            True,
+            f"ERROR: install of {_TAG} failed (uv sync failed",
+            True,
+            id="retry sync fails",
+        ),
+        pytest.param(
+            "exit0",
+            "exit1",
+            True,
+            "ERROR: the installed app cannot load",
+            False,
+            id="retry config check fails after the sync",
+        ),
+        pytest.param(
+            "exit0",
+            "exit0",
+            True,
+            f"Installed Corporate Serf Dashboard {_TAG}.",
+            False,
+            id="retry succeeds",
+        ),
+    ],
+)
+def test_a_retry_keeps_the_copy_an_earlier_run_parked(
+    tmp_path: Path,
+    stub_programs: dict[str, Path],
+    uv: str,
+    python: str,
+    download: bool,
+    expected: str,
+    kept: bool,
+) -> None:
+    r"""A retry keeps ``tmp\`` while an earlier run's parked copy is needed.
+
+    A failed restore leaves the only working copy parked, and its message
+    says to move it back or to re-run the installer. The retry parks nothing
+    itself, because ``versions\<tag>`` is gone, so a retry that fails before
+    its own sync must still keep the earlier copy. Once the retry has synced
+    a replacement for that version, the copy is no longer needed.
+    """
+    root = _reinstall_root(tmp_path, stub_programs, "exit1")
+    fixtures = _release_fixtures(tmp_path, stub_programs, python, _SHA)
+    parked = root / "tmp" / f"previous-{_TAG}"
+    target = root / "versions" / _TAG
+
+    first = _run_install(tmp_path, root, fixtures, refuse_restore=True)
+
+    assert f"It is intact at {parked}" in first.stdout, first.stdout
+    assert not target.exists()
+
+    shutil.copyfile(stub_programs[uv], root / "uv" / _UV_VERSION / "uv.exe")
+    if not download:
+        (fixtures / "csd.zip").unlink()
+
+    retry = _run_install(tmp_path, root, fixtures)
+
+    assert expected in retry.stdout, retry.stdout
+    if kept:
+        assert retry.returncode != 0
+        assert (parked / "previous.txt").is_file(), retry.stdout
+        assert not target.exists()
+    else:
+        assert not (root / "tmp").exists(), retry.stdout
+        assert (target / "version.txt").is_file()
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")

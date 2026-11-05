@@ -51,10 +51,10 @@ $ApiBase = 'https://api.github.com'
 $DownloadBase = 'https://github.com'
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $DefaultPort = 8050
-# True while tmp\ holds the only working copy of a version: a reinstall's
-# parked previous copy, from the park until the replacement has synced or the
-# copy is back in place. The cleanup on exit keeps tmp\ while it is set.
-$TempHoldsParkedCopy = $false
+# Set once this run's version has synced. A copy parked under tmp\ for that
+# version, by this run or an earlier one, is then no longer the only working
+# one, and the cleanup on exit may remove it.
+$VersionSynced = $false
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -170,8 +170,6 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
     if (Test-Path -LiteralPath $targetDir) {
         $backupDir = Join-Path $tempDir "previous-$releaseTag"
         if (Test-Path -LiteralPath $backupDir) { Remove-Item -LiteralPath $backupDir -Recurse -Force }
-        # Set before the move, so that a stop between the two keeps the copy.
-        $script:TempHoldsParkedCopy = $true
         Move-Item -LiteralPath $targetDir -Destination $backupDir
     }
     try {
@@ -189,7 +187,7 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
         Write-Host "Installing dependencies for $releaseTag ..."
         & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
         if ($LASTEXITCODE -ne 0) { throw "uv sync failed for $releaseTag (exit $LASTEXITCODE)" }
-        $script:TempHoldsParkedCopy = $false
+        $script:VersionSynced = $true
     } catch {
         $message = $_.Exception.Message
         # The restore itself can fail (a lingering handle on the partial
@@ -199,7 +197,6 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
             if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
             if ($backupDir -and (Test-Path -LiteralPath $backupDir)) {
                 Move-Item -LiteralPath $backupDir -Destination $targetDir
-                $script:TempHoldsParkedCopy = $false
                 Stop-Fatal "install of $releaseTag failed ($message); the previously installed copy was restored."
             }
         } catch {
@@ -299,7 +296,9 @@ $env:UV_CACHE_DIR = Join-Path $InstallRoot 'uv-cache'
 # finally blocks), an uncaught error, and Ctrl+C. Nothing else would: a
 # later install clears it only by succeeding, and a reinstall stopped after
 # its sync would keep a second full venv parked there. The one exception is
-# a parked copy that is still the only working one.
+# a failed exit while tmp\ holds a parked copy that may be the only working
+# one of its version.
+$installed = $false
 try {
     $uvExe = Install-UvVersion ([string]$release.uv_version)
     $versionDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
@@ -353,9 +352,17 @@ try {
     Write-FileAtomic -Path (Join-Path $InstallRoot 'launch.ps1') -Content ([System.IO.File]::ReadAllText($bootstrapTemplate))
 
     $shortcutWritten = New-DesktopShortcut ([Environment]::GetFolderPath('Desktop'))
+    $installed = $true
 } finally {
-    if (-not $TempHoldsParkedCopy) {
-        Remove-Item -LiteralPath (Join-Path $InstallRoot 'tmp') -Recurse -Force -ErrorAction SilentlyContinue
+    # Parked copies are read from disk, not tracked by this run: a copy that
+    # an earlier run parked and never put back (its restore failed, or it was
+    # stopped mid-sync) must outlive a retry that fails too. A copy of the
+    # version this run has synced is no longer needed.
+    $tempRoot = Join-Path $InstallRoot 'tmp'
+    $neededCopies = @(Get-ChildItem -LiteralPath $tempRoot -Directory -Filter 'previous-*' -ErrorAction SilentlyContinue |
+        Where-Object { -not ($VersionSynced -and $_.Name -eq "previous-$($release.tag)") })
+    if ($installed -or $neededCopies.Count -eq 0) {
+        Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
