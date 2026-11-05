@@ -13,7 +13,11 @@ from source.config import settings_service
 from source.config.config_service import ConfigData
 from source.kovaaks import api_service
 from source.kovaaks import percentile_warmup_service as warmup
-from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
+from source.kovaaks.api_models import (
+    LeaderboardAPIResponse,
+    ScenarioRankInfo,
+    ScenarioRankStatus,
+)
 from source.kovaaks.data_models import PlaylistData, Scenario, ScenarioStats
 
 
@@ -345,6 +349,103 @@ def test_dequeue_predicate_requires_fresh_total_only_for_ranked(
     )
 
     assert warmup._freshly_satisfied("Scenario", _config()) is expected
+
+
+def _seed_rank_above_total(
+    monkeypatch,
+    tmp_path: Path,
+    *,
+    total_players: int,
+    total_stored_before_rank: bool,
+) -> None:
+    """Cache a fresh rank of 900 read two hours ago and a TTL-fresh total.
+
+    The total was stored an hour before the rank was read, or an hour after.
+    """
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    api_service.make_cache()
+    monkeypatch.setattr(warmup, "get_cached_leaderboard_id", lambda _name: 42)
+    monkeypatch.setattr(warmup, "resolve_leaderboard_id", lambda *_a, **_k: 42)
+    rank_read_at = time.time() - 2 * 60 * 60
+    api_service.save_scenario_rank(
+        42,
+        "ValidUser",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=900,
+            leaderboard_id=42,
+            scenario_name="Scenario",
+            fetched_at=datetime.fromtimestamp(rank_read_at, UTC),
+        ),
+    )
+    api_service.save_leaderboard_total(42, total_players)
+    total_stored_at = rank_read_at + (-1 if total_stored_before_rank else 1) * 3600
+    os.utime(
+        api_service._leaderboard_total_cache_file(42),
+        (total_stored_at, total_stored_at),
+    )
+
+
+@pytest.mark.parametrize(
+    ("total_players", "total_stored_before_rank", "expected"),
+    [
+        (500, True, False),
+        # Read after the rank and still below it: the rank is the stale side,
+        # and a worker pass would only re-read the same total.
+        (850, False, True),
+        (900, True, True),
+    ],
+)
+def test_dequeue_predicate_rejects_a_fresh_total_that_a_later_rank_outruns(
+    monkeypatch,
+    tmp_path: Path,
+    total_players,
+    total_stored_before_rank,
+    expected,
+):
+    _seed_rank_above_total(
+        monkeypatch,
+        tmp_path,
+        total_players=total_players,
+        total_stored_before_rank=total_stored_before_rank,
+    )
+
+    assert warmup._freshly_satisfied("Scenario", _config()) is expected
+
+
+def test_worker_rereads_a_fresh_total_that_a_later_rank_outruns(
+    monkeypatch,
+    tmp_path: Path,
+):
+    _seed_rank_above_total(
+        monkeypatch,
+        tmp_path,
+        total_players=500,
+        total_stored_before_rank=True,
+    )
+    total_reads = []
+
+    def fake_get_leaderboard_scores(leaderboard_id, **kwargs):
+        total_reads.append((leaderboard_id, kwargs))
+        return LeaderboardAPIResponse(page=0, max=1, total=1200, data=[])
+
+    def fail_fetch_scenario_rank(*_args, **_kwargs):
+        raise AssertionError("a fresh rank must not be re-fetched")
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+    monkeypatch.setattr(warmup, "fetch_scenario_rank", fail_fetch_scenario_rank)
+
+    result = warmup.process_warmup_item("Scenario", warmup.WarmupContext(_config()))
+
+    assert result.disposition == warmup.StepDisposition.COMPLETE
+    assert result.success is True
+    assert total_reads == [(42, {"max_results": 1})]
+    assert api_service._cached_leaderboard_total(42) == 1200
+    assert warmup._freshly_satisfied("Scenario", _config()) is True
 
 
 def test_rejected_stale_rank_preserves_newer_cache_metadata_and_is_terminal(
