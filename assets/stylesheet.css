@@ -241,11 +241,14 @@ a.run-toast-link {
     );
 }
 
-/* The row above the chart, in the same two columns as the chart and the run
-   list under it, with the same gap. Both columns are as tall as the row, and
-   so is every card in it. Spaced off the chart with a margin and not a gap on
-   the page, because the page's column also holds the setup card's container,
-   which is empty on a configured install and would still be given a gap. */
+/* The row above the chart, in two columns with the same gap as the chart and
+   the run list under it. The second is the latest-run card's width, which is
+   the list's minimum, so the row's columns are the chart's and the list's
+   only while the list is at that minimum, as it is with its default columns.
+   Both columns are as tall as the row, and so is every card in it. Spaced off
+   the chart with a margin and not a gap on the page, because the page's
+   column also holds the setup card's container, which is empty on a
+   configured install and would still be given a gap. */
 .run-history-top-row {
     --run-history-score-card-top: 12px;
 
