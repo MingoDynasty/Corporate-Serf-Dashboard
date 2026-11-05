@@ -1408,11 +1408,41 @@ def test_import_refuses_a_filename_collision_with_a_healthy_playlist(
     assert imported_code is None
     assert message == (
         'The file for this playlist already holds "Squad Alpha" (IncumbentCode). '
-        "Delete that playlist first, then import again."
+        "Delete that file by hand, then restart the app and import again. "
+        f"File: {destination}"
     )
     assert destination.read_text(encoding="utf-8") == before
     assert not list(user_root.glob("*.bak"))
     assert not list(user_root.glob(".*.tmp"))
+
+
+def test_the_collision_refusals_remedy_lets_the_import_land(monkeypatch, tmp_path):
+    """Deleting the file by hand, restarting, and importing again works.
+
+    The incumbent's code is a bundled benchmark's, so its overview row is the
+    bundled one and has no Delete button: the remedy must not need one.
+    """
+    bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    destination = data_service.get_playlist_file_path("Squad Alpha", "OtherCode")
+    _write_user_playlist(destination, _playlist("Squad Alpha", "BundledCode"))
+    data_service.load_playlists()
+    assert "BundledCode" not in data_service.get_user_root_playlist_codes()
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Squad Alpha", "OtherCode"),
+    )
+    message, _code = data_service.load_playlist_from_code("OtherCode")
+    assert message is not None
+    assert message.endswith(f"File: {destination}")
+
+    destination.unlink()
+    data_service.load_playlists()
+
+    assert data_service.load_playlist_from_code("OtherCode") == (None, "OtherCode")
+    stored = json.loads(destination.read_text(encoding="utf-8"))
+    assert stored["code"] == "OtherCode"
 
 
 def test_the_duplicate_code_refusal_still_runs_before_the_point_check(
