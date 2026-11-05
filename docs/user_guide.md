@@ -555,9 +555,10 @@ Your settings set a later floor. Once `data/settings.json` has a
 `"schema_version"` line, which every release from `v2026.08.11.5` on writes,
 `v2026.08.11.5` is the earliest release that can read it. Releases from
 `v2026.08.02.4` through `v2026.08.11.4` treat the file as empty and run without
-your KovaaK's username and Steam ID. From `v2026.08.03` on, they also rewrite
-it on their first start to hold only the stats folder they detect, and the
-username and Steam ID are lost. Releases before `v2026.08.02.4` never open
+your KovaaK's username and Steam ID. From `v2026.08.03` on, once a start
+detects your stats folder, they also rewrite the file to hold only that
+folder, and the username and Steam ID are lost. Until then the file is left as
+it is. Releases before `v2026.08.02.4` never open
 `settings.json` and leave it as it is; they read their settings from
 `config.toml` instead.
 
