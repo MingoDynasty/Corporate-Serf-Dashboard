@@ -551,19 +551,35 @@ automatic updates, run the [install one-liner](../README.md#install) again.
 Releases published before the installer existed cannot be rolled back to;
 `v2026.07.19.4` is the earliest that can.
 
+Your settings set a later floor. Once `data/settings.json` has a
+`"schema_version"` line, which every release from `v2026.08.11.5` on writes,
+`v2026.08.11.5` is the earliest release that can read it. Releases from
+`v2026.08.02.4` through `v2026.08.11.4` treat the file as empty and run without
+your KovaaK's username and Steam ID. From `v2026.08.03` on, once a start
+detects your stats folder, they also rewrite the file to hold only that
+folder, and the username and Steam ID are lost. Until then the file is left as
+it is. Releases before `v2026.08.02.4` never open
+`settings.json` and leave it as it is; they read their settings from
+`config.toml` instead.
+
 Rolling back has a config floor too. Because `config.toml` is written once at
-first install and never rewritten, an install first set up by a release that
-omits `polling_interval` and `sens_round_decimal_places` cannot roll back to
-an older release that still requires them — the install stops with a "cannot
-load config.toml" error. Add these two lines to `config.toml`, or delete it so
-the older installer regenerates its own, then re-run:
+first install and never rewritten, a release that requires a line yours lacks
+stops the install with a "cannot load config.toml" error. Installers from
+`v2026.08.02.5` on write only `port`. Rolling back to `v2026.08.02.4` or older
+also needs `stats_dir`, and rolling back to `v2026.07.20` or `v2026.07.19.4`
+needs `polling_interval` and `sens_round_decimal_places` as well. Add the lines
+your target needs, or delete `config.toml` so the older installer writes its
+own, then re-run:
 
 ```toml
+stats_dir = "C:/Program Files (x86)/Steam/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats"
 polling_interval = 1000
 sens_round_decimal_places = 1
 ```
 
-Current releases no longer read the second line and log a warning about it,
-so remove it once you update again.
+Use your own stats folder, the one the Settings page shows, with forward
+slashes. Current releases no longer read `stats_dir` or
+`sens_round_decimal_places` and log a warning about them, so remove those
+lines once you update again.
 
 </details>
