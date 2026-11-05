@@ -10,10 +10,15 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
+import threading
 import zipfile
+from collections.abc import Iterator
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import NamedTuple
 
 import pytest
 
@@ -939,3 +944,164 @@ def test_pruning_keeps_a_runnable_fallback(
     assert result.stdout.splitlines() == [
         f"Pruned old version {tag}." for tag in pruned
     ]
+
+
+class _Reply(NamedTuple):
+    """What the fake GitHub sends for one URL path.
+
+    ``dropped`` announces the whole body, sends half of it, and closes the
+    connection: a transfer that dies mid-download.
+    """
+
+    status: int
+    body: bytes = b"{}"
+    dropped: bool = False
+
+
+class _ReplyHandler(BaseHTTPRequestHandler):
+    """Answer a GET from the server's ``replies``; an unknown path is a 404."""
+
+    def do_GET(self) -> None:
+        assert isinstance(self.server, _FakeGitHub)
+        reply = self.server.replies.get(self.path, _Reply(404))
+        self.send_response(reply.status)
+        self.send_header("Content-Type", "application/octet-stream")
+        self.send_header("Content-Length", str(len(reply.body)))
+        self.end_headers()
+        if reply.dropped:
+            self.wfile.write(reply.body[: len(reply.body) // 2])
+            self.wfile.flush()
+            self.connection.shutdown(socket.SHUT_RDWR)
+            self.close_connection = True
+            return
+        self.wfile.write(reply.body)
+
+    def log_message(self, format: str, *args: object) -> None:
+        """Keep the request log out of the test output."""
+
+
+class _FakeGitHub(ThreadingHTTPServer):
+    """A loopback HTTP server standing in for every host the scripts fetch from."""
+
+    def __init__(self) -> None:
+        super().__init__(("127.0.0.1", 0), _ReplyHandler)
+        self.replies: dict[str, _Reply] = {}
+        self.url = f"http://127.0.0.1:{self.server_address[1]}"
+
+
+@pytest.fixture
+def fake_github() -> Iterator[_FakeGitHub]:
+    """Serve ``replies`` on a free loopback port for the length of one test."""
+    server = _FakeGitHub()
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield server
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+_REPO = "MingoDynasty/Corporate-Serf-Dashboard"
+_LATEST = f"/repos/{_REPO}/releases/latest"
+_RAW_INSTALLER = f"/{_REPO}/{_TAG}/install.ps1"
+_STAND_IN_INSTALLER = (
+    b'param([string]$LatestTag)\nWrite-Host "TEST: the installer ran for $LatestTag"\n'
+)
+
+# Runs get.ps1 the way the one-liner does: through iex, in the caller's own
+# scope, so whatever the shim leaves in that scope is still there afterwards.
+# Its two GitHub hosts point at the fake server. The paths come in through
+# the environment because the shim passes the caller's $args on to the
+# installer, and a console's are empty.
+_SHIM_DRIVER = """
+$ErrorActionPreference = 'Continue'
+$shim = [System.IO.File]::ReadAllText($env:CSD_TEST_SHIM)
+foreach ($site in 'https://api.github.com', 'https://raw.githubusercontent.com') {
+    if (-not $shim.Contains($site)) { throw "get.ps1 no longer fetches from $site" }
+    $shim = $shim.Replace($site, $env:CSD_TEST_SERVER)
+}
+try {
+    $shim | Invoke-Expression
+} catch {
+    Write-Host "TEST: uncaught error: $($_.Exception.Message)"
+}
+"TEST: preference $ErrorActionPreference"
+"""
+
+
+def _run_shim(tmp_path: Path, server: _FakeGitHub) -> list[str]:
+    r"""Run ``get.ps1`` against ``server`` and return its output lines.
+
+    ``%TEMP%`` is the test's, so the installer the shim writes lands there.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+    temp = tmp_path / "temp"
+    temp.mkdir()
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "TEMP": str(temp),
+            "TMP": str(temp),
+            "CSD_TEST_SHIM": str(REPO_ROOT / "get.ps1"),
+            "CSD_TEST_SERVER": server.url,
+        }
+    )
+    result = _windows_powershell(tmp_path, _SHIM_DRIVER, [], environment)
+    assert result.returncode == 0, result.stderr
+    return result.stdout.splitlines()
+
+
+_LATEST_REPLY = _Reply(200, json.dumps({"tag_name": _TAG}).encode())
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(
+    ("replies", "expected"),
+    [
+        pytest.param(
+            {},
+            "Corporate Serf Dashboard: the release is not ready yet -- try again"
+            " shortly.",
+            id="release not ready",
+        ),
+        pytest.param(
+            {_LATEST: _LATEST_REPLY},
+            "Corporate Serf Dashboard: the release is not ready yet -- try again"
+            " shortly.",
+            id="installer not ready",
+        ),
+        pytest.param(
+            {_LATEST: _LATEST_REPLY, _RAW_INSTALLER: _Reply(200, _STAND_IN_INSTALLER)},
+            f"TEST: the installer ran for {_TAG}",
+            id="installer runs",
+        ),
+        pytest.param(
+            {_LATEST: _Reply(500)},
+            "TEST: uncaught error: The remote server returned an error: (500)"
+            " Internal Server Error.",
+            id="fetch fails",
+        ),
+    ],
+)
+def test_the_shim_gives_the_console_its_preference_back(
+    tmp_path: Path,
+    fake_github: _FakeGitHub,
+    replies: dict[str, _Reply],
+    expected: str,
+) -> None:
+    """Every way out of ``get.ps1`` restores the caller's error preference.
+
+    The one-liner runs the shim through iex in the user's own console, so the
+    shim's ``$ErrorActionPreference = 'Stop'`` used to stay behind there. For
+    the rest of that console session every error ended the command that hit
+    it. The header forbids functions and ``exit``, so the shim restores the
+    preference itself, on its ``return`` paths as much as at the end.
+    """
+    fake_github.replies.update(replies)
+
+    lines = _run_shim(tmp_path, fake_github)
+
+    assert expected in lines, lines
+    assert lines[-1] == "TEST: preference Continue", lines

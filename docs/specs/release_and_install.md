@@ -120,6 +120,9 @@ console lines quoted here are plain console output, not app notifications.
   Dashboard: the release is not ready yet -- try again shortly." and
   returns; the temp file is not deleted
   ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
+  The shim runs under `$ErrorActionPreference = 'Stop'` and, because iex
+  runs it in the caller's own scope, puts the caller's preference back on
+  every way out, its `return`s included.
 - `install.ps1` installs `-Tag` (pinned), else `-LatestTag` (unpinned), else
   the tag `releases/latest` resolves; with no release published it stops
   with "no release is published yet -- try again shortly." It then reads the
