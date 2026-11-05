@@ -148,7 +148,9 @@ at most 13 columns, so rendering them all costs nothing visible.
 
 Turning virtualization off also changes the default view in a narrow window.
 Before, a column scrolled out of view when the page opened kept AG Grid's 200
-px default, which a benchmark's table showed from 1680 px down. Now every
+px default. With nothing stored, a benchmark's table showed such a column from
+1850 px down in Firefox 157 and from 1800 px down in Edge, and none at 1900 px
+or wider (measured in 50 px steps in review of PR #344, 2026-10-05). Now every
 column is sized to its header and its content, whether the page or the menu
 showed it.
 
