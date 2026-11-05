@@ -311,6 +311,17 @@ and [product.md](../product.md). Leaderboard placement is worded
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
   Confirm handlers act only on a real click (`n_clicks`), because
   duplicate-output callbacks can fire once on page load.
+- Delete unlinks a recorded file only while it still holds the code, read
+  just before the unlink, because the file at a recorded path can change
+  while the app runs: deleted by hand, then written by an import or a sync.
+  A file that now holds another playlist, or nothing this build reads as a
+  playlist (unusable, or from a newer build), is kept, and the delete
+  completes as it does for a file already gone. Its green toast adds "Its
+  file no longer holds this playlist, so that file wasn't deleted. File:
+  {path}" after 'Deleted "{label}" ({code}).', and names one file when it
+  kept several; the log names each. A failed delete keeps that file
+  recorded, so the retry that lands reports it. A file that can't be read is
+  a failed unlink.
 
 ## The per-playlist scenario table
 
@@ -674,6 +685,12 @@ except where another entry is linked.
   or red "Cleanup failed". Both are channels, and the success clears the
   failure
   ([2026-08-31](../decision_log/2026/2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry.md)).
+  Cleanup checks each file the way Delete does on the Playlists page: one
+  that no longer holds the code it was recorded with is kept, the green toast
+  adds "A file no longer holds the playlist it held when this app started, so
+  it wasn't deleted. File: {path}" after "Deleted leftover playlist files."
+  (one file named, as for Delete), and the file leaves the list unless the
+  run failed.
 - User files are stamped and read through the store state machine (unusable
   or newer files skipped with an actionable warning); bundled files are
   unstamped by design
