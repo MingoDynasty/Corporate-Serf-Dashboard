@@ -43,6 +43,7 @@ from source.pages import run_history  # noqa: E402
 
 IDS = run_history.CHART_OPTIONS_IDS
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+DMC_BUNDLE = Path(dmc.__file__).parent / "dash_mantine_components.js"
 
 
 def _context(runs):
@@ -153,6 +154,37 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
 
     score_threshold_percentage = components[IDS.score_threshold_percentage]
     assert score_threshold_percentage.min == 1
+
+
+def test_the_score_threshold_percentage_stops_at_twice_the_pb(monkeypatch):
+    """A slip such as 9500 drew the line at 95 times the PB, above every run.
+
+    Strict, not Mantine's default clamp on blur: the field also sends on
+    Enter, before any blur, so a value over the maximum reached the chart.
+    """
+    field = _layout_components(monkeypatch)[IDS.score_threshold_percentage]
+
+    assert field.min == 1
+    assert field.max == chart_options.SCORE_THRESHOLD_PERCENTAGE_MAX == 200
+    assert field.clampBehavior == "strict"
+
+
+def test_bundled_number_input_keeps_its_steppers_out_of_the_accessibility_tree():
+    """Pin why the field's two stepper buttons need no accessible name.
+
+    The bundled Mantine draws them ``aria-hidden`` and out of the tab order, and
+    the field itself steps with the arrow keys, so assistive technology never
+    meets an unnamed button. No prop reaches the buttons to name them. A
+    failure here means an upgrade exposed them: name them or hide them again.
+    """
+    bundle = DMC_BUNDLE.read_text(encoding="utf-8")
+
+    for direction in ("up", "down"):
+        stepper = (
+            r'tabIndex:-1,"aria-hidden":!0,disabled:[^}]*?'
+            rf'mod:\{{direction:"{direction}"\}}'
+        )
+        assert len(re.findall(stepper, bundle)) == 1
 
 
 def test_help_texts_state_the_ratified_copy_with_control_names_in_bold(monkeypatch):

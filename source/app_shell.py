@@ -428,6 +428,16 @@ clientside_callback(
 )
 
 
+# Each header link's tooltip and its accessible name. A link shows only a
+# logo, which ``local_icon`` hides from assistive technology, and a tooltip is
+# no accessible name, so without the ``aria-label`` a screen reader announces
+# the bare address.
+DISCORD_LINK_LABEL = "Contact me via Discord: MingoDynasty"
+# Plain again: the build identity is the settings page's to show, not a thing
+# to be found by hovering a repo link.
+GITHUB_LINK_LABEL = "View this app on GitHub"
+
+
 discord_component = dmc.Tooltip(
     dmc.Anchor(
         local_icon(
@@ -435,8 +445,9 @@ discord_component = dmc.Tooltip(
             width=40,
         ),
         href="https://discordapp.com/users/222910150636339211",
+        **{"aria-label": DISCORD_LINK_LABEL},
     ),
-    label="Contact me via Discord: MingoDynasty",
+    label=DISCORD_LINK_LABEL,
 )
 
 
@@ -444,10 +455,9 @@ github_component = dmc.Tooltip(
     dmc.Anchor(
         local_icon("ion:logo-github", width=40),
         href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+        **{"aria-label": GITHUB_LINK_LABEL},
     ),
-    # Plain again: the build identity is the settings page's to show, not a
-    # thing to be found by hovering a repo link.
-    label="View this app on GitHub",
+    label=GITHUB_LINK_LABEL,
 )
 
 

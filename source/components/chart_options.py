@@ -103,6 +103,7 @@ CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
 # move: changing a persisted control's layout default silently discards every
 # value the browser already stored under its id.
 CHART_OPTIONS_FIELD_CLASS = "chart-options-field"
+SCORE_THRESHOLD_PERCENTAGE_MAX = 200
 POINT_COLOR_DEFAULT = ""
 # The empty field previews the generated point color. Mantine paints the
 # preview of an empty ColorInput white, so the stylesheet repaints it from
@@ -487,6 +488,13 @@ def chart_options_panel(ids: ChartOptionsIds) -> dmc.Paper:
                             SETTINGS_HELP_TEXT["score-threshold-percentage"],
                         ),
                         min=1,
+                        # Twice the PB leaves room for any goal past it,
+                        # while a slip such as 9500 can't draw the line far
+                        # above the runs and squeeze them into the foot of
+                        # the chart. Strict, because the field also sends on
+                        # Enter, and the default clamp acts only on blur.
+                        max=SCORE_THRESHOLD_PERCENTAGE_MAX,
+                        clampBehavior="strict",
                         persistence=True,
                         placeholder="Percentage",
                         radius="sm",

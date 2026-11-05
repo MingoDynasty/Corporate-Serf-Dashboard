@@ -92,7 +92,8 @@ and [product.md](../product.md). Leaderboard placement is worded
   store, never by the URL change
   ([2026-04-29](../decision_log/2026/2026-04-29-drive-playlist-table-loads-from-mounted-route-state.md)).
   An unknown code renders "No imported playlist has the code {code}."; no
-  code renders "Select a playlist from the Playlists page."
+  code renders "Select a playlist from the Playlists page."; a playlist with
+  no scenarios renders "This playlist has no scenarios."
 
 ## The overview
 
@@ -184,6 +185,9 @@ and [product.md](../product.md). Leaderboard placement is worded
   hidden. Turn on the **Show hidden** switch to manage them." instead, the
   control name rendered bold
   ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
+- Neither grid draws AG Grid's "No Rows To Show" over an empty grid: the
+  status line beside the filter is the one place that says why it is empty.
+  A filter that matches no row still shows AG Grid's "No Matching Rows".
 - Both grids feed their quick filter into AG Grid's built-in one client-side.
   Both log AG Grid's `columnSizeOptions` warning on every mount
   ([2026-07-18](../decision_log/2026/2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning.md)).

@@ -1627,6 +1627,10 @@ it.
   [2026-08-20][points],
   [2026-10-13][retired];
   label casing as amended by [2026-09-14][copy]).
+  The percentage's maximum is 200, twice the PB. The field refuses a
+  keystroke or a paste that would take it outside 1 to 200, so a value out
+  of range is never sent, on Enter or on losing focus. A value above 200
+  that a browser stored before the maximum keeps until it is replaced.
   Overlays ends with the typical score's three switches, after "PB score":
   "Typical score", "Middle 50%" and "Middle 80%", all on
   ([TS7][typical-switches]).
