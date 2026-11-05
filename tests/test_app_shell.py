@@ -2,6 +2,7 @@ from collections import deque
 from pathlib import Path
 
 import dash_mantine_components as dmc
+import pytest
 from dash import dcc
 from dash._callback import GLOBAL_CALLBACK_LIST
 
@@ -78,6 +79,27 @@ def test_theme_toggle_is_wrapped_in_tooltip():
 def test_github_tooltip_is_a_plain_link_label():
     """The build identity lives on the settings page, not behind this hover."""
     assert app_shell.github_component.label == "View this app on GitHub"
+
+
+@pytest.mark.parametrize(
+    ("tooltip", "name"),
+    [
+        (app_shell.discord_component, "Contact me via Discord: MingoDynasty"),
+        (app_shell.github_component, "View this app on GitHub"),
+    ],
+    ids=["discord", "github"],
+)
+def test_each_header_link_is_named_by_its_tooltip(tooltip, name):
+    """The link shows only a logo hidden from assistive technology.
+
+    A tooltip is no accessible name, so without the label a screen reader
+    announces the bare address.
+    """
+    anchor = tooltip.children
+
+    assert isinstance(anchor, dmc.Anchor)
+    assert tooltip.label == name
+    assert anchor.to_plotly_json()["props"]["aria-label"] == name
 
 
 def test_color_scheme_is_restored_before_styles_load():
