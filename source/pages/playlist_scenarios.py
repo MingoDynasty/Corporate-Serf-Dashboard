@@ -632,6 +632,10 @@ def load_playlist_scenario_rows(playlist_code):
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
         return [], f"No imported playlist has the code {playlist_code}.", None, True
+    # The grid draws nothing of its own over no rows, so this line is the only
+    # thing on screen that can say why it is empty.
+    if not playlist.scenarios:
+        return [], "This playlist has no scenarios.", None, True
 
     generation_token = uuid4().hex
     typical = take_typical_snapshot(scenario.name for scenario in playlist.scenarios)
@@ -1116,6 +1120,10 @@ def layout(
                     # choice and rows are ready, whichever arrives last.
                     "loading": True,
                     "animateRows": False,
+                    # The status line says why the grid is empty, so the
+                    # grid's own "No Rows To Show" would only repeat it in
+                    # another voice.
+                    "suppressOverlays": ["noRows"],
                     "tooltipShowDelay": 0,
                     # Every row is drawn, in view or not. The browser's own
                     # text search finds only what is in the page, and the

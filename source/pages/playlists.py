@@ -1246,6 +1246,10 @@ def layout(**kwargs):  # noqa: ARG001
                 dashGridOptions={
                     **COLUMNS_MENU_GRID_OPTIONS,
                     "animateRows": False,
+                    # The status line says why the grid is empty, so the
+                    # grid's own "No Rows To Show" would only repeat it in
+                    # another voice.
+                    "suppressOverlays": ["noRows"],
                     "tooltipShowDelay": 0,
                     # Every row is drawn, in view or not. The browser's own
                     # text search finds only what is in the page, and the

@@ -1888,6 +1888,38 @@ def test_playlist_scenarios_page_handles_missing_playlist_code():
     assert disabled is True
 
 
+def test_playlist_scenarios_page_says_a_playlist_has_no_scenarios(monkeypatch):
+    """The grid draws nothing over no rows, so the status line has to say why."""
+    playlist = PlaylistData(name="Empty", code="EmptyCode", scenarios=[])
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "start_playlist_scenario_fill",
+        lambda *_args, **_kwargs: pytest.fail("no scenarios leaves nothing to fill"),
+    )
+
+    rows, status, generation, disabled = playlist_scenarios.load_playlist_scenario_rows(
+        playlist.code
+    )
+
+    assert rows == []
+    assert status == "This playlist has no scenarios."
+    assert generation is None
+    assert disabled is True
+
+
+@pytest.mark.parametrize("page", ["overview", "scenarios"])
+def test_an_empty_playlist_grid_leaves_its_explanation_to_the_status_line(page):
+    """AG Grid's own "No Rows To Show" sat under the status line's message."""
+    grid = (
+        playlists.layout().children[-1]
+        if page == "overview"
+        else playlist_scenarios.layout("KovaaKsTestCode").children[-1]
+    )
+
+    assert grid.dashGridOptions["suppressOverlays"] == ["noRows"]
+
+
 def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
     playlist = PlaylistData(
         name="Voltaic Benchmarks",
