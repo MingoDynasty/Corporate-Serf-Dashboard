@@ -341,6 +341,15 @@ a.run-toast-link {
     grid-row: 1;
 }
 
+/* The link's icon, then its words, centered on one line. A flex box because
+   inline the 18px icon sits on local_icon's -0.125em baseline nudge, above
+   the words' middle, and makes the link's line taller than the words'. */
+.run-history-playlist-table-link a {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+}
+
 /* The Follow switch under the scenario dropdown, on one 16px line: the
    switch's xs track, its text at the dropdown labels' 14px (a switch's label
    otherwise takes the page's 16px), and the 16px help icon. */

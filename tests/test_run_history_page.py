@@ -1524,6 +1524,17 @@ def test_the_link_is_placed_on_the_labels_line():
     assert "grid-row: 1;" in link
 
 
+def test_the_links_icon_is_centered_on_its_words_line():
+    """Inline, the icon sat on its baseline nudge and made the line taller."""
+    anchor = _css_block(
+        STYLESHEET.read_text(encoding="utf-8"), ".run-history-playlist-table-link a"
+    )
+
+    assert "display: flex;" in anchor
+    assert "align-items: center;" in anchor
+    assert "gap: 4px;" in anchor
+
+
 def test_the_follow_switch_sits_under_the_scenario_dropdown_on_a_16px_line():
     """The maintainer's choice on PR #380: under the dropdown, and small.
 
