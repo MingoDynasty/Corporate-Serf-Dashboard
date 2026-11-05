@@ -130,11 +130,13 @@ times that name or order runs remain absolute ([T4][card-order]).
   the scenario select. The column joins a line at 260px and grows to 420px
   with the room the row has. It sets the row's height: 141px at 2560px.
 - The "Open scenario table" link sits at the right end of the Playlist
-  filter label's line while a playlist is selected. The Follow switch is
-  small, its text at the dropdown labels' 14px with a 16px help icon, on a
-  16px line. Neither is inside a label: each dropdown's accessible name is
-  its label alone, and keyboard focus and a screen reader reach the link and
-  the switch after their dropdown.
+  filter label's line while a playlist is selected. Its words follow the
+  navbar's Playlists icon at 18px, centered on their line. The icon is
+  hidden from a screen reader, so the link's name is its words. The Follow
+  switch is small, its text at the dropdown labels' 14px with a 16px help
+  icon, on a 16px line. Neither is inside a label: each dropdown's
+  accessible name is its label alone, and keyboard focus and a screen reader
+  reach the link and the switch after their dropdown.
 - The two dropdowns and the Follow switch persist in the browser. The Follow
   switch carries a help tooltip: "Automatically selects the scenario you just
   played when a new run is detected. If the **Playlist filter** doesn't list

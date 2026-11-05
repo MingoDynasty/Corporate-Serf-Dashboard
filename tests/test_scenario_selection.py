@@ -18,10 +18,12 @@ from dash import no_update
 from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 from source.components import scenario_selection
+from source.components.local_icon import local_icon
 from source.config import settings_service
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
+from source import app_shell  # noqa: E402
 from source.pages import run_history  # noqa: E402
 
 IDS = run_history.SCENARIO_SELECTION_IDS
@@ -280,22 +282,56 @@ def test_select_playlist_ignores_stale_persisted_names(playlist_lists):
     assert scenarios == ["KovaaKsAlpha Scenario"]
 
 
-def test_select_playlist_links_the_selection_to_its_scenario_table(playlist_lists):
-    """The way back from a scenario to the table it was opened from."""
+def _scenario_table_anchor() -> dmc.Anchor:
     _scenarios, link, _options = scenario_selection.select_playlist(
         "KovaaKsAlpha", None, None
     )
-
     (anchor,) = [
         component
         for component in _walk_components(link)
         if isinstance(component, dmc.Anchor)
     ]
-    assert anchor.children == "Open scenario table"
+    return anchor
+
+
+def test_select_playlist_links_the_selection_to_its_scenario_table(playlist_lists):
+    """The way back from a scenario to the table it was opened from."""
+    anchor = _scenario_table_anchor()
+
+    _icon, words = anchor.children
+    assert words == "Open scenario table"
     # The bare route: no ``?sort=``, so the table opens in playlist order.
     assert anchor.href == "/playlists/KovaaKsAlpha"
     # In-app navigation, as every other internal link on the page.
     assert anchor.refresh is False
+
+
+def test_the_scenario_table_link_is_named_by_its_words_alone(playlist_lists):
+    """The icon is decoration: a screen reader hears "Open scenario table".
+
+    A link's name is its text when nothing labels it, and a hidden icon adds
+    nothing to that text. An ``aria-label`` would replace the words, and an
+    icon left exposed would add an unnamed image to the name.
+    """
+    anchor = _scenario_table_anchor()
+
+    icon, words = anchor.children
+    assert "aria-label" not in anchor.to_plotly_json()["props"]
+    assert icon.to_plotly_json()["props"]["aria-hidden"] == "true"
+    assert getattr(icon, "children", None) is None
+    assert words == "Open scenario table"
+
+
+def test_the_scenario_table_link_carries_the_navbars_playlists_icon(playlist_lists):
+    """The table is a Playlists page, so the link marks it as the navbar does."""
+    icon, _words = _scenario_table_anchor().children
+    navbar_icons = {label: name for _id, label, _href, name in app_shell.NAVBAR_LINKS}
+
+    expected = local_icon(navbar_icons["Playlists"], width=18)
+    assert icon.to_plotly_json() == expected.to_plotly_json()
+    # 18px beside the link's 14px words, as the Import button has it, and no
+    # taller than the 20px line the words take.
+    assert icon.style["width"] == icon.style["height"] == 18
 
 
 @pytest.mark.parametrize("selected_playlist", [None, "", "KovaaKsGoneCode"])

@@ -23,6 +23,7 @@ from typing import Any, NamedTuple
 import dash_mantine_components as dmc
 from dash import Input, NoUpdate, Output, State, callback, ctx, no_update
 
+from source.components.local_icon import local_icon
 from source.config.settings_service import get_usable_stats_dir
 from source.kovaaks.data_service import (
     get_playlist_by_code,
@@ -36,6 +37,10 @@ from source.kovaaks.playlist_visibility_service import (
 )
 
 PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
+# The navbar's Playlists icon. The table is a Playlists page, and the navbar
+# marks Playlists while it is open, so the link and the navbar mark the one
+# destination alike.
+PLAYLIST_TABLE_LINK_ICON = "material-symbols:playlist-play"
 # Marks a dropdown's input for ``assets/selectHighlightOnOpen.js``, which
 # highlights the selected name when the list opens. dmc's
 # ``clearSearchOnFocus`` buys the same click-and-type search by emptying the
@@ -127,7 +132,12 @@ def _playlist_table_link(playlist_code: str) -> dmc.Text:
     """Build the link from the playlist filter to that playlist's scenario table."""
     return dmc.Text(
         dmc.Anchor(
-            PLAYLIST_TABLE_LINK_LABEL,
+            [
+                # ``local_icon`` hides the icon from assistive technology, so
+                # the link's name is its words alone.
+                local_icon(PLAYLIST_TABLE_LINK_ICON, width=18),
+                PLAYLIST_TABLE_LINK_LABEL,
+            ],
             # The bare path, with no ``?sort=``: the table opens in playlist
             # order, as it does from the Playlists page.
             href=f"/playlists/{playlist_code}",
