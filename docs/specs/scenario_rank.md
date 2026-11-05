@@ -101,6 +101,8 @@ benchmark tier) — see the
   logged at WARNING, and the playlists overview counts that scenario
   unresolved until the total refreshes. `rank == total_players` still derives
   ([2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)).
+  When the total was stored before the position, the next lookup that may
+  fetch re-reads it, as [Caching](#caching) says.
 
 ## On Run History
 
@@ -143,6 +145,17 @@ benchmark tier) — see the
   rank cache and the leaderboard-total TTL alike, so a live position meets a
   week-old count only when the total re-read fails, which the result marks
   ([2026-09-19](../decision_log/2026/2026-09-19-a-clicked-refresh-re-reads-the-leaderboard-total.md)).
+- The leaderboard-total TTL also gives way once to a TTL-fresh total that sits
+  below a position read after the total was stored. A lookup that may fetch
+  re-reads that total, which brings the percentile back on a board that grew:
+  a Run History lookup, the playlist scenarios fill's network phase, and the
+  percentile warmup worker, which counts such a scenario unsatisfied rather
+  than skipping it as fresh. A total read after the position that still sits
+  below it is not re-read again, because the position is then the stale side,
+  so the re-read happens once per stored position. A failed re-read keeps the
+  cached total, as every failed total read does, and the next lookup that may
+  fetch tries again. Cache-only reads never take it
+  ([2026-11-05](../decision_log/2026/2026-11-05-a-fresh-total-a-later-rank-outruns-is-re-read-once.md)).
 - Every automatic rank-cache write routes through one process-locked
   monotonic writer, so a lower score or transient `UNRANKED` result never
   replaces a known better value; only a user-clicked Refresh is

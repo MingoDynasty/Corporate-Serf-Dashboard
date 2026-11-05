@@ -1,6 +1,10 @@
 # 2026-09-20: A Rank Above The Known Total Suppresses The Percentile
 
-Status: Accepted
+Status: Accepted (amended by
+[2026-11-05](2026-11-05-a-fresh-total-a-later-rank-outruns-is-re-read-once.md):
+the self-heal its Not done paragraph deferred has landed, so on a board that
+grew a lookup that may fetch re-reads the total once, and opening the playlist
+clears the placeholder again)
 
 A scenario's position and its leaderboard's player count are fetched and cached
 separately, so a current position can be paired with an older, smaller count
@@ -71,4 +75,6 @@ condition so the warmup worker stops skipping the scenario as satisfied. It
 covers only a board that grew. If a board ever loses rows, the stale side is
 the rank, and a total re-read heals nothing. Suppression is the right floor
 either way, which is why the self-heal is a separable follow-up rather than
-part of this guard.
+part of this guard. It shipped in
+[2026-11-05](2026-11-05-a-fresh-total-a-later-rank-outruns-is-re-read-once.md),
+bounded to a total stored before the rank, so it re-reads once per stored rank.
