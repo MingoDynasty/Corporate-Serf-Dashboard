@@ -1021,6 +1021,16 @@ def resolve_leaderboard_id(
                 username,
                 request_exception_summary(exc),
             )
+        except OSError as exc:
+            # A failed cache write, such as a file where a cache folder belongs.
+            # It must follow the requests handler: a ``requests`` exception is
+            # an ``OSError`` too, and has to be logged through its summary.
+            logger.warning(
+                "Could not write the cache while hydrating leaderboard metadata "
+                'for "%s"; continuing without it: %s',
+                username,
+                exc,
+            )
         leaderboard_id = get_cached_leaderboard_id(scenario_name)
         if leaderboard_id is not None:
             return leaderboard_id
@@ -1148,6 +1158,41 @@ def _save_rank_monotonic(
             return existing, False
         save_scenario_rank(leaderboard_id, username, candidate)
         return candidate, True
+
+
+def _save_rank_best_effort(
+    leaderboard_id: int,
+    username: str,
+    candidate: ScenarioRankInfo,
+    allow_regression: bool = False,
+) -> ScenarioRankInfo:
+    """Save a looked-up rank through the monotonic writer and return what to serve.
+
+    A rank cache that can't be written (a file where its folder belongs, a
+    read-only rank file) must not cost the lookup the rank it already holds, so
+    a failed write logs one warning naming the file and serves ``candidate``
+    unsaved. That is what a successful write would have returned: the writer
+    only writes once it has chosen ``candidate`` over the stored rank. The
+    guard wraps the writer instead of living in it because the background
+    writers handle a failed save themselves.
+    """
+    try:
+        winner, _ = _save_rank_monotonic(
+            leaderboard_id,
+            username,
+            candidate,
+            allow_regression,
+        )
+    except OSError as exc:
+        logger.warning(
+            'Could not save the position for "%s" to rank cache file "%s"; '
+            "serving it unsaved: %s",
+            candidate.scenario_name,
+            _rank_cache_file(leaderboard_id, username),
+            exc,
+        )
+        return candidate
+    return winner
 
 
 def _leaderboard_total_cache_file(leaderboard_id: int) -> Path:
@@ -1843,7 +1888,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
                     update={"scenario_name": scenario_name}
                 )
                 if allow_network:
-                    cached_rank, _ = _save_rank_monotonic(
+                    cached_rank = _save_rank_best_effort(
                         leaderboard_id,
                         username,
                         cached_rank,
@@ -1942,7 +1987,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
                 request_exception_summary(exc),
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-    rank_info, _ = _save_rank_monotonic(
+    rank_info = _save_rank_best_effort(
         leaderboard_id,
         username,
         rank_info,

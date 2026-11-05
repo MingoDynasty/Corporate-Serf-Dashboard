@@ -160,6 +160,15 @@ benchmark tier) — see the
   neither does a cache entry written without a time. The age is worded in the
   browser and re-worded every 30 seconds. The playlist pages show no such time
   ([2026-10-04](../decision_log/2026/2026-10-04-the-position-value-says-when-it-was-last-updated.md)).
+- A cache write that fails during a lookup does not cost the lookup its
+  result. When the monotonic writer can't store the position a lookup holds,
+  such as with a file where the rank folder belongs, the lookup serves that
+  position unsaved and logs one warning naming the file. The Run History line
+  re-reads the cache on every poll, so there the unsaved position, and its
+  time, give way at the next poll to whatever the cache holds. When
+  `total-play` hydration can't write its cache or the mapping, it logs one
+  warning and resolution goes on to the exact-name search, as it does when the
+  `total-play` request fails.
 
 ## HTTP behavior
 
