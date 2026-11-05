@@ -120,12 +120,21 @@ console lines quoted here are plain console output, not app notifications.
   Dashboard: the release is not ready yet -- try again shortly." and
   returns; the temp file is not deleted
   ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
+  Any other failure of either fetch prints "Corporate Serf Dashboard:
+  download incomplete or failed (<reason>)." and returns. In the shim, the
+  installer, and the launcher alike, that reason is `HTTP <status>` when the
+  server answered, and otherwise the message of the error underneath (a
+  timeout, a refused connection, a zip that will not open). The shim runs
+  under `$ErrorActionPreference = 'Stop'` and, because iex runs it in the
+  caller's own scope, puts the caller's preference back on every way out,
+  its `return`s included.
 - `install.ps1` installs `-Tag` (pinned), else `-LatestTag` (unpinned), else
   the tag `releases/latest` resolves; with no release published it stops
-  with "no release is published yet -- try again shortly." It then reads the
-  tag's `release.json`, stops on a `schema_version` other than 1 ("Re-run
-  the install one-liner to get the matching installer.") or a missing
-  `tag`, `sha`, `commit_date`, `uv_version`, or `source_asset`
+  with "no release is published yet -- try again shortly.", and on any other
+  failure of that lookup with "download incomplete or failed (<reason>)." It
+  then reads the tag's `release.json`, stops on a `schema_version` other
+  than 1 ("Re-run the install one-liner to get the matching installer.") or
+  a missing `tag`, `sha`, `commit_date`, `uv_version`, or `source_asset`
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - The install root defaults to `%LOCALAPPDATA%\CorporateSerfDashboard`
   (`-InstallRoot` overrides). The toolchain is app-local: uv at
@@ -135,7 +144,12 @@ console lines quoted here are plain console output, not app notifications.
   `uv-cache\`. The uv version comes from the release, not the install
   ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
 - The zip is downloaded from the release's `source_asset`; a 404 falls back
-  to `archive/refs/tags/<tag>.zip`. Exactly one top-level directory is
+  to `archive/refs/tags/<tag>.zip`. Any other failure of the download, a
+  failed fallback, or a zip that will not extract deletes `tmp\<tag>.zip`
+  and stops with "download incomplete or failed (<reason>)." A dropped
+  transfer is the last kind: `Invoke-WebRequest -OutFile` keeps the partial
+  file without an error, so only extraction finds it. Exactly one
+  top-level directory is
   required, its name discovered after extraction; the extracted
   `version.txt` must contain the release's `sha`; then it is moved to
   `versions\<tag>\`, `release.json` is written beside it byte-for-byte, and
@@ -309,6 +323,11 @@ console lines quoted here are plain console output, not app notifications.
   replaced. "Starting <tag> (pending activation) ..." starts it with a fresh
   token and `Wait-AppReady` gates it on that release's `sha`
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
+  A download or extraction that fails as the installer's would deletes
+  `tmp\<tag>.zip` and fails the update with the reason "download incomplete
+  or failed (<reason>)", so the user reads "Update to <tag> failed
+  (download incomplete or failed (<reason>)); starting the installed
+  version."
 - On `ready` the manifest is rewritten atomically to the new tag, SHA, and
   date with policy `latest`, "Updated to <tag>." prints, the browser opens
   when `open_browser_on_launch` is on, the previous version is kept and
@@ -330,9 +349,14 @@ console lines quoted here are plain console output, not app notifications.
   newer release appears
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `Remove-PrunedVersions` keeps the active tag plus the replaced tag when it
-  still exists, else the most recently written other directory, and deletes
-  the rest ("Pruned old version <tag>."; a failure is a `WARNING:`)
+  still exists, else the most recently written other directory that holds
+  `.venv\Scripts\python.exe`, and deletes the rest ("Pruned old version
+  <tag>."; a failure is a `WARNING:`)
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
+  A plain or fallback start names no replaced tag, so a directory that a
+  failed update left without a venv interpreter is never kept over the last
+  version that ran; with no other directory holding one, only the active tag
+  is kept.
 - `Update-Bootstrap` replaces the root `launch.ps1` only when the installed
   release's template carries a higher `csd-bootstrap-version` marker: it
   writes `launch.ps1.new` beside it, checks the copy's marker and parses it

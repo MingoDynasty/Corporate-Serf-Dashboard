@@ -10,52 +10,67 @@
 #
 # Runs under iex, so: no param block, no functions (they would leak into the
 # caller's session), and `return` -- never `exit`, which could close the
-# user's console.
+# user's console. iex also runs this in the caller's own scope, so the
+# caller's $ErrorActionPreference is put back on every way out; left at Stop,
+# any later error in that console would end the command that hit it.
 #
 # Targets Windows PowerShell 5.1.
 
-$ErrorActionPreference = 'Stop'
-[System.Net.ServicePointManager]::SecurityProtocol = `
-    [System.Net.ServicePointManager]::SecurityProtocol -bor `
-    [System.Net.SecurityProtocolType]::Tls12
-
-$csdRepo = 'MingoDynasty/Corporate-Serf-Dashboard'
-$csdNotReady = 'Corporate Serf Dashboard: the release is not ready yet -- try again shortly.'
-
-$csdRelease = $null
+$csdCallerPreference = $ErrorActionPreference
 try {
-    $csdRelease = Invoke-RestMethod -UseBasicParsing -TimeoutSec 30 `
-        -Uri "https://api.github.com/repos/$csdRepo/releases/latest"
-} catch {
-    $csdStatus = 0
-    try { $csdStatus = [int]$_.Exception.Response.StatusCode } catch { }
-    if ($csdStatus -eq 404) { Write-Host $csdNotReady; return }
-    throw
-}
-$csdTag = [string]$csdRelease.tag_name
+    $ErrorActionPreference = 'Stop'
+    [System.Net.ServicePointManager]::SecurityProtocol = `
+        [System.Net.ServicePointManager]::SecurityProtocol -bor `
+        [System.Net.SecurityProtocolType]::Tls12
 
-$csdInstaller = $null
-try {
-    $csdInstaller = Invoke-WebRequest -UseBasicParsing -TimeoutSec 30 `
-        -Uri "https://raw.githubusercontent.com/$csdRepo/$csdTag/install.ps1"
-} catch {
-    $csdStatus = 0
-    try { $csdStatus = [int]$_.Exception.Response.StatusCode } catch { }
-    if ($csdStatus -eq 404) { Write-Host $csdNotReady; return }
-    throw
-}
+    $csdRepo = 'MingoDynasty/Corporate-Serf-Dashboard'
+    $csdNotReady = 'Corporate Serf Dashboard: the release is not ready yet -- try again shortly.'
 
-# Run from a file rather than iex so the installer's param block works and
-# its `exit` cannot close the user's console. The file runs in a child
-# Windows PowerShell with a process-scoped Bypass: stock clients default to
-# the Restricted execution policy, which runs piped iex content but refuses
-# script FILES -- invoking the temp file directly would die with "running
-# scripts is disabled". The child also guarantees 5.1 semantics even when
-# the one-liner was pasted into pwsh.
-$csdContent = $csdInstaller.Content
-if ($csdContent -is [byte[]]) { $csdContent = [System.Text.Encoding]::UTF8.GetString($csdContent) }
-$csdInstallerPath = Join-Path $env:TEMP "csd-install-$csdTag.ps1"
-[System.IO.File]::WriteAllText($csdInstallerPath, [string]$csdContent, `
-        [System.Text.UTF8Encoding]::new($false))
-& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile `
-    -ExecutionPolicy Bypass -File $csdInstallerPath -LatestTag $csdTag @args
+    $csdRelease = $null
+    try {
+        $csdRelease = Invoke-RestMethod -UseBasicParsing -TimeoutSec 30 `
+            -Uri "https://api.github.com/repos/$csdRepo/releases/latest"
+    } catch {
+        $csdStatus = 0
+        try { $csdStatus = [int]$_.Exception.Response.StatusCode } catch { }
+        if ($csdStatus -eq 404) { Write-Host $csdNotReady; return }
+        # The error record's own text is the response body, which names
+        # neither the status nor what failed.
+        $csdReason = "HTTP $csdStatus"
+        if (-not $csdStatus) { $csdReason = $_.Exception.GetBaseException().Message.TrimEnd('.') }
+        Write-Host "Corporate Serf Dashboard: download incomplete or failed ($csdReason)."
+        return
+    }
+    $csdTag = [string]$csdRelease.tag_name
+
+    $csdInstaller = $null
+    try {
+        $csdInstaller = Invoke-WebRequest -UseBasicParsing -TimeoutSec 30 `
+            -Uri "https://raw.githubusercontent.com/$csdRepo/$csdTag/install.ps1"
+    } catch {
+        $csdStatus = 0
+        try { $csdStatus = [int]$_.Exception.Response.StatusCode } catch { }
+        if ($csdStatus -eq 404) { Write-Host $csdNotReady; return }
+        $csdReason = "HTTP $csdStatus"
+        if (-not $csdStatus) { $csdReason = $_.Exception.GetBaseException().Message.TrimEnd('.') }
+        Write-Host "Corporate Serf Dashboard: download incomplete or failed ($csdReason)."
+        return
+    }
+
+    # Run from a file rather than iex so the installer's param block works and
+    # its `exit` cannot close the user's console. The file runs in a child
+    # Windows PowerShell with a process-scoped Bypass: stock clients default to
+    # the Restricted execution policy, which runs piped iex content but refuses
+    # script FILES -- invoking the temp file directly would die with "running
+    # scripts is disabled". The child also guarantees 5.1 semantics even when
+    # the one-liner was pasted into pwsh.
+    $csdContent = $csdInstaller.Content
+    if ($csdContent -is [byte[]]) { $csdContent = [System.Text.Encoding]::UTF8.GetString($csdContent) }
+    $csdInstallerPath = Join-Path $env:TEMP "csd-install-$csdTag.ps1"
+    [System.IO.File]::WriteAllText($csdInstallerPath, [string]$csdContent, `
+            [System.Text.UTF8Encoding]::new($false))
+    & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile `
+        -ExecutionPolicy Bypass -File $csdInstallerPath -LatestTag $csdTag @args
+} finally {
+    $ErrorActionPreference = $csdCallerPreference
+}
