@@ -395,14 +395,20 @@ function Show-AppFailure([string]$Context) {
 
 function Remove-PrunedVersions([string]$ActiveTag, [string]$PreviousTag) {
     # Keep the active version plus one fallback: the version just replaced
-    # when known, otherwise the most recently written other directory.
+    # when known, otherwise the most recently written other directory that
+    # holds a venv interpreter. A failed update can leave its tag's directory
+    # half-staged, and it is newer than every version that ran: picked by
+    # date alone, it was kept and the last good version pruned.
     $versionsDir = Join-Path $InstallRoot 'versions'
     $others = @(Get-ChildItem -LiteralPath $versionsDir -Directory | Where-Object { $_.Name -ne $ActiveTag })
     $keep = @($ActiveTag)
     if ($PreviousTag -and ($others | Where-Object { $_.Name -eq $PreviousTag })) {
         $keep += $PreviousTag
-    } elseif ($others.Count -gt 0) {
-        $keep += ($others | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+    } else {
+        $runnable = @($others | Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.venv\Scripts\python.exe') })
+        if ($runnable.Count -gt 0) {
+            $keep += ($runnable | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+        }
     }
     foreach ($dir in $others) {
         if ($keep -notcontains $dir.Name) {

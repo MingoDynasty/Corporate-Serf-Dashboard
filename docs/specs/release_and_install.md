@@ -330,9 +330,14 @@ console lines quoted here are plain console output, not app notifications.
   newer release appears
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
 - `Remove-PrunedVersions` keeps the active tag plus the replaced tag when it
-  still exists, else the most recently written other directory, and deletes
-  the rest ("Pruned old version <tag>."; a failure is a `WARNING:`)
+  still exists, else the most recently written other directory that holds
+  `.venv\Scripts\python.exe`, and deletes the rest ("Pruned old version
+  <tag>."; a failure is a `WARNING:`)
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
+  A plain or fallback start names no replaced tag, so a directory that a
+  failed update left without a venv interpreter is never kept over the last
+  version that ran; with no other directory holding one, only the active tag
+  is kept.
 - `Update-Bootstrap` replaces the root `launch.ps1` only when the installed
   release's template carries a higher `csd-bootstrap-version` marker: it
   writes `launch.ps1.new` beside it, checks the copy's marker and parses it

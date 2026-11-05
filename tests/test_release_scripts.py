@@ -859,3 +859,83 @@ def test_an_install_without_a_shortcut_still_finishes(
     assert (root / "install.json").is_file()
     assert (root / "launch.ps1").is_file()
     assert not (root / "tmp").exists()
+
+
+# Defines every function of the script named by the driver's second argument,
+# in the driver's own scope, the way the script itself would.
+_DEFINE_FUNCTIONS = """
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($args[1], [ref]$null, [ref]$null)
+foreach ($function in $ast.FindAll({
+        param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)) {
+    Invoke-Expression $function.Extent.Text
+}
+"""
+
+# Prunes the way a plain start does: no version was just replaced.
+_PRUNE_DRIVER = f"""
+$ErrorActionPreference = 'Stop'
+$InstallRoot = $args[0]
+{_DEFINE_FUNCTIONS}
+Remove-PrunedVersions -ActiveTag $args[2] -PreviousTag ''
+"""
+
+
+def _lay_out_versions(root: Path, venvs: dict[str, bool]) -> None:
+    r"""Create ``versions\<tag>`` oldest first, with or without a venv interpreter."""
+    first_day = 1_767_225_600  # 2026-01-01 UTC
+    for age, (tag, has_venv) in enumerate(venvs.items()):
+        directory = root / "versions" / tag
+        directory.mkdir(parents=True)
+        if has_venv:
+            interpreter = directory / ".venv" / "Scripts" / "python.exe"
+            interpreter.parent.mkdir(parents=True)
+            interpreter.write_bytes(b"")
+        written = first_day + age * 86_400
+        os.utime(directory, (written, written))
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows PowerShell 5.1 only")
+@pytest.mark.parametrize(
+    ("venvs", "kept", "pruned"),
+    [
+        pytest.param(
+            {"v2026.01.01": True, "v2026.01.02": True, "v2026.01.03": False},
+            ["v2026.01.01", "v2026.01.02"],
+            ["v2026.01.03"],
+            id="last good version kept",
+        ),
+        pytest.param(
+            {"v2026.01.01": False, "v2026.01.02": True, "v2026.01.03": False},
+            ["v2026.01.02"],
+            ["v2026.01.01", "v2026.01.03"],
+            id="nothing runnable to keep",
+        ),
+    ],
+)
+def test_pruning_keeps_a_runnable_fallback(
+    tmp_path: Path, venvs: dict[str, bool], kept: list[str], pruned: list[str]
+) -> None:
+    r"""A plain start keeps a fallback that can run, never a half-staged update.
+
+    A failed update can leave its tag's directory under ``versions\`` without
+    a synced environment, and that directory is newer than every version that
+    ran. Chosen by date alone, it was the one kept, and the last version that
+    started was pruned. Only a directory holding ``.venv\Scripts\python.exe``
+    can be the fallback; ``v2026.01.02`` is the active version throughout.
+    """
+    if not WINDOWS_POWERSHELL.is_file():
+        pytest.skip(f"{WINDOWS_POWERSHELL} not found")
+    root = tmp_path / "install-root"
+    _lay_out_versions(root, venvs)
+
+    result = _windows_powershell(
+        tmp_path,
+        _PRUNE_DRIVER,
+        [str(root), str(REPO_ROOT / "scripts" / "launcher.ps1"), "v2026.01.02"],
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert sorted(path.name for path in (root / "versions").iterdir()) == kept
+    assert result.stdout.splitlines() == [
+        f"Pruned old version {tag}." for tag in pruned
+    ]
