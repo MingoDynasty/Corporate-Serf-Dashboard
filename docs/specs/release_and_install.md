@@ -141,9 +141,16 @@ console lines quoted here are plain console output, not app notifications.
   `versions\<tag>\`, `release.json` is written beside it byte-for-byte, and
   `uv sync --locked --no-dev --managed-python` runs there. A reinstall onto
   a tag whose directory already exists parks that directory under `tmp\`
-  first and restores it if the replacement fails before its sync completes
+  first, replacing any copy of that tag already parked there, and restores
+  it if the replacement fails before its sync completes
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md),
   [2026-07-19](../decision_log/2026/2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp.md)).
+- Once the install root exists, every exit removes `tmp\`: a success, an
+  `ERROR:` stop, or an uncaught error. The one exception is an exit short
+  of success while `tmp\` holds a parked copy that may be the only working
+  one of its version: any parked copy, this run's or one an earlier run
+  left, except a copy of the version this run has synced. A restore that
+  fails names the parked copy's path under `tmp\` in its message.
 - Installs ask no questions. With no `config.toml` at the root, the installer
   writes one carrying only `port = 8050` under a comment header; an existing
   `config.toml` and `data/` are never touched ("Keeping the existing
@@ -168,6 +175,10 @@ console lines quoted here are plain console output, not app notifications.
   -File "<root>\launch.ps1"` with the root as working directory; it never
   points into a version directory
   ([2026-07-19](../decision_log/2026/2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract.md)).
+- A shortcut that cannot be written does not fail the install, which is
+  complete by then. A missing Desktop folder, or a failed save, prints
+  "WARNING: could not create the desktop shortcut (<reason>)." and the
+  install goes on to its closing lines and exits 0.
 - Closing lines: "Installed Corporate Serf Dashboard <tag>.", then under a
   pin "This install is PINNED to <tag> and will not auto-update." and
   "Re-run the installer without -Tag to return to automatic updates.", then
@@ -176,6 +187,9 @@ console lines quoted here are plain console output, not app notifications.
   exactly that; nothing outside the root is modified except the shortcut
   and the `%TEMP%` copy of the installer
   ([2026-07-19](../decision_log/2026/2026-07-19-the-installer-brings-its-own-toolchain-app-locally.md)).
+  With no shortcut written, the last two lines are instead 'Launch it with:
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File
+  "<root>\launch.ps1"' and "To uninstall: delete the folder <root>".
 - All scripts target Windows PowerShell 5.1 and are committed BOM-free;
   the bootstrap must carry a `# csd-bootstrap-version: N` marker
   ([2026-07-19](../decision_log/2026/2026-07-19-powershell-writes-utf-8-without-bom-and-forward-slash-paths.md)).

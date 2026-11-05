@@ -51,6 +51,10 @@ $ApiBase = 'https://api.github.com'
 $DownloadBase = 'https://github.com'
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $DefaultPort = 8050
+# Set once this run's version has synced. A copy parked under tmp\ for that
+# version, by this run or an earlier one, is then no longer the only working
+# one, and the cleanup on exit may remove it.
+$VersionSynced = $false
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -160,7 +164,8 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
     # install if the sync fails (network outage, resolver error). Park the
     # existing copy under tmp instead; a rename is same-volume and reversible,
     # and the venv stays valid because restore returns it to its original
-    # path. On success the tmp cleanup at the end of the install removes it.
+    # path. Once the replacement has synced, the tmp cleanup on exit removes
+    # it.
     $backupDir = $null
     if (Test-Path -LiteralPath $targetDir) {
         $backupDir = Join-Path $tempDir "previous-$releaseTag"
@@ -182,6 +187,7 @@ function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe)
         Write-Host "Installing dependencies for $releaseTag ..."
         & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
         if ($LASTEXITCODE -ne 0) { throw "uv sync failed for $releaseTag (exit $LASTEXITCODE)" }
+        $script:VersionSynced = $true
     } catch {
         $message = $_.Exception.Message
         # The restore itself can fail (a lingering handle on the partial
@@ -213,6 +219,28 @@ function Write-FirstRunConfig([int]$Port) {
         "port = $Port"
     )
     Write-FileAtomic -Path (Join-Path $InstallRoot 'config.toml') -Content (($lines -join "`n") + "`n")
+}
+
+function New-DesktopShortcut([string]$DesktopDir) {
+    # Returns whether the shortcut was written. By now the install is
+    # complete and launch.ps1 works, so a shortcut that cannot be written is a
+    # warning, never a failed install. The Desktop folder can be missing (a
+    # OneDrive-redirected Desktop before its first sync, a deleted folder);
+    # GetFolderPath then returns '' rather than a path, and Save() into a
+    # missing folder throws.
+    try {
+        if (-not $DesktopDir) { throw 'the Desktop folder does not exist' }
+        $shell = New-Object -ComObject WScript.Shell
+        $shortcut = $shell.CreateShortcut((Join-Path $DesktopDir 'Corporate Serf Dashboard.lnk'))
+        $shortcut.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+        $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
+        $shortcut.WorkingDirectory = $InstallRoot
+        $shortcut.Save()
+        return $true
+    } catch {
+        Write-Host "WARNING: could not create the desktop shortcut ($($_.Exception.Message))." -ForegroundColor Yellow
+        return $false
+    }
 }
 
 # ---------------------------------------------------------------------------
@@ -264,67 +292,79 @@ $InstallRoot = (Resolve-Path -LiteralPath $InstallRoot).Path
 $env:UV_PYTHON_INSTALL_DIR = Join-Path $InstallRoot 'python'
 $env:UV_CACHE_DIR = Join-Path $InstallRoot 'uv-cache'
 
-$uvExe = Install-UvVersion ([string]$release.uv_version)
-$versionDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
-
-# First-run config. An existing config.toml (and data/) is never touched.
-$configPath = Join-Path $InstallRoot 'config.toml'
-if (Test-Path -LiteralPath $configPath) {
-    Write-Host 'Keeping the existing config.toml.'
-} else {
-    Write-FirstRunConfig -Port $DefaultPort
-    Write-Host "Wrote $configPath (dashboard port $DefaultPort)."
-}
-
-# Round-trip the config through the installed app's own loader BEFORE the
-# manifest or shortcut exist: a config the app cannot parse must fail the
-# install loudly, never surface later as a broken first launch. Using
-# load_config (tomllib underneath, plus the app's schema validation) rather
-# than bare tomllib catches missing/mistyped required fields too -- the
-# config is kept on reinstall, so a schema miss here would never self-heal.
-$python = Join-Path $versionDir '.venv\Scripts\python.exe'
-$env:CSD_STATE_DIR = $InstallRoot
+# Every exit from here on removes tmp\: a success, Stop-Fatal (exit runs
+# finally blocks), an uncaught error, and Ctrl+C. Nothing else would: a
+# later install clears it only by succeeding, and a reinstall stopped after
+# its sync would keep a second full venv parked there. The one exception is
+# a failed exit while tmp\ holds a parked copy that may be the only working
+# one of its version.
+$installed = $false
 try {
-    & $python -c 'from source.config.config_service import load_config; load_config()'
+    $uvExe = Install-UvVersion ([string]$release.uv_version)
+    $versionDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
+
+    # First-run config. An existing config.toml (and data/) is never touched.
+    $configPath = Join-Path $InstallRoot 'config.toml'
+    if (Test-Path -LiteralPath $configPath) {
+        Write-Host 'Keeping the existing config.toml.'
+    } else {
+        Write-FirstRunConfig -Port $DefaultPort
+        Write-Host "Wrote $configPath (dashboard port $DefaultPort)."
+    }
+
+    # Round-trip the config through the installed app's own loader BEFORE the
+    # manifest or shortcut exist: a config the app cannot parse must fail the
+    # install loudly, never surface later as a broken first launch. Using
+    # load_config (tomllib underneath, plus the app's schema validation) rather
+    # than bare tomllib catches missing/mistyped required fields too -- the
+    # config is kept on reinstall, so a schema miss here would never self-heal.
+    $python = Join-Path $versionDir '.venv\Scripts\python.exe'
+    $env:CSD_STATE_DIR = $InstallRoot
+    try {
+        & $python -c 'from source.config.config_service import load_config; load_config()'
+    } finally {
+        Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
+    }
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Fatal "the installed app cannot load $configPath (details above) -- fix or delete it and run the installer again."
+    }
+
+    # Manifest (install.json, schema v1): the authoritative install identity.
+    $manifest = [ordered]@{
+        schema_version = 1
+        tag            = [string]$release.tag
+        sha            = [string]$release.sha
+        commit_date    = [string]$release.commit_date
+        update_policy  = 'latest'
+    }
+    if ($pinned) {
+        $manifest.update_policy = 'pinned'
+        $manifest.pinned_tag = [string]$release.tag
+    }
+    Write-FileAtomic -Path (Join-Path $InstallRoot 'install.json') -Content (($manifest | ConvertTo-Json) + "`n")
+
+    # Stable bootstrap at the root; the shortcut must never point into a
+    # versioned directory, because those get pruned.
+    $bootstrapTemplate = Join-Path $versionDir 'scripts\launch_bootstrap.ps1'
+    if (-not (Test-Path -LiteralPath $bootstrapTemplate)) {
+        Stop-Fatal "release $targetTag ships no scripts\launch_bootstrap.ps1; cannot write launch.ps1."
+    }
+    Write-FileAtomic -Path (Join-Path $InstallRoot 'launch.ps1') -Content ([System.IO.File]::ReadAllText($bootstrapTemplate))
+
+    $shortcutWritten = New-DesktopShortcut ([Environment]::GetFolderPath('Desktop'))
+    $installed = $true
 } finally {
-    Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
+    # Parked copies are read from disk, not tracked by this run: a copy that
+    # an earlier run parked and never put back (its restore failed, or it was
+    # stopped mid-sync) must outlive a retry that fails too. A copy of the
+    # version this run has synced is no longer needed.
+    $tempRoot = Join-Path $InstallRoot 'tmp'
+    $neededCopies = @(Get-ChildItem -LiteralPath $tempRoot -Directory -Filter 'previous-*' -ErrorAction SilentlyContinue |
+        Where-Object { -not ($VersionSynced -and $_.Name -eq "previous-$($release.tag)") })
+    if ($installed -or $neededCopies.Count -eq 0) {
+        Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
-if ($LASTEXITCODE -ne 0) {
-    Stop-Fatal "the installed app cannot load $configPath (details above) -- fix or delete it and run the installer again."
-}
-
-# Manifest (install.json, schema v1): the authoritative install identity.
-$manifest = [ordered]@{
-    schema_version = 1
-    tag            = [string]$release.tag
-    sha            = [string]$release.sha
-    commit_date    = [string]$release.commit_date
-    update_policy  = 'latest'
-}
-if ($pinned) {
-    $manifest.update_policy = 'pinned'
-    $manifest.pinned_tag = [string]$release.tag
-}
-Write-FileAtomic -Path (Join-Path $InstallRoot 'install.json') -Content (($manifest | ConvertTo-Json) + "`n")
-
-# Stable bootstrap at the root; the shortcut must never point into a
-# versioned directory, because those get pruned.
-$bootstrapTemplate = Join-Path $versionDir 'scripts\launch_bootstrap.ps1'
-if (-not (Test-Path -LiteralPath $bootstrapTemplate)) {
-    Stop-Fatal "release $targetTag ships no scripts\launch_bootstrap.ps1; cannot write launch.ps1."
-}
-Write-FileAtomic -Path (Join-Path $InstallRoot 'launch.ps1') -Content ([System.IO.File]::ReadAllText($bootstrapTemplate))
-
-# Desktop shortcut.
-$shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Corporate Serf Dashboard.lnk'
-$shell = New-Object -ComObject WScript.Shell
-$shortcut = $shell.CreateShortcut($shortcutPath)
-$shortcut.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
-$shortcut.WorkingDirectory = $InstallRoot
-$shortcut.Save()
-
-Remove-Item -LiteralPath (Join-Path $InstallRoot 'tmp') -Recurse -Force -ErrorAction SilentlyContinue
 
 Write-Host ''
 Write-Host "Installed Corporate Serf Dashboard $targetTag." -ForegroundColor Green
@@ -332,5 +372,12 @@ if ($pinned) {
     Write-Host "This install is PINNED to $targetTag and will not auto-update." -ForegroundColor Yellow
     Write-Host 'Re-run the installer without -Tag to return to automatic updates.'
 }
-Write-Host 'Launch it from the "Corporate Serf Dashboard" desktop shortcut.'
-Write-Host "To uninstall: delete the shortcut and the folder $InstallRoot"
+if ($shortcutWritten) {
+    Write-Host 'Launch it from the "Corporate Serf Dashboard" desktop shortcut.'
+    Write-Host "To uninstall: delete the shortcut and the folder $InstallRoot"
+} else {
+    # The shortcut's own command, not the bare path: double-clicking a .ps1
+    # does not run it, and the default execution policy refuses to.
+    Write-Host "Launch it with: powershell.exe -NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
+    Write-Host "To uninstall: delete the folder $InstallRoot"
+}
