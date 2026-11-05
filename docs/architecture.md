@@ -276,6 +276,7 @@ flowchart LR
         PlaylistScenarios["playlist_scenarios.py"]
         Journey["aim_training_journey.py"]
         SettingsPage["settings.py"]
+        NotFound["not_found_404.py"]
     end
 
     subgraph SharedUI["Shared UI"]
@@ -822,6 +823,10 @@ flowchart LR
   the current tab
   ([decision log](decision_log/2026/2026-10-12-on-both-playlist-tables-only-the-name-navigates-and-cell-text-can-be-selected.md)).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
+- `not_found_404.py` (`/404`, and every address no other page claims) — the
+  page Dash Pages draws, with its title, for an address that matches no page:
+  a heading, one sentence, and a link to Home. Dash finds it by its module
+  name, so the file name is the contract.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
   Save. The form is built per visit from the stored view (never the pinned
@@ -1577,8 +1582,8 @@ flowchart LR
   while a new one is on trial. Feeds the
   startup log line, `/health`, and the settings page's version section — plus,
   when `show_version_in_title` is on, a `<release label> - ` prefix on every
-  browser tab title (`pages/page_title.py` wraps all five `register_page`
-  titles as callables, so the flag is read per request rather than at import
+  browser tab title (`pages/page_title.py` wraps every `register_page`
+  title as a callable, so the flag is read per request rather than at import
   time, when the config is not yet loaded).
 - `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
   the one builder for `sendNotifications` payloads: semantic id, title,

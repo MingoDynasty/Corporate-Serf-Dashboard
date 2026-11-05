@@ -13,6 +13,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 from source.pages import (  # noqa: E402, F401
     aim_training_journey,
     home,
+    not_found_404,
     playlist_scenarios,
     playlists,
     run_history,
@@ -130,6 +131,7 @@ def test_registration_does_not_read_the_config(
         ("source.pages.playlists", "Playlists"),
         ("source.pages.settings", "Settings"),
         ("source.pages.aim_training_journey", "Aim Training Journey"),
+        ("source.pages.not_found_404", "Page Not Found"),
     ],
 )
 def test_every_static_page_resolves_its_own_title(
