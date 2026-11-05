@@ -127,16 +127,20 @@ and [product.md](../product.md). Leaderboard placement is worded
   scenarios have data. Open the playlist to fetch it now."; a Lowest value
   shows "Lowest: {scenario}" on hover.
 - A RANKED scenario whose rank sits above its cached leaderboard total has no
-  percentile, so it counts unresolved even with both caches fresh. The
-  placeholder can therefore hold with the warmup worker idle, and can return
-  to a row that was showing aggregates when a rewritten rank lands above the
-  cached total. Opening the playlist doesn't clear it, because the fill
-  honors the total's TTL. A clicked Refresh on that scenario re-reads the
-  total and does; otherwise it lasts until
-  `leaderboard_total_cache_ttl_hours` lapses, a week by default
+  percentile, so it counts unresolved even with both caches fresh, and the
+  placeholder can return to a row that was showing aggregates when a
+  rewritten rank lands above the cached total. When the total was stored
+  before the rank, opening the playlist re-reads it once, and so does the
+  warmup worker's next pass over the scenario, so on a board that grew the
+  placeholder clears. When a total read after the rank still sits below it,
+  nothing re-reads it again: the placeholder holds with the warmup worker
+  idle until a clicked Refresh on that scenario, a rank refresh, or the end of
+  `leaderboard_total_cache_ttl_hours`, a week by default
   ([2026-07-16](../decision_log/2026/2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker.md)
   as amended by
-  [2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)).
+  [2026-09-20](../decision_log/2026/2026-09-20-a-rank-above-the-known-total-suppresses-the-percentile.md)
+  and
+  [2026-11-05](../decision_log/2026/2026-11-05-a-fresh-total-a-later-rank-outruns-is-re-read-once.md)).
 - The warmup status line has three renderings: "Updating percentile data: N
   remaining", the same with " (~{duration})" once a pace sample exists
   (smallest form "<1 min"), and "Updating percentile data: N remaining ·

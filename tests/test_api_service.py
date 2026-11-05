@@ -1000,6 +1000,135 @@ def test_with_percentile_derives_when_rank_equals_the_total():
     assert round(api_service._with_percentile(rank_info).percentile, 2) == 0.10
 
 
+def _seed_rank_above_total(
+    monkeypatch,
+    tmp_path,
+    *,
+    total_players: int,
+    total_stored_before_rank: bool,
+) -> None:
+    """Cache a fresh rank of 900 and a TTL-fresh total below it.
+
+    The rank was read two hours ago. The total was stored an hour before
+    that, or an hour after it.
+    """
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("Some Scenario", 98330, "test")
+    rank_read_at = time.time() - 2 * 60 * 60
+    api_service.save_scenario_rank(
+        98330,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=900,
+            leaderboard_id=98330,
+            scenario_name="Some Scenario",
+            fetched_at=datetime.fromtimestamp(rank_read_at, UTC),
+        ),
+    )
+    api_service.save_leaderboard_total(98330, total_players)
+    total_stored_at = rank_read_at + (-1 if total_stored_before_rank else 1) * 3600
+    os.utime(
+        api_service._leaderboard_total_cache_file(98330),
+        (total_stored_at, total_stored_at),
+    )
+
+    def fail_get(*_args, **_kwargs):
+        raise AssertionError("only the faked leaderboard read may run")
+
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
+
+
+def _lookup_like_the_playlist_fill() -> ScenarioRankInfo:
+    """Look up the seeded scenario the way the fill's network phase does."""
+    return api_service.get_scenario_rank_info(
+        "Some Scenario",
+        "MingoDynasty",
+        allow_hydration=False,
+        record_activity=False,
+    )
+
+
+def test_lookup_rereads_a_fresh_total_that_a_later_rank_outruns(monkeypatch, tmp_path):
+    """A board that grew: the total is the stale side, so the TTL gives way once."""
+    _seed_rank_above_total(
+        monkeypatch,
+        tmp_path,
+        total_players=500,
+        total_stored_before_rank=True,
+    )
+    total_reads = []
+
+    def fake_get_leaderboard_scores(leaderboard_id, **kwargs):
+        total_reads.append((leaderboard_id, kwargs))
+        return LeaderboardAPIResponse(page=0, max=1, total=1200, data=[])
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    rank_info = _lookup_like_the_playlist_fill()
+
+    assert total_reads == [(98330, {"max_results": 1})]
+    assert rank_info.rank == 900
+    assert rank_info.total_players == 1200
+    assert round(rank_info.percentile, 2) == 25.04
+    assert api_service._cached_leaderboard_total(98330) == 1200
+
+
+def test_lookup_keeps_a_total_read_after_the_rank_it_trails(monkeypatch, tmp_path):
+    """The rank is the stale side there, so another read would heal nothing."""
+    _seed_rank_above_total(
+        monkeypatch,
+        tmp_path,
+        total_players=850,
+        total_stored_before_rank=False,
+    )
+
+    def fail_get_leaderboard_scores(*_args, **_kwargs):
+        raise AssertionError("a total read after the rank must not be re-read")
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fail_get_leaderboard_scores,
+    )
+
+    rank_info = _lookup_like_the_playlist_fill()
+
+    assert rank_info.rank == 900
+    assert rank_info.total_players == 850
+    assert rank_info.percentile is None
+
+
+def test_lookup_keeps_the_cached_total_when_its_re_read_fails(monkeypatch, tmp_path):
+    _seed_rank_above_total(
+        monkeypatch,
+        tmp_path,
+        total_players=500,
+        total_stored_before_rank=True,
+    )
+
+    def fail_get_leaderboard_scores(*_args, **_kwargs):
+        raise api_service.requests.ConnectionError("offline")
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fail_get_leaderboard_scores,
+    )
+
+    rank_info = _lookup_like_the_playlist_fill()
+
+    assert rank_info.rank == 900
+    assert rank_info.total_players == 500
+    assert rank_info.percentile is None
+    assert api_service._cached_leaderboard_total(98330) == 500
+
+
 def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)

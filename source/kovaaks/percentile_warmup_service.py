@@ -20,7 +20,9 @@ from source.kovaaks.api_service import (
     UnknownKovaaksUserError,
     _cached_leaderboard_total,
     _cached_rank,
+    _leaderboard_total_ttl_hours,
     _save_rank_monotonic,
+    _total_trails_rank,
     fetch_scenario_rank,
     get_api_activity_timestamps,
     get_cached_leaderboard_id,
@@ -358,7 +360,10 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
         try:
             get_leaderboard_total(
                 leaderboard_id,
-                config.leaderboard_total_cache_ttl_hours,
+                _leaderboard_total_ttl_hours(
+                    rank_info,
+                    config.leaderboard_total_cache_ttl_hours,
+                ),
             )
         except (
             requests.RequestException,
@@ -385,7 +390,11 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
 
 
 def _freshly_satisfied(scenario_name: str, config: ConfigData) -> bool:
-    """Implement R4's dequeue-time fresh-rank/fresh-total predicate."""
+    """Implement R4's dequeue-time fresh-rank/fresh-total predicate.
+
+    A fresh total that trails a rank read after it is not satisfied: its
+    percentile is suppressed, and ``process_warmup_item`` re-reads it.
+    """
     username = get_kovaaks_username()
     if not username:
         return True
@@ -401,13 +410,15 @@ def _freshly_satisfied(scenario_name: str, config: ConfigData) -> bool:
         return False
     if rank_info.status == ScenarioRankStatus.UNRANKED:
         return True
-    return (
-        rank_info.status == ScenarioRankStatus.RANKED
-        and get_cached_leaderboard_total(
-            leaderboard_id,
-            config.leaderboard_total_cache_ttl_hours,
-        )
-        is not None
+    if rank_info.status != ScenarioRankStatus.RANKED:
+        return False
+    total_players = get_cached_leaderboard_total(
+        leaderboard_id,
+        config.leaderboard_total_cache_ttl_hours,
+    )
+    return total_players is not None and not _total_trails_rank(
+        rank_info,
+        total_players,
     )
 
 

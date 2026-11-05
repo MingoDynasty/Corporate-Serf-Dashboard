@@ -8,7 +8,10 @@ overview's status line and a WARNING log carry it. Amended by
 the display rule is no longer weaker and monotonic, because a RANKED scenario
 whose rank sits above its cached total is worker-fresh yet display-unresolved,
 and a resolved row returns to the placeholder when a rewritten rank lands above
-the cached total. Everything else stands.
+the cached total. Amended by
+[2026-11-05](2026-11-05-a-fresh-total-a-later-rank-outruns-is-re-read-once.md):
+such a scenario is worker-fresh only once its total was read after its rank, so
+the worker re-reads a total stored before it. Everything else stands.
 
 Decision: After startup finishes ingesting local runs, one app-lifetime daemon
 worker warms the rank and leaderboard-total caches used by the Playlists

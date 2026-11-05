@@ -1311,6 +1311,75 @@ def _after_failed_total(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
     return _with_percentile(rank_info)
 
 
+def _total_trails_rank(
+    rank_info: ScenarioRankInfo,
+    total_players: int | None,
+) -> bool:
+    """Return whether a cached total sits below a rank read after it was stored.
+
+    Boards are expected to grow, so a total stored before the rank is the
+    stale side of the pair, and re-reading it can bring back the percentile
+    ``_with_percentile`` suppresses. A total stored after the rank that still
+    sits below it is not stale: the rank is, and re-reading the total on every
+    lookup would spend a request each time for nothing. A rank with no
+    ``fetched_at`` cannot be ordered against the total, so it never counts.
+    The total's side is its file's mtime, the clock its TTL runs on.
+    """
+    if (
+        rank_info.status != ScenarioRankStatus.RANKED
+        or rank_info.rank is None
+        or rank_info.leaderboard_id is None
+        or rank_info.fetched_at is None
+        or total_players is None
+        or total_players >= rank_info.rank
+    ):
+        return False
+    try:
+        stored_at = (
+            _leaderboard_total_cache_file(rank_info.leaderboard_id).stat().st_mtime
+        )
+        return stored_at < rank_info.fetched_at.timestamp()
+    except OSError, OverflowError, ValueError:
+        # A totals file replaced mid-read, or a hand-edited ``fetched_at`` out
+        # of the platform's timestamp range: no order, so no re-read.
+        return False
+
+
+def _leaderboard_total_ttl_hours(
+    rank_info: ScenarioRankInfo,
+    ttl_hours: int,
+) -> int:
+    """Return the total TTL a fetching lookup honors for this rank.
+
+    That is ``ttl_hours``, or ``0`` once a TTL-fresh total trails the rank (see
+    ``_total_trails_rank``): otherwise the percentile stays suppressed until
+    the TTL lapses, a week by default. A re-read that lands stores a total
+    newer than the rank, so it happens once per stored rank, not once per
+    lookup; one that fails stores nothing and is tried again by the next
+    fetching lookup, as an expired total is.
+    """
+    leaderboard_id = rank_info.leaderboard_id
+    if (
+        ttl_hours <= 0
+        or leaderboard_id is None
+        or rank_info.rank is None
+        or rank_info.fetched_at is None
+    ):
+        return ttl_hours
+    total_players = get_cached_leaderboard_total(leaderboard_id, ttl_hours)
+    if not _total_trails_rank(rank_info, total_players):
+        return ttl_hours
+    logger.info(
+        'Rank %s for "%s" (leaderboard %s) exceeds the cached total %s, stored '
+        "before it; re-reading the total.",
+        rank_info.rank,
+        rank_info.scenario_name or "?",
+        leaderboard_id,
+        total_players,
+    )
+    return 0
+
+
 def _with_leaderboard_total(
     rank_info: ScenarioRankInfo,
     leaderboard_total_cache_ttl_hours: int = 168,
@@ -1322,10 +1391,11 @@ def _with_leaderboard_total(
     Total-count freshness has its own TTL, which ``force_refresh`` bypasses:
     a board-authoritative caller re-reads the denominator its percentile is
     derived from, so a fresh rank meets a week-old total only when that
-    re-read fails. A failure degrades to the last cached total and says so
-    through ``total_refresh_failed``; only a leaderboard with no total cached
-    at all degrades to the rank/unranked state by itself, because that result
-    is still valid.
+    re-read fails. Without it, the TTL still gives way once to a fresh total
+    the rank outruns (``_leaderboard_total_ttl_hours``). A failure degrades to
+    the last cached total and says so through ``total_refresh_failed``; only a
+    leaderboard with no total cached at all degrades to the rank/unranked state
+    by itself, because that result is still valid.
     """
     if (
         rank_info.status not in (ScenarioRankStatus.RANKED, ScenarioRankStatus.UNRANKED)
@@ -1336,7 +1406,12 @@ def _with_leaderboard_total(
     try:
         total_players = get_leaderboard_total(
             rank_info.leaderboard_id,
-            0 if force_refresh else leaderboard_total_cache_ttl_hours,
+            0
+            if force_refresh
+            else _leaderboard_total_ttl_hours(
+                rank_info,
+                leaderboard_total_cache_ttl_hours,
+            ),
         )
     except requests.RequestException as exc:
         logger.warning(
