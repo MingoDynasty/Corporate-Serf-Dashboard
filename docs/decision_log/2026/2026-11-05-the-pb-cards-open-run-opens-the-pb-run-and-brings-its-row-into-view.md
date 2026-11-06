@@ -12,8 +12,9 @@ change.
 **Approval and delivery.** Approved by the maintainer on 2026-11-05, from
 the design brief "Jump to PB" by `claude-fable-5-1`, a note in the
 maintainer's own files. The brief left five questions to the maintainer.
-Each took the brief's recommended answer, and the pull request that built it
-listed them as open, so its merge settles them:
+Each took the brief's recommended answer, and
+[#470](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/470),
+which built it, listed them as open, so its merge settles them:
 
 1. The jump is the run viewer, not a standing mark on the chart.
 2. A press opens the PB's session in the run list and scrolls its row into
@@ -117,4 +118,4 @@ whose card was "neither a landmark nor a button" and held one control, and
 whose runs opened from the list and the chart alone.
 
 **Provenance.** Design brief by `claude-fable-5-1`. Built by
-`claude-opus-5-5`.
+`claude-opus-5-5` in #470.
