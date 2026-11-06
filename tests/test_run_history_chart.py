@@ -193,7 +193,7 @@ def test_score_vs_run_ignores_the_range_in_days(load_runs) -> None:
     assert len(_points(figure).y) == 120
 
 
-def test_score_vs_run_is_never_empty_for_a_scenario_with_runs(load_runs) -> None:
+def test_a_range_in_runs_is_never_empty_for_a_scenario_with_runs(load_runs) -> None:
     """A range in runs always holds the newest run, however old it is."""
     load_runs(_run(100.0, datetime(2019, 1, 1, 12)))
 
