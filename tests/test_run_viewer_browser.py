@@ -19,12 +19,18 @@ from urllib.request import urlopen
 
 import pytest
 
+from source.utilities.utilities import format_absolute_timestamp
+
 playwright = pytest.importorskip("playwright.sync_api")
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = "Viewer sample"
 OTHER = "Other viewer sample"
 LANDING = "Landing sample"
 BOTS = "Bots sample"
+# Played in early-morning sessions of its own, with its PB in the second oldest.
+PB = "PB sample"
+PB_DAY = 1
+PB_SCORE = 400
 GRID = "#run-history-list-grid"
 COLUMN = "#run-history-chart-column"
 GRAPH = "#run-history-graph .js-plotly-plot"
@@ -157,6 +163,13 @@ def viewer_server(tmp_path_factory):
             100 + day,
             FLY_NEWEST if day == 19 else FLY_TYPICAL,
         )
+        for minute in (0, 2, 4):
+            _write(
+                stats,
+                PB,
+                session - timedelta(hours=6) + timedelta(minutes=minute),
+                PB_SCORE if (day, minute) == (PB_DAY, 2) else 200 + day,
+            )
     origin = f"http://127.0.0.1:{port}"
     with (state / "server.log").open("w", encoding="utf-8") as log:
         process = subprocess.Popen(
@@ -738,6 +751,115 @@ def test_a_run_of_another_scenario_opens_without_changing_the_selection(
         page.evaluate(f"() => document.querySelector('{GRAPH}')._fullLayout.title.text")
         == SCENARIO
     )
+
+
+# --- The PB card's Open run ----------------------------------------------------
+
+OPEN_RUN = "#run-history-pb-open-run"
+
+
+def all_run_rows(page) -> list[dict]:
+    """Every run row the list holds, under a closed group or not."""
+    return page.evaluate("""() => {
+        const rows = [];
+        window.runHistoryList.api.forEachNode(node => {
+            if (node.data.kind === 'run') rows.push({
+                ...node.data, displayed: node.displayed,
+            });
+        });
+        return rows;
+    }""")
+
+
+def in_list_view(page, row_id) -> bool:
+    """Whether a row is drawn wholly inside the list's scrolled box."""
+    return page.evaluate(
+        """([grid, id]) => {
+        const box = document.querySelector(grid + ' .ag-body-viewport');
+        const row = [...document.querySelectorAll(grid + ' .ag-row')]
+            .find(each => each.getAttribute('row-id') === id);
+        if (!box || !row) return false;
+        const outer = box.getBoundingClientRect();
+        const inner = row.getBoundingClientRect();
+        return inner.top >= outer.top - 1 && inner.bottom <= outer.bottom + 1;
+    }""",
+        [GRID, row_id],
+    )
+
+
+def test_open_run_opens_the_pb_run_and_brings_its_row_into_view(
+    viewer_browser, viewer_server
+):
+    """The PB is not the latest run, and its row is under a closed session.
+
+    Every other session is open, so its row is far below the list's top.
+    """
+    context, page = _open_page(viewer_browser, viewer_server[0], PB)
+    try:
+        page.get_by_role("button", name="Expand all", exact=True).click()
+        page.wait_for_function(
+            """() => {
+            let shown = false;
+            window.runHistoryList.api.forEachNodeAfterFilterAndSort(node => {
+                shown ||= node.data.kind === 'run' && node.displayed;
+            });
+            return shown;
+        }"""
+        )
+        rows = all_run_rows(page)
+        pb = next(row for row in rows if row["score"] == f"{PB_SCORE}")
+        assert not next(row for row in rows if row["latest"])["id"] == pb["id"]
+        session = page.locator(f'{GRID} .ag-row[row-id="{pb["sid"]}"]')
+        page.evaluate(
+            "(id) => window.runHistoryList.api.ensureNodeVisible("
+            "window.runHistoryList.api.getRowNode(id))",
+            pb["sid"],
+        )
+        session.get_by_role("button", name="Session", exact=True).click()
+        page.evaluate("() => window.runHistoryList.api.ensureIndexVisible(0, 'top')")
+        page.wait_for_function(
+            "(id) => !window.runHistoryList.api.getRowNode(id).displayed", arg=pb["id"]
+        )
+        assert not in_list_view(page, pb["sid"])
+        # The button sits in the first line and keeps it one 18px line.
+        assert page.locator(".pb-card-heading").bounding_box()["height"] == 18
+
+        page.get_by_role("button", name="Open run of your PB", exact=True).click()
+
+        wait_open(page)
+        ended = datetime.strptime(
+            pb["id"].removeprefix("r:").split(" - ")[-1], "%Y.%m.%d-%H.%M.%S Stats.csv"
+        )
+        assert page.locator(".run-viewer-kicker").text_content() == (
+            f"{PB} · ended {format_absolute_timestamp(ended, include_seconds=True)}"
+        )
+        wait_focus(page, {"close": True})
+        page.wait_for_function(
+            "(id) => window.runHistoryList.api.getRowNode(id).displayed", arg=pb["id"]
+        )
+        assert in_list_view(page, pb["id"])
+        assert open_rows(page) == [pb["id"]]
+
+        page.get_by_role("button", name="Close", exact=True).click()
+
+        wait_closed(page)
+        page.wait_for_function(
+            "(button) => document.activeElement === document.querySelector(button)",
+            arg=OPEN_RUN,
+        )
+
+        # Esc returns there too, from a run opened by the button again.
+        page.locator(OPEN_RUN).press("Enter")
+        wait_open(page)
+        wait_focus(page, {"close": True})
+        page.keyboard.press("Escape")
+        wait_closed(page)
+        page.wait_for_function(
+            "(button) => document.activeElement === document.querySelector(button)",
+            arg=OPEN_RUN,
+        )
+    finally:
+        context.close()
 
 
 # --- By Bot --------------------------------------------------------------------

@@ -47,7 +47,8 @@
 //      draws each such row twice, once in each part.
 //  12. A click on a Run row, or Enter or Space on it, opens its run in the
 //      run viewer. The open run's row is marked by a field on its data and a
-//      row class rule, set again on every model applied.
+//      row class rule, set again on every model applied. The PB card's Open
+//      run opens the rows its run is under and scrolls to it.
 (function () {
   var dagfuncs = (window.dashAgGridFunctions = window.dashAgGridFunctions || {});
   var dagcomponentfuncs = (window.dashAgGridComponentFunctions =
@@ -974,6 +975,33 @@
     }
     api.ensureNodeVisible(node);
     api.setFocusedCell(node.rowIndex, columns[0]);
+    return true;
+  };
+
+  // Open the rows a run's row is under in the view on screen, and scroll it
+  // into view, leaving keyboard focus where it is: the PB card's Open run.
+  // Nothing is said in the live region, since the press was not in the list.
+  // A run whose session the view hasn't loaded is left alone. Returns whether
+  // the row was found.
+  state.revealRun = function (id) {
+    var api = state.api;
+    if (!api || api.isDestroyed() || id == null) {
+      return false;
+    }
+    var node = api.getRowNode(contextOf(api).runRowIdPrefix + id);
+    if (!node || !node.data) {
+      return false;
+    }
+    var open = openRows();
+    var closed = [node.data.sid, node.data.vid].filter(function (rowId) {
+      return rowId != null && !open.has(rowId);
+    });
+    if (closed.length) {
+      setOpen(api, closed, true);
+    }
+    if (node.displayed && node.rowIndex != null) {
+      api.ensureNodeVisible(node);
+    }
     return true;
   };
 

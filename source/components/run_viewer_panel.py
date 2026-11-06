@@ -1062,16 +1062,20 @@ class RunViewerIds(NamedTuple):
     shown_sink: str
 
 
-def run_viewer(ids: RunViewerIds, *, return_focus: str) -> html.Div:
+def run_viewer(
+    ids: RunViewerIds, *, return_focus: str, card_return_focus: str
+) -> html.Div:
     """Build the viewer, hidden and empty until a run opens.
 
     ``return_focus`` is the id of the chart's mode control, where focus goes
-    back when a run a chart point opened is closed. The script reads both
-    ids from the viewer's ``data-`` attributes.
+    back when a run a chart point opened is closed. ``card_return_focus`` is
+    the id of the PB card's Open run, where it goes back when that opened
+    the run. The script reads the ids from the viewer's ``data-`` attributes.
     """
     for_script: dict[str, Any] = {
         "data-request-store": ids.request,
         "data-return-focus": return_focus,
+        "data-card-return-focus": card_return_focus,
     }
     return html.Div(
         id=ids.viewer,
@@ -1112,8 +1116,13 @@ SELECTION = "selection"
 FOCUS_CLOSE = "close"
 FOCUS_ROW = "row"
 FOCUS_CHART = "chart"
+FOCUS_CARD = "card"
 FROM_LIST = "list"
 FROM_CHART = "chart"
+FROM_CARD = "card"
+# Where Close sends focus, by what opened the run: a chart point's opener is
+# hidden with the chart, so its run returns to the chart's mode control.
+_CLOSE_FOCUS = {FROM_LIST: FOCUS_ROW, FROM_CARD: FOCUS_CARD}
 
 _NO_CHANGE = (no_update,) * 5
 
@@ -1139,10 +1148,11 @@ def show_run(  # noqa: PLR0911, PLR0913
     """Decide what a press does to the viewer, and draw it.
 
     ``trigger`` names what called: a run asked for, Close, or the selected
-    scenario. ``held`` is the open run: its id, what opened it, ``"list"`` or
-    ``"chart"``, and the scenario selected when it opened. Returns what the
-    callback writes: the open run, the chart column's class, the header's
-    lines, the body, and what the script does once they are drawn.
+    scenario. ``held`` is the open run: its id, what opened it, ``"list"``,
+    ``"chart"`` or ``"card"``, and the scenario selected when it opened.
+    Returns what the callback writes: the open run, the chart column's class,
+    the header's lines, the body, and what the script does once they are
+    drawn.
 
     A run asked for opens, or replaces the open run. Close returns focus to
     what opened the run. A change of the selected scenario closes the run
@@ -1153,9 +1163,7 @@ def show_run(  # noqa: PLR0911, PLR0913
     if trigger == CLOSE:
         if not held:
             return _NO_CHANGE
-        return _closed(
-            held, FOCUS_ROW if held.get("from") == FROM_LIST else FOCUS_CHART
-        )
+        return _closed(held, _CLOSE_FOCUS.get(held.get("from", ""), FOCUS_CHART))
     if trigger == SELECTION:
         if not held or selected_scenario == held.get("selected"):
             return _NO_CHANGE
@@ -1167,8 +1175,8 @@ def show_run(  # noqa: PLR0911, PLR0913
     if held and held.get("run_id") == viewed:
         if held.get("from") == source:
             return _NO_CHANGE
-        # The same run pressed again in the list after a chart point opened
-        # it: Close now returns to its row.
+        # The same run pressed again somewhere else, as in the list after a
+        # chart point opened it: Close now returns to what was pressed last.
         return ({**held, "from": source}, *_NO_CHANGE[1:])
     content = run_viewer_from_store(viewed, score_threshold_percentage, now)
     if content is None:
@@ -1181,7 +1189,8 @@ def show_run(  # noqa: PLR0911, PLR0913
         COLUMN_OPEN_CLASS,
         content.heading,
         content.body,
-        # Switching runs from the list leaves focus on the row pressed.
+        # Switching runs from the list or the card leaves focus on what was
+        # pressed.
         {"open": viewed, "focus": None if held else FOCUS_CLOSE, "run": viewed},
     )
 

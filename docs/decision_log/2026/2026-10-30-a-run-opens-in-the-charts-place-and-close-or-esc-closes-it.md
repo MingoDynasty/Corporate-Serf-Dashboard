@@ -8,6 +8,11 @@ Esc key, brings the chart back exactly as it was left. The open run isn't
 kept in the address, so the browser's Back leaves the page and a reload shows
 the chart.
 
+**Note (2026-11-05).** A third way in: the PB card's **Open run** opens the
+PB run through the same request, with `card` as its source beside `list` and
+`chart`, and Close or Esc returns focus to that button
+([2026-11-05](2026-11-05-the-pb-cards-open-run-opens-the-pb-run-and-brings-its-row-into-view.md)). Everything below stands.
+
 **Ruling.** RV1 of
 [proposal #450](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/450),
 ratified by the maintainer on 2026-10-30 at `f80c109` ("Sounds good. I

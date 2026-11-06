@@ -26,8 +26,15 @@ from source.components.pb_card import (  # noqa: E402
     pb_card_content,
     personal_best,
 )
+from source.components.run_viewer_panel import FROM_CARD  # noqa: E402
 from source.kovaaks import data_service  # noqa: E402
-from source.kovaaks.data_models import PlaylistData, Rank, RunData, Scenario  # noqa: E402
+from source.kovaaks.data_models import (  # noqa: E402
+    PlaylistData,
+    Rank,
+    RunData,
+    Scenario,
+    run_id,
+)
 from source.kovaaks.time_scored_service import PaceBasis  # noqa: E402
 from source.pages import run_history  # noqa: E402
 from tests.rendered_text import rendered_text  # noqa: E402
@@ -205,6 +212,8 @@ def test_the_pb_was_set_by_the_earliest_run_to_reach_the_high_score():
 
     assert shown.set_at == runs[1].datetime_object
     assert shown.score_hover == "Up 21.8% on your previous best of 3,000"
+    # The run Open run opens, keyed as the run list keys its row.
+    assert shown.run_id == run_id(runs[1])
 
 
 @pytest.fixture
@@ -351,6 +360,7 @@ def test_the_faded_line_is_the_pb_runs_cm360_and_hit_accuracy(fields, faded):
 
 
 SHOWN = PersonalBest(
+    run_id=f"{SCENARIO} - Challenge - 2026.10.09-17.24.00 Stats.csv",
     set_at=datetime(2026, 10, 9, 17, 24),
     score="3,653",
     score_hover="Up 1.0% on your previous best of 3,617",
@@ -394,9 +404,17 @@ def test_the_card_starts_with_nothing_in_it_and_holds_every_id():
     }
     assert set(held) == set(IDS) - page_owned
     assert card.className == "pb-card"
-    for store in (IDS.set_at, IDS.rank_updated_ts, IDS.rank_of_total):
+    for store in (
+        IDS.set_at,
+        IDS.rank_updated_ts,
+        IDS.rank_of_total,
+        IDS.pb_run,
+        IDS.open_run_sink,
+    ):
         assert isinstance(held[store], dcc.Store)
         assert getattr(held[store], "data", None) is None
+        # Unset is the default, "memory": a reload forgets it.
+        assert getattr(held[store], "storage_type", "memory") == "memory"
     assert getattr(held[IDS.body], "children", None) is None
     assert getattr(held[IDS.faded], "children", None) is None
 
@@ -434,6 +452,7 @@ def test_the_first_line_reads_pb_and_the_age_is_drawn_once_hidden_until_a_pb():
     assert heading.className == "pb-card-heading"
     assert heading.children[0] == "PB"
     assert heading.children[1] is label
+    assert heading.children[2] is _held(card)[IDS.open_run_field]
     assert label.hidden is True
     lead, tooltip = label.children
     assert lead == " · set "
@@ -450,13 +469,44 @@ def test_the_first_line_reads_pb_and_the_age_is_drawn_once_hidden_until_a_pb():
     )
 
 
+def test_open_run_ends_the_first_line_and_is_hidden_until_a_pb():
+    """A quiet button built as Refresh is, at the end of the first line.
+
+    Its name starts with its words, so a voice command that says them still
+    finds it, and goes on to say whose run it opens.
+    """
+    held = _held(pb_card.pb_card(IDS))
+    field = held[IDS.open_run_field]
+    tooltip = field.children
+    button = tooltip.children
+
+    assert isinstance(field, html.Span)
+    assert field.hidden is True
+    assert field.className == "pb-card-open-run"
+    assert tooltip.label == (
+        "Open your PB run where the chart is, and show its row in the run list."
+    )
+    assert tooltip.events == {"hover": True, "focus": True, "touch": True}
+    assert tooltip.boxWrapperProps == {"className": "pb-card-flex-target"}
+    assert button is held[IDS.open_run]
+    assert button.children == "Open run"
+    assert (button.variant, button.size) == ("subtle", "compact-xs")
+    assert getattr(button, "aria-label") == "Open run of your PB"
+    icon = button.leftSection
+    assert getattr(icon, "aria-hidden") == "true"
+    assert "material-symbols-visibility-outline.svg" in icon.style["mask"]
+
+
 def test_a_pb_is_its_score_and_badge_then_the_next_rank_then_the_faded_line():
     content = pb_card_content(SHOWN, SCENARIO)
     score_row, next_rank = content.body
 
     assert content.set_at == SHOWN.set_at.timestamp()
-    # A local PB, so the leaderboard line shows under it.
+    # A local PB, so the leaderboard line shows under it, and Open run opens
+    # the PB run.
     assert content.leaderboard_hidden is False
+    assert content.pb_run == SHOWN.run_id
+    assert content.open_run_hidden is False
     # The score ends on a space a screen reader reads: the row is a flex
     # container, which would hand over "3,653Cerulean" as one word.
     assert [rendered_text(part) for part in score_row.children] == [
@@ -536,9 +586,11 @@ def test_with_no_scenario_selected_the_card_says_so(selected):
 
     assert content.set_at is None
     assert [rendered_text(line) for line in content.body] == ["No scenario selected"]
-    # Nothing to rank, and Refresh would have nothing to do.
+    # Nothing to rank, and Refresh would have nothing to do. No run to open.
     assert content.leaderboard_hidden is True
     assert content.faded is None
+    assert content.pb_run is None
+    assert content.open_run_hidden is True
 
 
 def test_a_scenario_with_no_local_runs_has_no_local_pb_yet():
@@ -549,9 +601,11 @@ def test_a_scenario_with_no_local_runs_has_no_local_pb_yet():
         "No local PB yet",
         "Play this scenario to record one in this app.",
     ]
-    # The line follows the local PB, so there is none.
+    # The line follows the local PB, so there is none, and no run to open.
     assert content.leaderboard_hidden is True
     assert content.faded is None
+    assert content.pb_run is None
+    assert content.open_run_hidden is True
 
 
 # --- Read from the run store ---------------------------------------------------
@@ -643,6 +697,25 @@ def test_the_ladder_is_the_one_the_playlist_filters_benchmark_gives(
     assert _body_text(content) == expected
 
 
+@pytest.mark.parametrize(
+    ("scores", "pb"),
+    [
+        pytest.param((3000, 3653, 3100), 1, id="an-older-pb"),
+        # Two thirds of the maintainer's scenarios: the button stays.
+        pytest.param((3000, 3653), 1, id="the-pb-is-the-latest-run"),
+        pytest.param((3653,), 0, id="one-run"),
+    ],
+)
+def test_open_run_opens_the_store_pb_run_whenever_there_is_one(store, scores, pb):
+    runs = _scored(*scores)
+    store["runs"][SCENARIO] = runs
+
+    content = pb_card.show_pb(None, SCENARIO, None)
+
+    assert content.pb_run == run_id(runs[pb])
+    assert content.open_run_hidden is False
+
+
 def test_the_gaps_pace_basis_is_read_only_for_a_scenario_with_a_ladder(store):
     """Read the gap's basis as the table does, and the hover's basis either way."""
     store["runs"][SCENARIO] = _scored(3000, 3653)
@@ -718,7 +791,8 @@ def test_the_card_is_rebuilt_by_a_run_on_its_scenario_the_scenario_and_the_filte
 
     assert registration["output"] == (
         f"..{ids.set_at}.data...{ids.body}.children"
-        f"...{ids.leaderboard}.hidden...{ids.faded}.children.."
+        f"...{ids.leaderboard}.hidden...{ids.faded}.children"
+        f"...{ids.pb_run}.data...{ids.open_run_field}.hidden.."
     )
     assert _keys(registration["inputs"]) == [
         f"{run_history.RUN_EVENTS_STORE_ID}.data",
@@ -726,6 +800,28 @@ def test_the_card_is_rebuilt_by_a_run_on_its_scenario_the_scenario_and_the_filte
         f"{run_history.SCENARIO_SELECTION_IDS.playlist_filter}.value",
     ]
     assert registration["prevent_initial_call"] is False
+
+
+def test_open_run_asks_the_run_viewer_for_the_pb_run_and_reveals_its_row():
+    """The request a Run row and a chart point send, from a third source.
+
+    The run is read when the button is pressed, so a run that lands and sets
+    a new PB is the one it opens. Nothing goes to the server but the request.
+    """
+    ids = run_history.PB_CARD_IDS
+    registration = _registration(f"{ids.open_run_sink}.data")
+    script = next(
+        source
+        for source in GLOBAL_INLINE_SCRIPTS
+        if registration["clientside_function"]["function_name"] in source
+    )
+
+    assert _keys(registration["inputs"]) == [f"{ids.open_run}.n_clicks"]
+    assert _keys(registration["state"]) == [f"{ids.pb_run}.data"]
+    assert registration["prevent_initial_call"] is True
+    assert FROM_CARD == "card"
+    assert f'window.runViewer.request(runId, "{FROM_CARD}")' in script
+    assert "window.runHistoryList.revealRun(runId)" in script
 
 
 def test_the_pbs_age_is_reworded_in_the_browser_on_the_30_second_tick():

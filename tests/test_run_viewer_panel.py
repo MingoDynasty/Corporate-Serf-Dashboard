@@ -1028,7 +1028,35 @@ def test_another_run_pressed_in_the_list_switches_and_leaves_focus(drawn) -> Non
     )
 
 
-@pytest.mark.parametrize(("source", "focus"), [("list", "row"), ("chart", "chart")])
+def test_the_pb_cards_open_run_opens_its_run_with_focus_on_close(drawn) -> None:
+    result = show_run("request", _request("pb", "card"), "A", None, 95.0, NOW)
+
+    assert result == (
+        _held("pb", "card"),
+        COLUMN_OPEN_CLASS,
+        ["heading"],
+        ["body"],
+        {"open": "pb", "focus": "close", "run": "pb"},
+    )
+
+
+def test_open_run_pressed_while_another_run_is_open_switches_and_leaves_focus(
+    drawn,
+) -> None:
+    result = show_run("request", _request("pb", "card"), "A", _held("r1"), 95, NOW)
+
+    assert result == (
+        _held("pb", "card"),
+        COLUMN_OPEN_CLASS,
+        ["heading"],
+        ["body"],
+        {"open": "pb", "focus": None, "run": "pb"},
+    )
+
+
+@pytest.mark.parametrize(
+    ("source", "focus"), [("list", "row"), ("chart", "chart"), ("card", "card")]
+)
 def test_close_brings_the_chart_back_and_focus_to_what_opened_the_run(
     drawn, source, focus
 ) -> None:
@@ -1085,6 +1113,19 @@ def test_the_open_run_pressed_again_changes_only_where_close_returns(drawn) -> N
     assert drawn == []
 
 
+def test_open_run_on_the_open_pb_run_changes_only_where_close_returns(drawn) -> None:
+    from_card = show_run(
+        "request", _request("pb", "card"), "A", _held("pb", "list"), 95.0, NOW
+    )
+    again = show_run(
+        "request", _request("pb", "card"), "A", _held("pb", "card"), 95.0, NOW
+    )
+
+    assert from_card == (_held("pb", "card"), *UNCHANGED[1:])
+    assert again == UNCHANGED
+    assert drawn == []
+
+
 def test_a_run_the_store_doesnt_hold_opens_nothing(monkeypatch) -> None:
     monkeypatch.setattr(
         run_viewer_panel, "run_viewer_from_store", lambda *_arguments: None
@@ -1126,6 +1167,10 @@ def test_the_viewer_is_the_chart_columns_last_child_and_starts_hidden() -> None:
     )
     assert viewer.to_plotly_json()["props"]["data-return-focus"] == (
         run_history.CHART_MODE_ID
+    )
+    # Where Close sends focus back to after the PB card's Open run.
+    assert viewer.to_plotly_json()["props"]["data-card-return-focus"] == (
+        run_history.PB_CARD_IDS.open_run
     )
 
 

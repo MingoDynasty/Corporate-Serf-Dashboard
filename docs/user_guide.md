@@ -101,7 +101,9 @@ the leaderboard standing and the PB run's cm/360 and hit accuracy. The next
 rank's figures are the benchmark table's own. Hover or focus the PB score
 for its improvement over the previous best, the age for the exact time,
 and the percentile for the position and when it was updated. **Refresh**
-updates only the leaderboard standing. A scenario with no local runs reads
+updates only the leaderboard standing. **Open run**, at the end of the first
+line, opens the PB run where the chart is, and opens its session in the run
+list with its row in view. A scenario with no local runs reads
 "No local PB yet" and has no leaderboard lookup, even if KovaaK's holds a
 record from another computer.
 
@@ -136,9 +138,10 @@ columns you turn on.
 
 Click a run in the run list, or a run's point or gold star on the chart, to
 open it where the chart was. Enter or Space on a focused run row opens it
-too. The list stays beside it, so a click on another run switches to that
-one. **Close**, or Esc, brings the chart back as you left it, with its zoom
-and hidden traces, and puts focus back on the row you opened. Esc is left
+too, and the PB card's **Open run** opens the PB run. The list stays beside
+it, so a click on another run switches to that one. **Close**, or Esc,
+brings the chart back as you left it, with its zoom and hidden traces, and
+puts focus back on the row or the button you opened it from. Esc is left
 alone while you type in a field or a menu or dialog is open. Choosing another
 scenario closes the run, the browser's Back leaves the page, and a reload
 shows the chart.
