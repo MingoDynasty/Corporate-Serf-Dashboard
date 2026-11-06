@@ -1,4 +1,4 @@
-# Run History Says Where A Run Landed Among Your Last 20 Runs, In Place Of The Score Threshold
+# Run History Says Where A Run Landed Among Your Last 20 Runs, In Place Of The Score Threshold's Verdict
 
 Status: Proposed
 Date: 2026-11-05
@@ -12,17 +12,17 @@ the run against a percentage of the PB, which passes 1 run in 10 on one
 scenario and 9 in 10 on another. This proposal names the band of the
 scenario's last 20 runs at session start that the run landed in, such as Top
 10%, and lets the outer two bands take the badge and the check. The score
-threshold, its chart line and its two controls retire, and the run's
-percentage of its PB stays.
+threshold stops judging runs, and its chart line stays as a target the player
+sets, off until they turn it on. The run's percentage of its PB stays.
 
 ## Decisions needed
 
 Six rows, RT1 to RT6. **Nothing is ratified.** RT1 to RT3 carry the
 maintainer's leans from their own note on the idea. RT4 to RT6 carry none: the
 note leaves the badge slot open ("Open: does it take the badge slot from the
-PB-based Threshold badge?"), and retiring the threshold is the author's
-recommendation. A lean is not a ruling. Reviewers may challenge any row, and
-anything in [Design](#design), which is author-owned.
+PB-based Threshold badge?"), and retiring the threshold's verdict is the
+author's recommendation. A lean is not a ruling. Reviewers may challenge any
+row, and anything in [Design](#design), which is author-owned.
 
 ### RT1. A run's band is read against its scenario's last 20 runs at session start
 
@@ -54,15 +54,20 @@ today. With no known window there is no band, never a low one.**
     every run lowers the top band only from 31% to 28%. The lag is the trend,
     not the freeze.
   - Even with no trend at all, a P90 interpolated inside 20 runs is beaten by
-    about 14% of new runs (17% for a window of 10; simulated). "Top 10%" says
-    where the run sits in the window, not how often it happens.
+    up to 14.3% of new runs whatever the scores' distribution, and by at least
+    9.5% when no two scores tie; uniform scores give 13.8%. Ties lower it, to
+    none on a scenario whose runs all score the same. "Top 10%" says where the
+    run sits in the window, not how often it happens.
 - **Its rate follows the trend, not the spread.** Across the 18 regimen
   scenarios with 15 or more banded runs, the top band's rate runs from 17% to
   66% and follows how far the runs sat above the frozen typical (Spearman
   +0.81), not the spread (−0.17). The threshold's pass rate on the same
   scenarios runs from 15% to 90% and leans on the spread instead (−0.38 here;
   −0.64 on 28 scenarios in the 2026-11-05 research read). Two scenarios that
-  aren't moving fire their top bands at the same rate, whatever their spreads.
+  aren't moving, and whose runs differ only in level and spread, fire their
+  top bands at exactly the same rate; any two whose scores don't tie stay
+  between 9.5% and 14.3% at 20 runs. The rates describe past runs; they
+  promise nothing about the next.
 - **No band: 31% of regimen runs** (369), all on scenarios with fewer than 10
   runs before the session or only one session. Lifetime, 635 of 866 scenarios
   never reach 10 runs. Unknown isn't weak, so these runs get no band and no
@@ -73,7 +78,7 @@ today. With no known window there is no band, never a low one.**
 - **Old windows** held 14% of banded regimen runs and 35% lifetime. After time
   away the player tends to come back better than the old window: on old
   windows the top band fired on 50% of runs lifetime, against 28% on recent
-  ones. The clock says why.
+  ones. The clock says why, on the card and in the list (RT5).
 - **The chart's bands are not the card's.** The chart draws the bands after
   each run, the run included. A third of Top 10% runs are not above the drawn
   Middle 80% band at their own point (in the regimen 67% are above it,
@@ -119,7 +124,7 @@ Status: open. The maintainer's lean: "Highlight the outer tiers (P10/P90, 1
 run in 5) by default; P25/P75 would flag half of all runs."
 
 The material consequence: with New PB first, the outer-band badges land on
-about 1 run in 5.7, and a third of Bottom 10% runs are a visit's first run.
+about 1 run in 5.7, and two in five Bottom 10% runs are a visit's first run.
 
 **Recommendation: Top 10% and Bottom 10% are highlighted (RT4 says where). The
 three middle bands are named on the line only. No setting chooses the bands.**
@@ -131,9 +136,10 @@ three middle bands are named on the line only. No setting chooses the bands.**
   included, the note's "half".
 - **Today's badge** lands on all but 3 of those runs: New PB 15%, Threshold
   passed 31%, Below threshold 53%.
-- **Warm-ups.** Bottom 10% fired on 15% of visits' first runs against about 5%
-  of later runs, so 21 of the 55 Bottom 10% runs (38%) were a visit's first
-  run. Marking warm-ups is separate work ([Out of scope](#out-of-scope)).
+- **Warm-ups.** Bottom 10% fired on 14% of visits' first runs against 5% of
+  later runs, so 22 of the 55 Bottom 10% runs (40%) were a visit's first run.
+  A first run is not always a warm-up, and marking warm-ups is separate work
+  ([Out of scope](#out-of-scope)).
 - **No setting.** "By default" is read as the default the app ships. A setting
   is a control nobody has asked for, and it would make the badge mean
   different things in different browsers, which the threshold's percentage
@@ -169,12 +175,15 @@ none.**
 Status: open. No lean.
 
 The material consequence: the check means "Top 10% of the runs before its
-session", a new mark flags Bottom 10%, and marks stop changing with a
-percentage or a browser.
+session", a new mark flags Bottom 10%, a clock marks either one read from an
+old window, and marks stop changing with a percentage or a browser.
 
 **Recommendation: a check on a Top 10% run, a gray down arrow on a Bottom 10%
-run, and the star as today. Every row's marks cell names its band on hover. A
-row with no band is blank, and its hover says why.**
+run, and the star as today. A check or down arrow read from a window that
+wasn't recent at session start carries the clock, as the card's line does; the
+star never does. Every row's marks cell names its band and the window's age on
+hover and to a screen reader. A row with no band is blank, and its hover says
+why.**
 
 - **The check is the badge's twin** by the 2026-10-12 design, so it follows
   RT4 to both outer bands.
@@ -182,51 +191,78 @@ row with no band is blank, and its hover says why.**
   The maintainer's lean highlights both, and the list is where a past bad run
   is found to open in the run viewer, where "what went wrong at the bottom"
   gets its answer.
+- **An old window shows while scanning.** 60 of the 307 outer-band marks in
+  the regimen, and 830 of 1,971 lifetime, are read from a window that was old
+  at session start, 285 of them beside a star. Without the clock they look
+  like marks against recent play. The 2026-10-22 evidence bar admits an old
+  value only with its qualification reaching every reader, and the list is
+  where runs are scanned for one to open. The clock qualifies the band, not
+  the PB, which is an achievement at any age.
 - **Marks stop moving.** A window at session start depends only on the runs
-  before the session, so a mark is fixed once its session is played. The
-  threshold's checks moved with the percentage, and differed from browser to
-  browser.
-- **The 30 px column holds them.** A new PB is always above its window, so the
-  star comes with a check when the run has a band, and a down arrow never
-  comes with either.
+  before the session, so a mark is fixed once its session is played, while
+  those runs stay as they are: a stats file that lands older than the session,
+  or one gone at the next start, can move it. The threshold's checks moved
+  with the percentage, and differed from browser to browser.
+- **The column fits its widest cell.** A new PB is always above its window, so
+  the star comes with a check when the run has a band, and a down arrow never
+  comes with either. The widest cell is a check, a clock and a star; today's
+  30 px holds two marks, so the column takes the width the browser check
+  measures for three, and stays fixed.
 - **Its cost:** a permanent mark on bad runs, 7% of banded regimen runs and 8%
-  lifetime.
+  lifetime, and a clock on 20% of regimen marks and 42% lifetime.
 
-### RT6. Score threshold retires; `% of PB` stays
+### RT6. The score threshold stops judging runs; its line stays as a target the player sets
 
 Status: open. No lean. The maintainer's backlog asks: "Challenge the idea of
 "Score Threshold". What is the intention of this? What do we expect the user
 to do with this information?"
 
-The material consequence: a player can no longer set a bar of their own or
-turn the marks off, and Chart options loses its Score Threshold group.
+The material consequence: nothing the player sets changes a badge or a mark,
+and a new player has no threshold line until they turn it on. A browser that
+showed the line with its switch on shows it off once.
 
-**Recommendation: the chart's "Score threshold" line, the Score threshold
-overlay switch and the Score threshold percentage, and the verdict they drive
-all retire. The card's `{pct}% of PB`, the run viewer's and its 99.9% cap
-stay; the cap that held a miss under its goal goes with the goal. A value a
-browser stored is left behind, unused, as the 2026-10-13 switches' were.**
+**Recommendation: the threshold's verdict retires: Threshold passed, Below
+threshold, the check it drove and the rule that judged them. The band takes
+the badge and the check (RT4, RT5). The chart's `Score threshold ({value})`
+line stays, with its two controls, as a target the player sets that judges no
+run: its overlay switch starts off, and the percentage keeps its default, 95.
+The card's `{pct}% of PB`, the run viewer's and their 99.9% cap stay; the cap
+that held a miss under its goal goes with the verdict.**
 
-- **Its purpose was retired; its mechanism was not.** The threshold is a
-  method's "advance once you hit it" rule. Its "Ready to move on." left on
-  2026-10-04 as advice, and no entry records another purpose.
-- **It means something different on every scenario.** At 95%, the regimen's
-  pass rate over each scenario's last 20 runs ran from 10% on VT Controlsphere
-  Viscose to 95% on StaticSwitchingVox Small, following the spread. Half its
-  Below threshold verdicts (228 of 470) sat on runs above typical.
-- **The band does its job, calibrated.** RT1 to RT5 put a per-run verdict
-  where the threshold's was, and a scenario that isn't moving fires it at the
-  same rate as any other.
-- **Simpler.** Two controls, one line family and one judging rule go; the band
-  reads edges the app already computes.
-- **What would change it** (none known today): the maintainer reads the line
-  as a chase target when no rank line is near (then keep a line the player
-  sets, with no verdict); the 2026-11-10 regimen review keeps its 95% good-run
-  bar and wants the app to show it (then keep the threshold opt-in, empty by
-  default); a reason from 2025 nobody wrote down.
-- **On file:** the 2026-11-05 research read recommends this: "Retire Score
-  Threshold as a percent-of-PB verdict and let the percentile tier take its
-  place".
+- **A verdict and a target are two things.** The 2026-10-04 principles name
+  the score threshold as a bar the player set, and whether a run met it as a
+  verdict the app may state. The evidence below condemns 95% as the app's own
+  good-run verdict, not a bar a player chooses: a target that is easy on one
+  scenario and hard on another can be what the player meant. Its "Ready to
+  move on." left on 2026-10-04 as advice; the line never gave any.
+- **As a verdict it means something different on every scenario.** At 95%, the
+  regimen's pass rate over each scenario's last 20 runs ran from 10% on VT
+  Controlsphere Viscose to 95% on StaticSwitchingVox Small, following the
+  spread. Half its Below threshold verdicts (228 of 470) sat on runs above
+  typical.
+- **The band does the verdict's job.** RT1 to RT5 put a per-run verdict where
+  the threshold's was, and on a scenario that isn't moving its rate is held
+  in a narrow range by the window, not set by the spread (RT1).
+- **Off by default.** A new player starts with no target, so the band and New
+  PB are the only verdicts the app draws unasked, and no line at the app's 95%
+  reads as a third. Turning the switch on draws the line at the stored
+  percentage, or at 95.
+- **What a browser keeps.** A control that persists in the browser drops its
+  stored value when its default in the layout changes. The percentage's
+  default stays 95, so a percentage a browser stored survives. The switch's
+  default moves from on to off: where the switch was turned off it stays off,
+  and where it was on, by default or turned back on, it shows off once;
+  turning it on brings the line back at its stored percentage. PR 2 says so
+  in its description and in the user guide.
+- **Least change.** One judging rule goes, nothing is built for the target,
+  and the band reads edges the app already computes.
+- **What would change it:** the maintainer has no use for the line as a target
+  (then it retires with its two controls); the 2026-11-10 regimen review
+  keeps its 95% good-run bar (the line serves it, turned on at 95).
+- **On file:** the 2026-11-05 research read recommends retiring the verdict
+  and the line, unless the line is read as a target (its question 2), when it
+  keeps "a user-set target" and retires only the verdict. This
+  recommendation keeps the line until that answer is in.
 
 ## Problem
 
@@ -274,8 +310,10 @@ right at the top, what went wrong at the bottom".
 ### What the maintainer's runs say
 
 9,284 runs through 2026-10-29, 866 scenarios; "regimen" is the Viscose S2
-Medium runs since 2026-09-13 (1,186 runs). Sessions split as the app splits
-them. Bands by score, with strict outer edges.
+Medium runs since 2026-09-13 (1,186 runs). Bands by score, with strict outer
+edges. Every row but 5 was re-run on 2026-11-06 with the app's own parser,
+session and visit split, `typical_score_at_session_start` and its recency
+rule.
 
 | # | Measure | Regimen | Lifetime |
 |---|---|---|---|
@@ -285,23 +323,31 @@ them. Bands by score, with strict outer edges.
 | 4 | Badge as RT4 shows it: New PB / Top 10% / Bottom 10% / none | 15% / 13% / 5% / 67% | 22% / 12% / 4% / 62% |
 | 5 | Today's badge: New PB / passed / below / none | 15% / 31% / 53% / 0% | n/a |
 | 6 | Top 10% runs above the chart's drawn band at their point | 67% | 60% |
-| 7 | Bottom 10% runs that are a visit's first run | 38% | 24% |
+| 7 | Bottom 10% runs that are a visit's first run | 40% | 24% |
+| 8 | Outer-band marks read from an old window | 60 of 307 (20%) | 830 of 1,971 (42%) |
 
-Expected rates with no trend at all (simulated, any distribution): Top 10% and
-Bottom 10% each 13.9% for a 20-run window, 15.0% at 15 runs, 17.2% at 10.
+Rates with no trend, every order of the runs equally likely, whatever the
+scores' distribution: each outer band at most 14.3% for a 20-run window, 18.8%
+at 15 runs and 18.2% at 10, and at least 9.5%, 12.5% and 9.1% when no two
+scores tie. Uniform scores give 13.8%, 15.0% and 17.3%. Ties lower the rates,
+to none when every run scores the same, and a skewed distribution splits them:
+scores of exp(8Z), Z normal, give 12.0% top and 14.1% bottom at 20 runs
+(simulated, 400,000 windows).
 
 ### Not checked
 
-- **The app's own functions** were not run; the windows are a
-  re-implementation (`viscose.py`'s session split, which is the app's rule,
-  with play order by end time only).
+- **The threshold's figures** (row 5, its pass rates and verdicts) are a
+  re-implementation's (`viscose.py`'s session split, which is the app's rule,
+  with play order by end time only). The re-run of the band figures matched
+  that re-implementation's except the visit figures, row 7 and RT3's rates,
+  where it had counted a scenario's first run in its session, not a visit's.
 - **Copy lengths in pixels.** RT2's 67 characters are compared by count with
   the 2026-10-25 measurement.
 - **The All scenarios view's cost** of building every listed scenario's
   windows for its marks.
 - **A screen reader** on the badge, the line and the marks' hovers.
 - **One player, one regimen** that set 180 PBs in seven weeks: band rates on a
-  flat player would sit nearer the 14% expectation.
+  flat player would sit nearer the no-trend rates above, at most 14.3%.
 
 ## Design
 
@@ -336,7 +382,7 @@ session start: typical 3,025, Middle 50% 2,904 to 3,116, Middle 80% 2,851 to
   band, no badge, no mark. Never read as low.
 - **Old:** judged at session start by the typical score's recency rule; the
   clock and `, Not recent` follow the band phrase, as they follow the typical
-  phrase today, and the list's hover says so.
+  phrase today, and the list's marks carry the clock too.
 - **In code:** a pure `band_at_session_start(score, typical)` beside
   `typical_score_at_session_start`, returning a `RunBand` or `None`.
   `score_line` calls it, so the card and the run viewer agree.
@@ -352,7 +398,9 @@ session start: typical 3,025, Middle 50% 2,904 to 3,116, Middle 80% 2,851 to
 - **The band phrase's hover,** by mouse and keyboard as today's phrase's: a
   first line naming the window, the typical score with the run's percentage
   from it, and both bands' edges in the scenario table's format; on an old
-  window, today's second paragraph, reworded for runs.
+  window, today's second paragraph, reworded for runs. With no percentage to
+  give, by score from a typical score of zero or less, the typical line names
+  the score alone and the band still shows.
 - **The card is rewritten** on the triggers it has today, less the
   percentage's change.
 
@@ -360,12 +408,17 @@ session start: typical 3,025, Middle 50% 2,904 to 3,116, Middle 80% 2,851 to
 
 - A check on a Top 10% run, a gray down arrow on a Bottom 10% run, the star
   unchanged. A new PB with a band carries the check and the star.
+- A check or down arrow read from an old window has the clock after it, the
+  scenario table's clock as the card draws it, hidden from a screen reader,
+  which hears the mark's words instead. The star has no clock.
 - Every row's marks cell has a hover and accessible text naming its band, the
-  window's size and its age; a row with no band says why. The column stays 30
-  px.
+  window's size and its age; a row with no band says why.
+- The column is as wide as its widest cell, a check, a clock and a star,
+  measured in the browser check, and stays fixed, so the marks stay beside
+  the score.
 - Marks are computed per run from its own session's window, the same build the
-  chart uses, and change only when a stats file lands older than a played
-  session.
+  chart uses, and change only when the runs before a played session change: a
+  stats file that lands older than it, or one gone at the next start.
 
 ### The run viewer
 
@@ -375,22 +428,23 @@ runs ("Typical comes from your {N} runs before this session").
 
 ### The chart and Chart options
 
-- The `Score threshold ({value})` line goes; the overlay families are the PB
-  line and the rank lines.
-- Chart options: the Score Threshold group and its two controls go, leaving
-  Overlays and Run Data Points, nine controls. The stored values stay behind,
-  unused.
+- The `Score threshold ({value})` line stays, drawn as today, by pace where
+  today's is, and judges no run. Clearing the percentage removes the line and
+  nothing else.
+- Chart options keeps its three groups and eleven controls. "Score threshold
+  overlay" starts off; "Score threshold percentage" keeps 95, so a stored
+  percentage survives (RT6 says what a browser keeps).
 - The Middle 50% and Middle 80% bands are unchanged: they still follow every
   run.
 
 ### What retires in code
 
-`judge_run`, `ThresholdVerdict`, `Unjudged`,
-`normalize_score_threshold_percentage` and `score_threshold_line` in
-`score_threshold.py`; `shown_percentage`'s miss cap (the 99.9% cap moves with
-the PB comparison); `CardBadge.THRESHOLD_PASSED` and `BELOW_THRESHOLD`; the
-threshold inputs of the card, list and chart callbacks; the two controls and
-their help text in `chart_options.py`.
+`judge_run`, `ThresholdVerdict` and `Unjudged` in `score_threshold.py`, with
+`shown_percentage`'s miss cap (the 99.9% cap moves with the PB comparison);
+`CardBadge.THRESHOLD_PASSED` and `BELOW_THRESHOLD`; the threshold inputs of
+the card and list callbacks. `normalize_score_threshold_percentage`,
+`score_threshold_line`, the chart callback's threshold inputs and the two
+controls stay; the switch's default becomes off.
 
 ### Copy
 
@@ -404,16 +458,19 @@ the PB card's leaderboard line reads `{n}% percentile`.
 | Bands | `Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%` |
 | Comparison line | `{band} of your last {N} runs at session start · {pct}% of PB`, or `· {pct}% of PB pace` |
 | Band hover, first line | `Measured against your last {N} runs when this run's session began.` |
-| Band hover, typical | `Typical score: {typical} · {pct}% above typical`, with `below`, `Matches typical`, or by pace `{pct}% faster than typical` and `slower` |
+| Band hover, typical | `Typical score: {typical} · {pct}% above typical`, with `below`, `Matches typical`, or by pace `{pct}% faster than typical` and `slower`; with no percentage to give, `Typical score: {typical}` |
 | Band hover, edges | `Middle 50%: {p25} to {p75}` and `Middle 80%: {p10} to {p90}` |
 | Band hover, old window | `Fewer than 10 of those runs were from the 30 days before the session began, so they may have been out of date.` |
 | Badges | `Top 10%`, `Bottom 10%`; `New PB` unchanged |
-| List mark hover and accessible text | `{band} of your last {N} runs at session start`, with `, which may have been out of date` on an old window |
+| List mark hover and accessible text | `{band} of your last {N} runs at session start`, with `, which may have been out of date` on an old window, whose mark shows the clock |
 | List hover, no band | `There was no typical score yet when this run's session began.` |
+| Score threshold percentage help text | `Sets the score goal as a percentage of your personal best. On a scenario scored by completion time, it's a percentage of your personal best's pace instead, when the app can measure pace reliably. Otherwise, it stays a percentage of your score. The overlay line tracks your current personal best.` |
 
 Retired strings: `Threshold passed`, `Below threshold`, the three "Not
-judged." hovers, `Score threshold ({value})`, the Score threshold overlay
-switch, the Score threshold percentage and its help text.
+judged." hovers, and the percentage help text's last sentence, `A run is
+judged against the personal best you had before the run.` The line's label
+`Score threshold ({value})`, both controls' labels and the switch's help text
+stay as they are.
 
 ### Terms
 
@@ -426,12 +483,25 @@ P75, between P25 and P75, below P25, or below P10. Unknown while that typical
 score is unknown.
 - On screen: `Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%`,
   with `of your last {N} runs at session start`; the outer two as the
-  latest-run card's badge and as the run list's check and down arrow.
+  latest-run card's badge and as the run list's check and down arrow, with
+  the clock where the window wasn't recent.
 - In code: `RunBand`, `band_at_session_start`.
-- Not a leaderboard percentile, not the retired Top N placement, and not the
-  chart's bands, which follow every run.
+- Not a leaderboard percentile, not the retired Top N placement, not the
+  chart's bands, which follow every run, and not a promised rate for the next
+  run.
 
-The glossary's Score threshold entry is removed.
+The glossary's Score threshold entry becomes:
+
+**Score threshold.** A score goal the player sets as a percentage of the PB,
+or of the PB's pace where the app measures a time-scored scenario by pace,
+drawn as a line on the chart. It judges no run.
+- On screen: the chart's `Score threshold ({value})` line, off until the
+  player turns on Score threshold overlay.
+- Not a rank's threshold, which comes from a benchmark file, and not the band
+  the latest-run card's badge and the run list's check show.
+
+The Typical at session start entry's on-screen wording moves with the phrase,
+into the band's hover.
 
 ### Decisions this changes
 
@@ -447,21 +517,21 @@ The glossary's Score threshold entry is removed.
   basis for `% of PB` stand. Superseded in part.
 - **[2026-10-13, Top N and the verdict
   switch](../decision_log/2026/2026-10-13-top-n-placement-and-the-score-threshold-verdict-switch-are-retired.md):**
-  no setting turns marks off any more. Its "Moving placement to the latest-run
-  card was considered and not taken" was about a run's place among all runs at
-  its sensitivity against an unexplained 5; the band is a place among the
-  typical's named window. Superseded in part.
+  no setting turns marks off any more, and clearing the percentage removes
+  only the line. Its "Moving placement to the latest-run card was considered
+  and not taken" was about a run's place among all runs at its sensitivity
+  against an unexplained 5; the band is a place among the typical's named
+  window. Superseded in part.
 - **2026-07-08, judged against the previous PB:** superseded; the PB-chased
   rule lives on in `% of PB`.
-- **2026-10-05, pace:** the threshold line's pace form leaves its list of
-  surfaces. Gains a note.
-- **The roadmap's "State verdicts, not advice"** names the score threshold as
-  its example of a bar the player set; the example becomes the band. The
-  2026-10-04 entry itself stands.
+- **2026-10-05, pace:** the verdict's two rows leave its table; the threshold
+  line's pace form stays. Gains a note.
 - Applied, not changed: [2026-10-18, two
   bands](../decision_log/2026/2026-10-18-two-percentile-bands-show-the-typical-scores-spread.md)
-  (its edges), 2026-10-14's rule on a card's lines, and 2026-10-22's old-value
-  clock.
+  (its edges), 2026-10-14's rule on a card's lines, 2026-10-22's evidence bar
+  and old-value clock, which reach the list's marks, and the 2026-10-04
+  principles with the roadmap's "State verdicts, not advice", whose example
+  of a bar the player set, the score threshold, stays true of the line.
 
 ### Alternatives rejected
 
@@ -479,9 +549,13 @@ The glossary's Score threshold entry is removed.
 - **A threshold as a percentage of the typical score.** The same fixed bar
   moved down: +5% is about 2 standard deviations on beanTS and half of one on
   CatClick Medium (the research read).
-- **The threshold kept, opt-in and empty by default.** Two controls and a
-  verdict family for a use nobody has named, and a second badge to rank
-  against the band (RT6).
+- **The line retired with the verdict** (RT6). The evidence against 95% bears
+  on the app's own verdict, not on a bar the player chooses, and the
+  2026-10-04 principles keep that bar as a verdict the app may state.
+- **The line on by default, at 95%** (RT6). It would draw the app's own
+  good-run bar on every scenario, the bar the pass rates discredit.
+- **An old window's mark left to the hover** (RT5). The qualification would
+  reach a reader only when they point at a row.
 - **A sixth band, `Best of your last 20`.** New PB already takes most such
   runs, and it adds a third top word.
 - **Red for Bottom 10%.** It reads as an alarm; gray is today's color for a
@@ -489,7 +563,7 @@ The glossary's Score threshold entry is removed.
 
 ## Out of scope
 
-- **Warm-up runs.** A visit's first run is 38% of Bottom 10% runs. Marking
+- **Warm-up runs.** A visit's first run is 40% of Bottom 10% runs. Marking
   warm-ups is an item of its own in the maintainer's note, tracked outside
   this proposal. Revisit if the first-run share keeps the bottom badge from
   being a useful cue.
@@ -512,17 +586,16 @@ description.
 1. **The band, pure.** `RunBand` and `band_at_session_start`, with tests on
    edges, ties, windows of 10 to 20, unknown and old windows. No UI.
 2. **Every surface, and the retirement.** The card's line, badge and hover,
-   the run viewer by way of `score_line`, the list's marks and hovers, the
-   chart line and Chart options group removed, the judging code deleted.
-   Specs, glossary, decision log, roadmap example, README Features line, user
-   guide and product inventory; deletes this proposal. One PR so no build
-   shows a band badge beside a threshold check.
+   the run viewer by way of `score_line`, the list's marks, clock and hovers,
+   the judging code deleted, the line's switch off by default and the
+   percentage's help text trimmed. Specs, glossary, decision log, README
+   Features line, user guide and product inventory; deletes this proposal.
+   One PR so no build shows a band badge beside a threshold check.
 
-PR #462 (K8) bounds the percentage this retires. Whichever merges second
-rebases; if #462 merges first, PR 2 removes its bound with the field. Open PR
-#469 adds a Run History spec statement that names the Score threshold among
-the overlay lines the score axis's autorange holds; if it merges first, PR 2
-drops the threshold from that statement too.
+PR #462 (K8) bounds the percentage, which stays; whichever merges second
+rebases. Open PR #469 adds a Run History spec statement that names the Score
+threshold among the overlay lines the score axis's autorange holds, which
+stays true.
 
 ## Testing
 
@@ -531,13 +604,16 @@ drops the threshold from that statement too.
   runs, one session of 15); a new PB always Top 10%; decimals at the edge.
 - **PR 2, unit:** the line's forms (band and PB part, PB part alone, new PB
   gain); the badge's precedence; the hover's lines, by score and by pace, old
-  and recent; the list's marks and hovers, the 30 px column holding a check
-  and a star; marks unchanged after a later run in another session; Chart
-  options without the group; a stored percentage ignored.
+  and recent, and with no percentage to give; the list's marks and hovers on
+  recent, old and unknown windows, an old check with a star and an old down
+  arrow; marks unchanged after a later run in another session; Chart options'
+  switch off and percentage at 95 to start; the line drawn at a set
+  percentage, with the card and the list unchanged by it.
 - **Browser** (headless Edge, then the maintainer's Firefox), on the states
   above, both themes, at 3840, 2560, 1920 and 1536 px: the longest line on one
-  line in the wide card, the narrow card's floor, the badge's contrast.
+  line in the wide card, the narrow card's floor, the badge's contrast, and
+  the marks column's width holding a check, a clock and a star.
 - **Screen reader** (NVDA): the badge, the line with `, Not recent`, and each
-  mark's accessible text.
+  mark's accessible text, old and recent.
 - **Gates:** pytest, ruff format and lint, mypy, compileall, as AGENTS.md
   lists.
