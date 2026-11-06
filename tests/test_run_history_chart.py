@@ -203,6 +203,99 @@ def test_score_vs_run_is_never_empty_for_a_scenario_with_runs(load_runs) -> None
     assert list(_points(figure).y) == [100.0]
 
 
+# --- Score vs Run: a range in days ---------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("run_range", "first_day"),
+    [
+        # 365 and 730 calendar dates, counting today, as the day modes count.
+        ("365d", date(2025, 10, 13)),
+        ("730d", date(2024, 10, 13)),
+    ],
+)
+def test_score_vs_run_counts_a_range_in_days_from_its_first_days_midnight(
+    load_runs, run_range, first_day
+) -> None:
+    """Counted as Score vs Time counts its days, so a run leaves at midnight."""
+    first_moment = datetime.combine(first_day, datetime.min.time())
+    just_outside = _run(101.0, first_moment - timedelta(seconds=1))
+    just_inside = _run(102.0, first_moment)
+    today = _run(103.0, MIDNIGHT_TODAY + timedelta(hours=20))
+    load_runs(just_outside, just_inside, today)
+
+    figure, supports_overlays = _figure(SCORE_VS_RUN, run_range=run_range)
+
+    assert supports_overlays is True
+    assert list(_points(figure).y) == [102.0, 103.0]
+
+
+@pytest.mark.parametrize(("run_range", "plotted"), [("365d", 365), ("730d", 730)])
+def test_a_range_in_days_numbers_its_runs_by_their_place_in_the_history(
+    load_runs, run_range, plotted
+) -> None:
+    """The points are the newest runs, in play order, numbered as ever."""
+    load_runs(*_daily_runs(800))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range=run_range)
+
+    points = _points(figure)
+    first_run_number = 800 - plotted + 1
+    assert list(points.x) == list(range(first_run_number, 801))
+    assert list(points.y) == [float(score) for score in range(first_run_number, 801)]
+    assert (list(_ring(figure).x), list(_ring(figure).y)) == ([800], [800.0])
+
+
+def test_a_range_in_days_draws_the_typical_score_the_whole_history_gives(
+    load_runs,
+) -> None:
+    """The value at the range's first run counts the runs before it."""
+    load_runs(*_daily_runs(800))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range="365d")
+    _faded, full = _line_traces(figure)
+
+    # Run 436 is the first in range. Its last 20 runs are 417 to 436.
+    assert (full.x[0], full.y[0]) == (436, 426.5)
+    assert full.x[-1] == 800
+
+
+def test_score_vs_run_says_when_a_range_in_days_holds_no_runs(load_runs) -> None:
+    """Reachable in Score vs Run too, in the day modes' words."""
+    load_runs(_run(100.0, MIDNIGHT_TODAY - timedelta(days=400)))
+
+    figure, supports_overlays = _figure(SCORE_VS_RUN, run_range="365d")
+
+    assert supports_overlays is False
+    assert len(figure.data) == 0
+    title, message = figure.layout.annotations
+    assert title.text == "<b>No runs in this range</b>"
+    assert message.text == "Choose a longer range or play more runs."
+
+
+@pytest.mark.parametrize("stored", ["365", "730", "2y", "365days"])
+def test_a_day_count_the_run_range_does_not_offer_reads_as_the_default(
+    load_runs, stored
+) -> None:
+    """A bare number is a count of runs, so the days select's 365 is never one."""
+    load_runs(*_daily_runs(800))
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range=stored)
+
+    assert list(_points(figure).x) == list(range(701, 801))
+
+
+@DAY_MODES
+def test_the_day_modes_ignore_a_range_in_days_on_the_run_select(
+    load_runs, mode
+) -> None:
+    load_runs(*_daily_runs(800))
+
+    figure, _supports_overlays = _figure(mode, run_range="730d", day_range="7")
+
+    assert len(_points(figure).y) == 7
+
+
 # --- Score vs Time and Score vs Sensitivity: a range in days -------------------
 
 
@@ -794,6 +887,8 @@ def test_the_mode_and_range_options_read_as_the_copy_block_words_them() -> None:
         "Last 50 runs",
         "Last 100 runs",
         "Last 200 runs",
+        "Last 12 months",
+        "Last 2 years",
         "All runs",
     ]
     assert labels(run_history_chart.DAY_RANGE_OPTIONS) == [

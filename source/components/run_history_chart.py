@@ -1,10 +1,11 @@
 """Choose what the Run History chart plots: its modes, its ranges, and its figure.
 
 The chart plots every run of one scenario inside a range. Score vs Run counts
-its range in runs. Score vs Time and Score vs Sensitivity count theirs in
-calendar days. The first two draw the typical score over the runs. The page
-holds the controls and the callback, and asks ``build_run_history_figure``
-for the figure. Nothing here has a component id or registers a callback.
+its range in runs, or in calendar days for two of its entries. Score vs Time
+and Score vs Sensitivity count theirs in calendar days. The first two draw the
+typical score over the runs. The page holds the controls and the callback, and
+asks ``build_run_history_figure`` for the figure. Nothing here has a component
+id or registers a callback.
 """
 
 import logging
@@ -52,10 +53,15 @@ CHART_MODE_DEFAULT = SCORE_VS_RUN
 
 # A range select holds a count as text, or this for the whole history.
 WHOLE_HISTORY = "all"
+# Ends a count in Score vs Run's select that is in days and not in runs.
+IN_DAYS = "d"
 RUN_RANGE_OPTIONS = [
     {"value": "50", "label": "Last 50 runs"},
     {"value": "100", "label": "Last 100 runs"},
     {"value": "200", "label": "Last 200 runs"},
+    # Counted as the day modes count, so a run leaves at midnight here too.
+    {"value": f"365{IN_DAYS}", "label": "Last 12 months"},
+    {"value": f"730{IN_DAYS}", "label": "Last 2 years"},
     {"value": WHOLE_HISTORY, "label": "All runs"},
 ]
 RUN_RANGE_DEFAULT = "100"
@@ -88,15 +94,21 @@ def _range_count(
     value: str | None,
     options: list[dict[str, str]],
     default: str,
-) -> int | None:
-    """Read a range select's value as a count, or None for the whole history.
+) -> tuple[int | None, bool]:
+    """Read a range select's value as a count, and whether it is marked as days.
 
-    A value the select does not offer reads as the default. The browser
-    stores the value, so one from an older list of options can come back.
+    The count is None for the whole history. Only Score vs Run's select marks
+    a count, since only it offers both units: every count in the days select
+    is in days. A value the select does not offer reads as the default. The
+    browser stores the value, so one from an older list of options can come
+    back.
     """
     if value not in {option["value"] for option in options}:
         value = default
-    return None if value == WHOLE_HISTORY else int(value)
+    if value == WHOLE_HISTORY:
+        return None, False
+    in_days = value.endswith(IN_DAYS)
+    return int(value.removesuffix(IN_DAYS)), in_days
 
 
 def first_moment_of_day_range(days: int, today: date) -> datetime:
@@ -107,6 +119,38 @@ def first_moment_of_day_range(days: int, today: date) -> datetime:
     at midnight and not in the middle of a day.
     """
     return datetime.combine(today - timedelta(days=days - 1), time.min)
+
+
+def _runs_in_day_range(runs: list[RunData], days: int, today: date) -> list[RunData]:
+    """Return the runs that ended in the last ``days`` calendar dates.
+
+    ``runs`` is in play order, which puts the end first, so the runs kept are
+    always its newest, as a range in runs keeps them.
+    """
+    first_moment = first_moment_of_day_range(days, today)
+    return [run for run in runs if run.datetime_object >= first_moment]
+
+
+def _runs_in_run_range(
+    runs: list[RunData], run_range: str | None, today: date
+) -> list[RunData]:
+    """Return the newest runs Score vs Run's range keeps, by count or by days."""
+    count, in_days = _range_count(run_range, RUN_RANGE_OPTIONS, RUN_RANGE_DEFAULT)
+    if count is None:
+        return runs
+    if in_days:
+        return _runs_in_day_range(runs, count, today)
+    return runs[-count:]
+
+
+def _no_runs_in_range() -> tuple[go.Figure, bool]:
+    return (
+        generate_empty_plot(
+            NO_RUNS_IN_RANGE_PLOT_TITLE,
+            NO_RUNS_IN_RANGE_PLOT_MESSAGE,
+        ),
+        False,
+    )
 
 
 def build_run_history_figure(  # noqa: PLR0913
@@ -187,8 +231,9 @@ def build_run_history_figure(  # noqa: PLR0913
         )
 
     if mode == SCORE_VS_RUN:
-        run_count = _range_count(run_range, RUN_RANGE_OPTIONS, RUN_RANGE_DEFAULT)
-        plotted = runs if run_count is None else runs[-run_count:]
+        plotted = _runs_in_run_range(runs, run_range, today)
+        if not plotted:
+            return _no_runs_in_range()
         first_run_number = len(runs) - len(plotted) + 1
         figure = generate_score_vs_run_plot(
             plotted,
@@ -231,19 +276,10 @@ def build_run_history_figure(  # noqa: PLR0913
             False,
         )
 
-    day_count = _range_count(day_range, DAY_RANGE_OPTIONS, DAY_RANGE_DEFAULT)
-    plotted = runs
-    if day_count is not None:
-        first_moment = first_moment_of_day_range(day_count, today)
-        plotted = [run for run in runs if run.datetime_object >= first_moment]
+    day_count, _in_days = _range_count(day_range, DAY_RANGE_OPTIONS, DAY_RANGE_DEFAULT)
+    plotted = runs if day_count is None else _runs_in_day_range(runs, day_count, today)
     if not plotted:
-        return (
-            generate_empty_plot(
-                NO_RUNS_IN_RANGE_PLOT_TITLE,
-                NO_RUNS_IN_RANGE_PLOT_MESSAGE,
-            ),
-            False,
-        )
+        return _no_runs_in_range()
 
     rank_data = _rank_data(selected_playlist, selected_scenario)
     if mode == SCORE_VS_TIME:
