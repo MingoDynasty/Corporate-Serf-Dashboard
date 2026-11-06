@@ -617,20 +617,32 @@ The card's lines, local-record scope and leaderboard presentation follow
   order
   ([2026-10-12][every-run]).
 - The range is a select beside the mode control, with the accessible name
-  "Range" and no visible label. Under Score vs Run it counts runs: "Last 50
-  runs", "Last 100 runs", "Last 200 runs", or "All runs". Under the other two
-  modes it counts days: "Last 7 days", "Last 14 days", "Last 30 days", "Last
-  90 days", "Last 12 months", or "All time". The chart opens on the last 100
-  runs, or the last 90 days. The mode and both ranges persist in the browser,
-  one remembered range for runs and one for days: they are two selects, both
-  always in the layout, and the one the mode does not use is hidden
+  "Range" and no visible label. Under Score vs Run it counts runs or days:
+  "Last 50 runs", "Last 100 runs", "Last 200 runs", "Last 12 months", "Last
+  2 years", or "All runs"
+  ([2026-10-12][every-run], [2026-11-05][run-days]).
+  Under the other two modes it counts days: "Last 7 days", "Last 14 days",
+  "Last 30 days", "Last 90 days", "Last 12 months", or "All time". The chart
+  opens on the last 100 runs, or the last 90 days. The mode and both ranges
+  persist in the browser, one remembered range for Score vs Run and one for
+  the other two modes: they are two selects, both always in the layout, and
+  the one the mode does not use is hidden
   ([2026-10-12][every-run]).
+  A remembered range the select does not offer, as one a later build stored
+  can be, plots the select's default, and the select shows no entry
+  ([2026-11-05][run-days]).
 - A range of N days is N calendar dates, counting today: it starts at local
   midnight N minus 1 days before today, so on October 11 the last 7 days are
-  October 5 to 11. The last 12 months are 365 days, counted the same way. The
-  date is the app's own, never the browser's. A chart left open past midnight
-  is redrawn within 30 seconds of the date moving on
-  ([2026-10-12][every-run]).
+  October 5 to 11. The last 12 months are 365 days, and the last 2 years 730,
+  counted the same way in every mode. The date is the app's own, never the
+  browser's. A chart left open past midnight is redrawn within 30 seconds of
+  the date moving on
+  ([2026-10-12][every-run], [2026-11-05][run-days]).
+- Under Score vs Run a range of days keeps the scenario's newest runs, as a
+  range of runs does, and plots them the same way: in play order, each at its
+  number in the whole history. It can hold no run, on a scenario not played
+  in that time
+  ([2026-11-05][run-days]).
 - The plot title is the scenario's name alone
   ([2026-10-12][every-run]).
 - Score vs Run and Score vs Time mark each plotted run that set a
@@ -840,6 +852,12 @@ The card's lines, local-record scope and leaderboard presentation follow
   drawn rank is above 100%, "Every rank on the chart has an estimated
   accuracy target above 100%." With no rank line drawn there is neither
   figure nor note ([2026-10-30][at-note]).
+- The score axis's full autorange holds the plotted runs, the typical
+  score's line and bands, and every overlay line drawn: the PB score, the
+  Score threshold, and the rank lines. So a range that leaves old runs out
+  still reaches an older PB's line, and the bands at its first runs, which
+  count runs before the range, can reach below every plotted run
+  ([2026-11-05][run-days]).
 - Zooming the x axis refits the score axis to what is in view: every
   visible trace's points inside the x window, padded by 5% of their span. The
   stars and the ring repeat run points, so they never change the fit. The
@@ -862,8 +880,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   ([2026-07-16][pre-hydration]):
   "No scenario selected" / "Select a scenario to see your score history.",
   "No local runs found" / "Play this scenario once and the graph will fill
-  in.", and, in the two modes that count days, "No runs in this range" /
-  "Choose a longer range or play more runs.". An unexpected mode value gets
+  in.", and, under any range of days, "No runs in this range" /
+  "Choose a longer range or play more runs."
+  ([2026-11-05][run-days]). An unexpected mode value gets
   "Unsupported graph option" / "Choose <b>Score vs Run</b>, <b>Score vs
   Time</b>, or <b>Score vs Sensitivity</b>.". A control named in an
   empty-state message is bold through `<b>` in the annotation string
@@ -1878,6 +1897,7 @@ it.
 [column]: ../decision_log/2026/2026-10-12-the-run-list-is-a-second-column-beside-the-chart.md
 [grid]: ../decision_log/2026/2026-10-12-the-run-list-is-built-on-ag-grid-community-and-nvda-is-run-on-the-built-list.md
 [every-run]: ../decision_log/2026/2026-10-12-the-run-history-chart-plots-every-run-and-draws-no-summary-line.md
+[run-days]: ../decision_log/2026/2026-11-05-score-vs-run-also-offers-the-last-12-months-and-the-last-2-years.md
 [at-rule]: ../decision_log/2026/2026-10-30-accuracy-targets-are-estimated-from-the-players-own-runs-where-at-least-5-agree.md
 [at-tenth]: ../decision_log/2026/2026-10-30-an-accuracy-target-shows-a-tenth-of-a-percent-rounded-up.md
 [at-margin]: ../decision_log/2026/2026-10-30-accuracy-targets-sit-beside-the-rank-lines-in-the-charts-right-margin.md
