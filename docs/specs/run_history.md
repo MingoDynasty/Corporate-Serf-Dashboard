@@ -522,6 +522,21 @@ The card's lines, local-record scope and leaderboard presentation follow
   every 30 seconds. Hovering or focusing the age shows the exact time, in the
   shared format with no seconds, such as `Oct 9, 2026, 5:24 PM`
   ([2026-07-11][timestamps]).
+- **Open run** ends the first line, at the card's right edge: a subtle
+  compact button with an eye icon, built as Refresh is. Its accessible name
+  is `Open run of your PB`, and hovering or focusing it shows "Open your PB
+  run where the chart is, and show its row in the run list." It shows in
+  every state with a local PB, the PB being the latest run included, and is
+  hidden with no scenario selected and with no local PB. The button is
+  taller than the line and takes 2px of the room above and below it, so the
+  line stays 18px and none of the card's lines moves ([2026-11-05][open-run]).
+- A press opens the PB run, the run the card describes, in
+  [the run viewer](#the-run-viewer), as a chart point opens its run, and
+  brings its row into view in the run list
+  ([Both views](#both-views)). The run is the one the card shows when the
+  button is pressed, so after a new PB it opens the new one. Nothing on the
+  chart changes: no mark is added and no range moves. Nothing is kept: a
+  reload shows the chart ([2026-11-05][open-run]).
 - The score is large, formatted as the playlist scenario table formats PB
   Score. Hovering or focusing it shows the line the latest-run card showed
   when this PB landed: `Up {pct}% on your previous best of {previous}`,
@@ -583,9 +598,10 @@ The card's lines, local-record scope and leaderboard presentation follow
 - In every state that can change between runs, the card fits in the row the
   dropdowns' column sets: 141px at 2560px. With no KovaaK's username the
   line's hint takes two lines and the row is about 164px.
-- The card is not a landmark or a button, and its first line is text. The
-  dotted score, the percentile, and the age take keyboard focus and show
-  their tooltips, as the latest-run card's age does.
+- The card is not a landmark or a button, and its first line is text, apart
+  from Open run at its end. The dotted score, the percentile, and the age
+  take keyboard focus and show their tooltips, as the latest-run card's age
+  does. The score and the age are never links ([2026-11-05][open-run]).
 
 ## The chart
 
@@ -1039,7 +1055,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   run card. Its row keeps the highlight even when the chart's range leaves
   its point off the chart. A selection change does not open rows or scroll
   the list to reach it. The highlight is a look alone and tells a screen
-  reader nothing ([2026-10-23][latest-highlights]).
+  reader nothing ([2026-10-23][latest-highlights]). The PB card's **Open
+  run** is a press, and does open the PB's session and scroll to its row
+  ([Both views](#both-views), [2026-11-05][open-run]).
 - With runs and no scenario selected, this view reads "No scenario selected"
   with the switch still above it, and "Expand all" and "Columns" out of view.
   A selected scenario with no local runs lists the newest session alone
@@ -1116,6 +1134,13 @@ The card's lines, local-record scope and leaderboard presentation follow
   all open. It opens no runs, and "Collapse all" leaves the scenario rows'
   own state alone. Both buttons read what a press would do, following every
   way a row can open or close.
+- The PB card's **Open run** opens the rows the PB run's row is under in the
+  view on screen: its session row, and under All scenarios its scenario row
+  too. Then it scrolls the row into view, as little as it takes, and leaves
+  keyboard focus where it is. Rows already open stay open, and nothing is
+  said in the live region. A PB whose session the view hasn't loaded is left
+  alone, and no older sessions load to reach it; the run still opens
+  ([2026-11-05][open-run]).
 - The "Columns" menu shows or hides, in table order, Shots Fired, Reloads,
   Sensitivity, FOV and Avg FPS ([2026-10-05][columns-menu]). Sensitivity is
   shown to start, and the other four are off ([2026-10-22][new-columns],
@@ -1235,6 +1260,9 @@ it.
   focused Run row opens it too. A position several runs share opens the run
   its tooltip names. Over a run point or a star the pointer is a hand. A
   Session or Scenario row keeps its own click and keys ([RV1][rv-open]).
+- The PB card's **Open run** opens the PB run, through the same request with
+  `card` as its source beside `list` and `chart`
+  ([The PB card](#the-pb-card), [2026-11-05][open-run]).
 - The run takes the place of everything in the chart's column: the chart,
   its header, and Chart options. The chart is hidden, not rebuilt, so
   closing the run shows it as it was left: its mode, zoom, ranges, hidden
@@ -1251,11 +1279,14 @@ it.
   dialog, a Select's list or the Columns menu: Esc then does only what that
   control does with it ([RV1][rv-open]).
 - Focus goes to **Close** when a run opens, and stays on the row pressed
-  when a run is switched from the list. When the run closes, by Close or
-  Esc, focus goes back to the Run row that opened it, scrolled into view, or
-  to the chart's mode control when a point or a star did. A row no longer in
-  the view on screen, or under a closed group, sends focus to the mode
-  control too ([RV1][rv-open]).
+  when a run is switched from the list, or on Open run when it switches the
+  run. When the run closes, by Close or Esc, focus goes back to the Run row
+  that opened it, scrolled into view, to Open run when it did, or to the
+  chart's mode control when a point or a star did. A row no longer in the
+  view on screen, or under a closed group, sends focus to the mode control
+  too, and so does a card that no longer shows Open run. What was pressed
+  last for the open run decides: the open run pressed again elsewhere
+  changes only where Close returns ([RV1][rv-open], [2026-11-05][open-run]).
 - A change of the selected scenario closes the run, made by the player or by
   Follow, and leaves focus where it is. The scenario written again with the
   value it already holds, as when a run lands with Follow on, changes
@@ -1858,7 +1889,8 @@ it.
   and back shows the chart. Nothing about a run is stored either: its
   figures are worked out each time it opens, from its stats file and its
   typical runs' files, and the stats folder and the performances folder are
-  only ever read.
+  only ever read. The PB card's Open run keeps nothing either: the PB run is
+  worked out from the run store with the card ([2026-11-05][open-run]).
 
 ## Setup surfaces
 
@@ -1975,6 +2007,8 @@ it.
 [compact-hover]: ../decision_log/2026/2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md
 
 [rv-open]: ../decision_log/2026/2026-10-30-a-run-opens-in-the-charts-place-and-close-or-esc-closes-it.md
+
+[open-run]: ../decision_log/2026/2026-11-05-the-pb-cards-open-run-opens-the-pb-run-and-brings-its-row-into-view.md
 
 [rv-typical]: ../decision_log/2026/2026-10-30-the-run-viewer-measures-a-run-against-its-typical-runs.md
 

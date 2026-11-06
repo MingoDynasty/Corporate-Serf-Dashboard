@@ -9,6 +9,12 @@ needed, so the benchmark milestone is visible without arithmetic or a hover.
 The leaderboard standing follows underneath. The PB run's sensitivity and
 accuracy give quieter context for that record.
 
+**Note (2026-11-05).** The first line now ends with an **Open run** button,
+which opens the PB run in the run viewer and brings its row into view in the
+run list ([2026-11-05](2026-11-05-the-pb-cards-open-run-opens-the-pb-run-and-brings-its-row-into-view.md)). The card is still neither a landmark nor a
+button, and its first line still reads `PB · set {age}`; Refresh is no
+longer its only control. Every line and rule below stands.
+
 **Ruling and delivery.** T3 of [#379](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/379),
 ratified by the maintainer on 2026-10-14 at `7329c23`, as amended after review
 to show the next rank's threshold and omit the leaderboard line without a

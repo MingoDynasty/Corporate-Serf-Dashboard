@@ -706,10 +706,13 @@ flowchart LR
   The run viewer is `components/run_viewer_panel.py`'s, and the page puts it
   last in the chart's column (`run-history-chart-column`) and wires it with
   `register_run_viewer()`. Opening a run goes: a click on a Run row (the
-  grid's `cellClicked`), Enter or Space on one (`runListKeyDown`), or a
-  `plotly_click` on a run point or star (`assets/runHistoryHover.js`) calls
-  `window.runViewer.request`, which writes the run id and what asked for it
-  to the `run-history-run-viewer-request` store with `set_props`. The one
+  grid's `cellClicked`), Enter or Space on one (`runListKeyDown`), a
+  `plotly_click` on a run point or star (`assets/runHistoryHover.js`), or a
+  press on the PB card's Open run (a clientside callback of
+  `components/pb_card.py`, which also calls
+  `window.runHistoryList.revealRun`) calls `window.runViewer.request`, which
+  writes the run id and what asked for it to the
+  `run-history-run-viewer-request` store with `set_props`. The one
   server callback, `show_run`, takes that store, Close's clicks and the
   scenario dropdown, and writes the open run to `run-history-run-viewer-open`,
   the chart column's class, the viewer's header and body, and
@@ -717,7 +720,10 @@ flowchart LR
   its file and typical runs' files through `view_run_from_store`, and builds
   its score line with the latest-run card's `score_line`. A clientside
   callback on the shown store hands it to `assets/runViewer.js`, which moves
-  focus and marks the run's row once the change is drawn. The column's class
+  focus and marks the run's row once the change is drawn. The viewer's root
+  names the chart's mode control and the PB card's Open run in its `data-`
+  attributes, where Close returns focus for a run a chart point or the card
+  opened. The column's class
   hides the chart's own parts and keeps them mounted, so no callback that
   opens or closes a run writes the figure. Esc is a capture-phase listener in
   `assets/runViewer.js` that presses Close. No store the viewer uses
@@ -1023,7 +1029,8 @@ flowchart LR
   leaderboard position as its leaderboard line. `personal_best()` is one
   pure function from a scenario's runs in the store's order, the order
   `get_personal_best_run()` takes the PB in, to the text the card shows:
-  when the PB was set, its score, the latest-run card's new-PB line for it
+  the PB run's id, when the PB was set, its score, the latest-run card's
+  new-PB line for it
   (`run_marks.new_pb_gain()` over `what_runs_chased()` in play order), the
   rank it has reached and the next rank's parts from
   `playlist_scenarios_service.ladder_standing()`, the table's own walk, and
@@ -1036,9 +1043,11 @@ flowchart LR
   interval, and 30-second interval, which the card only reads. It puts
   `pb_card()` in its layout and calls `register_pb_card()` with the ids
   once, at import, which registers `show_pb`, the clientside callback that
-  words the PB's age, and the leaderboard line's three: `get_scenario_rank`,
+  words the PB's age, the clientside callback that answers Open run, and the
+  leaderboard line's three: `get_scenario_rank`,
   the passive read, `refresh_rank`, the click, and the clientside callback
-  that words the line's hover. `show_pb` writes the card and shows the
+  that words the line's hover. `show_pb` writes the card, with the PB run's
+  id in a store Open run reads when pressed, and shows Open run and the
   leaderboard line only while the scenario has local runs, and the two
   server callbacks look up no scenario without them. A tick of the polling
   interval alone reads caches only, and the tick is told by its
