@@ -10,6 +10,14 @@ the chart opens on a new mode that spaces runs evenly in the order they were
 played. Score vs Sensitivity now shows every run at each sensitivity with
 nothing that sums one up, until that mode is redesigned.
 
+**Superseded in part (2026-11-05).** Under **Ranges**, Score vs Run no longer
+counts only runs: its select also offers the last 12 months and the last 2
+years, counted in days as the other two modes count theirs, by
+[the Score vs Run day-range decision](2026-11-05-score-vs-run-also-offers-the-last-12-months-and-the-last-2-years.md).
+So `No runs in this range` is reachable in all three modes, not only the two
+that count days. The rest of **Ranges**, its defaults, and the two remembered
+selects stand.
+
 **Superseded in part (2026-10-24).** The
 [run-point tooltip decision](2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md)
 replaces only the point-hover contract under **What else the chart keeps and

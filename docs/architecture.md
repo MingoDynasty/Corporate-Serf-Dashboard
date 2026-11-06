@@ -597,7 +597,8 @@ flowchart LR
   page's `SCENARIO_SELECTION_IDS`. The Follow switch sits with the scenario
   selector it governs rather than living in the panel.
   The chart's mode is a segmented control and its range is two selects, one
-  in runs and one in days, both always in the layout: a clientside callback
+  for Score vs Run, in runs or days, and one in days for the other two modes,
+  both always in the layout: a clientside callback
   hides the one the mode does not use by a class. They are two controls
   because each is remembered, and a remembered control's layout default
   cannot change with the mode. A range of days counts back from today, so
