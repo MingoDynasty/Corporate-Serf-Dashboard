@@ -12,7 +12,9 @@ scenario not played in that time, as Score vs Time already does.
 **Approval.** The maintainer approved the two entries on 2026-11-05. They come
 from a research note of that day on the maintainer's own runs, which weighed
 them against a per-run Hide, a minimum-date picker, and an automatic clamp of
-the score axis, and recommended these. What the chart does today is in
+the score axis, and recommended these. Built in
+[#469](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/469).
+What the chart does today is in
 [run_history.md](../../specs/run_history.md#the-chart).
 
 **The rule.**
