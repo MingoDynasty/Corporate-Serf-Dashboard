@@ -252,6 +252,10 @@ PB_CARD_IDS = PbCardIds(
     rank_updated_ts="run-history-position-updated-ts",
     rank_of_total="run-history-position-of-total",
     faded="run-history-pb-faded",
+    pb_run="run-history-pb-run",
+    open_run_field="run-history-pb-open-run-field",
+    open_run="run-history-pb-open-run",
+    open_run_sink="run-history-pb-open-run-sink",
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
@@ -866,7 +870,11 @@ def _chart_column() -> dmc.Box:
                     ],
                 ),
             ),
-            run_viewer(RUN_VIEWER_IDS, return_focus=CHART_MODE_ID),
+            run_viewer(
+                RUN_VIEWER_IDS,
+                return_focus=CHART_MODE_ID,
+                card_return_focus=PB_CARD_IDS.open_run,
+            ),
         ],
     )
 

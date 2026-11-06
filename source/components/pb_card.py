@@ -14,6 +14,10 @@ Refresh button. It is shown only while the scenario has a local PB. Its
 callbacks are plain functions here, registered once per page with that
 page's ids, as the card's are.
 
+The first line ends with Open run, which asks the page's run viewer for the
+PB run, as a chart point asks for its run, and brings the run's row into view
+in the run list.
+
 What the leaderboard line remembers between calls is module-level state:
 ``_session_notices_sent`` and ``_last_rank_hints``. Every page that
 registers the card reads and writes the same objects, so the Steam ID
@@ -58,11 +62,12 @@ from source.components.latest_run_card import (
 )
 from source.components.local_icon import local_icon
 from source.components.run_marks import new_pb_gain, what_runs_chased
+from source.components.run_viewer_panel import FROM_CARD
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity, get_kovaaks_username
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch_warning
-from source.kovaaks.data_models import Rank, RunData
+from source.kovaaks.data_models import Rank, RunData, run_id
 from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_runs_newest_first,
@@ -91,6 +96,12 @@ TOP_RANK_TEXT = "Top rank"
 NO_SCENARIO_TEXT = "No scenario selected"
 NO_LOCAL_PB_TEXT = "No local PB yet"
 NO_LOCAL_PB_MESSAGE = "Play this scenario to record one in this app."
+OPEN_RUN_LABEL = "Open run"
+# Its words first, so a voice command that says them still finds it.
+OPEN_RUN_NAME = "Open run of your PB"
+OPEN_RUN_TOOLTIP = (
+    "Open your PB run where the chart is, and show its row in the run list."
+)
 
 CARD_CLASS = "pb-card"
 HEADING_CLASS = "pb-card-heading"
@@ -107,6 +118,7 @@ FLEX_TARGET_CLASS = "pb-card-flex-target"
 WORD_END_CLASS = "pb-card-word-end"
 POSITION_LABEL_CLASS = "pb-card-position-label"
 POSITION_TOOLTIP_CLASS = "pb-card-position-tooltip"
+OPEN_RUN_CLASS = "pb-card-open-run"
 # The stylesheet drops the score cards' top offset while a hint shows, so
 # every hint keeps this class.
 RANK_HINT_CLASS = "scenario-rank-hint"
@@ -168,7 +180,9 @@ class NextRank:
 class PersonalBest:
     """What the card says about a scenario's PB, as the text it shows.
 
-    ``set_at`` is when the PB run ended, which the browser words as an age.
+    ``run_id`` is the PB run's id, as the run list keys its row, which Open
+    run asks the run viewer for. ``set_at`` is when the PB run ended, which
+    the browser words as an age.
     ``score_hover`` is the line the latest-run card showed when this PB
     landed, and ``None`` for a PB the scenario's first run set, which beat
     nothing. ``rank`` is the rank the PB has reached on the ladder the
@@ -179,6 +193,7 @@ class PersonalBest:
     card's last line.
     """
 
+    run_id: str
     set_at: datetime
     score: str
     score_hover: str | None
@@ -241,6 +256,7 @@ def personal_best(
             points=gap.points_text,
         )
     return PersonalBest(
+        run_id=run_id(run),
         set_at=run.datetime_object,
         score=format_score(run.score),
         score_hover=score_hover,
@@ -901,6 +917,11 @@ class PbCardIds(NamedTuple):
     stored, and ``rank_of_total``, the position and the total where the
     percentile leads. ``rank_refresh_button`` is Refresh.
 
+    ``open_run`` is Open run, at the first line's end, in ``open_run_field``,
+    hidden with no PB. ``pb_run`` is a store holding the PB run's id, which a
+    press reads, or nothing with no PB. ``open_run_sink`` takes the press's
+    script's empty answer.
+
     ``run_events``, ``scenario_dropdown``, ``playlist_filter``,
     ``polling_interval`` and ``relative_time_interval`` are the page's own.
     The card reads them and builds none of them:
@@ -927,6 +948,10 @@ class PbCardIds(NamedTuple):
     rank_updated_ts: str
     rank_of_total: str
     faded: str
+    pb_run: str
+    open_run_field: str
+    open_run: str
+    open_run_sink: str
     run_events: str
     scenario_dropdown: str
     playlist_filter: str
@@ -941,6 +966,8 @@ class PbCardContent(NamedTuple):
     body: list[Any]
     leaderboard_hidden: bool
     faded: str | None
+    pb_run: str | None
+    open_run_hidden: bool
 
 
 def _leaderboard_line(ids: PbCardIds) -> html.Div:
@@ -1005,6 +1032,42 @@ def _leaderboard_line(ids: PbCardIds) -> html.Div:
     )
 
 
+def _open_run(ids: PbCardIds) -> html.Span:
+    """Build Open run, which ends the first line while there is a PB.
+
+    The line is 18px and the button 22px. The stylesheet floats it to the
+    line's end, so it needs no flex box, which would drop the spaces either
+    side of the age, and pulls it 2px into the room above and below, so the
+    line keeps its height and no line under it moves.
+    """
+    return html.Span(
+        dmc.Tooltip(
+            dmc.Button(
+                OPEN_RUN_LABEL,
+                id=ids.open_run,
+                variant="subtle",
+                size="compact-xs",
+                leftSection=local_icon(
+                    "material-symbols:visibility-outline",
+                    width=14,
+                ),
+                **{"aria-label": OPEN_RUN_NAME},
+            ),
+            # As Refresh's: a block box would be a line taller than the button.
+            boxWrapperProps={"className": FLEX_TARGET_CLASS},
+            label=OPEN_RUN_TOOLTIP,
+            events=TOOLTIP_EVENTS,
+            multiline=True,
+            withArrow=True,
+            w=SETTINGS_HELP_TOOLTIP_WIDTH,
+        ),
+        className=OPEN_RUN_CLASS,
+        # The card's callback shows it once there is a PB run to open.
+        hidden=True,
+        id=ids.open_run_field,
+    )
+
+
 def pb_card(ids: PbCardIds) -> dmc.Paper:
     """Build the card with nothing in it yet.
 
@@ -1022,6 +1085,8 @@ def pb_card(ids: PbCardIds) -> dmc.Paper:
             # When the position was stored, and the hover's first line.
             dcc.Store(id=ids.rank_updated_ts),
             dcc.Store(id=ids.rank_of_total),
+            dcc.Store(id=ids.pb_run),
+            dcc.Store(id=ids.open_run_sink),
             # Not a flex container, which would drop the spaces either side of
             # the age and hand a screen reader the words run together.
             html.Div(
@@ -1050,6 +1115,7 @@ def pb_card(ids: PbCardIds) -> dmc.Paper:
                         hidden=True,
                         id=ids.label,
                     ),
+                    _open_run(ids),
                 ],
             ),
             html.Div(id=ids.body, className=BODY_CLASS),
@@ -1122,7 +1188,8 @@ def pb_card_content(
     """Build what the card shows for a PB, or for a scenario with none.
 
     The leaderboard line follows the local PB: with none, there is nothing
-    the line could sit under, and no line.
+    the line could sit under, and no line. So does Open run, which shows in
+    every state with a PB, the PB being the latest run included.
     """
     if not selected_scenario:
         return PbCardContent(
@@ -1130,6 +1197,8 @@ def pb_card_content(
             body=[html.Div(NO_SCENARIO_TEXT, className=EMPTY_TITLE_CLASS)],
             leaderboard_hidden=True,
             faded=None,
+            pb_run=None,
+            open_run_hidden=True,
         )
     if shown is None:
         return PbCardContent(
@@ -1140,6 +1209,8 @@ def pb_card_content(
             ],
             leaderboard_hidden=True,
             faded=None,
+            pb_run=None,
+            open_run_hidden=True,
         )
     score_row: list[Any] = [_score(shown)]
     if shown.rank is not None:
@@ -1154,7 +1225,26 @@ def pb_card_content(
         body=body,
         leaderboard_hidden=False,
         faded=shown.faded,
+        pb_run=shown.run_id,
+        open_run_hidden=False,
     )
+
+
+# A press asks the run viewer (``assets/runViewer.js``) for the PB run, as a
+# chart point asks for its run, and opens the rows the run list holds it under
+# (``assets/runHistoryList.js``). Both are the page's scripts, so the card
+# names no id of theirs.
+_OPEN_RUN_SCRIPT = f"""
+(clicks, runId) => {{
+    if (clicks && runId && window.runViewer) {{
+        window.runViewer.request(runId, "{FROM_CARD}");
+        if (window.runHistoryList) {{
+            window.runHistoryList.revealRun(runId);
+        }}
+    }}
+    return window.dash_clientside.no_update;
+}}
+"""
 
 
 def show_pb(_run_events, selected_scenario, selected_playlist) -> PbCardContent:
@@ -1184,6 +1274,8 @@ def register_pb_card(ids: PbCardIds) -> None:
         Output(ids.body, "children"),
         Output(ids.leaderboard, "hidden"),
         Output(ids.faded, "children"),
+        Output(ids.pb_run, "data"),
+        Output(ids.open_run_field, "hidden"),
         Input(ids.run_events, "data"),
         Input(ids.scenario_dropdown, "value"),
         # The badge and the next rank follow the filter's benchmark at once,
@@ -1197,6 +1289,15 @@ def register_pb_card(ids: PbCardIds) -> None:
         Output(ids.time_tooltip, "label"),
         Input(ids.set_at, "data"),
         Input(ids.relative_time_interval, "n_intervals"),
+    )
+    clientside_callback(
+        _OPEN_RUN_SCRIPT,
+        Output(ids.open_run_sink, "data"),
+        Input(ids.open_run, "n_clicks"),
+        # State, not Input: a run that sets a new PB changes the run the
+        # button opens, and must not open it.
+        State(ids.pb_run, "data"),
+        prevent_initial_call=True,
     )
     callback(
         Output(ids.rank, "children"),

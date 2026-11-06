@@ -1766,6 +1766,7 @@ def _expected_registrations(ids) -> list[tuple]:
             [f"{ids.set_at}.data", f"{ids.relative_time_interval}.n_intervals"],
             [],
         ),
+        (None, [f"{ids.open_run}.n_clicks"], [f"{ids.pb_run}.data"]),
         (
             pb_card.get_scenario_rank,
             [
@@ -1852,6 +1853,9 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
         "second-body",
         "second-leaderboard",
         "second-faded",
+        "second-pb_run",
+        "second-open_run_field",
+        "second-open_run_sink",
         "second-label",
         "second-time",
         "second-time_tooltip",

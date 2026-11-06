@@ -553,6 +553,15 @@ a.run-toast-link {
     line-height: 18px;
 }
 
+/* Open run, at the first line's end. Floated, as the line is not a flex box.
+   The button is 22px and the line 18px: pulled 2px into the room above and
+   below, it keeps the line 18px, so the card's lines stay level with the
+   other score cards'. */
+.pb-card-open-run {
+    float: right;
+    margin: -2px 0;
+}
+
 /* The rank the PB has reached: the page's text on a tint of the rank's color,
    bordered in that color, so a pale rank stays legible in both themes. The
    two classes outrank the badge's own, whose colors are its variant's. */

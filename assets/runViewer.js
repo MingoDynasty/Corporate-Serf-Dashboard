@@ -3,7 +3,7 @@
 // opens and closes it and draws it. This script asks it for a run, closes the
 // run on Esc, and once a change is drawn moves focus and marks the run's row
 // in the list (assets/runHistoryList.js). It also gives By Bot's grid its name
-// order. The viewer's root names the store a request goes to and the control
+// order. The viewer's root names the store a request goes to and the controls
 // focus returns to, in its data- attributes.
 (function () {
   function viewer() {
@@ -18,9 +18,9 @@
     return element.getClientRects().length > 0;
   }
 
-  // Asked by a Run row ("list") or a chart point ("chart"). The time makes
-  // each press a new value, so the same run asked for again after a close
-  // still reaches the server.
+  // Asked by a Run row ("list"), a chart point ("chart") or the PB card's Open
+  // run ("card"). The time makes each press a new value, so the same run
+  // asked for again after a close still reaches the server.
   function request(runId, from) {
     var root = viewer();
     if (!root || !window.dash_clientside) {
@@ -112,6 +112,12 @@
     return control && (control.querySelector("input:checked") || control.querySelector("input"));
   }
 
+  // Open run, or the chart's mode control while the card shows no PB.
+  function cardButton(root) {
+    var button = document.getElementById(root.getAttribute("data-card-return-focus"));
+    return button && visible(button) ? button : chartModeControl(root);
+  }
+
   // ``shown`` is what the server drew: the open run, or none, what focus
   // does next, and the run the change was about.
   function shown(change) {
@@ -130,6 +136,10 @@
     if (change.focus === "close") {
       focusWhenShown(function () {
         return root && root.querySelector(".run-viewer-close");
+      });
+    } else if (change.focus === "card") {
+      focusWhenShown(function () {
+        return root && cardButton(root);
       });
     } else if (change.focus === "row" || change.focus === "chart") {
       // The row that opened the run, when it is still in the view on screen
