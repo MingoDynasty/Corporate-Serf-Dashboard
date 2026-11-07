@@ -1136,6 +1136,7 @@ def test_the_chart_rebuilds_on_the_mode_both_ranges_the_date_and_the_playlist_fi
         f"{options.middle_80_overlay}.checked",
         f"{options.score_threshold_overlay}.checked",
         f"{options.score_threshold_percentage}.value",
+        f"{run_history.RUN_VIEWER_IDS.exclusions}.data",
     ]
     # It reads no notification setting and no toast registry: the shell sends
     # the run toast.
@@ -1839,7 +1840,7 @@ def _card_registration() -> dict:
     return _registration(f"{run_history.LATEST_RUN_CARD_IDS.body}.children")
 
 
-def test_the_card_is_written_by_these_five_inputs_and_on_load():
+def test_the_card_is_written_by_these_six_inputs_and_on_load():
     """The date among them: an older session's name leaves its year out only while it is this year's.
 
     The browser words the run's age, so the date is not read for that.
@@ -1857,6 +1858,7 @@ def test_the_card_is_written_by_these_five_inputs_and_on_load():
         f"{run_history.CHART_OPTIONS_IDS.score_threshold_percentage}.value",
         f"{run_history.SESSION_IN_PROGRESS_STORE_ID}.data",
         f"{run_history.TODAY_STORE_ID}.data",
+        f"{run_history.RUN_VIEWER_IDS.exclusions}.data",
     ]
     assert _keys(registration["state"]) == [f"{run_history.LATEST_RUN_STORE_ID}.data"]
     # The page load runs it, so the card is right with no new run.

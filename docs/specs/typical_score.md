@@ -16,6 +16,11 @@ scores cannot stop a calculation.
   run counts, including a run with no version hash. Versions are treated as
   comparable even when a rework changes the scoring scale
   ([TS1][typical-definition]).
+- A run the player excluded never counts: it is never a score in a window,
+  gets no value of its own, and still joins the runs either side of it into
+  one session. The windows below are of counted runs. The caller passes the
+  excluded runs' ids, so the definition still reads no store
+  ([2026-11-07][exclude]).
 - The CSV parser skips a stats file whose score is NaN or infinite, including
   numeric overflow to infinity. It never enters the run store or a supporting
   window. Finite scores, including zero and negative scores, are retained.
@@ -175,3 +180,5 @@ scores cannot stop a calculation.
 [typical-card-lead]: ../decision_log/2026/2026-10-20-scenario-stats-leads-with-the-typical-score.md
 
 [typical-session-start]: ../decision_log/2026/2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md
+
+[exclude]: ../decision_log/2026/2026-11-07-a-player-can-exclude-a-run-from-the-chart-and-the-typical-score.md

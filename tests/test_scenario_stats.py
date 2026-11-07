@@ -108,6 +108,7 @@ PAGE_BUILT_FIELDS = (
     "scenario_dropdown",
     "playlist_filter",
     "relative_time_interval",
+    "exclusions",
 )
 
 
@@ -158,6 +159,7 @@ def _expected_registrations(ids) -> list[tuple]:
                 f"{ids.run_events}.data",
                 f"{ids.scenario_dropdown}.value",
                 f"{ids.relative_time_interval}.n_intervals",
+                f"{ids.exclusions}.data",
             ],
             [f"{ids.lead}.children", f"{ids.recent_readout}.children"],
         ),

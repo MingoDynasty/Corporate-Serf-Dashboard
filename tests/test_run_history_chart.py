@@ -25,8 +25,8 @@ from source.components.run_history_chart import (
     build_run_history_figure,
     first_moment_of_day_range,
 )
-from source.kovaaks import data_service
-from source.kovaaks.data_models import Rank, RunData
+from source.kovaaks import data_service, excluded_runs_service
+from source.kovaaks.data_models import Rank, RunData, run_id
 from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.time_scored_service import PaceBasis
 from source.kovaaks.typical_score import (
@@ -1671,3 +1671,105 @@ def test_a_zoom_inside_a_hold_keeps_its_line_and_bands_in_view(load_runs) -> Non
     value = _values(runs)[19]
     assert _fitted_scores(figure, *window, crossings=False) is None
     assert _fitted_scores(figure, *window) == (value.p10, value.p90)
+
+
+# --- Excluded runs ---------------------------------------------------------------
+
+
+def _exclude(*runs: RunData) -> None:
+    for run in runs:
+        excluded_runs_service.set_run_excluded(run_id(run), excluded=True)
+
+
+def test_an_excluded_run_leaves_score_vs_run_and_the_others_keep_their_numbers(
+    load_runs,
+) -> None:
+    """The range still counts the run, so its place on the axis stays empty."""
+    runs = _daily_runs(120)
+    load_runs(*runs)
+    _exclude(runs[109])
+
+    figure, supports_overlays = _figure(SCORE_VS_RUN, run_range="100")
+
+    points = _points(figure)
+    assert supports_overlays is True
+    assert list(points.x) == [n for n in range(21, 121) if n != 110]
+    assert 110.0 not in points.y
+
+
+def test_the_typical_score_on_the_chart_leaves_excluded_runs_out(load_runs) -> None:
+    """Run 21's window is its last 20 counted runs: run 1 and runs 12 to 21."""
+    runs = _daily_runs(120)
+    load_runs(*runs)
+    _exclude(*runs[1:11])
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN, run_range="100")
+    _faded, full = _line_traces(figure)
+
+    assert (full.x[0], full.y[0]) == (21, 16)
+
+
+@DAY_MODES
+def test_an_excluded_run_leaves_the_day_modes(load_runs, mode) -> None:
+    runs = _daily_runs(10)
+    load_runs(*runs)
+    _exclude(runs[4])
+
+    figure, _supports_overlays = _figure(mode, day_range="30")
+
+    assert sorted(_points(figure).y) == [1.0, 2.0, 3.0, 4.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+
+
+def test_score_vs_time_holds_only_the_counted_runs_values(load_runs) -> None:
+    runs = _daily_runs(30)
+    load_runs(*runs)
+    _exclude(runs[29])
+
+    figure, _supports_overlays = _figure(SCORE_VS_TIME, day_range="90")
+    _faded, full = _line_traces(figure)
+
+    # The last counted run, run 29, holds the last value: runs 10 to 29.
+    assert full.y[-1] == statistics.median(range(10, 30))
+
+
+@pytest.mark.parametrize("mode", [SCORE_VS_RUN, SCORE_VS_TIME, SCORE_VS_SENSITIVITY])
+def test_a_range_of_excluded_runs_says_so(load_runs, mode) -> None:
+    runs = _daily_runs(3)
+    load_runs(*runs)
+    _exclude(*runs)
+
+    figure, supports_overlays = _figure(mode)
+
+    title, message = figure.layout.annotations
+    assert supports_overlays is False
+    assert title.text == "<b>Every run in this range is excluded</b>"
+    assert message.text == (
+        "Choose a longer range, or open a run from the list to include it again."
+    )
+
+
+def test_an_excluded_newest_run_has_no_ring(load_runs) -> None:
+    runs = _daily_runs(5)
+    load_runs(*runs)
+    _exclude(runs[-1])
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+
+    assert _ring(figure) is None
+    assert list(_points(figure).y) == [1.0, 2.0, 3.0, 4.0]
+
+
+def test_an_excluded_pb_still_decides_which_later_runs_are_new_pbs(load_runs) -> None:
+    """A hidden PB is still the PB: a later run under it gets no star."""
+    runs = [
+        _run(100.0, MIDNIGHT_TODAY - timedelta(days=3)),
+        _run(200.0, MIDNIGHT_TODAY - timedelta(days=2)),
+        _run(150.0, MIDNIGHT_TODAY - timedelta(days=1)),
+    ]
+    load_runs(*runs)
+    _exclude(runs[1])
+
+    figure, _supports_overlays = _figure(SCORE_VS_RUN)
+
+    assert list(_points(figure).y) == [100.0, 150.0]
+    assert _stars(figure) == []

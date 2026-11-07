@@ -23,6 +23,7 @@ from source.components.control_name import control_name
 from source.components.latest_run_card import EMPTY_TITLE_CLASS, SCORE_CLASS, TIME_CLASS
 from source.components.local_icon import local_icon
 from source.components.run_history_list import NO_SCENARIO_TEXT
+from source.kovaaks.data_models import run_id
 from source.kovaaks.data_service import (
     get_all_runs,
     get_playlist_by_code,
@@ -30,6 +31,7 @@ from source.kovaaks.data_service import (
     is_benchmark_playlist,
     is_scenario_in_database,
 )
+from source.kovaaks.excluded_runs_service import excluded_run_ids
 from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.playlist_scenarios_service import playlist_scenario_groups
 from source.kovaaks.typical_score import (
@@ -44,6 +46,7 @@ from source.kovaaks.typical_score import (
 
 SCENARIO_STATS_LABEL = "Typical score"
 NO_RUNS_TEXT = "No runs yet"
+ALL_EXCLUDED_TEXT = "Every run of this scenario is excluded."
 TOOLTIP_TARGET_CLASS = "scenario-stats-tooltip-target"
 WORD_END_CLASS = "scenario-stats-word-end"
 DIMMED_CLASS = "scenario-stats-dimmed"
@@ -53,7 +56,8 @@ def _help() -> dmc.Tooltip:
     """Explain the figure beside the card's first line."""
     paragraphs: list[Any] = [
         "Your typical score is the median of your last 20 runs of this scenario, "
-        "or of all your runs if you have fewer. Runs count regardless of age.",
+        "or of all your runs if you have fewer. Runs count regardless of age, "
+        "except the runs you exclude.",
         [
             "On the chart, the darker band shows the middle 50% of those scores, "
             "and the lighter band the middle 80%. Narrower bands mean more "
@@ -105,13 +109,14 @@ def get_scenario_typical_score(
     _tick,
     current_lead=None,
     current_readout=None,
+    _exclusions=None,
 ) -> tuple[Any, Any, bool]:
     """Build the lead from one run snapshot, keeping unchanged tooltips mounted.
 
     Return the lead's children, the recency readout and whether to hide the
     lead. Unchanged children or readout are ``no_update``; visibility is
-    always written. The run-event payload and interval count trigger the
-    call and are not read.
+    always written. The run-event payload, the interval count and the
+    exclusions store trigger the call and are not read.
     """
     lead: Any = []
     readout: Any = ""
@@ -124,8 +129,13 @@ def get_scenario_typical_score(
         if not runs:
             lead = html.Div(NO_RUNS_TEXT, className=EMPTY_TITLE_CLASS)
         else:
-            value = build_typical_scores(runs, split_into_play_sessions(snapshot))[-1]
-            if value.known:
+            excluded = excluded_run_ids()
+            counted = [run for run in runs if run_id(run) not in excluded]
+            values = build_typical_scores(
+                runs, split_into_play_sessions(snapshot), excluded=excluded
+            )
+            value = values[-1] if values else None
+            if value is not None and value.known:
                 recent = typical_score_recency(value, now)
                 if recent.run_count < value.run_count:
                     readout = f" · {recent.run_count} of {value.run_count} recent runs"
@@ -134,11 +144,14 @@ def get_scenario_typical_score(
                 css = f"{SCORE_CLASS} {TIME_CLASS}"
                 if not recent.recent:
                     css += f" {DIMMED_CLASS}"
-                label: Any = _value_hover(value, len(runs), now)
+                # Counted runs: an excluded one is not one of "your runs".
+                label: Any = _value_hover(value, len(counted), now)
             else:
                 text = TOO_FEW_RUNS_TEXT
                 css = f"{EMPTY_TITLE_CLASS} {TIME_CLASS}"
-                label = below_minimum_text(value)
+                label = (
+                    ALL_EXCLUDED_TEXT if value is None else below_minimum_text(value)
+                )
             lead = dmc.Tooltip(
                 html.Span(
                     [text, html.Span(" ", className=WORD_END_CLASS)],
@@ -171,10 +184,11 @@ class ScenarioStatsIds(NamedTuple):
     ``category``, ``num_runs_row``, ``num_runs``, ``no_scenario``, ``lead``
     and ``recent_readout``.
     ``run_events``, ``scenario_dropdown`` and ``playlist_filter`` are the
-    page's own, as is its ``relative_time_interval``. The card reads them and
-    builds none of them: ``run_events``
-    is the store the page's run delivery writes when new runs land on the
-    scenario it shows.
+    page's own, as are its ``relative_time_interval`` and ``exclusions``. The
+    card reads them and builds none of them: ``run_events`` is the store the
+    page's run delivery writes when new runs land on the scenario it shows,
+    and ``exclusions`` the one its run viewer writes when a run is excluded
+    or included again.
     """
 
     category_row: str
@@ -188,6 +202,7 @@ class ScenarioStatsIds(NamedTuple):
     lead: str
     recent_readout: str
     relative_time_interval: str
+    exclusions: str
 
 
 def get_scenario_category(
@@ -319,4 +334,7 @@ def register_scenario_stats(ids: ScenarioStatsIds) -> None:
         Input(ids.relative_time_interval, "n_intervals"),
         State(ids.lead, "children"),
         State(ids.recent_readout, "children"),
+        # Last, so it is the function's last argument: a run excluded or
+        # included again, read for nothing but its change.
+        Input(ids.exclusions, "data"),
     )(get_scenario_typical_score)

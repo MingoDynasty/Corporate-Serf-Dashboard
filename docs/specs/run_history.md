@@ -4,8 +4,8 @@ Run History charts one scenario's runs and typical score beside a session
 list, with point tooltips naming each run's session, hover linking each chart
 run to one list row and a separate latest-run highlight.
 A click on any run, on the chart or in the list, opens it in the chart's
-place, measured against the runs behind its typical score, until it is
-closed.
+place, measured against the runs behind its typical score, and there the
+player can exclude it from the chart and the typical score.
 Its top row puts the player's note beside the scenario selectors, followed
 by adjacent cards for its typical score, personal best and latest run. The
 page receives each new run once without a reload and can follow the
@@ -601,6 +601,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   inside two bands, below ([TS3][typical-chart], [TS4][typical-bands]).
   Score vs Sensitivity draws no summary line
   ([2026-10-12][every-run]).
+- A run the player [excluded](#excluding-a-run) is not drawn in any mode,
+  and is never a score in the typical score's window. It still counts in the
+  range's count of runs and in the run numbers, so Score vs Run leaves its
+  place on the axis empty, and as a PB it still decides which later runs get
+  a star ([2026-11-07][exclude]).
 - Score vs Run plots the runs in the order they were played, evenly spaced.
   The order is the one [sessions.md](sessions.md#sessions) sets, so the chart
   and the run list never disagree about which run came first. A run's place
@@ -863,7 +868,10 @@ The card's lines, local-record scope and leaderboard presentation follow
   "No scenario selected" / "Select a scenario to see your score history.",
   "No local runs found" / "Play this scenario once and the graph will fill
   in.", and, in the two modes that count days, "No runs in this range" /
-  "Choose a longer range or play more runs.". An unexpected mode value gets
+  "Choose a longer range or play more runs.". In any mode, a range whose
+  runs are all excluded gets "Every run in this range is excluded" /
+  "Choose a longer range, or open a run from the list to include it again."
+  ([2026-11-07][exclude]). An unexpected mode value gets
   "Unsupported graph option" / "Choose <b>Score vs Run</b>, <b>Score vs
   Time</b>, or <b>Score vs Sensitivity</b>.". A control named in an
   empty-state message is bold through `<b>` in the annotation string
@@ -1434,6 +1442,22 @@ it.
   one Dash component per cell: a kill table can run to hundreds of rows
   ([RV6][rv-recorded]).
 
+### Excluding a run
+
+- **Exclude run** sits in the header, left of **Close**. It asks first, in
+  the browser's confirm box: "Exclude this run? It leaves the chart and your
+  typical score. Your PB and the leaderboard still count it." On an
+  excluded run it reads **Include run**, which asks nothing
+  ([2026-11-07][exclude]).
+- Under the header, an excluded run's line reads "Excluded. This run doesn't
+  count on the chart or in your typical score." The same line gives the
+  reason a press failed, or the store's own message when its file can't be
+  used, in which case every run counts ([2026-11-07][exclude]).
+- A press redraws the chart behind the viewer, the run list, the latest-run
+  card and Scenario Stats. The chart is rebuilt, so it comes back without
+  its zoom. The open run and its figures stay as they were: a run's own
+  figures never count it ([2026-11-07][exclude]).
+
 ## Marks: the check and the star
 
 - Two facts about a run are drawn beside its score in the run list, and
@@ -1443,6 +1467,10 @@ it.
   run can carry both. The check's hover and accessible name are "Threshold
   passed", and the star's are "New PB"
   ([2026-10-12][check]).
+- An excluded run stays in the list, in either view, with its cells
+  dimmed. Its marks cell's hover and screen-reader text say "Excluded. It
+  doesn't count on the chart or in your typical score." Its check and star
+  are judged as any run's are ([2026-11-07][exclude]).
 - A run is judged against the PB it was chasing: the scenario's best score
   before it, at any sensitivity
   ([2026-07-08][previous-pb]).
@@ -1714,7 +1742,10 @@ it.
   over `Total runs: 0`. Below the existence minimum the lead reads "Too few
   runs", whose hover gives the minimum and the scenario's run and session
   counts, with singular wording for one
-  ([TS8][typical-card-lead]).
+  ([TS8][typical-card-lead]). The counts are of counted runs, and a
+  scenario whose runs are all excluded reads "Too few runs" with the hover
+  "Every run of this scenario is excluded." Total runs counts every run
+  ([2026-11-07][exclude]).
 - The first line's help explains the median, both bands and their switches,
   the dimming, and why the card's recency can differ from the chart's last
   point. The help icon and the hovered lead accept keyboard focus
@@ -1827,7 +1858,8 @@ it.
   stores are rebuilt from them at startup, and every view on this page is
   therefore recomputable at any time: the chart, the run list, the marks, and
   the card
-  ([2026-08-08][rank-history]).
+  ([2026-08-08][rank-history]). The one exception is which runs the player
+  excluded, below.
 - Leaderboard positions are not history: only the latest position per
   scenario is cached, past positions are overwritten and cannot be
   reconstructed, and capture stays unbuilt until a position-over-time
@@ -1843,10 +1875,14 @@ it.
 - The chart-appearance preferences live only in the browser's local
   storage. Nothing the panel sets is written server-side
   ([2026-08-20][points]).
-- Scenario notes are the one thing on this page a player writes and nothing
-  can rebuild. Each is a file under `data/scenario_notes/`, read when its
-  scenario is selected and never held in memory
-  ([2026-10-18][note-store]). Text that isn't saved yet lives only in the
+- Scenario notes and excluded runs are the two things on this page a
+  player writes and nothing can rebuild. Each note is a file under
+  `data/scenario_notes/`, read when its scenario is selected and never held
+  in memory
+  ([2026-10-18][note-store]). The excluded runs are one file,
+  `data/excluded_runs.json`, read whenever a chart, a list, a card or a
+  typical score needs it and never held in memory
+  ([2026-11-07][exclude]). Text that isn't saved yet lives only in the
   open page: nothing keeps a draft, so only a crash or a killed browser loses
   it without a question ([2026-10-18][note-unsaved]).
 - Nothing about a mark is stored. A check and a star are worked out again
@@ -1855,8 +1891,9 @@ it.
   ([2026-10-12][check]).
 - The run open in [the run viewer](#the-run-viewer) is held by the open page
   alone: it is not in the address, and a reload or a visit to another page
-  and back shows the chart. Nothing about a run is stored either: its
-  figures are worked out each time it opens, from its stats file and its
+  and back shows the chart. Nothing else about a run is stored: whether it
+  is excluded is the store above, and its figures are worked out each time
+  it opens, from its stats file and its
   typical runs' files, and the stats folder and the performances folder are
   only ever read.
 
@@ -1945,6 +1982,8 @@ it.
 [stats-last-played]: ../decision_log/2026/2026-10-18-last-played-leaves-scenario-stats-and-its-first-line-is-plain-text.md
 [heading-line]: ../decision_log/2026/2026-10-18-the-run-lists-heading-line-is-for-screen-readers-only.md
 [note-store]: ../decision_log/2026/2026-10-18-a-scenario-note-is-one-plain-text-note-per-scenario-in-a-file-of-its-own.md
+
+[exclude]: ../decision_log/2026/2026-11-07-a-player-can-exclude-a-run-from-the-chart-and-the-typical-score.md
 [note-card]: ../decision_log/2026/2026-10-18-run-historys-top-row-shows-the-selected-scenarios-note.md
 [long-note]: ../decision_log/2026/2026-10-19-a-long-scenario-note-scrolls-in-its-card.md
 [note-aligned]: ../decision_log/2026/2026-10-28-the-scenario-note-lines-up-with-the-score-cards.md

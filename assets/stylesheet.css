@@ -1128,6 +1128,12 @@ a.run-toast-link {
     outline-offset: -2px;
 }
 
+/* A run the player excluded: still listed, dimmed. Its cells, not the row,
+   so the open run's outline keeps its full strength. */
+.run-history-list-grid .ag-row.run-list-row-excluded .ag-cell {
+    opacity: 0.45;
+}
+
 /* ---- The run viewer, in the chart's place ----
    Hidden, not removed: everything else in the chart's column stays mounted
    while a run is open, so the chart comes back with its mode, zoom, ranges
@@ -1185,6 +1191,18 @@ a.run-toast-link {
 
 .run-viewer-close {
     flex: none;
+}
+
+.run-viewer-actions {
+    display: flex;
+    flex: none;
+    gap: var(--mantine-spacing-xs);
+}
+
+.run-viewer-exclusion-note {
+    color: var(--mantine-color-dimmed);
+    font-size: 13px;
+    margin: 0;
 }
 
 .run-viewer-body {

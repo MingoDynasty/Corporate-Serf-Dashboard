@@ -39,6 +39,7 @@ from source.components.score_threshold import (
 )
 from source.kovaaks.data_models import RunData
 from source.kovaaks.data_service import get_all_runs, new_high_score_runs
+from source.kovaaks.excluded_runs_service import excluded_run_ids
 from source.kovaaks.pace import percent_faster
 from source.kovaaks.play_sessions import (
     PlaySession,
@@ -432,7 +433,9 @@ def latest_run(
     line = score_line(
         run,
         scenario_runs,
-        typical_score_at_session_start(scenario_runs, sessions, session),
+        typical_score_at_session_start(
+            scenario_runs, sessions, session, excluded=excluded_run_ids()
+        ),
         session,
         goal_percentage,
         version_pace_basis,

@@ -327,9 +327,16 @@
       return null;
     }
     var labels = (props.context && props.context.labels) || {};
+    // An excluded run's row is dimmed. The cell says why, on hover and to a
+    // screen reader, in place of the check's own reason.
+    var title = data.excluded
+      ? labels.excluded
+      : data.passed
+        ? undefined
+        : data.check_text;
     return h(
       "span",
-      { className: "run-list-marks", title: data.passed ? undefined : data.check_text },
+      { className: "run-list-marks", title: title },
       data.passed
         ? h(
             "span",
@@ -342,7 +349,10 @@
             "✓"
           )
         : h("span", { className: "visually-hidden" }, data.check_text),
-      data.new_pb ? star(labels.newPb) : null
+      data.new_pb ? star(labels.newPb) : null,
+      data.excluded
+        ? h("span", { className: "visually-hidden" }, " " + labels.excluded)
+        : null
     );
   };
 

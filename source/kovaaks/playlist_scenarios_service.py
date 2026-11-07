@@ -22,7 +22,13 @@ from source.kovaaks.api_service import (
     get_scenario_rank_info,
     hydrate_leaderboard_id_cache,
 )
-from source.kovaaks.data_models import PlaylistData, Rank, RunData, ScenarioStats
+from source.kovaaks.data_models import (
+    PlaylistData,
+    Rank,
+    RunData,
+    ScenarioStats,
+    run_id,
+)
 from source.kovaaks.data_service import (
     get_all_runs,
     get_personal_best_run,
@@ -32,6 +38,7 @@ from source.kovaaks.data_service import (
     is_benchmark_playlist,
     is_scenario_in_database,
 )
+from source.kovaaks.excluded_runs_service import excluded_run_ids
 from source.kovaaks.pace import percent_faster
 from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.request_logging import request_exception_summary
@@ -80,8 +87,9 @@ _terminal_sequence = 0
 class TypicalSnapshot:
     """Each scenario's newest typical score, from one copy of the run store.
 
-    ``values`` maps a scenario with runs to its newest value and how many runs
-    it has; a scenario with none is absent. Recency is judged at ``moment``,
+    ``values`` maps a scenario with counted runs to its newest value and how
+    many counted runs it has; a scenario with none is absent, whether it has
+    no runs or the player excluded every one. Recency is judged at ``moment``,
     when the copy was taken, so every row built from one snapshot agrees.
     """
 
@@ -111,17 +119,25 @@ def take_typical_snapshot(scenario_names: Iterable[str]) -> TypicalSnapshot:
     session_of = {
         run: index for index, session in enumerate(sessions) for run in session.runs
     }
+    excluded = excluded_run_ids()
     values = {}
     for name, runs in runs_by_scenario.items():
         # Only the newest value is kept, and it depends on the last window of
-        # runs in play order and their sessions alone. Built from the whole
-        # history, each scenario would map every run in the store to its
-        # session again and build every older value too.
-        window = in_play_order(runs)[-TYPICAL_SCORE_WINDOW_RUNS:]
+        # counted runs in play order and their sessions alone. Built from the
+        # whole history, each scenario would map every run in the store to
+        # its session again and build every older value too. The sessions
+        # were split with the excluded runs in, so they still join sessions.
+        counted = [run for run in in_play_order(runs) if run_id(run) not in excluded]
+        if not counted:
+            continue
+        window = counted[-TYPICAL_SCORE_WINDOW_RUNS:]
         window_sessions = [
             sessions[index] for index in sorted({session_of[run] for run in window})
         ]
-        values[name] = (build_typical_scores(window, window_sessions)[-1], len(runs))
+        values[name] = (
+            build_typical_scores(window, window_sessions)[-1],
+            len(counted),
+        )
     return TypicalSnapshot(moment, values)
 
 

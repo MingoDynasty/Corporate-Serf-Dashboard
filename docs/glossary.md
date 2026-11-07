@@ -41,6 +41,20 @@ folder. Play that writes no stats file isn't a run.
 
 - On screen, a run's stats file is a run file.
 
+### Excluded run
+
+A run the player excluded from the run viewer. It leaves the Run History
+chart and every typical score's window, and stays in the run list, the PB,
+the stars and the leaderboard. Only the player excludes a run, and only the
+player includes it again
+([run_history.md](specs/run_history.md#excluding-a-run)).
+
+- On screen: **Exclude run** and **Include run**, and `Excluded.` on the
+  run.
+- Not a run the range leaves out, which still counts in the typical score.
+- In code: `excluded_runs_service`, and `excluded` where the typical score
+  takes the ids.
+
 ### Run length
 
 How long a run took to play, with paused time left out. Some runs have none,
@@ -250,7 +264,8 @@ and everything its stats file recorded
 ([run_history.md](specs/run_history.md#the-run-viewer)).
 
 - On screen: no name of its own. Its sections are By Bot, Settings and
-  Everything Recorded, and its button is Close.
+  Everything Recorded, and its buttons are Exclude run, or Include run, and
+  Close.
 - In code: `run_viewer`, and `run_viewer_panel` for what draws it.
 
 ## Playlists
@@ -460,7 +475,8 @@ sensitivity. It's the player's own record, not their leaderboard score
 ### Typical score
 
 What a player's runs on a scenario usually score: the median of its last 20
-runs, or of all its runs when it has fewer, whatever their age. It is known
+runs, or of all its runs when it has fewer, whatever their age, leaving out
+any [excluded run](#excluded-run). It is known
 once those runs number at least 10 from at least 2 sessions, or 20, and before
 that it is unknown, which is never read as weak. It is drawn at full strength
 when recent and faded when not. The rules are in

@@ -27,12 +27,20 @@ from source.components.latest_run_card import CardBadge, score_line  # noqa: E40
 from source.components.run_viewer_panel import (  # noqa: E402
     COLUMN_CLASS,
     COLUMN_OPEN_CLASS,
+    EXCLUDE_CONFIRM,
+    EXCLUDE_LABEL,
+    EXCLUDE_PRESS,
+    EXCLUDED_NOTE,
+    INCLUDE_LABEL,
     ViewerContent,
     completion_time_text,
+    exclusion_controls,
+    press_exclusion,
     recorded_groups,
     run_viewer_content,
     show_run,
 )
+from source.kovaaks import excluded_runs_service  # noqa: E402
 from source.kovaaks.data_models import RunData  # noqa: E402
 from source.kovaaks.play_sessions import in_play_order  # noqa: E402
 from source.kovaaks.run_viewer import RunView, read_run_file  # noqa: E402
@@ -1162,3 +1170,86 @@ def test_opening_and_closing_never_write_the_chart() -> None:
         run_history.SCENARIO_SELECTION_IDS.scenario_dropdown,
     ]
     assert show["prevent_initial_call"] is True
+
+
+# --- Excluding the open run ----------------------------------------------------
+
+HELD = {"run_id": "a.csv", "from": "list", "selected": SCENARIO}
+EXCLUDE_NOW = datetime(2026, 11, 7, 10)
+
+
+def test_excluding_a_counted_run_asks_first_and_writes_nothing() -> None:
+    displayed, exclusions = press_exclusion(EXCLUDE_PRESS, HELD, EXCLUDE_NOW)
+
+    assert displayed is True
+    assert exclusions is no_update
+    assert excluded_runs_service.excluded_run_ids() == frozenset()
+
+
+def test_confirming_excludes_the_open_run() -> None:
+    displayed, exclusions = press_exclusion(EXCLUDE_CONFIRM, HELD, EXCLUDE_NOW)
+
+    assert displayed is no_update
+    assert exclusions == {
+        "run": "a.csv",
+        "excluded": True,
+        "error": None,
+        "at": EXCLUDE_NOW.isoformat(),
+    }
+    assert excluded_runs_service.excluded_run_ids() == frozenset({"a.csv"})
+
+
+def test_including_an_excluded_run_again_needs_no_confirm() -> None:
+    excluded_runs_service.set_run_excluded("a.csv", excluded=True)
+
+    displayed, exclusions = press_exclusion(EXCLUDE_PRESS, HELD, EXCLUDE_NOW)
+
+    assert displayed is no_update
+    assert exclusions["excluded"] is False
+    assert excluded_runs_service.excluded_run_ids() == frozenset()
+
+
+def test_with_no_open_run_a_press_does_nothing() -> None:
+    assert press_exclusion(EXCLUDE_PRESS, None, EXCLUDE_NOW) == (no_update, no_update)
+    assert press_exclusion(EXCLUDE_CONFIRM, None, EXCLUDE_NOW) == (
+        no_update,
+        no_update,
+    )
+
+
+def test_the_control_names_what_a_press_does_and_an_excluded_run_says_so() -> None:
+    assert exclusion_controls(HELD, None) == (EXCLUDE_LABEL, "", True)
+
+    excluded_runs_service.set_run_excluded("a.csv", excluded=True)
+
+    assert exclusion_controls(HELD, None) == (INCLUDE_LABEL, EXCLUDED_NOTE, False)
+
+
+def test_a_store_from_a_newer_build_refuses_the_press_and_says_so() -> None:
+    path = excluded_runs_service.EXCLUDED_RUNS_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('{"schema_version": 99, "excluded_runs": []}', encoding="utf-8")
+
+    _displayed, exclusions = press_exclusion(EXCLUDE_CONFIRM, HELD, EXCLUDE_NOW)
+
+    assert "newer version of this app" in exclusions["error"]
+    _label, note, hidden = exclusion_controls(HELD, exclusions)
+    assert note == exclusions["error"]
+    assert hidden is False
+
+
+def test_the_chart_list_card_and_stats_redraw_when_a_run_is_excluded() -> None:
+    exclusions = f"{run_history.RUN_VIEWER_IDS.exclusions}.data"
+    redrawn = {
+        spec["output"]
+        for spec in GLOBAL_CALLBACK_LIST
+        if exclusions in [f"{item['id']}.{item['property']}" for item in spec["inputs"]]
+    }
+
+    for output in (
+        run_history.CHART_OPTIONS_IDS.cached_plot,
+        run_history.RUN_LIST_IDS.model,
+        run_history.LATEST_RUN_CARD_IDS.body,
+        run_history.SCENARIO_STATS_IDS.lead,
+    ):
+        assert any(output in spec_output for spec_output in redrawn), output

@@ -613,7 +613,7 @@ def _typical_score_plot() -> str:
     today = date(2026, 10, 12)
     figure = generate_score_vs_run_plot(
         runs,
-        1,
+        range(1, 1 + len(runs)),
         "Scenario",
         False,
         [],

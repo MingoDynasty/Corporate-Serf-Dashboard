@@ -22,6 +22,7 @@ import json
 import statistics
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import replace
 from datetime import date, datetime
 from typing import Any, NamedTuple, TypedDict
 
@@ -57,6 +58,7 @@ from source.components.score_threshold import (
 )
 from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import get_all_runs
+from source.kovaaks.excluded_runs_service import excluded_run_ids
 from source.kovaaks.play_sessions import (
     PlaySession,
     ScenarioVisit,
@@ -134,6 +136,8 @@ ONE_SCORE_TEXT = f"{SCORE_LABEL} {{score}}"
 THRESHOLD_PASSED_TEXT = "Threshold passed"
 BELOW_THRESHOLD_TEXT = "Below threshold"
 NEW_PB_TEXT = "New PB"
+# Said by an excluded run's marks, to a screen reader and on hover.
+EXCLUDED_TEXT = "Excluded. It doesn't count on the chart or in your typical score."
 SESSION_PB_TEXT = "A new PB was set in this session."
 SCENARIO_SESSION_PB_TEXT = "A new PB for this scenario was set in this session."
 # What a blank cell says on hover, and to a screen reader, for each reason
@@ -354,6 +358,7 @@ def _run_row(
         "passed": mark.passed,
         "check_text": _check_text(mark),
         "new_pb": mark.is_new_pb,
+        "excluded": mark.is_excluded,
         "accuracy": format_percent(run.accuracy),
         "shots": "" if run.shots_fired is None else f"{run.shots_fired:,}",
         "reloads": "" if run.reloads is None else f"{run.reloads:,}",
@@ -742,6 +747,7 @@ def run_list_from_store(
     if not all_runs:
         return empty_run_list(NO_RUNS_TEXT, view=view)
     goal_percentage = normalize_score_threshold_percentage(score_threshold_percentage)
+    excluded = excluded_run_ids()
     if view == VIEW_ALL:
         sessions = split_into_play_sessions(all_runs)
         listed = sessions[max(len(sessions) - session_limit, 0) :]
@@ -751,7 +757,9 @@ def run_list_from_store(
         marks: dict[RunData, RunMark] = {}
         for name in {run.scenario for session in listed for run in session.runs}:
             marks.update(_mark_scenario(by_scenario[name], name, goal_percentage))
-        return build_session_tree(all_runs, scenario, session_limit, now, marks)
+        return build_session_tree(
+            all_runs, scenario, session_limit, now, _with_exclusions(marks, excluded)
+        )
     if not scenario:
         return empty_run_list(
             NO_SCENARIO_TEXT,
@@ -763,8 +771,18 @@ def run_list_from_store(
         scenario,
         session_limit,
         now,
-        _mark_scenario(all_runs, scenario, goal_percentage),
+        _with_exclusions(_mark_scenario(all_runs, scenario, goal_percentage), excluded),
     )
+
+
+def _with_exclusions(
+    marks: Mapping[RunData, RunMark], excluded: frozenset[str]
+) -> dict[RunData, RunMark]:
+    """Mark the runs the player excluded. The list keeps them, so it must say so."""
+    return {
+        run: replace(mark, is_excluded=True) if run_id(run) in excluded else mark
+        for run, mark in marks.items()
+    }
 
 
 def is_session_in_progress(now: datetime) -> bool:
@@ -807,6 +825,7 @@ RUN_LIST_GRID_CLASS = "run-history-list-grid"
 LATEST_ROW_CLASS = "run-list-row-latest"
 SELECTED_ROW_CLASS = "run-list-row-selected"
 OPEN_ROW_CLASS = "run-list-row-open"
+EXCLUDED_ROW_CLASS = "run-list-row-excluded"
 
 # The columns the Columns menu shows or hides, in table order. Sensitivity is
 # shown to start and the other four are off. The browser remembers each
@@ -1134,6 +1153,8 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                         # The run open in the run viewer, marked by the
                         # list's script.
                         OPEN_ROW_CLASS: "params.data.open === true",
+                        # A rule, so a run included again loses the dimming.
+                        EXCLUDED_ROW_CLASS: "params.data.excluded === true",
                         LATEST_ROW_CLASS: "params.data.latest",
                         SELECTED_ROW_CLASS: (
                             f"params.data.sel && params.data.kind === '{RUN_ROW}'"
@@ -1169,6 +1190,7 @@ def run_list_panel(ids: RunListIds) -> dmc.Paper:
                             "lengthHelp": SESSION_LENGTH_HELP,
                             "wholeSession": WHOLE_SESSION_HELP,
                             "newPb": NEW_PB_TEXT,
+                            "excluded": EXCLUDED_TEXT,
                             "sessionNewPb": SESSION_PB_TEXT,
                             "scenarioSessionNewPb": SCENARIO_SESSION_PB_TEXT,
                             "median": MEDIAN_LABEL,

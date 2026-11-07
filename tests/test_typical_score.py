@@ -1,10 +1,11 @@
+import statistics
 from dataclasses import replace
 from datetime import datetime, timedelta
 from itertools import permutations
 
 import pytest
 
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.typical_score import (
     build_typical_scores,
@@ -459,3 +460,89 @@ def test_calculated_quartile_keeps_its_decimal_half_for_display() -> None:
 
     assert value.p25 == 2.35
     assert format_typical_score(value.p25, value.runs) == "2.4"
+
+
+def test_an_excluded_run_is_never_a_score_in_a_window() -> None:
+    """The window is the last 20 counted runs: an excluded run's place is taken."""
+    runs = _sitting(21)
+    left_out = runs[10]
+
+    values = build_typical_scores(
+        runs, split_into_play_sessions(runs), excluded={run_id(left_out)}
+    )
+
+    assert len(values) == 20
+    assert all(left_out not in value.runs for value in values)
+    assert values[-1].runs == tuple(run for run in runs if run is not left_out)
+    assert values[-1].median == statistics.median(
+        run.score for run in runs if run is not left_out
+    )
+
+
+def test_an_excluded_run_still_joins_its_session() -> None:
+    """A run left out of the window still bridges the break it closes."""
+    first = _sitting(5)
+    # 25 minutes after the last of the first five and 25 before the next:
+    # without it the two stretches are two sessions.
+    bridge = _run(first[-1].datetime_object + timedelta(minutes=25), score=1)
+    second = _sitting(5, bridge.datetime_object + timedelta(minutes=25))
+    runs = [*first, bridge, *second]
+    sessions = split_into_play_sessions(runs)
+
+    value = build_typical_scores(runs, sessions, excluded={run_id(bridge)})[-1]
+
+    assert len(sessions) == 1
+    assert value.run_count == 10
+    assert value.session_count == 1
+    assert not value.known
+
+
+def test_every_run_excluded_leaves_no_value() -> None:
+    runs = _sitting(3)
+
+    assert (
+        build_typical_scores(
+            runs, split_into_play_sessions(runs), excluded={run_id(r) for r in runs}
+        )
+        == []
+    )
+
+
+def test_a_value_at_a_session_start_leaves_excluded_runs_out() -> None:
+    runs = _sitting(10) + _sitting(10, START + timedelta(days=1))
+    runs += _sitting(2, START + timedelta(days=2))
+    sessions = split_into_play_sessions(runs)
+    left_out = runs[3]
+
+    value = typical_score_at_session_start(
+        runs, sessions, sessions[2], excluded={run_id(left_out)}
+    )
+
+    assert value is not None
+    assert value.run_count == 19
+    assert left_out not in value.runs
+
+
+def test_a_session_whose_runs_are_all_excluded_still_has_a_start_value() -> None:
+    runs = _sitting(10) + _sitting(10, START + timedelta(days=1))
+    runs += _sitting(2, START + timedelta(days=2))
+    sessions = split_into_play_sessions(runs)
+
+    value = typical_score_at_session_start(
+        runs, sessions, sessions[2], excluded={run_id(run) for run in runs[-2:]}
+    )
+
+    assert value is not None
+    assert value.runs == tuple(runs[:20])
+
+
+def test_no_counted_run_before_a_session_leaves_no_start_value() -> None:
+    runs = _sitting(3) + _sitting(3, START + timedelta(days=1))
+    sessions = split_into_play_sessions(runs)
+
+    assert (
+        typical_score_at_session_start(
+            runs, sessions, sessions[1], excluded={run_id(run) for run in runs[:3]}
+        )
+        is None
+    )

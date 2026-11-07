@@ -9,7 +9,8 @@ from dash import html, no_update
 from plotly.io.json import to_json_plotly
 
 from source.components import run_history_chart, scenario_stats
-from source.kovaaks.data_models import RunData
+from source.kovaaks import excluded_runs_service
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.typical_score import build_typical_scores, format_typical_score
 
@@ -241,7 +242,8 @@ def test_help_copy_accessible_name_and_focus():
     assert [_text(p) for p in help_tip.label.children] == [
         (
             "Your typical score is the median of your last 20 runs of this scenario, or of "
-            "all your runs if you have fewer. Runs count regardless of age."
+            "all your runs if you have fewer. Runs count regardless of age, except "
+            "the runs you exclude."
         ),
         (
             "On the chart, the darker band shows the middle 50% of those scores, and the "
@@ -254,3 +256,30 @@ def test_help_copy_accessible_name_and_focus():
         ),
         "The card shows how recent it is today, and the chart how recent it was at each run.",
     ]
+
+
+def test_the_lead_leaves_excluded_runs_out(store):
+    runs, _clock = store
+    runs.extend(_sitting(20))
+    excluded_runs_service.set_run_excluded(run_id(runs[0]), excluded=True)
+
+    lead, _readout, _hidden = scenario_stats.get_scenario_typical_score(None, "Test", 0)
+
+    assert _text(lead).strip() == "Too few runs"
+    assert lead.label == (
+        "A typical score needs 10 runs across 2 or more sessions, or 20 in one "
+        "session. You have 19 runs in 1 session."
+    )
+
+
+def test_the_lead_says_when_every_run_is_excluded(store):
+    runs, _clock = store
+    runs.extend(_sitting(3))
+    for run in runs:
+        excluded_runs_service.set_run_excluded(run_id(run), excluded=True)
+
+    lead, readout, hidden = scenario_stats.get_scenario_typical_score(None, "Test", 0)
+
+    assert _text(lead).strip() == "Too few runs"
+    assert lead.label == "Every run of this scenario is excluded."
+    assert (readout, hidden) == ("", False)

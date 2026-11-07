@@ -10,6 +10,13 @@ the chart opens on a new mode that spaces runs evenly in the order they were
 played. Score vs Sensitivity now shows every run at each sensitivity with
 nothing that sums one up, until that mode is redesigned.
 
+**Superseded in part (2026-11-07), proposed.** The
+[excluded-run entry](2026-11-07-a-player-can-exclude-a-run-from-the-chart-and-the-typical-score.md), which is
+`Proposed` until the maintainer rules on it, leaves a run the player
+excluded off the chart in every mode. The run list still shows every run and
+marks the excluded ones, and the range still counts them. Every other run in
+the range is still plotted.
+
 **Superseded in part (2026-10-24).** The
 [run-point tooltip decision](2026-10-24-chart-point-tooltips-show-score-time-and-run-numbers.md)
 replaces only the point-hover contract under **What else the chart keeps and

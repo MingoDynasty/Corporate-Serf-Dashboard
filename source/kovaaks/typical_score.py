@@ -1,20 +1,21 @@
 """Define typical scores and their recency from one snapshot of runs.
 
-The caller supplies one scenario's runs and the play sessions split from the
-same snapshot of every scenario's runs. Nothing reads the run store, holds a
-clock, or persists a value. The contract is in ``docs/specs/typical_score.md``.
+The caller supplies one scenario's runs, the play sessions split from the
+same snapshot of every scenario's runs, and the ids of the runs the player
+excluded. Nothing reads the run store or the excluded runs, holds a clock, or
+persists a value. The contract is in ``docs/specs/typical_score.md``.
 The words of a value's hover are here too, so every surface that explains a
 value says the same thing.
 """
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Collection, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from functools import lru_cache
 from statistics import median, quantiles
 
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.play_sessions import PlaySession, in_play_order
 from source.utilities.utilities import format_score, format_short_date
 
@@ -80,21 +81,28 @@ class TypicalScoreRecency:
 
 
 def build_typical_scores(
-    runs: Iterable[RunData], play_sessions: Iterable[PlaySession]
+    runs: Iterable[RunData],
+    play_sessions: Iterable[PlaySession],
+    *,
+    excluded: Collection[str] = frozenset(),
 ) -> list[TypicalScore]:
-    """Return the typical score after each run of one scenario, in play order.
+    """Return the typical score after each counted run of one scenario, in play order.
 
-    Count every sensitivity, version and warm-up run. ``play_sessions`` must
-    have been split across every scenario in the same run snapshot; a missing
-    run raises ``ValueError`` rather than inventing its session membership.
-    Empty input returns no values. Neither input is changed.
+    Count every sensitivity, version and warm-up run, and leave out each run
+    whose id is in ``excluded``: it is never a score in a window, and it gets
+    no value of its own. ``play_sessions`` must have been split across every
+    scenario in the same run snapshot, excluded runs included, so a run left
+    out still joins the runs either side of it into one session; a counted
+    run missing from them raises ``ValueError`` rather than inventing its
+    session membership. No counted runs return no values. No input is
+    changed.
     """
     session_by_run = {
         run: session_id
         for session_id, session in enumerate(play_sessions)
         for run in session.runs
     }
-    ordered = in_play_order(runs)
+    ordered = [run for run in in_play_order(runs) if run_id(run) not in excluded]
     try:
         ordered_session_ids = [session_by_run[run] for run in ordered]
     except KeyError:
@@ -129,23 +137,26 @@ def typical_score_at_session_start(
     runs: Sequence[RunData],
     play_sessions: Sequence[PlaySession],
     session: PlaySession,
+    *,
+    excluded: Collection[str] = frozenset(),
 ) -> TypicalScore | None:
     """Return one scenario's typical score as it stood when ``session`` began.
 
-    It is the value after the scenario's last run before the session, so every
-    run of the session meets the same value and none meets a value it helped
-    make. ``runs`` is the scenario's runs in play order and must hold at least
-    one of ``session``'s runs; ``play_sessions`` is split from the same
-    snapshot of every scenario's runs and holds ``session``. ``None`` when the
-    scenario has no run before the session. The value can still be unknown.
+    It is the value after the scenario's last counted run before the session,
+    so every run of the session meets the same value and none meets a value
+    it helped make. ``runs`` is the scenario's runs in play order, excluded
+    ones included, and must hold at least one of ``session``'s runs;
+    ``play_sessions`` is split from the same snapshot of every scenario's
+    runs and holds ``session``. ``excluded`` is as ``build_typical_scores``
+    takes it. ``None`` when the scenario has no counted run before the
+    session. The value can still be unknown.
     """
     in_session = set(session.runs)
     first = next(index for index, run in enumerate(runs) if run in in_session)
-    if first == 0:
-        return None
     # The value after a run depends only on the runs before it, so the runs
     # after the session's start need not be built.
-    return build_typical_scores(runs[:first], play_sessions)[-1]
+    values = build_typical_scores(runs[:first], play_sessions, excluded=excluded)
+    return values[-1] if values else None
 
 
 def typical_score_recency(value: TypicalScore, moment: datetime) -> TypicalScoreRecency:

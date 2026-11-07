@@ -83,7 +83,7 @@ def _context(runs):
 def _score_vs_run(runs, *, first_run_number=1, new_pbs=(), ranks=(), today=TODAY):
     return generate_score_vs_run_plot(
         runs,
-        first_run_number,
+        range(first_run_number, first_run_number + len(runs)),
         SCENARIO,
         True,
         list(ranks),
@@ -251,7 +251,7 @@ def test_run_age_names_the_latest_run_and_uses_singular_for_one(count, text):
     run = _run(100.0, NOON)
     figure = generate_score_vs_run_plot(
         [run],
-        1,
+        [1],
         SCENARIO,
         False,
         [],
@@ -586,7 +586,7 @@ def test_each_mode_rings_the_run_it_is_told_to_at_that_runs_own_point() -> None:
 
     by_run = generate_score_vs_run_plot(
         runs,
-        5,
+        range(5, 5 + len(runs)),
         SCENARIO,
         True,
         [],
@@ -634,7 +634,7 @@ def test_the_ring_has_no_legend_entry_and_no_hover_of_its_own() -> None:
     ring = _ring(
         generate_score_vs_run_plot(
             runs,
-            1,
+            range(1, 1 + len(runs)),
             SCENARIO,
             True,
             [],
@@ -661,7 +661,7 @@ def test_the_ring_is_drawn_last_so_it_sits_over_a_star() -> None:
 
     figure = generate_score_vs_run_plot(
         runs,
-        1,
+        range(1, 1 + len(runs)),
         SCENARIO,
         True,
         [],
@@ -687,7 +687,7 @@ def test_a_run_that_is_not_plotted_gets_no_ring() -> None:
 
     figure = generate_score_vs_run_plot(
         runs,
-        1,
+        range(1, 1 + len(runs)),
         SCENARIO,
         True,
         [],
@@ -712,7 +712,7 @@ def test_two_runs_that_share_a_point_ring_the_one_named() -> None:
 
     figure = generate_score_vs_run_plot(
         [first, second],
-        1,
+        [1, 2],
         SCENARIO,
         True,
         [],
@@ -755,7 +755,7 @@ def test_the_ring_is_shown_in_the_schemes_blue_and_hidden_by_its_opacity(
     runs = _three_runs()
     figure = generate_score_vs_run_plot(
         runs,
-        1,
+        range(1, 1 + len(runs)),
         SCENARIO,
         True,
         [],
@@ -793,7 +793,7 @@ def test_point_size_sizes_the_ring_with_the_stars(point_size) -> None:
     runs = _three_runs()
     figure = generate_score_vs_run_plot(
         runs,
-        1,
+        range(1, 1 + len(runs)),
         SCENARIO,
         True,
         [],
@@ -819,7 +819,7 @@ def test_the_default_point_size_leaves_the_rings_own() -> None:
     runs = _three_runs()
     figure = generate_score_vs_run_plot(
         runs,
-        1,
+        range(1, 1 + len(runs)),
         SCENARIO,
         True,
         [],
