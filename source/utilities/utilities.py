@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from source.kovaaks.data_models import RecordedSensitivity, RunData
+    from source.kovaaks.play_sessions import TimeInRuns
 
 # Abbreviated English month names, hardcoded so the absolute-timestamp format is
 # locale-independent (``%b``/``calendar.month_abbr`` follow the process locale).
@@ -198,9 +199,34 @@ def format_elapsed_duration(seconds: float) -> str:
     minutes = math.floor(seconds / 60 + 0.5)
     if minutes < 1:
         return "<1 min"
+    return _hours_and_minutes(minutes)
+
+
+def _hours_and_minutes(minutes: int) -> str:
+    """Write a whole number of minutes, one or more, as ``1 hr 6 min``."""
     hours, remainder = divmod(minutes, 60)
     if not hours:
         return f"{minutes} min"
     if not remainder:
         return f"{hours} hr"
     return f"{hours} hr {remainder} min"
+
+
+def format_time_in_runs(total: TimeInRuns) -> str | None:
+    """Show a time in runs by the display rule, or return None where it is unknown.
+
+    With every length known it reads as a measured time does,
+    ``format_elapsed_duration``'s nearest minute. With a run of no length it
+    is a minimum, ``at least`` and the whole minutes recorded: 90 seconds
+    reads ``at least 1 min``, since rounding up would claim time the runs
+    don't hold. Under a minute recorded beside a run of no length is
+    unknown, which each surface words, so it never reads as a small time.
+
+    Not for no runs at all, whose figure is absent.
+    """
+    if not total.unknown:
+        return format_elapsed_duration(total.seconds)
+    minutes = math.floor(total.seconds / 60)
+    if minutes < 1:
+        return None
+    return f"at least {_hours_and_minutes(minutes)}"

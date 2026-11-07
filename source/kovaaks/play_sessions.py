@@ -1,9 +1,10 @@
-"""Group runs into play sessions and scenario visits.
+"""Group runs into play sessions and scenario visits, and add up their time in runs.
 
 A play session is what the docs call a session: one stretch of play,
 including the breaks between runs. A scenario visit is what they call a
-visit: consecutive runs on one scenario within a play session. The rules,
-and the decision that set them, are in ``docs/specs/sessions.md``.
+visit: consecutive runs on one scenario within a play session. A time in
+runs is the sum of some runs' lengths, without those breaks. The rules, and
+the decisions that set them, are in ``docs/specs/sessions.md``.
 
 Everything here is worked out from a list of runs when something asks, and
 nothing is stored. The functions never read the run store and hold no clock:
@@ -76,8 +77,44 @@ class PlaySession(_ConsecutiveRuns):
 
     @property
     def length(self) -> datetime.timedelta:
-        """How long the play session lasted, with the breaks between runs."""
+        """How long the play session lasted, with its pauses and the breaks between runs.
+
+        The only length of play the app shows that counts those breaks. Every
+        total of play is a ``time_in_runs`` instead.
+        """
         return self.end - self.start
+
+
+@dataclass(frozen=True)
+class TimeInRuns:
+    """The time some runs took to play, and how many of them have no length.
+
+    ``seconds`` is the sum of the lengths the runs have, unrounded, so the
+    totals of two sets of runs add up to the total of both. ``unknown``
+    counts the runs with no length. They add no time, so a total with any is
+    a minimum: unknown is never read as zero.
+    """
+
+    seconds: float
+    unknown: int
+
+
+def time_in_runs(runs: Iterable[RunData]) -> TimeInRuns:
+    """Add up the time ``runs`` took to play: every total of play the app shows.
+
+    A run's length leaves out its pauses, and nothing here counts the breaks
+    between runs, which only a play session's length holds.
+    """
+    # Summed as time spans, exact to the microsecond, so a minimum of whole
+    # minutes can't read a minute short through float error.
+    played = datetime.timedelta(0)
+    unknown = 0
+    for run in runs:
+        if run.run_length is None:
+            unknown += 1
+        else:
+            played += run.run_length
+    return TimeInRuns(seconds=played.total_seconds(), unknown=unknown)
 
 
 @dataclass(frozen=True)

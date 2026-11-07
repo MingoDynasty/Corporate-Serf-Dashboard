@@ -830,10 +830,11 @@ def test_the_grid_is_named_for_the_scenario():
     assert _build(_minutes(0))["grid_name"] == "Runs of Scenario A, by session"
 
 
-def test_the_lengths_hover_says_why_the_figure_stands_still_between_runs():
+def test_the_lengths_hover_says_it_holds_the_breaks_and_stands_still_between_runs():
+    """The only length of play the app shows that counts the breaks between runs."""
     assert SESSION_LENGTH_HELP == (
-        "The length runs from the first run to the last run. It doesn't count "
-        "the time since your last run."
+        "The length runs from the first run to the last run, pauses and breaks "
+        "between runs included. It doesn't count the time since your last run."
     )
 
 

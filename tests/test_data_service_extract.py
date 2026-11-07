@@ -578,6 +578,62 @@ def test_a_file_with_no_usable_challenge_start_has_no_start_and_no_length(
     assert run.run_length is None
 
 
+def _write_timed_file(path: Path, challenge_start: str) -> Path:
+    """Write a stats file at ``path`` that carries a start and no pause."""
+    _write_stats_file(
+        path,
+        DAMAGE_SUB_CSV_ROW,
+        extra_line=f"Challenge Start:,{challenge_start}\nPause Duration:,0",
+    )
+    return path
+
+
+def test_a_freeplay_file_has_no_start_and_no_length_however_its_start_reads(
+    tmp_path,
+) -> None:
+    """Statistics Export on Always names freeplay's file without ``Challenge``.
+
+    Its ``Challenge Start:`` is left over from the last challenge played, so a
+    start that lands in range is still not this run's. The run itself loads.
+    """
+    freeplay = _write_timed_file(
+        tmp_path / f"{SCENARIO_NAME} - 2026.10.10-17.15.24 Stats.csv",
+        "17:14:59.391",
+    )
+
+    run = extract_data_from_file(str(freeplay))
+
+    assert run is not None
+    assert run.score == 123.45
+    assert run.datetime_object == datetime(2026, 10, 10, 17, 15, 24)
+    assert run.run_start is None
+    assert run.run_length is None
+
+
+def test_a_freeplay_files_left_over_start_cannot_hold_a_session_together(
+    tmp_path,
+) -> None:
+    """It joins its session by its end, as any run with no start does.
+
+    Its left-over start is 20 minutes after the challenge before it ended,
+    and its end 35 minutes after: read as its own, the start would have kept
+    the two in one session.
+    """
+    challenge = _write_timed_file(
+        tmp_path / f"{SCENARIO_NAME} - Challenge - 2025.01.01-10.00.00 Stats.csv",
+        "09:59:00.000",
+    )
+    freeplay = _write_timed_file(
+        tmp_path / f"{SCENARIO_NAME} - 2025.01.01-10.35.00 Stats.csv",
+        "10:20:00.000",
+    )
+    runs = [extract_data_from_file(str(path)) for path in (challenge, freeplay)]
+
+    assert all(run is not None for run in runs)
+    assert runs[0].run_length == timedelta(seconds=60)
+    assert len(split_into_play_sessions(runs)) == 2
+
+
 def test_a_missing_pause_duration_subtracts_nothing() -> None:
     # Files from 2020 and 2021 carry a start and no pause lines.
     run = _extract_timed_file("Challenge Start:,09:59:00.000")
