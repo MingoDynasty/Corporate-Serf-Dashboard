@@ -1,6 +1,8 @@
 # 2026-09-04: Comment And Docstring Conventions
 
-Status: Accepted
+Status: Superseded in part, for the annotation requirement, by the
+[2026-11-07 annotation entry](2026-11-07-every-definition-under-source-carries-type-annotations.md).
+Every other part of this entry remains Accepted.
 
 The application code carries a lot of explanatory prose, and nearly all of it
 is the useful kind, but the rules that shaped it were never written down. A
@@ -10,6 +12,11 @@ as a reply to whoever asked in review. The agent instructions now state what
 earns a comment, what stays beside the code when fuller rationale also lives
 elsewhere, and the shape a docstring takes. The enforced lint and type gates
 do not change.
+
+**Superseded in part (2026-11-07).** [Every Definition Under Source Carries Type Annotations](2026-11-07-every-definition-under-source-carries-type-annotations.md)
+takes the third of the options below: every definition under `source/` is
+annotated, and mypy's `disallow_untyped_defs` holds it. The comment and
+docstring rules, and the rest of what is deliberately not enforced, stand.
 
 **What was measured (2026-09-04, 44 files under `source/`; later additions
 dated).** Comment-only lines are 12% of code lines and docstring lines 23%;
