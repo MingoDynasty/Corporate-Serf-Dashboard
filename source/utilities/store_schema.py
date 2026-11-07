@@ -36,7 +36,7 @@ import json
 import logging
 import os
 import threading
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
@@ -175,7 +175,11 @@ def _parse_stamped_object(
 
 
 def decode_store_document(
-    text: str, *, path: Path, kind: str, validate
+    text: str,
+    *,
+    path: Path,
+    kind: str,
+    validate: Callable[[dict[str, Any]], object],
 ) -> StoreDocument:
     """Run the four-state machine over one store file's text.
 
@@ -213,7 +217,11 @@ def decode_store_document(
 
 
 def read_store_document(
-    path: Path, *, encoding: str, kind: str, validate
+    path: Path,
+    *,
+    encoding: str,
+    kind: str,
+    validate: Callable[[dict[str, Any]], object],
 ) -> StoreDocument:
     """Read one store file from disk and classify it. Never mutates the file.
 

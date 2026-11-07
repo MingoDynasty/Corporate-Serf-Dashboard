@@ -48,7 +48,7 @@ from source.kovaaks.typical_score import NOT_RECENT_TEXT
 from source.pages.page_title import page_title
 
 
-def _page_title(playlist_code=None, **_kwargs):
+def _page_title(playlist_code: str | None = None, **_kwargs: str) -> str:
     """Carry the playlist name into the browser tab title.
 
     Dash Pages calls this per request with the route's path variables, after

@@ -7,6 +7,7 @@ import dash_ag_grid as dag
 import dash_mantine_components as dmc
 from dash import (
     Input,
+    NoUpdate,
     Output,
     State,
     callback,
@@ -552,7 +553,9 @@ def _format_warmup_status(snapshot: PercentileWarmupSnapshot) -> str:
     return status
 
 
-def _playlist_overview_warmup_state(observed_generation):
+def _playlist_overview_warmup_state(
+    observed_generation: int,
+) -> tuple[bool, str | NoUpdate, int]:
     """Compute interval outputs before the caller's sequenced row rebuild."""
     snapshot = get_percentile_warmup_state()
     observed_generation = (

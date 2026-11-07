@@ -13,6 +13,7 @@ from decimal import ROUND_FLOOR, Decimal
 from email.utils import parsedate_to_datetime
 from enum import StrEnum
 from pathlib import Path
+from typing import Any, Self
 
 import requests
 from pydantic import ValidationError
@@ -111,7 +112,7 @@ def _record_network_success() -> None:
 class Endpoints(StrEnum):
     """Build fully qualified URLs for supported KovaaK's endpoints."""
 
-    def __new__(cls, path: str):
+    def __new__(cls, path: str) -> Self:
         """Combine an endpoint path with the KovaaK's API base URL."""
         base = "https://kovaaks.com/webapp-backend"
         obj = str.__new__(cls, base + path)  # type: ignore
@@ -126,7 +127,7 @@ class Endpoints(StrEnum):
     USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 
-def make_cache():
+def make_cache() -> None:
     """Create non-user-specific cache directories and permanent index files."""
     for directory in (
         "benchmarks",
@@ -190,7 +191,7 @@ def _get_thread_session() -> requests.Session:
     return session
 
 
-def _session_get(url: str, **kwargs) -> requests.Response:
+def _session_get(url: str, **kwargs: Any) -> requests.Response:
     """Make a GET request through the current thread's reusable session."""
     return _get_thread_session().get(url, **kwargs)
 
@@ -201,7 +202,7 @@ def _get_with_retry(
     attempts: int = 2,
     backoff_seconds: Sequence[float] = (0.0,),
     sensitive: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> requests.Response:
     """
     Make a GET request with configurable retries for transient failures.
@@ -293,7 +294,7 @@ def _get_with_retry(
     raise RuntimeError("unreachable retry state")
 
 
-def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
+def get_playlist_data(playlist_code: str) -> PlaylistAPIResponse:
     """Fetch playlist metadata matching a KovaaK's playlist code."""
     params = {"page": 0, "max": 20, "search": playlist_code.strip()}
 

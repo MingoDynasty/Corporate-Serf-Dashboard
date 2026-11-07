@@ -28,7 +28,7 @@ _MONTH_ABBREVIATIONS = (
 )
 
 
-def format_decimal(number) -> Decimal | int:
+def format_decimal(number: float | Decimal) -> Decimal | int:
     """
     Remove trailing zeroes from a float.
     Examples: 10.0 -> 10,  10.5 -> 10.5
