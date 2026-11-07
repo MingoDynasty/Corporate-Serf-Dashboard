@@ -1017,7 +1017,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (100, 110, 120),
             105,
-            "Iron",
+            "Iron · 50%",
             1.5,
             "+4.8% to Bronze",
             110,
@@ -1027,7 +1027,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (100, 110, 120),
             110,
-            "Bronze",
+            "Bronze · 0%",
             2,
             "+9.1% to Silver",
             120,
@@ -1058,7 +1058,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (130, 142, 142),
             141,
-            "Iron",
+            "Iron · 91%",
             1 + 11 / 12,
             "+0.8% to Bronze",
             142,
@@ -1080,7 +1080,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (36, 54, 50, 58),
             52,
-            "Iron",
+            "Iron · 88%",
             1 + 16 / 18,
             "+3.9% to Bronze",
             54,
@@ -1090,7 +1090,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (2800, 2850, 2900, 2950, 2900, 3000),
             2920,
-            "Silver",
+            "Silver · 40%",
             3.4,
             "+1.1% to Gold",
             2950,
@@ -1100,7 +1100,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (2800, 2850, 2900, 2950, 2900, 3000),
             2960,
-            "Platinum",
+            "Platinum · 60%",
             5.6,
             "+1.4% to Diamond",
             3000,
@@ -1110,7 +1110,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (1700, 2000, 1933),
             1950,
-            "Iron",
+            "Iron · 83%",
             1 + 250 / 300,
             "+2.6% to Bronze",
             2000,
@@ -1131,7 +1131,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (0, 250, 275),
             100,
-            "Iron",
+            "Iron · 40%",
             1.4,
             "+150.0% to Bronze",
             250,
@@ -1141,7 +1141,7 @@ def _ladder(*thresholds: float) -> list[Rank]:
         pytest.param(
             (0, 250, 275),
             0,
-            "Iron",
+            "Iron · 0%",
             1,
             "N/A",
             None,
@@ -1399,7 +1399,7 @@ def test_below_the_first_rank_a_pace_pb_sorts_by_time_whatever_its_constant(
     ids=["ascending", "tie", "dip"],
 )
 def test_rank_sorts_as_typical_rank_does_for_the_same_score(thresholds, pace_constant):
-    """One key for both columns, so a PB and a typical score order alike."""
+    """One key and one cell for both columns, so a PB reads as a typical score."""
     ladder = _ladder(*thresholds)
 
     for score in (-5, 0, 399.99, 400, 450, 500, 599.999, 600, 650, 700, 990):
@@ -1408,6 +1408,7 @@ def test_rank_sorts_as_typical_rank_does_for_the_same_score(thresholds, pace_con
             ladder, score, pace_constant
         )
         assert pb["tier_sort"] == typical["typical_tier_sort"]
+        assert pb["tier_display"] == typical["typical_tier_display"]
 
 
 _VISCOSE_LADDER = [
@@ -1420,7 +1421,7 @@ def test_a_time_scored_rows_next_rank_gap_is_a_pace_gap():
     fields = benchmark_rank_fields(_VISCOSE_LADDER, 896.2, 1000.0)
 
     assert fields == {
-        "tier_display": "Cerulean",
+        "tier_display": "Cerulean · 56%",
         "tier_sort": pytest.approx(1 + 3.7 / 6.5),
         "next_tier_display": "+2.8% faster to Lavender",
         # The sort key is the unrounded pace gap, so a pace row and a score
@@ -1621,7 +1622,7 @@ def test_format_playlist_scenario_rank_row_adds_rank_fields_for_a_ladder():
     )
 
     assert {field: benchmark_row[field] for field in RANK_FIELDS} == {
-        "tier_display": "Iron",
+        "tier_display": "Iron · 50%",
         "tier_sort": 1.5,
         "next_tier_display": "+4.8% to Bronze",
         "next_tier_sort": (110 - 105) / 105 * 100,
@@ -1745,7 +1746,7 @@ def test_phase_one_rows_carry_rank_fields_only_on_a_benchmark(rank_row_sources):
         (row["scenario"], row["tier_display"], row["next_tier_display"])
         for row in benchmark_rows
     ] == [
-        ("Ranked", "Iron", "+4.8% to Bronze"),
+        ("Ranked", "Iron · 50%", "+4.8% to Bronze"),
         ("Unplayed", "N/A", "N/A"),
         ("No Ladder", "N/A", "N/A"),
         ("Top", "Silver", "Top rank"),
@@ -2047,7 +2048,7 @@ def test_phase_one_rows_measure_a_time_scored_scenario_by_pace(
 
     assert _next_ranks(rows) == _PACE_NEXT_RANKS
     assert rows[0]["next_tier_sort"] == pytest.approx((895 / 890 - 1) * 100)
-    assert rows[0]["tier_display"] == "Iron"
+    assert rows[0]["tier_display"] == "Iron · 50%"
     # A row with no ladder or no PB shows no gap, so nothing asks about it.
     assert asked == ["Ranked"]
 

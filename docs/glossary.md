@@ -386,6 +386,8 @@ threshold, and a PB below the first one has No rank
 How a PB is placed on the ladder is in
 [playlists.md](specs/playlists.md#the-per-playlist-scenario-table).
 
+- On screen: the Rank column, such as `Gold · 40%`, the rank and how far the
+  PB is toward the next, as Typical Rank reads.
 - In code: `tier` in the scenario table's row fields, whose sort key is the
   rank position, as Typical Rank's is, and `rank` in the ladder data
   ([2026-11-07](decision_log/2026/2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)).

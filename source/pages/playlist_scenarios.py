@@ -251,7 +251,12 @@ BENCHMARK_COLUMN_DEFS = [
     {
         "headerName": "Rank",
         "field": "tier_sort",
-        "headerTooltip": "The highest rank your PB score has reached on this scenario.",
+        "headerTooltip": (
+            "The highest rank your PB score has reached on this scenario, and "
+            "how far it is toward the next rank. The percent rounds down, so 0% "
+            "can be just above the rank's threshold. Lower is weaker on this "
+            "benchmark's rank ladder."
+        ),
         # The field is the rank position, as Typical Rank's is, so the column
         # sorts by it. It is under 1 below the first rank, where a plain
         # truthiness test would give No rank a tooltip.
@@ -341,7 +346,7 @@ TYPICAL_RANK_COLUMN_DEF = {
     "sortable": True,
     "minWidth": 120,
     # Rank's cap, as the maintainer chose: the same kind of text, a rank name
-    # and a percent once Rank shows one too. Every bundled name fits with room
+    # and a percent, as Rank shows. Every bundled name fits with room
     # to spare; one that didn't would end in an ellipsis, since the hover is
     # the gap and not the name.
     "maxWidth": 240,

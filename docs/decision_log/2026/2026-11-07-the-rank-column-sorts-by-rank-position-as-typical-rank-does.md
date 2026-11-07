@@ -7,7 +7,8 @@ each personal best sits toward the next rank. Before, they tied on the rank
 and stayed in playlist order, so the sort couldn't tell a scenario that has
 just reached a rank from one about to pass it. The key is the rank position
 that Typical Rank already sorts by, measured from the personal best instead
-of the typical score.
+of the typical score. The cell shows it as Typical Rank's does, such as
+Celadon · 7%.
 
 **Maintainer direction, 2026-11-07.** Typical Rank's PR left Rank sorting by
 the rank alone, and vault Backlog Features item 10 held the same position for
@@ -41,12 +42,24 @@ gap, so a time-scored row whose PB can be measured by pace sorts by time
 there, as Typical Rank's does. Between two thresholds the fraction is the
 same in score or in time, so pace moves nothing from the first rank up.
 
-**The cell tooltip.** Rank's tooltip still shows only from the first rank
-up. Its test is `tier_sort >= 1`, since a below-first key is above 0 and a
-plain truthiness test would give No rank a tooltip.
+**The cell** reads as Typical Rank's does, through the same function:
+`{rank} · {percent}%`, the rank's name alone at the top rank, `No rank`
+below the first rank with no number, and `N/A` with no PB or no ladder.
+The percent is `min(99, floor(round(fraction * 100, 6)))`, so `0%` means
+on the threshold or just above it, and no cell reads 100%. The header
+tooltip is Typical Rank's, said of the PB. The one difference from Typical
+Rank is the hover: Typical Rank's is the gap to the next rank, which Next Rank
+already shows for the PB, so Rank keeps its tooltip of its own text. Rank
+keeps its 240 px cap, the cap Typical Rank's same kind of text has.
 
-**Not changed:** Rank's cell, Next Rank, the PB card's badge, the field name
-`tier_sort`, and the `?sort=rank` name, so a saved link opens the new order.
+**The cell tooltip.** Rank's tooltip, the cell's text in full, still
+shows only from the first rank up. Its test is `tier_sort >= 1`, since a
+below-first key is above 0 and a plain truthiness test would give No rank
+a tooltip.
+
+**Not changed:** Next Rank, the PB card's badge, which still names the rank
+alone, the field names, and the `?sort=rank` name, so a saved link opens
+the new order.
 
 **Rejected:** breaking a rank's ties by Next Rank's gap, which Next Rank's own
 column already sorts by, and which puts a rank's newest arrivals last, since

@@ -380,6 +380,7 @@ def benchmark_rank_fields(
     The figures are ``ladder_standing``'s. ``tier_sort`` is the unrounded
     rank position, as Typical Rank's is, so scenarios on one rank sort by how
     far each PB is toward the next, and No rank sorts under every ranked row.
+    ``tier_display`` reads that position as Typical Rank's cell does.
     ``next_tier_sort`` is the unrounded gap, and Top rank and ``N/A`` sort as
     null.
     """
@@ -395,10 +396,9 @@ def benchmark_rank_fields(
     standing = ladder_standing(ladder, high_score, pace_constant)
     if standing is None:
         return fields
-    fields["tier_display"] = (
-        "No rank" if standing.reached is None else standing.reached.name
-    )
-    fields["tier_sort"] = rank_position(ladder, high_score, standing)
+    position = rank_position(ladder, high_score, standing)
+    fields["tier_display"] = rank_position_text(standing, position)
+    fields["tier_sort"] = position
     if standing.at_top:
         fields["next_tier_display"] = "Top rank"
     elif standing.next_gap is not None:
@@ -445,6 +445,20 @@ def band_percent(fraction: float) -> int:
     return min(99, math.floor(round(fraction * 100, 6)))
 
 
+def rank_position_text(standing: LadderStanding, position: float) -> str:
+    """Show a rank position as the rank reached and the percent toward the next.
+
+    The rank's name stands alone at the top rank, and below the first rank
+    the cell reads No rank with no number, since a number there would rest on
+    an invented floor.
+    """
+    if standing.reached is None:
+        return "No rank"
+    if standing.at_top:
+        return standing.reached.name
+    return f"{standing.reached.name} · {band_percent(position - standing.passed)}%"
+
+
 def typical_tier_fields(
     ladder: list[Rank],
     typical_score: float | None,
@@ -472,13 +486,7 @@ def typical_tier_fields(
         return fields
     position = rank_position(ladder, typical_score, standing)
     fields["typical_tier_sort"] = position
-    if standing.reached is None:
-        fields["typical_tier_display"] = "No rank"
-    elif standing.at_top:
-        fields["typical_tier_display"] = standing.reached.name
-    else:
-        percent = band_percent(position - standing.passed)
-        fields["typical_tier_display"] = f"{standing.reached.name} · {percent}%"
+    fields["typical_tier_display"] = rank_position_text(standing, position)
     lines = []
     if standing.next_gap is not None:
         next_gap = standing.next_gap

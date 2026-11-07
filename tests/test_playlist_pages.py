@@ -2639,7 +2639,10 @@ def test_playlist_scenarios_rank_column_defs():
         "headerName": "Rank",
         "field": "tier_sort",
         "headerTooltip": (
-            "The highest rank your PB score has reached on this scenario."
+            "The highest rank your PB score has reached on this scenario, and "
+            "how far it is toward the next rank. The percent rounds down, so 0% "
+            "can be just above the rank's threshold. Lower is weaker on this "
+            "benchmark's rank ladder."
         ),
         "valueFormatter": {"function": "params.data.tier_display"},
         # The field is the rank position, under 1 below the first rank, so

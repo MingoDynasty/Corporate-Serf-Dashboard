@@ -164,8 +164,9 @@ fraction of the way to the next, so the scenarios on one rank order by how
 far each PB is toward the next one instead of keeping playlist order. Below
 the first rank the key follows Next Rank's gap, so No rank rows order too,
 and still sort under every ranked row. `tier_sort` holds the position, not
-the ranks passed. The ladder walk, the Rank cell, D1, D2, and everything
-else here stand. The
+the ranks passed. The Rank cell reads that position as Typical Rank's
+does, the rank and the percent toward the next, such as `Iron · 50%`. The
+ladder walk, D1, D2, and everything else here stand. The
 [2026-11-07 entry](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)
 holds the key.
 
