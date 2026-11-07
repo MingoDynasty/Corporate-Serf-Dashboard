@@ -125,8 +125,9 @@ As of 2026-10-30, every open alert names a version from it (certifi
 2026.7.22, filelock 4.1.1, setuptools 84.0.0 and virtualenv 21.14.7), and
 `main` locks a fixed release of each. Tracked upstream as
 [dependabot/dependabot-core#16524](https://github.com/dependabot/dependabot-core/issues/16524).
-Until it ships, the `uv audit` step in each refresh is the only check of the
-current lock. Once a Dependency Graph run on `main` passes, drop the paragraph
+Until it ships, the weekly Audit workflow (`.github/workflows/audit.yml`) and
+the `uv audit` step in each refresh are the only checks of the current lock.
+Once a Dependency Graph run on `main` passes, drop the paragraph
 about this from
 [the playbook's security section](dependency_refresh.md#a-security-alert-between-refreshes),
 and confirm the stale alerts closed.

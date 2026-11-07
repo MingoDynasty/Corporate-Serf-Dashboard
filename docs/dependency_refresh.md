@@ -3,7 +3,8 @@
 Dependency and toolchain updates are made by hand, from this playbook, about
 once a month. Nothing opens update PRs on its own. A refresh is one or two
 ordinary PRs, and merging one that changes what an installed copy runs cuts a
-release.
+release. The cross-repo tooling spec names this file the refresh playbook for
+every Python repository that follows it.
 
 ## When to run
 
@@ -347,9 +348,14 @@ the PR body. Lift the cap in a later refresh, once the breakage is gone.
 
 ## A security alert between refreshes
 
-GitHub's Dependabot alerts watch `uv.lock` and raise an alert when a locked
-package has a known vulnerability. Its automatic fix PRs are off, because they
-cannot run against this repository's exact uv pin
+Two things watch `uv.lock` between refreshes, and neither turns a pull request
+red. GitHub's Dependabot alerts raise an alert when a locked package has a
+known vulnerability. The Audit workflow (`.github/workflows/audit.yml`) runs
+the audit from [package pass](#package-pass) step 6 on `main` every Monday, or
+on demand from the Actions tab, and a finding fails that run
+([2026-11-07 decision](decision_log/2026/2026-11-07-a-weekly-workflow-audits-the-lock.md)).
+Dependabot's automatic fix PRs are off, because they cannot run against this
+repository's exact uv pin
 ([2026-10-04 decision](decision_log/2026/2026-10-04-dependency-updates-stay-manual-run-from-a-playbook.md)).
 So the fix is made by hand, as its own PR:
 
@@ -369,7 +375,7 @@ describe the last lock Dependabot read, on 2026-10-12: they can name a version
 `main` no longer locks, and they miss any vulnerability in a version it locks
 now. Check an alert's version against `uv.lock` before acting on it, and run
 the audit in [package pass](#package-pass) step 6 to see what the current lock
-holds. Nothing checks the lock between refreshes in the meantime. The
+holds. The weekly Audit run checks the current lock in the meantime. The
 [tech-debt entry](tech_debt.md#dependabot-cant-read-the-lock-on-python-315)
 says what to do once Dependabot supports the project's Python again.
 
