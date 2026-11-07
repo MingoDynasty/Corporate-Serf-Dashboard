@@ -6,6 +6,7 @@ Driven in a child process, like the other whole-startup tests: importing
 costs seconds, so one run serves every test that reads what it swept.
 """
 
+import contextlib
 import logging
 import os
 import subprocess
@@ -241,3 +242,116 @@ def test_a_temp_that_cannot_be_removed_is_logged_and_left(
     assert held.exists()
     assert not free.exists()
     assert f'Could not remove the stale temp "{held}"' in caplog.text
+
+
+def _link_directory(kind: str, link: Path, target: Path) -> None:
+    """Make ``link`` a directory junction or symbolic link to ``target``."""
+    if kind == "junction":
+        result = subprocess.run(
+            ["cmd", "/c", "mklink", "/J", str(link), str(target)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stderr
+        return
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except OSError as error:
+        pytest.skip(f"cannot create a directory symbolic link: {error}")
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="junctions are Windows-only")
+@pytest.mark.parametrize("kind", ["junction", "symlink"])
+def test_the_sweep_never_follows_a_directory_link_out_of_its_tree(
+    tmp_path: Path,
+    kind: str,
+) -> None:
+    """A link under the cache can point anywhere, and nothing there is ours."""
+    cache = tmp_path / "cache"
+    nested = cache / "leaderboard"
+    outside = tmp_path / "outside"
+    nested.mkdir(parents=True)
+    outside.mkdir()
+    ours = nested / ".98765.json.123.456.tmp"
+    not_ours = outside / ".settings.json.123.456.tmp"
+    for leftover in (ours, not_ours):
+        leftover.write_text("{}", encoding="utf-8")
+        _set_mtime(leftover, time.time() - DAY_SECONDS)
+    _link_directory(kind, cache / "linked", outside)
+
+    removed = atomic_write.remove_stale_temp_files(
+        cache,
+        older_than=time.time(),
+        logger=logging.getLogger(__name__),
+        recursive=True,
+    )
+
+    assert removed == 1
+    assert not ours.exists()
+    assert not_ours.is_file()
+
+
+class _TypeQueryFails:
+    """A directory entry whose ``method`` raises, as a metadata query may."""
+
+    def __init__(self, entry: os.DirEntry[str], method: str) -> None:
+        self._entry = entry
+        self._method = method
+
+    def __getattr__(self, attribute: str) -> object:
+        if attribute != self._method:
+            return getattr(self._entry, attribute)
+
+        def refuse(*args: object, **kwargs: object) -> bool:
+            raise PermissionError(5, "Access is denied")
+
+        return refuse
+
+
+def test_an_entry_whose_type_cannot_be_read_is_logged_and_left(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A failed type query must not stop startup or the entries after it."""
+    folder = tmp_path / "leaderboard"
+    folder.mkdir()
+    unread, free = (tmp_path / temp for temp in _left_by_a_kill("settings.json"))
+    for leftover in (unread, free):
+        leftover.write_text("{}", encoding="utf-8")
+        _set_mtime(leftover, time.time() - DAY_SECONDS)
+    failing = {folder.name: "is_dir", unread.name: "is_file"}
+    real_scandir = os.scandir
+
+    def scandir_whose_type_queries_fail(
+        path: Path,
+    ) -> contextlib.nullcontext[list[object]]:
+        with real_scandir(path) as scan:
+            # The failures come first, so the entry after them shows the
+            # sweep carried on.
+            entries = sorted(scan, key=lambda entry: entry.name not in failing)
+        return contextlib.nullcontext(
+            [
+                _TypeQueryFails(entry, failing[entry.name])
+                if entry.name in failing
+                else entry
+                for entry in entries
+            ]
+        )
+
+    monkeypatch.setattr(atomic_write.os, "scandir", scandir_whose_type_queries_fail)
+
+    with caplog.at_level(logging.WARNING):
+        removed = atomic_write.remove_stale_temp_files(
+            tmp_path,
+            older_than=time.time(),
+            logger=logging.getLogger(__name__),
+            recursive=True,
+        )
+
+    assert removed == 1
+    assert unread.exists()
+    assert not free.exists()
+    for path in (folder, unread):
+        assert f'Could not check "{path}" for stale temp files' in caplog.text

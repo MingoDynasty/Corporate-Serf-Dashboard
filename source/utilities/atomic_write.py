@@ -100,9 +100,10 @@ def remove_stale_temp_files(
     writer's temp name and whose modification time (seconds since the epoch)
     is before ``older_than`` is removed. A newer one may be a write still in
     flight. A missing directory removes nothing, and a directory that cannot
-    be listed or a temp that cannot be removed is logged and left. A
-    backup-claim temp is a second hard link to its backup, so removing it
-    leaves the backup whole.
+    be listed, an entry whose type cannot be read, or a temp that cannot be
+    removed is logged and left. ``recursive`` descends into subdirectories but
+    never through a symbolic link or junction. A backup-claim temp is a second
+    hard link to its backup, so removing it leaves the backup whole.
     """
     try:
         with os.scandir(directory) as scan:
@@ -115,15 +116,32 @@ def remove_stale_temp_files(
 
     removed = 0
     for entry in entries:
-        if recursive and entry.is_dir(follow_symlinks=False):
+        # Windows may have to query an entry's metadata to answer these, and
+        # that query can fail like any other.
+        try:
+            # follow_symlinks=False keeps a symbolic link out but not a
+            # junction, which could carry the sweep outside this tree.
+            descend = (
+                recursive
+                and entry.is_dir(follow_symlinks=False)
+                and not entry.is_junction()
+            )
+            is_temp = (
+                not descend
+                and _WRITER_TEMP_NAME.fullmatch(entry.name) is not None
+                and entry.is_file(follow_symlinks=False)
+            )
+        except OSError as error:
+            logger.warning(
+                'Could not check "%s" for stale temp files: %s', entry.path, error
+            )
+            continue
+        if descend:
             removed += remove_stale_temp_files(
                 Path(entry.path), older_than=older_than, logger=logger, recursive=True
             )
             continue
-        if not (
-            entry.is_file(follow_symlinks=False)
-            and _WRITER_TEMP_NAME.fullmatch(entry.name)
-        ):
+        if not is_temp:
             continue
         try:
             if entry.stat(follow_symlinks=False).st_mtime >= older_than:

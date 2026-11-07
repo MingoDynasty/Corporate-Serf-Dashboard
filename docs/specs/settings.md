@@ -487,11 +487,13 @@ exempt
   link to the backup once its name is claimed. Startup removes them once,
   after it builds and seeds the cache tree, from `data/`, `data/playlists/`,
   `data/scenario_notes/`, and the whole `data/cache/` tree, so cache files
-  are covered although the rest of this section exempts them. It removes only a regular file whose whole name
-  has that form, with `<name>` ending in `.json` and both numbers decimal,
-  and whose modification time is before the process started: a newer one may
-  be a write in flight. Nothing else in those folders is touched, removing a
-  claim's temp leaves its backup whole, and a temp that can't be removed is
+  are covered although the rest of this section exempts them. The cache walk
+  never descends through a symbolic link or junction. It removes only a
+  regular file whose whole name has that form, with `<name>` ending in
+  `.json` and both numbers decimal, and whose modification time is before
+  the process started: a newer one may be a write in flight. Nothing else in
+  those folders is touched, removing a claim's temp leaves its backup whole,
+  and an entry whose type can't be read or a temp that can't be removed is
   logged at WARNING and left. A nonzero count is logged at INFO as "Removed
   `<n>` temp file(s) left by interrupted writes.", and each removed path at
   DEBUG.
