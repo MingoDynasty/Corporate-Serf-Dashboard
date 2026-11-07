@@ -377,9 +377,11 @@ def benchmark_rank_fields(
 ) -> PlaylistScenarioRow:
     """Compute a benchmark row's Rank and Next Rank fields from its PB.
 
-    The figures are ``ladder_standing``'s. ``tier_sort`` counts the ranks
-    passed, so No rank is 0. ``next_tier_sort`` is the unrounded gap, and Top
-    rank and ``N/A`` sort as null.
+    The figures are ``ladder_standing``'s. ``tier_sort`` is the unrounded
+    rank position, as Typical Rank's is, so scenarios on one rank sort by how
+    far each PB is toward the next, and No rank sorts under every ranked row.
+    ``next_tier_sort`` is the unrounded gap, and Top rank and ``N/A`` sort as
+    null.
     """
     fields: PlaylistScenarioRow = {
         "tier_display": "N/A",
@@ -388,13 +390,15 @@ def benchmark_rank_fields(
         "next_tier_sort": None,
         "next_tier_tooltip": None,
     }
+    if high_score is None:
+        return fields
     standing = ladder_standing(ladder, high_score, pace_constant)
     if standing is None:
         return fields
     fields["tier_display"] = (
         "No rank" if standing.reached is None else standing.reached.name
     )
-    fields["tier_sort"] = standing.passed
+    fields["tier_sort"] = rank_position(ladder, high_score, standing)
     if standing.at_top:
         fields["next_tier_display"] = "Top rank"
     elif standing.next_gap is not None:

@@ -1543,7 +1543,10 @@ it.
   ([The latest-run card](#the-latest-run-card)).
   Anything that orders or places scores is unchanged, because a higher score
   is always a faster finish: the chart's points and axis, the PB score line,
-  the rank lines, and the Rank column. No completion time is shown anywhere
+  the rank lines, and the rank the Rank column names. Below the first rank
+  the Rank and Typical Rank columns sort by the Next Rank gap's rule, pace
+  included
+  ([playlists.md](playlists.md#the-per-playlist-scenario-table)). No completion time is shown anywhere
   but the run viewer's Time tile and By Bot's splits, which the pace entry's
   note of 2026-10-30 names ([2026-10-05][pace], [RV3][rv-tiles],
   [RV4][rv-by-bot]; [The tiles](#the-tiles), [By Bot](#by-bot)).

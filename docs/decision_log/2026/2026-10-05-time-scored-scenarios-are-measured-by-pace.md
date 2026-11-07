@@ -1,8 +1,7 @@
 # 2026-10-05: Time-Scored Scenarios Are Measured By Pace
 
 Status: Superseded in part, as its dated notes say, most recently by the
-[run viewer's tiles](2026-10-30-the-run-viewers-tiles-are-score-accuracy-shots-fired-reloads-and-time.md) and
-[By Bot](2026-10-30-by-bot-measures-each-bot-against-its-own-typical-and-names-no-bot.md) decisions
+[rank position decision](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)
 
 Some scenarios score the time left on a countdown when the task is done, and
 on those the app now measures by pace: how fast a run finishes compared with
@@ -296,6 +295,15 @@ and a time-scored run's By Bot shows each bot's split
 So no completion time is shown anywhere else, and Run History and a
 per-bot breakdown are no longer out of scope. The pace rule, its
 detection and its surfaces stand.
+
+**Superseded in part (2026-11-07).** The Rank column sorts by rank
+position, and below the first rank that key follows Next Rank's gap, so a
+No rank row whose PB can be measured by pace sorts by pace there. The rank
+a row reaches, and the column's order from the first rank up, stay the
+same by score or by time, because between two thresholds the fraction is
+the same in either
+([the rank position decision](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)).
+Everything else that orders or places scores is unchanged.
 
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.

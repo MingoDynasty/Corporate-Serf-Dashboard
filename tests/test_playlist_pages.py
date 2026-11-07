@@ -2642,8 +2642,10 @@ def test_playlist_scenarios_rank_column_defs():
             "The highest rank your PB score has reached on this scenario."
         ),
         "valueFormatter": {"function": "params.data.tier_display"},
+        # The field is the rank position, under 1 below the first rank, so
+        # No rank and N/A have no tooltip.
         "tooltipValueGetter": {
-            "function": "params.data.tier_sort ? params.data.tier_display : null"
+            "function": "params.data.tier_sort >= 1 ? params.data.tier_display : null"
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,

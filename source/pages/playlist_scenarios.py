@@ -252,9 +252,12 @@ BENCHMARK_COLUMN_DEFS = [
         "headerName": "Rank",
         "field": "tier_sort",
         "headerTooltip": "The highest rank your PB score has reached on this scenario.",
+        # The field is the rank position, as Typical Rank's is, so the column
+        # sorts by it. It is under 1 below the first rank, where a plain
+        # truthiness test would give No rank a tooltip.
         "valueFormatter": {"function": "params.data.tier_display"},
         "tooltipValueGetter": {
-            "function": "params.data.tier_sort ? params.data.tier_display : null"
+            "function": "params.data.tier_sort >= 1 ? params.data.tier_display : null"
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,

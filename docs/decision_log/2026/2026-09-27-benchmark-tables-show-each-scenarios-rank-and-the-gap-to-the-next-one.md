@@ -1,6 +1,7 @@
 # 2026-09-27: Benchmark Tables Show Each Scenario's Rank And The Gap To The Next One
 
-Status: Accepted
+Status: Superseded in part, as its dated notes say, most recently by the
+[rank position decision](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)
 
 A benchmark's scenario table now shows the rank each scenario's personal best
 has reached, and how much that personal best has to grow, as a percentage, to
@@ -156,6 +157,17 @@ Every other row keeps D1 as written, and the ladder walk, the Rank column,
 the rounding, the sort, and the tooltip are unchanged for all rows. The
 [2026-10-05 entry](2026-10-05-time-scored-scenarios-are-measured-by-pace.md)
 holds the formula and the reasons. Shipped in PR #343.
+
+**Superseded in part (2026-11-07).** Rank sorts by rank position, the key
+Typical Rank sorts by, measured from the PB: the ranks passed plus the
+fraction of the way to the next, so the scenarios on one rank order by how
+far each PB is toward the next one instead of keeping playlist order. Below
+the first rank the key follows Next Rank's gap, so No rank rows order too,
+and still sort under every ranked row. `tier_sort` holds the position, not
+the ranks passed. The ladder walk, the Rank cell, D1, D2, and everything
+else here stand. The
+[2026-11-07 entry](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)
+holds the key.
 
 **Provenance.** Proposal by `claude-opus-5-5` (PR #320), reviewed by
 `gpt-6-sol` and, as a supplementary seat, `claude-fable-5-1`. Shipped in PR
