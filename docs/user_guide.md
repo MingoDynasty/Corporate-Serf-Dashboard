@@ -93,7 +93,7 @@ have cleared, starts with run notifications on and on Confetti.
 Run History's top row puts the selected scenario's stats beside its
 personal best and its latest run. The **Playlist filter** sets the benchmark
 context: Scenario Stats shows that benchmark's category and subcategory
-above Total runs. Category disappears when the filter is empty, holds
+above Time in runs. Category disappears when the filter is empty, holds
 an ordinary playlist, or has no grouping for the scenario.
 
 The PB card shows the local record, its rank and the next rank's score, then
@@ -108,8 +108,10 @@ record from another computer.
 The latest-run card reports the selected scenario's latest run, so with
 **Follow newly played scenario** on it shows each run as you play it, and
 while you look another scenario up it shows when that one was last played
-and how the run went. A run from an older session names the session, such
-as "Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
+and how the run went. Its session line gives the run's number in its
+session and the scenario's time in runs there, such as "Run 7 this session
+· 7 min in runs". A run from an older session names the session, such as
+"Run 7 (Oct 16, 2:00 PM session)". With **Follow newly played scenario**
 off, a run on another scenario doesn't reach the card: the run's toast links
 to it, and the run list's **All scenarios** view lists it.
 
@@ -200,9 +202,17 @@ Scenario Stats leads with your typical score: the median of this scenario's
 last 20 runs, or all of its runs if you have fewer, regardless of age. It
 needs at least 10 runs across 2 or more sessions, or 20 in one session.
 Before that it reads "Too few runs"; with no local runs, "No runs yet".
-**Total runs** counts the whole scenario history, not only the runs behind
-the typical score. Hover or focus the number to see its supporting runs,
-sessions, dates and both bands; the help icon explains the figure.
+Hover or focus the number to see its supporting runs, sessions, dates and
+both bands; the help icon explains the figure.
+
+**Time in runs** adds up how long every run of the scenario took, its whole
+history, not only the runs behind the typical score. It counts the runs
+themselves, not their pauses, restarts, results screens or the breaks
+between runs, so it reads about the run count in minutes on a 60-second
+scenario. Hover or focus it for the run count. Some stats files from before
+2022 record no run length, and a figure that holds one reads "at least", or
+"unknown" when under a minute is recorded. A session's length in the run
+list is its clock instead, with its pauses and breaks.
 
 A dimmed number means fewer than 10 supporting runs are from the last
 30 days, so it may be out of date. Whenever any supporting runs are older,

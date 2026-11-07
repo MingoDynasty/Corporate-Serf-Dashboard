@@ -437,9 +437,10 @@ it is saved is in [2026-10-18][note-store].
     value a second paragraph follows: `Fewer than 10 of its runs were from
     the 30 days before the session began, so it may have been out of date.`
     The hover is at most 360px wide ([SC1][typical-start]).
-- The session line names the run in its session, then ` · `, then the time
-  spent on its scenario: `Run 7 this session · 9 min on this scenario`
-  ([SC3][card-lines]). In the newest session the run reads
+- The session line names the run in its session, then ` · `, then its
+  scenario's time in runs in that session: `Run 7 this session · 7 min in
+  runs` ([SC3][card-lines], [2026-11-07][time-in-runs]). In the newest
+  session the run reads
   `Run {n} this session` while the session is in progress, and
   `Run {n} last session` once it has ended. A run in an older session names
   the session as the run list names its row, by when it began, with the year
@@ -447,11 +448,13 @@ it is saved is in [2026-10-18][note-store].
   `Run 8 (Jul 20, 2020, 11:47 PM session)`. The year is judged against the
   app's own date. `{n}` counts the session's runs on the run's scenario
   ([2026-10-18][follows]).
-  The time reads `{duration} on this scenario`, the time spent on the
-  scenario in the run's session, as
-  [sessions.md](sessions.md#where-sessions-show) defines it. Where that time
-  can't be known it reads `Time on this scenario unknown`
-  ([2026-10-12][check], [2026-10-18][follows]).
+  The time is the sum of the run lengths of the scenario's runs in the
+  session, over every visit to it there, so the breaks between them are left
+  out. It reads by the display rule in
+  [sessions.md](sessions.md#time-in-runs): `{duration} in runs`, or
+  `at least {duration} in runs` where one of those runs has no length, or
+  `Time in runs unknown` where under a minute is recorded beside one. The
+  line has no hover ([2026-11-07][time-in-runs]).
 - The last line is the run's sensitivity and accuracy, worded as the PB
   card's last line words the PB run's: `{cm/360} cm/360 · Accuracy
   {accuracy}%`, or `Accuracy {accuracy}%` where the run's cm/360 is unknown
@@ -464,7 +467,8 @@ it is saved is in [2026-10-18][note-store].
   minute, a half rounding up: `9 min`, `1 hr 6 min`
   ([2026-10-13][nearest-minute]).
   A time that rounds to zero reads `<1 min`, so that form means under 30
-  seconds.
+  seconds. A time in runs that holds a run with no length is a minimum
+  instead, and counts whole minutes ([2026-11-07][time-in-runs]).
 - The card is 480px wide, a width of its own that equals the run list's
   minimum, which is the list's width with the default columns
   ([2026-10-22][card-width], [2026-10-29][card-480]), and as tall as the
@@ -965,8 +969,9 @@ The card's lines, local-record scope and leaderboard presentation follow
   Selected scenario field and the chart's title name the scenario
   ([SC2][first-line]).
   Under This scenario the line reads `{scenario} · {n} runs`, or `1 run`,
-  where `{n}` counts every run of the scenario in the run store, the figure
-  Scenario Stats shows as Total runs. Under All scenarios it reads
+  where `{n}` counts every run of the scenario in the run store, the count
+  Scenario Stats' Time in runs adds up and its hover gives. Under All
+  scenarios it reads
   `All scenarios · {n} runs`, where `{n}` counts every run in the store
   ([2026-10-14][all-scenarios]).
 
@@ -1058,7 +1063,11 @@ The card's lines, local-record scope and leaderboard presentation follow
   while its session is in progress, then `{length} · {n} runs · {k}
   scenarios`, such as `1 hr 6 min · 47 runs · 7 scenarios`, singular where a
   count is one. `{k}` counts scenarios, not rows. Every session row gives its
-  length, and only the first row's length has the hover.
+  length, and only the first row's length has the hover:
+  `The length runs from the first run to the last run, pauses and breaks between runs included. It doesn't count the time since your last run.`
+  The length is the session's clock, the only length of play the app shows
+  that counts the breaks between runs, and no session row shows a time in
+  runs ([2026-11-07][time-in-runs]).
 - Under a session is a scenario row per visit, so a scenario that was left
   and returned to has a second row. The rows are numbered in the order they
   were played and listed newest first. A scenario row reads
@@ -1689,7 +1698,8 @@ it.
   named "About the typical score" follows it, and its lead is the typical
   score in the same large-number style as the PB and latest-run cards, with
   a dotted underline and a hover ([TS8][typical-card-lead]). Category and
-  Total runs follow at one weight ([TS8][typical-card-lead]). The personal best and the
+  Time in runs follow at one weight ([TS8][typical-card-lead],
+  [2026-11-07][time-in-runs]). The personal best and the
   leaderboard position are [the PB card's](#the-pb-card), and when the
   scenario was last played is [the latest-run card's](#the-latest-run-card)
   ([2026-10-18][stats-last-played]).
@@ -1710,11 +1720,26 @@ it.
   ([TS5][typical-card-value]).
 - With no scenario selected, the card reads "No scenario selected" under its
   first line, in the PB card's empty-title style, in place of the lead,
-  Category and Total runs. A scenario with no local runs reads "No runs yet"
-  over `Total runs: 0`. Below the existence minimum the lead reads "Too few
-  runs", whose hover gives the minimum and the scenario's run and session
-  counts, with singular wording for one
-  ([TS8][typical-card-lead]).
+  Category and Time in runs. A scenario with no local runs reads "No runs
+  yet", and the Time in runs line is absent. Below the existence minimum the
+  lead reads "Too few runs", whose hover gives the minimum and the
+  scenario's run and session counts, with singular wording for one
+  ([TS8][typical-card-lead], [2026-11-07][time-in-runs]).
+- Time in runs reads `Time in runs: `, the label bold as `Category:` is, then
+  the scenario's lifetime time in runs over every run in the run store, by
+  the display rule in [sessions.md](sessions.md#time-in-runs):
+  `{duration}`, `at least {duration}` or `unknown`. The figure has the
+  lead's dotted underline, accepts keyboard focus, and its hover, at most
+  360px wide, opens with the count: `{n} runs`,
+  `{n} runs · {k} with no recorded length`, or
+  `{n} runs · none with a recorded length`, singular `1 run`. Then
+  `Only the runs themselves count, not their pauses. Restarts, results screens and breaks between runs don't either.`
+  An `at least` figure adds
+  `Runs with no recorded length add no time, so this is a minimum.`, and an
+  `unknown` one with some lengths adds
+  `The runs with a recorded length come to under a minute.` A run landing on
+  the scenario and a scenario change rewrite it
+  ([2026-11-07][time-in-runs]).
 - The first line's help explains the median, both bands and their switches,
   the dimming, and why the card's recency can differ from the chart's last
   point. The help icon and the hovered lead accept keyboard focus
@@ -1888,6 +1913,7 @@ it.
 [check]: ../decision_log/2026/2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md
 [own-ids]: ../decision_log/2026/2026-10-12-run-history-keeps-its-own-control-ids-so-every-browser-saw-the-defaults-once.md
 [nearest-minute]: ../decision_log/2026/2026-10-13-a-measured-time-rounds-to-the-nearest-minute.md
+[time-in-runs]: ../decision_log/2026/2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md
 [naming]: ../decision_log/2026/2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options.md
 [panel]: ../decision_log/2026/2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph.md
 [localhost]: ../decision_log/2026/2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001.md

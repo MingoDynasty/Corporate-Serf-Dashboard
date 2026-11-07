@@ -112,8 +112,8 @@ NOT_PLAYED_TEXT = "Not played in this session"
 SHOW_OLDER_SESSIONS_LABEL = "Show older sessions"
 IN_PROGRESS_LABEL = "In progress"
 SESSION_LENGTH_HELP = (
-    "The length runs from the first run to the last run. It doesn't count the "
-    "time since your last run."
+    "The length runs from the first run to the last run, pauses and breaks "
+    "between runs included. It doesn't count the time since your last run."
 )
 ALL_SCENARIOS_HEADING = "All scenarios"
 ALL_SCENARIOS_GRID_NAME = "Runs of all scenarios, by session"

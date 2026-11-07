@@ -22,6 +22,10 @@ continues to show every session's length.
 Superseded in part again, 2026-10-29, by
 [Shots Fired starts hidden](2026-10-29-the-run-lists-shots-fired-column-starts-hidden.md):
 Shots Fired starts hidden, so a run row has six columns by default.
+Superseded in part again, 2026-11-07, by
+[Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md):
+the first row's length hover adds that pauses and breaks between runs are
+included.
 
 Run History lists the selected scenario's runs in a column of its own, to the
 right of the chart and always shown. The chart is narrower than the old

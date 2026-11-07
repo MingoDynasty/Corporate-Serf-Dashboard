@@ -15,6 +15,11 @@ this entry left for the second delivery PR, and `LatestRun.comparison` is
 now `pb_comparison` beside `typical`. The session line, the last line and
 the readable grey stand.
 
+**Superseded in part (2026-11-07).** [Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md): the session line's time
+is the scenario's time in runs in the session,
+`Run 7 this session · 7 min in runs`, and `Time on this scenario unknown`
+is retired. The run's words, the last line and the readable grey stand.
+
 **Ruling and delivery.** SC3 of the Run History score cards proposal,
 [#430](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/430),
 ratified by the maintainer on 2026-10-25 at `c77ad06`: "I ratify the proposal

@@ -2,10 +2,10 @@
 
 The app groups a player's runs into sessions: the runs separated by breaks of
 no more than 30 minutes. To measure a break it works out when each run began
-and how long it took, from two lines of the run's stats file. Inside a
-session it also finds each visit, the consecutive runs on one scenario.
-Run History names the session and shows a scenario's run position and total
-within it.
+and how long it took, from two lines of the run's stats file. Every total of
+play is the sum of those run lengths, called time in runs, while a session's
+own length counts its breaks too. Run History names the session and shows a
+scenario's run position and time in runs within it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log/README.md) entry that set them. Rationale lives in
@@ -48,26 +48,21 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - The latest-run card reports the selected scenario's latest run: its last
   run in the newest session that holds one
   ([2026-10-18](../decision_log/2026/2026-10-18-the-latest-run-card-reports-the-selected-scenarios-latest-run.md)).
-  Its third line gives the run's number among its scenario's runs in its
-  session, and its fourth the time spent on that scenario in the session:
-  the sum of the scenario's visits, each from its first run's start to its
-  last run's end. For the newest session it says "this session" while the
-  session is in progress and "last session" once it has ended (see
-  [In progress](#in-progress)). An older session is named as the list names
-  its row, by its first run's start, such as `Run 7 (Oct 16, 2:00 PM
-  session)`.
-- Where the first run of any of those visits has no usable start, the card
-  says the time on the scenario is unknown and gives no number. Such a visit
-  is counted from that run's end, so one long run would read as under a
-  minute (see [Run start and run length](#run-start-and-run-length)).
+  Its session line gives the run's number among its scenario's runs in its
+  session, then that scenario's time in runs in the session, over every
+  visit to it there (see [Time in runs](#time-in-runs)). For the newest
+  session it says "this session" while the session is in progress and "last
+  session" once it has ended (see [In progress](#in-progress)). An older
+  session is named as the list names its row, by its first run's start, such
+  as `Run 7 (Oct 16, 2:00 PM session)`
+  ([2026-11-07][time-in-runs]).
 - That page's chart plots a scenario's runs in the order sessions are split
   in (see [Sessions](#sessions)).
-- No toast or log line shows a session, a visit, a run's start, or a run's
-  length.
+- No toast or log line shows a session, a visit, a run's start, a run's
+  length, or a time in runs.
 - A run's start and its run length are shown nowhere by themselves. They
   decide which session a run joins, a session's name and its length are read
-  from its first run's start, and the card's time on a scenario is read from
-  each visit's first run's start.
+  from its first run's start, and every time in runs adds up run lengths.
 
 ## Run start and run length
 
@@ -101,6 +96,11 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - A file that looks like a reset, with a start within a second of its end,
   is still a run. It has no start and no length
   ([2026-10-11][entry]).
+- A stats file named without ` - Challenge - ` is freeplay, which the game's
+  Statistics Export on Always writes. It is still a run, with no start and no
+  length, however its `Challenge Start:` reads: that line is left over from
+  the last challenge played. It loads, and joins a session by its end
+  ([2026-11-07][time-in-runs]).
 - Neither field is stored. The run store is rebuilt from the stats folder at
   every start, and both are read again each time ([2026-10-11][entry]).
 
@@ -131,8 +131,9 @@ Two words are kept apart throughout. A **break** is time between runs. A
   run has no start. It ends at its last run's end
   ([2026-10-11][entry]).
 - Session length is the session's end minus its start, whether or not the
-  session is in progress. It includes the breaks between runs
-  ([2026-10-11][entry]).
+  session is in progress. It includes paused time and the breaks between
+  runs ([2026-10-11][entry]), and it is the only length of play the app
+  shows that counts those breaks ([2026-11-07][time-in-runs]).
 - A session has no identity of its own. A view that needs a key for one uses
   the session's first run ([2026-10-11][entry]).
 - A session can cross midnight, and one day can hold several
@@ -177,10 +178,43 @@ Two words are kept apart throughout. A **break** is time between runs. A
 - A visit starts at its first run's start, or at that run's end when the run
   has no start, and ends at its last run's end ([2026-10-11][entry]).
 
+## Time in runs
+
+- Every total of play the app shows, over any set of runs, is their time in
+  runs: the sum of their run lengths. It leaves out pauses, and the breaks
+  between runs, which only a session's length holds
+  ([2026-11-07][time-in-runs]).
+- A run with no run length adds no time and is counted as unknown, never as
+  zero. A total keeps its seconds unrounded and its count of such runs, so
+  the totals of two sets of runs add up to the total of both
+  ([2026-11-07][time-in-runs]).
+- It is shown by one display rule, in one of four forms
+  ([2026-11-07][time-in-runs]):
+  - With no runs, the figure is absent.
+  - With every length known, the nearest minute, a half rounding up, and
+    `<1 min` under 30 seconds, as a session's length reads
+    ([2026-10-13][nearest-minute]).
+  - With a run of no length and a minute or more recorded, `at least` and
+    the whole minutes recorded, never rounded up: 90 seconds reads
+    `at least 1 min`.
+  - With a run of no length and under a minute recorded, unknown. A measured
+    total under a minute reads `<1 min` instead.
+- A time in runs reads `{duration} in runs`, or `Time in runs: {duration}` as
+  a labelled line. The name says what it counts, so a total with every
+  length known shows no visible minimum word, and its hover says what runs
+  leave out ([2026-11-07][time-in-runs]).
+- It shows on Scenario Stats, over every run of the scenario, and on the
+  latest-run card, over the scenario's runs in the run's session
+  ([run_history.md](run_history.md#scenario-stats)). No session row shows
+  one ([2026-11-07][time-in-runs]).
+- It comes from the stats files alone. The app reads no game log, no Steam
+  log and no watcher, so restarts that wrote no stats file, menus and the
+  time the game was open are in no figure ([2026-11-07][time-in-runs]).
+
 ## Computed, never stored
 
-- Sessions and visits are worked out from a list of runs each time something
-  asks. Nothing about them is written to disk or kept in memory, so there is
+- Sessions, visits and times in runs are worked out from a list of runs each
+  time something asks. Nothing about them is written to disk or kept in memory, so there is
   nothing to migrate, and changing the constant re-splits the whole history
   ([2026-10-11][entry]).
 - The session functions take a list of runs and never read the run store. A
@@ -203,6 +237,10 @@ as written. What follows is accepted ([2026-10-11][entry]).
 - A manual clock change, or a trip across time zones, does the same.
 
 [entry]: ../decision_log/2026/2026-10-11-a-session-ends-after-a-break-of-more-than-30-minutes.md
+
+[time-in-runs]: ../decision_log/2026/2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md
+
+[nearest-minute]: ../decision_log/2026/2026-10-13-a-measured-time-rounds-to-the-nearest-minute.md
 
 [typical-card-value]: ../decision_log/2026/2026-10-18-scenario-stats-shows-the-newest-typical-score-at-any-age.md
 
