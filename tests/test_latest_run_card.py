@@ -750,8 +750,8 @@ def _visits() -> list[RunData]:
     ]
 
 
-# The scenario's time in its session, where the run's words end. The run's
-# words, before it, are held by the tests of which session the run is in.
+# The scenario's time in runs in its session, after the run's words. The tests
+# of which session the run is in read the run's words alone.
 
 
 def test_the_run_is_numbered_and_its_scenarios_time_in_runs_follows():
