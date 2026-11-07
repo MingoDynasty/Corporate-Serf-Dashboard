@@ -9,7 +9,7 @@ plain functions here and are registered once per page.
 
 import json
 from datetime import datetime
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import dash_mantine_components as dmc
 from dash import Input, Output, State, callback, html, no_update
@@ -41,6 +41,9 @@ from source.kovaaks.typical_score import (
     typical_score_hover,
     typical_score_recency,
 )
+
+if TYPE_CHECKING:
+    from source.components.run_delivery import RunEventsPayload
 
 SCENARIO_STATS_LABEL = "Typical score"
 NO_RUNS_TEXT = "No runs yet"
@@ -100,11 +103,11 @@ def _value_hover(value: TypicalScore, total: int, now: datetime) -> html.Div:
 
 
 def get_scenario_typical_score(
-    _,
+    _: RunEventsPayload | None,
     selected_scenario: str | None,
-    _tick,
-    current_lead=None,
-    current_readout=None,
+    _tick: int,
+    current_lead: object = None,
+    current_readout: str | None = None,
 ) -> tuple[Any, Any, bool]:
     """Build the lead from one run snapshot, keeping unchanged tooltips mounted.
 
@@ -191,7 +194,9 @@ class ScenarioStatsIds(NamedTuple):
 
 
 def get_scenario_category(
-    _, selected_scenario: str | None, playlist_code: str | None
+    _: RunEventsPayload | None,
+    selected_scenario: str | None,
+    playlist_code: str | None,
 ) -> tuple[str, bool]:
     """Read the selected benchmark's table group and whether to hide its row."""
     if not selected_scenario or not playlist_code:
@@ -211,7 +216,9 @@ def get_scenario_category(
     return "", True
 
 
-def get_scenario_num_runs(_, selected_scenario) -> tuple[int | None, bool, bool]:
+def get_scenario_num_runs(
+    _: RunEventsPayload | None, selected_scenario: str | None
+) -> tuple[int | None, bool, bool]:
     """Count the selected scenario's runs, and choose between that line and no selection.
 
     Returns the count, whether to hide its line, and whether to hide the line

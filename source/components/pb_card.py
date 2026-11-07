@@ -24,11 +24,12 @@ import logging
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import dash_mantine_components as dmc
 from dash import (
     Input,
+    NoUpdate,
     Output,
     State,
     callback,
@@ -83,6 +84,9 @@ from source.utilities.notifications import (
     toast,
 )
 from source.utilities.utilities import format_score
+
+if TYPE_CHECKING:
+    from source.components.run_delivery import RunEventsPayload
 
 logger = logging.getLogger(__name__)
 
@@ -592,7 +596,17 @@ def _render_scenario_rank(
     return outputs, _steam_mismatch_notifications(rank_info, username, steam_id)
 
 
-def get_scenario_rank(_, selected_scenario, _n_intervals):
+def get_scenario_rank(
+    _: RunEventsPayload | None,
+    selected_scenario: str | None,
+    _n_intervals: int,
+) -> tuple[
+    str | list,
+    bool,
+    float | None,
+    str | None,
+    list[dict[str, object]] | NoUpdate,
+]:
     """Render scenario rank, keeping interval-only calls cache-only.
 
     Under DashProxy an ``allow_duplicate`` callback can still fire once on page
@@ -763,10 +777,10 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
 # One return per outcome the click can have. Collapsing any pair would only
 # hide which answer a reader is looking at.
 def refresh_rank(  # noqa: PLR0911
-    n_clicks,
+    n_clicks: int | None,
     selected_scenario: str | None,
-    toast_channels,
-):
+    toast_channels: dict[str, str | None],
+) -> tuple[object, ...]:
     """Fetch and display authoritative board truth after an explicit user request.
 
     The user asked, so every outcome answers on this callback's own
@@ -1157,7 +1171,11 @@ def pb_card_content(
     )
 
 
-def show_pb(_run_events, selected_scenario, selected_playlist) -> PbCardContent:
+def show_pb(
+    _run_events: RunEventsPayload | None,
+    selected_scenario: str | None,
+    selected_playlist: str | None,
+) -> PbCardContent:
     """Write what the card shows, from the run store.
 
     The first argument is the page's run-events store, which triggers the

@@ -7,7 +7,7 @@ on an interval of its own, once, at import. Every page that does reads the
 same queue, so whichever one is open delivers what is in it.
 """
 
-from dash import Input, Output, callback, no_update
+from dash import Input, NoUpdate, Output, callback, no_update
 
 from source.components.local_icon import local_icon
 from source.kovaaks.data_service import drain_startup_playlist_warnings
@@ -42,7 +42,7 @@ def _build_run_import_failure_notification(
     )
 
 
-def flush_run_import_failures(_n_intervals):
+def flush_run_import_failures(_n_intervals: int) -> list[dict[str, object]] | NoUpdate:
     """Deliver run imports the watchdog thread could not complete.
 
     Delivered only on the pages that register it, Home and Run History: a
@@ -76,7 +76,7 @@ def _build_startup_playlist_warning_notifications(
     ]
 
 
-def flush_startup_playlist_warnings(_):
+def flush_startup_playlist_warnings(_: int) -> list[dict[str, object]] | NoUpdate:
     """Deliver import-time playlist warnings after Dash has mounted."""
     warnings = drain_startup_playlist_warnings()
     if not warnings:

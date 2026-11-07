@@ -204,7 +204,12 @@ def settings_help_label(
     )
 
 
-def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
+def apply_graph_appearance(
+    color_scheme: str,
+    plot_json: str | None,
+    point_size: str,
+    point_color: str,
+) -> go.Figure:
     """Apply the theme and the Run Data Points preferences to the graph.
 
     Everything here is presentation over the figure the page's chart callback
@@ -220,7 +225,9 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
     return apply_point_appearance(figure, point_size, point_color)
 
 
-def latest_run_ring_patch(plot_json: str | None, latest_run_id: str | None):
+def latest_run_ring_patch(
+    plot_json: str | None, latest_run_id: str | None
+) -> Patch | NoUpdate:
     """Show or hide the ring on the graph as it stands, changing nothing else.
 
     Returns a patch of the one trace, or ``no_update`` for a figure with no
@@ -244,11 +251,11 @@ def latest_run_ring_patch(plot_json: str | None, latest_run_id: str | None):
 
 
 def apply_graph_appearance_ringing_latest_run(  # noqa: PLR0913
-    color_scheme,
-    plot_json,
-    point_size,
-    point_color,
-    latest_run_id,
+    color_scheme: str,
+    plot_json: str | None,
+    point_size: str,
+    point_color: str,
+    latest_run_id: str | None,
     *,
     only_the_latest_run_changed: bool,
 ) -> go.Figure | Patch | NoUpdate:
@@ -267,7 +274,7 @@ def apply_graph_appearance_ringing_latest_run(  # noqa: PLR0913
     return show_latest_run_ring(figure, latest_run_id, color_scheme)
 
 
-def clear_point_color(n_clicks):
+def clear_point_color(n_clicks: int | None) -> str | NoUpdate:
     """
     Returns the point color to Default.
     :param n_clicks: clicks on the Use default action.
@@ -285,7 +292,9 @@ def _chart_options_panel_class(opened: bool) -> str:
     return f"{CHART_OPTIONS_PANEL_CLASS} {CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
 
 
-def toggle_chart_options(n_clicks, panel_class):
+def toggle_chart_options(
+    n_clicks: int | None, panel_class: str | None
+) -> tuple[str | NoUpdate, str | NoUpdate]:
     """Open or collapse the chart options inspector.
 
     The panel's class is the open state and ``aria-expanded`` rides with it, so
@@ -551,8 +560,12 @@ def register_chart_options(ids: ChartOptionsIds, *, latest_run: str) -> None:
         Input(latest_run, "data"),
     )
     def ring_latest_run_on_graph(
-        color_scheme, plot_json, point_size, point_color, latest_run_id
-    ):
+        color_scheme: str,
+        plot_json: str | None,
+        point_size: str,
+        point_color: str,
+        latest_run_id: str | None,
+    ) -> go.Figure | Patch | NoUpdate:
         """Style the graph, or only move the ring when nothing else changed."""
         return apply_graph_appearance_ringing_latest_run(
             color_scheme,

@@ -1227,7 +1227,11 @@ def register_run_viewer(
         prevent_initial_call=True,
     )
     def show_requested_run(
-        request, _close_clicks, selected_scenario, held, percentage
+        request: dict[str, str | int] | None,
+        _close_clicks: int | None,
+        selected_scenario: str | None,
+        held: dict[str, str | None] | None,
+        percentage: float | str | None,
     ) -> tuple:
         trigger = {
             ids.request: REQUEST,

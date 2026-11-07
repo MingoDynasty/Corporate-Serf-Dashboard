@@ -18,7 +18,7 @@ list asks first. The note card's script answers with a request this callback
 carries out, so one callback still writes both dropdowns.
 """
 
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
 import dash_mantine_components as dmc
 from dash import Input, NoUpdate, Output, State, callback, ctx, no_update
@@ -34,6 +34,9 @@ from source.kovaaks.data_service import (
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
+
+if TYPE_CHECKING:
+    from source.components.run_delivery import RunEventsPayload
 
 PLAYLIST_TABLE_LINK_LABEL = "Open scenario table"
 # Marks a dropdown's input for ``assets/selectHighlightOnOpen.js``, which
@@ -167,7 +170,11 @@ def playlist_filter_options(held_playlist: str | None) -> list[dict[str, str]]:
     ]
 
 
-def select_playlist(selected_playlist, _deep_link, _run_landed):
+def select_playlist(
+    selected_playlist: str | None,
+    _deep_link: dict[str, str | None] | None,
+    _run_landed: str | None,
+) -> tuple[list[str], dmc.Text | None, list[dict[str, str]]]:
     """List the selected playlist's scenarios, link to its table, and list the filter.
 
     With no playlist selected, or a remembered code that no longer resolves,
@@ -246,12 +253,12 @@ def _filter_leaves_out(playlist_code: str | None, scenario: str) -> bool:
 
 
 def reach_scenario(
-    selection,
-    run_events,
-    follow_newly_played,
-    selected_playlist,
-    selected_scenario,
-):
+    selection: dict[str, str | None] | None,
+    run_events: RunEventsPayload | None,
+    follow_newly_played: bool,
+    selected_playlist: str | None,
+    selected_scenario: str | None,
+) -> tuple[str | None | NoUpdate, str | None | NoUpdate]:
     """Select the scenario a link or a new run names, and clear a filter in its way.
 
     Two things reach a scenario. A visit's query parameters do, through the
@@ -377,7 +384,12 @@ def note_request(
     )
 
 
-def _hold_run(run_events, follow_newly_played, editor, waiting) -> tuple[Any, Any, Any]:
+def _hold_run(
+    run_events: RunEventsPayload,
+    follow_newly_played: bool,
+    editor: dict[str, str],
+    waiting: str | None,
+) -> tuple[Any, Any, Any]:
     """Hold a run that lands while the note has unsaved changes: nothing moves.
 
     The run on another scenario becomes the one the page will move to, the
@@ -395,19 +407,24 @@ def _hold_run(run_events, follow_newly_played, editor, waiting) -> tuple[Any, An
 
 
 def reach_the_scenario_asked_for(  # noqa: PLR0913
-    triggered,
+    triggered: list[dict],
     props: SelectionProps,
-    selection,
-    run_events,
-    list_scenario,
-    request,
-    follow_newly_played,
-    selected_playlist,
-    selected_scenario,
-    editor,
-    draft,
-    waiting,
-):
+    selection: dict[str, str | None] | None,
+    run_events: RunEventsPayload | None,
+    list_scenario: str | None,
+    request: dict[str, Any] | None,
+    follow_newly_played: bool,
+    selected_playlist: str | None,
+    selected_scenario: str | None,
+    editor: dict[str, str] | None,
+    draft: str | None,
+    waiting: str | None,
+) -> tuple[
+    str | None | NoUpdate,
+    str | None | NoUpdate,
+    str | None | NoUpdate,
+    dict[str, str] | NoUpdate,
+]:
     """Select the scenario a link, a new run, the list or the note card names.
 
     Returns the filter, the scenario, the scenario a held run waits on, and a
@@ -435,8 +452,14 @@ def reach_the_scenario_asked_for(  # noqa: PLR0913
     """
     unsaved = has_unsaved_changes(editor, draft)
     if _called_with(triggered, props.go):
+        # ``_called_with`` holds that the store called with a value: the request.
         return (
-            *note_request(request, waiting, selected_playlist, selected_scenario),
+            *note_request(
+                cast(dict[str, Any], request),
+                waiting,
+                selected_playlist,
+                selected_scenario,
+            ),
             no_update,
         )
     if _called_with(triggered, props.list_asked):
@@ -452,8 +475,13 @@ def reach_the_scenario_asked_for(  # noqa: PLR0913
     held_on: Any = no_update
     if _called_with(triggered, props.run_events):
         if unsaved:
+            # The store called with a value, the summary, and unsaved changes
+            # need an open editor.
             playlist, scenario, held_on = _hold_run(
-                run_events, follow_newly_played, editor, waiting
+                cast("RunEventsPayload", run_events),
+                follow_newly_played,
+                cast(dict[str, str], editor),
+                waiting,
             )
         else:
             playlist, scenario = reach_scenario(
@@ -550,7 +578,14 @@ def register_scenario_selection_clearing_filter(  # noqa: PLR0913
         deep_link=f"{ids.deep_link}.data",
     )
 
-    def reach_scenario_or_the_one_asked_for(*values):
+    def reach_scenario_or_the_one_asked_for(
+        *values: Any,
+    ) -> tuple[
+        str | None | NoUpdate,
+        str | None | NoUpdate,
+        str | None | NoUpdate,
+        dict[str, str] | NoUpdate,
+    ]:
         return reach_the_scenario_asked_for(ctx.triggered, props, *values)
 
     callback(
