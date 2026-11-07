@@ -28,6 +28,13 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Time in runs** — every total of play is the time the runs themselves
+  took. Scenario Stats reads `Time in runs: 2 hr 26 min` where it read the
+  run count, which moves to its hover, and the latest-run card's session line
+  reads `Run 7 this session · 7 min in runs`. A total that holds an old run
+  with no recorded length reads `at least` or `unknown`, and a session's
+  length stays its clock, breaks included. (PR #479; design in #473)
+  Design rationale distilled into [`decision_log/`](./decision_log/README.md).
 - **Run viewer** — a click on any run in Run History, in the run list or
   on the chart, opens it where the chart was, with the list beside it,
   and Close or Esc brings the chart back as it was left. The run shows its
@@ -61,13 +68,6 @@ sequence.
   and every value's hover explains it, from the mouse or the keyboard. (PR
   #414; design in #408) Design rationale distilled into
   [`decision_log/`](./decision_log/README.md).
-- **Typical score** — Scenario Stats leads with the median of the scenario's
-  last 20 runs, and Score vs Run and Score vs Time chart it inside two bands
-  showing the scores' spread. A minimum guards the first value, and older
-  support dims the card and fades the chart, with recent-run counts shown.
-  The three chart metrics have independent remembered switches, all on at
-  first. (PRs #398, #400, #402 and #401; design in #382) Design rationale
-  distilled into [`decision_log/`](./decision_log/README.md).
 
 ---
 
