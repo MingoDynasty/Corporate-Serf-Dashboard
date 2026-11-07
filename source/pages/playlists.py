@@ -1,6 +1,7 @@
 """Playlist-level overview page at the playlists landing route."""
 
 import logging
+from typing import Any
 
 import dash
 import dash_ag_grid as dag
@@ -9,6 +10,7 @@ from dash import (
     Input,
     NoUpdate,
     Output,
+    Patch,
     State,
     callback,
     clientside_callback,
@@ -40,7 +42,10 @@ from source.kovaaks.percentile_warmup_service import (
     enqueue_playlist_percentile_warmup,
     get_percentile_warmup_state,
 )
-from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
+from source.kovaaks.playlist_overview_service import (
+    OverviewRow,
+    build_playlist_overview_rows,
+)
 from source.kovaaks.playlist_visibility_service import (
     get_visibility_store_message,
     hide_playlist,
@@ -397,7 +402,7 @@ MENU_COLUMNS = [
     Input("playlists-overview-grid", "cellClicked"),
     prevent_initial_call=True,
 )
-def route_to_clicked_playlist(cell_clicked):
+def route_to_clicked_playlist(cell_clicked: dict[str, Any] | None) -> str | NoUpdate:
     """Navigate to a playlist's scenario table from a click in its name cell.
 
     No other cell navigates, so a click or a double-click there can select
@@ -423,7 +428,16 @@ def route_to_clicked_playlist(cell_clicked):
     State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def update_playlist_visibility(cell_clicked, rows_refresh, toast_channels):
+def update_playlist_visibility(
+    cell_clicked: dict[str, Any] | None,
+    rows_refresh: int,
+    toast_channels: dict[str, str | None],
+) -> tuple[
+    list[dict[str, Any]] | NoUpdate,
+    list[str] | NoUpdate,
+    Patch | NoUpdate,
+    int | NoUpdate,
+]:
     """Toggle one visibility cell and wake warmup work after an unhide.
 
     A refusal (the visibility file belongs to a newer build) reports through a
@@ -476,12 +490,12 @@ def update_playlist_visibility(cell_clicked, rows_refresh, toast_channels):
     State("playlists-overview-warmup-generation", "data"),
 )
 def load_playlist_overview_rows(
-    _mounted,
-    show_hidden,
-    _rows_refresh,
-    _warmup_tick,
-    observed_generation,
-):
+    _mounted: bool,
+    show_hidden: bool,
+    _rows_refresh: int,
+    _warmup_tick: int,
+    observed_generation: int,
+) -> tuple[list[OverviewRow], str | list, bool, str | NoUpdate, int]:
     """Snapshot warmup state, then build cache-only rows before disabling."""
     warmup_outputs = _playlist_overview_warmup_state(observed_generation)
     record_activity = ctx.triggered_id != "playlists-overview-warmup-interval"
@@ -590,7 +604,7 @@ def _playlist_overview_warmup_state(
     State("playlists-import-modal", "opened"),
     prevent_initial_call=True,
 )
-def toggle_import_modal(_, opened):
+def toggle_import_modal(_: int | None, opened: bool | None) -> bool:
     """Open or close the share-code import modal."""
     return not opened
 
@@ -614,7 +628,20 @@ def toggle_import_modal(_, opened):
     running=[(Output("playlists-import-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
+def import_playlist(
+    n_clicks: int | None,
+    playlist_to_import: str | None,
+    rows_refresh: int,
+    toast_channels: dict[str, str | None],
+) -> tuple[
+    list[dict[str, Any]] | NoUpdate,
+    list[str] | NoUpdate,
+    Patch | NoUpdate,
+    int | NoUpdate,
+    bool | NoUpdate,
+    str | NoUpdate,
+    str | None | NoUpdate,
+]:
     """Import a playlist code and surface the result on this page.
 
     Reuses the shared import service path. On success the playlist is marked
@@ -750,7 +777,9 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
     Input("playlists-delete-cancel-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def manage_delete_modal(cell_clicked, _cancel):
+def manage_delete_modal(
+    cell_clicked: dict[str, Any] | None, _cancel: int | None
+) -> tuple[bool | NoUpdate, str | NoUpdate, str | NoUpdate]:
     """Open the delete confirmation modal for a clicked delete cell, or cancel.
 
     A click on the delete action cell opens the modal naming the target
@@ -793,7 +822,18 @@ def manage_delete_modal(cell_clicked, _cancel):
     State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels):
+def confirm_delete_playlist(
+    n_clicks: int | None,
+    target_code: str | None,
+    rows_refresh: int,
+    toast_channels: dict[str, str | None],
+) -> tuple[
+    list[dict[str, Any]] | NoUpdate,
+    list[str] | NoUpdate,
+    Patch | NoUpdate,
+    int | NoUpdate,
+    bool | NoUpdate,
+]:
     """Delete the confirmed user playlist, then rebuild the grid.
 
     On failure the red notification carries the service's message and the grid
@@ -857,7 +897,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels)
     Input("playlists-overview-mounted", "data"),
     Input("playlists-rows-refresh", "data"),
 )
-def render_visibility_alert(_mounted, _rows_refresh):
+def render_visibility_alert(_mounted: bool, _rows_refresh: int) -> tuple[str, str]:
     """Say when the visibility file is not the one driving these rows.
 
     An unusable visibility store falls back to the first-run seed, which looks
@@ -878,7 +918,7 @@ def render_visibility_alert(_mounted, _rows_refresh):
     Input("playlists-overview-mounted", "data"),
     Input("playlists-rows-refresh", "data"),
 )
-def render_superseded_alert(_mounted, _rows_refresh):
+def render_superseded_alert(_mounted: bool, _rows_refresh: int) -> tuple[str, str]:
     """Show the cleanup alert only while superseded user files remain.
 
     The recorded list is refreshed on each ``load_playlists()`` run and pruned
@@ -905,7 +945,9 @@ def render_superseded_alert(_mounted, _rows_refresh):
     Input("playlists-superseded-cancel-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def manage_superseded_modal(_delete, _cancel):
+def manage_superseded_modal(
+    _delete: int | None, _cancel: int | None
+) -> tuple[bool | NoUpdate, str | NoUpdate]:
     """Open the confirm modal for the superseded-file cleanup, or cancel it.
 
     Keyed off ``ctx.triggered_id`` (not a bare else) so an initial-load fire —
@@ -938,7 +980,17 @@ def manage_superseded_modal(_delete, _cancel):
     State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def confirm_delete_superseded(n_clicks, rows_refresh, toast_channels):
+def confirm_delete_superseded(
+    n_clicks: int | None,
+    rows_refresh: int,
+    toast_channels: dict[str, str | None],
+) -> tuple[
+    list[dict[str, Any]] | NoUpdate,
+    list[str] | NoUpdate,
+    Patch | NoUpdate,
+    int | NoUpdate,
+    bool | NoUpdate,
+]:
     """Delete the superseded user files, then refresh the alert.
 
     ``delete_superseded_user_playlist_files`` prunes every file it removes even
@@ -1022,7 +1074,7 @@ clientside_callback(
 register_columns_menu(COLUMNS_MENU_ID, "playlists-overview-grid")
 
 
-def layout(**kwargs):  # noqa: ARG001
+def layout(**kwargs: str | list[str]) -> dmc.Stack:  # noqa: ARG001
     """Build the playlist-level overview page."""
     return dmc.Stack(
         children=[

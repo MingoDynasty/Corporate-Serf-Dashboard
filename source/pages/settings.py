@@ -23,6 +23,7 @@ import dash
 import dash_mantine_components as dmc
 from dash import (
     Input,
+    NoUpdate,
     Output,
     State,
     callback,
@@ -317,7 +318,21 @@ def _store_alert() -> tuple[str, str]:
     State("app-settings-steam-id", "value"),
     prevent_initial_call=True,
 )
-def save_user_settings(n_clicks, stats_dir, username, steam_id):
+def save_user_settings(
+    n_clicks: int | None,
+    stats_dir: str | None,
+    username: str | None,
+    steam_id: str | None,
+) -> tuple[
+    str | None | NoUpdate,
+    str | None | NoUpdate,
+    str | NoUpdate,
+    str | NoUpdate,
+    str | NoUpdate,
+    str | NoUpdate,
+    str | dmc.Group | NoUpdate,
+    str | NoUpdate,
+]:
     """Validate the form, then write all three keys or none of them.
 
     All-or-nothing: any field-level error writes nothing, so a save never
@@ -548,7 +563,17 @@ def _detect_status(result: IdentityDetectionResult) -> list:
     running=[(Output("app-settings-detect-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def detect_identity(n_clicks):
+def detect_identity(
+    n_clicks: int | None,
+) -> tuple[
+    str | NoUpdate,
+    str | NoUpdate,
+    list | NoUpdate,
+    dmc.Stack | NoUpdate,
+    str | NoUpdate,
+    None | NoUpdate,
+    list[dict[str, str]] | NoUpdate,
+]:
     """Check this machine's Steam accounts against KovaaK's and offer the result.
 
     Suggestion only: this fills inputs and never touches the store — Save stays
@@ -608,7 +633,9 @@ def detect_identity(n_clicks):
     State("app-settings-identity-candidates", "data"),
     prevent_initial_call=True,
 )
-def use_detected_identity(steam_id, candidates):
+def use_detected_identity(
+    steam_id: str | None, candidates: list[dict[str, str]] | None
+) -> tuple[str | NoUpdate, str | NoUpdate]:
     """Fill the identity fields from the picked candidate. Save applies it.
 
     The candidates come from the store rather than from a second detection, so
@@ -814,7 +841,7 @@ def _identity_detection() -> dmc.Stack:
     State(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
     prevent_initial_call=True,
 )
-def set_run_notifications(checked, initialized):
+def set_run_notifications(checked: bool, initialized: int) -> str | NoUpdate:
     """Write the switch's value to the browser-local Run notifications store.
 
     The store is the setting and the switch is a view of it, as the
@@ -839,7 +866,7 @@ def set_run_notifications(checked, initialized):
     State(RUN_NOTIFICATIONS_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def show_stored_run_notifications(_n_intervals, stored):
+def show_stored_run_notifications(_n_intervals: int, stored: str) -> bool | NoUpdate:
     """Show the stored setting once the browser has handed its value over.
 
     Only the exact off value turns the switch off, as only that value
@@ -856,7 +883,7 @@ def show_stored_run_notifications(_n_intervals, stored):
     State(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
     prevent_initial_call=True,
 )
-def set_celebration_style(style, initialized):
+def set_celebration_style(style: str, initialized: int) -> str | NoUpdate:
     """Write the selected style to the browser-local style store.
 
     The store is the setting; this control is a view of it. The stored value
@@ -889,7 +916,7 @@ def set_celebration_style(style, initialized):
     State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def show_stored_celebration_style(_n_intervals, style):
+def show_stored_celebration_style(_n_intervals: int, style: str) -> str | NoUpdate:
     """Show the stored setting once the browser has handed its value over.
 
     A value this build has no option for -- a cleared store, or a style a
@@ -1028,7 +1055,7 @@ def _celebrations_section() -> dmc.Stack:
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
-def layout(**kwargs):  # noqa: ARG001
+def layout(**kwargs: str | list[str]) -> dmc.Stack:  # noqa: ARG001
     """Build the settings form from the stored values.
 
     Built per visit, and from the stored view rather than the pinned
