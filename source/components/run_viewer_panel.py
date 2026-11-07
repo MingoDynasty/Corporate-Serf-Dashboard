@@ -1130,6 +1130,7 @@ def run_viewer(ids: RunViewerIds, *, return_focus: str) -> html.Div:
                             dmc.Button(
                                 CLOSE_LABEL,
                                 id=ids.close,
+                                className="run-viewer-close",
                                 rightSection=dmc.Kbd(ESC_HINT, size="xs"),
                                 size="xs",
                                 variant="default",
@@ -1140,7 +1141,7 @@ def run_viewer(ids: RunViewerIds, *, return_focus: str) -> html.Div:
                                 },
                             ),
                         ],
-                        className="run-viewer-close",
+                        className="run-viewer-actions",
                     ),
                 ],
                 className="run-viewer-header",

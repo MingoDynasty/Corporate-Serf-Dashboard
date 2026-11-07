@@ -1190,6 +1190,10 @@ a.run-toast-link {
 }
 
 .run-viewer-close {
+    flex: none;
+}
+
+.run-viewer-actions {
     display: flex;
     flex: none;
     gap: var(--mantine-spacing-xs);
