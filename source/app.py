@@ -9,6 +9,7 @@ import logging
 import os
 import socket
 import sys
+import time
 import tomllib
 from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
@@ -29,14 +30,16 @@ from source.config.config_service import (
 )
 from source.config.settings_service import (
     KOVAAKS_USERNAME_KEY,
+    SETTINGS_FILE_PATH,
     get_settings,
     get_usable_stats_dir,
     resolve_stats_dir,
 )
 from source.config.stats_dir_detection import bootstrap_stats_dir
 from source.health import register_health_endpoint
-from source.kovaaks.api_service import make_cache, set_request_timeout
+from source.kovaaks.api_service import CACHE_DIR, make_cache, set_request_timeout
 from source.kovaaks.data_service import (
+    USER_PLAYLIST_DIRECTORY_PATH,
     initialize_kovaaks_data,
     load_playlists,
     seed_leaderboard_ids_from_bundled_corpus,
@@ -44,14 +47,20 @@ from source.kovaaks.data_service import (
 from source.kovaaks.percentile_warmup_service import (
     start_percentile_warmup_worker,
 )
+from source.kovaaks.scenario_notes_service import SCENARIO_NOTES_DIR
 from source.kovaaks.time_scored_service import index_performance_files
 from source.my_watchdog.file_watchdog import NewFileHandler
+from source.utilities.atomic_write import remove_stale_temp_files
 from source.utilities.build_info import get_build_info
 from source.utilities.crash_logging import (
     SUPPRESS_CONSOLE_KEY,
     install_crash_logging,
 )
 from source.utilities.paths import log_dir
+
+# Taken as this module loads, before any of its code writes a file, so a writer
+# temp older than this was left by an earlier process.
+PROCESS_STARTED_AT = time.time()
 
 # Logging setup
 LOG_DIR = log_dir()
@@ -136,6 +145,32 @@ def log_rank_lookup_availability() -> None:
             "KovaaK's username not configured -- scenario position lookups "
             "disabled (set it in Settings)."
         )
+
+
+def remove_interrupted_write_temps() -> None:
+    """Delete the temps that writes killed before their replace left behind.
+
+    Every writer puts its temp beside its destination, so the sweep covers the
+    folders the stores and the cache write to and nothing else under ``data/``.
+    Each kill leaves a full copy of its file, so without this they pile up.
+    """
+    removed = sum(
+        remove_stale_temp_files(
+            directory,
+            older_than=PROCESS_STARTED_AT,
+            logger=logger,
+            recursive=recursive,
+        )
+        for directory, recursive in (
+            # Also where playlist_visibility.json lives.
+            (SETTINGS_FILE_PATH.parent, False),
+            (USER_PLAYLIST_DIRECTORY_PATH, False),
+            (SCENARIO_NOTES_DIR, False),
+            (CACHE_DIR, True),
+        )
+    )
+    if removed:
+        logger.info("Removed %d temp file(s) left by interrupted writes.", removed)
 
 
 def app_name() -> str:
@@ -351,6 +386,8 @@ def main() -> None:
     # Fold the bundled corpus's embedded leaderboard IDs into the permanent
     # name->ID mapping cache before any rank lookup needs them.
     seed_leaderboard_ids_from_bundled_corpus()
+
+    remove_interrupted_write_temps()
 
     # Detect the stats directory when nothing ever configured one -- before the
     # pin below, so a first detection serves this boot instead of the next one.

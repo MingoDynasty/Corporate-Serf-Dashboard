@@ -1599,7 +1599,9 @@ flowchart LR
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
   performs, with an optional `before_replace` hook the playlist, visibility,
-  settings, and scenario note writers use for their destination point-checks),
+  settings, and scenario note writers use for their destination point-checks;
+  and `remove_stale_temp_files()`, which startup runs over the store and cache
+  folders to clear the temps of writes killed before their replace),
   `store_schema` (the `schema_version` marker, the four-state read machine, the
   per-store v1 validators, and `back_up_unusable_store()` — see State above),
   `file_keys` (`safe_file_key()`, a readable prefix plus 8 hex digits of the
