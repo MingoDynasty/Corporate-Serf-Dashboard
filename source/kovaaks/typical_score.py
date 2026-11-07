@@ -4,13 +4,15 @@ The caller supplies one scenario's runs and the play sessions split from the
 same snapshot of every scenario's runs. Nothing reads the run store, holds a
 clock, or persists a value. The contract is in ``docs/specs/typical_score.md``.
 The words of a value's hover are here too, so every surface that explains a
-value says the same thing.
+value says the same thing. So is the band of a value's runs that a run's
+score lands in.
 """
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
+from enum import Enum
 from functools import lru_cache
 from statistics import median, quantiles
 
@@ -146,6 +148,49 @@ def typical_score_at_session_start(
     # The value after a run depends only on the runs before it, so the runs
     # after the session's start need not be built.
     return build_typical_scores(runs[:first], play_sessions)[-1]
+
+
+class RunBand(Enum):
+    """Where a run's score sits among the runs behind a typical score.
+
+    The value is the band's on-screen name.
+    """
+
+    TOP_10 = "Top 10%"
+    TOP_25 = "Top 25%"
+    MIDDLE_50 = "Middle 50%"
+    BOTTOM_25 = "Bottom 25%"
+    BOTTOM_10 = "Bottom 10%"
+
+
+def band_at_session_start(score: float, value: TypicalScore | None) -> RunBand | None:
+    """Return the band of ``value``'s supporting runs that ``score`` lands in.
+
+    ``value`` is the run's scenario's typical score when the run's session
+    began, as ``typical_score_at_session_start`` returns it, so every run of a
+    session meets the same edges. The edges are its unrounded P10, P25, P75
+    and P90. A score on an edge belongs to the inner band, as a point on a
+    drawn band's edge is on the band. ``None`` while ``value`` is missing or
+    unknown: an unknown value never reads as a low band. A known value bands
+    a run at any age; whether it was recent is the caller's to judge.
+
+    It compares scores, never pace: on a time-scored version the order of
+    times is the order of scores, and the window holds every version.
+    """
+    if value is None or not value.known:
+        return None
+    p10, p25, p75, p90 = value.p10, value.p25, value.p75, value.p90
+    assert p10 is not None and p25 is not None
+    assert p75 is not None and p90 is not None
+    if score > p90:
+        return RunBand.TOP_10
+    if score > p75:
+        return RunBand.TOP_25
+    if score >= p25:
+        return RunBand.MIDDLE_50
+    if score >= p10:
+        return RunBand.BOTTOM_25
+    return RunBand.BOTTOM_10
 
 
 def typical_score_recency(value: TypicalScore, moment: datetime) -> TypicalScoreRecency:

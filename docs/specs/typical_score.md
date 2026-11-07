@@ -151,6 +151,14 @@ scores cannot stop a calculation.
   value it returns can still be unknown. Every run of the session meets the
   same value, and none meets a value it helped make
   ([SC1][typical-session-start]).
+- `band_at_session_start(score, value)` returns the `RunBand` of a value's
+  supporting runs that `score` lands in, for the value a session began with:
+  `Top 10%` above P90, `Top 25%` above P75 up to P90, `Middle 50%` from P25
+  to P75, `Bottom 25%` from P10 up to below P25, and `Bottom 10%` below P10,
+  against the unrounded edges. A score on an edge belongs to the inner band.
+  It compares scores, never pace. A missing or unknown value gives no band,
+  never a low one, and a known value bands a run at any age. No surface
+  shows a band yet.
 - Run History's latest-run card is a caller. It takes that value from the
   same snapshot as the card's run, judges its recency at the session's
   start, and words the run against it, by pace where every run behind the
