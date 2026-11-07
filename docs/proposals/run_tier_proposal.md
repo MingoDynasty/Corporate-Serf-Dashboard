@@ -127,7 +127,7 @@ today.**
 - **It fits.** The longest form,
   `Bottom 25% vs typical at session start · 99.9% of PB pace`, is 57
   characters, under the 2026-10-25 phrase's longest, 62, which measured
-  361 px of the card's 474.
+  361 px. The card has been 480 px wide since 2026-10-29, 454 px of text.
 
 ### RT3. Only the outer bands are highlighted
 
@@ -238,7 +238,8 @@ sure yet." Both are leans, not rulings.
 
 The material consequence: nothing the player sets changes a badge or a mark,
 and a new player has no threshold line until they turn it on. A browser that
-showed the line with its switch on shows it off once.
+showed the line only by default shows it off; where the player turned the
+switch on, it stays on.
 
 **Recommendation: the threshold's verdict retires: Threshold passed, Below
 threshold, the check it drove and the rule that judged them. The band takes
@@ -248,12 +249,17 @@ run: its overlay switch starts off, and the percentage keeps its default, 95.
 The card's `{pct}% of PB`, the run viewer's and their 99.9% cap stay; the cap
 that held a miss under its goal goes with the verdict.**
 
-- **A verdict and a target are two things.** The 2026-10-04 principles name
-  the score threshold as a bar the player set, and whether a run met it as a
-  verdict the app may state. The evidence below condemns 95% as the app's own
-  good-run verdict, not a bar a player chooses: a target that is easy on one
-  scenario and hard on another can be what the player meant. Its "Ready to
-  move on." left on 2026-10-04 as advice; the line never gave any.
+- **A verdict and a target are two things.** The 2026-10-04 principles count
+  whether a run met a bar the player set as a verdict the app may state, with
+  the score threshold as their example. The verdict retires anyway: the badge
+  and the check hold one verdict per run (RT4, RT5), and the band does that
+  job better (below). That example is superseded in part ([Decisions this
+  changes](#decisions-this-changes)). The line stays as a target the player
+  chooses, which the app already draws from two controls it already has. The
+  evidence below condemns 95% as the app's own good-run verdict, not a bar a
+  player chooses: a target that is easy on one scenario and hard on another
+  can be what the player meant. Its "Ready to move on." left on 2026-10-04 as
+  advice; the line never gave any.
 - **As a verdict it means something different on every scenario.** At 95%, the
   regimen's pass rate over each scenario's last 20 runs ran from 10% on VT
   Controlsphere Viscose to 95% on StaticSwitchingVox Small, following the
@@ -266,15 +272,19 @@ that held a miss under its goal goes with the verdict.**
   PB are the only verdicts the app draws unasked, and no line at the app's 95%
   reads as a third. Turning the switch on draws the line at the stored
   percentage, or at 95.
-- **What a browser keeps.** A control that persists in the browser drops its
-  stored value when its default in the layout changes. The percentage's
-  default stays 95, so a percentage a browser stored survives. The switch's
-  default moves from on to off: where the switch was turned off it stays off,
-  and where it was on, by default or turned back on, it shows off once;
-  turning it on brings the line back at its stored percentage. PR 2 says so
-  in its description and in the user guide.
-- **Least change.** One judging rule goes, nothing is built for the target,
-  and the band reads edges the app already computes.
+- **What a browser keeps: every choice the player made.** A control that
+  persists in the browser drops its stored value when its default in the
+  layout changes, so the switch's move from on to off needs one step. The
+  page's head script, which already carries an old stored switch across for
+  the color scheme, carries this one across before Dash restores it
+  ([What retires in code](#what-retires-in-code)). Where the player used the
+  switch, their last choice stands: on stays on, including off and then on
+  again, and off stays off. A browser with no stored choice, new or one that
+  only ever had the default, starts off. The percentage's default stays 95, so a stored percentage, a cleared
+  one included, survives with no step. A choice made after the change
+  persists as today.
+- **Least change.** One judging rule goes, nothing is built for the target but
+  that step, and the band reads edges the app already computes.
 - **The maintainer's answers keep it.** They use the line little but expect
   other players might, and the 2026-11-10 regimen review keeps its 95% bar
   for now, which the line serves, turned on at 95. Once this ships, no run is
@@ -364,7 +374,7 @@ scores of exp(8Z), Z normal, give 12.0% top and 14.1% bottom at 20 runs
   with play order by end time only). The re-run of the band figures matched
   that re-implementation's except the visit figures, row 7 and RT3's rates,
   where it had counted a scenario's first run in its session, not a visit's.
-- **Copy lengths in pixels.** RT2's 67 characters are compared by count with
+- **Copy lengths in pixels.** RT2's 57 characters are compared by count with
   the 2026-10-25 measurement.
 - **The All scenarios view's cost** of building every listed scenario's
   windows for its marks.
@@ -431,6 +441,10 @@ session start: typical 3,025, Middle 50% 2,904 to 3,116, Middle 80% 2,851 to
 
 - A check on a Top 10% run, a gray down arrow on a Bottom 10% run, the star
   unchanged. A new PB with a band carries the check and the star.
+- The down arrow is `↓` (U+2193), drawn as the check is, in the gray of the
+  card's quiet lines, `#676d75` light and `#a6a6a6` dark. The check stays `✓`
+  (U+2713) in green, `green-7` light and `green-4` dark, and the star `★`
+  (U+2605) in `#fab005`.
 - A check or down arrow read from an old window has the clock after it, the
   scenario table's clock as the card draws it, hidden from a screen reader,
   which hears the mark's words instead. The star has no clock.
@@ -455,8 +469,8 @@ runs ("Typical comes from your {N} runs before this session").
   today's is, and judges no run. Clearing the percentage removes the line and
   nothing else.
 - Chart options keeps its three groups and eleven controls. "Score threshold
-  overlay" starts off; "Score threshold percentage" keeps 95, so a stored
-  percentage survives (RT6 says what a browser keeps).
+  overlay" starts off; "Score threshold percentage" keeps 95. A stored choice
+  of either survives (RT6 says what a browser keeps).
 - The Middle 50% and Middle 80% bands are unchanged: they still follow every
   run.
 
@@ -465,9 +479,19 @@ runs ("Typical comes from your {N} runs before this session").
 `judge_run`, `ThresholdVerdict` and `Unjudged` in `score_threshold.py`, with
 `shown_percentage`'s miss cap (the 99.9% cap moves with the PB comparison);
 `CardBadge.THRESHOLD_PASSED` and `BELOW_THRESHOLD`; the threshold inputs of
-the card and list callbacks. `normalize_score_threshold_percentage`,
-`score_threshold_line`, the chart callback's threshold inputs and the two
-controls stay; the switch's default becomes off.
+the card, list and run viewer callbacks, with `run_viewer_from_store`'s
+percentage. `normalize_score_threshold_percentage`, `score_threshold_line`,
+the chart callback's threshold inputs and the two controls stay; the switch's
+default becomes off.
+
+One step is added, in `APP_INDEX_STRING`'s head script, before the renderer
+runs. Dash stores a persisted edit as `[choice, original]` and restores it
+only while the layout's value still equals `original`. Every switch entry an
+earlier build stored has `original` true, the old default. The step rewrites
+such an entry, stored under
+`_dash_persistence.run-history-score-threshold-overlay-switch.checked.true`,
+as `[choice, false]`, which Dash then restores. Entries recorded after the
+change already hold false, so a second load changes nothing.
 
 ### Copy
 
@@ -480,12 +504,12 @@ the PB card's leaderboard line reads `{n}% percentile`.
 |---|---|
 | Bands | `Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%` |
 | Comparison line | `{band} vs typical at session start · {pct}% of PB`, or `· {pct}% of PB pace` |
-| Band hover, first line | `Typical comes from your last {N} runs before this run's session began.` |
+| Band hover, first line | `Typical comes from your last {N} runs before this run's session began.`, with `last` only when the scenario had more runs than {N} before the session, as the typical score's hover has it |
 | Band hover, typical | `Typical score: {typical} · {pct}% above typical`, with `below`, `Matches typical`, or by pace `{pct}% faster than typical` and `slower`; with no percentage to give, `Typical score: {typical}` |
 | Band hover, edges | `Middle 50%: {p25} to {p75}` and `Middle 80%: {p10} to {p90}` |
 | Band hover, old window | `Fewer than 10 of those runs were from the 30 days before the session began, so they may have been out of date.` |
 | Badges | `Top 10%`, `Bottom 10%`; `New PB` unchanged |
-| List mark hover and accessible text | `{band} of your last {N} runs at session start`, with `, which may have been out of date` on an old window, whose mark shows the clock |
+| List mark hover and accessible text | `{band} of your last {N} runs at session start`, with `last` by the same rule, and `, which may have been out of date` on an old window, whose mark shows the clock |
 | List hover, no band | `There was no typical score yet when this run's session began.` |
 | Score threshold percentage help text | `Sets the score goal as a percentage of your personal best. On a scenario scored by completion time, it's a percentage of your personal best's pace instead, when the app can measure pace reliably. Otherwise, it stays a percentage of your score. The overlay line tracks your current personal best.` |
 
@@ -551,12 +575,18 @@ band's hover.
   rule lives on in `% of PB`.
 - **2026-10-05, pace:** the verdict's two rows leave its table; the threshold
   line's pace form stays. Gains a note.
+- **[2026-10-04, verdicts, not
+  advice](../decision_log/2026/2026-10-04-skill-is-judged-by-the-typical-run-with-honest-uncertainty-in-verdicts-not-advice.md):**
+  D3's example of a verdict, whether a bar the player set, such as the score
+  threshold, was met, is one the app stops stating: the line judges no run.
+  The rule stands, and a result measured against something the player set is
+  still a verdict it allows. The entry gains a dated note, and the roadmap's
+  "State verdicts, not advice" names the band in the threshold's place.
+  Superseded in part.
 - Applied, not changed: [2026-10-18, two
   bands](../decision_log/2026/2026-10-18-two-percentile-bands-show-the-typical-scores-spread.md)
-  (its edges), 2026-10-14's rule on a card's lines, 2026-10-22's evidence bar
-  and old-value clock, which reach the list's marks, and the 2026-10-04
-  principles with the roadmap's "State verdicts, not advice", whose example
-  of a bar the player set, the score threshold, stays true of the line.
+  (its edges), 2026-10-14's rule on a card's lines, and 2026-10-22's evidence
+  bar and old-value clock, which reach the list's marks.
 
 ### Alternatives rejected
 
@@ -581,8 +611,9 @@ band's hover.
   moved down: +5% is about 2 standard deviations on beanTS and half of one on
   CatClick Medium (the research read).
 - **The line retired with the verdict** (RT6). The evidence against 95% bears
-  on the app's own verdict, not on a bar the player chooses, and the
-  2026-10-04 principles keep that bar as a verdict the app may state.
+  on the app's own verdict, not on a bar the player chooses. The line is a
+  target the app already draws, from two controls it already has, and the
+  maintainer expects other players may use it.
 - **The line on by default, at 95%** (RT6). It would draw the app's own
   good-run bar on every scenario, the bar the pass rates discredit.
 - **An old window's mark left to the hover** (RT5). The qualification would
@@ -618,10 +649,16 @@ description.
    edges, ties, windows of 10 to 20, unknown and old windows. No UI.
 2. **Every surface, and the retirement.** The card's line, badge and hover,
    the run viewer by way of `score_line`, the list's marks, clock and hovers,
-   the judging code deleted, the line's switch off by default and the
-   percentage's help text trimmed. Specs, glossary, decision log, README
-   Features line, user guide and product inventory; deletes this proposal.
-   One PR so no build shows a band badge beside a threshold check.
+   the judging code deleted, the line's switch off by default with the head
+   script's step for a stored choice, and the percentage's help text
+   trimmed. Docs: the Run History spec, the notifications spec's sentence on
+   judging a run against the threshold, the glossary, the decision log, the
+   roadmap's "State verdicts, not advice", the architecture map
+   (`score_threshold.py`'s entry, the run marks' and the card's judging
+   lines, the "how a run is judged" row, and the edges into
+   `ScoreThreshold`), the README Features line, the user guide and the
+   product inventory; deletes this proposal. One PR so no build shows a band
+   badge beside a threshold check.
 
 PR #462 (K8) bounds the percentage, which stays; whichever merges second
 rebases. Open PR #469 adds a Run History spec statement that names the Score
@@ -640,6 +677,11 @@ stays true.
   arrow; marks unchanged after a later run in another session; Chart options'
   switch off and percentage at 95 to start; the line drawn at a set
   percentage, with the card and the list unchanged by it.
+- **Browser, upgrade,** with storage seeded as an earlier build leaves it: a
+  switch turned off and then on stays on; one turned off stays off; a stored
+  percentage of 87 and a cleared one survive; a browser with nothing stored,
+  new or untouched, starts off. Each holds over a second load, and a choice
+  made after the upgrade holds over two more.
 - **Browser** (headless Edge, then the maintainer's Firefox), on the states
   above, both themes, at 3840, 2560, 1920 and 1536 px: the longest line on one
   line in the wide card, the narrow card's floor, the badge's contrast, and
