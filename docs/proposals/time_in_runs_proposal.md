@@ -11,8 +11,7 @@ last. Every page planned next needs a third, a total for a scenario, a day or
 all play, and nothing says how to count it. This proposal makes every total of
 play the sum of run lengths, called time in runs, and keeps a session's length
 as its clock, breaks included. Scenario Stats' run count becomes a time in
-runs, and the latest-run card drops a time that would only repeat its run
-number.
+runs, and the latest-run card's time on a scenario becomes one too.
 
 ## Decisions needed
 
@@ -37,8 +36,9 @@ open.
 
 **Recommendation: a total of play over any set of runs (a scenario's, a
 session's, a day's, a week's, all of them) is the sum of their run lengths,
-called time in runs. One function adds it up and one formatter rounds it, to
-the nearest minute. Every page that shows a total uses it.**
+called time in runs. One function adds it up and one display rule shows it
+([The display rule](#the-display-rule)). Every page that shows a total uses
+both.**
 
 - **A, time in runs (recommended).** The sum of each run's end minus its start
   minus its paused time.
@@ -50,9 +50,17 @@ the nearest minute. Every page that shows a total uses it.**
   end, as the latest-run card counts today: 1.61 times A in 2026. It counts
   every break under 30 minutes inside a visit: the card would have read 36 min
   for 5 runs on 2026-09-30.
-- **It splits cleanly.** Each run's time belongs to one scenario, one day and
-  one hour, so the parts always add up to the whole. A visit's or a session's
-  clock can't be split by hour or by scenario without a rule for its breaks.
+- **Which runs.** Every run the app imports, as Total runs counts them. A
+  stats file whose name lacks ` - Challenge - ` is freeplay, written on
+  Statistics Export's Always setting with a start left over from the last
+  challenge. It becomes a run with no start and no length, so it adds no time
+  and makes its total a minimum.
+- **It splits cleanly.** Each run's time belongs to one scenario, so the parts
+  of any set of runs add up to the whole, summed in seconds before rounding. A
+  run belongs to one day and one hour by a rule, such as the date and hour it
+  ended, which the first calendar proposal sets: 13 of the 9,284 runs cross
+  midnight. A visit's or a session's clock can't be split by hour or by
+  scenario without a rule for its breaks.
 - **It comes from the stats files alone,** on every game version the app reads
   (DT6).
 - **On most scenarios it reads close to the run count in minutes.** 85% of
@@ -75,16 +83,16 @@ about two to one apart. The 2026-10-27 session reads
 `1 hr 13 min · 33 runs · 6 scenarios` with 33 min in runs.
 
 **Recommendation: a session's length stays its first run's start to its last
-run's end, breaks between runs included, as today. It is the only length the
-app shows that counts breaks, and its hover says so. No session row shows a
-time in runs.**
+run's end, pauses and breaks between runs included, as today. It is the only
+length of play the app shows that counts the breaks between runs, and its
+hover says so. No session row shows a time in runs.**
 
 - **A, the clock (recommended).**
 - **B, time in runs on the session row too.** One measure everywhere, but "how
   long was that sitting?" would read 33 min for a sitting of 1 hr 13 min.
 - **C, both on the row,**
   `1 hr 13 min · 33 min in runs · 33 runs · 6 scenarios`. A fifth part, and a
-  count beside its own time on 60-second scenarios (DT3's problem).
+  second length on a row whose question is how long the sitting was.
 - **The question is the sitting's length,** and a sitting holds its breaks.
   The product page and the glossary already define a session as one stretch of
   play "including the breaks between runs".
@@ -94,40 +102,50 @@ time in runs.**
 - **Unchanged:** the 30-minute split (S1), the In progress state (S3) and its
   30-second recheck, This scenario's session rows with no length (2026-10-23).
 
-### DT3. The latest-run card's session line drops its time
+### DT3. The latest-run card's session line counts time in runs
 
 Status: open. The maintainer floated runs-only "for the session line too" on
-2026-10-14 (transcribed). This recommendation differs from that.
+2026-10-14 (transcribed). This recommendation follows it.
 
-The material consequence: the card no longer says how long the player has
-spent on the scenario this session.
-`Run 7 this session · 9 min on this scenario` becomes `Run 7 this session`.
+The material consequence: the card's time on the scenario this session leaves
+out the breaks between its runs, and on 60-second scenarios it reads the run
+number in minutes. `Run 7 this session · 9 min on this scenario` becomes
+`Run 7 this session · 7 min in runs`.
 
-**Recommendation: the session line names the run's number in its session and
-nothing after it. The card shows no length of play.**
+**Recommendation: the session line names the run's number in its session,
+then the scenario's time in runs in that session, over every visit to it
+there, in the display rule every total uses.**
 
-- **A, drop the time (recommended).**
-- **B, time in runs:** `Run 7 this session · 7 min in runs`.
+- **A, drop the time:** `Run 7 this session`.
+- **B, time in runs (recommended):** `Run 7 this session · 7 min in runs`.
 - **C, the visit spans, as today:**
   `Run 7 this session · 9 min on this scenario`.
 - **D, runs plus gaps up to 2 minutes:** `Run 7 this session · 12 min`.
-- **B repeats the run number.** 91% of 2026 runs last 50 to 62 seconds, so a
-  scenario's time in runs in a session is its run number in minutes. It would
-  read `Run 7 this session · 7 min in runs` in 3,341 of the card's 3,619
-  readings in 2026 (92%), and 1,153 of 1,221 since 2026-09-13 (94%).
+- **E, A with the minutes in the line's hover:** the run number alone on
+  screen, and the time one hover away on a line drawn as plain text today.
+- **B says what the run number can't on longer runs.** Air CELESTIAL No UFO
+  Medium's 4 runs read 7 min on 2026-09-25 and 8 min the next day, and Ground
+  Plaza Sparky V3's 5 runs read 10 min on 2026-09-26. No other surface gives
+  this scenario's time in this session: Scenario Stats is lifetime, and the
+  All scenarios row counts every scenario and the breaks.
+- **B repeats the run number on most runs.** 91% of 2026 runs last 50 to 62
+  seconds, so B would read `Run 7 this session · 7 min in runs` in 3,341 of
+  the card's 3,619 readings in 2026 (92%), and 1,153 of 1,221 since 2026-09-13
+  (94%). The repetition is the price of one rule on every scenario.
 - **C counts breaks no total keeps (DT1).** It ran 5 minutes or more over the
   runs in 16% of 2026 readings, and the same runs would read two times on two
   cards. Its worst: `36 min on this scenario` for 5 runs, 2026-09-30 (before
   the card shipped, so what it would have read).
 - **D is DT1's option B on one card:** a second definition for one line.
-- **The run number already paces a visit,** and the card's first line,
-  `Latest run · 5 minutes ago`, already times the break since the last run.
-- **The time is still there, where it adds up:** the scenario's total on
-  Scenario Stats (DT4) and the session's clock in All scenarios (DT2).
-- **Simpler.** The time part, its unknown form `Time on this scenario unknown`
-  and the rule for a visit with no usable start all go.
+- **A and E keep the line shortest,** and the run number and the card's first
+  line, `Latest run · 5 minutes ago`, pace a visit either way. They lose, or
+  hide, the minutes on the scenarios where the minutes differ from the count.
+- **Simpler than today.** The visit sum, its unknown form
+  `Time on this scenario unknown` and the rule for a visit with no usable
+  start all go. A run with no length takes the display rule's forms.
 - **It changes ratified design.** The card's time came with the Run History
   proposal, ratified on 2026-10-12, and was kept by 2026-10-18 and 2026-10-25.
+  B keeps the time and changes what it counts.
 
 ### DT4. Scenario Stats' Total runs becomes Time in runs
 
@@ -143,19 +161,21 @@ a hover.
 **Recommendation: `Total runs: 147` becomes `Time in runs: 2 hr 26 min`, over
 every run of the scenario, as Total runs counts them. Its hover opens with the
 count, `147 runs`, and says what is left out. A total that holds a run with no
-length reads `at least` (DT5).**
+length reads as a minimum, or as unknown ([The display
+rule](#the-display-rule)).**
 
 - **A, the time in place of the count (recommended, the lean).**
-- **B, both on one line,** `Total runs: 147 · 2 hr 26 min in runs`: a count
-  beside its own time, which DT3 removes from the card.
+- **B, both on one line,** `Total runs: 147 · 2 hr 26 min in runs`: a longer
+  line in a 270 px card, where the hover holds the count at no cost.
 - **C, the count stays,** and no time ships on Run History.
 - **Lifetime, not a window.** Total runs is lifetime, and the line answers
   "how much have I put into this scenario?" A 30-day total (53 min on VT
   Controlsphere Viscose since 2026-10-01) would be a second meaning on one
   card, and the typical score's 30 days already date its runs.
-- **18 scenarios played in 2026 read `at least`,** because their totals reach
-  back to files from 2019 to 2021 with no length: 1w6ts reload v2,
-  `at least 31 min` over 48 runs, 17 without a length.
+- **18 scenarios played in 2026 have runs with no length,** files from 2019
+  to 2021. 14 read `at least`, such as 1w6ts reload v2, `at least 30 min` over
+  48 runs, 17 without a length. 4 read `unknown`, because under a minute of
+  their runs is recorded.
 - **One line for one line.** The card stays 270 px wide. Whether the longest
   form fits on one line is checked in the browser ([Not
   checked](#not-checked)).
@@ -168,29 +188,41 @@ minimum is labelled one wherever it's shown, such as time spent in runs". PR
 runs is a minimum of time played."
 
 The material consequence: most figures read without "at least". The minimum is
-said by the name `in runs`, and in words where a surface is about time.
+said by the name `in runs`, and in words where a surface is about time. This
+narrows D2's example, so ruled this way it supersedes D2 in part ([Decisions
+this changes](#decisions-this-changes)).
 
 **Recommendation: every time in runs reads `{duration} in runs`, or
 `Time in runs: {duration}` as a labelled line. `at least` goes in front only
-when a counted run has no length. No number on screen is labelled time played,
-time spent or play time. A surface whose subject is time, such as a later
-calendar or week readout, also carries one visible sentence saying what runs
-leave out, as HM2's line does. Every figure's hover says it.**
+when a counted run has no length, and then it never rounds up. No number on
+screen is labelled time played, time spent or play time. A surface whose
+subject is time, such as a later calendar or week readout, also carries one
+visible sentence saying what runs leave out, as HM2's line does. Every
+figure's hover says it.**
 
 - **A, the name is the label (recommended).** `in runs` says what is counted,
   so the figure is exact for what it names; `at least` marks the one case
   where it isn't.
 - **B, `at least` on every figure,** HM2's line read app-wide. The word would
-  be on every number, so it would stop telling one apart from another.
+  be on every number, so it would stop telling one apart from another. And a
+  minimum can't round up, so every figure would count whole minutes: a
+  60-second run measures a little under 60 seconds (a median 59.5 in 2026),
+  and the card would read `Run 7 this session · at least 6 min in runs` in
+  3,503 of its 3,619 readings in 2026 (97%).
 - **C, "time played" with a minimum note.** It names the whole of what the app
   sees about half of.
+- **D, D2's sentence on every surface,**
+  `Recorded time in runs is a minimum of time played.`, with `at least` kept
+  for a missing length. D2 stands as written, and Scenario Stats and the card
+  each gain a line for it.
 - **Runs with no length are old.** 509 of 9,284, all from 2019 to 2021: 463
   files with no `Challenge Start:`, 46 out of range. None since 2022. So
-  `at least` shows on totals that reach back that far: 85 of 866 scenarios,
-  and the lifetime figure, `at least 142 hr in runs`.
+  `at least` shows on 29 of 866 scenarios, `unknown` on 56 more, and the
+  lifetime figure reads `at least 142 hr 22 min in runs`.
 - **What runs leave out** is half the session clock and about two thirds of
   the time the game was open (DT6). D2 asks for the label; this row says which
-  word carries it.
+  word carries it. Under A a figure with every length known carries the
+  minimum in its name and its hover, not in a visible word.
 
 ### DT6. Time comes from the stats folder alone
 
@@ -217,12 +249,12 @@ of launches left.**
   would be the first data the stats folder can't rebuild, with no history
   before it starts.
 - **The gap, measured.** From 2026-05-10 to 2026-10-30, 133 launches: 25.9 h
-  in runs, 42.6 h of visit spans, 54.0 h of session clocks, and the game open
+  in runs, 42.9 h of visit spans, 54.3 h of session clocks, and the game open
   75.6 h, 2.91 times the runs. 53 launches held no finished run, 10.1 h.
 - **Restarts have no source on 3.9.12.** The analytics log that timed them on
   3.9.10 is gone (`docs/research/kovaaks_analytics_log_restarts.md`). With
   Statistics Export on Always a reset writes a stats file, which the app
-  counts as a run with no length.
+  counts as a run with no length, and so does freeplay under DT1's rule.
 - **D2 already covers the gap** with a minimum. An upper bound would be a
   second number on every figure.
 
@@ -235,17 +267,17 @@ At `0fdde2af`. "Length of play" rows are the ones this proposal governs.
 | # | Where | Reads today | Measure | Code | Docs | Here |
 |---|---|---|---|---|---|---|
 | 1 | Sessions, the split | none on screen | a break over 30 min ends a session | `play_sessions.py:21-26, 104-132` | `sessions.md:107-135`; S1 | unchanged |
-| 2 | A run's start and length | none by itself | end − `Challenge Start:` − pause, trusted 1 s to 30 min | `data_service.py:81-91, 740-794` | `sessions.md:72-105` | the unit of every total |
+| 2 | A run's start and length | none by itself | end − `Challenge Start:` − pause, trusted 1 s to 30 min | `data_service.py:81-91, 740-794` | `sessions.md:72-105` | the unit of every total; a freeplay file gets neither (DT1) |
 | 3 | In progress | `In progress` badge, first row | newest session within 30 min of its last run | `play_sessions.py:135-156`; `run_history_list.py:476, 639, 770-777`; `run_history.py:391-417` | `sessions.md:141-166`; S3 | unchanged |
 | 4 | All scenarios, session row | `1 hr 6 min · 47 runs · 7 scenarios` | session clock: length of play | `run_history_list.py:653-663`; `play_sessions.py:77-80` | `run_history.md:1057-1061`; glossary 128-132 | kept (DT2) |
 | 5 | The first row's length hover | "The length runs from the first run to the last run…" | text | `run_history_list.py:114-117, 657`; `runHistoryList.js:600` | 2026-10-12 run list entry, 259-268 | reworded (DT2) |
 | 6 | This scenario, session row | `7 of 47 runs` | a count, no length | `run_history_list.py:481-509` | `run_history.md:981-990`; 2026-10-23 | unchanged |
-| 7 | Latest-run card, session line | `Run 7 this session · 9 min on this scenario` | visit spans summed: length of play | `latest_run_card.py:307-330, 674` | `sessions.md:48-62`; `run_history.md:440-454` | time leaves (DT3) |
+| 7 | Latest-run card, session line | `Run 7 this session · 9 min on this scenario` | visit spans summed: length of play | `latest_run_card.py:307-330, 674` | `sessions.md:48-62`; `run_history.md:440-454` | time in runs (DT3) |
 | 8 | Latest-run card, first line | `Latest run · 5 minutes ago` | an age, reworded every 30 s | `latest_run_card.py:109-128` | `run_history.md:365-372` | unchanged |
 | 9 | Scenario Stats | `Total runs: 147` | a count | `scenario_stats.py:214-227, 261-277` | `run_history.md:1691-1692, 1711-1714`; TS8 | Time in runs (DT4) |
-| 10 | Run list heading, screen readers | `{scenario} · 147 runs` | a count | `run_history_list.py:518-528` | `run_history.md:967-971` | unchanged |
+| 10 | Run list heading, screen readers | `{scenario} · 147 runs` | a count | `run_history_list.py:518-528` | `run_history.md:967-971` | unchanged; its spec's "Total runs" is reworded |
 | 11 | Home's line | `Found 9,284 runs across 866 scenarios in your stats folder.` | counts | `home.py:157-179` | `home.md:45-57` | unchanged; later Home work follows DT1 |
-| 12 | The formatters | `9 min`, `1 hr 6 min`; ETAs round up | nearest minute; up for estimates | `utilities.py:78-93, 182-206` | 2026-10-13 | one formatter for every time in runs |
+| 12 | The formatters | `9 min`, `1 hr 6 min`; ETAs round up | nearest minute; up for estimates | `utilities.py:78-93, 182-206` | 2026-10-13 | one display rule for every time in runs |
 | 13 | Playlists' percentile status | `(~5 min)` while updating | an estimate | `playlists.py:540-552`; `percentile_warmup_service.py:663-669` | | unchanged |
 | 14 | Run viewer, Time tile and By Bot | `1:54.3`, a time per kill | a run's own clock | `run_viewer_panel.py:103, 324, 404-414`; `run_viewer.py:238` | `run_history.md:1306, 1546-1547` | unchanged |
 | 15 | Aim Training Journey, by address only | progress at "N hours" | every 60th run: one run a minute assumed | `data_service.py:271-281`; `aim_training_journey.py:106` | `run_history.md:21-22` | adopts DT1 if revived |
@@ -281,9 +313,16 @@ At `0fdde2af`. "Length of play" rows are the ones this proposal governs.
 - A run has a start and a length, or neither (`data_service.py:761-794`).
   Paused time is in a session's clock and a visit's span, and out of a run's
   length.
+- `extract_data_from_file` reads only the end time from the file name
+  (`data_service.py:549-552`), so a freeplay file named without
+  ` - Challenge - ` loads as a run, and its left-over `Challenge Start:` gives
+  it a length when the arithmetic lands in range. The two freeplay files in
+  the archived Statistics Export test do: 24.6 and 35.6 seconds, from the
+  start of the challenge before them. No file in the maintainer's stats folder
+  lacks the token.
 - `format_elapsed_duration` rounds a measured time to the nearest minute, a
   half up, `<1 min` under 30 seconds (`utilities.py:182-206`), for both
-  shipped lengths (2026-10-13).
+  shipped lengths (2026-10-13). It reads 0 seconds as `<1 min`.
 - The first row's length is the only one with a hover
   (`run_history_list.py:657`, `runHistoryList.js:600`).
 - Scenario Stats' count is `get_scenario_stats(...).number_of_runs`
@@ -296,7 +335,7 @@ At `0fdde2af`. "Length of play" rows are the ones this proposal governs.
 ### What the maintainer's runs say
 
 9,284 runs through 2026-10-29 23:57, 866 scenarios, 332 sessions, read with
-the app's own rules.
+the app's own parser, sessions and visits.
 
 | # | Measure | Lifetime | 2026 | Since 2026-09-13 |
 |---|---|---|---|---|
@@ -305,10 +344,13 @@ the app's own rules.
 | 3 | Runs plus gaps up to 2 min (B), as a multiple of A | 1.42 | 1.46 | 1.45 |
 | 4 | Visit spans (C), as a multiple of A | 1.61 | 1.61 | 1.63 |
 | 5 | Session clocks (E), as a multiple of A | 2.03 | 2.08 | 2.04 |
-| 6 | Runs as a share of a session's clock, sessions of 5+ runs: median (middle half) | 55% (45 to 66) | 49% (41 to 57) | 50% (37 to 58) |
+| 6 | Runs as a share of a session's clock, sessions of 5+ runs with every length known: median (middle half) | 55% (45 to 66) | 49% (41 to 57) | 50% (37 to 58) |
 | 7 | Runs of 50 to 62 s | | 91% | 94% |
 | 8 | Card readings where time in runs equals the run number | 92% | 92% | 94% |
 | 9 | Card readings where visit spans run 5+ min over the runs | 20% | 16% | 13% |
+
+Row 6 leaves out the 25 lifetime sessions of 5 or more runs that hold a run
+with no length; with them the lifetime median is 53%.
 
 Scenarios played most since 2026-09-13:
 
@@ -339,21 +381,25 @@ runs would:
 
 Game open against the stats files, 2026-05-10 to 2026-10-30, from Steam's log
 (133 launches, every one of the 1,520 runs inside one): time in runs 25.9 h,
-visit spans 42.6 h, session clocks 54.0 h, game open 75.6 h.
+visit spans 42.9 h, session clocks 54.3 h, game open 75.6 h. The spans and
+clocks are the window's own runs split into sessions and visits.
 
 ### Not checked
 
-- **The app's functions were not run.** Every figure is a re-implementation of
-  the app's rules over the stats folder; it reproduces the counts of two
-  earlier reads.
+- **`time_in_runs` and the display rule don't exist yet.** Their figures are
+  worked out beside the app's own parser, sessions, visits and formatter, run
+  over the stats folder and the archived Statistics Export test files.
 - **Scenario Stats' longest line in pixels.**
   `Time in runs: at least 12 hr 34 min` is 35 characters in a 270 px card;
-  `Total runs: 463` is 15.
+  `Total runs: 463` is 15. The longest on the maintainer's runs is
+  `Time in runs: at least 30 min`.
+- **The card's longest session line in pixels,** such as
+  `Run 12 (Dec 30, 2025, 9:45 PM session) · at least 11 min in runs`.
 - **The restart share on 3.9.12.** The 9% is from 9 sessions on 3.9.10;
   nothing records restarts now.
 - **Another player's run lengths.** A player on longer scenarios would see
-  time in runs move further from the run count, and the card's lost time cost
-  more (DT3).
+  time in runs move further from the run count, and the card's minutes say
+  more than its run number (DT3).
 - **One player's folder** throughout.
 
 ## Design
@@ -362,23 +408,46 @@ visit spans 42.6 h, session clocks 54.0 h, game open 75.6 h.
 
 1. **A total of play is time in runs** (DT1): the sum of the run lengths of
    whichever runs the figure covers.
-2. **A session's length is its clock** (DT2), the only length that counts
-   breaks.
-3. **A run count and its time in runs never sit side by side** (DT3, DT4): a
-   figure shows one, and the other goes in its hover or not at all.
-4. **A time in runs is named** `in runs` (DT5), with `at least` only where a
-   counted run has no length.
+2. **A session's length is its clock** (DT2), the only length of play that
+   counts the breaks between runs.
+3. **Each surface chooses between a run count and its time in runs.**
+   Scenario Stats shows the time and puts the count in its hover (DT4). The
+   card's session line shows both, the run's number and the scenario's time
+   (DT3). A later surface that shows both says why in its own proposal.
+4. **A time in runs is named** `in runs` (DT5), and shown by the display
+   rule: `at least` only where a counted run has no length.
 5. **Ages, a run's own clock, estimates and calendar windows** keep their
    forms: `5 minutes ago`, `1:54.3`, `~5 min`, "the last 30 days". None is a
    length of play, and none shares a label with one.
 6. **Every time comes from the stats files** (DT6).
+
+### The display rule
+
+Every time in runs is shown from its seconds and its count of runs with no
+length, in one of four forms:
+
+| # | The runs | Reads | Example |
+|---|---|---|---|
+| 1 | none | nothing: the figure is absent | Scenario Stats' `No runs yet` |
+| 2 | every one with a length | the nearest minute, `<1 min` under 30 seconds | `2 hr 26 min` |
+| 3 | some with no length, a minute or more recorded | `at least` and the whole minutes recorded | 1,843 seconds: `at least 30 min` |
+| 4 | some with no length, under a minute recorded | `unknown` | 22 runs, none with a length |
+
+- **Form 2 is the 2026-10-13 rule,** as a session's length reads.
+- **A minimum never rounds up.** 90 recorded seconds beside a reset read
+  `at least 1 min`, not `at least 2 min`. The nearest minute would claim 30
+  seconds the runs don't hold.
+- **Unknown is never a small time.** Form 4 keeps a total of runs with no
+  length apart from a measured total under a minute, which reads `<1 min`.
+- **The hover says which,** with the count of runs and of those with no length
+  ([Copy](#copy)).
 
 ### Per surface
 
 | # | Surface | Measure | Reads | Change |
 |---|---|---|---|---|
 | 1 | Scenario Stats | time in runs, lifetime | `Time in runs: 2 hr 26 min`, the count in the hover | replaces Total runs (DT4) |
-| 2 | Latest-run card, session line | none | `Run 7 this session` | the time goes (DT3) |
+| 2 | Latest-run card, session line | time in runs, the scenario's in that session | `Run 7 this session · 7 min in runs` | visit spans become time in runs (DT3) |
 | 3 | All scenarios, session row | session clock | `1 hr 6 min · 47 runs · 7 scenarios` | the first row's hover is reworded (DT2) |
 | 4 | This scenario, session row | none | `7 of 47 runs` | none |
 | 5 | Later pages: Home's figures, a calendar, a week, a lifetime line, a recently played list | time in runs | their own proposals | bound by rules 1, 3 and 4 |
@@ -390,16 +459,27 @@ visit spans 42.6 h, session clocks 54.0 h, game open 75.6 h.
 
 - **`time_in_runs(runs)`** in `source/kovaaks/play_sessions.py`, beside
   `PlaySession.length`: a pure function returning a frozen
-  `TimeInRuns(seconds, unknown)`, the sum of `run_length` over the runs that
-  have one and the count of those that don't. It reads no store and no clock.
-- **Formatting** is `format_elapsed_duration`, unchanged. A caller puts
-  `at least ` in front when `unknown` is above zero.
+  `TimeInRuns(seconds, unknown)`, the unrounded sum of `run_length` over the
+  runs that have one and the count of those that don't. It reads no store and
+  no clock.
+- **`format_time_in_runs(total)`** in `source/utilities/utilities.py`, beside
+  `format_elapsed_duration`: the display rule's forms 2 to 4. Form 2 calls
+  `format_elapsed_duration`; form 3 writes whole minutes in the same form.
+  Every surface that shows a time in runs calls it.
+- **Freeplay files.** A stats file whose name lacks ` - Challenge - ` gets no
+  start and no length, beside the no-`Challenge Start:` rule, and
+  `sessions.md` gains the line. The run still loads and counts, as a reset
+  file does, and joins its session by its end, so its left-over start can't
+  move a session boundary either.
 - **Scenario Stats.** `get_scenario_num_runs` becomes the line's callback:
   from one snapshot of the run store, the scenario's runs, their time in runs
   and their count. With no scenario selected the card reads as today. With no
-  local runs the line is absent and `No runs yet` stands alone.
-- **The card.** `_session_line` keeps the run's words and drops the time, with
-  its visit sum and its unknown branch.
+  local runs the line is absent and `No runs yet` stands alone. The hover is
+  built as the typical score's is, so a keyboard and a screen reader reach
+  it.
+- **The card.** `_session_line` keeps the run's words and adds the scenario's
+  `time_in_runs` over its runs in the session, through the display rule. The
+  visit sum and its no-start branch go.
 - **The session row.** `SESSION_LENGTH_HELP` gets the new text; still on the
   first row only.
 - **Nothing is stored,** so nothing migrates, as with sessions.
@@ -410,71 +490,95 @@ Every string this proposal adds or edits. Rules 1 to 9 apply.
 
 | Where | String |
 |---|---|
-| Scenario Stats, line | `Time in runs: ` (the label bold, as `Category:` is), then `{duration}` or `at least {duration}` |
-| Scenario Stats, hover, first line | `{n} runs`, or `{n} runs · {k} with no recorded length` |
-| Scenario Stats, hover, second line | `Only the runs themselves count. Restarts, results screens and breaks between runs don't.` |
-| Scenario Stats, hover, with `at least` | adds `A run with no recorded length isn't counted.` |
-| Latest-run card, session line | `Run {n} this session`, `Run {n} last session`, `Run {n} ({session} session)`, unchanged and alone |
-| Session row, first row's length hover | `The length runs from the first run's start to the last run's end, breaks between runs included. It doesn't count the time since your last run.` |
+| Scenario Stats, line | `Time in runs: ` (the label bold, as `Category:` is), then `{duration}`, `at least {duration}` or `unknown` |
+| Scenario Stats, hover, first line | `{n} runs`, `{n} runs · {k} with no recorded length`, or `{n} runs · none with a recorded length`; singular `1 run` and `1 with no recorded length` |
+| Scenario Stats, hover, second line | `Only the runs themselves count, not their pauses. Restarts, results screens and breaks between runs don't either.` |
+| Scenario Stats, hover, with `at least` | adds `Runs with no recorded length add no time, so this is a minimum.` |
+| Scenario Stats, hover, with `unknown` and some lengths | adds `The runs with a recorded length come to under a minute.` |
+| Latest-run card, session line | the run's words, `Run {n} this session`, `Run {n} last session` or `Run {n} ({session} session)`, unchanged; then ` · {duration} in runs`, ` · at least {duration} in runs` or ` · Time in runs unknown` |
+| Session row, first row's length hover | `The length runs from the first run to the last run, pauses and breaks between runs included. It doesn't count the time since your last run.` |
 
 Retired: ` · {duration} on this scenario`, `Time on this scenario unknown`,
 `Total runs: `, and the old length hover,
 `The length runs from the first run to the last run. It doesn't count the time since your last run.`
 
-- **`breaks between runs included`** rewords the glossary's own phrase for a
-  session, "including the breaks between runs", and puts the word break on
-  screen for the first time, as the specs use it.
+- **`pauses and breaks between runs included`** rewords the glossary's own
+  phrase for a session, "including the breaks between runs", and puts the
+  word break on screen for the first time, as the specs use it. The hover
+  keeps the shipped "from the first run to the last run", which holds when
+  the first run has no start and the clock counts from its end.
 - **`in runs` is a tail, `Time in runs:` a label.** Where a figure stands in a
   sentence or a readout, the tail; where it has a line of its own beside
-  `Category:`, the label.
+  `Category:`, the label. `Time in runs unknown` takes the capital the
+  retired `Time on this scenario unknown` had after ` · `.
 
 ### Terms
 
 For the glossary, under Play, after Session length.
 
 **Time in runs.** The sum of the run lengths of some runs: a scenario's, a
-session's, a day's, or all of them. It leaves out restarts, results screens,
-menus, freeplay and the breaks between runs, because none of them writes a
-run. A total that holds a run with no length is a minimum, and reads
-`at least`.
+session's, a day's, or all of them, summed in seconds before it is rounded. It
+leaves out pauses, restarts, results screens, menus, freeplay and the breaks
+between runs. On the game's default Statistics Export setting, restarts and
+freeplay write no stats file. On Always they do, and the app counts each as a
+run with no length. A run with no length adds no time, so a total that holds
+one is a minimum and reads `at least`, or `unknown` when under a minute is
+recorded. Every time in runs is also a minimum of time played, since an
+attempt that wrote no stats file isn't in it.
 - On screen: `Time in runs: 2 hr 26 min` in Scenario Stats;
-  `{duration} in runs` where a figure reads in a line.
-- In code: `time_in_runs`, `TimeInRuns`.
-- Not a session length, which counts the breaks. Not time played, which the
-  app can't see. Not a calendar window such as the typical score's 30 days.
+  `{duration} in runs` where a figure reads in a line, such as the latest-run
+  card's session line.
+- In code: `time_in_runs`, `TimeInRuns`, `format_time_in_runs`.
+- Not a session length, which counts pauses and the breaks. Not time played,
+  which the app can't see. Not a calendar window such as the typical score's
+  30 days.
 
-**Session length** gains: "It is the only length the app shows that counts the
-breaks. On screen: the All scenarios session row."
+**Session length** gains: "It includes paused time and the breaks between
+runs, and it is the only length of play the app shows that counts those
+breaks. A first run with no start counts from its end. On screen: the All
+scenarios session row."
 
 **Break.** The time between two runs, from one run's end to the next one's
 start. A break of more than 30 minutes ends a session.
-- On screen: the session row's hover, `breaks between runs included`.
+- On screen: the session row's hover, `pauses and breaks between runs
+  included`.
 - Not a pause, the game's own pause inside a run, which a stats file records
   as `Pause Duration:` and which a run's length leaves out.
 
 ### Decisions this changes
 
 - **2026-10-12, a past run's check** (the card's third line, "the clock time
-  spent on the scenario in that session"): superseded in part. The run's
-  number in its session stands.
+  spent on the scenario in that session"): superseded in part. The time on
+  the scenario becomes its time in runs in that session. The run's number in
+  its session stands.
 - **2026-10-18, the card reports the selected scenario's latest run** ("the
   time still the sum of the scenario's visits"), and **2026-10-25 (SC3)**
   ("the time on the scenario shares the session line"): superseded in part.
-  The session's words stand.
+  The time is the scenario's time in runs, not the sum of its visits, and
+  still shares the session line. The session's words stand.
 - **2026-10-20 (TS8):** `Total runs: {n}` becomes `Time in runs: {duration}`,
   and the count moves to its hover. The lead, its order and Category stand.
   Superseded in part.
 - **2026-10-12, the run list column:** the first row's length hover is
   reworded. Superseded in part.
+- **2026-10-11, a run's start and length:** gains a rule. A stats file whose
+  name lacks ` - Challenge - ` has no start and no length.
 - **2026-10-13, nearest minute:** gains a note. The rule covers a session's
-  length and every time in runs; the card's time on a scenario is gone.
+  length and every time in runs whose runs all have a length. A time in runs
+  with a run of no length counts whole minutes, never rounded up, or reads
+  unknown.
+- **2026-10-04 D2, if DT5 is ruled as recommended:** superseded in part. Its
+  example, "time spent in runs", is labelled a minimum by the name `in runs`
+  and its hover, and a visible `at least` marks only a total with a run of no
+  length, so a figure with every length known carries no visible minimum
+  word. The roadmap's uncertainty principle reads the same. Ruled the other
+  way, D2 stands as written and DT5 changes to follow it.
 - **The roadmap.** "KovaaK's own log" is corrected for 3.9.12 (DT6). "An
   overview" reads "time in runs and activity". The uncertainty principle's
   example reads "time in runs". The Future list's membership, D5 of
   2026-10-04, stands.
-- Applied, not changed: **2026-10-04 D2**, whose label DT5 says how to read
-  for time; **2026-10-11 S1 and S3**; **2026-10-23**, This scenario's rows
-  with no length.
+- Applied, not changed: **2026-10-11 S1 and S3**; **2026-10-23**, This
+  scenario's rows with no length.
 
 ### Alternatives rejected
 
@@ -491,6 +595,9 @@ start. A break of more than 30 minutes ends a session.
 - **The card's time under a new name,** such as
   `15 min since your first run here`. It keeps the break counting DT1 rejects
   for totals, and still disagrees with Scenario Stats.
+- **Leaving freeplay files out of time in runs only,** their count kept and
+  disclosed. It is a second rule inside the total beside the run's own, and
+  the left-over start would still move a session boundary.
 - **Every session row's length with a hover.** The first row's hover exists
   for the length that stands still in session; the new text adds the breaks
   and needs no wider reach.
@@ -514,27 +621,40 @@ start. A break of more than 30 minutes ends a session.
 Stated intent, not a contract; a PR that moves a boundary says so in its
 description.
 
-1. **One PR.** `time_in_runs` and its tests; Scenario Stats' line and hover;
-   the card's session line; the session row's hover. `sessions.md`,
-   `run_history.md`, the glossary, a decision-log entry, the roadmap's three
-   wordings, `architecture.md`'s card line, and a check of the user guide and
-   README; this proposal is deleted.
+1. **One PR.** `time_in_runs`, `format_time_in_runs` and their tests; the
+   freeplay rule in the parser; Scenario Stats' line and hover; the card's
+   session line; the session row's hover. `sessions.md`, `run_history.md`
+   (the run list heading's sentence naming Total runs included), the
+   glossary, a decision-log entry, the roadmap's three wordings,
+   `architecture.md`'s card line, and a check of the user guide and README;
+   this proposal is deleted.
 
 ## Testing
 
 - **Unit, `time_in_runs`:** no runs; all with a length; some without; a paused
   run counts its length only; a run at 1 s and at 30 min; the sum over two
-  sessions equals the sum of each.
+  sessions equals the sum of each, in unrounded seconds.
+- **Unit, the display rule:** every length known, to the nearest minute and
+  `<1 min` under 30 seconds; 90 seconds beside a run with no length reads
+  `at least 1 min`; 1,843 seconds beside runs with no length reads
+  `at least 30 min`; no length at all reads `unknown`; under a minute beside a
+  run with no length reads `unknown`.
+- **Unit, the parser:** a stats file named without ` - Challenge - `, whose
+  left-over start lands in range, loads with no start and no length, and
+  joins its session by its end.
 - **Unit, Scenario Stats:** no scenario; no runs; a known total; an `at least`
-  total; the hover's two forms; a run landing changes the line.
-- **Unit, the card:** the session line's three forms with no time; a session
-  whose first run has no start reads as any other.
+  total; an `unknown` total; the hover's forms and their singulars; a run
+  landing changes the line.
+- **Unit, the card:** the session line's three forms with a time in runs; a
+  scenario's visits in one session summed; a run with no length reads
+  `at least` or `Time in runs unknown`; a session whose first run has no start
+  reads by its runs' lengths.
 - **Unit, the session row:** the first row's hover text; the other rows have
   none.
 - **Browser** (headless Edge, then the maintainer's Firefox), both themes, at
   3840, 2560, 1920 and 1536 px: Scenario Stats' longest line on one line in
-  270 px; the top row's height unchanged; the card's session line.
-- **Screen reader** (NVDA): Scenario Stats' line and hover; the session row's
-  length and hover.
+  270 px; the top row's height unchanged; the card's longest session line.
+- **Screen reader** (NVDA): Scenario Stats' line and hover, reached by
+  keyboard; the session row's length and hover.
 - **Gates:** pytest, ruff format and lint, mypy, compileall, as AGENTS.md
   lists.
