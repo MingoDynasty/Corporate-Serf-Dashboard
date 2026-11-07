@@ -9,16 +9,27 @@ copied per call site.
 ``atomic_write_text`` wraps that loop in the full write dance every durable
 store performs: a uniquely named temp file beside the destination, flushed and
 fsynced, then replaced into place and cleaned up on any failure.
+``remove_stale_temp_files`` clears the temps that cleanup never reached,
+because the process was killed before its replace.
 """
 
 import logging
 import os
+import re
 import threading
 import time
 from collections.abc import Callable
 from pathlib import Path
 
 REPLACE_RETRY_DELAYS_SECONDS = (0.05, 0.1)  # Windows AV/indexer file locks.
+
+# Exactly the temp names the app's writers use, so the sweep removes nothing
+# else: ``atomic_write_text`` and ``api_service._write_json`` write
+# ``.<name>.<pid>.<tid>.tmp`` beside their destination, and
+# ``store_schema.back_up_unusable_store`` writes ``.<name>.corrupt.<pid>.<tid>.tmp``.
+# Every destination they write is a ``.json`` file. Matched case-sensitively,
+# unlike a Windows glob.
+_WRITER_TEMP_NAME = re.compile(r"\..+\.json(?:\.corrupt)?\.[0-9]+\.[0-9]+\.tmp")
 
 
 def replace_with_retry(
@@ -74,3 +85,55 @@ def atomic_write_text(
         replace_with_retry(temp_file, destination, logger=logger)
     finally:
         temp_file.unlink(missing_ok=True)
+
+
+def remove_stale_temp_files(
+    directory: Path,
+    *,
+    older_than: float,
+    logger: logging.Logger,
+    recursive: bool = False,
+) -> int:
+    """Delete the writer temps in ``directory`` older than ``older_than``.
+
+    Returns how many were removed. Only a regular file whose whole name is a
+    writer's temp name and whose modification time (seconds since the epoch)
+    is before ``older_than`` is removed. A newer one may be a write still in
+    flight. A missing directory removes nothing, and a directory that cannot
+    be listed or a temp that cannot be removed is logged and left. A
+    backup-claim temp is a second hard link to its backup, so removing it
+    leaves the backup whole.
+    """
+    try:
+        with os.scandir(directory) as scan:
+            entries = list(scan)
+    except FileNotFoundError:
+        return 0
+    except OSError as error:
+        logger.warning('Could not list "%s" for stale temp files: %s', directory, error)
+        return 0
+
+    removed = 0
+    for entry in entries:
+        if recursive and entry.is_dir(follow_symlinks=False):
+            removed += remove_stale_temp_files(
+                Path(entry.path), older_than=older_than, logger=logger, recursive=True
+            )
+            continue
+        if not (
+            entry.is_file(follow_symlinks=False)
+            and _WRITER_TEMP_NAME.fullmatch(entry.name)
+        ):
+            continue
+        try:
+            if entry.stat(follow_symlinks=False).st_mtime >= older_than:
+                continue
+            os.unlink(entry.path)
+        except OSError as error:
+            logger.warning(
+                'Could not remove the stale temp "%s": %s', entry.path, error
+            )
+            continue
+        logger.debug('Removed the stale temp "%s".', entry.path)
+        removed += 1
+    return removed

@@ -481,6 +481,20 @@ exempt
   settings file isn't valid JSON. File: {path}"; a malformed stamp is quoted
   as the file holds it, in JSON
   ([2026-09-14](../decision_log/2026/2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out.md)).
+- A write killed between its fsync and its replace leaves its temp file
+  beside the destination, `.<name>.<pid>.<tid>.tmp`; a kill while a backup is
+  made also leaves `.<name>.corrupt.<pid>.<tid>.tmp`, which is a second hard
+  link to the backup once its name is claimed. Startup removes them once,
+  after it builds and seeds the cache tree, from `data/`, `data/playlists/`,
+  `data/scenario_notes/`, and the whole `data/cache/` tree, so cache files
+  are covered although the rest of this section exempts them. It removes only a regular file whose whole name
+  has that form, with `<name>` ending in `.json` and both numbers decimal,
+  and whose modification time is before the process started: a newer one may
+  be a write in flight. Nothing else in those folders is touched, removing a
+  claim's temp leaves its backup whole, and a temp that can't be removed is
+  logged at WARNING and left. A nonzero count is logged at INFO as "Removed
+  `<n>` temp file(s) left by interrupted writes.", and each removed path at
+  DEBUG.
 - Settings v1 is a subset of the three keys with string values, unknown keys
   invalid; visibility v1 is exactly `shown_playlists` as a list of strings;
   playlist v1 is `PlaylistData`, extras ignored. The same validators serve the
