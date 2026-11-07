@@ -106,7 +106,7 @@ def cached_plot(request) -> str:
     if request.param == "score_vs_run":
         figure = generate_score_vs_run_plot(
             runs,
-            1,
+            range(1, 1 + len(runs)),
             "1w4ts",
             False,
             [],

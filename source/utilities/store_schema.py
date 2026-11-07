@@ -5,9 +5,10 @@ Every file the app writes under ``data/`` carries a top-level integer
 it understands from one it does not, and so a file written by a newer build is
 recognized as *newer* rather than parsed as garbage.
 
-Four stores are covered: ``data/settings.json``,
+Five stores are covered: ``data/settings.json``,
 ``data/playlist_visibility.json``, each user playlist under
-``data/playlists/``, and each scenario note under ``data/scenario_notes/``.
+``data/playlists/``, each scenario note under ``data/scenario_notes/``, and
+``data/excluded_runs.json``.
 The bundled benchmark corpus is exempt (it ships with the
 code and carries its own provenance contract), and cache files under
 ``data/cache/`` are deliberately unstamped.
@@ -27,7 +28,7 @@ An unstamped but otherwise well-formed file is deliberately *not* treated as
 version 1: there is no grandfather rule. The one-time conversion script in
 ``scripts/stamp_schema_version.py`` retires the pre-stamp population, so no
 future reader has to carry a missing-means-v1 special case. Scenario notes
-were born stamped, so the script doesn't cover them.
+and the excluded runs were born stamped, so the script doesn't cover them.
 
 A stamp routes a payload to a validator; it never vouches for the payload.
 """

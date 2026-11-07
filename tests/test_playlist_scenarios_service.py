@@ -8,7 +8,11 @@ import pytest
 import requests
 
 from source.config import settings_service
-from source.kovaaks import data_service, playlist_scenarios_service
+from source.kovaaks import (
+    data_service,
+    excluded_runs_service,
+    playlist_scenarios_service,
+)
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import UnknownKovaaksUserError
 from source.kovaaks.data_models import (
@@ -17,6 +21,7 @@ from source.kovaaks.data_models import (
     RunData,
     Scenario,
     ScenarioStats,
+    run_id,
 )
 from source.kovaaks.play_sessions import split_into_play_sessions
 from source.kovaaks.playlist_scenarios_service import (
@@ -2558,3 +2563,25 @@ def test_a_snapshot_value_equals_the_newest_one_built_from_the_whole_history(
             whole.p90,
         )
     assert typical.values["Ranked"][1] > 20
+
+
+def test_a_snapshot_value_leaves_excluded_runs_out(monkeypatch):
+    runs = _daily_runs(range(500, 525), last=TYPICAL_MOMENT - timedelta(hours=1))
+    for run in runs[-5:]:
+        excluded_runs_service.set_run_excluded(run_id(run), excluded=True)
+
+    typical = _typical(monkeypatch, runs)
+
+    value, total = typical.values["Ranked"]
+    assert value.runs == tuple(runs[:20])
+    assert total == 20
+
+
+def test_a_scenario_with_every_run_excluded_has_no_snapshot_value(monkeypatch):
+    runs = _daily_runs(range(500, 503), last=TYPICAL_MOMENT - timedelta(hours=1))
+    for run in runs:
+        excluded_runs_service.set_run_excluded(run_id(run), excluded=True)
+
+    typical = _typical(monkeypatch, runs)
+
+    assert typical.values == {}

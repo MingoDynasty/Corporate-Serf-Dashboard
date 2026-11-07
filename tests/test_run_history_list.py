@@ -27,6 +27,7 @@ from source.components.run_history_list import (  # noqa: E402
     run_list_from_store,
 )
 from source.components.run_marks import mark_runs  # noqa: E402
+from source.kovaaks import excluded_runs_service  # noqa: E402
 from source.kovaaks.data_models import RecordedSensitivity, RunData  # noqa: E402
 from source.kovaaks.play_sessions import in_play_order  # noqa: E402
 
@@ -657,6 +658,7 @@ def test_a_run_row_formats_each_value_for_its_column():
         "passed": True,
         "check_text": "Threshold passed",
         "new_pb": True,
+        "excluded": False,
         "accuracy": "54.50%",
         "shots": "1,234",
         "reloads": "",
@@ -1850,3 +1852,15 @@ def test_late_runs_and_same_second_ties_keep_both_views_on_the_selected_latest(
         for model in (_build(stored), _tree(stored)):
             assert _latest_rows(model) == [f"r:{run_id(expected)}"]
             assert model["newest_run"] == run_id(global_newest)
+
+
+@pytest.mark.parametrize("view", [VIEW_SCENARIO, VIEW_ALL])
+def test_an_excluded_run_stays_in_the_list_marked(store, view):
+    """The list keeps every run, so it says which ones the chart leaves out."""
+    store.extend(_minutes(0, 2, 4))
+    excluded_runs_service.set_run_excluded(run_id(store[1]), excluded=True)
+
+    model = run_list_from_store(view, A, 30, 95, EVENING + timedelta(minutes=5))
+
+    rows = {row["n"]: row["excluded"] for row in _of_kind(model, "run")}
+    assert rows == {1: False, 2: True, 3: False}

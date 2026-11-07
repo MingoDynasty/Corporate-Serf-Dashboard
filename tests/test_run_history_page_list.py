@@ -665,6 +665,9 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
             ),
             "wholeSession": "Show the whole session",
             "newPb": "New PB",
+            "excluded": (
+                "Excluded. It doesn't count on the chart or in your typical score."
+            ),
             "sessionNewPb": "A new PB was set in this session.",
             "scenarioSessionNewPb": "A new PB for this scenario was set in this session.",
             # The figures' words, which This scenario draws in columns.
@@ -785,6 +788,7 @@ def test_the_selected_scenarios_latest_run_is_highlighted_by_a_row_rule():
     assert rules == {
         "run-list-row-linked": "params.data.linked === true",
         "run-list-row-open": "params.data.open === true",
+        "run-list-row-excluded": "params.data.excluded === true",
         "run-list-row-latest": "params.data.latest",
         "run-list-row-selected": "params.data.sel && params.data.kind === 'run'",
     }
@@ -1308,8 +1312,14 @@ def test_a_session_rows_parts_end_with_a_space_a_screen_reader_is_given():
 def test_the_marks_cell_says_why_a_run_has_no_check():
     script = LIST_SCRIPT.read_text(encoding="utf-8")
 
-    assert "title: data.passed ? undefined : data.check_text" in script
+    marks = script[
+        script.index("dagcomponentfuncs.RunListMarks") : script.index("function star(")
+    ]
+    assert "? labels.excluded" in marks
+    assert ": data.passed\n        ? undefined\n        : data.check_text;" in marks
+    assert '{ className: "run-list-marks", title: title }' in marks
     assert 'h("span", { className: "visually-hidden" }, data.check_text)' in script
+    assert '" " + labels.excluded' in marks
     assert '"aria-label": label,' in _function(script, "star")
     assert "star(labels.newPb)" in script
 
@@ -1410,7 +1420,7 @@ def _list_registration() -> dict:
     return _registration(f"{IDS.model}.data")
 
 
-def test_the_list_is_rebuilt_by_these_eight_inputs_and_no_other():
+def test_the_list_is_rebuilt_by_these_nine_inputs_and_no_other():
     registration = _list_registration()
     options = run_history.CHART_OPTIONS_IDS
 
@@ -1427,6 +1437,7 @@ def test_the_list_is_rebuilt_by_these_eight_inputs_and_no_other():
         f"{options.score_threshold_percentage}.value",
         f"{run_history.TODAY_STORE_ID}.data",
         f"{run_history.SESSION_IN_PROGRESS_STORE_ID}.data",
+        f"{run_history.RUN_VIEWER_IDS.exclusions}.data",
     ]
     assert registration["state"] == []
     # It draws the first list, so the page load runs it.

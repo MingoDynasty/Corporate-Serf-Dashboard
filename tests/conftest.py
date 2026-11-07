@@ -7,7 +7,12 @@ import pytest
 
 from source.config import config_service, settings_service
 from source.config.config_service import ConfigData, get_config
-from source.kovaaks import api_service, scenario_notes_service, time_scored_service
+from source.kovaaks import (
+    api_service,
+    excluded_runs_service,
+    scenario_notes_service,
+    time_scored_service,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -66,6 +71,20 @@ def test_scenario_notes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
         scenario_notes_service,
         "SCENARIO_NOTES_DIR",
         tmp_path / "scenario-notes-store" / "scenario_notes",
+    )
+
+
+@pytest.fixture(autouse=True)
+def test_excluded_runs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Keep the excluded-runs store off the developer's real one.
+
+    Every chart, typical score and run list reads it, so any test that draws
+    one would otherwise read the real file, and an exclude would write to it.
+    """
+    monkeypatch.setattr(
+        excluded_runs_service,
+        "EXCLUDED_RUNS_PATH",
+        tmp_path / "excluded-runs-store" / "data" / "excluded_runs.json",
     )
 
 

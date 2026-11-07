@@ -47,11 +47,14 @@ class RunMark:
     ``verdict`` is how the run measured up against the score threshold, or
     the reason nothing judges it. ``is_new_pb`` never depends on the
     threshold: the first run at a new sensitivity is not judged and can still
-    be a new PB.
+    be a new PB. ``is_excluded`` is whether the player excluded the run,
+    which the run list sets from the store and nothing here judges; it
+    changes neither of the other two.
     """
 
     verdict: ThresholdVerdict | Unjudged
     is_new_pb: bool
+    is_excluded: bool = False
 
     @property
     def passed(self) -> bool:

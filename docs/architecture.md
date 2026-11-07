@@ -228,9 +228,16 @@ state, not a field grafted onto someone else's schema.
   each time it is asked for and never cached: its path comes from the name, so
   nothing scans the folder. A save writes one file atomically, and saving empty
   text deletes it. The folder is absent until the first save.
+- **Excluded runs** — `data/excluded_runs.json` (not committed) lists the
+  runs the player excluded (`kovaaks/excluded_runs_service.py`), by stats
+  file name. It is read from disk each time it is asked for and never
+  cached; the chart, the run list, the typical score's callers and the run
+  viewer each read it once per build. A press rewrites the whole file
+  atomically. It is absent until the first exclude.
 - **Schema stamps** — the durable stores above (settings, visibility, each
-  user playlist under `data/playlists/`, and each scenario note under
-  `data/scenario_notes/`) carry a top-level integer `"schema_version"`. User
+  user playlist under `data/playlists/`, each scenario note under
+  `data/scenario_notes/`, and the excluded runs) carry a top-level integer
+  `"schema_version"`. User
   playlists and scenario notes are a store per file, each classified on its
   own. The read machine lives once in
   `utilities/store_schema.py` and has four states per store: *missing* is the
@@ -1365,6 +1372,10 @@ flowchart LR
   History filter, Journey picker, overview). The Run History
   filter adds one playlist to that list, the hidden one it holds, in
   `components/scenario_selection.py`.
+- `excluded_runs_service.py` — the excluded-runs store, one stamped file
+  at `data/excluded_runs.json` (see State above). `excluded_run_ids` is what
+  the chart, the run list and every typical score's caller read;
+  `set_run_excluded` is the run viewer's press.
 - `scenario_notes_service.py` — the scenario note store, a stamped file per
   scenario under `data/scenario_notes/` (see State above). Run History's
   note card (`components/scenario_note_card.py`) reads and saves through it.

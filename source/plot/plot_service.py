@@ -1151,7 +1151,7 @@ def _run_axis_date_ticks(
 
 def generate_score_vs_run_plot(  # noqa: PLR0913
     runs: Sequence[RunData],
-    first_run_number: int,
+    run_numbers: Sequence[int],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
@@ -1167,15 +1167,16 @@ def generate_score_vs_run_plot(  # noqa: PLR0913
     """Build the Score vs Run figure: the runs given, evenly spaced, in their order.
 
     ``runs`` is in the order the runs were played and must hold at least one.
-    A run's x value is its number in the scenario's whole history, counted
-    from ``first_run_number`` for the first run given, so a run keeps its
-    place on the axis when the range around it changes. The axis is numeric
-    and its labels are dates, which is why the ticks are written out here:
-    plotly places a point by its value and would label the axis with the run
-    numbers. ``today`` only decides which labels carry a year.
-    ``accuracy_targets`` is as ``_generate_run_history_plot`` takes it.
+    ``run_numbers`` is in step with it: each run's number in the scenario's
+    whole history, which is its x value, so a run keeps its place on the axis
+    when the range around it changes, and a run left out leaves its place
+    empty. The axis is numeric and its labels are dates, which is why the
+    ticks are written out here: plotly places a point by its value and would
+    label the axis with the run numbers. ``today`` only decides which labels
+    carry a year. ``accuracy_targets`` is as ``_generate_run_history_plot``
+    takes it.
     """
-    axis_run_numbers = list(range(first_run_number, first_run_number + len(runs)))
+    axis_run_numbers = list(run_numbers)
     tick_values, tick_labels = _run_axis_date_ticks(runs, axis_run_numbers, today)
     return _generate_run_history_plot(
         runs,

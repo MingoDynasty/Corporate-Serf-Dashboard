@@ -1,10 +1,11 @@
 """Choose what the Run History chart plots: its modes, its ranges, and its figure.
 
-The chart plots every run of one scenario inside a range. Score vs Run counts
-its range in runs. Score vs Time and Score vs Sensitivity count theirs in
-calendar days. The first two draw the typical score over the runs. The page
-holds the controls and the callback, and asks ``build_run_history_figure``
-for the figure. Nothing here has a component id or registers a callback.
+The chart plots every run of one scenario inside a range, except the runs the
+player excluded. Score vs Run counts its range in runs. Score vs Time and
+Score vs Sensitivity count theirs in calendar days. The first two draw the
+typical score over the runs. The page holds the controls and the callback,
+and asks ``build_run_history_figure`` for the figure. Nothing here has a
+component id or registers a callback.
 """
 
 import logging
@@ -20,6 +21,7 @@ from source.kovaaks.data_service import (
     get_sensitivities_vs_runs,
     new_high_score_runs,
 )
+from source.kovaaks.excluded_runs_service import excluded_run_ids
 from source.kovaaks.play_sessions import in_play_order, split_into_play_sessions
 from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.kovaaks.typical_score import build_typical_scores
@@ -76,6 +78,10 @@ NO_LOCAL_RUNS_PLOT_TITLE = "No local runs found"
 NO_LOCAL_RUNS_PLOT_MESSAGE = "Play this scenario once and the graph will fill in."
 NO_RUNS_IN_RANGE_PLOT_TITLE = "No runs in this range"
 NO_RUNS_IN_RANGE_PLOT_MESSAGE = "Choose a longer range or play more runs."
+ALL_EXCLUDED_PLOT_TITLE = "Every run in this range is excluded"
+ALL_EXCLUDED_PLOT_MESSAGE = (
+    "Choose a longer range, or open a run from the list to include it again."
+)
 UNSUPPORTED_MODE_PLOT_TITLE = "Unsupported graph option"
 # The empty-state messages are plotly annotation text, which cannot hold a
 # component, so a control name is bolded with ``<b>`` inside the string.
@@ -141,6 +147,11 @@ def build_run_history_figure(  # noqa: PLR0913
     Score vs Time each value held flat to the next run. Score vs Sensitivity
     draws neither.
 
+    A run the player excluded is not drawn, and is never a score in a
+    typical score's window. It still counts everywhere else: in the range's
+    count of runs, in the run numbers, and as a PB the stars judge against.
+    A range whose runs are all excluded says so, and skips the overlays.
+
     With the Accuracy targets switch and Rank thresholds on, every mode's
     rank lines get their accuracy targets, or a note saying why there are
     none.
@@ -167,6 +178,7 @@ def build_run_history_figure(  # noqa: PLR0913
             )
     newest = runs[-1]
     newest_id = run_id(newest)
+    excluded = excluded_run_ids()
     # Judged over the whole history, and only then is the range applied: a
     # new PB the range leaves out is not drawn, and it still decides which
     # later runs beat it. Judged in play order, so the star sits on the same
@@ -188,11 +200,14 @@ def build_run_history_figure(  # noqa: PLR0913
 
     if mode == SCORE_VS_RUN:
         run_count = _range_count(run_range, RUN_RANGE_OPTIONS, RUN_RANGE_DEFAULT)
-        plotted = runs if run_count is None else runs[-run_count:]
-        first_run_number = len(runs) - len(plotted) + 1
+        in_range = runs if run_count is None else runs[-run_count:]
+        plotted = [run for run in in_range if run_id(run) not in excluded]
+        if not plotted:
+            return _all_excluded_plot(), False
+        run_numbers = [overall_numbers[run] for run in plotted]
         figure = generate_score_vs_run_plot(
             plotted,
-            first_run_number,
+            run_numbers,
             selected_scenario,
             rank_overlay_switch,
             _rank_data(selected_playlist, selected_scenario),
@@ -207,11 +222,12 @@ def build_run_history_figure(  # noqa: PLR0913
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Worked out over the whole history before the range is applied,
             # as the stars are, so the value at the range's first run counts
-            # the runs before it that the range leaves out.
-            values = build_typical_scores(runs, sessions)
+            # the runs before it that the range leaves out. There is one value
+            # per counted run, and the plotted runs are the newest of those.
+            values = build_typical_scores(runs, sessions, excluded=excluded)
             figure.add_traces(
                 typical_score_traces(
-                    range(first_run_number, len(runs) + 1),
+                    run_numbers,
                     values[-len(plotted) :],
                     today,
                     line=typical_score_switch,
@@ -232,18 +248,21 @@ def build_run_history_figure(  # noqa: PLR0913
         )
 
     day_count = _range_count(day_range, DAY_RANGE_OPTIONS, DAY_RANGE_DEFAULT)
-    plotted = runs
+    in_range = runs
     if day_count is not None:
         first_moment = first_moment_of_day_range(day_count, today)
-        plotted = [run for run in runs if run.datetime_object >= first_moment]
+        in_range = [run for run in runs if run.datetime_object >= first_moment]
+    plotted = [run for run in in_range if run_id(run) not in excluded]
     if not plotted:
-        return (
-            generate_empty_plot(
+        empty = (
+            _all_excluded_plot()
+            if in_range
+            else generate_empty_plot(
                 NO_RUNS_IN_RANGE_PLOT_TITLE,
                 NO_RUNS_IN_RANGE_PLOT_MESSAGE,
-            ),
-            False,
+            )
         )
+        return empty, False
 
     rank_data = _rank_data(selected_playlist, selected_scenario)
     if mode == SCORE_VS_TIME:
@@ -262,7 +281,7 @@ def build_run_history_figure(  # noqa: PLR0913
         if typical_score_switch or middle_50_switch or middle_80_switch:
             # Over the whole history, as on Score vs Run. The range keeps the
             # newest runs, so the last values are the plotted runs'.
-            values = build_typical_scores(runs, sessions)
+            values = build_typical_scores(runs, sessions, excluded=excluded)
             figure.add_traces(
                 typical_score_hold_traces(
                     values[-len(plotted) :],
@@ -274,7 +293,7 @@ def build_run_history_figure(  # noqa: PLR0913
             )
         return figure, True
 
-    in_range = set(plotted)
+    drawn = set(plotted)
     return (
         generate_score_vs_sensitivity_plot(
             # The store keeps the sensitivities sorted, which is the order
@@ -285,7 +304,7 @@ def build_run_history_figure(  # noqa: PLR0913
                     selected_scenario
                 ).values()
                 for run in runs_at_sensitivity
-                if run in in_range
+                if run in drawn
             ],
             selected_scenario,
             rank_overlay_switch,
@@ -298,6 +317,10 @@ def build_run_history_figure(  # noqa: PLR0913
         ),
         True,
     )
+
+
+def _all_excluded_plot() -> go.Figure:
+    return generate_empty_plot(ALL_EXCLUDED_PLOT_TITLE, ALL_EXCLUDED_PLOT_MESSAGE)
 
 
 def _rank_data(selected_playlist: str | None, selected_scenario: str) -> list:

@@ -14,6 +14,12 @@ change of the selected scenario close it. While a run is open the chart's
 column hides the chart's own parts with a class and keeps them mounted, so
 the chart comes back as it was left: its mode, zoom, ranges and hidden
 traces. The open run is held in a store that no reload keeps.
+
+The header's other button excludes the open run, after a confirm, or
+includes an excluded one again. A press writes the excluded-runs store and
+then the page's exclusions store, which redraws the chart behind the viewer,
+the run list, the latest-run card and Scenario Stats; the chart's zoom is
+then lost, as with any other redraw.
 """
 
 import hashlib
@@ -46,6 +52,11 @@ from source.components.latest_run_card import (
 from source.components.score_threshold import normalize_score_threshold_percentage
 from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import get_all_runs
+from source.kovaaks.excluded_runs_service import (
+    excluded_run_ids,
+    read_excluded_runs,
+    set_run_excluded,
+)
 from source.kovaaks.play_sessions import in_play_order
 from source.kovaaks.run_viewer import (
     BotRow,
@@ -63,6 +74,7 @@ from source.kovaaks.run_viewer import (
 )
 from source.kovaaks.time_scored_service import get_version_pace_basis
 from source.kovaaks.typical_score import format_typical_score
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 from source.utilities.utilities import (
     format_absolute_timestamp,
     format_percent,
@@ -76,6 +88,18 @@ logger = logging.getLogger(__name__)
 # --- Copy ----------------------------------------------------------------------
 
 CLOSE_LABEL = "Close"
+EXCLUDE_LABEL = "Exclude run"
+INCLUDE_LABEL = "Include run"
+# The browser's own confirm box shows it, so it is plain text.
+EXCLUDE_CONFIRM_MESSAGE = (
+    "Exclude this run? It leaves the chart and your typical score. "
+    "Your PB and the leaderboard still count it."
+)
+EXCLUDED_NOTE = (
+    "Excluded. This run doesn't count on the chart or in your typical score."
+)
+EXCLUDE_FAILED_TEXT = "The run couldn't be excluded. See data/logs/debug.log."
+INCLUDE_FAILED_TEXT = "The run couldn't be included again. See data/logs/debug.log."
 ESC_HINT = "Esc"
 HEADER_LINE = "{scenario} · ended {ended}"
 TITLE = "Run {number} · {session} session"
@@ -1048,7 +1072,11 @@ class RunViewerIds(NamedTuple):
     open to, ``open`` holds the open run, and ``shown`` is written with every
     change, for the script to move focus and mark the run's row.
     ``shown_sink`` is the output the script's callback needs and never
-    writes.
+    writes. ``exclude`` is the header's button that excludes or includes the
+    open run, ``exclude_confirm`` the confirm an exclude asks first, and
+    ``exclusion_note`` the line under the header that says the run is
+    excluded or why a press failed. ``exclusions`` is written after every
+    press, and the page redraws whatever an excluded run changes from it.
     """
 
     column: str
@@ -1060,6 +1088,10 @@ class RunViewerIds(NamedTuple):
     open: str
     shown: str
     shown_sink: str
+    exclude: str
+    exclude_confirm: str
+    exclusion_note: str
+    exclusions: str
 
 
 def run_viewer(ids: RunViewerIds, *, return_focus: str) -> html.Div:
@@ -1081,21 +1113,42 @@ def run_viewer(ids: RunViewerIds, *, return_focus: str) -> html.Div:
             dcc.Store(id=ids.open),
             dcc.Store(id=ids.shown),
             dcc.Store(id=ids.shown_sink),
+            dcc.Store(id=ids.exclusions),
+            dcc.ConfirmDialog(id=ids.exclude_confirm, message=EXCLUDE_CONFIRM_MESSAGE),
             html.Div(
                 [
                     html.Div(id=ids.heading, className="run-viewer-heading-lines"),
-                    dmc.Button(
-                        CLOSE_LABEL,
-                        id=ids.close,
+                    html.Div(
+                        [
+                            dmc.Button(
+                                EXCLUDE_LABEL,
+                                id=ids.exclude,
+                                size="xs",
+                                variant="subtle",
+                                color="gray",
+                            ),
+                            dmc.Button(
+                                CLOSE_LABEL,
+                                id=ids.close,
+                                rightSection=dmc.Kbd(ESC_HINT, size="xs"),
+                                size="xs",
+                                variant="default",
+                                # The key hint is not part of the button's name.
+                                **{
+                                    "aria-label": CLOSE_LABEL,
+                                    "aria-keyshortcuts": "Escape",
+                                },
+                            ),
+                        ],
                         className="run-viewer-close",
-                        rightSection=dmc.Kbd(ESC_HINT, size="xs"),
-                        size="xs",
-                        variant="default",
-                        # The key hint is not part of the button's name.
-                        **{"aria-label": CLOSE_LABEL, "aria-keyshortcuts": "Escape"},
                     ),
                 ],
                 className="run-viewer-header",
+            ),
+            html.P(
+                id=ids.exclusion_note,
+                className="run-viewer-exclusion-note",
+                hidden=True,
             ),
             html.Div(id=ids.body, className="run-viewer-body"),
         ],
@@ -1186,6 +1239,72 @@ def show_run(  # noqa: PLR0911, PLR0913
     )
 
 
+# What called ``press_exclusion``.
+EXCLUDE_PRESS = "exclude"
+EXCLUDE_CONFIRM = "confirm"
+
+
+def press_exclusion(trigger: str | None, held: dict | None, now: datetime) -> tuple:
+    """Decide what a press of the exclude button, or of its confirm, does.
+
+    Returns whether to show the confirm, and what to write to the page's
+    exclusions store. An exclude asks first and writes nothing; the confirm
+    excludes the open run. Including an excluded run again asks nothing,
+    since it undoes a press. The store's value names the run, what it now
+    is, the press's time so every press is a change, and the error that
+    refused the write, or None.
+    """
+    if not held or not held.get("run_id"):
+        return no_update, no_update
+    viewed = held["run_id"]
+    if trigger == EXCLUDE_PRESS:
+        if viewed not in excluded_run_ids():
+            return True, no_update
+        excluded = False
+    elif trigger == EXCLUDE_CONFIRM:
+        excluded = True
+    else:
+        return no_update, no_update
+    error = None
+    try:
+        set_run_excluded(viewed, excluded=excluded)
+    except UnsupportedSchemaError as exc:
+        error = str(exc)
+    except OSError:
+        logger.exception('Failed to write the excluded runs for "%s"', viewed)
+        error = EXCLUDE_FAILED_TEXT if excluded else INCLUDE_FAILED_TEXT
+    return no_update, {
+        "run": viewed,
+        "excluded": excluded,
+        "error": error,
+        "at": now.isoformat(),
+    }
+
+
+def exclusion_controls(held: dict | None, exclusions: dict | None) -> tuple:
+    """Draw the exclude button's label and the note under the header.
+
+    Returns the label, the note, and whether to hide it. The note says the
+    open run is excluded, or why the last press on it failed, or what is
+    wrong with the store, which then counts every run.
+    """
+    document = read_excluded_runs()
+    viewed = held.get("run_id") if held else None
+    is_excluded = (
+        document.state is StoreState.SUPPORTED
+        and viewed is not None
+        and viewed in document.value
+    )
+    label = INCLUDE_LABEL if is_excluded else EXCLUDE_LABEL
+    if exclusions and exclusions.get("error") and exclusions.get("run") == viewed:
+        note = exclusions["error"]
+    elif document.state in (StoreState.ERROR, StoreState.FUTURE):
+        note = document.message
+    else:
+        note = EXCLUDED_NOTE if is_excluded else ""
+    return label, note, not note
+
+
 # Once a change is drawn: move focus, mark the open run's row in the list, and
 # start a newly shown run from the top.
 _SHOWN_SCRIPT = """
@@ -1244,3 +1363,26 @@ def register_run_viewer(
         Input(ids.shown, "data"),
         prevent_initial_call=True,
     )
+
+    @callback(
+        Output(ids.exclude_confirm, "displayed"),
+        Output(ids.exclusions, "data"),
+        Input(ids.exclude, "n_clicks"),
+        Input(ids.exclude_confirm, "submit_n_clicks"),
+        State(ids.open, "data"),
+        prevent_initial_call=True,
+    )
+    def press_exclude(_clicks, _submits, held) -> tuple:
+        trigger = {
+            ids.exclude: EXCLUDE_PRESS,
+            ids.exclude_confirm: EXCLUDE_CONFIRM,
+        }.get(ctx.triggered_id)
+        return press_exclusion(trigger, held, datetime.now())
+
+    callback(
+        Output(ids.exclude, "children"),
+        Output(ids.exclusion_note, "children"),
+        Output(ids.exclusion_note, "hidden"),
+        Input(ids.open, "data"),
+        Input(ids.exclusions, "data"),
+    )(exclusion_controls)

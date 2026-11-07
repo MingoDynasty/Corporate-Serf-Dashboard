@@ -28,6 +28,7 @@ from statistics import median
 from source.config.settings_service import get_usable_stats_dir
 from source.kovaaks.data_models import RunData, run_id
 from source.kovaaks.data_service import get_all_runs, parse_pause_duration
+from source.kovaaks.excluded_runs_service import excluded_run_ids
 from source.kovaaks.play_sessions import (
     PlaySession,
     in_play_order,
@@ -774,7 +775,9 @@ def view_run(
         return RunView(run=run, session=session, number=number, figures=None)
 
     scenario_runs = in_play_order(r for r in runs if r.scenario == run.scenario)
-    typical_score = typical_score_at_session_start(scenario_runs, sessions, session)
+    typical_score = typical_score_at_session_start(
+        scenario_runs, sessions, session, excluded=excluded_run_ids()
+    )
     typical_runs = (
         typical_score.runs if typical_score is not None and typical_score.known else ()
     )

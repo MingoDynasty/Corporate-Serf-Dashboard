@@ -7,6 +7,13 @@ A minimum keeps a first short sitting from being mistaken for an established lev
 Every version and sensitivity counts, so after a rework a value can mix two
 versions' scores, which it treats as comparable.
 
+**Superseded in part (2026-11-07), proposed.** The
+[excluded-run entry](2026-11-07-a-player-can-exclude-a-run-from-the-chart-and-the-typical-score.md), which is
+`Proposed` until the maintainer rules on it, leaves a run the player
+excluded out of every window: the window is the last 20 counted runs, and an
+excluded run still joins sessions. "Every sensitivity, warm-up run and
+version counts" stands for every run that isn't excluded; the rest stands.
+
 **Ruling and amendments.** TS1 of [proposal #382](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/382), ruled by the maintainer on 2026-10-15: pool every version with the assumption stated, recorded at [47acc33](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/commit/47acc33). TS6, ruled 2026-10-20 at [7908d00](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/commit/7908d00), removes the age window and carry-forward from the value. This entry records TS1 as amended. Delivered by #398, #400, #402 and #401.
 
 **Contract.** After each run, take the scenario's last 20 runs in play order, or all of them below 20. A value exists at 10 runs from at least 2 play sessions, or 20 runs from any number of sessions. Sessions are split over every scenario's runs, so another scenario can join two visits into one session. Below the minimum, unknown never means weak. Once known, a value remains known without a stored flag: below 20 its whole history stays in the window, and a full window always qualifies.

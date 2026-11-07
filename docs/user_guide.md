@@ -150,6 +150,13 @@ typical and the difference, green when better and red when worse; hover the
 typical to see how many runs it rests on. A run from before the scenario had
 a typical score shows its own figures alone, and the line says why.
 
+**Exclude run**, beside Close, takes a run off the chart and out of your
+typical score, after you confirm. Use it for a run that says nothing about
+your form, such as a test run, an experiment, or a run where you went AFK.
+The run stays in the list, dimmed, and your PB and the leaderboard still
+count it. On an excluded run the button reads **Include run**, which puts it
+back. The app keeps the list in `data/excluded_runs.json`.
+
 **By Bot** appears when the run's kills name two bots or more. Where bots
 come back many times, as on Popcorn, it shows each bot's kills, time per kill
 and accuracy. Where each bot is killed once and the score is a completion
@@ -197,7 +204,8 @@ enough, as on most click scenarios, or every rank shown is estimated above
 ### Typical score
 
 Scenario Stats leads with your typical score: the median of this scenario's
-last 20 runs, or all of its runs if you have fewer, regardless of age. It
+last 20 runs, or all of its runs if you have fewer, regardless of age,
+leaving out any run you excluded. It
 needs at least 10 runs across 2 or more sessions, or 20 in one session.
 Before that it reads "Too few runs"; with no local runs, "No runs yet".
 **Total runs** counts the whole scenario history, not only the runs behind

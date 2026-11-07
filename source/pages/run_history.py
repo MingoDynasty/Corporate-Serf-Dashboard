@@ -215,6 +215,10 @@ RUN_VIEWER_IDS = RunViewerIds(
     open="run-history-run-viewer-open",
     shown="run-history-run-viewer-shown",
     shown_sink="run-history-run-viewer-shown-sink",
+    exclude="run-history-run-viewer-exclude",
+    exclude_confirm="run-history-run-viewer-exclude-confirm",
+    exclusion_note="run-history-run-viewer-exclusion-note",
+    exclusions="run-history-run-viewer-exclusions",
 )
 LATEST_RUN_CARD_IDS = LatestRunCardIds(
     played_at="run-history-card-played-at",
@@ -235,6 +239,7 @@ SCENARIO_STATS_IDS = ScenarioStatsIds(
     run_events=RUN_EVENTS_STORE_ID,
     scenario_dropdown=SCENARIO_SELECTION_IDS.scenario_dropdown,
     playlist_filter=SCENARIO_SELECTION_IDS.playlist_filter,
+    exclusions=RUN_VIEWER_IDS.exclusions,
 )
 # The position's ids are the ones it had in the Scenario Stats card. No browser
 # remembers a value under any of them.
@@ -439,6 +444,8 @@ def track_session_in_progress(_n_intervals, _run_landed, held_answer):
     # ends with no run landing.
     Input(TODAY_STORE_ID, "data"),
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
+    # Read for nothing but its change: a run excluded or included again.
+    Input(RUN_VIEWER_IDS.exclusions, "data"),
 )
 def build_run_list_rows(  # noqa: PLR0913
     view,
@@ -449,6 +456,7 @@ def build_run_list_rows(  # noqa: PLR0913
     score_threshold_percentage,
     _held_date,
     _held_in_progress,
+    _exclusions=None,
 ):
     """Build the run list's rows in the view on screen, from the run store.
 
@@ -486,6 +494,9 @@ def build_run_list_rows(  # noqa: PLR0913
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
     Input(TODAY_STORE_ID, "data"),
     State(LATEST_RUN_STORE_ID, "data"),
+    # Read for nothing but its change: an excluded run leaves the typical
+    # score the card measures against.
+    Input(RUN_VIEWER_IDS.exclusions, "data"),
 )
 def show_latest_run(  # noqa: PLR0913
     _run_landed,
@@ -494,6 +505,7 @@ def show_latest_run(  # noqa: PLR0913
     _held_in_progress,
     _held_date,
     held_latest_run,
+    _exclusions=None,
 ):
     """Write what the latest-run card shows, from the run store.
 
@@ -558,6 +570,8 @@ clientside_callback(
     Input(CHART_OPTIONS_IDS.middle_80_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.score_threshold_overlay, "checked"),
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
+    # Read for nothing but its change: a run excluded or included again.
+    Input(RUN_VIEWER_IDS.exclusions, "data"),
 )
 def generate_graph(  # noqa: PLR0913
     _run_events,
@@ -576,6 +590,7 @@ def generate_graph(  # noqa: PLR0913
     middle_80_overlay_switch,
     score_threshold_overlay_switch,
     score_threshold_percentage,
+    _exclusions=None,
 ):
     """Build the chart, and return the figure serialized to JSON.
 
