@@ -120,12 +120,15 @@ next.
   overview → scenario table → Run History drill chain covers
   playlist-first navigation; this would answer "show me this scenario
   regardless of playlist."
-- **An overview** — time spent and activity across all scenarios. No design
-  yet. Home, the page the app opens on, holds its place.
-- **KovaaK's own log** — the game's log records what stats files usually
-  don't: restarts, freeplay, and how long the game was open, which could give
-  time spent an upper bound. A local archive outside the app is already
-  collecting the maintainer's logs, so there's history to design against.
+- **An overview** — time in runs and activity across all scenarios. No
+  design yet. Home, the page the app opens on, holds its place.
+- **KovaaK's own log** — KovaaK's 3.9.10 wrote an analytics log that timed
+  what stats files usually don't: restarts, freeplay, and how long the game
+  was open. 3.9.12 no longer writes it
+  ([research](./research/kovaaks_analytics_log_restarts.md)), so Steam's own
+  log of launches is the one known record left. For now every time comes
+  from the stats folder alone
+  ([2026-11-07](./decision_log/2026/2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md)).
 - **Accuracy guideline** — the accuracy the top leaderboard players land at on
   a scenario, as a reference for what good play looks like rather than a
   target.
@@ -148,8 +151,8 @@ next.
 - **Be honest about uncertainty.** Unknown isn't weak: a judgment with too few
   runs behind it says so, and a scenario isn't ranked weak or strong until it
   has enough. A figure that can only be a minimum is labelled one, such as
-  time spent in runs, which leaves out the time between runs and any attempt
-  that wrote no stats file. An estimate is shown no more precisely than it's
+  time in runs, which leaves out the time between runs and any attempt that
+  wrote no stats file. An estimate is shown no more precisely than it's
   known, such as "about 1 in 25 runs" rather than "4.1%".
 - **State verdicts, not advice.** The app states facts and verdicts: the
   typical run, a trend, a rank-up chance, "unknown", and whether a bar the

@@ -10,6 +10,11 @@ file, so a break can be told apart from a long run. No screen shows any of
 this yet, and the typical score that Run History was going to define now
 waits for a proposal of its own.
 
+**Superseded in part (2026-11-07).** [Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md): a stats file named
+without ` - Challenge - ` is freeplay, and has no start and no length, as
+a file with no `Challenge Start:` has. Every other rule for a run's start
+and length, and S1 to S4, stand.
+
 **Rulings.** All by the maintainer, 2026-10-11, on
 [PR #355](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/355):
 rows S1 to S4 ratified as recommended, after both review seats and a

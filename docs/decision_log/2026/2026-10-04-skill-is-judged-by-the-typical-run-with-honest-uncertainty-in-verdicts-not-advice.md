@@ -13,6 +13,13 @@ history now builds sessions first.
 
 **Superseded in part (2026-10-21).** The Terms passage's working name is now [Typical score](2026-10-15-typical-score-uses-the-last-twenty-runs-and-counts-every-version.md) on screen, in the glossary and in code. D1, D2 and D3 stand; defining the figure does not authorize a later judgment to use a dimmed value without choosing its evidence bar.
 
+**Superseded in part (2026-11-07).** [Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md): D2's example, time spent
+in runs, is labelled a minimum by its name, `in runs`, and by its hover.
+A visible `at least` marks only a total that holds a run with no length,
+so a figure with every length known carries no visible minimum word. A
+later surface whose subject is time carries D2's sentence. D1, the rest of
+D2 and D3 stand.
+
 **Ruling.** Ruled (user) 2026-10-04, in chat, after both reviewers endorsed
 each row:
 [rows D1 to D5 of PR #327](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/327#issuecomment-5986985763)

@@ -27,6 +27,11 @@ floor is 135 px in the wide layout and 158 px in a page area of 900 px or
 less. Which run, the session's words, the empty states and when the card is
 written stand.
 
+**Superseded in part (2026-11-07).** [Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md): the time on the session
+line is the scenario's time in runs in the session, not the sum of its
+visits. Which run, the session's words, the empty states and when the card
+is written stand.
+
 **Ruling and delivery.** R1 of
 [#388](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/388),
 ratified by the maintainer on 2026-10-18 at `0fcac03`, "I ratify the
