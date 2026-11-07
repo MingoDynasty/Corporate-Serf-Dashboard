@@ -546,7 +546,12 @@ def register_scenario_note_card(ids: NoteCardIds) -> None:
         Input(ids.shown, "data"),
     )(show_note)
 
-    def save(save_clicks, dialog_save_clicks, editor, draft):
+    def save(
+        save_clicks: int | None,
+        dialog_save_clicks: int | None,
+        editor: dict[str, str] | None,
+        draft: str | None,
+    ) -> tuple[Any, ...]:
         # Read from the press, never from the counts alone. With duplicate
         # outputs this can be called once as the page is drawn, with neither
         # button pressed.

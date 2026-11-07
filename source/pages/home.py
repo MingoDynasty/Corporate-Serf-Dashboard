@@ -7,10 +7,11 @@ Skip button. It reads no query parameter.
 """
 
 import logging
+from typing import Any
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, ctx, dcc, no_update
+from dash import Input, NoUpdate, Output, Patch, State, callback, ctx, dcc, no_update
 
 from source.components.local_icon import local_icon
 from source.components.queued_notices import (
@@ -90,7 +91,14 @@ register_startup_playlist_warning_flush(STARTUP_PLAYLIST_WARNING_INTERVAL_ID)
     State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def skip_identity_setup(n_clicks, toast_channels):
+def skip_identity_setup(
+    n_clicks: int | None, toast_channels: dict[str, str | None]
+) -> tuple[
+    list[object] | NoUpdate,
+    list[dict[str, Any]] | NoUpdate,
+    list[str] | NoUpdate,
+    Patch | NoUpdate,
+]:
     """Record the declined identity ask and take the card away.
 
     The write goes through the settings service's decline operation rather than
@@ -179,7 +187,7 @@ def stats_line() -> list:
     ]
 
 
-def layout(**_kwargs):
+def layout(**_kwargs: str | list[str]) -> dmc.Box:
     """Build the Home page.
 
     ``**_kwargs`` takes every query parameter, which Dash would otherwise

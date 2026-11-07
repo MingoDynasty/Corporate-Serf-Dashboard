@@ -4,6 +4,7 @@ import logging
 
 import dash
 import dash_mantine_components as dmc
+import plotly.graph_objects as go
 from dash import Input, Output, callback, dcc
 from dash.exceptions import PreventUpdate
 
@@ -47,7 +48,11 @@ dash.register_page(
     Input("checkpoint-hour", "value"),
     Input("color-scheme-switch", "computedColorScheme"),
 )
-def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
+def generate_graph(
+    selected_playlist: list[str] | None,
+    checkpoint_hour: float | str | None,
+    color_scheme: str | None,
+) -> go.Figure:
     """Build a themed progress graph for the selected playlists."""
     if color_scheme not in {"dark", "light"}:
         raise PreventUpdate
@@ -103,7 +108,9 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
         get_playlist_display_label(playlist_code): data
         for playlist_code, data in journey_data.items()
     }
-    aim_training_checkpoints = get_aim_training_checkpoints(checkpoint_hour)
+    # TODO: the NumberInput sends ``string | number``, and either goes on
+    # unconverted to a parameter that takes a whole number of hours.
+    aim_training_checkpoints = get_aim_training_checkpoints(checkpoint_hour)  # type: ignore[arg-type]
     figure = generate_aim_training_journey_plot(
         labeled_journey_data,
         aim_training_checkpoints,
@@ -112,7 +119,7 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
-def layout(**kwargs):  # noqa: ARG001
+def layout(**kwargs: str | list[str]) -> dmc.Box:  # noqa: ARG001
     """Build the work-in-progress aim-training journey page."""
     return dmc.Box(
         [

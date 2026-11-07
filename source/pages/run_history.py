@@ -14,11 +14,13 @@ surfaces and the queued notices, lives under ``source/components/``.
 
 import logging
 from datetime import datetime
+from typing import Any
 
 import dash
 import dash_mantine_components as dmc
 from dash import (
     Input,
+    NoUpdate,
     Output,
     State,
     callback,
@@ -27,7 +29,11 @@ from dash import (
     no_update,
 )
 
-from source.app_shell import RUN_EVENTS_BATCH_STORE_ID, RUN_TOAST_LINK_CLASS
+from source.app_shell import (
+    RUN_EVENTS_BATCH_STORE_ID,
+    RUN_TOAST_LINK_CLASS,
+    RunEventBatch,
+)
 from source.components.chart_options import (
     SETTINGS_HELP_TEXT,
     ChartOptionsIds,
@@ -48,7 +54,7 @@ from source.components.queued_notices import (
     register_run_import_failure_flush,
     register_startup_playlist_warning_flush,
 )
-from source.components.run_delivery import summarize_run_events
+from source.components.run_delivery import RunEventsPayload, summarize_run_events
 from source.components.run_history_chart import (
     CHART_MODE_DEFAULT,
     CHART_MODE_OPTIONS,
@@ -67,6 +73,7 @@ from source.components.run_history_list import (
     SESSIONS_PER_LOAD,
     VIEW_ALL,
     RunListIds,
+    RunListModel,
     is_session_in_progress,
     register_run_list,
     run_list_class,
@@ -325,7 +332,11 @@ def _empty_plot_json(title: str, message: str) -> str:
     State(SCENARIO_SELECTION_IDS.scenario_dropdown, "value"),
     prevent_initial_call=True,
 )
-def forward_run_events(batch, follow_newly_played, selected_scenario):
+def forward_run_events(
+    batch: RunEventBatch | None,
+    follow_newly_played: bool,
+    selected_scenario: str | None,
+) -> tuple[RunEventsPayload | NoUpdate, str | NoUpdate]:
     """Forward the shell's run-event batch as one summary for this page.
 
     The summary names the scenario the page should now show: the one last
@@ -372,7 +383,7 @@ def _today_text() -> str:
     # would write nothing, and the first chart would be held for its answer.
     prevent_initial_call=True,
 )
-def advance_today(_n_intervals, held_date):
+def advance_today(_n_intervals: int, held_date: str) -> str | NoUpdate:
     """Write the app's date to the page once it is no longer the one held.
 
     A range of days counts back from today, so a point leaves the chart at
@@ -401,7 +412,9 @@ def advance_today(_n_intervals, held_date):
     # the date.
     prevent_initial_call=True,
 )
-def track_session_in_progress(_n_intervals, _run_landed, held_answer):
+def track_session_in_progress(
+    _n_intervals: int, _run_landed: str | None, held_answer: bool
+) -> bool | NoUpdate:
     """Write whether a session is in progress, once that is no longer what is held.
 
     A session is in progress until 30 minutes after its last run, and nothing
@@ -441,15 +454,15 @@ def track_session_in_progress(_n_intervals, _run_landed, held_answer):
     Input(SESSION_IN_PROGRESS_STORE_ID, "data"),
 )
 def build_run_list_rows(  # noqa: PLR0913
-    view,
-    selected_scenario,
-    _run_landed,
-    session_limit,
-    all_session_limit,
-    score_threshold_percentage,
-    _held_date,
-    _held_in_progress,
-):
+    view: str,
+    selected_scenario: str | None,
+    _run_landed: str | None,
+    session_limit: int,
+    all_session_limit: int,
+    score_threshold_percentage: float | str | None,
+    _held_date: str,
+    _held_in_progress: bool,
+) -> tuple[RunListModel, str, str | None, str]:
     """Build the run list's rows in the view on screen, from the run store.
 
     Under This scenario the rows are the selected scenario's. Under All
@@ -488,13 +501,13 @@ def build_run_list_rows(  # noqa: PLR0913
     State(LATEST_RUN_STORE_ID, "data"),
 )
 def show_latest_run(  # noqa: PLR0913
-    _run_landed,
-    selected_scenario,
-    score_threshold_percentage,
-    _held_in_progress,
-    _held_date,
-    held_latest_run,
-):
+    _run_landed: str | None,
+    selected_scenario: str | None,
+    score_threshold_percentage: float | str | None,
+    _held_in_progress: bool,
+    _held_date: str,
+    held_latest_run: str | None,
+) -> tuple[float | None, list[Any], str | None | NoUpdate]:
     """Write what the latest-run card shows, from the run store.
 
     The card reports the selected scenario's latest run. The page load runs
@@ -560,23 +573,23 @@ clientside_callback(
     Input(CHART_OPTIONS_IDS.score_threshold_percentage, "value"),
 )
 def generate_graph(  # noqa: PLR0913
-    _run_events,
-    selected_scenario,
-    selected_playlist,
-    chart_mode,
-    run_range,
-    day_range,
-    _held_date,
-    rank_overlay_switch,
-    show_all_ranks_switch,
-    accuracy_targets_switch,
-    high_score_overlay_switch,
-    typical_score_overlay_switch,
-    middle_50_overlay_switch,
-    middle_80_overlay_switch,
-    score_threshold_overlay_switch,
-    score_threshold_percentage,
-):
+    _run_events: RunEventsPayload | None,
+    selected_scenario: str | None,
+    selected_playlist: str | None,
+    chart_mode: str,
+    run_range: str,
+    day_range: str,
+    _held_date: str,
+    rank_overlay_switch: bool,
+    show_all_ranks_switch: bool,
+    accuracy_targets_switch: bool,
+    high_score_overlay_switch: bool,
+    typical_score_overlay_switch: bool,
+    middle_50_overlay_switch: bool,
+    middle_80_overlay_switch: bool,
+    score_threshold_overlay_switch: bool,
+    score_threshold_percentage: float | str | None,
+) -> str:
     """Build the chart, and return the figure serialized to JSON.
 
     The page load runs it, which is what draws the first chart.
@@ -874,8 +887,8 @@ def _chart_column() -> dmc.Box:
 def layout(
     scenario: str | None = None,
     playlist_code: str | None = None,
-    **_kwargs,
-):
+    **_kwargs: str | list[str],
+) -> dmc.Box:
     """Build the Run History page.
 
     ``scenario`` and ``playlist_code`` are the two query parameters the page

@@ -7,8 +7,9 @@ import logging
 import time
 from collections import deque
 from pathlib import Path
+from typing import cast
 
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import DirCreatedEvent, FileCreatedEvent, FileSystemEventHandler
 
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity
@@ -63,12 +64,14 @@ def drain_run_import_failures() -> list[str]:
             return failures
 
 
-def _get_created_csv_path(event) -> str | None:
+def _get_created_csv_path(event: DirCreatedEvent | FileCreatedEvent) -> str | None:
     """Return a created CSV path after preserving the detection debug log."""
     if event.is_directory:
         return None
 
-    file = event.src_path
+    # Watchdog types ``src_path`` as ``bytes | str``, but the observer is
+    # scheduled on a ``str`` path, so every event it emits carries a ``str``.
+    file = cast(str, event.src_path)
     logger.debug('Detected new file: "%s"', Path(file).name)
     if not file.endswith(".csv"):
         return None
@@ -141,7 +144,7 @@ class NewFileHandler(FileSystemEventHandler):
     This class handles monitoring a specified directory for newly created files.
     """
 
-    def on_created(self, event):
+    def on_created(self, event: DirCreatedEvent | FileCreatedEvent) -> None:
         """Import a newly created run CSV and notify interested UI callbacks."""
         try:
             self._import_created_file(event)
@@ -156,7 +159,7 @@ class NewFileHandler(FileSystemEventHandler):
             )
             run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
 
-    def _import_created_file(self, event):
+    def _import_created_file(self, event: DirCreatedEvent | FileCreatedEvent) -> None:
         """Parse, store, and announce one created file; may raise on surprises."""
         file = _get_created_csv_path(event)
         if file is None or is_run_file_loaded(file):

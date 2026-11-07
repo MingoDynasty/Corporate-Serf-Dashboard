@@ -46,7 +46,7 @@ class PlaylistAPIResponse(BaseModel):
 
     @field_validator("data", mode="before")
     @classmethod
-    def ignore_null_playlist_items(cls, value):
+    def ignore_null_playlist_items(cls, value: object) -> object:
         """Discard null playlist entries before response validation."""
         if isinstance(value, list):
             return [item for item in value if item is not None]

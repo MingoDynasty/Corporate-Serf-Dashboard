@@ -11,6 +11,7 @@ import dash_ag_grid as dag
 import dash_mantine_components as dmc
 from dash import (
     Input,
+    NoUpdate,
     Output,
     State,
     callback,
@@ -38,6 +39,7 @@ from source.kovaaks.data_service import (
 from source.kovaaks.evxl_links import evxl_benchmark_url
 from source.kovaaks.playlist_scenarios_service import (
     PlaylistScenarioFillDrain,
+    PlaylistScenarioRow,
     build_playlist_scenario_rank_rows,
     drain_playlist_scenario_fill,
     scenario_run_history_href,
@@ -48,7 +50,7 @@ from source.kovaaks.typical_score import NOT_RECENT_TEXT
 from source.pages.page_title import page_title
 
 
-def _page_title(playlist_code=None, **_kwargs):
+def _page_title(playlist_code: str | None = None, **_kwargs: str) -> str:
     """Carry the playlist name into the browser tab title.
 
     Dash Pages calls this per request with the route's path variables, after
@@ -605,7 +607,9 @@ def _menu_columns(
     State("playlist-scenarios-code", "data"),
     prevent_initial_call=True,
 )
-def route_to_scenario_run_history(cell_clicked, current_playlist_code):
+def route_to_scenario_run_history(
+    cell_clicked: dict[str, Any] | None, current_playlist_code: str | None
+) -> str | NoUpdate:
     """Open a clicked scenario cell's scenario on Run History."""
     if (
         not isinstance(cell_clicked, dict)
@@ -624,7 +628,9 @@ def route_to_scenario_run_history(cell_clicked, current_playlist_code):
     Output("playlist-scenarios-fill-interval", "disabled"),
     Input("playlist-scenarios-code", "data"),
 )
-def load_playlist_scenario_rows(playlist_code):
+def load_playlist_scenario_rows(
+    playlist_code: str | None,
+) -> tuple[list[PlaylistScenarioRow], str | list, str | None, bool]:
     """Paint cache-only rows, then register phase 2 just before returning."""
     if not playlist_code:
         return [], "Select a playlist from the Playlists page.", None, True
@@ -710,7 +716,9 @@ def _settled_fill_status(fill: PlaylistScenarioFillDrain) -> str:
     State("playlist-scenarios-generation", "data"),
     prevent_initial_call=True,
 )
-def drain_playlist_scenario_rows(_n_intervals, generation_token):
+def drain_playlist_scenario_rows(
+    _n_intervals: int, generation_token: str | None
+) -> tuple[dict[str, list[PlaylistScenarioRow]] | NoUpdate, str | NoUpdate]:
     """Apply streamed rows and settle the status when the fill ends."""
     # DashProxy can phantom-fire allow_duplicate callbacks on initial load.
     if not generation_token:
@@ -1009,8 +1017,8 @@ def _page_header(playlist_code: str, *, benchmark: bool) -> dmc.Group:
 def layout(
     playlist_code: str | None = None,
     sort: str | list[str] | None = None,
-    **kwargs,  # noqa: ARG001
-):
+    **kwargs: str | list[str],  # noqa: ARG001
+) -> dmc.Stack:
     """Build the per-playlist scenario table page.
 
     ``sort`` is the raw ``?sort=`` query value, which Dash Pages passes as a

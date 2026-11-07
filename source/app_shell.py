@@ -8,7 +8,9 @@ import dash
 import dash_mantine_components as dmc
 from dash import (
     Input,
+    NoUpdate,
     Output,
+    Patch,
     State,
     callback,
     clientside_callback,
@@ -353,12 +355,17 @@ def _next_animation_sequence(
     prevent_initial_call=True,
 )
 def publish_run_events(
-    _n_intervals,
-    previous_batch,
-    toast_channels,
-    celebration_style,
-    run_notifications,
-):
+    _n_intervals: int,
+    previous_batch: RunEventBatch | None,
+    toast_channels: dict[str, str | None],
+    celebration_style: str,
+    run_notifications: str,
+) -> tuple[
+    RunEventBatch | NoUpdate,
+    list[dict[str, Any]] | NoUpdate,
+    list[str] | NoUpdate,
+    Patch | NoUpdate,
+]:
     """Drain the run-event queue and publish one batch for the whole app.
 
     The single consumer of ``message_queue``, and the one sender of both run
@@ -505,7 +512,7 @@ def nav_link(link_id: str, label: str, href: str, icon: str) -> dmc.NavLink:
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
-def layout(**kwargs):  # noqa: ARG001
+def layout(**kwargs: str | list[str]) -> dmc.MantineProvider:  # noqa: ARG001
     """Build the shared application shell around the active Dash page."""
     return dmc.MantineProvider(
         id="mantine-provider",

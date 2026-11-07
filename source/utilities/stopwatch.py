@@ -12,13 +12,13 @@ class Stopwatch:
         self.end_time: float | None = None
         self.running = False
 
-    def start(self):
+    def start(self) -> None:
         """Start timing unless the stopwatch is already running."""
         if not self.running:
             self.start_time = time.time()
             self.running = True
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop timing while preserving the elapsed interval."""
         if self.running:
             self.end_time = time.time()
@@ -33,7 +33,7 @@ class Stopwatch:
             raise RuntimeError("Stopwatch.elapsed() requires start() and stop() first.")
         return self.end_time - self.start_time
 
-    def reset(self):
+    def reset(self) -> None:
         """Clear recorded timestamps and return to the stopped state."""
         self.start_time = None
         self.end_time = None
