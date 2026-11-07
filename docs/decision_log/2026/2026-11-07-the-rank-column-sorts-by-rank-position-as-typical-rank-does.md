@@ -13,7 +13,9 @@ Celadon · 7%.
 **Maintainer direction, 2026-11-07.** Typical Rank's PR left Rank sorting by
 the rank alone, and vault Backlog Features item 10 held the same position for
 Rank as a change that needs its own decision. The maintainer said "all" to
-building it on 2026-11-07, to see it. Current behavior is in
+building it on 2026-11-07, to see it. Built in
+[#477](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/477).
+Current behavior is in
 [playlists.md](../../specs/playlists.md#the-per-playlist-scenario-table).
 
 **The key** is Typical Rank's own `rank_position`, given the PB, and never

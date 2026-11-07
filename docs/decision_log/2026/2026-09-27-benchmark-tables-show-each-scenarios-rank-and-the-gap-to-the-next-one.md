@@ -168,7 +168,7 @@ the ranks passed. The Rank cell reads that position as Typical Rank's
 does, the rank and the percent toward the next, such as `Iron · 50%`. The
 ladder walk, D1, D2, and everything else here stand. The
 [2026-11-07 entry](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)
-holds the key.
+holds the key. Built in PR #477.
 
 **Provenance.** Proposal by `claude-opus-5-5` (PR #320), reviewed by
 `gpt-6-sol` and, as a supplementary seat, `claude-fable-5-1`. Shipped in PR

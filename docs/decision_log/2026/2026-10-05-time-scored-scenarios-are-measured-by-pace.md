@@ -303,7 +303,8 @@ a row reaches, and the column's order from the first rank up, stay the
 same by score or by time, because between two thresholds the fraction is
 the same in either
 ([the rank position decision](2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)).
-Everything else that orders or places scores is unchanged.
+Everything else that orders or places scores is unchanged. Built in PR
+#477.
 
 **Provenance.** Proposal by `claude-opus-5-5` (PR #329), reviewed by
 `gpt-6-astra` and `claude-fable-5-1`. Shipped in PR #343.
