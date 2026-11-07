@@ -277,8 +277,10 @@ carry no rank data — the benchmark-rank overlays come only from the bundled
 library.
 
 A benchmark's scenario table has two more columns after PB Score. **Rank** is
-the highest rank your personal best has reached on that scenario, or "No rank"
-below the first one. **Next Rank** says how much your personal best has to
+the highest rank your personal best has reached on that scenario and how far
+it is toward the next rank, such as "Gold · 40%", or "No rank" below the
+first one. Sorting it puts the scenarios that share a rank in order
+of how far each personal best is toward the next rank. **Next Rank** says how much your personal best has to
 grow to reach the next rank: "+4.8% to Gold" means a personal best 4.8% higher
 earns Gold. Hover the cell to see Gold's threshold and the points still
 needed. Click the **Next Rank** header once to sort it ascending, and the

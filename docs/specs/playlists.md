@@ -221,8 +221,8 @@ and [product.md](../product.md). Leaderboard placement is worded
   Longer values end in an ellipsis; a cut Typical Rank has no tooltip with
   the full name, since its hover is the gap, and no bundled rank name is long
   enough to be cut
-  ([2026-10-22](../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md)). Rank's tooltip shows a reached rank's full name and is absent for
-  `N/A` and `No rank`. Next Rank's existing tooltip includes the full target
+  ([2026-10-22](../decision_log/2026/2026-10-22-the-scenario-table-shows-the-typical-score-beside-the-pb-columns.md)). Rank's tooltip shows a reached rank's cell in full, its rank and
+  percent, and is absent for `N/A` and `No rank`. Next Rank's existing tooltip includes the full target
   rank name. Scenario-table tooltips wrap long text within the window,
   including names with no spaces.
 - Hiding a column is display only. Rows carry every field, no fetch stops,
@@ -357,8 +357,11 @@ and [product.md](../product.md). Leaderboard placement is worded
   PB Score, the local all-time high, so they fill in phase 1, with no
   username, and offline. The ladder is walked in its stored order, never
   sorted, from the bottom to the first threshold above the PB; a PB equal to
-  a threshold has reached it. Rank names the last rank passed: "No rank"
-  below the first threshold, `N/A` with no PB. Next Rank reads
+  a threshold has reached it. Rank reads `{rank} · {percent}%`, the last
+  rank passed and how far the PB is toward the next, as Typical Rank
+  reads the typical score: the rank's name alone at the top rank, "No
+  rank" below the first threshold, `N/A` with no PB. Its percent is
+  Typical Rank's, `min(99, floor(round(fraction * 100, 6)))`. Next Rank reads
   "+{gap}% to {rank name}", the gap being `(next threshold - PB) / PB * 100`
   rounded up to one decimal, never below 0.1, with thousands separators. Its
   cell tooltip reads "{rank name} at {threshold} · {points} to go", the
@@ -366,21 +369,33 @@ and [product.md](../product.md). Leaderboard placement is worded
   as PB Score. Next Rank reads "Top rank" once the PB has passed every
   threshold, whatever its value; otherwise it reads `N/A` with no PB or with
   a PB of zero or less. Top rank and `N/A` carry no tooltip. A benchmark
-  scenario without a ladder reads `N/A` in both. Rank sorts by ladder
-  position with No rank lowest; Next Rank sorts by the unrounded gap; `N/A`,
-  and Next Rank's Top rank, sort last in both directions. The fill and a
-  cancelled fill's rebuild carry each row's ladder, so their update
+  scenario without a ladder reads `N/A` in both. Rank sorts by the PB's rank
+  position, Typical Rank's key: the ranks passed plus `(PB - last passed
+  threshold) / (next threshold - last passed threshold)`; below the first
+  rank `1 / (1 + gap / 100)`, the gap to the first rank by the Next Rank
+  rule, pace included, or 0 with no gap; at the top rank the rank count. So
+  the scenarios on one rank sort by how far each PB is toward the next, and
+  No rank sorts under every ranked row. Rank's header tooltip reads "The
+  highest rank your PB score has reached on this scenario, and how far it
+  is toward the next rank. The percent rounds down, so 0% can be just above
+  the rank's threshold. Lower is weaker on this benchmark's rank ladder."
+  Next Rank sorts by the unrounded gap;
+  `N/A`, and Next Rank's Top rank, sort last in both directions. The fill and
+  a cancelled fill's rebuild carry each row's ladder, so their update
   transactions never blank the two cells. When a run lands, both stay as
   they were until the page reopens, as PB Score does
-  ([2026-09-27](../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md)).
+  ([2026-09-27](../decision_log/2026/2026-09-27-benchmark-tables-show-each-scenarios-rank-and-the-gap-to-the-next-one.md),
+  [2026-11-07](../decision_log/2026/2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)).
 - On a time-scored scenario whose PB can be measured by pace, Next Rank reads
   "+{gap}% faster to {rank name}", such as "+2.8% faster to Lavender". The
   gap is `((C − PB) / (C − next threshold) − 1) × 100`, where `C` is the
   scenario's constant: how much faster the PB run has to finish to reach the
   next rank. It carries the sign, rounds up, floors at 0.1, and takes
   thousands separators as the score gap does, and it sorts by its unrounded
-  value among the score gaps of the other rows. Rank, the cell tooltip in
-  points, Top rank, and `N/A` with no PB are the same as on any row. A pace
+  value among the score gaps of the other rows. Rank's cell, the cell tooltip
+  in points, Top rank, and `N/A` with no PB are the same as on any row. Only
+  below the first rank does Rank's sort key follow the pace gap
+  ([2026-11-07](../decision_log/2026/2026-11-07-the-rank-column-sorts-by-rank-position-as-typical-rank-does.md)). A pace
   gap needs only positive times, so a time-scored PB of zero or less gets
   one. Where the gap is undefined, with the PB or the next threshold at or
   above the constant, the row reads as the bullet above says. Phase 1, the
