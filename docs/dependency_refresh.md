@@ -3,7 +3,8 @@
 Dependency and toolchain updates are made by hand, from this playbook, about
 once a month. Nothing opens update PRs on its own. A refresh is one or two
 ordinary PRs, and merging one that changes what an installed copy runs cuts a
-release.
+release. The cross-repo tooling spec names this file the refresh playbook for
+every Python repository that follows it.
 
 ## When to run
 
