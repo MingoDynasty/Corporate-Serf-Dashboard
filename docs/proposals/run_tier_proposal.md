@@ -18,11 +18,14 @@ sets, off until they turn it on. The run's percentage of its PB stays.
 ## Decisions needed
 
 Six rows, RT1 to RT6. **Nothing is ratified.** RT1 to RT3 carry the
-maintainer's leans from their own note on the idea. RT4 to RT6 carry none: the
-note leaves the badge slot open ("Open: does it take the badge slot from the
-PB-based Threshold badge?"), and retiring the threshold's verdict is the
-author's recommendation. A lean is not a ruling. Reviewers may challenge any
-row, and anything in [Design](#design), which is author-owned.
+maintainer's leans from their own note on the idea. The note leaves the badge
+slot open ("Open: does it take the badge slot from the PB-based Threshold
+badge?"), and retiring the threshold's verdict is the author's
+recommendation. At the direction checkpoint on 2026-11-06 the maintainer
+answered for RT2's words, RT5's down arrow and RT6's line; those answers are
+leans too, quoted in each row. RT4 carries none. A lean is not a ruling.
+Reviewers may challenge any row, and anything in [Design](#design), which is
+author-owned.
 
 ### RT1. A run's band is read against its scenario's last 20 runs at session start
 
@@ -90,23 +93,31 @@ today. With no known window there is no band, never a low one.**
 
 Status: open. The maintainer's lean: "Percentile tier on the latest-run card,
 in place of "3.6% above typical" … The percentage can't say that without
-knowing each scenario's spread."
+knowing each scenario's spread." At the direction checkpoint (2026-11-06, in
+chat), of the line as first filed, `{band} of your last {N} runs at session
+start`: "I feel this is really wordy. Simply say "typical" instead with a
+hover over to explain exactly what "typical" means (last 20 runs)." Of the
+wordings then offered, they chose the author's, `{band} vs typical at session
+start`: "Let's go with your recommended wording."
 
 The material consequence: the line no longer says how far from typical a run
-was; that figure moves into the hover.
+was; that figure moves into the hover, and so does the window's size.
 
 **Recommendation: on a run that isn't a new PB, with a known window, the line
-reads `{band} of your last {N} runs at session start · {pct}% of PB`. Five
-bands: `Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%`. The
-hover gives the typical score, the run's percentage from it, and both bands'
-edges. A new PB keeps its gain alone, as today.**
+reads `{band} vs typical at session start · {pct}% of PB`. Five bands:
+`Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%`. The hover
+says which runs typical comes from, then gives the typical score, the run's
+percentage from it, and both bands' edges. A new PB keeps its gain alone, as
+today.**
 
 - **The percentage hides the spread.** 3.6% above typical is Top 25% on VT
   Controlsphere Viscose and Top 10% on beanTS, whose middle half is about a
   third as wide (2.5% of its typical score against 7.0%).
-- **The basis is on screen.** The 2026-10-25 ruling named its basis because
-  "the at-a-glance reading must not depend on a hover". `at session start` is
-  that ruling's own wording, and `last {N}` counts the window, 10 to 20 runs.
+- **The basis stays on screen, in fewer words.** The 2026-10-25 ruling named
+  its basis because "the at-a-glance reading must not depend on a hover", and
+  the Typical score card beside the line shows the value after the newest
+  run, which can differ. `vs typical at session start` keeps that ruling's own
+  words. The window's size, 10 to 20 runs, moves into the hover.
 - **The words are the chart's.** Middle 50% is the glossary's and the legend's
   name for the darker band, and Top 10% and Bottom 10% are the runs outside
   the Middle 80% band.
@@ -114,9 +125,9 @@ edges. A new PB keeps its gain alone, as today.**
   worded and computed as the ratified phrase is, by pace where that phrase
   used pace.
 - **It fits.** The longest form,
-  `Bottom 25% of your last 20 runs at session start · 99.9% of PB pace`, is 67
-  characters. The 2026-10-25 phrase's longest is 62 and measured 361 px of the
-  card's 474, so by that measure this is about 390 px.
+  `Bottom 25% vs typical at session start · 99.9% of PB pace`, is 57
+  characters, under the 2026-10-25 phrase's longest, 62, which measured
+  361 px of the card's 474.
 
 ### RT3. Only the outer bands are highlighted
 
@@ -172,7 +183,10 @@ none.**
 
 ### RT5. The run list's marks follow the badge
 
-Status: open. No lean.
+Status: open. The maintainer's lean, at the direction checkpoint (2026-11-06,
+in chat), on a mark for Bottom 10% runs: "I think it's a good idea. If not a
+down arrow then some sort of icon. The idea is that bottom 10% runs could be
+good candidates for VOD review, just like top 10% runs are."
 
 The material consequence: the check means "Top 10% of the runs before its
 session", a new mark flags Bottom 10%, a clock marks either one read from an
@@ -188,9 +202,10 @@ why.**
 - **The check is the badge's twin** by the 2026-10-12 design, so it follows
   RT4 to both outer bands.
 - **Both, not the top only** (the research read's draft marked the top only).
-  The maintainer's lean highlights both, and the list is where a past bad run
+  The maintainer's leans highlight both, and the list is where a past bad run
   is found to open in the run viewer, where "what went wrong at the bottom"
-  gets its answer.
+  gets its answer: a Bottom 10% run is a candidate for VOD review, as a Top
+  10% run is. The down arrow is the author's choice of icon.
 - **An old window shows while scanning.** 60 of the 307 outer-band marks in
   the regimen, and 830 of 1,971 lifetime, are read from a window that was old
   at session start, 285 of them beside a star. Without the clock they look
@@ -213,9 +228,13 @@ why.**
 
 ### RT6. The score threshold stops judging runs; its line stays as a target the player sets
 
-Status: open. No lean. The maintainer's backlog asks: "Challenge the idea of
-"Score Threshold". What is the intention of this? What do we expect the user
-to do with this information?"
+Status: open. The maintainer's backlog asks: "Challenge the idea of "Score
+Threshold". What is the intention of this? What do we expect the user to do
+with this information?" At the direction checkpoint (2026-11-06, in chat),
+asked whether they read the line as a target: "I don't use it that much, but
+I could imagine some users using it." Asked whether the 2026-11-10 regimen
+review keeps its 95%-of-PB good-run bar: "For now yes. But afterward, I'm not
+sure yet." Both are leans, not rulings.
 
 The material consequence: nothing the player sets changes a badge or a mark,
 and a new player has no threshold line until they turn it on. A browser that
@@ -256,13 +275,17 @@ that held a miss under its goal goes with the verdict.**
   in its description and in the user guide.
 - **Least change.** One judging rule goes, nothing is built for the target,
   and the band reads edges the app already computes.
-- **What would change it:** the maintainer has no use for the line as a target
-  (then it retires with its two controls); the 2026-11-10 regimen review
-  keeps its 95% good-run bar (the line serves it, turned on at 95).
+- **The maintainer's answers keep it.** They use the line little but expect
+  other players might, and the 2026-11-10 regimen review keeps its 95% bar
+  for now, which the line serves, turned on at 95. Once this ships, no run is
+  marked as passing that bar; only the line shows it.
+- **What would change it:** a ruling that the line has no use as a target
+  (then it retires with its two controls).
 - **On file:** the 2026-11-05 research read recommends retiring the verdict
   and the line, unless the line is read as a target (its question 2), when it
   keeps "a user-set target" and retires only the verdict. This
-  recommendation keeps the line until that answer is in.
+  recommendation keeps the line, as the maintainer's answer to that question
+  leans.
 
 ## Problem
 
@@ -359,10 +382,10 @@ session start: typical 3,025, Middle 50% 2,904 to 3,116, Middle 80% 2,851 to
 
 | Run | Today | Proposed |
 |---|---|---|
-| 2026-10-16, run 7, 3,133 | [Below threshold] `3.6% above typical at session start · 85.8% of PB` | no badge, `Top 25% of your last 20 runs at session start · 85.8% of PB` |
-| 2026-10-16, run 5, 2,665 | [Below threshold] `11.9% below typical at session start · 73.0% of PB` | [Bottom 10%] `Bottom 10% of your last 20 runs at session start · 73.0% of PB` |
-| 2026-10-04, run 7, 3,181 | [Below threshold] `10.2% above typical at session start · 94.8% of PB` | [Top 10%] `Top 10% of your last 20 runs at session start · 94.8% of PB` |
-| cloverRawControl Viscose 50cm, 2026-10-29, 9,969, old window of 15 | [Below threshold] `10.7% above typical at session start` + clock ` · 93.7% of PB` | [Top 10%] `Top 10% of your last 15 runs at session start` + clock ` · 93.7% of PB` |
+| 2026-10-16, run 7, 3,133 | [Below threshold] `3.6% above typical at session start · 85.8% of PB` | no badge, `Top 25% vs typical at session start · 85.8% of PB` |
+| 2026-10-16, run 5, 2,665 | [Below threshold] `11.9% below typical at session start · 73.0% of PB` | [Bottom 10%] `Bottom 10% vs typical at session start · 73.0% of PB` |
+| 2026-10-04, run 7, 3,181 | [Below threshold] `10.2% above typical at session start · 94.8% of PB` | [Top 10%] `Top 10% vs typical at session start · 94.8% of PB` |
+| cloverRawControl Viscose 50cm, 2026-10-29, 9,969, old window of 15 | [Below threshold] `10.7% above typical at session start` + clock ` · 93.7% of PB` | [Top 10%] `Top 10% vs typical at session start` + clock ` · 93.7% of PB`; the hover names the 15 runs |
 | A new PB | [New PB] `Up {pct}% on your previous best of {previous}` | unchanged |
 | A scenario's third session, 8 runs before it | [Threshold passed] `{pct}% of PB` | no badge, `{pct}% of PB` |
 
@@ -456,8 +479,8 @@ the PB card's leaderboard line reads `{n}% percentile`.
 | Where | String |
 |---|---|
 | Bands | `Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%` |
-| Comparison line | `{band} of your last {N} runs at session start · {pct}% of PB`, or `· {pct}% of PB pace` |
-| Band hover, first line | `Measured against your last {N} runs when this run's session began.` |
+| Comparison line | `{band} vs typical at session start · {pct}% of PB`, or `· {pct}% of PB pace` |
+| Band hover, first line | `Typical comes from your last {N} runs before this run's session began.` |
 | Band hover, typical | `Typical score: {typical} · {pct}% above typical`, with `below`, `Matches typical`, or by pace `{pct}% faster than typical` and `slower`; with no percentage to give, `Typical score: {typical}` |
 | Band hover, edges | `Middle 50%: {p25} to {p75}` and `Middle 80%: {p10} to {p90}` |
 | Band hover, old window | `Fewer than 10 of those runs were from the 30 days before the session began, so they may have been out of date.` |
@@ -482,9 +505,9 @@ scenario's typical score when the run's session began: above their P90, above
 P75, between P25 and P75, below P25, or below P10. Unknown while that typical
 score is unknown.
 - On screen: `Top 10%`, `Top 25%`, `Middle 50%`, `Bottom 25%`, `Bottom 10%`,
-  with `of your last {N} runs at session start`; the outer two as the
-  latest-run card's badge and as the run list's check and down arrow, with
-  the clock where the window wasn't recent.
+  with `vs typical at session start`; the outer two as the latest-run card's
+  badge and as the run list's check and down arrow, with the clock where the
+  window wasn't recent.
 - In code: `RunBand`, `band_at_session_start`.
 - Not a leaderboard percentile, not the retired Top N placement, not the
   chart's bands, which follow every run, and not a promised rate for the next
@@ -500,15 +523,17 @@ drawn as a line on the chart. It judges no run.
 - Not a rank's threshold, which comes from a benchmark file, and not the band
   the latest-run card's badge and the run list's check show.
 
-The Typical at session start entry's on-screen wording moves with the phrase,
-into the band's hover.
+The Typical at session start entry's on-screen wording becomes the line's
+`vs typical at session start`, with the run's percentage from typical in the
+band's hover.
 
 ### Decisions this changes
 
 - **[2026-10-25, typical at session
   start](../decision_log/2026/2026-10-25-the-latest-run-card-measures-the-run-against-the-typical-score-at-session-start.md):**
-  the phrase moves from the line to the band's hover; its value, basis,
-  evidence bar, clock and pace rule stand. Superseded in part.
+  the percentage moves from the line to the band's hover, and the line keeps
+  the basis as `vs typical at session start`; its value, evidence bar, clock
+  and pace rule stand. Superseded in part.
 - **[2026-10-12, a past run's
   check](../decision_log/2026/2026-10-12-a-past-runs-check-is-judged-against-the-pb-it-was-chasing-under-its-own-version.md):**
   the check and the badge mark bands, not a threshold; the "Not judged"
@@ -544,6 +569,12 @@ into the band's hover.
   reads as the ranking the 2026-10-13 entry retired.
 - **The percentage and the band both on the line.** Three parts don't fit, and
   the band answers what the percentage was for.
+- **`of your last {N} runs at session start` on the line** (RT2), as first
+  filed. The maintainer found it wordy at the direction checkpoint; the
+  window's size reads in the hover.
+- **`vs typical` alone, or `of typical`** (RT2). Bare `typical` drops the
+  basis the 2026-10-25 ruling put on screen, beside a Typical score card that
+  can show another value. `of typical` reads as a share of the typical score.
 - **Quartile highlights, or a setting for them** (RT3).
 - **Two badges, or the band badge only while no threshold is set** (RT4).
 - **A threshold as a percentage of the typical score.** The same fixed bar
