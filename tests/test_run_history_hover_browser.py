@@ -5,6 +5,7 @@ Install the screenshots dependency group to run these browser regressions.
 
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -850,3 +851,28 @@ def test_summary_hover_clears_a_previously_linked_run(hover_page, view):
     }""")
     playwright.expect(page.locator(".run-list-row-linked")).to_have_count(0)
     playwright.expect(page.locator(".run-history-point-linked")).to_have_count(0)
+
+
+def test_keyboard_focus_on_the_time_in_runs_reads_its_run_count(hover_page):
+    """The tooltip describes the box round the value, so focus lands there.
+
+    The sample's stats files record no run length, so the figure is unknown
+    and its hover counts the scenario's 102 runs.
+    """
+    page = hover_page
+    line = page.locator("#run-history-time-in-runs")
+    playwright.expect(line).to_have_text("unknown")
+    target = line.locator("[tabindex]")
+    playwright.expect(target).to_have_count(1)
+    # Reach it by keyboard, from the tab stop before it.
+    target.focus()
+    page.keyboard.press("Shift+Tab")
+    page.keyboard.press("Tab")
+    focused = page.locator(":focus")
+    playwright.expect(focused).to_have_text("unknown")
+    playwright.expect(focused).to_have_accessible_description(
+        re.compile(
+            r"^102 runs · none with a recorded length\s+"
+            r"Only the runs themselves count, not their pauses\."
+        )
+    )

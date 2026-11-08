@@ -1729,8 +1729,9 @@ it.
   the scenario's lifetime time in runs over every run in the run store, by
   the display rule in [sessions.md](sessions.md#time-in-runs):
   `{duration}`, `at least {duration}` or `unknown`. The figure has the
-  lead's dotted underline, accepts keyboard focus, and its hover, at most
-  360px wide, opens with the count: `{n} runs`,
+  lead's dotted underline and accepts keyboard focus, where a screen reader
+  reads its hover as its description. The hover, at most 360px wide, opens
+  with the count: `{n} runs`,
   `{n} runs · {k} with no recorded length`, or
   `{n} runs · none with a recorded length`, singular `1 run`. Then
   `Only the runs themselves count, not their pauses. Restarts, results screens and breaks between runs don't either.`

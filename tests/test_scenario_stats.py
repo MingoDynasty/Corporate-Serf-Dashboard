@@ -241,7 +241,12 @@ def test_a_run_landing_changes_the_line(store):
 
 
 def test_the_value_is_a_hover_target_a_keyboard_reaches_inside_its_line(store):
-    """Built as the typical score's is, and drawn inline after its label."""
+    """Drawn inline after its label, with the tooltip's own box as the one tab stop.
+
+    The tooltip describes the box dmc wraps round the value, so the box takes
+    focus and the value does not. What focus reads there is checked in a
+    browser in ``tests/test_run_history_hover_browser.py``.
+    """
     store.extend(_runs(60))
 
     value, _line_hidden, _no_scenario_hidden = scenario_stats.get_scenario_time_in_runs(
@@ -249,9 +254,12 @@ def test_the_value_is_a_hover_target_a_keyboard_reaches_inside_its_line(store):
     )
 
     target = value.children
-    assert target.tabIndex == 0
+    assert getattr(target, "tabIndex", None) is None
     assert latest_run_card.TIME_CLASS in target.className.split()
-    assert value.boxWrapperProps == {"className": latest_run_card.TIME_TARGET_CLASS}
+    assert value.boxWrapperProps == {
+        "className": latest_run_card.TIME_TARGET_CLASS,
+        "tabIndex": 0,
+    }
     assert value.label.className == "scenario-stats-value-help"
 
 

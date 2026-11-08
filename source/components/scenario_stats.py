@@ -275,14 +275,12 @@ def get_scenario_time_in_runs(_, selected_scenario) -> tuple[Any, bool, bool]:
     total = time_in_runs(runs)
     time = format_time_in_runs(total)
     figure = dmc.Tooltip(
-        html.Span(
-            TIME_IN_RUNS_UNKNOWN if time is None else time,
-            className=TIME_CLASS,
-            tabIndex=0,
-        ),
+        html.Span(TIME_IN_RUNS_UNKNOWN if time is None else time, className=TIME_CLASS),
         # dmc wraps the target in a block box, which would break the line
-        # round it.
-        boxWrapperProps={"className": TIME_TARGET_CLASS},
+        # round it. That box is what the tooltip describes, so it is the tab
+        # stop: focus on the value inside it would not reach the run count.
+        # dmc's box passes tabIndex to the page, though dmc doesn't list it.
+        boxWrapperProps={"className": TIME_TARGET_CLASS, "tabIndex": 0},
         label=_time_in_runs_hover(total, len(runs), time),
         events=TOOLTIP_EVENTS,
         multiline=True,
