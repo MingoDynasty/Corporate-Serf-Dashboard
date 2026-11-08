@@ -179,7 +179,10 @@ def test_a_time_in_runs_with_a_run_of_no_length_reads_at_least_the_whole_minutes
 def test_a_time_in_runs_with_under_a_minute_beside_a_run_of_no_length_is_unknown(
     total: TimeInRuns,
 ) -> None:
-    """Unknown is never a small time: a measured total under a minute reads <1 min."""
+    """Unknown is never a small time.
+
+    Only a measured total reads <1 min, and only under 30 seconds.
+    """
     assert format_time_in_runs(total) is None
 
 

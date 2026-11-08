@@ -198,7 +198,7 @@ Two words are kept apart throughout. A **break** is time between runs. A
     the whole minutes recorded, never rounded up: 90 seconds reads
     `at least 1 min`.
   - With a run of no length and under a minute recorded, unknown. A measured
-    total under a minute reads `<1 min` instead.
+    total under 30 seconds reads `<1 min` instead.
 - A time in runs reads `{duration} in runs`, or `Time in runs: {duration}` as
   a labelled line. The name says what it counts, so a total with every
   length known shows no visible minimum word, and its hover says what runs

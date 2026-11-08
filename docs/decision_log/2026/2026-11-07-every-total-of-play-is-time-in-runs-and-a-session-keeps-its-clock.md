@@ -102,8 +102,8 @@ length, in one of four forms:
 
 Form 2 is the [2026-10-13 rule](2026-10-13-a-measured-time-rounds-to-the-nearest-minute.md).
 A minimum never rounds up: 90 recorded seconds beside a reset read
-`at least 1 min`. Unknown is never a small time: a measured total under a
-minute reads `<1 min`. On the maintainer's runs, 509 of 9,284 have no length,
+`at least 1 min`. Unknown is never a small time: a measured total under 30
+seconds reads `<1 min`. On the maintainer's runs, 509 of 9,284 have no length,
 all from 2019 to 2021, so `at least` shows on 29 of 866 scenarios and
 unknown on 56 more.
 
