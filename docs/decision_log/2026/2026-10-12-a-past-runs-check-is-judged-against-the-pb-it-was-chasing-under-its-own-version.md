@@ -40,6 +40,11 @@ from the typical score as it stood when its session began, before the PB
 comparison. The marks, the badge, the PB comparison's words and caps, and a
 past run's pace basis stand.
 
+**Superseded in part (2026-11-07).** [Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md): the card's time on the
+scenario is that scenario's time in runs in the session, not the clock
+time spent on it. The run's number in its session, the marks, the badge
+and the comparisons stand.
+
 **Rulings.** By the maintainer, 2026-10-12, on
 [PR #356](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/356):
 "I ratify the proposal." Nothing here was a numbered row. It is the

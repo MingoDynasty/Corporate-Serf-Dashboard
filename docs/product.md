@@ -144,6 +144,18 @@ the same form as the finished ones under it.
   *Problem solved:* "how is this session going?" needs the app to know what
   a session is, and so does nearly everything planned after it: time spent,
   the trend verdict, and the typical run.
+- **Time in runs** (Run History page, PR #479; design in #473). Every
+  total of play is the time the runs themselves took, without pauses,
+  restarts, menus or the breaks between runs. Scenario Stats reads
+  `Time in runs: 2 hr 26 min` in place of the run count, which its hover
+  gives, and the latest-run card's session line reads
+  `Run 7 this session · 7 min in runs`. A session's length stays its clock,
+  breaks included. *Problem solved:* the app showed two lengths of play
+  counted two ways, and the pages planned next each need a total for a
+  scenario, a day or all play. A run count can't say that a 2-minute
+  scenario took twice as long, and a total that counted the breaks couldn't
+  be split by scenario or by hour. It costs some repetition: on a 60-second
+  scenario the minutes read the run count.
 - **Older runs land on the same sensitivity axis.** Runs recorded on a game's
   own sensitivity scale are shown in cm/360 like everything else, with a
   chart hover that names the setting and DPI each was recorded at, and the

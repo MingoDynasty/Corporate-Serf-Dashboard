@@ -78,6 +78,10 @@ BASE_SCALE_YAW = 0.07
 # in different groups.
 CM360_DECIMAL_PLACES = 1
 
+# KovaaK's names a challenge's stats file ``<scenario> - Challenge - <end>
+# Stats.csv``. A stats file named without it is freeplay's.
+CHALLENGE_FILE_TOKEN = " - Challenge - "
+
 # A run length outside this range means the stats file's start or pause can't
 # be trusted, so the run keeps neither a start nor a length.
 MIN_RUN_LENGTH = timedelta(seconds=1)
@@ -936,6 +940,13 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         # 4.75 Overwatch into 4.8.
         horizontal_sens = round(horizontal_sens, CM360_DECIMAL_PLACES)
 
+    if CHALLENGE_FILE_TOKEN not in Path(full_file_path).name:
+        # Freeplay, which Statistics Export on Always writes as well. Its
+        # ``Challenge Start:`` is left over from the last challenge played,
+        # so a start that lands in range would still not be this run's:
+        # it would add time the run didn't take, and could hold a play
+        # session together across a break that ends it.
+        raw_challenge_start = None
     run_start, run_length = _run_start_and_length(
         datetime_object, raw_challenge_start, raw_pause_duration
     )

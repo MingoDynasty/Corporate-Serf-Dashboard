@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import pytest
 
+from source.kovaaks.play_sessions import TimeInRuns
 from source.utilities.stopwatch import Stopwatch
 from source.utilities.utilities import (
     format_absolute_timestamp,
@@ -13,6 +14,7 @@ from source.utilities.utilities import (
     format_score,
     format_short_date,
     format_short_timestamp,
+    format_time_in_runs,
     format_time_of_day,
 )
 
@@ -122,6 +124,66 @@ def test_format_elapsed_duration_rounds_to_the_nearest_minute(
     seconds: float, expected: str
 ) -> None:
     assert format_elapsed_duration(seconds) == expected
+
+
+# --- The display rule for a time in runs --------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("seconds", "expected"),
+    [
+        # Every length known: the nearest minute, as a session's length reads.
+        (15, "<1 min"),
+        (29.9, "<1 min"),
+        (59.486, "1 min"),
+        (90, "2 min"),
+        (8786, "2 hr 26 min"),
+        (3600, "1 hr"),
+    ],
+)
+def test_a_time_in_runs_with_every_length_known_reads_the_nearest_minute(
+    seconds: float, expected: str
+) -> None:
+    assert format_time_in_runs(TimeInRuns(seconds, unknown=0)) == expected
+    assert format_time_in_runs(TimeInRuns(seconds, 0)) == format_elapsed_duration(
+        seconds
+    )
+
+
+@pytest.mark.parametrize(
+    ("seconds", "expected"),
+    [
+        # A minimum never rounds up: 30 seconds the runs don't hold.
+        (90, "at least 1 min"),
+        (119.999, "at least 1 min"),
+        (120, "at least 2 min"),
+        # 1w6ts reload v2: 48 runs, 17 with no length.
+        (1843, "at least 30 min"),
+        (3600, "at least 1 hr"),
+        (45272.4, "at least 12 hr 34 min"),
+    ],
+)
+def test_a_time_in_runs_with_a_run_of_no_length_reads_at_least_the_whole_minutes(
+    seconds: float, expected: str
+) -> None:
+    assert format_time_in_runs(TimeInRuns(seconds, unknown=17)) == expected
+
+
+@pytest.mark.parametrize(
+    "total",
+    [
+        pytest.param(TimeInRuns(0, unknown=22), id="no length at all"),
+        pytest.param(TimeInRuns(59.97, unknown=30), id="under a minute recorded"),
+    ],
+)
+def test_a_time_in_runs_with_under_a_minute_beside_a_run_of_no_length_is_unknown(
+    total: TimeInRuns,
+) -> None:
+    """Unknown is never a small time.
+
+    Only a measured total reads <1 min, and only under 30 seconds.
+    """
+    assert format_time_in_runs(total) is None
 
 
 @pytest.mark.parametrize(

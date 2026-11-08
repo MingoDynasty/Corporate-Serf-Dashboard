@@ -635,8 +635,8 @@ flowchart LR
   size alone to the New PB stars and the latest run's ring. Before it,
   `apply_graph_appearance` recolors the typical score's line and bands for
   the theme (`plot_service.apply_typical_score_colors`).
-  The Scenario Stats card (the typical-score lead, Category and Total runs,
-  or "No scenario selected") is built
+  The Scenario Stats card (the typical-score lead, Category and Time in
+  runs, or "No scenario selected") is built
   by `components/scenario_stats.py` from this page's `SCENARIO_STATS_IDS`, and
   `register_scenario_stats` wires that module's callbacks to the same ids.
   The PB card, with Position as its leaderboard line, is built the same way
@@ -1002,16 +1002,18 @@ flowchart LR
   `normalize_score_threshold_percentage()` reads the percentage input, which
   is empty while the user is clearing it.
 - `components/scenario_stats.py` — the Scenario Stats card: the typical-score
-  lead and its recency readout, Category and Total runs, or "No scenario
+  lead and its recency readout, Category and Time in runs, or "No scenario
   selected" with nothing selected. A page
   fills in a `ScenarioStatsIds`: an id for each component the card builds,
   plus the page's own run-events store, scenario dropdown, and playlist
   filter and 30-second interval, which the card only reads. It puts
   `scenario_stats_panel()` in its
   layout and calls `register_scenario_stats()` with the ids once, at import,
-  which registers `get_scenario_category`, `get_scenario_num_runs` and
-  `get_scenario_typical_score`. The count and no-selection visibility are
-  written together. The lead takes one `get_all_runs()` snapshot, splits
+  which registers `get_scenario_category`, `get_scenario_time_in_runs` and
+  `get_scenario_typical_score`. The time in runs, its line's visibility and
+  the no-selection line's are written together, from one copy of the
+  scenario's runs (`get_runs_newest_first`) added up by `time_in_runs` and
+  shown by `format_time_in_runs`. The lead takes one `get_all_runs()` snapshot, splits
   its sessions, builds the scenario's newest typical score, and judges its
   recency with the app's clock. It reads its current rendered content as
   State and returns `no_update` for unchanged content, preserving a held
@@ -1159,15 +1161,15 @@ flowchart LR
   the page's script words as an age, its score, one badge, its percentage of
   the PB it was chasing or a new PB's gain, one line with its number in its
   session, which names an older session as the run list names its row, and
-  the time on its scenario there, and its cm/360 and hit accuracy.
+  its scenario's time in runs there, and its cm/360 and hit accuracy.
   `sensitivity_and_accuracy()` words that last line for this card and the
   PB card's, so the two read alike.
   It judges the run with `score_threshold.judge_run()` from what
   `run_marks.what_runs_chased()` works out, as the run list does, and prints
   the percentage with `shown_percentage()`. A run nothing
   judges is measured against a goal of 100 for its percentage alone. The time
-  on the scenario is the sum of its visits in the session, and reads as
-  unknown where a visit's first run has no usable start.
+  is `play_sessions.time_in_runs()` over the scenario's runs in the session,
+  shown by `format_time_in_runs()`.
   `latest_run_from_store()` copies the store once and returns the card's run
   with the id of the newest run on any scenario. The latter only tells the
   card's empty-state logic whether the store has runs. The page writes the
@@ -1408,6 +1410,9 @@ flowchart LR
   every play session and the current time, and `split_into_scenario_visits`
   splits one play session. `PlaySession` and `ScenarioVisit` are frozen
   tuples of runs with a start and an end, and nothing is stored.
+  `time_in_runs` adds up any runs' lengths into a `TimeInRuns`, the unrounded
+  seconds and the count of runs with no length, which every total of play
+  reads, and `utilities.format_time_in_runs` shows it.
   `in_play_order` is that sort by itself, which the Run History chart also
   asks for. The Run History page's run list calls the other three, through
   `components/run_history_list.py`, and the chart splits its copy of the run

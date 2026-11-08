@@ -128,8 +128,44 @@ since its last run. How a break is measured is in
 ### Session length
 
 How long a session lasted, from the start of its first run to the end of its
-last. It includes the time between runs. How it is worked out is in
+last. It includes paused time and the breaks between runs, and it is the only
+length of play the app shows that counts those breaks. A first run with no
+start counts from its end. How it is worked out is in
 [sessions.md](specs/sessions.md#sessions).
+
+- On screen: the All scenarios session row, such as
+  `1 hr 6 min · 47 runs · 7 scenarios`.
+
+### Time in runs
+
+The sum of the run lengths of some runs: a scenario's, a session's, a day's,
+or all of them, summed in seconds before it is rounded. It leaves out pauses,
+restarts, results screens, menus, freeplay and the breaks between runs. On
+the game's default Statistics Export setting, restarts and freeplay write no
+stats file. On Always they do, and the app counts each as a run with no
+length. A run with no length adds no time, so a total that holds one is a
+minimum and reads `at least`, or `unknown` when under a minute is recorded.
+Every time in runs is also a minimum of time played, since an attempt that
+wrote no stats file isn't in it. How it is shown is in
+[sessions.md](specs/sessions.md#time-in-runs).
+
+- On screen: `Time in runs: 2 hr 26 min` in Scenario Stats;
+  `{duration} in runs` where a figure reads in a line, such as the latest-run
+  card's session line.
+- In code: `time_in_runs`, `TimeInRuns`, `format_time_in_runs`.
+- Not a session length, which counts pauses and the breaks. Not time played,
+  which the app can't see. Not a calendar window such as the typical score's
+  30 days.
+
+### Break
+
+The time between two runs, from one run's end to the next one's start. A
+break of more than 30 minutes ends a session.
+
+- On screen: the session row's hover, `pauses and breaks between runs
+  included`.
+- Not a pause, the game's own pause inside a run, which a stats file records
+  as `Pause Duration:` and which a run's length leaves out.
 
 ### Visit
 
@@ -185,7 +221,7 @@ against the typical score at session start and the PB it was chasing
 ### Scenario Stats
 
 The card in Run History's top row about the selected scenario: its typical
-score, benchmark category and total run count
+score, benchmark category and time in runs
 ([run_history.md](specs/run_history.md#scenario-stats)).
 
 - On screen its first line reads `Typical score`, the figure it leads with.

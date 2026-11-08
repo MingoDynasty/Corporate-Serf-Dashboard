@@ -8,6 +8,12 @@ to count only the whole minutes gone by, so a single 60-second run read as
 under a minute. The app measures such a run at just under 60 seconds, because
 a run's start is recorded more finely than its end.
 
+**Superseded in part (2026-11-07).** [Every total of play is time in runs](2026-11-07-every-total-of-play-is-time-in-runs-and-a-session-keeps-its-clock.md): the latest-run card's
+time on a scenario is now a time in runs. The rule covers a session's
+length and every time in runs whose runs all have a length. A time in
+runs that holds a run with no length counts whole minutes, never rounded
+up, or reads unknown, so the card's unknown time below is history.
+
 **Ruling.** By the maintainer, 2026-10-13, after a lone 60-second run read
 `<1 min` in their look at
 [PR #372](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/372):

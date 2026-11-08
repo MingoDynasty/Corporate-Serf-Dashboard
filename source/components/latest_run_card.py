@@ -45,7 +45,7 @@ from source.kovaaks.play_sessions import (
     find_play_session_in_progress,
     in_play_order,
     split_into_play_sessions,
-    split_into_scenario_visits,
+    time_in_runs,
 )
 from source.kovaaks.playlist_scenarios_service import personal_best_cm360
 from source.kovaaks.time_scored_service import (
@@ -61,10 +61,10 @@ from source.kovaaks.typical_score import (
     typical_score_recency,
 )
 from source.utilities.utilities import (
-    format_elapsed_duration,
     format_percent,
     format_score,
     format_short_timestamp,
+    format_time_in_runs,
 )
 
 LATEST_RUN_LABEL = "Latest run"
@@ -183,7 +183,7 @@ class LatestRun:
     joins ``typical``, the run against the typical score at its session's
     start, and ``pb_comparison``, the run against the PB it was chasing; each
     is ``None`` with nothing to say, and with neither the line is left out.
-    ``session`` is its number in its session and the time on its scenario;
+    ``session`` is its number in its session and its scenario's time in runs;
     ``sensitivity_and_accuracy`` is the last line.
     """
 
@@ -305,29 +305,17 @@ def _which_session(
 
 
 def _session_line(session: PlaySession, scenario: str, which_session: str) -> str:
-    """Word the run's number in its session, then the time spent on its scenario.
+    """Word the run's number in its session, then its scenario's time in runs there.
 
     The run is its scenario's last in the session, so its number is how many
-    of the session's runs were on its scenario. The time is the sum of the
-    scenario's visits, each from its first run's start to its last run's
-    end, so it includes the breaks between a visit's runs.
-
-    A visit whose first run has no usable start is counted from that run's
-    end, so a visit of one long run would add nothing and the time could
-    read ``<1 min``. The line says the time is unknown then, and never gives
-    a number.
+    of the session's runs were on its scenario. The time is those runs' time
+    in runs, over every visit to the scenario in the session, so it leaves
+    out the breaks between them, as every total of play does.
     """
-    visits = [
-        visit
-        for visit in split_into_scenario_visits(session)
-        if visit.scenario == scenario
-    ]
-    number = sum(len(visit.runs) for visit in visits)
-    run_line = f"Run {number} {which_session}"
-    if any(visit.runs[0].run_start is None for visit in visits):
-        return f"{run_line} · Time on this scenario unknown"
-    seconds = sum((visit.end - visit.start).total_seconds() for visit in visits)
-    return f"{run_line} · {format_elapsed_duration(seconds)} on this scenario"
+    runs = [run for run in session.runs if run.scenario == scenario]
+    time = format_time_in_runs(time_in_runs(runs))
+    time_words = "Time in runs unknown" if time is None else f"{time} in runs"
+    return f"Run {len(runs)} {which_session} · {time_words}"
 
 
 def sensitivity_and_accuracy(run: RunData) -> str:

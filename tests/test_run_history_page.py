@@ -1081,7 +1081,7 @@ def test_the_page_registers_every_block_for_its_own_ids():
         return GLOBAL_CALLBACK_MAP[registration["output"]]["callback"].__name__
 
     stats, options = run_history.SCENARIO_STATS_IDS, run_history.CHART_OPTIONS_IDS
-    assert answering(f"{stats.num_runs}.children") == "get_scenario_num_runs"
+    assert answering(f"{stats.time_in_runs}.children") == "get_scenario_time_in_runs"
     assert answering(f"{options.graph}.figure") == "ring_latest_run_on_graph"
     assert answering(f"{options.panel}.className") == "toggle_chart_options"
     flushes = {
@@ -1931,7 +1931,7 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
         badge=None,
         typical=None,
         pb_comparison=None,
-        session="Run 1 this session · 4 min on this scenario",
+        session="Run 1 this session · 4 min in runs",
         sensitivity_and_accuracy="50 cm/360 · Accuracy 55.00%",
     )
 
@@ -1953,7 +1953,7 @@ def test_the_card_is_worked_out_from_the_run_store_for_the_selection(monkeypatch
     assert played_at == datetime(2026, 10, 12, 22, 49).timestamp()
     assert [rendered_text(line) for line in body] == [
         "812.4 ",
-        "Run 1 this session · 4 min on this scenario",
+        "Run 1 this session · 4 min in runs",
         "50 cm/360 · Accuracy 55.00%",
     ]
     # The card and ring identify the same selected-scenario run.
@@ -2056,6 +2056,11 @@ B_SCENARIO = "Scenario B"
 EVENING = datetime(2026, 10, 12, 21, 0)
 
 
+def _run_words(session_line: str) -> str:
+    """Read the session line's words for the run, before its scenario's time."""
+    return session_line.split(" · ", maxsplit=1)[0]
+
+
 def test_a_change_of_scenario_rewrites_the_card_for_the_new_one(monkeypatch):
     _Store(
         monkeypatch,
@@ -2067,11 +2072,12 @@ def test_a_change_of_scenario_rewrites_the_card_for_the_new_one(monkeypatch):
     on_a = _card_at(monkeypatch, now, SCENARIO)
     on_b = _card_at(monkeypatch, now, B_SCENARIO)
 
-    assert on_a[0] == [
+    score, session, settings = on_a[0]
+    assert (score, _run_words(session), settings) == (
         "80 ",
-        "Run 1 this session · 1 min on this scenario",
+        "Run 1 this session",
         "40.8 cm/360 · Accuracy 50.00%",
-    ]
+    )
     assert on_b[0][0] == "612.5 "
 
 
@@ -2106,8 +2112,8 @@ def test_a_run_that_starts_a_new_session_names_the_old_one(monkeypatch):
     store.runs.append(_record(B_SCENARIO, an_hour_on))
     named = _card_at(monkeypatch, an_hour_on + timedelta(minutes=1), SCENARIO)
 
-    assert ended[0][1] == "Run 1 last session · 1 min on this scenario"
-    assert named[0][1] == "Run 1 (Oct 12, 8:59 PM session) · 1 min on this scenario"
+    assert _run_words(ended[0][1]) == "Run 1 last session"
+    assert _run_words(named[0][1]) == "Run 1 (Oct 12, 8:59 PM session)"
 
 
 def test_the_date_moving_into_a_new_year_puts_the_year_in_an_older_sessions_name(
@@ -2123,10 +2129,8 @@ def test_the_date_moving_into_a_new_year_puts_the_year_in_an_older_sessions_name
     before = _card_at(monkeypatch, datetime(2026, 12, 31, 23, 59), SCENARIO)
     after = _card_at(monkeypatch, datetime(2027, 1, 1, 0, 0), SCENARIO)
 
-    assert before[0][1] == "Run 1 (Dec 30, 9:00 PM session) · 1 min on this scenario"
-    assert (
-        after[0][1] == "Run 1 (Dec 30, 2026, 9:00 PM session) · 1 min on this scenario"
-    )
+    assert _run_words(before[0][1]) == "Run 1 (Dec 30, 9:00 PM session)"
+    assert _run_words(after[0][1]) == "Run 1 (Dec 30, 2026, 9:00 PM session)"
     assert f"{run_history.TODAY_STORE_ID}.data" in _keys(_card_registration()["inputs"])
 
 

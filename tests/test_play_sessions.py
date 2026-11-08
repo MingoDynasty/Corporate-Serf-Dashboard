@@ -4,12 +4,15 @@ from itertools import permutations
 import pytest
 
 from source.kovaaks.data_models import RunData
+from source.kovaaks.data_service import MAX_RUN_LENGTH, MIN_RUN_LENGTH
 from source.kovaaks.play_sessions import (
     PlaySession,
+    TimeInRuns,
     find_play_session_in_progress,
     in_play_order,
     split_into_play_sessions,
     split_into_scenario_visits,
+    time_in_runs,
 )
 
 TEN = datetime(2026, 5, 1, 10, 0, 0)
@@ -445,3 +448,71 @@ def test_a_visit_never_crosses_from_one_session_into_the_next() -> None:
         [visit.runs for visit in split_into_scenario_visits(session)]
         for session in play_sessions
     ] == [[(first,)], [(second,)]]
+
+
+# --- Time in runs -------------------------------------------------------------
+
+
+def test_no_runs_have_no_time_in_runs() -> None:
+    assert time_in_runs([]) == TimeInRuns(seconds=0, unknown=0)
+
+
+def test_time_in_runs_adds_up_the_run_lengths_unrounded() -> None:
+    first = _run(TEN, seconds=59.486)
+    second = _after(first, 600, seconds=61.25)
+
+    assert time_in_runs([first, second]) == TimeInRuns(seconds=120.736, unknown=0)
+
+
+def test_the_breaks_between_runs_are_left_out() -> None:
+    """A session's length counts them; a time in runs never does."""
+    first = _run(TEN)
+    second = _after(first, 600)
+
+    (play_session,) = split_into_play_sessions([first, second])
+
+    assert play_session.length == timedelta(seconds=720)
+    assert time_in_runs(play_session.runs).seconds == 120
+
+
+def test_a_run_with_no_length_adds_no_time_and_is_counted_as_unknown() -> None:
+    """Unknown is never read as zero: the total says how many it holds."""
+    runs = [_run(TEN), _run(TEN + timedelta(minutes=2), seconds=None)]
+
+    assert time_in_runs(runs) == TimeInRuns(seconds=60, unknown=1)
+
+
+def test_runs_that_all_lack_a_length_have_no_seconds_and_are_all_unknown() -> None:
+    runs = [_run(TEN + timedelta(minutes=minute), seconds=None) for minute in range(3)]
+
+    assert time_in_runs(runs) == TimeInRuns(seconds=0, unknown=3)
+
+
+def test_a_paused_run_counts_its_length_and_not_its_pause() -> None:
+    run = _run(TEN, seconds=60, paused=240)
+
+    assert time_in_runs([run]).seconds == 60
+
+
+@pytest.mark.parametrize("length", [MIN_RUN_LENGTH, MAX_RUN_LENGTH])
+def test_the_shortest_and_the_longest_trusted_runs_count_in_full(length) -> None:
+    run = _run(TEN, seconds=length.total_seconds())
+
+    assert time_in_runs([run]) == TimeInRuns(length.total_seconds(), unknown=0)
+
+
+def test_the_time_of_two_sessions_is_the_sum_of_each_in_unrounded_seconds() -> None:
+    """Rounded first, two sessions of 29 seconds would each read under a minute."""
+    morning = [_run(TEN, seconds=29)]
+    evening = [
+        _run(TEN + timedelta(hours=8), seconds=29),
+        _run(TEN + timedelta(hours=8, minutes=2), seconds=None),
+    ]
+
+    both = time_in_runs([*morning, *evening])
+
+    assert both == TimeInRuns(seconds=58, unknown=1)
+    assert both.seconds == pytest.approx(
+        time_in_runs(morning).seconds + time_in_runs(evening).seconds
+    )
+    assert both.unknown == time_in_runs(morning).unknown + time_in_runs(evening).unknown

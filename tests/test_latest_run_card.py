@@ -730,27 +730,40 @@ def _line(shown: LatestRun) -> str:
     return shown.session
 
 
-def _visits() -> list[RunData]:
-    """Two visits to A with a visit to B between them, in one session.
+def _run_words(shown: LatestRun) -> str:
+    """Read the session line's words for the run, before its scenario's time."""
+    return shown.session.split(" · ", maxsplit=1)[0]
 
-    The first visit runs from 9:45 to 9:50 PM and the second from 9:59 to
-    10:06 PM, each from its first run's start to its last run's end.
+
+def _visits() -> list[RunData]:
+    """Two visits to A with a 10-minute run of B between them, in one session.
+
+    A's four runs take a minute each, with breaks between them: its two
+    visits span 12 minutes from first start to last end.
     """
     return [
         _run(A, EVENING + timedelta(minutes=1)),
         _run(A, EVENING + timedelta(minutes=5)),
-        _run(B, EVENING + timedelta(minutes=10)),
-        _run(A, EVENING + timedelta(minutes=15)),
-        _run(A, EVENING + timedelta(minutes=21)),
+        _run(B, EVENING + timedelta(minutes=16), length=timedelta(minutes=10)),
+        _run(A, EVENING + timedelta(minutes=17)),
+        _run(A, EVENING + timedelta(minutes=23)),
     ]
 
 
-def test_the_run_is_numbered_and_the_scenarios_visits_are_summed_on_one_line():
-    """The breaks inside a visit count, and the time on another scenario does not."""
-    assert _line(_shown(_visits())) == "Run 4 this session · 12 min on this scenario"
+# The scenario's time in runs in its session, after the run's words. The tests
+# of which session the run is in read the run's words alone.
 
 
-def test_the_number_counts_this_scenarios_runs_in_the_runs_own_session_only():
+def test_the_run_is_numbered_and_its_scenarios_time_in_runs_follows():
+    """Every visit to the scenario in the session counts, and only its runs.
+
+    Not the breaks between them, which a visit's span would count, and not
+    the runs on another scenario.
+    """
+    assert _line(_shown(_visits())) == "Run 4 this session · 4 min in runs"
+
+
+def test_the_number_and_the_time_count_this_scenarios_runs_in_its_session_only():
     earlier_session = [
         _run(A, EVENING - timedelta(hours=3)),
         _run(A, EVENING - timedelta(hours=3) + timedelta(minutes=2)),
@@ -758,18 +771,18 @@ def test_the_number_counts_this_scenarios_runs_in_the_runs_own_session_only():
 
     assert (
         _line(_shown([*earlier_session, *_visits()]))
-        == "Run 4 this session · 12 min on this scenario"
+        == "Run 4 this session · 4 min in runs"
     )
 
 
 def test_the_run_is_its_scenarios_last_in_the_session_and_not_the_sessions_last():
-    """Another scenario played after it changes neither line."""
+    """Another scenario played after it changes neither."""
     runs = [*_visits(), _run(B, EVENING + timedelta(minutes=25))]
 
     shown = _shown(runs, scenario=A)
 
     assert shown.run_id == run_id(runs[4])
-    assert _line(shown) == "Run 4 this session · 12 min on this scenario"
+    assert _line(shown) == "Run 4 this session · 4 min in runs"
 
 
 @pytest.mark.parametrize(
@@ -782,10 +795,63 @@ def test_the_run_is_its_scenarios_last_in_the_session_and_not_the_sessions_last(
         (59.9, "1 min"),
     ],
 )
-def test_the_time_on_a_scenario_rounds_to_the_nearest_minute(seconds, time):
+def test_with_every_length_known_the_time_rounds_to_the_nearest_minute(seconds, time):
     runs = [_run(A, EVENING, length=timedelta(seconds=seconds))]
 
-    assert _line(_shown(runs)) == f"Run 1 this session · {time} on this scenario"
+    assert _line(_shown(runs)) == f"Run 1 this session · {time} in runs"
+
+
+@pytest.mark.parametrize("without_a_length", [0, 1, 3, 4])
+def test_a_run_with_no_length_makes_the_time_a_minimum(without_a_length):
+    """Wherever it falls in the scenario's visits, the session's first run included.
+
+    Its scenario's other runs still count by their own lengths.
+    """
+    runs = _visits()
+    runs[without_a_length] = _run(
+        A, runs[without_a_length].datetime_object, length=None
+    )
+
+    assert _line(_shown(runs)) == "Run 4 this session · at least 3 min in runs"
+
+
+def test_a_minimum_counts_whole_minutes_and_never_rounds_up():
+    runs = [
+        _run(A, EVENING, length=None),
+        _run(A, EVENING + timedelta(minutes=2), length=timedelta(seconds=90)),
+    ]
+
+    assert _line(_shown(runs)) == "Run 2 this session · at least 1 min in runs"
+
+
+@pytest.mark.parametrize(
+    "lengths",
+    [
+        pytest.param([None], id="one run with no length"),
+        pytest.param([None, timedelta(seconds=59)], id="under a minute recorded"),
+    ],
+)
+def test_under_a_minute_recorded_beside_a_run_of_no_length_reads_unknown(lengths):
+    """Counted from what is recorded, one long run would read as under a minute."""
+    runs = [
+        _run(A, EVENING + timedelta(minutes=2 * order), length=length)
+        for order, length in enumerate(lengths)
+    ]
+
+    line = _line(_shown(runs))
+
+    assert line == f"Run {len(runs)} this session · Time in runs unknown"
+    assert not re.search(r"\d+ (min|hr)", line)
+
+
+def test_a_run_of_another_scenario_with_no_length_leaves_the_time_known():
+    runs = _visits()
+    runs[2] = _run(B, runs[2].datetime_object, length=None)
+
+    assert _line(_shown(runs)) == "Run 4 this session · 4 min in runs"
+
+
+# The run's words: which session it is in.
 
 
 @pytest.mark.parametrize(
@@ -801,52 +867,17 @@ def test_once_the_session_has_ended_the_line_says_last_session(since_the_run, wh
     runs = _visits()
     now = runs[-1].datetime_object + since_the_run
 
-    assert _line(_shown(runs, now=now)) == f"Run 4 {which} · 12 min on this scenario"
+    assert _run_words(_shown(runs, now=now)) == f"Run 4 {which}"
 
 
-def test_a_visit_whose_first_run_has_no_usable_start_reads_as_time_unknown():
-    """Counted from the run's end, one long run would read as under a minute."""
+def test_a_run_with_no_length_keeps_its_number_in_this_session_and_the_last():
     one_long_run = [_run(A, EVENING, length=None)]
 
+    assert _run_words(_shown(one_long_run)) == "Run 1 this session"
     assert (
-        _line(_shown(one_long_run))
-        == "Run 1 this session · Time on this scenario unknown"
+        _run_words(_shown(one_long_run, now=EVENING + timedelta(hours=2)))
+        == "Run 1 last session"
     )
-    assert (
-        _line(_shown(one_long_run, now=EVENING + timedelta(hours=2)))
-        == "Run 1 last session · Time on this scenario unknown"
-    )
-
-
-@pytest.mark.parametrize("without_a_start", [0, 3])
-def test_the_time_is_unknown_when_any_visits_first_run_has_no_usable_start(
-    without_a_start,
-):
-    """The run's number stays, and no number is given for the time."""
-    runs = _visits()
-    broken = runs[without_a_start]
-    runs[without_a_start] = _run(A, broken.datetime_object, length=None)
-
-    line = _line(_shown(runs))
-
-    assert line == "Run 4 this session · Time on this scenario unknown"
-    assert not re.search(r"\d+ (min|hr)", line)
-
-
-def test_a_later_run_of_a_visit_with_no_usable_start_leaves_the_time_known():
-    """A visit is timed from its first run's start to its last run's end."""
-    runs = _visits()
-    runs[1] = _run(A, runs[1].datetime_object, length=None)
-    runs[4] = _run(A, runs[4].datetime_object, length=None)
-
-    assert _line(_shown(runs)) == "Run 4 this session · 12 min on this scenario"
-
-
-def test_a_visit_to_another_scenario_with_no_usable_start_leaves_the_time_known():
-    runs = _visits()
-    runs[2] = _run(B, runs[2].datetime_object, length=None)
-
-    assert _line(_shown(runs)) == "Run 4 this session · 12 min on this scenario"
 
 
 # --- An older session's name ---------------------------------------------------
@@ -887,7 +918,7 @@ def test_a_run_in_an_older_session_names_it_as_the_run_list_names_its_row(
     shown = _shown(runs, scenario=A, now=now)
 
     assert shown.run_id == run_id(older[1])
-    assert _line(shown) == "Run 2 (Oct 4, 2:00 PM session) · 6 min on this scenario"
+    assert _run_words(shown) == "Run 2 (Oct 4, 2:00 PM session)"
     assert _listed_name(runs, A, older[0], now) == "Oct 4, 2:00 PM"
 
 
@@ -897,8 +928,8 @@ def test_a_session_from_an_earlier_year_is_named_with_its_year():
     runs = [*older, *newest]
     now = datetime(2026, 1, 2, 9, 1)
 
-    assert _line(_shown(runs, scenario=A, now=now)) == (
-        "Run 1 (Dec 30, 2025, 9:45 PM session) · 1 min on this scenario"
+    assert _run_words(_shown(runs, scenario=A, now=now)) == (
+        "Run 1 (Dec 30, 2025, 9:45 PM session)"
     )
     assert _listed_name(runs, A, older[0], now) == "Dec 30, 2025, 9:45 PM"
 
@@ -913,10 +944,8 @@ def test_the_year_joins_the_name_once_the_date_moves_into_a_new_year():
     before = _shown(runs, scenario=A, now=datetime(2025, 12, 31, 23, 59))
     after = _shown(runs, scenario=A, now=datetime(2026, 1, 1, 0, 0))
 
-    assert before.session == "Run 1 (Dec 30, 9:45 PM session) · 1 min on this scenario"
-    assert after.session == (
-        "Run 1 (Dec 30, 2025, 9:45 PM session) · 1 min on this scenario"
-    )
+    assert _run_words(before) == "Run 1 (Dec 30, 9:45 PM session)"
+    assert _run_words(after) == "Run 1 (Dec 30, 2025, 9:45 PM session)"
 
 
 def test_an_older_session_whose_first_run_has_no_usable_start_is_named_by_its_end():
@@ -925,8 +954,8 @@ def test_an_older_session_whose_first_run_has_no_usable_start_is_named_by_its_en
     newest = [_run(B, EVENING)]
     runs = [*older, *newest]
 
-    assert _line(_shown(runs, scenario=A, now=EVENING)) == (
-        "Run 1 (Oct 4, 2:01 PM session) · Time on this scenario unknown"
+    assert _run_words(_shown(runs, scenario=A, now=EVENING)) == (
+        "Run 1 (Oct 4, 2:01 PM session)"
     )
     assert _listed_name(runs, A, older[0], EVENING) == "Oct 4, 2:01 PM"
 
@@ -1019,7 +1048,7 @@ LATEST = LatestRun(
     badge=CardBadge.THRESHOLD_PASSED,
     typical=None,
     pb_comparison="96.4% of PB",
-    session="Run 7 (Oct 4, 2:00 PM session) · 1 hr 6 min on this scenario",
+    session="Run 7 (Oct 4, 2:00 PM session) · 7 min in runs",
     sensitivity_and_accuracy="50 cm/360 · Accuracy 55.00%",
 )
 
@@ -1115,9 +1144,7 @@ def test_the_body_is_the_score_with_its_badge_then_three_lines():
     )
     assert rendered_text(comparison) == "96.4% of PB"
     assert comparison.className == latest_run_card.RESULT_CLASS
-    assert rendered_text(session) == (
-        "Run 7 (Oct 4, 2:00 PM session) · 1 hr 6 min on this scenario"
-    )
+    assert rendered_text(session) == "Run 7 (Oct 4, 2:00 PM session) · 7 min in runs"
     assert rendered_text(last) == "50 cm/360 · Accuracy 55.00%"
     assert session.className == last.className == latest_run_card.QUIET_CLASS
 

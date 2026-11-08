@@ -660,8 +660,9 @@ def test_the_scripts_copy_and_ids_come_with_the_grid():
             "collapsed": "Collapsed",
             "inProgress": "In progress",
             "lengthHelp": (
-                "The length runs from the first run to the last run. It doesn't "
-                "count the time since your last run."
+                "The length runs from the first run to the last run, pauses and "
+                "breaks between runs included. It doesn't count the time since "
+                "your last run."
             ),
             "wholeSession": "Show the whole session",
             "newPb": "New PB",

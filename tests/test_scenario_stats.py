@@ -1,13 +1,15 @@
 """The Scenario Stats card on the Run History page.
 
 The callbacks live in ``source/components/scenario_stats.py`` and take their
-ids from the page that hosts them. These tests hold the card's lines, the run
-count with its no-selection state, and the card's registration. The ones that
+ids from the page that hosts them. These tests hold the card's lines, the time
+in runs with its no-selection state, and the card's registration. The ones that
 read a layout or a registration read the page's own. The Position field the
 card held until the PB card took it is ``tests/test_pb_card_position.py``.
+The time in runs reads by the display rule, which ``tests/test_utilities.py``
+holds in every form; here it is the line and its hover.
 """
 
-from types import SimpleNamespace
+from datetime import datetime, timedelta
 
 import dash
 import dash_mantine_components as dmc
@@ -21,8 +23,9 @@ from dash._callback import (
 
 from source.components import latest_run_card, scenario_selection, scenario_stats
 from source.kovaaks import data_service, playlist_scenarios_service
-from source.kovaaks.data_models import PlaylistData, Rank, Scenario
+from source.kovaaks.data_models import PlaylistData, Rank, RunData, Scenario
 from source.kovaaks.scenario_groups import GROUP_EXCLUDED_PLAYLIST_CODES, ScenarioGroup
+from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -66,36 +69,198 @@ def _output_keys(registration: dict) -> set[str]:
     }
 
 
+# --- Time in runs -------------------------------------------------------------
+
+PLAYED = "Played Scenario"
+HOVER_SECOND_LINE = (
+    "Only the runs themselves count, not their pauses. Restarts, results "
+    "screens and breaks between runs don't either."
+)
+AT_LEAST_LINE = "Runs with no recorded length add no time, so this is a minimum."
+UNDER_A_MINUTE_LINE = "The runs with a recorded length come to under a minute."
+
+
+def _runs(*lengths: float | None, scenario: str = PLAYED) -> list[RunData]:
+    """Build one run per length in seconds, a minute apart, the last ending last.
+
+    ``None`` is a run whose stats file gave no usable start, so no length.
+    """
+    first_end = datetime(2026, 10, 21, 12)
+    runs = []
+    for order, length in enumerate(lengths):
+        end = first_end + timedelta(minutes=order)
+        runs.append(
+            RunData(
+                datetime_object=end,
+                score=100,
+                sens_scale="cm/360",
+                horizontal_sens=40,
+                scenario=scenario,
+                accuracy=0.5,
+                run_start=None if length is None else end - timedelta(seconds=length),
+                run_length=None if length is None else timedelta(seconds=length),
+            )
+        )
+    return runs
+
+
+@pytest.fixture
+def store(monkeypatch) -> list[RunData]:
+    """Stand in for the run store: the list a test fills is every run in it."""
+    runs: list[RunData] = []
+    monkeypatch.setattr(
+        scenario_stats,
+        "get_runs_newest_first",
+        lambda scenario: [run for run in reversed(runs) if run.scenario == scenario],
+    )
+    return runs
+
+
+def _line(selected: str | None = PLAYED) -> tuple[str, list[str]]:
+    """Read the line's value and its hover's paragraphs, with the line shown."""
+    value, line_hidden, no_scenario_hidden = scenario_stats.get_scenario_time_in_runs(
+        None, selected
+    )
+    assert (line_hidden, no_scenario_hidden) == (False, True)
+    assert isinstance(value, dmc.Tooltip)
+    return rendered_text(value.children), [
+        rendered_text(paragraph) for paragraph in value.label.children
+    ]
+
+
 @pytest.mark.parametrize("selected", [None, ""])
-def test_with_no_scenario_selected_the_card_says_so_in_place_of_its_lines(selected):
-    """A count of zero there would read as a fact about a scenario."""
-    assert scenario_stats.get_scenario_num_runs(None, selected) == (None, True, False)
-
-
-def test_a_scenario_with_no_runs_counts_zero(monkeypatch):
+def test_with_no_scenario_selected_the_card_says_so_in_place_of_its_lines(
+    monkeypatch, selected
+):
+    """A figure there would read as a fact about a scenario."""
     monkeypatch.setattr(
-        scenario_stats, "is_scenario_in_database", lambda _scenario: False
+        scenario_stats,
+        "get_runs_newest_first",
+        lambda _scenario: pytest.fail("no scenario to read"),
     )
 
-    assert scenario_stats.get_scenario_num_runs(None, "Unplayed Scenario") == (
-        0,
+    assert scenario_stats.get_scenario_time_in_runs(None, selected) == (
+        None,
+        True,
         False,
+    )
+
+
+def test_a_scenario_with_no_runs_has_no_time_in_runs_line(store):
+    """``No runs yet`` stands alone in the lead: the figure is absent, never zero."""
+    store.extend(_runs(60, scenario="Another Scenario"))
+
+    assert scenario_stats.get_scenario_time_in_runs(None, PLAYED) == (
+        None,
+        True,
         True,
     )
 
 
-def test_a_played_scenario_counts_its_runs(monkeypatch):
-    played = SimpleNamespace(number_of_runs=12)
-    monkeypatch.setattr(
-        scenario_stats, "is_scenario_in_database", lambda _scenario: True
-    )
-    monkeypatch.setattr(scenario_stats, "get_scenario_stats", lambda _scenario: played)
+def test_every_length_known_reads_the_nearest_minute_and_counts_the_runs(store):
+    """VT Controlsphere Viscose: 147 runs of about a minute each."""
+    store.extend(_runs(*[59.6] * 147))
 
-    assert scenario_stats.get_scenario_num_runs(None, "Played Scenario") == (
-        12,
-        False,
-        True,
+    assert _line() == ("2 hr 26 min", ["147 runs", HOVER_SECOND_LINE])
+
+
+def test_a_total_holding_a_run_of_no_length_reads_at_least_and_says_so(store):
+    """1w6ts reload v2: 48 runs, 17 with no length, 1,843 seconds recorded."""
+    store.extend(_runs(*[1843 / 31] * 31, *[None] * 17))
+
+    assert _line() == (
+        "at least 30 min",
+        [
+            "48 runs · 17 with no recorded length",
+            HOVER_SECOND_LINE,
+            AT_LEAST_LINE,
+        ],
     )
+
+
+def test_runs_that_all_lack_a_length_read_unknown(store):
+    """Thin Aiming Long slow: 22 runs, none with a length."""
+    store.extend(_runs(*[None] * 22))
+
+    assert _line() == (
+        "unknown",
+        ["22 runs · none with a recorded length", HOVER_SECOND_LINE],
+    )
+
+
+def test_under_a_minute_recorded_beside_a_run_of_no_length_reads_unknown(store):
+    """1w2ts reload: 31 runs, 30 with no length, 59.97 seconds recorded."""
+    store.extend(_runs(59.97, *[None] * 30))
+
+    assert _line() == (
+        "unknown",
+        [
+            "31 runs · 30 with no recorded length",
+            HOVER_SECOND_LINE,
+            UNDER_A_MINUTE_LINE,
+        ],
+    )
+
+
+@pytest.mark.parametrize(
+    ("lengths", "expected"),
+    [
+        pytest.param([45], ("1 min", ["1 run", HOVER_SECOND_LINE]), id="one run"),
+        pytest.param(
+            [None],
+            ("unknown", ["1 run · none with a recorded length", HOVER_SECOND_LINE]),
+            id="one run with no length",
+        ),
+        pytest.param(
+            [60, None],
+            (
+                "at least 1 min",
+                [
+                    "2 runs · 1 with no recorded length",
+                    HOVER_SECOND_LINE,
+                    AT_LEAST_LINE,
+                ],
+            ),
+            id="one of two with no length",
+        ),
+    ],
+)
+def test_the_hover_counts_one_run_as_singular(store, lengths, expected):
+    store.extend(_runs(*lengths))
+
+    assert _line() == expected
+
+
+def test_a_run_landing_changes_the_line(store):
+    store.extend(_runs(*[60] * 9))
+    assert _line()[0] == "9 min"
+
+    store.extend(_runs(*[60] * 10)[9:])
+
+    assert _line() == ("10 min", ["10 runs", HOVER_SECOND_LINE])
+
+
+def test_the_value_is_a_hover_target_a_keyboard_reaches_inside_its_line(store):
+    """Drawn inline after its label, with the tooltip's own box as the one tab stop.
+
+    The tooltip describes the box dmc wraps round the value, so the box takes
+    focus and the value does not. What focus reads there is checked in a
+    browser in ``tests/test_run_history_hover_browser.py``.
+    """
+    store.extend(_runs(60))
+
+    value, _line_hidden, _no_scenario_hidden = scenario_stats.get_scenario_time_in_runs(
+        None, PLAYED
+    )
+
+    target = value.children
+    assert getattr(target, "tabIndex", None) is None
+    assert latest_run_card.TIME_CLASS in target.className.split()
+    assert value.boxWrapperProps == {
+        "className": latest_run_card.TIME_TARGET_CLASS,
+        "tabIndex": 0,
+    }
+    assert value.label.className == "scenario-stats-value-help"
 
 
 # A second page's ids, none of which the Run History page uses.
@@ -148,7 +313,7 @@ def _expected_registrations(ids) -> list[tuple]:
             [],
         ),
         (
-            scenario_stats.get_scenario_num_runs,
+            scenario_stats.get_scenario_time_in_runs,
             [f"{ids.run_events}.data", f"{ids.scenario_dropdown}.value"],
             [],
         ),
@@ -185,7 +350,9 @@ def _card():
     )
 
 
-def test_the_card_holds_category_and_the_run_count_and_no_last_played(monkeypatch):
+def test_the_card_holds_category_and_the_time_in_runs_and_no_last_played(
+    monkeypatch,
+):
     """Last played went: the latest-run card beside it says when the scenario was played.
 
     Position moved to the PB card's leaderboard line, ids and all.
@@ -202,14 +369,15 @@ def test_the_card_holds_category_and_the_run_count_and_no_last_played(monkeypatc
         "Typical score",
         " ",
         "Category: ",
-        "Total runs: ",
+        "Time in runs: ",
         "No scenario selected",
     ]
     assert not [text for text in texts if "Last played" in text]
     assert components[IDS.category_row].hidden is True
     assert components[IDS.category_row].children.children[0].fw == 700
     assert components[IDS.category_row].children.size == "sm"
-    assert components[IDS.num_runs_row].children.size == "sm"
+    assert components[IDS.time_in_runs_row].children.size == "sm"
+    assert components[IDS.time_in_runs_row].children.children[0].fw == 700
     assert run_history.PB_CARD_IDS.rank in components
     assert run_history.PB_CARD_IDS.rank not in {
         getattr(component, "id", None) for component in _walk_components(card)
@@ -241,7 +409,7 @@ def test_the_no_selection_line_is_drawn_once_hidden_and_styled_as_the_pb_cards(
     assert line.children == "No scenario selected"
     assert line.hidden is True
     assert line.className == latest_run_card.EMPTY_TITLE_CLASS
-    assert getattr(components[IDS.num_runs_row], "hidden", None) is None
+    assert getattr(components[IDS.time_in_runs_row], "hidden", None) is None
 
 
 def test_the_page_registers_the_card_for_its_own_ids():
@@ -249,7 +417,7 @@ def test_the_page_registers_the_card_for_its_own_ids():
     assert _card_registrations(IDS) == _expected_registrations(IDS)
 
 
-def test_the_run_count_and_the_no_selection_line_are_written_together():
+def test_the_time_in_runs_and_the_no_selection_line_are_written_together():
     """One answer, so the card never shows both or neither."""
     (registration,) = [
         entry
@@ -258,8 +426,8 @@ def test_the_run_count_and_the_no_selection_line_are_written_together():
     ]
 
     assert _output_keys(registration) == {
-        f"{IDS.num_runs}.children",
-        f"{IDS.num_runs_row}.hidden",
+        f"{IDS.time_in_runs}.children",
+        f"{IDS.time_in_runs_row}.hidden",
         f"{IDS.no_scenario}.hidden",
     }
 
@@ -302,8 +470,8 @@ def test_a_second_registration_adds_callbacks_for_its_own_ids_only(
     } == {
         "second-category",
         "second-category_row",
-        "second-num_runs",
-        "second-num_runs_row",
+        "second-time_in_runs",
+        "second-time_in_runs_row",
         "second-no_scenario",
         "second-lead",
         "second-recent_readout",

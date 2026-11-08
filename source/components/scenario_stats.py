@@ -1,8 +1,8 @@
 """Build the Scenario Stats card and wire its callbacks to a page's ids.
 
-The card leads with the typical score, followed by Category and Total runs,
-or says no scenario is selected. A page that hosts it fills in a ``ScenarioStatsIds``,
-puts ``scenario_stats_panel`` in its layout, and calls
+The card leads with the typical score, followed by Category and Time in
+runs, or says no scenario is selected. A page that hosts it fills in a
+``ScenarioStatsIds``, puts ``scenario_stats_panel`` in its layout, and calls
 ``register_scenario_stats`` with the ids once, at import. The callbacks are
 plain functions here and are registered once per page.
 """
@@ -20,17 +20,25 @@ from source.components.chart_options import (
     TOOLTIP_EVENTS,
 )
 from source.components.control_name import control_name
-from source.components.latest_run_card import EMPTY_TITLE_CLASS, SCORE_CLASS, TIME_CLASS
+from source.components.latest_run_card import (
+    EMPTY_TITLE_CLASS,
+    SCORE_CLASS,
+    TIME_CLASS,
+    TIME_TARGET_CLASS,
+)
 from source.components.local_icon import local_icon
 from source.components.run_history_list import NO_SCENARIO_TEXT
 from source.kovaaks.data_service import (
     get_all_runs,
     get_playlist_by_code,
-    get_scenario_stats,
+    get_runs_newest_first,
     is_benchmark_playlist,
-    is_scenario_in_database,
 )
-from source.kovaaks.play_sessions import split_into_play_sessions
+from source.kovaaks.play_sessions import (
+    TimeInRuns,
+    split_into_play_sessions,
+    time_in_runs,
+)
 from source.kovaaks.playlist_scenarios_service import playlist_scenario_groups
 from source.kovaaks.typical_score import (
     TOO_FEW_RUNS_TEXT,
@@ -41,8 +49,21 @@ from source.kovaaks.typical_score import (
     typical_score_hover,
     typical_score_recency,
 )
+from source.utilities.utilities import format_time_in_runs
 
 SCENARIO_STATS_LABEL = "Typical score"
+TIME_IN_RUNS_LABEL = "Time in runs: "
+TIME_IN_RUNS_UNKNOWN = "unknown"
+TIME_IN_RUNS_HOVER = (
+    "Only the runs themselves count, not their pauses. Restarts, results "
+    "screens and breaks between runs don't either."
+)
+TIME_IN_RUNS_MINIMUM_HOVER = (
+    "Runs with no recorded length add no time, so this is a minimum."
+)
+TIME_IN_RUNS_UNDER_A_MINUTE_HOVER = (
+    "The runs with a recorded length come to under a minute."
+)
 NO_RUNS_TEXT = "No runs yet"
 TOOLTIP_TARGET_CLASS = "scenario-stats-tooltip-target"
 WORD_END_CLASS = "scenario-stats-word-end"
@@ -168,8 +189,8 @@ class ScenarioStatsIds(NamedTuple):
     Dash allows one callback per output.
 
     ``scenario_stats_panel`` builds the card from ``category_row``,
-    ``category``, ``num_runs_row``, ``num_runs``, ``no_scenario``, ``lead``
-    and ``recent_readout``.
+    ``category``, ``time_in_runs_row``, ``time_in_runs``, ``no_scenario``,
+    ``lead`` and ``recent_readout``.
     ``run_events``, ``scenario_dropdown`` and ``playlist_filter`` are the
     page's own, as is its ``relative_time_interval``. The card reads them and
     builds none of them: ``run_events``
@@ -179,8 +200,8 @@ class ScenarioStatsIds(NamedTuple):
 
     category_row: str
     category: str
-    num_runs_row: str
-    num_runs: str
+    time_in_runs_row: str
+    time_in_runs: str
     no_scenario: str
     run_events: str
     scenario_dropdown: str
@@ -211,20 +232,62 @@ def get_scenario_category(
     return "", True
 
 
-def get_scenario_num_runs(_, selected_scenario) -> tuple[int | None, bool, bool]:
-    """Count the selected scenario's runs, and choose between that line and no selection.
+def _time_in_runs_hover(
+    total: TimeInRuns, run_count: int, time: str | None
+) -> html.Div:
+    """Count the runs behind a time in runs, and say what it leaves out.
 
-    Returns the count, whether to hide its line, and whether to hide the line
-    that says no scenario is selected. With nothing selected the card says
-    so, as the PB card and the latest-run card beside it do: a count of zero
-    there would read as a fact about a scenario. The first argument is the
-    page's run-events store, which triggers the call and is not read.
+    ``time`` is the figure as the display rule shows it, ``None`` unknown.
+    """
+    runs = "1 run" if run_count == 1 else f"{run_count} runs"
+    if total.unknown == run_count:
+        runs += " · none with a recorded length"
+    elif total.unknown:
+        runs += f" · {total.unknown} with no recorded length"
+    lines = [runs, TIME_IN_RUNS_HOVER]
+    if time is None:
+        if total.unknown < run_count:
+            lines.append(TIME_IN_RUNS_UNDER_A_MINUTE_HOVER)
+    elif total.unknown:
+        lines.append(TIME_IN_RUNS_MINIMUM_HOVER)
+    return html.Div(
+        [html.P(line) for line in lines], className="scenario-stats-value-help"
+    )
+
+
+def get_scenario_time_in_runs(_, selected_scenario) -> tuple[Any, bool, bool]:
+    """Add up the selected scenario's time in runs, or choose the no-selection line.
+
+    Returns the figure with its hover, whether to hide its line, and whether
+    to hide the line that says no scenario is selected. With nothing selected
+    the card says so, as the PB card and the latest-run card beside it do: a
+    figure there would read as a fact about a scenario. With no runs the line
+    is left out, and the lead's ``No runs yet`` speaks for the card. The first
+    argument is the page's run-events store, which triggers the call and is
+    not read.
     """
     if not selected_scenario:
         return None, True, False
-    if not is_scenario_in_database(selected_scenario):
-        return 0, False, True
-    return get_scenario_stats(selected_scenario).number_of_runs, False, True
+    # One copy of the scenario's runs, so the figure and its count agree.
+    runs = get_runs_newest_first(selected_scenario)
+    if not runs:
+        return None, True, True
+    total = time_in_runs(runs)
+    time = format_time_in_runs(total)
+    figure = dmc.Tooltip(
+        html.Span(TIME_IN_RUNS_UNKNOWN if time is None else time, className=TIME_CLASS),
+        # dmc wraps the target in a block box, which would break the line
+        # round it. That box is what the tooltip describes, so it is the tab
+        # stop: focus on the value inside it would not reach the run count.
+        # dmc's box passes tabIndex to the page, though dmc doesn't list it.
+        boxWrapperProps={"className": TIME_TARGET_CLASS, "tabIndex": 0},
+        label=_time_in_runs_hover(total, len(runs), time),
+        events=TOOLTIP_EVENTS,
+        multiline=True,
+        withArrow=True,
+        w=360,
+    )
+    return figure, False, True
 
 
 def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Paper:
@@ -261,19 +324,12 @@ def scenario_stats_panel(ids: ScenarioStatsIds) -> dmc.Paper:
             html.Div(
                 dmc.Text(
                     [
-                        dmc.Text(
-                            "Total runs: ",
-                            fw=700,
-                            span=True,
-                        ),
-                        dmc.Text(
-                            id=ids.num_runs,
-                            span=True,
-                        ),
+                        dmc.Text(TIME_IN_RUNS_LABEL, fw=700, span=True),
+                        dmc.Text(id=ids.time_in_runs, span=True),
                     ],
                     size="sm",
                 ),
-                id=ids.num_runs_row,
+                id=ids.time_in_runs_row,
             ),
             html.Div(
                 NO_SCENARIO_TEXT,
@@ -304,12 +360,12 @@ def register_scenario_stats(ids: ScenarioStatsIds) -> None:
         Input(ids.playlist_filter, "value"),
     )(get_scenario_category)
     callback(
-        Output(ids.num_runs, "children"),
-        Output(ids.num_runs_row, "hidden"),
+        Output(ids.time_in_runs, "children"),
+        Output(ids.time_in_runs_row, "hidden"),
         Output(ids.no_scenario, "hidden"),
         Input(ids.run_events, "data"),
         Input(ids.scenario_dropdown, "value"),
-    )(get_scenario_num_runs)
+    )(get_scenario_time_in_runs)
     callback(
         Output(ids.lead, "children"),
         Output(ids.recent_readout, "children"),
